@@ -83,7 +83,7 @@ namespace Launcher
         {
             var result = new Result();
 
-            (result.Success, result.Output) = Start(
+            (result.Code, result.Output) = Start(
                                                 parameters.WorkingDir,
                                                 parameters.FileName,
                                                 parameters.Arguments,

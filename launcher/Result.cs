@@ -8,7 +8,7 @@ namespace launcher
         /// <summary>
         /// 0 indicate success; otherwise failure 
         /// </summary>
-        public int Success { get; set; }
+        public int Code { get; set; }
 
         /// <summary>
         /// A collection of lines displayed output
@@ -17,7 +17,8 @@ namespace launcher
 
         public Result()
         {
-            Success = Exception;
+            // default return code
+            Code = Exception;
             Output = new List<string>();
         }
     }

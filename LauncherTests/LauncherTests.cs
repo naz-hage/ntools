@@ -73,7 +73,7 @@ namespace Launcher.Tests
                         
             var result = Launcher.Start(launcherParameters);
 
-            Assert.AreEqual(-100, result.Success);
+            Assert.AreEqual(-100, result.Code);
             Assert.AreEqual(5, result.Output.Count);
             Assert.IsTrue(result.Output.Contains("fail"));
             Assert.IsTrue(result.Output.Contains("error"));
