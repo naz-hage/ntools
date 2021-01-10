@@ -36,7 +36,7 @@ namespace Launcher.Tests
         public void ProcessStartTestFail()
         {
             (int result, List<string> lines) =
-                            Launcher.Start(
+                Launcher.Start(
                                 workingDir: Directory.GetCurrentDirectory(),
                                 fileName: "test.exe",
                                 arguments: "fail",
@@ -70,7 +70,7 @@ namespace Launcher.Tests
                 Arguments = "fail",
                 RedirectStandardOutput = true
             };
-                        
+
             var result = Launcher.Start(launcherParameters);
 
             Assert.AreEqual(-100, result.Code);
