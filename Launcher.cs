@@ -22,13 +22,13 @@ namespace Launcher
         public static (int, List<string>) Start(string workingDir, string fileName, string arguments, bool redirectStandardOutput=false, bool verbose = false)
         {
             Verbose = verbose;
-            List<string> output = new List<string>();
+            List<string> output = new();
             
             if (Verbose) Console.WriteLine($"launcher=>{fileName} {arguments}");
             
             try
             {
-                using Process process = new Process();
+                using Process process = new();
                 process.StartInfo.WorkingDirectory = workingDir;
                 process.StartInfo.FileName = fileName;
                 process.StartInfo.Arguments = arguments;
