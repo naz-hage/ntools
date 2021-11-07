@@ -7,7 +7,7 @@ namespace launcher
         public static readonly int Success = 0;
         public static readonly int InvalidParameter = -1;
         public static readonly int FileNotFound = -3;
-        public int Exception = int.MaxValue;
+        public static readonly int Exception = int.MaxValue;
 
         /// <summary>
         /// 0 indicate success; otherwise failure 
