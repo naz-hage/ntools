@@ -12,12 +12,7 @@ namespace Launcher.Tests
     [TestClass()]
     public class LauncherTests
     {
-        private readonly Dictionary<string, int> TestResult = new Dictionary<string, int>()
-        {
-        {"pass", 2},
-        {"fail", 5},
-        };
-
+        
 
         [TestMethod]
         public void ProcessStartTestPass()
@@ -63,7 +58,7 @@ namespace Launcher.Tests
         [TestMethod()]
         public void ProcessStartTestWithLauncherParameters()
         {
-            Parameters launcherParameters = new Parameters
+            Parameters launcherParameters = new()
             {
                 WorkingDir = Directory.GetCurrentDirectory(),
                 FileName = "test.exe",
