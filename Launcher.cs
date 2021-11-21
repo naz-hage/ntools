@@ -19,7 +19,12 @@ namespace Launcher
         /// <param name="redirectStandardOutput">Show the console output</param>
         /// <param name="verbose">Show additional output.  messages are precded by launcher=></param>
         /// <returns>0 if successful; otherwise non-zero.  message is possible if executable has standard output</returns>
-        public static (int, List<string>) Start(string workingDir, string fileName, string arguments, bool redirectStandardOutput=false, bool verbose = false)
+        public static (int, List<string>) Start(string workingDir, 
+                            string fileName,
+                            string arguments,
+                            bool redirectStandardOutput=false,
+                            bool verbose = false,
+                            bool useShellExecute = false)
         {
             Verbose = verbose;
             List<string> output = new();
@@ -34,7 +39,7 @@ namespace Launcher
                 process.StartInfo.Arguments = arguments;
                 process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 process.StartInfo.CreateNoWindow = false;
-                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.UseShellExecute = useShellExecute;
                 process.StartInfo.RedirectStandardOutput = redirectStandardOutput;
                 process.StartInfo.RedirectStandardError = redirectStandardOutput;
 
@@ -88,7 +93,8 @@ namespace Launcher
                                                 parameters.FileName,
                                                 parameters.Arguments,
                                                 parameters.RedirectStandardOutput,
-                                                parameters.Verbose
+                                                parameters.Verbose,
+                                                parameters.UseShellExecute
                                                 );
             return result;
         }
