@@ -1,6 +1,5 @@
 ﻿using launcher;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -19,15 +18,15 @@ namespace Launcher
         /// <param name="redirectStandardOutput">Show the console output</param>
         /// <param name="verbose">Show additional output.  messages are precded by launcher=></param>
         /// <returns>0 if successful; otherwise non-zero.  message is possible if executable has standard output</returns>
-        public static (int, List<string>) Start(string workingDir, 
+        private static Result Start(string workingDir, 
                             string fileName,
                             string arguments,
                             bool redirectStandardOutput=false,
                             bool verbose = false,
                             bool useShellExecute = false)
         {
+            Result result = new(); 
             Verbose = verbose;
-            List<string> output = new();
             
             if (Verbose) Console.WriteLine($"launcher=>{fileName} {arguments}");
             
@@ -57,25 +56,27 @@ namespace Launcher
                         {
                             var line = process?.StandardOutput.ReadLine();
                             WriteError(line);
-                            output.Add(line);
+                            result.Output.Add(line);
                         }
                         while (!process.StandardError.EndOfStream)
                         {
                             var line = process?.StandardError.ReadLine();
                             WriteError(line);
-                            output.Add(line);
+                            result.Output.Add(line);
                         }
                     }
                 }
                 if (Verbose) Console.WriteLine($"Exit Code: {process.ExitCode}");
-                return (process.ExitCode, output);
+                result.Code = process.ExitCode;
+                return result;
             }
 
             catch (Exception ex)
             {
                 Console.WriteLine($"ProcessStart Exception: {ex.Message}");
-                output.Add($"ProcessStart Exception: {ex.Message}");
-                return (int.MaxValue, output);
+                result.Output.Add($"ProcessStart Exception: {ex.Message}");
+                result.Code = int.MaxValue;
+                return result;
             }
         }
 
@@ -86,9 +87,8 @@ namespace Launcher
         /// <returns></returns>
         public static Result Start(Parameters parameters)
         {
-            var result = new Result();
 
-            (result.Code, result.Output) = Start(
+            var result= Start(
                                                 parameters.WorkingDir,
                                                 parameters.FileName,
                                                 parameters.Arguments,

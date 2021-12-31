@@ -12,42 +12,47 @@ namespace Launcher.Tests
     [TestClass()]
     public class LauncherTests
     {
-        
-
         [TestMethod]
         public void ProcessStartTestPass()
         {
-            (int result, List<string> lines) =
-                            Launcher.Start(
-                                workingDir: Directory.GetCurrentDirectory(),
-                                fileName: "test.exe",
-                                arguments: "pass",
-                                redirectStandardOutput: true);
-            Assert.AreEqual(0, result);
-            Assert.AreEqual(2, lines.Count);
+            Parameters parameters = new()
+            {
+                WorkingDir = Directory.GetCurrentDirectory(),
+                Arguments = "pass",
+                FileName = "test.exe",
+                RedirectStandardOutput = true
+            };
+
+            var result = Launcher.Start(parameters);
+            Assert.AreEqual(0, result.Code);
+            Assert.AreEqual(2, result.Output.Count);
         }
 
         [TestMethod]
         public void ProcessStartTestFail()
         {
-            (int result, List<string> lines) =
-                Launcher.Start(
-                                workingDir: Directory.GetCurrentDirectory(),
-                                fileName: "test.exe",
-                                arguments: "fail",
-                                redirectStandardOutput: true);
-            Assert.AreEqual(-100, result);
-            Assert.AreEqual(5, lines.Count);
-            Assert.IsTrue(lines.Contains("fail"));
-            Assert.IsTrue(lines.Contains("error"));
-            Assert.IsTrue(lines.Contains("rejected"));
+            Parameters parameters = new()
+            {
+                WorkingDir = Directory.GetCurrentDirectory(),
+                Arguments = "fail",
+                FileName = "test.exe",
+                RedirectStandardOutput = true
+            };
+
+            var result = Launcher.Start(parameters);
+
+
+            Assert.AreEqual(-100, result.Code);
+            Assert.AreEqual(5, result.Output.Count);
+            Assert.IsTrue(result.Output.Contains("fail"));
+            Assert.IsTrue(result.Output.Contains("error"));
+            Assert.IsTrue(result.Output.Contains("rejected"));
         }
 
         [TestMethod()]
         public void LaunchInThreadTest()
         {
-            int result =
-                       Launcher.LaunchInThread(
+            int result = Launcher.LaunchInThread(
                            workingDir: Directory.GetCurrentDirectory(),
                            fileName: "test.exe",
                            arguments: "pass"
