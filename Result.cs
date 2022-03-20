@@ -17,7 +17,7 @@ namespace launcher
         /// <summary>
         /// A collection of lines displayed output
         /// </summary>
-        public List<string> Output {get;set;}
+        public List<string> Output {get;}
 
         public Result()
         {
