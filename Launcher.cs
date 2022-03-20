@@ -10,13 +10,13 @@ namespace Launcher
     {
         public static bool Verbose { get; set; } = false;
         /// <summary>
-        /// A wrapper to launch and executable with arguments
+        /// A wrapper to launch an executable with arguments
         /// an executable must run silent and not require any user input.
         /// </summary>
         /// <param name="fileName">The file name to launch</param>
         /// <param name="arguments">The command line arguments</param>
         /// <param name="redirectStandardOutput">Show the console output</param>
-        /// <param name="verbose">Show additional output.  messages are precded by launcher=></param>
+        /// <param name="verbose">Show additional output.  messages are preceded by launcher=></param>
         /// <returns>0 if successful; otherwise non-zero.  message is possible if executable has standard output</returns>
         private static Result Start(string workingDir, 
                             string fileName,
@@ -25,14 +25,14 @@ namespace Launcher
                             bool verbose = false,
                             bool useShellExecute = false)
         {
-            Result result = new(); 
+            Result result = new Result(); 
             Verbose = verbose;
             
             if (Verbose) Console.WriteLine($"launcher=>{fileName} {arguments}");
             
             try
             {
-                using Process process = new();
+                using Process process = new Process();
                 process.StartInfo.WorkingDirectory = workingDir;
                 process.StartInfo.FileName = fileName;
                 process.StartInfo.Arguments = arguments;
@@ -81,7 +81,7 @@ namespace Launcher
         }
 
         /// <summary>
-        /// An alternative to 
+        /// Launch a process specified in parameters 
         /// </summary>
         /// <param name="parameters"></param>
         /// <returns></returns>
@@ -89,13 +89,13 @@ namespace Launcher
         {
 
             var result= Start(
-                                                parameters.WorkingDir,
-                                                parameters.FileName,
-                                                parameters.Arguments,
-                                                parameters.RedirectStandardOutput,
-                                                parameters.Verbose,
-                                                parameters.UseShellExecute
-                                                );
+                                parameters.WorkingDir,
+                                parameters.FileName,
+                                parameters.Arguments,
+                                parameters.RedirectStandardOutput,
+                                parameters.Verbose,
+                                parameters.UseShellExecute
+                                );
             return result;
         }
 
