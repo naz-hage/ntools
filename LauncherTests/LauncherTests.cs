@@ -1,14 +1,8 @@
-﻿using Launcher;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections.Generic;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
-using System.Security.Principal;
 
 namespace Launcher.Tests
 {
-
-
-
     [TestClass()]
     public class LauncherTests
     {
@@ -52,12 +46,21 @@ namespace Launcher.Tests
         [TestMethod()]
         public void LaunchInThreadTest()
         {
-            int result = Launcher.LaunchInThread(
+            var result = Launcher.LaunchInThread(
                            workingDir: Directory.GetCurrentDirectory(),
                            fileName: "test.exe",
                            arguments: "pass"
                            );
-            Assert.AreEqual(0, result);
+            Assert.AreEqual(0, result.Code);
+            Assert.AreEqual("Success", result.Output[0]);
+
+            result = Launcher.LaunchInThread(
+               workingDir: Directory.GetCurrentDirectory(),
+               fileName: "test1.exe",
+               arguments: "fail"
+               );
+            Assert.AreEqual(int.MinValue, result.Code);
+            Assert.IsTrue(result.Output[0].Contains("not found"));
         }
 
         [TestMethod()]
