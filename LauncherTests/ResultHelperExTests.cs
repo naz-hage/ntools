@@ -10,11 +10,11 @@ namespace launcherTests
         public void IsSuccessTest()
         {
             var success = "Success";
-            var result = ResultHelper.Success();
+            var result = ResultHelperEx.Success();
             Assert.IsTrue(result.IsSuccess());
             Assert.AreEqual(success, result.Output[0]);
             success = "This function passed";
-            result = ResultHelper.Success(success);
+            result = ResultHelperEx.Success(success);
             Assert.IsTrue(result.IsSuccess());
             Assert.AreEqual(success, result.Output[0]);
         }
@@ -23,11 +23,11 @@ namespace launcherTests
         public void IsFailTest()
         {
             var fail = "Fail";
-            var result = ResultHelper.Fail();
+            var result = ResultHelperEx.Fail();
             Assert.IsTrue(result.IsFail());
             Assert.AreEqual(fail, result.Output[0]);
             fail = "This function Failed";
-            result = ResultHelper.Fail(-1, fail);
+            result = ResultHelperEx.Fail(-1, fail);
             Assert.IsTrue(result.IsFail());
             Assert.AreEqual(fail, result.Output[0]);
 
@@ -37,7 +37,7 @@ namespace launcherTests
         public void SuccessTest()
         {
             var success = "Success";
-            var result = ResultHelper.Success();
+            var result = ResultHelperEx.Success();
             Assert.IsNotNull(result);
             Assert.AreEqual(0, result.Code);
             Assert.AreEqual(success, result.Output[0]);
@@ -47,7 +47,7 @@ namespace launcherTests
         [TestMethod()]
         public void FailTest()
         {
-            var result = ResultHelper.Fail();
+            var result = ResultHelperEx.Fail();
             Assert.IsNotNull(result);
             Assert.AreEqual(int.MinValue, result.Code);
             Assert.AreEqual("Fail", result.Output[0]);
@@ -57,7 +57,7 @@ namespace launcherTests
         [TestMethod()]
         public void NewTest()
         {
-            var result = ResultHelper.New();
+            var result = ResultHelperEx.New();
             Assert.IsNotNull(result);
             Assert.AreEqual(int.MaxValue, result.Code);
             Assert.AreEqual(0, result.Output.Count);

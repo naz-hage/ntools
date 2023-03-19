@@ -20,14 +20,14 @@ namespace Launcher
         /// <param name="verbose">Show additional output.  messages are preceded by launcher=></param>
         /// <param name="useShellExecute"></param>
         /// <returns>0 if successful; otherwise non-zero.  message is possible if executable has standard output</returns>
-        private static ResultHelper Start(string workingDir,
+        private static ResultHelperEx Start(string workingDir,
                     string fileName,
                     string arguments,
                     bool redirectStandardOutput = false,
                     bool verbose = false,
                     bool useShellExecute = false)
         {
-            var result = ResultHelper.New();
+            var result = ResultHelperEx.New();
             Verbose = verbose;
 
             if (Verbose) Console.WriteLine($"launcher=>{fileName} {arguments}");
@@ -86,7 +86,7 @@ namespace Launcher
         /// </summary>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public static ResultHelper Start(Parameters parameters)
+        public static ResultHelperEx Start(Parameters parameters)
         {
 
             var result = Start(
@@ -117,7 +117,7 @@ namespace Launcher
         /// <param name="workingDir"></param>
         /// <param name="arguments"></param>
         /// <returns></returns>
-        public static ResultHelper LaunchInThread(string workingDir, string fileName, string arguments)
+        public static ResultHelperEx LaunchInThread(string workingDir, string fileName, string arguments)
         {
             var startInfo = new ProcessStartInfo
             {
@@ -134,7 +134,7 @@ namespace Launcher
                 var executable = $"{workingDir}\\{fileName}";
                 if (!File.Exists(executable))
                 {
-                    return ResultHelper.Fail(message: $"File {executable} not found");
+                    return ResultHelperEx.Fail(message: $"File {executable} not found");
                 }
                 new Thread(() =>
                 {
@@ -150,12 +150,12 @@ namespace Launcher
                     }
                 }).Start();
 
-                return ResultHelper.Success();
+                return ResultHelperEx.Success();
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Exception: {ex.Message}");
-                return ResultHelper.Fail(message:ex.Message);
+                return ResultHelperEx.Fail(message:ex.Message);
             }
         }
     }
