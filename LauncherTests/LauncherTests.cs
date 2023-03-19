@@ -1,6 +1,6 @@
-﻿using System.IO;
-using Launcher;
+﻿using Launcher;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.IO;
 
 namespace launcherTests
 {
