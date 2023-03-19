@@ -2,7 +2,7 @@
 
 namespace Launcher
 {
-    public class ResultHelperEx
+    public class ResultHelper
     {
         public static readonly int SuccessCode = 0;
         public static readonly int InvalidParameter = -1;
@@ -26,9 +26,9 @@ namespace Launcher
         {
             return Code != SuccessCode;
         }
-        public static ResultHelperEx Success(string message = SuccessMessage)
+        public static ResultHelper Success(string message = SuccessMessage)
         {
-            var result = new ResultHelperEx
+            var result = new ResultHelper
             {
                 Code = SuccessCode,
                 Output =
@@ -39,9 +39,9 @@ namespace Launcher
             return result;
         }
 
-        public static ResultHelperEx Fail(int code = int.MinValue, string message = FailMessage)
+        public static ResultHelper Fail(int code = int.MinValue, string message = FailMessage)
         {
-            var result = new ResultHelperEx
+            var result = new ResultHelper
             {
                 Code = code,
                 Output =
@@ -52,9 +52,9 @@ namespace Launcher
             return result;
         }
 
-        public static ResultHelperEx New()
+        public static ResultHelper New()
         {
-            return new ResultHelperEx
+            return new ResultHelper
             {
                 Code = Exception,
                 Output = new List<string>()
