@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace launcher
+namespace Launcher
 {
     public class ResultHelper
     {
@@ -28,15 +28,27 @@ namespace launcher
         }
         public static ResultHelper Success(string message = SuccessMessage)
         {
-            var result = new ResultHelper { Code = SuccessCode };
-            result.Output[0] = message;
+            var result = new ResultHelper
+            {
+                Code = SuccessCode,
+                Output =
+                {
+                    [0] = message
+                }
+            };
             return result;
         }
 
         public static ResultHelper Fail(int code = int.MinValue, string message = FailMessage)
         {
-            var result = new ResultHelper { Code = code };
-            result.Output[0] = message;
+            var result = new ResultHelper
+            {
+                Code = code,
+                Output =
+                {
+                    [0] = message
+                }
+            };
             return result;
         }
 

@@ -1,7 +1,7 @@
-﻿using launcher;
+﻿using Launcher;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Launcher.Tests
+namespace launcherTests
 {
     [TestClass()]
     public class ResultHelperExTests

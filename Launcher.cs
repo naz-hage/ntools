@@ -1,5 +1,4 @@
-﻿using launcher;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -9,14 +8,17 @@ namespace Launcher
     public static class Launcher
     {
         public static bool Verbose { get; set; } = false;
+
         /// <summary>
         /// A wrapper to launch an executable with arguments
         /// an executable must run silent and not require any user input.
         /// </summary>
+        /// <param name="workingDir"></param>
         /// <param name="fileName">The file name to launch</param>
         /// <param name="arguments">The command line arguments</param>
         /// <param name="redirectStandardOutput">Show the console output</param>
         /// <param name="verbose">Show additional output.  messages are preceded by launcher=></param>
+        /// <param name="useShellExecute"></param>
         /// <returns>0 if successful; otherwise non-zero.  message is possible if executable has standard output</returns>
         private static ResultHelper Start(string workingDir,
                     string fileName,
@@ -32,7 +34,7 @@ namespace Launcher
 
             try
             {
-                using Process process = new Process();
+                using var process = new Process();
                 process.StartInfo.WorkingDirectory = workingDir;
                 process.StartInfo.FileName = fileName;
                 process.StartInfo.Arguments = arguments;
