@@ -1,5 +1,4 @@
-﻿using launcher;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -9,30 +8,33 @@ namespace Launcher
     public static class Launcher
     {
         public static bool Verbose { get; set; } = false;
+
         /// <summary>
         /// A wrapper to launch an executable with arguments
         /// an executable must run silent and not require any user input.
         /// </summary>
+        /// <param name="workingDir"></param>
         /// <param name="fileName">The file name to launch</param>
         /// <param name="arguments">The command line arguments</param>
         /// <param name="redirectStandardOutput">Show the console output</param>
         /// <param name="verbose">Show additional output.  messages are preceded by launcher=></param>
+        /// <param name="useShellExecute"></param>
         /// <returns>0 if successful; otherwise non-zero.  message is possible if executable has standard output</returns>
-        private static Result Start(string workingDir, 
-                            string fileName,
-                            string arguments,
-                            bool redirectStandardOutput=false,
-                            bool verbose = false,
-                            bool useShellExecute = false)
+        private static ResultHelper Start(string workingDir,
+                    string fileName,
+                    string arguments,
+                    bool redirectStandardOutput = false,
+                    bool verbose = false,
+                    bool useShellExecute = false)
         {
-            Result result = new Result(); 
+            var result = ResultHelper.New();
             Verbose = verbose;
-            
+
             if (Verbose) Console.WriteLine($"launcher=>{fileName} {arguments}");
-            
+
             try
             {
-                using Process process = new Process();
+                using var process = new Process();
                 process.StartInfo.WorkingDirectory = workingDir;
                 process.StartInfo.FileName = fileName;
                 process.StartInfo.Arguments = arguments;
@@ -79,16 +81,15 @@ namespace Launcher
                 return result;
             }
         }
-
         /// <summary>
         /// Launch a process specified in parameters 
         /// </summary>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public static Result Start(Parameters parameters)
+        public static ResultHelper Start(Parameters parameters)
         {
 
-            var result= Start(
+            var result = Start(
                                 parameters.WorkingDir,
                                 parameters.FileName,
                                 parameters.Arguments,
@@ -98,7 +99,6 @@ namespace Launcher
                                 );
             return result;
         }
-
 
         private static void WriteError(string line)
         {
@@ -117,7 +117,7 @@ namespace Launcher
         /// <param name="workingDir"></param>
         /// <param name="arguments"></param>
         /// <returns></returns>
-        public static int LaunchInThread(string workingDir, string fileName, string arguments)
+        public static ResultHelper LaunchInThread(string workingDir, string fileName, string arguments)
         {
             var startInfo = new ProcessStartInfo
             {
@@ -131,19 +131,31 @@ namespace Launcher
 
             try
             {
+                var executable = $"{workingDir}\\{fileName}";
+                if (!File.Exists(executable))
+                {
+                    return ResultHelper.Fail(message: $"File {executable} not found");
+                }
                 new Thread(() =>
                 {
-                    Thread.CurrentThread.IsBackground = true;
-                    Process.Start(startInfo);
-                    Console.WriteLine($"Started {startInfo.FileName} {startInfo.Arguments}");
+                    try
+                    {
+                        Thread.CurrentThread.IsBackground = true;
+                        Process.Start(startInfo);
+                        Console.WriteLine($"Started {startInfo.FileName} {startInfo.Arguments}");
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception(ex.Message);
+                    }
                 }).Start();
 
-                return 0;
+                return ResultHelper.Success();
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Exception: {ex.Message}");
-                return 1;
+                return ResultHelper.Fail(message:ex.Message);
             }
         }
     }

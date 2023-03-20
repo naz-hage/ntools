@@ -1,15 +1,10 @@
 ﻿using Launcher;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections.Generic;
 using System.IO;
-using System.Security.Principal;
 
-namespace Launcher.Tests
+namespace launcherTests
 {
-
-
-
-    [TestClass()]
+    [TestClass]
     public class LauncherTests
     {
         [TestMethod]
@@ -23,7 +18,7 @@ namespace Launcher.Tests
                 RedirectStandardOutput = true
             };
 
-            var result = Launcher.Start(parameters);
+            var result = Launcher.Launcher.Start(parameters);
             Assert.AreEqual(0, result.Code);
             Assert.AreEqual(2, result.Output.Count);
         }
@@ -39,7 +34,7 @@ namespace Launcher.Tests
                 RedirectStandardOutput = true
             };
 
-            var result = Launcher.Start(parameters);
+            var result = Launcher.Launcher.Start(parameters);
 
 
             Assert.AreEqual(-100, result.Code);
@@ -49,18 +44,27 @@ namespace Launcher.Tests
             Assert.IsTrue(result.Output.Contains("rejected"));
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void LaunchInThreadTest()
         {
-            int result = Launcher.LaunchInThread(
+            var result = Launcher.Launcher.LaunchInThread(
                            workingDir: Directory.GetCurrentDirectory(),
                            fileName: "test.exe",
                            arguments: "pass"
                            );
-            Assert.AreEqual(0, result);
+            Assert.AreEqual(0, result.Code);
+            Assert.AreEqual("Success", result.Output[0]);
+
+            result = Launcher.Launcher.LaunchInThread(
+               workingDir: Directory.GetCurrentDirectory(),
+               fileName: "test1.exe",
+               arguments: "fail"
+               );
+            Assert.AreEqual(int.MinValue, result.Code);
+            Assert.IsTrue(result.Output[0].Contains("not found"));
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void ProcessStartTestWithLauncherParameters()
         {
             Parameters launcherParameters = new()
@@ -71,7 +75,7 @@ namespace Launcher.Tests
                 RedirectStandardOutput = true
             };
 
-            var result = Launcher.Start(launcherParameters);
+            var result = Launcher.Launcher.Start(launcherParameters);
 
             Assert.AreEqual(-100, result.Code);
             Assert.AreEqual(5, result.Output.Count);
