@@ -50,7 +50,8 @@ jobs:
 
     strategy:
       matrix:
-        configuration: [Debug, Release]
+        #configuration: [Debug, Release]
+        configuration: [Debug]
 
     runs-on: windows-latest  # For a list of available runner types, refer to
                              # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
@@ -85,14 +86,14 @@ jobs:
       run: dotnet test
 
     # Publish the NuGet package
-    - name: Create the project
-      run: dotnet new console --name launcher
+    #- name: Create the project
+    #  run: dotnet new console --name launcher
 
-    - name: Package the project
-      run: dotnet pack --configuration Release
+    #- name: Package the project
+    #  run: dotnet pack --configuration Release
 
-    - name: Publish the package
-      run: dotnet nuget push "bin/Release/launcher.1.0.0.nupkg"  --api-key ${{ secrets.LAUNCHER_TOKEN }} --source "github"
+    #- name: Publish the package
+    #  run: dotnet nuget push "bin/Release/launcher.1.0.0.nupkg"  --api-key ${{ secrets.LAUNCHER_TOKEN }} --source "github"
 
     # Restore the application to populate the obj folder with RuntimeIdentifiers
 #     - name: Restore the application
