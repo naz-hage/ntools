@@ -10,16 +10,16 @@ namespace Launcher
         public static bool Verbose { get; set; } = false;
 
         /// <summary>
-        /// A wrapper to launch an executable with arguments
-        /// an executable must run silent and not require any user input.
+        /// A wrapper to launch an executable with arguments. The executable must run silently without requiring user input.
+        /// If redirectStandardOutput is true, any output from the executable will be redirected to the result object's Output property.
         /// </summary>
-        /// <param name="workingDir"></param>
-        /// <param name="fileName">The file name to launch</param>
-        /// <param name="arguments">The command line arguments</param>
-        /// <param name="redirectStandardOutput">Show the console output</param>
-        /// <param name="verbose">Show additional output.  messages are preceded by launcher=></param>
-        /// <param name="useShellExecute"></param>
-        /// <returns>0 if successful; otherwise non-zero.  message is possible if executable has standard output</returns>
+        /// <param name="workingDir">The working directory to run the executable from.</param>
+        /// <param name="fileName">The file name (including extension) of the executable to launch.</param>
+        /// <param name="arguments">The command line arguments to pass to the executable.</param>
+        /// <param name="redirectStandardOutput">Whether or not to redirect any output from the executable to the result object's Output property.</param>
+        /// <param name="verbose">Whether or not to output additional verbose messages.</param>
+        /// <param name="useShellExecute">Whether or not to use the system shell to start the process. This should be false to allow I/O redirection.</param>
+        /// <returns>A ResultHelper object containing the exit code and, if redirectStandardOutput is true, any output from the executable.</returns>
         private static ResultHelper Start(string workingDir,
                     string fileName,
                     string arguments,
@@ -30,10 +30,12 @@ namespace Launcher
             var result = ResultHelper.New();
             Verbose = verbose;
 
+            // Output verbose message if required.
             if (Verbose) Console.WriteLine($"launcher=>{fileName} {arguments}");
 
             try
             {
+                // Create a new process object and set the properties for running the specified executable.
                 using var process = new Process();
                 process.StartInfo.WorkingDirectory = workingDir;
                 process.StartInfo.FileName = fileName;
@@ -44,31 +46,29 @@ namespace Launcher
                 process.StartInfo.RedirectStandardOutput = redirectStandardOutput;
                 process.StartInfo.RedirectStandardError = redirectStandardOutput;
 
+                // Set the current directory to the working directory to avoid issues when running the executable.
                 Directory.SetCurrentDirectory(process.StartInfo.WorkingDirectory);
 
+                // Start the process.
                 if (process.Start())
                 {
-                    if (!process.StartInfo.RedirectStandardOutput)
+                    // If redirectStandardOutput is true, read any output from the executable and add it to the result object's Output property.
+                    if (redirectStandardOutput)
+                    {
+                        result.Output.AddRange(process.StandardOutput.ReadToEnd()
+                                                       .Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries));
+                        result.Output.AddRange(process.StandardError.ReadToEnd()
+                                                       .Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries));
+                    }
+                    else // Otherwise, wait for the process to exit.
                     {
                         process.WaitForExit();
                     }
-                    else
-                    {
-                        while (!process.StandardOutput.EndOfStream)
-                        {
-                            var line = process?.StandardOutput.ReadLine();
-                            WriteError(line);
-                            result.Output.Add(line);
-                        }
-                        while (!process.StandardError.EndOfStream)
-                        {
-                            var line = process?.StandardError.ReadLine();
-                            WriteError(line);
-                            result.Output.Add(line);
-                        }
-                    }
                 }
+                // Output verbose message if required.
                 if (Verbose) Console.WriteLine($"Exit Code: {process.ExitCode}");
+
+                // Set the exit code in the result object and return it.
                 result.Code = process.ExitCode;
                 return result;
             }
