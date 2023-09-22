@@ -1,18 +1,25 @@
-﻿using launcher;
-using Launcher;
+﻿using Launcher;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Text;
 using System.Text.Json;
 
 namespace nbackup
 {
     public class NBackup
     {
-        public static Result Perform(Cli options)
+        private static readonly Dictionary<string, string?> _environmentVariables = new (){
+                { "USERPROFILE", Environment.GetEnvironmentVariable("USERPROFILE") },
+                { "USERNAME", Environment.GetEnvironmentVariable("USERNAME") },
+                { "APPDATA", Environment.GetEnvironmentVariable("APPDATA") },
+            };
+
+        public static ResultHelper Perform(Cli options)
         {
-            Result result = new();
-            if (File.Exists(options.Input))
+            ResultHelper result = new();
+            if ((!string.IsNullOrEmpty(options.Input)) && (File.Exists(options.Input)))
             {
                 try
                 {
@@ -26,6 +33,11 @@ namespace nbackup
                                 IsNotNull(backup.Destination) &&
                                 IsNotNull(backup.BackupOptions))
                             {
+                                //Console.WriteLine($"    --> Source      :   {backup.Source}");
+                                //Console.WriteLine($"    --> Destination :   {backup.Destination}");
+                                //Console.WriteLine($"    --> roboCopyOptions: {backup.BackupOptions}");
+                                //Console.WriteLine();
+
                                 backup.Source = ReplaceEnvironmentVariables(backup.Source);
 
                                 backup.Destination = ReplaceEnvironmentVariables(backup.Destination);
@@ -55,6 +67,7 @@ namespace nbackup
                                     }
                                     arguments = arguments.TrimEnd(',') + "\n";
                                 }
+
                                 if (backup.ExcludeFiles != null)
                                 {
                                     arguments += $" ExcludeFiles:";
@@ -74,6 +87,7 @@ namespace nbackup
                                     }
                                     arguments = arguments.TrimEnd(',') + "\n";
                                 }
+
                                 if (!string.IsNullOrEmpty(backup.LogFile))
                                 {
                                     backup.LogFile = ReplaceEnvironmentVariables(backup.LogFile);
@@ -86,6 +100,10 @@ namespace nbackup
                                 if (options.PerformBackup)
                                 {
                                     result = Perform(backup.Source, backup.Destination, backup.BackupOptions);
+
+                                    // Read log file and display last 12 lines
+                                    DisplayOutput(result, backup);
+                                    Console.WriteLine($"Exit Code: {result.Code}");
                                 }
                                 else
                                 {
@@ -93,37 +111,29 @@ namespace nbackup
                                 }
                             }
 
-                            Console.WriteLine($"    --> Source      :   {backup.Source}");
-                            Console.WriteLine($"    --> Destination :   {backup.Destination}");
-                            Console.WriteLine($"    --> roboCopyOptions: {backup.BackupOptions}");
-                            Console.WriteLine();
+
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    result.Code = Result.Exception;
+                    result.Code = ResultHelper.Exception;
                     Console.WriteLine($"An exception occurred: {ex.Message}");
                 }
             }
+            else if (!string.IsNullOrEmpty(options.Source) &&
+                !string.IsNullOrEmpty(options.Destination) &&
+                !string.IsNullOrEmpty(options.Backup))
+            {
+                result = NBackup.Perform(options.Source, options.Destination, options.Backup);
+            }
             else
             {
-                result.Code = Result.FileNotFound;
+                result.Code = ResultHelper.FileNotFound;
                 Console.WriteLine($"Input file 'backup.json' not found");
             }
 
             return result;
-        }
-
-        private static string ReplaceEnvironmentVariables(string source)
-        {
-            string destination = source.Replace(
-                               "%USERPROFILE%", Environment.GetEnvironmentVariable("USERPROFILE"));
-
-            destination = destination.Replace(
-                                "%USERNAME%", Environment.GetEnvironmentVariable("USERNAME"));
-
-            return destination;
         }
 
         /// <summary>
@@ -145,35 +155,103 @@ namespace nbackup
         /// <param name="destination"></param>
         /// <param name="backupOptions"></param>
         /// <returns></returns>
-        public static Result Perform(string source, string destination, string backupOptions)
+        public static ResultHelper Perform(string source, string destination, string backupOptions, bool verbose = false)
         {
             Parameters parameters = new()
             {
                 WorkingDir = @"c:\windows\system32",
                 FileName = "robocopy.exe",
                 Arguments = $"\"{source}\" \"{destination}\" {backupOptions}",
-                RedirectStandardOutput = false,
-                Verbose = true
+                RedirectStandardOutput = true,
+                Verbose = verbose
             };
 
-            Result result = Launcher.Launcher.Start(parameters);
-            foreach (var item in result.Output)
-            {
-                if (item.Trim().StartsWith("Dirs :") ||
-                    item.Trim().StartsWith("Files :") ||
-                    item.Trim().StartsWith("Bytes :") ||
-                    item.Trim().StartsWith("Times :") ||
-                    item.Trim().StartsWith("Ended :") ||
-                    item.ToLower().Trim().Contains("error") ||
-                    item.Contains("Total    Copied"))
-                {
-                    Console.WriteLine(item);
-                }
-            }
+            ResultHelper result = Launcher.Launcher.Start(parameters);
+
+            //// display the last 7 lines of result.Output
+            //int start = result.Output.Count - 9;
+            //if (start < 0)
+            //{
+            //    start = 0;
+            //}
+            //for (int i = start; i < result.Output.Count; i++)
+            //{
+            //    Console.WriteLine(result.Output[i]);
+            //}
+
+            //foreach (var item in result.Output)
+            //{
+                
+                
+
+            //    if (item.Trim().StartsWith("Dirs :") ||
+            //        item.Trim().StartsWith("Files :") ||
+            //        item.Trim().StartsWith("Bytes :") ||
+            //        item.Trim().StartsWith("Times :") ||
+            //        item.Trim().StartsWith("Ended :") ||
+            //        item.ToLower().Trim().Contains("error") ||
+            //        item.Contains("Total    Copied"))
+            //    {
+            //        Console.WriteLine(item);
+            //    }
+            //}
 
             return result;
         }
-        
+
+        private static string ReplaceEnvironmentVariables(string source)
+        {
+            StringBuilder destination = new(source);
+
+            foreach (var kvp in _environmentVariables)
+            {
+                if (kvp.Value != null)
+                {
+                    destination.Replace($"%{kvp.Key}%", kvp.Value);
+                }
+            }
+            return destination.ToString();
+        }
+
+        private static void DisplayOutput(ResultHelper result, Backup backup)
+        {
+            if (!string.IsNullOrEmpty(backup.LogFile))
+            {
+                if (File.Exists(backup.LogFile))
+                {
+                    Console.WriteLine("----------------------------------------------------------------------------");
+
+                    string[] lines = File.ReadAllLines(backup.LogFile);
+                    int start = lines.Length - 12;
+                    if (start < 0)
+                    {
+                        start = 0;
+                    }
+                    for (int i = start; i < lines.Length; i++)
+                    {
+                        Console.WriteLine(lines[i]);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"Log file not found: {backup.LogFile}");
+                }
+            }
+            else
+            {
+                // display the last 0 lines of result.Output
+                int start = result.Output.Count - 9;
+                if (start < 0)
+                {
+                    start = 0;
+                }
+                for (int i = start; i < result.Output.Count; i++)
+                {
+                    Console.WriteLine(result.Output[i]);
+                }
+            }
+        }
+
         private static bool IsNotNull([NotNullWhen(true)] object? obj) => obj != null;
     }
 }

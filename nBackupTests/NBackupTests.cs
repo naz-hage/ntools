@@ -1,5 +1,5 @@
 ﻿using CommandLine;
-using launcher;
+using Launcher;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
@@ -17,7 +17,7 @@ namespace nbackup.Tests
         {
             Assert.IsTrue(Parser.TryParse($"-input {backupInput}", out Cli options));
             Console.WriteLine(backupInput);
-            Result result = NBackup.Perform(options);
+            ResultHelper result = NBackup.Perform(options);
             Assert.IsFalse(result.Code > 2);
         }
 
@@ -28,8 +28,8 @@ namespace nbackup.Tests
 
             Assert.IsTrue(Parser.TryParse($"-input {backupInput}", out Cli options));
 
-            Result result = NBackup.Perform(options);
-            Assert.AreEqual(Result.FileNotFound, result.Code);
+            ResultHelper result = NBackup.Perform(options);
+            Assert.AreEqual(ResultHelper.FileNotFound, result.Code);
         }
 
         [TestMethod()]
@@ -37,8 +37,8 @@ namespace nbackup.Tests
         {
             Assert.IsTrue(Parser.TryParse($"-input m", out Cli options));
 
-            Result result = NBackup.Perform(options);
-            Assert.AreEqual(Result.FileNotFound, result.Code);
+            ResultHelper result = NBackup.Perform(options);
+            Assert.AreEqual(ResultHelper.FileNotFound, result.Code);
         }
 
         [TestMethod()]

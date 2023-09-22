@@ -14,7 +14,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "launcher", "launcher\launch
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nBackup", "nBackup\nBackup.csproj", "{DD01490F-8871-4C51-A657-473765088F6E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nBackupTests", "nBackupTests\nBackupTests.csproj", "{5AFB3924-2D66-4ACE-BC67-6DBC18A8D351}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nBackupTests", "nBackupTests\nBackupTests.csproj", "{5AFB3924-2D66-4ACE-BC67-6DBC18A8D351}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

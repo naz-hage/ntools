@@ -1,5 +1,5 @@
 ﻿using CommandLine;
-using launcher;
+using Launcher;
 using OutputColorizer;
 using System;
 using System.Diagnostics;
@@ -16,23 +16,13 @@ namespace nbackup
 
             if (!Parser.TryParse(args, out Cli options))
             {
-                ReturnCode = Result.InvalidParameter;
+                ReturnCode = ResultHelper.InvalidParameter;
                 if (args[0].ToLower() != "--help") Console.WriteLine($"backup completed with '{ReturnCode}'");
                 return ReturnCode;
             }
 
             var watch = Stopwatch.StartNew();
-            Result result = new();
-            if (!string.IsNullOrEmpty(options.Source) &&
-                !string.IsNullOrEmpty(options.Destination) &&
-                !string.IsNullOrEmpty(options.Backup))
-            {
-                result = NBackup.Perform(options.Source, options.Destination, options.Backup);
-            }
-            else if (!string.IsNullOrEmpty(options.Input))
-            {
-                result = NBackup.Perform(options);
-            }
+            ResultHelper result = NBackup.Perform(options);
 
             watch.Stop();
 
