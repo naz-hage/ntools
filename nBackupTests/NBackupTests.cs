@@ -46,7 +46,9 @@ namespace nbackup.Tests
         public void PerformTestValidInput()
         {
             // Data\backup.json is in the same folder as the executable
-            var file = $"{Path.GetDirectoryName(Assembly.GetAssembly(typeof(NBackupTests)).Location)}\\Data\\backup.json";
+            Assembly? assembly = Assembly.GetAssembly(typeof(NBackupTests));
+            Assert.IsNotNull(assembly);
+            var file = $"{Path.GetDirectoryName(assembly.Location)}\\Data\\backup.json";
 
             Console.WriteLine($"file: {file}");
             var jsonString = File.ReadAllText(file);

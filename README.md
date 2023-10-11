@@ -24,9 +24,9 @@ nBackup command line options:
 
 - example usage:
 
+```c#
 using Launcher;
 
-```c#
 var result = Launcher.Launcher.Start(new()
                   {
                   WorkingDir = Directory.GetCurrentDirectory(),
