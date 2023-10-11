@@ -15,8 +15,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{35AAB912-8196-4DE2-B5DA-98E9F4340A8D}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "launcher", "launcher\launcher.csproj", "{7196E4C6-77BF-4B00-BD4A-431575EFE920}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nBackup", "nBackup\nBackup.csproj", "{1E00CF48-2881-478B-AC19-A9AE90910F44}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nBackupTests", "nBackupTests\nBackupTests.csproj", "{79DD18A9-0E82-4F97-8353-1E5D8BC844BA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,6 +43,14 @@ Global
 		{7196E4C6-77BF-4B00-BD4A-431575EFE920}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7196E4C6-77BF-4B00-BD4A-431575EFE920}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7196E4C6-77BF-4B00-BD4A-431575EFE920}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E00CF48-2881-478B-AC19-A9AE90910F44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E00CF48-2881-478B-AC19-A9AE90910F44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E00CF48-2881-478B-AC19-A9AE90910F44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E00CF48-2881-478B-AC19-A9AE90910F44}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79DD18A9-0E82-4F97-8353-1E5D8BC844BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79DD18A9-0E82-4F97-8353-1E5D8BC844BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79DD18A9-0E82-4F97-8353-1E5D8BC844BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79DD18A9-0E82-4F97-8353-1E5D8BC844BA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
