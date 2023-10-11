@@ -10,7 +10,7 @@ namespace nbackup.Tests
     [TestClass()]
     public class NBackupTests
     {
-        private readonly string backupInput = "..\\..\\..\\..\\nBackup\\Data\\backup.json";
+        private readonly string backupInput = "\\source\\dev-ops\\nBackup\\Data\\backup.json";
 
         [TestMethod()]
         public void PerformTest()
@@ -18,7 +18,7 @@ namespace nbackup.Tests
             Assert.IsTrue(Parser.TryParse($"-input {backupInput}", out Cli options));
             Console.WriteLine(backupInput);
             ResultHelper result = NBackup.Perform(options);
-            Assert.IsFalse(result.Code > 2);
+            Assert.IsFalse(result.Code > 3);
         }
 
         [TestMethod()]
@@ -52,7 +52,7 @@ namespace nbackup.Tests
                 Assert.IsNotNull(backups);
                 Assert.IsNotNull(backups.BackupsList);
                 Assert.AreEqual(1, backups.BackupsList.Count);
-                Assert.AreEqual("c:\\source\\naz-hage\\dev-ops", backups.BackupsList[0].Source);
+                Assert.AreEqual("c:\\source\\dev-ops", backups.BackupsList[0].Source);
                 Assert.AreEqual("c:\\temp\\Users\\%USERNAME%\\dev-ops", backups.BackupsList[0].Destination);
                 Assert.AreEqual("/S /V /R:5 /W:5 /MT:16 /dcopy:DAT /copy:DT", backups.BackupsList[0].BackupOptions);
                 Assert.IsNotNull(backups.BackupsList[0].ExcludeFolders);

@@ -26,7 +26,9 @@ namespace nbackup
 
             watch.Stop();
 
-            Console.WriteLine($"Backup completed in {watch.ElapsedMilliseconds/1000.00} s with {ReturnCode}");
+            Console.WriteLine($"Backup completed in {watch.ElapsedMilliseconds/1000.00} s with {result.Code}");
+            // display elapsed time in HH:MM:SS.MS format
+            Console.WriteLine($"Backup completed in {watch.Elapsed.ToString("hh\\:mm\\:ss\\.ff")} (hh:mm:ss.ff) with {result.Code}");
             return result.Code;
         }
     }

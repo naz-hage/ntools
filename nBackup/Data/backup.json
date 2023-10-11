@@ -1,7 +1,7 @@
 {
   "BackupsList": [
     {
-      "Source": "c:\\source\\naz-hage\\dev-ops",
+      "Source": "c:\\source\\dev-ops",
       "Destination": "c:\\temp\\Users\\%USERNAME%\\dev-ops",
       "ExcludeFolders": [
         ".git",
