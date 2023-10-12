@@ -1,4 +1,0 @@
-[submodule "launcher"]
-	path = launcher
-	url = https://github.com/naz-hage/launcher.git
-	branch = main

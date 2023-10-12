@@ -1,3 +1,0 @@
- *** ngit, git automation, blue-man, 2020-2023 - Version: 1.0.41.3
-
-GIT_PROJECT: dev-ops
