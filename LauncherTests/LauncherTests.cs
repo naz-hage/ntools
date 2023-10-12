@@ -7,6 +7,22 @@ namespace launcherTests
     [TestClass]
     public class LauncherTests
     {
+
+        [TestMethod]
+        public void ProcessTestRobocopy()
+        {
+            var result = Launcher.Launcher.Start(new()
+                        {
+                            WorkingDir = Directory.GetCurrentDirectory(),
+                            Arguments = "/?",
+                            FileName = "robocopy",
+                            RedirectStandardOutput = true
+                        }
+            );
+            Assert.AreEqual(16, result.Code);
+            Assert.IsTrue(result.Output.Count > 100);
+        }
+
         [TestMethod]
         public void ProcessStartTestPass()
         {

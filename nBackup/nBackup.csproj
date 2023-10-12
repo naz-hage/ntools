@@ -38,10 +38,9 @@
     <ProjectReference Include="..\launcher\launcher.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="Data\backup.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
+	<ItemGroup>
+		<Content Include="Data\backup.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 </Project>

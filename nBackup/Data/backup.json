@@ -1,8 +1,8 @@
 {
   "BackupsList": [
     {
-      "Source": "c:\\source\\dev-ops",
-      "Destination": "c:\\temp\\Users\\%USERNAME%\\dev-ops",
+      "Source": ".",
+      "Destination": "%APPDATA%\\ntools",
       "ExcludeFolders": [
         ".git",
         ".vs"
@@ -12,8 +12,8 @@
         "*.dll",
         "*.pdb"
       ],
-      "LogFile": "c:\\temp\\backup.log",
-      "BackupOptions": "/S /V /R:5 /W:5 /MT:16 /dcopy:DAT /copy:DT"
+      "LogFile": "%APPDATA%\\backup.log",
+      "BackupOptions": "/V /R:5 /W:5 /MT:16 /dcopy:DAT /copy:DT"
     }
   ]
 }
