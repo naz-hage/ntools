@@ -396,3 +396,8 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+/__azurite_db_blob_extent__.json
+/__azurite_db_blob__.json
+/BUILD_TYPE.TXT
+/GIT_BRANCH.TXT
+/TAG.TXT
