@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "test", "test\test.csproj", "{675AB480-2D5C-43C2-A9FA-2B2D85830A16}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "launcherTests", "LauncherTests\launcherTests.csproj", "{BE437ED5-EBDE-4B6C-9B4F-BA7E0D5898CC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{675AB480-2D5C-43C2-A9FA-2B2D85830A16} = {675AB480-2D5C-43C2-A9FA-2B2D85830A16}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{80B7EE8D-BFD5-4F31-BC37-103FDDACEA23}"
 EndProject
