@@ -401,3 +401,4 @@ FodyWeavers.xsd
 /BUILD_TYPE.TXT
 /GIT_BRANCH.TXT
 /TAG.TXT
+/nuget.exe
