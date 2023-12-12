@@ -402,3 +402,6 @@ FodyWeavers.xsd
 /GIT_BRANCH.TXT
 /TAG.TXT
 /nuget.exe
+/nuget-push.bat
+/NUGET_API_KEY.TXT
+/LocalNugetFeed
