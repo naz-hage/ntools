@@ -405,3 +405,4 @@ FodyWeavers.xsd
 /nuget-push.bat
 /NUGET_API_KEY.TXT
 /LocalNugetFeed
+/test/Properties/launchSettings.json
