@@ -22,7 +22,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "launcher", "launcher\launcher.csproj", "{7196E4C6-77BF-4B00-BD4A-431575EFE920}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Launcher", "launcher\Launcher.csproj", "{7196E4C6-77BF-4B00-BD4A-431575EFE920}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nBackup", "nBackup\nBackup.csproj", "{1E00CF48-2881-478B-AC19-A9AE90910F44}"
 EndProject

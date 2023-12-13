@@ -406,3 +406,6 @@ FodyWeavers.xsd
 /NUGET_API_KEY.TXT
 /LocalNugetFeed
 /test/Properties/launchSettings.json
+/build.xml
+/version.txt
+/Build.bat
