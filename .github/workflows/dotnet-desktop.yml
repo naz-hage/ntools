@@ -85,7 +85,17 @@ jobs:
     - name: Execute unit tests
       run: dotnet test
 
-    # Publish the NuGet package
+    # 0:Matches Multiple schemas when only one must validate
+    # - name: Push
+    #   uses: actions/setup-dotnet@v3
+    #   with:
+    #     dotnet-version: 8.0
+    #     source-url: https://api.nuget.org/v3/index.json
+    #   env:
+    #     NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+    #     run: dotnet nuget push ./nupkgs/*.nupkg
+
+      # Publish the NuGet package
     #- name: Create the project
     #  run: dotnet new console --name launcher
 

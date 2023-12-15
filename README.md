@@ -19,26 +19,5 @@ nBackup command line options:
             - if `input` option is not specified, the `src`, `dest`, and `opt` options are required.
 
 ```
-
-- **launcher** - A .NET class library which exposes the launcher class and methods to launch a process and wait for it to complete. The launcher class is used by nBackup to launch robocopy and wait for it to complete.
-
-- example usage:
-
-```c#
-using Launcher;
-
-var result = Launcher.Launcher.Start(new()
-                  {
-                  WorkingDir = Directory.GetCurrentDirectory(),
-                  Arguments = "/?",
-                  FileName = "robocopy",
-                  RedirectStandardOutput = true
-                  }
-            );
-console.writeline(result.Output);
-foreach (var line in result.Output)
-{
-      console.writeline(line);
-}
-```
+- [**launcher**](./launcher/README.md) - The launcher class is used by nBackup to launch robocopy and wait for it to complete.
 

@@ -35,7 +35,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\launcher\launcher.csproj" />
+    <ProjectReference Include="..\launcher\Launcher.csproj" />
   </ItemGroup>
 
 </Project>
