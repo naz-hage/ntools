@@ -26,7 +26,7 @@
   <PropertyGroup>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <PackageId>ntools-$(AssemblyName)</PackageId>
     <Title>A wrapper for Process .NET class</Title>
     <Description>This package simplifies calling another executable. </Description>
@@ -35,7 +35,7 @@
     <RepositoryUrl>https://github.com/naz-hage/ntools/tree/main/launcher</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageReleaseNotes>First release</PackageReleaseNotes>
-    <PackageOutputPath>$(solutionDir)\nupkgs</PackageOutputPath>
+    <PackageOutputPath>$(MSBuildProjectDirectory)\..\nupkgs</PackageOutputPath>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
   </PropertyGroup>
