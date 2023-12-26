@@ -410,3 +410,4 @@ FodyWeavers.xsd
 /version.txt
 /Build.bat
 /nbuild.xml
+/common.targets
