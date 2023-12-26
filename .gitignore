@@ -409,3 +409,4 @@ FodyWeavers.xsd
 /build.xml
 /version.txt
 /Build.bat
+/nbuild.xml
