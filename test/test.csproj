@@ -26,7 +26,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ntools-Launcher" Version="1.0.0.4" />
+    <PackageReference Include="ntools-launcher" Version="1.0.0.5" />
   </ItemGroup>
+
 
 </Project>
