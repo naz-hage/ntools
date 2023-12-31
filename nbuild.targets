@@ -9,7 +9,6 @@
 		<SolutionName>ntools</SolutionName>
         <!-- This is the location when the app deployed or installed -->
         <DeploymentFolder>$(ProgramFiles)\$(SolutionName)</DeploymentFolder>
-		<BranchFile>$(ArtifactsDir)\$(SolutionName)\.git_branch.txt</BranchFile>
 	</PropertyGroup>
 	
 	
