@@ -5,6 +5,7 @@
 @REM for more information, please visit <TBD>
 set BUILD_LOG=nbuild.log
 set PROJECT=nbuild.targets
+set TAG=tag.txt
 
 if "%1"=="" (
     set CMD=%PROJECT% -fl -flp:logfile=%BUILD_LOG%;verbosity=normal
@@ -15,12 +16,12 @@ if "%1"=="" (
 msbuild %CMD%
 if ERRORLEVEL 1 (
     echo %ERRORLEVEL%
-    type TAG.TXT
+    type %TAG%
     echo %0 '%1' FAILED
     echo %0 '%1' FAILED >>%BUILD_LOG%
     EXIT /B1
 ) else (
-    type TAG.TXT
+    type %TAG%
     echo %0 '%1' SUCCEEDED 
     echo %0 '%1' SUCCEEDED >>%BUILD_LOG%
 )

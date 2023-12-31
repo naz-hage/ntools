@@ -20,6 +20,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{35AAB912-8196-4DE2-B5DA-98E9F4340A8D}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
+		nbuild.log = nbuild.log
+		nbuild.targets = nbuild.targets
 		README.md = README.md
 	EndProjectSection
 EndProject

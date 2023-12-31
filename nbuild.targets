@@ -9,28 +9,29 @@
 		<SolutionName>ntools</SolutionName>
         <!-- This is the location when the app deployed or installed -->
         <DeploymentFolder>$(ProgramFiles)\$(SolutionName)</DeploymentFolder>
+		<BranchFile>$(ArtifactsDir)\$(SolutionName)\.git_branch.txt</BranchFile>
 	</PropertyGroup>
 	
 	
     <Target Name="ARTIFACTS">
       <PropertyGroup>
-        <ArtifactsFolder>$(ArtifactsDir)\$(SolutionName)\release\$(VERSION)</ArtifactsFolder>
+        <ArtifactsFolder>$(ArtifactsDir)\$(SolutionName)\$(TargetRelease)\$(ProductVersion)</ArtifactsFolder>
 		
       </PropertyGroup>  
       <ItemGroup>
             <BinaryFiles Include="
-                        $(SolutionDir)\Release\*.exe;
-                        $(SolutionDir)\Release\*.exe.config;
-                        $(SolutionDir)\Release\*.json;  
-                        $(SolutionDir)\Release\*.dll"
+                        $(SolutionDir)\$(TargetRelease)\*.exe;
+                        $(SolutionDir)\$(TargetRelease)\*.exe.config;
+                        $(SolutionDir)\$(TargetRelease)\*.json;  
+                        $(SolutionDir)\$(TargetRelease)\*.dll"
 						 
                     Exclude="
-						$(SolutionDir)\Release\**\*.pdb;
-						$(SolutionDir)\Release\testhost.*"
+						$(SolutionDir)\$(TargetRelease)\**\*.pdb;
+						$(SolutionDir)\$(TargetRelease)\testhost.*"
 						/>
 
             <DataFiles Include="
-                       $(SolutionDir)\Release\Data\*.json"
+                       $(SolutionDir)\$(TargetRelease)\Data\*.json"
                       />
 
             <TestFiles Include="
@@ -40,9 +41,9 @@
 		    <ArtifactsBlobs Include = "$(ArtifactsFolder)\**\*.*" />
 
             <RunTimesNetStandard20 Include = "
-								   $(SolutionDir)\Release\netstandard2.0\*.*"
+								   $(SolutionDir)\$(TargetRelease)\netstandard2.0\*.*"
                                     Exclude="
-						            $(SolutionDir)\Release\**\*.pdb"
+						            $(SolutionDir)\$(TargetRelease)\**\*.pdb"
 						            />
 		  
         </ItemGroup>
@@ -52,48 +53,27 @@
         <Message Text="==> DONE"/>
     </Target>
 
-	<Target Name="GIT_BRANCH">
-		<Exec Command='$(NbuildExe) -git getbranch -project $(SolutionName) > NUL' />
-		<ReadLinesFromFile File="$(BranchFile)">
-			<Output TaskParameter="Lines" PropertyName="GIT_BRANCH" />
-		</ReadLinesFromFile>
-		<Message Text="GIT_BRANCH = $(GIT_BRANCH)"/>
-		<Message Text="==> DONE"/>
-	</Target>
-
-	<Target Name="GIT_PUSH" DependsOnTargets="GIT_BRANCH">
-		<ReadLinesFromFile File="$(VersionFile)">
-			<Output TaskParameter="Lines" PropertyName="VERSION" />
-		</ReadLinesFromFile>
-		<Exec Command='$(NbuildExe) -git settag -project $(SolutionName) -tag $(VERSION) -branch $(GIT_BRANCH) > TAG.TXT' />
-		<Exec Command='cd $(SolutionDir) &amp; git commit -a -m "Automated tag $(VERSION)" &amp; exit 0' />
-		<Exec Command='cd $(SolutionDir) &amp; git tag -a $(VERSION) HEAD -m "Automated Tag" &amp; exit 0' />
-		<Exec Command='cd $(SolutionDir) &amp; git pull --rebase &amp; exit 0' />
-		<Exec Command='cd $(SolutionDir) &amp; git push origin --tags &amp; exit 0' />
-		<Exec Command='cd $(SolutionDir) &amp; git push origin &amp; exit 0' />
-		<Exec Command='cd $(SolutionDir) &amp; git status &amp; exit 0' />
-
-		<Message Text="==> DONE"/>
-	</Target>
-
-	<Target Name="NUGET_PACK" DependsOnTargets="VARIABLES">
-		<Exec Command='$(NugetExe) pack $(SolutionDir)\launcher\ntools-launcher.nuspec -Version $(VERSION) -OutputDirectory $(NugetPackagePath)'/>
-		<Exec Command='rd $(LocalNugetFeed)\ntools-launcher\$(VERSION) /s /q'/>
-		<Exec Command='$(NugetExe) add $(NugetPackagePath)\$(SolutionName)-launcher.$(VERSION).nupkg -Source "$(LocalNugetFeed)"'/>
+	<Target Name="NUGET_PACK">
+		<Exec Command='$(NugetExe) pack $(SolutionDir)\launcher\ntools-launcher.nuspec -Version $(ProductVersion) -OutputDirectory $(NugetPackagePath)'/>
+		<Exec Command='rd $(LocalNugetFeed)\ntools-launcher\$(ProductVersion) /s /q'/>
+		<Exec Command='$(NugetExe) add $(NugetPackagePath)\$(SolutionName)-launcher.$(ProductVersion).nupkg -Source "$(LocalNugetFeed)"'/>
 		<Message Text="==> DONE"/>
 		</Target>
 	
-	<Target Name="NUGET_PUBLISH" DependsOnTargets='VARIABLES'>
+	<Target Name="NUGET_PUBLISH">
+		<PropertyGroup>
+			<NugetApiKey>$(USERPROFILE)\NugetApiKey.txt</NugetApiKey>
+		</PropertyGroup>
 		<ReadLinesFromFile File="$(ApiKeyFile)">
-		<Output TaskParameter="Lines" PropertyName="NUGET_API_KEY" />
+		<Output TaskParameter="Lines" PropertyName="NugetApiKey" />
 		</ReadLinesFromFile>
-		<MSBuild Projects="$(SolutionDir)\launcher\launcher.csproj" Properties="Configuration=$(TargetRelease);Platform=Any CPU;Version=$(VERSION);AssemblyVersion=$(VERSION)"/>
-		<Exec Command='$(NugetExe) push $(NugetPackagePath)\$(SolutionName)-launcher.$(VERSION).nupkg -Source https://api.nuget.org/v3/index.json -ApiKey $(NUGET_API_KEY)'/>
+		<MSBuild Projects="$(SolutionDir)\launcher\launcher.csproj" Properties="Configuration=$(TargetRelease);Platform=Any CPU;Version=$(ProductVersion);AssemblyVersion=$(ProductVersion)"/>
+		<Exec Command='$(NugetExe) push $(NugetPackagePath)\$(SolutionName)-launcher.$(ProductVersion).nupkg -Source https://api.nuget.org/v3/index.json -ApiKey $(NugetApiKey)'/>
 		<Message Text="==> DONE"/>	
 	</Target>
 
 	<Target Name="GET_TAG" DependsOnTargets="GIT_BRANCH">
-		<Exec Command='$(NbuildExe) -git gettag -project $(SolutionName) -branch $(GIT_BRANCH)'/>
+		<Exec Command='$(NbuildExe) -git gettag -project $(SolutionName) -branch $(GitBranch)'/>
 		<Message Text="==> DONE"/>	
 	</Target>
 
