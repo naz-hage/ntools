@@ -411,3 +411,4 @@ FodyWeavers.xsd
 /Build.bat
 /nbuild.xml
 /common.targets
+**/launchSettings.json

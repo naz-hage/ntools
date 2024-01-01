@@ -8,7 +8,7 @@
         <!-- This is the folder where the *.sln resides-->
 		<SolutionName>ntools</SolutionName>
         <!-- This is the location when the app deployed or installed -->
-        <DeploymentFolder>$(ProgramFiles)\$(SolutionName)</DeploymentFolder>
+        <DeploymentFolder>$(ProgramFiles)\nbuild</DeploymentFolder>
 	</PropertyGroup>
 	
 	
@@ -18,26 +18,21 @@
 		
       </PropertyGroup>  
       <ItemGroup>
-            <BinaryFiles Include="
+            <BinaryFiles 
+						Exclude="
+						 $(SolutionDir)\$(TargetRelease)\**\*.pdb;
+						 $(SolutionDir)\$(TargetRelease)\test.*;
+						 $(SolutionDir)\$(TargetRelease)\*test*;
+						 $(SolutionDir)\$(TargetRelease)\Nuget*;
+						 $(SolutionDir)\$(TargetRelease)\*CodeCoverage*"
+
+						Include="
                         $(SolutionDir)\$(TargetRelease)\*.exe;
                         $(SolutionDir)\$(TargetRelease)\*.exe.config;
-                        $(SolutionDir)\$(TargetRelease)\*.json;  
+                        $(SolutionDir)\$(TargetRelease)\*.json;
+						$(SolutionDir)\nbuild\resources\*.targets;
                         $(SolutionDir)\$(TargetRelease)\*.dll"
-						 
-                    Exclude="
-						$(SolutionDir)\$(TargetRelease)\**\*.pdb;
-						$(SolutionDir)\$(TargetRelease)\testhost.*"
 						/>
-
-            <DataFiles Include="
-                       $(SolutionDir)\$(TargetRelease)\Data\*.json"
-                      />
-
-            <TestFiles Include="
-                       $(SolutionDir)\Debug\**\*.*;
-                       " />
-
-		    <ArtifactsBlobs Include = "$(ArtifactsFolder)\**\*.*" />
 
             <RunTimesNetStandard20 Include = "
 								   $(SolutionDir)\$(TargetRelease)\netstandard2.0\*.*"
@@ -46,8 +41,6 @@
 						            />
 		  
         </ItemGroup>
-		
-		<RemoveDir Directories="$(ArtifactsFolder)" />
 		
         <Message Text="==> DONE"/>
     </Target>
@@ -76,4 +69,70 @@
 		<Message Text="==> DONE"/>	
 	</Target>
 
+	<Target Name="PACKAGE" DependsOnTargets="ARTIFACTS;GET_TAG">
+		<Message Text="Staging tag: $(ProductVersion)"/>
+		<Message Text="Artifacts folder: $(ArtifactsFolder)"/>
+		<Message Text="Removing  file $(ArtifactsFolder).zip"> </Message>
+		<Delete Files="$(ArtifactsFolder).zip"/>
+
+		
+		
+		<Exec Command='"$(ZipExe)" a -r -tzip $(ArtifactsFolder).zip $(ArtifactsFolder)\*'/>
+		
+		<Message Text="==> DONE"/>
+	</Target>
+
+	<Target Name="CLEAN_ARTIFACTS" AfterTargets="PACKAGE">
+		<Message Text="Removing $(ArtifactsFolder)"> </Message>
+		<RemoveDir Directories="$(ArtifactsFolder);"/>
+		<Message Text="==> DONE"/>
+	</Target>
+
+	<Target Name="CLEAN_TEST" DependsOnTargets="IS_ADMIN">
+		<ItemGroup>
+			<NGitFiles
+						Exclude="
+						 $(SolutionDir)\$(TargetRelease)\**\*.pdb;
+						 $(SolutionDir)\$(TargetRelease)\test.*;
+						 $(SolutionDir)\$(TargetRelease)\*test*;
+						 $(SolutionDir)\$(TargetRelease)\Nuget*;
+						 $(SolutionDir)\$(TargetRelease)\*CodeCoverage*"
+
+						Include="
+                        $(SolutionDir)\$(TargetRelease)\ngit*;
+						$(SolutionDir)\$(TargetRelease)\launcher*;
+                        $(SolutionDir)\nbuild\resources\*.targets;
+                        $(SolutionDir)\$(TargetRelease)\commandline.dll;  
+                        $(SolutionDir)\$(TargetRelease)\OutputColorizer.dll"
+						/>
+		</ItemGroup>
+		<Exec Command='del "$(DeploymentFolder)" /q' />
+		<Copy SourceFiles="@(NGitFiles)"
+			DestinationFolder="$(DeploymentFolder)"
+			Condition="'@(NGitFiles, ' ')' != ''"
+			SkipUnchangedFiles="true" />
+		<Exec Command='dir "$(DeploymentFolder)"'></Exec>
+
+		<Message Text="==> DONE"/>
+	</Target>
+	
+	<Target Name="TEST_STAGING_DEPLOY" DependsOnTargets="
+				CLEAN;
+                GET_TAG;
+                SOLUTION;
+                TEST;
+                SAVE_ARTIFACTS;
+                PACKAGE;
+				DEPLOY
+				">
+		<Exec Command='dir "$(DeploymentFolder)"'></Exec>
+		<Message Text="==> DONE"/>
+	</Target>
+
+	<Target Name="TEST_DEBUG">
+		<Exec Command="git describe" Outputs="tag" EchoOff="false"></Exec>
+		<Exec Command="Debug\ngit.exe -git gettag -project ntools"></Exec>
+		<Exec Command="Debug\ngit.exe -git getbranch -project ntools"></Exec>
+		<Message Text="==> DONE"/>
+	</Target>
 </Project>

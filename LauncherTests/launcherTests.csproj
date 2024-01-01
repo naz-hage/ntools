@@ -8,7 +8,7 @@
     <Authors>blue-man</Authors>
     <Company>blue-man</Company>
     <Product>launcher</Product>
-    <Copyright>2020-2023</Copyright>
+    <Copyright>2020-2024</Copyright>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

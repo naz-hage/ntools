@@ -10,7 +10,7 @@
     <projectUrl>https://github.com/naz-hage/ntools/tree/main/launcher</projectUrl>
     <description>This package simplifies calling another executable.</description>
     <releaseNotes>First release</releaseNotes>
-    <copyright>2020-2023</copyright>
+    <Copyright>2020-2024</Copyright>
     <readme>README.md</readme>
     <tags></tags>
     <dependencies>

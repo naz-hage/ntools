@@ -9,7 +9,7 @@
     <Authors>blue-man</Authors>
     <Company>blue-man</Company>
     <Product>Backup automation</Product>
-    <Copyright>2020-2023</Copyright>
+    <Copyright>2020-2024</Copyright>
   </PropertyGroup>
 
 
@@ -28,14 +28,11 @@
 
   <ItemGroup>
     <PackageReference Include="CommandLine.Net" Version="2.3.0" />
+    <PackageReference Include="ntools-launcher" Version="1.0.0.5" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Properties\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\launcher\Launcher.csproj" />
   </ItemGroup>
 
 	<ItemGroup>
