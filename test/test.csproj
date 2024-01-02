@@ -5,8 +5,8 @@
     <TargetFramework>net8.0-windows</TargetFramework>
     <Version></Version>
     <AssemblyVersion></AssemblyVersion>
-    <Authors>blue-man</Authors>
-    <Company>blue-man</Company>
+    <Authors>naz-hage</Authors>
+    <Company>naz-hage</Company>
     <Product>launcher</Product>
     <Copyright>2020-2024</Copyright>
   </PropertyGroup>

@@ -6,8 +6,8 @@
 	  <Nullable>enable</Nullable>
     <Version></Version>
     <AssemblyVersion></AssemblyVersion>
-    <Authors>blue-man</Authors>
-    <Company>blue-man</Company>
+    <Authors>naz-hage</Authors>
+    <Company>naz-hage</Company>
     <Product>Backup automation</Product>
     <Copyright>2020-2024</Copyright>
   </PropertyGroup>
