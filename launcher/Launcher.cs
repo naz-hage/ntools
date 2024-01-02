@@ -36,40 +36,44 @@ namespace Launcher
             try
             {
                 // Create a new process object and set the properties for running the specified executable.
-                using var process = new Process();
-                process.StartInfo.WorkingDirectory = workingDir;
-                process.StartInfo.FileName = fileName;
-                process.StartInfo.Arguments = arguments;
-                process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                process.StartInfo.CreateNoWindow = false;
-                process.StartInfo.UseShellExecute = useShellExecute;
-                process.StartInfo.RedirectStandardOutput = redirectStandardOutput;
-                process.StartInfo.RedirectStandardError = redirectStandardOutput;
-
-                // Set the current directory to the working directory to avoid issues when running the executable.
-                Directory.SetCurrentDirectory(process.StartInfo.WorkingDirectory);
-
-                // Start the process.
-                if (process.Start())
+                using (var process = new Process())
                 {
-                    // If redirectStandardOutput is true, read any output from the executable and add it to the result object's Output property.
-                    if (redirectStandardOutput)
-                    {
-                        result.Output.AddRange(process.StandardOutput.ReadToEnd()
-                                                       .Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries));
-                        result.Output.AddRange(process.StandardError.ReadToEnd()
-                                                       .Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries));
-                    }
-                    else // Otherwise, wait for the process to exit.
-                    {
-                        process.WaitForExit();
-                    }
-                }
-                // Output verbose message if required.
-                if (Verbose) Console.WriteLine($"Exit Code: {process.ExitCode}");
+                    process.StartInfo.WorkingDirectory = workingDir;
+                    process.StartInfo.FileName = fileName;
+                    process.StartInfo.Arguments = arguments;
+                    process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                    process.StartInfo.CreateNoWindow = false;
+                    process.StartInfo.UseShellExecute = useShellExecute;
+                    process.StartInfo.RedirectStandardOutput = redirectStandardOutput;
+                    process.StartInfo.RedirectStandardError = redirectStandardOutput;
 
-                // Set the exit code in the result object and return it.
-                result.Code = process.ExitCode;
+                    // Set the current directory to the working directory to avoid issues when running the executable.
+                    Directory.SetCurrentDirectory(process.StartInfo.WorkingDirectory);
+
+                    // Start the process.
+                    if (process.Start())
+                    {
+                        // If redirectStandardOutput is true, read any output from the executable and add it to the result object's Output property.
+                        if (redirectStandardOutput)
+                        {
+                            result.Output.AddRange(process.StandardOutput.ReadToEnd()
+                                                           .Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries));
+                            result.Output.AddRange(process.StandardError.ReadToEnd()
+                                                           .Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries));
+                        }
+                        else // Otherwise, wait for the process to exit.
+                        {
+                            process.WaitForExit();
+                        }
+                    }
+
+
+                    // Output verbose message if required.
+                    if (Verbose) Console.WriteLine($"Exit Code: {process.ExitCode}");
+
+                    // Set the exit code in the result object and return it.
+                    result.Code = process.ExitCode;
+                }
                 return result;
             }
 

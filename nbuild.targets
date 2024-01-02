@@ -45,7 +45,11 @@
         <Message Text="==> DONE"/>
     </Target>
 
-	<Target Name="NUGET_PACK">
+	<Target Name="NUGET_PACK" DependsOnTargets="GET_TAG">
+		<PropertyGroup>
+			<NugetPackagePath>$(ArtifactsDir)\$(SolutionName)\Nuget\$(ProductVersion)</NugetPackagePath>
+			<LocalNugetFeed>$(ArtifactsDir)\$(SolutionName)\Nuget</LocalNugetFeed>
+		</PropertyGroup>
 		<Exec Command='$(NugetExe) pack $(SolutionDir)\launcher\ntools-launcher.nuspec -Version $(ProductVersion) -OutputDirectory $(NugetPackagePath)'/>
 		<Exec Command='rd $(LocalNugetFeed)\ntools-launcher\$(ProductVersion) /s /q'/>
 		<Exec Command='$(NugetExe) add $(NugetPackagePath)\$(SolutionName)-launcher.$(ProductVersion).nupkg -Source "$(LocalNugetFeed)"'/>
@@ -61,11 +65,6 @@
 		</ReadLinesFromFile>
 		<MSBuild Projects="$(SolutionDir)\launcher\launcher.csproj" Properties="Configuration=$(TargetRelease);Platform=Any CPU;Version=$(ProductVersion);AssemblyVersion=$(ProductVersion)"/>
 		<Exec Command='$(NugetExe) push $(NugetPackagePath)\$(SolutionName)-launcher.$(ProductVersion).nupkg -Source https://api.nuget.org/v3/index.json -ApiKey $(NugetApiKey)'/>
-		<Message Text="==> DONE"/>	
-	</Target>
-
-	<Target Name="GET_TAG" DependsOnTargets="GIT_BRANCH">
-		<Exec Command='$(NbuildExe) -git gettag -project $(SolutionName) -branch $(GitBranch)'/>
 		<Message Text="==> DONE"/>	
 	</Target>
 
