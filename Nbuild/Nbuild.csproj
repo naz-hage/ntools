@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+	  <Version></Version>
+	  <AssemblyVersion></AssemblyVersion>
+	  <Authors>blue-man</Authors>
+	  <Company>blue-man</Company>
+	  <Product>Build automation</Product>
+	  <Copyright>2020-2024</Copyright>
+  </PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<OutputPath>$(SolutionDir)/Debug</OutputPath>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<OutputPath>$(SolutionDir)/Release</OutputPath>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="resources\common.targets" />
+		<EmbeddedResource Include="resources\GetFileVersion.ps1" />
+		<EmbeddedResource Include="resources\nbuild.bat" />
+		<EmbeddedResource Include="resources\nbuild.targets" />
+		<EmbeddedResource Include="resources\node.targets" />
+		<EmbeddedResource Include="resources\nuget.targets" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <PackageReference Include="CommandLine.Net" Version="2.3.0" />
+	  <PackageReference Include="ntools-launcher" Version="1.0.0.5" />
+	</ItemGroup>
+
+</Project>

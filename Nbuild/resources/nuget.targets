@@ -1,0 +1,33 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<Target Name="NUGET_VERSION" AfterTargets="DOWNLOAD_NUGET">
+		<Message Text="$(NugetExe) $(NugetExe)" />
+		
+		<!-- Call the PowerShell script and capture nuget version output into  NugetVersion property-->
+        <Exec Command='powershell -File "$(BuildTools)\GetFileVersion.ps1" "$(NugetExe)"' ConsoleToMSBuild="true">
+            <Output TaskParameter="ConsoleOutput" PropertyName="NugetVersion" />
+        </Exec>
+
+		<Message Text="$(NugetExe) version: $(NugetVersion)" />
+	</Target>
+
+	<Target Name="DOWNLOAD_NUGET" DependsOnTargets="IS_ADMIN">
+		<PropertyGroup>
+			<NugetTempExe>c:\temp\nuget.exe</NugetTempExe>
+		</PropertyGroup>
+
+		<!-- Delete NugetTempExe if it exists -->
+		<Exec Command='if exist "$(NugetTempExe)" del "$(NugetTempExe)"' ContinueOnError="true" />		
+
+		<Exec Command='powershell -Command "Invoke-WebRequest -OutFile $(NugetTempExe) https://dist.nuget.org/win-x86-commandline/latest/nuget.exe"' />
+		 
+		 <!-- Move nuget.exe from NugetTempExe to NugetExe -->
+		<Exec Command='move /Y "$(NugetTempExe)" "$(NugetExe)"' />
+
+		<!-- Delete NugetTempExe if it exists -->
+		<Exec Command='if exist "$(NugetTempExe)" del "$(NugetTempExe)"' ContinueOnError="true" />		
+
+		<Message Text="==> NUGET_DONE"/>
+	</Target>
+
+</Project>

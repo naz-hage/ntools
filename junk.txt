@@ -1,0 +1,901 @@
+
+//  Microsoft (R) .NET Framework IL Disassembler.  Version 4.8.3928.0
+//  Copyright (c) Microsoft Corporation.  All rights reserved.
+
+
+
+// Metadata version: v4.0.30319
+.assembly extern netstandard
+{
+  .publickeytoken = (CC 7B 13 FF CD 2D DD 51 )                         // .{...-.Q
+  .ver 2:0:0:0
+}
+.assembly extern System.Security.Principal.Windows
+{
+  .publickeytoken = (B0 3F 5F 7F 11 D5 0A 3A )                         // .?_....:
+  .ver 5:0:0:0
+}
+.assembly Launcher
+{
+  .custom instance void [netstandard]System.Runtime.CompilerServices.CompilationRelaxationsAttribute::.ctor(int32) = ( 01 00 08 00 00 00 00 00 ) 
+  .custom instance void [netstandard]System.Runtime.CompilerServices.RuntimeCompatibilityAttribute::.ctor() = ( 01 00 01 00 54 02 16 57 72 61 70 4E 6F 6E 45 78   // ....T..WrapNonEx
+                                                                                                                63 65 70 74 69 6F 6E 54 68 72 6F 77 73 01 )       // ceptionThrows.
+
+  // --- The following custom attribute is added automatically, do not uncomment -------
+  //  .custom instance void [netstandard]System.Diagnostics.DebuggableAttribute::.ctor(valuetype [netstandard]System.Diagnostics.DebuggableAttribute/DebuggingModes) = ( 01 00 02 00 00 00 00 00 ) 
+
+  .custom instance void [netstandard]System.Runtime.Versioning.TargetFrameworkAttribute::.ctor(string) = ( 01 00 19 2E 4E 45 54 53 74 61 6E 64 61 72 64 2C   // ....NETStandard,
+                                                                                                           56 65 72 73 69 6F 6E 3D 76 32 2E 30 01 00 54 0E   // Version=v2.0..T.
+                                                                                                           14 46 72 61 6D 65 77 6F 72 6B 44 69 73 70 6C 61   // .FrameworkDispla
+                                                                                                           79 4E 61 6D 65 11 2E 4E 45 54 20 53 74 61 6E 64   // yName..NET Stand
+                                                                                                           61 72 64 20 32 2E 30 )                            // ard 2.0
+  .custom instance void [netstandard]System.Reflection.AssemblyCompanyAttribute::.ctor(string) = ( 01 00 08 6E 61 7A 2D 68 61 67 65 00 00 )          // ...naz-hage..
+  .custom instance void [netstandard]System.Reflection.AssemblyConfigurationAttribute::.ctor(string) = ( 01 00 07 52 65 6C 65 61 73 65 00 00 )             // ...Release..
+  .custom instance void [netstandard]System.Reflection.AssemblyCopyrightAttribute::.ctor(string) = ( 01 00 09 32 30 32 30 2D 32 30 32 34 00 00 )       // ...2020-2024..
+  .custom instance void [netstandard]System.Reflection.AssemblyDescriptionAttribute::.ctor(string) = ( 01 00 34 54 68 69 73 20 70 61 63 6B 61 67 65 20   // ..4This package 
+                                                                                                       73 69 6D 70 6C 69 66 69 65 73 20 63 61 6C 6C 69   // simplifies calli
+                                                                                                       6E 67 20 61 6E 6F 74 68 65 72 20 65 78 65 63 75   // ng another execu
+                                                                                                       74 61 62 6C 65 2E 20 00 00 )                      // table. ..
+  .custom instance void [netstandard]System.Reflection.AssemblyFileVersionAttribute::.ctor(string) = ( 01 00 07 31 2E 30 2E 30 2E 30 00 00 )             // ...1.0.0.0..
+  .custom instance void [netstandard]System.Reflection.AssemblyInformationalVersionAttribute::.ctor(string) = ( 01 00 2E 31 2E 30 2E 30 2B 65 64 65 61 66 39 65   // ...1.0.0+edeaf9e
+                                                                                                                65 31 62 37 38 64 33 34 62 33 34 65 63 66 30 34   // e1b78d34b34ecf04
+                                                                                                                36 63 37 35 36 33 33 38 36 64 65 33 65 31 30 61   // 6c7563386de3e10a
+                                                                                                                65 00 00 )                                        // e..
+  .custom instance void [netstandard]System.Reflection.AssemblyProductAttribute::.ctor(string) = ( 01 00 08 6C 61 75 6E 63 68 65 72 00 00 )          // ...launcher..
+  .custom instance void [netstandard]System.Reflection.AssemblyTitleAttribute::.ctor(string) = ( 01 00 08 4C 61 75 6E 63 68 65 72 00 00 )          // ...Launcher..
+  .custom instance void [netstandard]System.Reflection.AssemblyMetadataAttribute::.ctor(string,
+                                                                                        string) = ( 01 00 0D 52 65 70 6F 73 69 74 6F 72 79 55 72 6C   // ...RepositoryUrl
+                                                                                                    35 68 74 74 70 73 3A 2F 2F 67 69 74 68 75 62 2E   // 5https://github.
+                                                                                                    63 6F 6D 2F 6E 61 7A 2D 68 61 67 65 2F 6E 74 6F   // com/naz-hage/nto
+                                                                                                    6F 6C 73 2F 74 72 65 65 2F 6D 61 69 6E 2F 6C 61   // ols/tree/main/la
+                                                                                                    75 6E 63 68 65 72 00 00 )                         // uncher..
+  .hash algorithm 0x00008004
+  .ver 1:0:0:0
+}
+.module Launcher.dll
+// MVID: {13F11E2B-4303-4532-99A8-DBD6A73190B9}
+.imagebase 0x10000000
+.file alignment 0x00000200
+.stackreserve 0x00100000
+.subsystem 0x0003       // WINDOWS_CUI
+.corflags 0x00000001    //  ILONLY
+// Image base: 0x06E50000
+
+
+// =============== CLASS MEMBERS DECLARATION ===================
+
+.class public auto ansi beforefieldinit Launcher.CurrentProcess
+       extends [netstandard]System.Object
+{
+  .method public hidebysig static bool  IsElevated() cil managed
+  {
+    // Code size       21 (0x15)
+    .maxstack  8
+    IL_0000:  call       class [System.Security.Principal.Windows]System.Security.Principal.WindowsIdentity [System.Security.Principal.Windows]System.Security.Principal.WindowsIdentity::GetCurrent()
+    IL_0005:  newobj     instance void [System.Security.Principal.Windows]System.Security.Principal.WindowsPrincipal::.ctor(class [System.Security.Principal.Windows]System.Security.Principal.WindowsIdentity)
+    IL_000a:  ldc.i4     0x220
+    IL_000f:  callvirt   instance bool [System.Security.Principal.Windows]System.Security.Principal.WindowsPrincipal::IsInRole(valuetype [System.Security.Principal.Windows]System.Security.Principal.WindowsBuiltInRole)
+    IL_0014:  ret
+  } // end of method CurrentProcess::IsElevated
+
+  .method public hidebysig specialname rtspecialname 
+          instance void  .ctor() cil managed
+  {
+    // Code size       7 (0x7)
+    .maxstack  8
+    IL_0000:  ldarg.0
+    IL_0001:  call       instance void [netstandard]System.Object::.ctor()
+    IL_0006:  ret
+  } // end of method CurrentProcess::.ctor
+
+} // end of class Launcher.CurrentProcess
+
+.class public abstract auto ansi sealed beforefieldinit Launcher.Launcher
+       extends [netstandard]System.Object
+{
+  .class auto ansi sealed nested private beforefieldinit '<>c__DisplayClass7_0'
+         extends [netstandard]System.Object
+  {
+    .custom instance void [netstandard]System.Runtime.CompilerServices.CompilerGeneratedAttribute::.ctor() = ( 01 00 00 00 ) 
+    .field public class [netstandard]System.Diagnostics.ProcessStartInfo startInfo
+    .method public hidebysig specialname rtspecialname 
+            instance void  .ctor() cil managed
+    {
+      // Code size       7 (0x7)
+      .maxstack  8
+      IL_0000:  ldarg.0
+      IL_0001:  call       instance void [netstandard]System.Object::.ctor()
+      IL_0006:  ret
+    } // end of method '<>c__DisplayClass7_0'::.ctor
+
+    .method assembly hidebysig instance void 
+            '<LaunchInThread>b__0'() cil managed
+    {
+      // Code size       79 (0x4f)
+      .maxstack  4
+      .try
+      {
+        IL_0000:  call       class [netstandard]System.Threading.Thread [netstandard]System.Threading.Thread::get_CurrentThread()
+        IL_0005:  ldc.i4.1
+        IL_0006:  callvirt   instance void [netstandard]System.Threading.Thread::set_IsBackground(bool)
+        IL_000b:  ldarg.0
+        IL_000c:  ldfld      class [netstandard]System.Diagnostics.ProcessStartInfo Launcher.Launcher/'<>c__DisplayClass7_0'::startInfo
+        IL_0011:  call       class [netstandard]System.Diagnostics.Process [netstandard]System.Diagnostics.Process::Start(class [netstandard]System.Diagnostics.ProcessStartInfo)
+        IL_0016:  pop
+        IL_0017:  ldstr      "Started "
+        IL_001c:  ldarg.0
+        IL_001d:  ldfld      class [netstandard]System.Diagnostics.ProcessStartInfo Launcher.Launcher/'<>c__DisplayClass7_0'::startInfo
+        IL_0022:  callvirt   instance string [netstandard]System.Diagnostics.ProcessStartInfo::get_FileName()
+        IL_0027:  ldstr      " "
+        IL_002c:  ldarg.0
+        IL_002d:  ldfld      class [netstandard]System.Diagnostics.ProcessStartInfo Launcher.Launcher/'<>c__DisplayClass7_0'::startInfo
+        IL_0032:  callvirt   instance string [netstandard]System.Diagnostics.ProcessStartInfo::get_Arguments()
+        IL_0037:  call       string [netstandard]System.String::Concat(string,
+                                                                       string,
+                                                                       string,
+                                                                       string)
+        IL_003c:  call       void [netstandard]System.Console::WriteLine(string)
+        IL_0041:  leave.s    IL_004e
+
+      }  // end .try
+      catch [netstandard]System.Exception 
+      {
+        IL_0043:  callvirt   instance string [netstandard]System.Exception::get_Message()
+        IL_0048:  newobj     instance void [netstandard]System.Exception::.ctor(string)
+        IL_004d:  throw
+
+      }  // end handler
+      IL_004e:  ret
+    } // end of method '<>c__DisplayClass7_0'::'<LaunchInThread>b__0'
+
+  } // end of class '<>c__DisplayClass7_0'
+
+  .field private static bool '<Verbose>k__BackingField'
+  .custom instance void [netstandard]System.Runtime.CompilerServices.CompilerGeneratedAttribute::.ctor() = ( 01 00 00 00 ) 
+  .method public hidebysig specialname static 
+          bool  get_Verbose() cil managed
+  {
+    .custom instance void [netstandard]System.Runtime.CompilerServices.CompilerGeneratedAttribute::.ctor() = ( 01 00 00 00 ) 
+    // Code size       6 (0x6)
+    .maxstack  8
+    IL_0000:  ldsfld     bool Launcher.Launcher::'<Verbose>k__BackingField'
+    IL_0005:  ret
+  } // end of method Launcher::get_Verbose
+
+  .method public hidebysig specialname static 
+          void  set_Verbose(bool 'value') cil managed
+  {
+    .custom instance void [netstandard]System.Runtime.CompilerServices.CompilerGeneratedAttribute::.ctor() = ( 01 00 00 00 ) 
+    // Code size       7 (0x7)
+    .maxstack  8
+    IL_0000:  ldarg.0
+    IL_0001:  stsfld     bool Launcher.Launcher::'<Verbose>k__BackingField'
+    IL_0006:  ret
+  } // end of method Launcher::set_Verbose
+
+  .method private hidebysig static class Launcher.ResultHelper 
+          Start(string workingDir,
+                string fileName,
+                string arguments,
+                [opt] bool redirectStandardOutput,
+                [opt] bool verbose,
+                [opt] bool useShellExecute) cil managed
+  {
+    .param [4] = bool(false)
+    .param [5] = bool(false)
+    .param [6] = bool(false)
+    // Code size       396 (0x18c)
+    .maxstack  6
+    .locals init (class Launcher.ResultHelper V_0,
+             class [netstandard]System.Diagnostics.Process V_1,
+             class Launcher.ResultHelper V_2,
+             class [netstandard]System.Exception V_3)
+    IL_0000:  call       class Launcher.ResultHelper Launcher.ResultHelper::New()
+    IL_0005:  stloc.0
+    IL_0006:  ldarg.s    verbose
+    IL_0008:  call       void Launcher.Launcher::set_Verbose(bool)
+    IL_000d:  call       bool Launcher.Launcher::get_Verbose()
+    IL_0012:  brfalse.s  IL_002a
+
+    IL_0014:  ldstr      "launcher=>"
+    IL_0019:  ldarg.1
+    IL_001a:  ldstr      " "
+    IL_001f:  ldarg.2
+    IL_0020:  call       string [netstandard]System.String::Concat(string,
+                                                                   string,
+                                                                   string,
+                                                                   string)
+    IL_0025:  call       void [netstandard]System.Console::WriteLine(string)
+    IL_002a:  nop
+    .try
+    {
+      IL_002b:  newobj     instance void [netstandard]System.Diagnostics.Process::.ctor()
+      IL_0030:  stloc.1
+      .try
+      {
+        IL_0031:  ldloc.1
+        IL_0032:  callvirt   instance class [netstandard]System.Diagnostics.ProcessStartInfo [netstandard]System.Diagnostics.Process::get_StartInfo()
+        IL_0037:  ldarg.0
+        IL_0038:  callvirt   instance void [netstandard]System.Diagnostics.ProcessStartInfo::set_WorkingDirectory(string)
+        IL_003d:  ldloc.1
+        IL_003e:  callvirt   instance class [netstandard]System.Diagnostics.ProcessStartInfo [netstandard]System.Diagnostics.Process::get_StartInfo()
+        IL_0043:  ldarg.1
+        IL_0044:  callvirt   instance void [netstandard]System.Diagnostics.ProcessStartInfo::set_FileName(string)
+        IL_0049:  ldloc.1
+        IL_004a:  callvirt   instance class [netstandard]System.Diagnostics.ProcessStartInfo [netstandard]System.Diagnostics.Process::get_StartInfo()
+        IL_004f:  ldarg.2
+        IL_0050:  callvirt   instance void [netstandard]System.Diagnostics.ProcessStartInfo::set_Arguments(string)
+        IL_0055:  ldloc.1
+        IL_0056:  callvirt   instance class [netstandard]System.Diagnostics.ProcessStartInfo [netstandard]System.Diagnostics.Process::get_StartInfo()
+        IL_005b:  ldc.i4.1
+        IL_005c:  callvirt   instance void [netstandard]System.Diagnostics.ProcessStartInfo::set_WindowStyle(valuetype [netstandard]System.Diagnostics.ProcessWindowStyle)
+        IL_0061:  ldloc.1
+        IL_0062:  callvirt   instance class [netstandard]System.Diagnostics.ProcessStartInfo [netstandard]System.Diagnostics.Process::get_StartInfo()
+        IL_0067:  ldc.i4.0
+        IL_0068:  callvirt   instance void [netstandard]System.Diagnostics.ProcessStartInfo::set_CreateNoWindow(bool)
+        IL_006d:  ldloc.1
+        IL_006e:  callvirt   instance class [netstandard]System.Diagnostics.ProcessStartInfo [netstandard]System.Diagnostics.Process::get_StartInfo()
+        IL_0073:  ldarg.s    useShellExecute
+        IL_0075:  callvirt   instance void [netstandard]System.Diagnostics.ProcessStartInfo::set_UseShellExecute(bool)
+        IL_007a:  ldloc.1
+        IL_007b:  callvirt   instance class [netstandard]System.Diagnostics.ProcessStartInfo [netstandard]System.Diagnostics.Process::get_StartInfo()
+        IL_0080:  ldarg.3
+        IL_0081:  callvirt   instance void [netstandard]System.Diagnostics.ProcessStartInfo::set_RedirectStandardOutput(bool)
+        IL_0086:  ldloc.1
+        IL_0087:  callvirt   instance class [netstandard]System.Diagnostics.ProcessStartInfo [netstandard]System.Diagnostics.Process::get_StartInfo()
+        IL_008c:  ldarg.3
+        IL_008d:  callvirt   instance void [netstandard]System.Diagnostics.ProcessStartInfo::set_RedirectStandardError(bool)
+        IL_0092:  ldloc.1
+        IL_0093:  callvirt   instance class [netstandard]System.Diagnostics.ProcessStartInfo [netstandard]System.Diagnostics.Process::get_StartInfo()
+        IL_0098:  callvirt   instance string [netstandard]System.Diagnostics.ProcessStartInfo::get_WorkingDirectory()
+        IL_009d:  call       void [netstandard]System.IO.Directory::SetCurrentDirectory(string)
+        IL_00a2:  ldloc.1
+        IL_00a3:  callvirt   instance bool [netstandard]System.Diagnostics.Process::Start()
+        IL_00a8:  brfalse.s  IL_010d
+
+        IL_00aa:  ldarg.3
+        IL_00ab:  brfalse.s  IL_0107
+
+        IL_00ad:  ldloc.0
+        IL_00ae:  callvirt   instance class [netstandard]System.Collections.Generic.List`1<string> Launcher.ResultHelper::get_Output()
+        IL_00b3:  ldloc.1
+        IL_00b4:  callvirt   instance class [netstandard]System.IO.StreamReader [netstandard]System.Diagnostics.Process::get_StandardOutput()
+        IL_00b9:  callvirt   instance string [netstandard]System.IO.TextReader::ReadToEnd()
+        IL_00be:  ldc.i4.2
+        IL_00bf:  newarr     [netstandard]System.Char
+        IL_00c4:  dup
+        IL_00c5:  ldc.i4.0
+        IL_00c6:  ldc.i4.s   10
+        IL_00c8:  stelem.i2
+        IL_00c9:  dup
+        IL_00ca:  ldc.i4.1
+        IL_00cb:  ldc.i4.s   13
+        IL_00cd:  stelem.i2
+        IL_00ce:  ldc.i4.1
+        IL_00cf:  callvirt   instance string[] [netstandard]System.String::Split(char[],
+                                                                                 valuetype [netstandard]System.StringSplitOptions)
+        IL_00d4:  callvirt   instance void class [netstandard]System.Collections.Generic.List`1<string>::AddRange(class [netstandard]System.Collections.Generic.IEnumerable`1<!0>)
+        IL_00d9:  ldloc.0
+        IL_00da:  callvirt   instance class [netstandard]System.Collections.Generic.List`1<string> Launcher.ResultHelper::get_Output()
+        IL_00df:  ldloc.1
+        IL_00e0:  callvirt   instance class [netstandard]System.IO.StreamReader [netstandard]System.Diagnostics.Process::get_StandardError()
+        IL_00e5:  callvirt   instance string [netstandard]System.IO.TextReader::ReadToEnd()
+        IL_00ea:  ldc.i4.2
+        IL_00eb:  newarr     [netstandard]System.Char
+        IL_00f0:  dup
+        IL_00f1:  ldc.i4.0
+        IL_00f2:  ldc.i4.s   10
+        IL_00f4:  stelem.i2
+        IL_00f5:  dup
+        IL_00f6:  ldc.i4.1
+        IL_00f7:  ldc.i4.s   13
+        IL_00f9:  stelem.i2
+        IL_00fa:  ldc.i4.1
+        IL_00fb:  callvirt   instance string[] [netstandard]System.String::Split(char[],
+                                                                                 valuetype [netstandard]System.StringSplitOptions)
+        IL_0100:  callvirt   instance void class [netstandard]System.Collections.Generic.List`1<string>::AddRange(class [netstandard]System.Collections.Generic.IEnumerable`1<!0>)
+        IL_0105:  br.s       IL_010d
+
+        IL_0107:  ldloc.1
+        IL_0108:  callvirt   instance void [netstandard]System.Diagnostics.Process::WaitForExit()
+        IL_010d:  call       bool Launcher.Launcher::get_Verbose()
+        IL_0112:  brfalse.s  IL_012e
+
+        IL_0114:  ldstr      "Exit Code: {0}"
+        IL_0119:  ldloc.1
+        IL_011a:  callvirt   instance int32 [netstandard]System.Diagnostics.Process::get_ExitCode()
+        IL_011f:  box        [netstandard]System.Int32
+        IL_0124:  call       string [netstandard]System.String::Format(string,
+                                                                       object)
+        IL_0129:  call       void [netstandard]System.Console::WriteLine(string)
+        IL_012e:  ldloc.0
+        IL_012f:  ldloc.1
+        IL_0130:  callvirt   instance int32 [netstandard]System.Diagnostics.Process::get_ExitCode()
+        IL_0135:  callvirt   instance void Launcher.ResultHelper::set_Code(int32)
+        IL_013a:  leave.s    IL_0146
+
+      }  // end .try
+      finally
+      {
+        IL_013c:  ldloc.1
+        IL_013d:  brfalse.s  IL_0145
+
+        IL_013f:  ldloc.1
+        IL_0140:  callvirt   instance void [netstandard]System.IDisposable::Dispose()
+        IL_0145:  endfinally
+      }  // end handler
+      IL_0146:  ldloc.0
+      IL_0147:  stloc.2
+      IL_0148:  leave.s    IL_018a
+
+    }  // end .try
+    catch [netstandard]System.Exception 
+    {
+      IL_014a:  stloc.3
+      IL_014b:  ldstr      "ProcessStart Exception: "
+      IL_0150:  ldloc.3
+      IL_0151:  callvirt   instance string [netstandard]System.Exception::get_Message()
+      IL_0156:  call       string [netstandard]System.String::Concat(string,
+                                                                     string)
+      IL_015b:  call       void [netstandard]System.Console::WriteLine(string)
+      IL_0160:  ldloc.0
+      IL_0161:  callvirt   instance class [netstandard]System.Collections.Generic.List`1<string> Launcher.ResultHelper::get_Output()
+      IL_0166:  ldstr      "ProcessStart Exception: "
+      IL_016b:  ldloc.3
+      IL_016c:  callvirt   instance string [netstandard]System.Exception::get_Message()
+      IL_0171:  call       string [netstandard]System.String::Concat(string,
+                                                                     string)
+      IL_0176:  callvirt   instance void class [netstandard]System.Collections.Generic.List`1<string>::Add(!0)
+      IL_017b:  ldloc.0
+      IL_017c:  ldc.i4     0x7fffffff
+      IL_0181:  callvirt   instance void Launcher.ResultHelper::set_Code(int32)
+      IL_0186:  ldloc.0
+      IL_0187:  stloc.2
+      IL_0188:  leave.s    IL_018a
+
+    }  // end handler
+    IL_018a:  ldloc.2
+    IL_018b:  ret
+  } // end of method Launcher::Start
+
+  .method public hidebysig static class Launcher.ResultHelper 
+          Start(class Launcher.Parameters parameters) cil managed
+  {
+    // Code size       42 (0x2a)
+    .maxstack  8
+    IL_0000:  ldarg.0
+    IL_0001:  callvirt   instance string Launcher.Parameters::get_WorkingDir()
+    IL_0006:  ldarg.0
+    IL_0007:  callvirt   instance string Launcher.Parameters::get_FileName()
+    IL_000c:  ldarg.0
+    IL_000d:  callvirt   instance string Launcher.Parameters::get_Arguments()
+    IL_0012:  ldarg.0
+    IL_0013:  callvirt   instance bool Launcher.Parameters::get_RedirectStandardOutput()
+    IL_0018:  ldarg.0
+    IL_0019:  callvirt   instance bool Launcher.Parameters::get_Verbose()
+    IL_001e:  ldarg.0
+    IL_001f:  callvirt   instance bool Launcher.Parameters::get_UseShellExecute()
+    IL_0024:  call       class Launcher.ResultHelper Launcher.Launcher::Start(string,
+                                                                              string,
+                                                                              string,
+                                                                              bool,
+                                                                              bool,
+                                                                              bool)
+    IL_0029:  ret
+  } // end of method Launcher::Start
+
+  .method private hidebysig static void  WriteError(string line) cil managed
+  {
+    // Code size       61 (0x3d)
+    .maxstack  8
+    IL_0000:  ldarg.0
+    IL_0001:  callvirt   instance string [netstandard]System.String::ToLower()
+    IL_0006:  ldstr      "error"
+    IL_000b:  callvirt   instance bool [netstandard]System.String::Contains(string)
+    IL_0010:  brtrue.s   IL_0036
+
+    IL_0012:  ldarg.0
+    IL_0013:  callvirt   instance string [netstandard]System.String::ToLower()
+    IL_0018:  ldstr      "fail"
+    IL_001d:  callvirt   instance bool [netstandard]System.String::Contains(string)
+    IL_0022:  brtrue.s   IL_0036
+
+    IL_0024:  ldarg.0
+    IL_0025:  callvirt   instance string [netstandard]System.String::ToLower()
+    IL_002a:  ldstr      "rejected"
+    IL_002f:  callvirt   instance bool [netstandard]System.String::Contains(string)
+    IL_0034:  brfalse.s  IL_003c
+
+    IL_0036:  ldarg.0
+    IL_0037:  call       void [netstandard]System.Console::WriteLine(string)
+    IL_003c:  ret
+  } // end of method Launcher::WriteError
+
+  .method public hidebysig static class Launcher.ResultHelper 
+          LaunchInThread(string workingDir,
+                         string fileName,
+                         string arguments) cil managed
+  {
+    // Code size       187 (0xbb)
+    .maxstack  4
+    .locals init (class Launcher.Launcher/'<>c__DisplayClass7_0' V_0,
+             string V_1,
+             class Launcher.ResultHelper V_2,
+             class [netstandard]System.Exception V_3)
+    IL_0000:  newobj     instance void Launcher.Launcher/'<>c__DisplayClass7_0'::.ctor()
+    IL_0005:  stloc.0
+    IL_0006:  ldloc.0
+    IL_0007:  newobj     instance void [netstandard]System.Diagnostics.ProcessStartInfo::.ctor()
+    IL_000c:  dup
+    IL_000d:  ldarg.1
+    IL_000e:  callvirt   instance void [netstandard]System.Diagnostics.ProcessStartInfo::set_FileName(string)
+    IL_0013:  dup
+    IL_0014:  ldarg.0
+    IL_0015:  callvirt   instance void [netstandard]System.Diagnostics.ProcessStartInfo::set_WorkingDirectory(string)
+    IL_001a:  dup
+    IL_001b:  ldarg.2
+    IL_001c:  callvirt   instance void [netstandard]System.Diagnostics.ProcessStartInfo::set_Arguments(string)
+    IL_0021:  dup
+    IL_0022:  ldc.i4.1
+    IL_0023:  callvirt   instance void [netstandard]System.Diagnostics.ProcessStartInfo::set_UseShellExecute(bool)
+    IL_0028:  dup
+    IL_0029:  ldc.i4.0
+    IL_002a:  callvirt   instance void [netstandard]System.Diagnostics.ProcessStartInfo::set_RedirectStandardOutput(bool)
+    IL_002f:  dup
+    IL_0030:  ldc.i4.1
+    IL_0031:  callvirt   instance void [netstandard]System.Diagnostics.ProcessStartInfo::set_CreateNoWindow(bool)
+    IL_0036:  stfld      class [netstandard]System.Diagnostics.ProcessStartInfo Launcher.Launcher/'<>c__DisplayClass7_0'::startInfo
+    .try
+    {
+      IL_003b:  ldarg.0
+      IL_003c:  ldstr      "\\"
+      IL_0041:  ldarg.1
+      IL_0042:  call       string [netstandard]System.String::Concat(string,
+                                                                     string,
+                                                                     string)
+      IL_0047:  stloc.1
+      IL_0048:  ldloc.1
+      IL_0049:  call       bool [netstandard]System.IO.File::Exists(string)
+      IL_004e:  brtrue.s   IL_006d
+
+      IL_0050:  ldc.i4     0x80000000
+      IL_0055:  ldstr      "File "
+      IL_005a:  ldloc.1
+      IL_005b:  ldstr      " not found"
+      IL_0060:  call       string [netstandard]System.String::Concat(string,
+                                                                     string,
+                                                                     string)
+      IL_0065:  call       class Launcher.ResultHelper Launcher.ResultHelper::Fail(int32,
+                                                                                   string)
+      IL_006a:  stloc.2
+      IL_006b:  leave.s    IL_00b9
+
+      IL_006d:  ldloc.0
+      IL_006e:  ldftn      instance void Launcher.Launcher/'<>c__DisplayClass7_0'::'<LaunchInThread>b__0'()
+      IL_0074:  newobj     instance void [netstandard]System.Threading.ThreadStart::.ctor(object,
+                                                                                          native int)
+      IL_0079:  newobj     instance void [netstandard]System.Threading.Thread::.ctor(class [netstandard]System.Threading.ThreadStart)
+      IL_007e:  call       instance void [netstandard]System.Threading.Thread::Start()
+      IL_0083:  ldstr      "Success"
+      IL_0088:  call       class Launcher.ResultHelper Launcher.ResultHelper::Success(string)
+      IL_008d:  stloc.2
+      IL_008e:  leave.s    IL_00b9
+
+    }  // end .try
+    catch [netstandard]System.Exception 
+    {
+      IL_0090:  stloc.3
+      IL_0091:  ldstr      "Exception: "
+      IL_0096:  ldloc.3
+      IL_0097:  callvirt   instance string [netstandard]System.Exception::get_Message()
+      IL_009c:  call       string [netstandard]System.String::Concat(string,
+                                                                     string)
+      IL_00a1:  call       void [netstandard]System.Console::WriteLine(string)
+      IL_00a6:  ldc.i4     0x80000000
+      IL_00ab:  ldloc.3
+      IL_00ac:  callvirt   instance string [netstandard]System.Exception::get_Message()
+      IL_00b1:  call       class Launcher.ResultHelper Launcher.ResultHelper::Fail(int32,
+                                                                                   string)
+      IL_00b6:  stloc.2
+      IL_00b7:  leave.s    IL_00b9
+
+    }  // end handler
+    IL_00b9:  ldloc.2
+    IL_00ba:  ret
+  } // end of method Launcher::LaunchInThread
+
+  .property bool Verbose()
+  {
+    .get bool Launcher.Launcher::get_Verbose()
+    .set void Launcher.Launcher::set_Verbose(bool)
+  } // end of property Launcher::Verbose
+} // end of class Launcher.Launcher
+
+.class public auto ansi beforefieldinit Launcher.Parameters
+       extends [netstandard]System.Object
+{
+  .field private string '<WorkingDir>k__BackingField'
+  .custom instance void [netstandard]System.Runtime.CompilerServices.CompilerGeneratedAttribute::.ctor() = ( 01 00 00 00 ) 
+  .field private string '<FileName>k__BackingField'
+  .custom instance void [netstandard]System.Runtime.CompilerServices.CompilerGeneratedAttribute::.ctor() = ( 01 00 00 00 ) 
+  .field private string '<Arguments>k__BackingField'
+  .custom instance void [netstandard]System.Runtime.CompilerServices.CompilerGeneratedAttribute::.ctor() = ( 01 00 00 00 ) 
+  .field private bool '<RedirectStandardOutput>k__BackingField'
+  .custom instance void [netstandard]System.Runtime.CompilerServices.CompilerGeneratedAttribute::.ctor() = ( 01 00 00 00 ) 
+  .field private bool '<Verbose>k__BackingField'
+  .custom instance void [netstandard]System.Runtime.CompilerServices.CompilerGeneratedAttribute::.ctor() = ( 01 00 00 00 ) 
+  .field private bool '<UseShellExecute>k__BackingField'
+  .custom instance void [netstandard]System.Runtime.CompilerServices.CompilerGeneratedAttribute::.ctor() = ( 01 00 00 00 ) 
+  .method public hidebysig specialname instance string 
+          get_WorkingDir() cil managed
+  {
+    .custom instance void [netstandard]System.Runtime.CompilerServices.CompilerGeneratedAttribute::.ctor() = ( 01 00 00 00 ) 
+    // Code size       7 (0x7)
+    .maxstack  8
+    IL_0000:  ldarg.0
+    IL_0001:  ldfld      string Launcher.Parameters::'<WorkingDir>k__BackingField'
+    IL_0006:  ret
+  } // end of method Parameters::get_WorkingDir
+
+  .method public hidebysig specialname instance void 
+          set_WorkingDir(string 'value') cil managed
+  {
+    .custom instance void [netstandard]System.Runtime.CompilerServices.CompilerGeneratedAttribute::.ctor() = ( 01 00 00 00 ) 
+    // Code size       8 (0x8)
+    .maxstack  8
+    IL_0000:  ldarg.0
+    IL_0001:  ldarg.1
+    IL_0002:  stfld      string Launcher.Parameters::'<WorkingDir>k__BackingField'
+    IL_0007:  ret
+  } // end of method Parameters::set_WorkingDir
+
+  .method public hidebysig specialname instance string 
+          get_FileName() cil managed
+  {
+    .custom instance void [netstandard]System.Runtime.CompilerServices.CompilerGeneratedAttribute::.ctor() = ( 01 00 00 00 ) 
+    // Code size       7 (0x7)
+    .maxstack  8
+    IL_0000:  ldarg.0
+    IL_0001:  ldfld      string Launcher.Parameters::'<FileName>k__BackingField'
+    IL_0006:  ret
+  } // end of method Parameters::get_FileName
+
+  .method public hidebysig specialname instance void 
+          set_FileName(string 'value') cil managed
+  {
+    .custom instance void [netstandard]System.Runtime.CompilerServices.CompilerGeneratedAttribute::.ctor() = ( 01 00 00 00 ) 
+    // Code size       8 (0x8)
+    .maxstack  8
+    IL_0000:  ldarg.0
+    IL_0001:  ldarg.1
+    IL_0002:  stfld      string Launcher.Parameters::'<FileName>k__BackingField'
+    IL_0007:  ret
+  } // end of method Parameters::set_FileName
+
+  .method public hidebysig specialname instance string 
+          get_Arguments() cil managed
+  {
+    .custom instance void [netstandard]System.Runtime.CompilerServices.CompilerGeneratedAttribute::.ctor() = ( 01 00 00 00 ) 
+    // Code size       7 (0x7)
+    .maxstack  8
+    IL_0000:  ldarg.0
+    IL_0001:  ldfld      string Launcher.Parameters::'<Arguments>k__BackingField'
+    IL_0006:  ret
+  } // end of method Parameters::get_Arguments
+
+  .method public hidebysig specialname instance void 
+          set_Arguments(string 'value') cil managed
+  {
+    .custom instance void [netstandard]System.Runtime.CompilerServices.CompilerGeneratedAttribute::.ctor() = ( 01 00 00 00 ) 
+    // Code size       8 (0x8)
+    .maxstack  8
+    IL_0000:  ldarg.0
+    IL_0001:  ldarg.1
+    IL_0002:  stfld      string Launcher.Parameters::'<Arguments>k__BackingField'
+    IL_0007:  ret
+  } // end of method Parameters::set_Arguments
+
+  .method public hidebysig specialname instance bool 
+          get_RedirectStandardOutput() cil managed
+  {
+    .custom instance void [netstandard]System.Runtime.CompilerServices.CompilerGeneratedAttribute::.ctor() = ( 01 00 00 00 ) 
+    // Code size       7 (0x7)
+    .maxstack  8
+    IL_0000:  ldarg.0
+    IL_0001:  ldfld      bool Launcher.Parameters::'<RedirectStandardOutput>k__BackingField'
+    IL_0006:  ret
+  } // end of method Parameters::get_RedirectStandardOutput
+
+  .method public hidebysig specialname instance void 
+          set_RedirectStandardOutput(bool 'value') cil managed
+  {
+    .custom instance void [netstandard]System.Runtime.CompilerServices.CompilerGeneratedAttribute::.ctor() = ( 01 00 00 00 ) 
+    // Code size       8 (0x8)
+    .maxstack  8
+    IL_0000:  ldarg.0
+    IL_0001:  ldarg.1
+    IL_0002:  stfld      bool Launcher.Parameters::'<RedirectStandardOutput>k__BackingField'
+    IL_0007:  ret
+  } // end of method Parameters::set_RedirectStandardOutput
+
+  .method public hidebysig specialname instance bool 
+          get_Verbose() cil managed
+  {
+    .custom instance void [netstandard]System.Runtime.CompilerServices.CompilerGeneratedAttribute::.ctor() = ( 01 00 00 00 ) 
+    // Code size       7 (0x7)
+    .maxstack  8
+    IL_0000:  ldarg.0
+    IL_0001:  ldfld      bool Launcher.Parameters::'<Verbose>k__BackingField'
+    IL_0006:  ret
+  } // end of method Parameters::get_Verbose
+
+  .method public hidebysig specialname instance void 
+          set_Verbose(bool 'value') cil managed
+  {
+    .custom instance void [netstandard]System.Runtime.CompilerServices.CompilerGeneratedAttribute::.ctor() = ( 01 00 00 00 ) 
+    // Code size       8 (0x8)
+    .maxstack  8
+    IL_0000:  ldarg.0
+    IL_0001:  ldarg.1
+    IL_0002:  stfld      bool Launcher.Parameters::'<Verbose>k__BackingField'
+    IL_0007:  ret
+  } // end of method Parameters::set_Verbose
+
+  .method public hidebysig specialname instance bool 
+          get_UseShellExecute() cil managed
+  {
+    .custom instance void [netstandard]System.Runtime.CompilerServices.CompilerGeneratedAttribute::.ctor() = ( 01 00 00 00 ) 
+    // Code size       7 (0x7)
+    .maxstack  8
+    IL_0000:  ldarg.0
+    IL_0001:  ldfld      bool Launcher.Parameters::'<UseShellExecute>k__BackingField'
+    IL_0006:  ret
+  } // end of method Parameters::get_UseShellExecute
+
+  .method public hidebysig specialname instance void 
+          set_UseShellExecute(bool 'value') cil managed
+  {
+    .custom instance void [netstandard]System.Runtime.CompilerServices.CompilerGeneratedAttribute::.ctor() = ( 01 00 00 00 ) 
+    // Code size       8 (0x8)
+    .maxstack  8
+    IL_0000:  ldarg.0
+    IL_0001:  ldarg.1
+    IL_0002:  stfld      bool Launcher.Parameters::'<UseShellExecute>k__BackingField'
+    IL_0007:  ret
+  } // end of method Parameters::set_UseShellExecute
+
+  .method public hidebysig specialname rtspecialname 
+          instance void  .ctor() cil managed
+  {
+    // Code size       7 (0x7)
+    .maxstack  8
+    IL_0000:  ldarg.0
+    IL_0001:  call       instance void [netstandard]System.Object::.ctor()
+    IL_0006:  ret
+  } // end of method Parameters::.ctor
+
+  .property instance string WorkingDir()
+  {
+    .get instance string Launcher.Parameters::get_WorkingDir()
+    .set instance void Launcher.Parameters::set_WorkingDir(string)
+  } // end of property Parameters::WorkingDir
+  .property instance string FileName()
+  {
+    .get instance string Launcher.Parameters::get_FileName()
+    .set instance void Launcher.Parameters::set_FileName(string)
+  } // end of property Parameters::FileName
+  .property instance string Arguments()
+  {
+    .get instance string Launcher.Parameters::get_Arguments()
+    .set instance void Launcher.Parameters::set_Arguments(string)
+  } // end of property Parameters::Arguments
+  .property instance bool RedirectStandardOutput()
+  {
+    .get instance bool Launcher.Parameters::get_RedirectStandardOutput()
+    .set instance void Launcher.Parameters::set_RedirectStandardOutput(bool)
+  } // end of property Parameters::RedirectStandardOutput
+  .property instance bool Verbose()
+  {
+    .get instance bool Launcher.Parameters::get_Verbose()
+    .set instance void Launcher.Parameters::set_Verbose(bool)
+  } // end of property Parameters::Verbose
+  .property instance bool UseShellExecute()
+  {
+    .get instance bool Launcher.Parameters::get_UseShellExecute()
+    .set instance void Launcher.Parameters::set_UseShellExecute(bool)
+  } // end of property Parameters::UseShellExecute
+} // end of class Launcher.Parameters
+
+.class public auto ansi beforefieldinit Launcher.ResultHelper
+       extends [netstandard]System.Object
+{
+  .field public static initonly int32 SuccessCode
+  .field public static initonly int32 InvalidParameter
+  .field public static initonly int32 FileNotFound
+  .field public static initonly int32 Exception
+  .field private static literal string SuccessMessage = "Success"
+  .field private static literal string UndefinedMessage = "Undefined"
+  .field private static literal string FailMessage = "Fail"
+  .field private int32 '<Code>k__BackingField'
+  .custom instance void [netstandard]System.Runtime.CompilerServices.CompilerGeneratedAttribute::.ctor() = ( 01 00 00 00 ) 
+  .field private class [netstandard]System.Collections.Generic.List`1<string> '<Output>k__BackingField'
+  .custom instance void [netstandard]System.Runtime.CompilerServices.CompilerGeneratedAttribute::.ctor() = ( 01 00 00 00 ) 
+  .method public hidebysig specialname instance int32 
+          get_Code() cil managed
+  {
+    .custom instance void [netstandard]System.Runtime.CompilerServices.CompilerGeneratedAttribute::.ctor() = ( 01 00 00 00 ) 
+    // Code size       7 (0x7)
+    .maxstack  8
+    IL_0000:  ldarg.0
+    IL_0001:  ldfld      int32 Launcher.ResultHelper::'<Code>k__BackingField'
+    IL_0006:  ret
+  } // end of method ResultHelper::get_Code
+
+  .method public hidebysig specialname instance void 
+          set_Code(int32 'value') cil managed
+  {
+    .custom instance void [netstandard]System.Runtime.CompilerServices.CompilerGeneratedAttribute::.ctor() = ( 01 00 00 00 ) 
+    // Code size       8 (0x8)
+    .maxstack  8
+    IL_0000:  ldarg.0
+    IL_0001:  ldarg.1
+    IL_0002:  stfld      int32 Launcher.ResultHelper::'<Code>k__BackingField'
+    IL_0007:  ret
+  } // end of method ResultHelper::set_Code
+
+  .method public hidebysig specialname instance class [netstandard]System.Collections.Generic.List`1<string> 
+          get_Output() cil managed
+  {
+    .custom instance void [netstandard]System.Runtime.CompilerServices.CompilerGeneratedAttribute::.ctor() = ( 01 00 00 00 ) 
+    // Code size       7 (0x7)
+    .maxstack  8
+    IL_0000:  ldarg.0
+    IL_0001:  ldfld      class [netstandard]System.Collections.Generic.List`1<string> Launcher.ResultHelper::'<Output>k__BackingField'
+    IL_0006:  ret
+  } // end of method ResultHelper::get_Output
+
+  .method public hidebysig specialname instance void 
+          set_Output(class [netstandard]System.Collections.Generic.List`1<string> 'value') cil managed
+  {
+    .custom instance void [netstandard]System.Runtime.CompilerServices.CompilerGeneratedAttribute::.ctor() = ( 01 00 00 00 ) 
+    // Code size       8 (0x8)
+    .maxstack  8
+    IL_0000:  ldarg.0
+    IL_0001:  ldarg.1
+    IL_0002:  stfld      class [netstandard]System.Collections.Generic.List`1<string> Launcher.ResultHelper::'<Output>k__BackingField'
+    IL_0007:  ret
+  } // end of method ResultHelper::set_Output
+
+  .method public hidebysig instance bool 
+          IsSuccess() cil managed
+  {
+    // Code size       14 (0xe)
+    .maxstack  8
+    IL_0000:  ldarg.0
+    IL_0001:  call       instance int32 Launcher.ResultHelper::get_Code()
+    IL_0006:  ldsfld     int32 Launcher.ResultHelper::SuccessCode
+    IL_000b:  ceq
+    IL_000d:  ret
+  } // end of method ResultHelper::IsSuccess
+
+  .method public hidebysig instance bool 
+          IsFail() cil managed
+  {
+    // Code size       17 (0x11)
+    .maxstack  8
+    IL_0000:  ldarg.0
+    IL_0001:  call       instance int32 Launcher.ResultHelper::get_Code()
+    IL_0006:  ldsfld     int32 Launcher.ResultHelper::SuccessCode
+    IL_000b:  ceq
+    IL_000d:  ldc.i4.0
+    IL_000e:  ceq
+    IL_0010:  ret
+  } // end of method ResultHelper::IsFail
+
+  .method public hidebysig static class Launcher.ResultHelper 
+          Success([opt] string message) cil managed
+  {
+    .param [1] = "Success"
+    // Code size       30 (0x1e)
+    .maxstack  8
+    IL_0000:  newobj     instance void Launcher.ResultHelper::.ctor()
+    IL_0005:  dup
+    IL_0006:  ldsfld     int32 Launcher.ResultHelper::SuccessCode
+    IL_000b:  callvirt   instance void Launcher.ResultHelper::set_Code(int32)
+    IL_0010:  dup
+    IL_0011:  callvirt   instance class [netstandard]System.Collections.Generic.List`1<string> Launcher.ResultHelper::get_Output()
+    IL_0016:  ldc.i4.0
+    IL_0017:  ldarg.0
+    IL_0018:  callvirt   instance void class [netstandard]System.Collections.Generic.List`1<string>::set_Item(int32,
+                                                                                                              !0)
+    IL_001d:  ret
+  } // end of method ResultHelper::Success
+
+  .method public hidebysig static class Launcher.ResultHelper 
+          Fail([opt] int32 code,
+               [opt] string message) cil managed
+  {
+    .param [1] = int32(0x80000000)
+    .param [2] = "Fail"
+    // Code size       26 (0x1a)
+    .maxstack  8
+    IL_0000:  newobj     instance void Launcher.ResultHelper::.ctor()
+    IL_0005:  dup
+    IL_0006:  ldarg.0
+    IL_0007:  callvirt   instance void Launcher.ResultHelper::set_Code(int32)
+    IL_000c:  dup
+    IL_000d:  callvirt   instance class [netstandard]System.Collections.Generic.List`1<string> Launcher.ResultHelper::get_Output()
+    IL_0012:  ldc.i4.0
+    IL_0013:  ldarg.1
+    IL_0014:  callvirt   instance void class [netstandard]System.Collections.Generic.List`1<string>::set_Item(int32,
+                                                                                                              !0)
+    IL_0019:  ret
+  } // end of method ResultHelper::Fail
+
+  .method public hidebysig static class Launcher.ResultHelper 
+          New() cil managed
+  {
+    // Code size       28 (0x1c)
+    .maxstack  8
+    IL_0000:  newobj     instance void Launcher.ResultHelper::.ctor()
+    IL_0005:  dup
+    IL_0006:  ldsfld     int32 Launcher.ResultHelper::Exception
+    IL_000b:  callvirt   instance void Launcher.ResultHelper::set_Code(int32)
+    IL_0010:  dup
+    IL_0011:  newobj     instance void class [netstandard]System.Collections.Generic.List`1<string>::.ctor()
+    IL_0016:  callvirt   instance void Launcher.ResultHelper::set_Output(class [netstandard]System.Collections.Generic.List`1<string>)
+    IL_001b:  ret
+  } // end of method ResultHelper::New
+
+  .method public hidebysig specialname rtspecialname 
+          instance void  .ctor() cil managed
+  {
+    // Code size       40 (0x28)
+    .maxstack  8
+    IL_0000:  ldarg.0
+    IL_0001:  ldsfld     int32 Launcher.ResultHelper::Exception
+    IL_0006:  stfld      int32 Launcher.ResultHelper::'<Code>k__BackingField'
+    IL_000b:  ldarg.0
+    IL_000c:  newobj     instance void class [netstandard]System.Collections.Generic.List`1<string>::.ctor()
+    IL_0011:  dup
+    IL_0012:  ldstr      "Undefined"
+    IL_0017:  callvirt   instance void class [netstandard]System.Collections.Generic.List`1<string>::Add(!0)
+    IL_001c:  stfld      class [netstandard]System.Collections.Generic.List`1<string> Launcher.ResultHelper::'<Output>k__BackingField'
+    IL_0021:  ldarg.0
+    IL_0022:  call       instance void [netstandard]System.Object::.ctor()
+    IL_0027:  ret
+  } // end of method ResultHelper::.ctor
+
+  .method private hidebysig specialname rtspecialname static 
+          void  .cctor() cil managed
+  {
+    // Code size       30 (0x1e)
+    .maxstack  8
+    IL_0000:  ldc.i4.0
+    IL_0001:  stsfld     int32 Launcher.ResultHelper::SuccessCode
+    IL_0006:  ldc.i4.m1
+    IL_0007:  stsfld     int32 Launcher.ResultHelper::InvalidParameter
+    IL_000c:  ldc.i4.s   -3
+    IL_000e:  stsfld     int32 Launcher.ResultHelper::FileNotFound
+    IL_0013:  ldc.i4     0x7fffffff
+    IL_0018:  stsfld     int32 Launcher.ResultHelper::Exception
+    IL_001d:  ret
+  } // end of method ResultHelper::.cctor
+
+  .property instance int32 Code()
+  {
+    .get instance int32 Launcher.ResultHelper::get_Code()
+    .set instance void Launcher.ResultHelper::set_Code(int32)
+  } // end of property ResultHelper::Code
+  .property instance class [netstandard]System.Collections.Generic.List`1<string>
+          Output()
+  {
+    .get instance class [netstandard]System.Collections.Generic.List`1<string> Launcher.ResultHelper::get_Output()
+    .set instance void Launcher.ResultHelper::set_Output(class [netstandard]System.Collections.Generic.List`1<string>)
+  } // end of property ResultHelper::Output
+} // end of class Launcher.ResultHelper
+
+
+// =============================================================
+
+// *********** DISASSEMBLY COMPLETE ***********************
