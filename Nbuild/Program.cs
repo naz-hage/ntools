@@ -3,7 +3,7 @@ using Launcher;
 using OutputColorizer;
 using System.Diagnostics;
 
-namespace nbuild
+namespace Nbuild
 {
     public class Program
     {

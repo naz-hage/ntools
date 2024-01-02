@@ -26,7 +26,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ntools-launcher" Version="1.0.10" />
+    <ProjectReference Include="..\launcher\Launcher.csproj" />
   </ItemGroup>
 
 

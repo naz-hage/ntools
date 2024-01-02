@@ -2,7 +2,7 @@
 using System.Reflection;
 using System.Text;
 
-namespace nbuild
+namespace Nbuild
 {
     public class Nversion
     {

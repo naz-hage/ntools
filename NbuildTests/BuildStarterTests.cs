@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Reflection;
 
-namespace nbuild.Tests
+namespace Nbuild.Tests
 {
     [TestClass()]
     public class BuildStarterTests
@@ -42,7 +42,7 @@ namespace nbuild.Tests
             // Act
             var executingAssemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             Assert.IsNotNull(executingAssemblyDirectory);
-            string resourcePath = Path.Combine(executingAssemblyDirectory, "nbuild.dll");
+            string resourcePath = Path.Combine(executingAssemblyDirectory, "Nbuild.dll");
             string targetFileName = Path.Combine(executingAssemblyDirectory, "commom.targets");
     
             ResourceHelper.ExtractEmbeddedResource(resourcePath, "Nbuild.resources.common.targets", targetFileName);

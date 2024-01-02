@@ -1,6 +1,6 @@
 ﻿using CommandLine.Attributes;
 
-namespace nbuild;
+namespace Nbuild;
 
 public class Cli
 {

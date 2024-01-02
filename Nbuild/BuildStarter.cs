@@ -3,7 +3,7 @@ using OutputColorizer;
 using System.Diagnostics;
 using System.Xml;
 
-namespace nbuild
+namespace Nbuild
 {
     public class BuildStarter
     {

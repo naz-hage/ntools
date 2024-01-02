@@ -1,7 +1,7 @@
 using System.IO;
 using System.Reflection;
 
-namespace nbuild
+namespace Nbuild
 {
     public class ResourceHelper
     {
