@@ -48,11 +48,11 @@
 	<Target Name="NUGET_PACK" DependsOnTargets="GET_TAG">
 		<PropertyGroup>
 			<NugetPackagePath>$(ArtifactsDir)\$(SolutionName)\Nuget\$(ProductVersion)</NugetPackagePath>
-			<LocalNugetFeed>$(ArtifactsDir)\$(SolutionName)\Nuget</LocalNugetFeed>
+			<LocalNugetFeed>$(ArtifactsDir)\nupkgs</LocalNugetFeed>
 		</PropertyGroup>
-		<Exec Command='$(NugetExe) pack $(SolutionDir)\launcher\ntools-launcher.nuspec -Version $(ProductVersion) -OutputDirectory $(NugetPackagePath)'/>
+		<Exec Command='"$(NugetExe)" pack $(SolutionDir)\launcher\ntools-launcher.nuspec -Version $(ProductVersion) -OutputDirectory $(NugetPackagePath)'/>
 		<Exec Command='rd $(LocalNugetFeed)\ntools-launcher\$(ProductVersion) /s /q'/>
-		<Exec Command='$(NugetExe) add $(NugetPackagePath)\$(SolutionName)-launcher.$(ProductVersion).nupkg -Source "$(LocalNugetFeed)"'/>
+		<Exec Command='"$(NugetExe)" add $(NugetPackagePath)\$(SolutionName)-launcher.$(ProductVersion).nupkg -Source "$(LocalNugetFeed)"'/>
 		<Message Text="==> DONE"/>
 		</Target>
 	
