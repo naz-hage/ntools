@@ -1,18 +1,18 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
 	<!-- Reference: https://learn.microsoft.com/en-us/visualstudio/msbuild/walkthrough-using-msbuild?view=vs-2022 -->
-
-	<Import Project="$(ProgramFiles)\nbuild\common.targets"/>
+	
+	<Import Project="$(ProgramFiles)\Nbuild\common.targets"/>
 	
 	<PropertyGroup>
         <!-- This is the folder where the *.sln resides-->
 		<SolutionName>ntools</SolutionName>
         <!-- This is the location when the app deployed or installed -->
-        <DeploymentFolder>$(ProgramFiles)\nbuild</DeploymentFolder>
+        <DeploymentFolder>$(ProgramFiles)\Nbuild</DeploymentFolder>
 	</PropertyGroup>
 	
 	
-    <Target Name="ARTIFACTS">
+    <Target Name="ARTIFACTS" DependsOnTargets="GET_TAG">
       <PropertyGroup>
         <ArtifactsFolder>$(ArtifactsDir)\$(SolutionName)\$(TargetRelease)\$(ProductVersion)</ArtifactsFolder>
 		
@@ -30,7 +30,7 @@
                         $(SolutionDir)\$(TargetRelease)\*.exe;
                         $(SolutionDir)\$(TargetRelease)\*.exe.config;
                         $(SolutionDir)\$(TargetRelease)\*.json;
-						$(SolutionDir)\nbuild\resources\*.targets;
+						$(SolutionDir)\Nbuild\resources\*.targets;
                         $(SolutionDir)\$(TargetRelease)\*.dll"
 						/>
 
@@ -100,7 +100,7 @@
 						Include="
                         $(SolutionDir)\$(TargetRelease)\ngit*;
 						$(SolutionDir)\$(TargetRelease)\launcher*;
-                        $(SolutionDir)\nbuild\resources\*.targets;
+                        $(SolutionDir)\Nbuild\resources\*.targets;
                         $(SolutionDir)\$(TargetRelease)\commandline.dll;  
                         $(SolutionDir)\$(TargetRelease)\OutputColorizer.dll"
 						/>
@@ -128,10 +128,81 @@
 		<Message Text="==> DONE"/>
 	</Target>
 
-	<Target Name="TEST_DEBUG">
-		<Exec Command="git describe" Outputs="tag" EchoOff="false"></Exec>
-		<Exec Command="Debug\ngit.exe -git gettag -project ntools"></Exec>
-		<Exec Command="Debug\ngit.exe -git getbranch -project ntools"></Exec>
+	<Target Name="TEST_GIT">
+		<Git Command="GetBranch">
+			<Output TaskParameter="Output" PropertyName="GitBranch"/>
+		</Git>
+		<Message Text="Task - Git Branch:'$(GitBranch)'"/>
+
+		<RedError Condition="'$(GitBranch)' == ''" Message="GetBranch Failed: GitBranch property is not defined." />
+
+		<Git Command="GetTag" >
+			<Output TaskParameter="Output" PropertyName="ProductVersion"/>
+		</Git>
+		<Message Text="Task - Git Tag:'$(ProductVersion)'"/>
+
+		<RedError Condition="'$(ProductVersion)' == ''" Message="GetTag Failed: Product Version property is not defined." />
+
+		<!--<Git Command="DeleteTag" TaskParameter="$(ProductVersion)">
+			<Output TaskParameter="Output" PropertyName="Result"/>
+		</Git>
+		<Message Text="Task - Git Delete Tag Result:'$(Result)'"/>
+
+		<RedError Condition="'$(Result)' != 'True'" Message="DeteteTag Failed: Product Version property is not defined." />-->
+		
+		<Git Command="AutoTag" TaskParameter="Staging">
+			<Output TaskParameter="Output" PropertyName="ProductVersion"/>
+		</Git>
+		<Message Text="Task - Git Next Tag:'$(ProductVersion)'"/>
+
+		<RedError Condition="'$(ProductVersion)' == ''" Message="AutoTag Staging Failed: Product Version property is not defined." />
+
+		<!--<Git Command="AutoTag" TaskParameter="Production">
+			<Output TaskParameter="Output" PropertyName="ProductVersion"/>
+		</Git>
+		<Message Text="Task - Git Next Tag:'$(ProductVersion)'"/>
+
+		<RedError Condition="'$(ProductVersion)' == ''" Message="AutoTag Production Failed: Product Version property is not defined." />-->
+
+		<Git Command="SetTag" TaskParameter="$(ProductVersion)">
+			<Output TaskParameter="Output" PropertyName="ProductVersion"/>
+		</Git>
+		<Message Text="Task - Git Next Tag:'$(ProductVersion)'"/>
+
+		<RedError Condition="'$(ProductVersion)' == ''" Message="SetTag Failed: Product Version property is not defined." />
+
+		<Git Command="PushTag" TaskParameter="$(ProductVersion)">
+			<Output TaskParameter="Output" PropertyName="ProductVersion"/>
+		</Git>
+
+		<Message Text="Task - Git Push Tag Result:'$(Result)'"/>
+
+		<RedError Condition="'$(Result)' != 'True'" Message="DeteteTag Failed: Product Version property is not defined." />
+
+		<Git Command="DeleteTag" TaskParameter="$(ProductVersion)">
+			<Output TaskParameter="Output" PropertyName="Result"/>
+		</Git>
+		<Message Text="Task - Git Delete Tag Result:'$(Result)'"/>
+
+		<RedError Condition="'$(Result)' != 'True'" Message="DeteteTag Failed: Product Version property is not defined." />
+
 		<Message Text="==> DONE"/>
 	</Target>
+
+	<Target Name="STAGING_LOCAL" DependsOnTargets="
+				CLEAN;
+                AUTOTAG_STAGING;
+                SOLUTION;
+                TEST;
+                SAVE_ARTIFACTS;
+                PACKAGE;
+				DEPLOY">
+	</Target>
+
+	<Target Name="DEPLOY_LOCAL" DependsOnTargets="
+                STAGING_LOCAL;
+                DEPLOY">
+	</Target>
+
+
 </Project>

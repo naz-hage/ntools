@@ -11,15 +11,17 @@
 		<Message Text="$(NugetExe) version: $(NugetVersion)" />
 	</Target>
 
-	<Target Name="DOWNLOAD_NUGET" DependsOnTargets="IS_ADMIN">
+	<Target Name="NUGET_INSTALL" DependsOnTargets="IS_ADMIN">
+		<RedError Condition="'$(IsAdmin)' == false" Message="Must be an admin to install Nuget" />
 		<PropertyGroup>
 			<NugetTempExe>c:\temp\nuget.exe</NugetTempExe>
+			<DowbloadUrl>https://dist.nuget.org/win-x86-commandline/latest/nuget.exe</DowbloadUrl>
 		</PropertyGroup>
 
 		<!-- Delete NugetTempExe if it exists -->
 		<Exec Command='if exist "$(NugetTempExe)" del "$(NugetTempExe)"' ContinueOnError="true" />		
 
-		<Exec Command='powershell -Command "Invoke-WebRequest -OutFile $(NugetTempExe) https://dist.nuget.org/win-x86-commandline/latest/nuget.exe"' />
+		<Exec Command='powershell -Command "Invoke-WebRequest -OutFile $(NugetTempExe) $(DownloadUrl)"' />
 		 
 		 <!-- Move nuget.exe from NugetTempExe to NugetExe -->
 		<Exec Command='move /Y "$(NugetTempExe)" "$(NugetExe)"' />

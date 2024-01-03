@@ -1,0 +1,38 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+    <Target Name="DOTNET_INSTALL" DependsOnTargets="IS_ADMIN">
+        <PropertyGroup>
+            <TargetNodeVersion>21.5.0</TargetNodeVersion>
+            <NodeExe>$(ProgramFiles)\nodejs\node.exe</NodeExe>
+            <FilePath>$(NodeExe)</FilePath>
+            <!-- visit https://nodejs.org/dist/ to get the latest stable version -->
+           
+        </PropertyGroup>
+        <Exec Command='"$(NodeExe)" --version'  Condition="Exists('$(NodeExe)')" />
+        
+        <RedError Condition="'$(IsAdmin)' == false" Message="Must be an admin to install node" />
+        
+        <!-- Call the PowerShell script and capture node version output into  NodeVersion property-->
+        <Exec Command='powershell -File "$(BuildTools)\GetFileVersion.ps1" "$(NodeExe)"' ConsoleToMSBuild="true">
+            <Output TaskParameter="ConsoleOutput" PropertyName="NodeVersion" />
+        </Exec>
+
+        <!-- Parse the output to get the file version -->
+        <PropertyGroup>
+             <NodeUri>https://nodejs.org/dist/v$(TargetNodeVersion)/node-v$(TargetNodeVersion)-x64.msi</NodeUri>
+            <NodeArgList>"/i", "node.msi", "/quiet", "/norestart" -NoNewWindow -Wait; Remove-Item node.msi"</NodeArgList>
+        </PropertyGroup>
+
+        <!-- Display the file version -->
+        <Message Text="Node.js installed version: $(NodeVersion)" />
+       
+        <Message Text="Installing Node.js" Condition="!Exists('$(NodeExe)') or '$(NodeVersion)' &lt; '$(TargetNodeVersion)'"/>
+        <Exec Command='powershell -Command "Invoke-WebRequest -Uri $(NodeUri) -OutFile node.msi; Start-Process msiexec.exe -ArgumentList $(NodeArgList)' Condition="'$(NodeVersion)' &lt; '$(TargetNodeVersion)'"/>
+
+        <Exec Command='"$(NodeExe)" --version'  Condition="Exists('$(NodeExe)')" />
+        
+        <Message Text="Node.js installed version: $(NodeVersion)" />
+        <Message Text="==> NODE_DONE"/>
+    </Target>
+
+</Project>
