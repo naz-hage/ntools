@@ -19,7 +19,12 @@
 		<OutputPath>$(SolutionDir)/Release</OutputPath>
 		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
 	</PropertyGroup>
-  
+	
+    <PropertyGroup>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <AppendTargetFrameworkToOutputPath>True</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.8.3" />
   </ItemGroup>

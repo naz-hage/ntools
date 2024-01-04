@@ -17,7 +17,7 @@ namespace nbackup
             if (!Parser.TryParse(args, out Cli options))
             {
                 ReturnCode = ResultHelper.InvalidParameter;
-                if (args[0].ToLower() != "--help") Console.WriteLine($"backup completed with '{ReturnCode}'");
+                if (!args[0].Equals("--help", StringComparison.CurrentCultureIgnoreCase)) Console.WriteLine($"backup completed with '{ReturnCode}'");
                 return ReturnCode;
             }
 
@@ -28,7 +28,7 @@ namespace nbackup
 
             Console.WriteLine($"Backup completed in {watch.ElapsedMilliseconds/1000.00} s with {result.Code}");
             // display elapsed time in HH:MM:SS.MS format
-            Console.WriteLine($"Backup completed in {watch.Elapsed.ToString("hh\\:mm\\:ss\\.ff")} (hh:mm:ss.ff) with {result.Code}");
+            Console.WriteLine($"Backup completed in {watch.Elapsed:hh\\:mm\\:ss\\.ff} (hh:mm:ss.ff) with {result.Code}");
             return result.Code;
         }
     }

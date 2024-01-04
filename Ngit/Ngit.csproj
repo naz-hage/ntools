@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -7,7 +7,8 @@
     <AssemblyVersion></AssemblyVersion>
     <Authors>naz-hage</Authors>
     <Company>naz-hage</Company>
-    <Product>launcher</Product>
+    <Product>Wrapper for git</Product>
+	<Description>Wrapper for git</Description>
     <Copyright>2020-2024</Copyright>
   </PropertyGroup>
 
@@ -27,6 +28,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\launcher\Launcher.csproj" />
+    <ProjectReference Include="..\NbuildTasks\NbuildTasks.csproj" />
   </ItemGroup>
 
 

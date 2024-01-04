@@ -28,7 +28,6 @@
 
   <ItemGroup>
     <PackageReference Include="CommandLine.Net" Version="2.3.0" />
-    <PackageReference Include="ntools-launcher" Version="1.0.0.5" />
   </ItemGroup>
 
   <ItemGroup>
@@ -39,5 +38,9 @@
 		<Content Include="Data\backup.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\launcher\Launcher.csproj" />
 	</ItemGroup>
 </Project>

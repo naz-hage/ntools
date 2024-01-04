@@ -8,6 +8,7 @@ namespace launcherTests
     [TestClass]
     public class LauncherTests
     {
+        private const string ExcecutableToLaunch = "Ngit.exe";
 
         [TestMethod]
         public void ProcessTestRobocopy()
@@ -27,11 +28,12 @@ namespace launcherTests
         [TestMethod]
         public void ProcessStartTestPass()
         {
+            
             Parameters launcherParameters = new()
             {
                 WorkingDir = Directory.GetCurrentDirectory(),
                 Arguments = "pass",
-                FileName = "test.exe",
+                FileName = ExcecutableToLaunch,
                 RedirectStandardOutput = true
             };
 
@@ -56,7 +58,7 @@ namespace launcherTests
             {
                 WorkingDir = Directory.GetCurrentDirectory(),
                 Arguments = "fail",
-                FileName = "test.exe",
+                FileName = ExcecutableToLaunch,
                 RedirectStandardOutput = true
             };
 
@@ -83,7 +85,7 @@ namespace launcherTests
         {
             var result = Launcher.Launcher.LaunchInThread(
                            workingDir: Directory.GetCurrentDirectory(),
-                           fileName: "test.exe",
+                           fileName: ExcecutableToLaunch,
                            arguments: "pass"
                            );
             Assert.AreEqual(0, result.Code);
@@ -104,7 +106,7 @@ namespace launcherTests
             Parameters launcherParameters = new()
             {
                 WorkingDir = Directory.GetCurrentDirectory(),
-                FileName = "test.exe",
+                FileName = ExcecutableToLaunch,
                 Arguments = "fail",
                 RedirectStandardOutput = true
             };
