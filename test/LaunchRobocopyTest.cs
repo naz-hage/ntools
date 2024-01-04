@@ -2,7 +2,7 @@
 
 namespace test
 {
-    public class LaucnherTest
+    public class LaunchRobocopyTest
     {
         public static ResultHelper Test()
         {
@@ -27,7 +27,7 @@ namespace test
                     Console.WriteLine(line);
                 }
             }
-            return new ResultHelper();
+            return result;
         }
     }
 }

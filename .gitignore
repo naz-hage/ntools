@@ -400,5 +400,4 @@ FodyWeavers.xsd
 /__azurite_db_blob_extent__.json
 /__azurite_db_blob__.json
 /nuget-push.bat
-/test/Properties/launchSettings.json
 **/launchSettings.json

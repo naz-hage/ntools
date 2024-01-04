@@ -1,5 +1,6 @@
 ﻿using Launcher;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.IO;
 
 namespace launcherTests
@@ -26,7 +27,7 @@ namespace launcherTests
         [TestMethod]
         public void ProcessStartTestPass()
         {
-            Parameters parameters = new()
+            Parameters launcherParameters = new()
             {
                 WorkingDir = Directory.GetCurrentDirectory(),
                 Arguments = "pass",
@@ -34,7 +35,16 @@ namespace launcherTests
                 RedirectStandardOutput = true
             };
 
-            var result = Launcher.Launcher.Start(parameters);
+            Console.WriteLine($"WorkingDir: {launcherParameters.WorkingDir}");
+            Console.WriteLine($"FileName: {launcherParameters.FileName}");
+            Console.WriteLine($"Arguments: {launcherParameters.Arguments}");
+            Console.WriteLine($"RedirectStandardOutput: {launcherParameters.RedirectStandardOutput}");
+            var expectedExcecutablePath = Path.Combine(Path.GetFullPath(launcherParameters.WorkingDir), launcherParameters.FileName);
+            Console.WriteLine($"expectedExcecutablePath: {expectedExcecutablePath}");
+            Assert.IsTrue(File.Exists(expectedExcecutablePath));
+
+
+            var result = Launcher.Launcher.Start(launcherParameters);
             Assert.AreEqual(0, result.Code);
             Assert.AreEqual(2, result.Output.Count);
         }
@@ -42,7 +52,7 @@ namespace launcherTests
         [TestMethod]
         public void ProcessStartTestFail()
         {
-            Parameters parameters = new()
+            Parameters launcherParameters = new()
             {
                 WorkingDir = Directory.GetCurrentDirectory(),
                 Arguments = "fail",
@@ -50,7 +60,15 @@ namespace launcherTests
                 RedirectStandardOutput = true
             };
 
-            var result = Launcher.Launcher.Start(parameters);
+            Console.WriteLine($"WorkingDir: {launcherParameters.WorkingDir}");
+            Console.WriteLine($"FileName: {launcherParameters.FileName}");
+            Console.WriteLine($"Arguments: {launcherParameters.Arguments}");
+            Console.WriteLine($"RedirectStandardOutput: {launcherParameters.RedirectStandardOutput}");
+            var expectedExcecutablePath = Path.Combine(Path.GetFullPath(launcherParameters.WorkingDir), launcherParameters.FileName);
+            Console.WriteLine($"expectedExcecutablePath: {expectedExcecutablePath}");
+            Assert.IsTrue(File.Exists(expectedExcecutablePath));
+
+            var result = Launcher.Launcher.Start(launcherParameters);
 
 
             Assert.AreEqual(-100, result.Code);
@@ -90,7 +108,13 @@ namespace launcherTests
                 Arguments = "fail",
                 RedirectStandardOutput = true
             };
-
+            Console.WriteLine($"WorkingDir: {launcherParameters.WorkingDir}");
+            Console.WriteLine($"FileName: {launcherParameters.FileName}");
+            Console.WriteLine($"Arguments: {launcherParameters.Arguments}");
+            Console.WriteLine($"RedirectStandardOutput: {launcherParameters.RedirectStandardOutput}");
+            var expectedExcecutablePath = Path.Combine(Path.GetFullPath(launcherParameters.WorkingDir), launcherParameters.FileName);
+            Console.WriteLine($"expectedExcecutablePath: {expectedExcecutablePath}");
+            Assert.IsTrue(File.Exists(expectedExcecutablePath));
             var result = Launcher.Launcher.Start(launcherParameters);
 
             Assert.AreEqual(-100, result.Code);
