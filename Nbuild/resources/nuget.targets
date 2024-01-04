@@ -15,7 +15,7 @@
 		<RedError Condition="'$(IsAdmin)' == false" Message="Must be an admin to install Nuget" />
 		<PropertyGroup>
 			<NugetTempExe>c:\temp\nuget.exe</NugetTempExe>
-			<DowbloadUrl>https://dist.nuget.org/win-x86-commandline/latest/nuget.exe</DowbloadUrl>
+			<DownloadUrl>https://dist.nuget.org/win-x86-commandline/latest/nuget.exe</DownloadUrl>
 		</PropertyGroup>
 
 		<!-- Delete NugetTempExe if it exists -->

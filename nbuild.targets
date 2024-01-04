@@ -3,6 +3,7 @@
 	<!-- Reference: https://learn.microsoft.com/en-us/visualstudio/msbuild/walkthrough-using-msbuild?view=vs-2022 -->
 	
 	<Import Project="$(ProgramFiles)\Nbuild\common.targets"/>
+	<Import Project="$(ProgramFiles)\Nbuild\nuget.targets"/>
 	
 	<PropertyGroup>
         <!-- This is the folder where the *.sln resides-->

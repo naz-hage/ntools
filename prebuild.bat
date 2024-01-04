@@ -10,7 +10,7 @@ for %%F in (%FILES%) do (
 
 set SRC=nbuild\resources
 set DST=%programfiles%\nbuild
-set FILES=common.targets
+set FILES=common.targets nuget.targets nbuild.targets 
 for %%F in (%FILES%) do (
     xcopy "%SRC%\%%F" "%DST%\" /d /y
 )
