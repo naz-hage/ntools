@@ -20,6 +20,7 @@ nBackup command line options:
 
 ```
 - [**Launcher**](./launcher/README.md) - The launcher class is used by nBackup to launch robocopy and wait for it to complete.
+- [**Nbuild**](./Nbuild/README.md) - The launcher class is used by nBackup to launch robocopy and wait for it to complete.
 
 ## Additional information:
 - There are several predefined MSBuild properties that can be used during builds. Here are a few examples:
