@@ -20,8 +20,7 @@ namespace Nbuild
 
       
             // Always extract nbuild.bat common.targets.xml
-            //ResourceHelper.ExtractEmbeddedResource(Environment.CurrentDirectory, "nbuild.resources.common.targets", CommonBuildFileName);
-            ResourceHelper.ExtractEmbeddedResource(Environment.CurrentDirectory, "nbuild.resources.nbuild.bat", NbuildBatchFile);
+            ResourceHelper.ExtractEmbeddedResource(Environment.CurrentDirectory, "Nbuild.resources.nbuild.bat", NbuildBatchFile);
             Colorizer.WriteLine($"[{ConsoleColor.Yellow}!Extracted {NbuildBatchFile} & {CommonBuildFileName} to {Environment.CurrentDirectory}]\n");
 
             if (!File.Exists(buildXmlPath))

@@ -34,10 +34,11 @@
 
 	<ItemGroup>
 		<EmbeddedResource Include="resources\common.targets" />
+		<EmbeddedResource Include="resources\dotnet.targets" />
 		<EmbeddedResource Include="resources\GetFileVersion.ps1" />
+		<EmbeddedResource Include="resources\mongodb.targets" />
 		<EmbeddedResource Include="resources\nbuild.bat" />
 		<EmbeddedResource Include="resources\nbuild.targets" />
-		<EmbeddedResource Include="resources\dotnet.targets" />
 		<EmbeddedResource Include="resources\node.targets" />
 		<EmbeddedResource Include="resources\nuget.targets" />
 	</ItemGroup>
