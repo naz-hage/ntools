@@ -1,6 +1,5 @@
-﻿using Launcher;
+﻿using LauncherTest;
 using NbuildTasks;
-using test;
 
 try
 {

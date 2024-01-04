@@ -8,7 +8,7 @@ namespace launcherTests
     [TestClass]
     public class LauncherTests
     {
-        private const string ExcecutableToLaunch = "Ngit.exe";
+        private const string ExcecutableToLaunch = "LauncherTest.exe";
 
         [TestMethod]
         public void ProcessTestRobocopy()

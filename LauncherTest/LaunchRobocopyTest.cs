@@ -1,6 +1,6 @@
 ﻿using Launcher;
 
-namespace test
+namespace LauncherTest
 {
     public class LaunchRobocopyTest
     {

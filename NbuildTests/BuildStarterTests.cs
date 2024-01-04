@@ -44,7 +44,7 @@ namespace Nbuild.Tests
             string resourcePath = Path.Combine(executingAssemblyDirectory, "Nbuild.dll");
             string targetFileName = Path.Combine(executingAssemblyDirectory, "commom.targets");
     
-            ResourceHelper.ExtractEmbeddedResource(resourcePath, "Nbuild.resources.common.targets", targetFileName);
+            ResourceHelper.ExtractEmbeddedResource("Nbuild.resources.common.targets", targetFileName);
     
             // Assert
             Console.WriteLine($"ResourcePath: {targetFileName}");

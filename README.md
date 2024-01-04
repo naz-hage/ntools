@@ -1,26 +1,11 @@
 # ntools
 Collection of useful tools which automates various tasks on Windows client.
 
-- **nBackup** - A .NET executable which relies on robocopy to backup a list of folders from source and destination.
-nBackup command line options:
- 
-```
- nBackup.exe [-src value] [-dest value] [-opt value] [-input value] [-verbose value] [-performbackup value]
+- [**nBackup**](./Nbackup/README.md) - A tool which relies on `robocopy` to backup a list of files and folders from source and destination.
 
  
-      - `src`           : Source Folder (string, default=)
-      - `dest`          : Destination folder (string, default=)
-      - `opt`           : Backup Options (string, default=/s /XD .git /XD .vs /XD TestResults /XF *.exe /XF *.dll /XF *.pdb /e)
-      - `input`         : input backup file which specifies source, destination and backup options. See [backup.json](./nBackup/Data/backup.json) for a sample input backup json file. (string, default=)
-      - `verbose`       : Values: true | false.  Default is false (true or false, default=False)
-      - `performbackup` : Values: true | false.  false displays options and does not perform backup (default=True)
-
-            - if `input` option is specified, the `src`, `dest`, and `opt` options are ignored.
-            - if `input` option is not specified, the `src`, `dest`, and `opt` options are required.
-
-```
+- [**Nbuild**](./Nbuild/README.md) - A tool which launches MSBuild with a target to build.
 - [**Launcher**](./launcher/README.md) - The launcher class is used by nBackup to launch robocopy and wait for it to complete.
-- [**Nbuild**](./Nbuild/README.md) - The launcher class is used by nBackup to launch robocopy and wait for it to complete.
 
 ## Additional information:
 - There are several predefined MSBuild properties that can be used during builds. Here are a few examples:

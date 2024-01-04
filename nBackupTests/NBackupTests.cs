@@ -16,7 +16,7 @@ namespace nbackup.Tests
         public void PerformTest()
         {
             string backupInput = "..\\..\\nBackup\\Data\\backup.json";
-            Assert.IsTrue(Parser.TryParse($"-input {backupInput}", out Cli options));
+            Assert.IsTrue(Parser.TryParse($"-i {backupInput}", out Cli options));
             Console.WriteLine(backupInput);
             ResultHelper result = NBackup.Perform(options);
             Assert.IsFalse(result.Code > 3);
@@ -27,7 +27,7 @@ namespace nbackup.Tests
         {
             string backupInput = "\\..\\nBackup\\Data\\TextFile.txt";
 
-            Assert.IsTrue(Parser.TryParse($"-input {backupInput}", out Cli options));
+            Assert.IsTrue(Parser.TryParse($"-i {backupInput}", out Cli options));
 
             ResultHelper result = NBackup.Perform(options);
             Assert.AreEqual(ResultHelper.FileNotFound, result.Code);
@@ -36,7 +36,7 @@ namespace nbackup.Tests
         [TestMethod()]
         public void PerformTestInvalidInputBadFormattedJson()
         {
-            Assert.IsTrue(Parser.TryParse($"-input m", out Cli options));
+            Assert.IsTrue(Parser.TryParse($"-i m", out Cli options));
 
             ResultHelper result = NBackup.Perform(options);
             Assert.AreEqual(ResultHelper.FileNotFound, result.Code);

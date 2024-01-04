@@ -12,11 +12,11 @@ namespace Nbuild.Tests
             // Arrange
             string? executingAssemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             Assert.IsNotNull(executingAssemblyDirectory);
-            string resourcePath = Path.Combine(executingAssemblyDirectory, "nbuild.dll");
+            
             string targetFileName = Path.Combine(executingAssemblyDirectory, "commom.targets");
 
             // Act
-            ResourceHelper.ExtractEmbeddedResource(resourcePath, "Nbuild.resources.common.targets", targetFileName);
+            ResourceHelper.ExtractEmbeddedResource("Nbuild.resources.common.targets", targetFileName);
 
             // Assert
             Console.WriteLine($"ResourcePath: {targetFileName}");

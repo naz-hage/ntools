@@ -11,7 +11,7 @@ namespace Nbuild
         public const string BuildFileName = "nbuild.targets";
         public const string CommonBuildFileName = "common.targets";
         private const string NbuildBatchFile = "nbuild.bat";
-
+        private const string ResourceLocation = "Nbuild.resources.nbuild.bat";
 
         public static ResultHelper Build(string? target, bool verbose)
         {
@@ -20,7 +20,7 @@ namespace Nbuild
 
       
             // Always extract nbuild.bat common.targets.xml
-            ResourceHelper.ExtractEmbeddedResource(Environment.CurrentDirectory, "Nbuild.resources.nbuild.bat", NbuildBatchFile);
+            ResourceHelper.ExtractEmbeddedResource(ResourceLocation, Path.Combine(Environment.CurrentDirectory, NbuildBatchFile));
             Colorizer.WriteLine($"[{ConsoleColor.Yellow}!Extracted {NbuildBatchFile} & {CommonBuildFileName} to {Environment.CurrentDirectory}]\n");
 
             if (!File.Exists(buildXmlPath))

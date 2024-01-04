@@ -14,6 +14,8 @@
 - Add Git Wrapper class to facilitate git operations.
 - Target .netstandard2.0 for Launcher project.  This allows NbuildTasks to use it 
 - Refactor Launcher tests
+- Refactor Nbackup - remove cli options src, dest, and options and use json input only file instead.
 - Publish Launcher 1.1.0 to nuget.org and unlist 1.0.0.5
+- Update documentation
 - Reference: [issue#23](https://github.com/naz-hage/ntools/issues/23)
 
