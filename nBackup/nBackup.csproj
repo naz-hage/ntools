@@ -35,12 +35,11 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<Content Include="Data\backup.json">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</Content>
+		<EmbeddedResource Include="Resources\Nbackup.json" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <ProjectReference Include="..\launcher\Launcher.csproj" />
+	  <ProjectReference Include="..\NbuildTasks\NbuildTasks.csproj" />
 	</ItemGroup>
 </Project>

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace nbackup
+namespace Nbackup
 {
     public class Backup
     {

@@ -48,6 +48,7 @@
 	</ItemGroup>
  <ItemGroup>
     <ProjectReference Include="..\launcher\Launcher.csproj" />
+    <ProjectReference Include="..\NbuildTasks\NbuildTasks.csproj" />
   </ItemGroup>
 
 </Project>

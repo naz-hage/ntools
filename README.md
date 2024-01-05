@@ -1,18 +1,31 @@
-# ntools
-Collection of useful tools which automates various tasks on Windows client.
+# Software Tools Collection
 
-- [**nBackup**](./Nbackup/README.md) - A tool which relies on `robocopy` to backup a list of files and folders from source and destination.
+This repository contains a collection of software tools designed to automate various tasks on Windows clients.
 
- 
-- [**Nbuild**](./Nbuild/README.md) - A tool which launches MSBuild with a target to build.
-- [**Launcher**](./launcher/README.md) - The launcher class is used by nBackup to launch robocopy and wait for it to complete.
+## Table of Contents
+1. [Nbackup](#nbackup)
+2. [Nbuild](#nbuild)
+3. [NbuildTasks](#nbuildtasks)
+4. [Launcher](#launcher)
+5. [Installation](#installation)
+6. [Usage](#usage)
 
-## Additional information:
-- There are several predefined MSBuild properties that can be used during builds. Here are a few examples:
-    - `$(MSBuildProjectFile)`: The file name of the project file.
-    - `$(MSBuildProjectName)`: The file name of the project file without the extension.
-    - `$(MSBuildProjectExtension)`: The extension of the project file.
-    - `$(MSBuildProjectFullPath)`: The absolute path of the project file.
-    - `$(MSBuildThisFileDirectory)`: The directory of the MSBuild file that is currently being processed.
- 
-You can find the complete list of predefined [MSBuild properties in the Microsoft documentation](https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild-reserved-and-well-known-properties?view=vs-2022).
+## Nbackup
+[Nbackup](./Nbackup/README.md) is a tool that leverages `robocopy` to backup a list of files and folders from a source to a destination. It is designed to be reliable and efficient, ensuring that your data is safe.
+
+## Nbuild
+[Nbuild](./Nbuild/README.md) is a tool that launches MSBuild with a target to build. It simplifies the build process and makes it easier to manage your projects.
+
+## NbuildTasks
+[NbuildTasks](./NbuildTasks/README.md) is a class library that exposes MSBuild tasks. It is used by Nbuild to perform various tasks.
+
+## Launcher
+[Launcher](./launcher/README.md) is class library which is used by Nbackup to launch `robocopy` and wait for it to complete. This ensures that the backup process is fully completed before the program continues.
+
+
+
+## Installation
+(installation instructions will be provided after the first release)
+
+## Usage
+(usage examples will be provided after the first release)

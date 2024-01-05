@@ -6,7 +6,7 @@ using System.IO;
 using System.Text;
 using System.Text.Json;
 
-namespace nbackup
+namespace Nbackup
 {
     public class NBackup
     {

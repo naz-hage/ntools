@@ -30,12 +30,18 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nbackup", "nBackup\Nbackup.csproj", "{1E00CF48-2881-478B-AC19-A9AE90910F44}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NbackupTests", "nBackupTests\NbackupTests.csproj", "{79DD18A9-0E82-4F97-8353-1E5D8BC844BA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{36875C3B-0953-4936-BB31-2402515DCBAA} = {36875C3B-0953-4936-BB31-2402515DCBAA}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NbuildTasks", "NbuildTasks\NbuildTasks.csproj", "{36875C3B-0953-4936-BB31-2402515DCBAA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nbuild", "nbuild\Nbuild.csproj", "{6E288918-A193-42FC-93A7-8457BF284B82}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NbuildTests", "NbuildTests\NbuildTests.csproj", "{EFB85C8C-26C3-4A6F-919F-3534CD238975}"
+	ProjectSection(ProjectDependencies) = postProject
+		{36875C3B-0953-4936-BB31-2402515DCBAA} = {36875C3B-0953-4936-BB31-2402515DCBAA}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LauncherTest", "LauncherTest\LauncherTest.csproj", "{EF541BB6-416C-4DDC-ACB5-B0BFECD2E9F4}"
 EndProject

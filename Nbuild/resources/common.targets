@@ -28,8 +28,6 @@
 	
 	<Target Name="PROPERTIES" DependsOnTargets="GET_TAG">
 		<PropertyGroup>
-			<BuildTypeFile>build_type.txt</BuildTypeFile>
-			<Tag>tag.txt</Tag>
 			<NbuildExe>"$(BuildTools)\ngit.exe"</NbuildExe>
 			<NugetExe>$(BuildTools)\nuget.exe</NugetExe>
 			<ZipExe>$(ProgramFiles)\BuildTools\7-Zip\7z.exe</ZipExe>
@@ -43,10 +41,6 @@
 			<TestResultsFolder>$(DevDrive)\TestResults</TestResultsFolder>
 		</PropertyGroup>
 
-		<!-- <ReadLinesFromFile File="$(VersionFile)" Condition="Exists('$(VersionFile)')">
-			<Output TaskParameter="Lines" PropertyName="ProductVersion" />
-		</ReadLinesFromFile>
-		 -->
 		<RedError Condition="'$(ProductVersion)' == ''" Message="Error: Version property is not defined. Type Ngit.exe -git settag -project [] -branch [] -tag 0.0.1" />
 		<RedError Condition="'$(SolutionName)' == ''" Message="Error: SolutionName property is not defined." />
 		<RedError Condition="'$(DeploymentFolder)' == ''" Message="Error: DeploymentFolder property is not defined." />
@@ -74,12 +68,12 @@
 							"/>
 
 		<ItemGroup>
-			<FilesToDelete Include="$(SolutionDir)\**\obj\**\*" />
+			<FilesToDelete Include="$(SolutionDir)\**\obj\**\*;$(SolutionDir)\**\bin\**\*" />
 		</ItemGroup>
 		<Delete Files="@(FilesToDelete)" />
 		<RemoveDir Directories="$(SolutionDir)\**\obj" />
 		<ItemGroup>
-			<DirectoriesToDelete Include="$(SolutionDir)\**\obj\**\*" />
+			<DirectoriesToDelete Include="$(SolutionDir)\**\obj\**\*;$(SolutionDir)\**\bin\**\*" />
 		</ItemGroup>
 		<RemoveDir Directories="@(DirectoriesToDelete)" />
 

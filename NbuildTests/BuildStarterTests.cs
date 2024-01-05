@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NbuildTasks;
 using System.Reflection;
 
 namespace Nbuild.Tests
@@ -44,7 +45,7 @@ namespace Nbuild.Tests
             string resourcePath = Path.Combine(executingAssemblyDirectory, "Nbuild.dll");
             string targetFileName = Path.Combine(executingAssemblyDirectory, "commom.targets");
     
-            ResourceHelper.ExtractEmbeddedResource("Nbuild.resources.common.targets", targetFileName);
+            ResourceHelper.ExtractEmbeddedResourceFromAssembly(resourcePath,"Nbuild.resources.common.targets", targetFileName);
     
             // Assert
             Console.WriteLine($"ResourcePath: {targetFileName}");
