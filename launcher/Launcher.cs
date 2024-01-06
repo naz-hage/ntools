@@ -62,6 +62,7 @@ namespace Launcher
                                                            .Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries));
                         }
                         else // Otherwise, wait for the process to exit.
+                        
                         {
                             process.WaitForExit();
                         }

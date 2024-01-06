@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Nbuild;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NbuildTasks;
 using System.Reflection;
 
@@ -38,15 +39,15 @@ namespace Nbuild.Tests
                 "GIT_BRANCH",
                 "SingleProject",
                 "HandleError"];
-    
+
             // Act
             var executingAssemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             Assert.IsNotNull(executingAssemblyDirectory);
             string resourcePath = Path.Combine(executingAssemblyDirectory, "Nbuild.dll");
             string targetFileName = Path.Combine(executingAssemblyDirectory, "commom.targets");
-    
-            ResourceHelper.ExtractEmbeddedResourceFromAssembly(resourcePath,"Nbuild.resources.common.targets", targetFileName);
-    
+
+            ResourceHelper.ExtractEmbeddedResourceFromAssembly(resourcePath, "Nbuild.resources.common.targets", targetFileName);
+
             // Assert
             Console.WriteLine($"ResourcePath: {targetFileName}");
             Assert.IsTrue(File.Exists(targetFileName));
@@ -57,6 +58,29 @@ namespace Nbuild.Tests
 
             // assert that arrays actual and expected are equal
             CollectionAssert.AreEqual(expected, actual, StringComparer.OrdinalIgnoreCase);
+        }
+
+        [TestMethod()]
+        public void GetImportAttributesTest()
+        {
+            // Arrange
+            var executingAssemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            Assert.IsNotNull(executingAssemblyDirectory);
+
+            string resourcePath = Path.Combine(executingAssemblyDirectory, "Nbuild.dll");
+            string targetFileName = Path.Combine(executingAssemblyDirectory, "nbuild.targets");
+
+            ResourceHelper.ExtractEmbeddedResourceFromAssembly(resourcePath, "Nbuild.resources.nbuild.targets", targetFileName);
+
+            // Act
+            var fileNames = BuildStarter.GetImportAttributes(targetFileName, "Project");
+
+            // display file names
+            Console.WriteLine($"FileNames:");
+            Console.WriteLine($"{string.Join(",\n", fileNames.Select(a => $"\"{a}\""))}");
+
+            // Assert
+            Assert.IsTrue(fileNames.Count() > 0);
         }
     }
 }

@@ -1,7 +1,9 @@
 ﻿using CommandLine;
 using Launcher;
+using NbuildTasks;
 using OutputColorizer;
 using System.Diagnostics;
+using System.Xml.Linq;
 
 namespace Nbuild
 {
@@ -50,6 +52,7 @@ namespace Nbuild
                             // project required
                             // find all *.targets files
                             string[] targetsFiles = Directory.GetFiles(Environment.CurrentDirectory, "*.targets", SearchOption.TopDirectoryOnly);
+                            
 
                             try
                             {
@@ -62,6 +65,22 @@ namespace Nbuild
                                         Console.WriteLine(targetName);
                                     }
                                     Console.WriteLine();
+
+                                    Console.WriteLine($"Imported Targets:");
+                                    Console.WriteLine($"----------------------");
+                                    foreach (var item in BuildStarter.GetImportAttributes(targetsFile, "Project"))
+                                    {
+                                        // replace $(ProgramFiles) with environment variable
+                                        var importItem = item.Replace("$(ProgramFiles)", Environment.GetEnvironmentVariable("ProgramFiles"));
+                                        Console.WriteLine($"{importItem} Targets:");
+                                        Console.WriteLine($"----------------------");
+                                        foreach (var targetName in BuildStarter.GetTargets(importItem))
+                                        {
+                                            Console.WriteLine(targetName);
+                                        }
+                                        Console.WriteLine();
+
+                                    }
                                 }
 
                                 buildResult = ResultHelper.Success();
@@ -78,6 +97,8 @@ namespace Nbuild
                     }
                 }
             }
+
+            DisplayGitInfo();
 
             if (buildResult.IsSuccess())
             {
@@ -115,5 +136,26 @@ namespace Nbuild
 
             return (int)buildResult.Code;
         }
+
+        private static void DisplayGitInfo()
+        {
+            var parameters = new Parameters
+            {
+                FileName = "ngit.exe",
+                Arguments = $"-git getbranch",
+                WorkingDir = Environment.CurrentDirectory,
+                RedirectStandardOutput = false,
+                Verbose = false,
+            };
+
+            var resultHelper = Launcher.Launcher.Start(parameters);
+            if (!resultHelper.IsSuccess())
+            {
+                Console.WriteLine($"==> Failed tp display git info");
+            }
+        }
+
+    
+
     }
 }

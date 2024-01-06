@@ -17,14 +17,12 @@ if "%1"=="/?" (
 msbuild %CMD%
 if ERRORLEVEL 1 (
     echo %ERRORLEVEL%
-    for /f "tokens=1 delims='" %%G in ('ngit -git getbranch') do echo Branch: %%G
-    for /f "tokens=1 delims='" %%G in ('ngit -git gettag') do echo Tag: %%G
+    ngit -git getbranch
     echo %0 '%1' FAILED
     echo %0 '%1' FAILED >>%BUILD_LOG%
     EXIT /B1
 ) else (
-    for /f "tokens=1 delims='" %%G in ('ngit -git getbranch') do echo Branch: %%G
-    for /f "tokens=1 delims='" %%G in ('ngit -git gettag') do echo Tag: %%G
+    ngit -git getbranch
     echo %0 '%1' SUCCEEDED 
     echo %0 '%1' SUCCEEDED >>%BUILD_LOG%
 )

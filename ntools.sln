@@ -45,6 +45,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NbuildTests", "NbuildTests\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LauncherTest", "LauncherTest\LauncherTest.csproj", "{EF541BB6-416C-4DDC-ACB5-B0BFECD2E9F4}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ngit", "Ngit\Ngit.csproj", "{432E20EA-0A75-4D7B-8683-9DF1A8B1D3B1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ngitTests", "NgitTests\ngitTests.csproj", "{A6C392C4-1290-40CD-AE5A-9282CA554FD7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +87,14 @@ Global
 		{EF541BB6-416C-4DDC-ACB5-B0BFECD2E9F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EF541BB6-416C-4DDC-ACB5-B0BFECD2E9F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EF541BB6-416C-4DDC-ACB5-B0BFECD2E9F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{432E20EA-0A75-4D7B-8683-9DF1A8B1D3B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{432E20EA-0A75-4D7B-8683-9DF1A8B1D3B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{432E20EA-0A75-4D7B-8683-9DF1A8B1D3B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{432E20EA-0A75-4D7B-8683-9DF1A8B1D3B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A6C392C4-1290-40CD-AE5A-9282CA554FD7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6C392C4-1290-40CD-AE5A-9282CA554FD7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A6C392C4-1290-40CD-AE5A-9282CA554FD7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6C392C4-1290-40CD-AE5A-9282CA554FD7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

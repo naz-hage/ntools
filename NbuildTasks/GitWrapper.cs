@@ -17,6 +17,10 @@ namespace NbuildTasks
             Verbose = false
         };
 
+        public string Branch { get { return GetBranch(); } }
+        public string Tag { get { return GetTag(); } }
+
+
         public string AutoTag(string buildType)
         {
             if (string.IsNullOrEmpty(buildType))
@@ -87,7 +91,6 @@ namespace NbuildTasks
             bool resultSetTag = true;
             Parameters.Arguments = $"tag -a {newTag} HEAD -m \"Automated tag\"";
             var result = Launcher.Launcher.Start(Parameters);
-            Console.WriteLine($"result.Code: {result.Code}, result.Output.Count: {result.Output.Count}");
             if ((result.Code == 0) && (result.Output.Count >= 0))
             {
                 foreach (var line in result.Output)
@@ -105,12 +108,6 @@ namespace NbuildTasks
                 }
             }
 
-            //if (resultSetTag)
-            //{
-            //    resultSetTag = UpdateTagToVersionFiles(newTag);
-            //}
-
-            Console.WriteLine($"resultSetTag: {resultSetTag}");
             return resultSetTag;
         }
         private bool IsValid4Tag(string newTag)
@@ -300,7 +297,6 @@ namespace NbuildTasks
 
         public bool DeleteTag(string tag)
         {
-            Console.WriteLine($"DeleteTag Start");
             if (!IsValidTag(tag)) return false;
             bool resultDeleteTag = DeleteLocalTag(tag);
             if (resultDeleteTag)
@@ -308,7 +304,6 @@ namespace NbuildTasks
                 resultDeleteTag = DeleteRemoteTag(tag);
             }
 
-            Console.WriteLine($"DeleteTag End");
             return resultDeleteTag;
         }
 
@@ -316,7 +311,6 @@ namespace NbuildTasks
         {
             Parameters.Arguments = $"tag -d {tag}";
             var result = Launcher.Launcher.Start(Parameters);
-            Console.WriteLine($"result.Code: {result.Code}, result.Output.Count: {result.Output.Count}");
             if (result.Code == 0 && result.Output.Count >= 1)
             {
                 foreach (var line in result.Output)

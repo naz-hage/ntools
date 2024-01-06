@@ -3,6 +3,7 @@ using NbuildTasks;
 using OutputColorizer;
 using System.Diagnostics;
 using System.Xml;
+using System.Xml.Linq;
 
 namespace Nbuild
 {
@@ -129,6 +130,28 @@ namespace Nbuild
             }
         }
 
+        public static IEnumerable<string> GetImportAttributes(string filePath, string attributeName)
+        {
+            XmlDocument doc = new();
+            doc.Load(filePath);
+
+            XmlNodeList? imports = doc.GetElementsByTagName("Import");
+
+            if (imports != null)
+            {
+                foreach (XmlNode? import in imports)
+                {
+                    if (import != null && import.Attributes != null && import.Attributes[attributeName] != null)
+                    {
+                        var projectName = import?.Attributes?[attributeName]?.Value;
+                        if (projectName != null)
+                        {
+                            yield return projectName;
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
