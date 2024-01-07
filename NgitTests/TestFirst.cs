@@ -1,0 +1,69 @@
+﻿using NbuildTasks;
+
+namespace NgitTests;
+
+[TestClass]
+public class TestFirst 
+{
+    public const string TestProject = "https://nazhage.visualstudio.com/_git/random";
+    public const string TestBranch = "testRandom";
+    public static string? ProjectName { get; set; }
+
+    public TestFirst()
+    {
+        ProjectName = TestProject.Split('/').Last().Split('.').First();
+    }
+
+    /// <summary>
+    /// Initializes the assembly before any tests are run.
+    /// </summary>
+    /// <param name="context">The test context.</param>
+    [AssemblyInitialize]
+    public static void AssemblyInit(TestContext context)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+
+        RandomRepoTest();
+    }
+
+    public static void RandomRepoTest()
+    {
+        // extract project name from url
+        ProjectName = TestProject.Split('/').Last().Split('.').First();
+        Assert.IsNotNull(ProjectName);
+
+        var gitWrapper = new GitWrapper(ProjectName);
+        
+        // change to project directory
+
+        var solutionDir = $@"{gitWrapper.DevDrive}\{gitWrapper.MainDir}\{ProjectName}";
+        if (!Directory.Exists(solutionDir))
+        {
+            Assert.IsTrue(gitWrapper.CloneProject(TestProject));
+        }
+        Assert.IsTrue(Directory.Exists(solutionDir));
+
+        // change to project directory
+        Directory.SetCurrentDirectory(solutionDir);
+
+        Assert.IsTrue(File.Exists($"{ProjectName}.sln"));
+
+        // create 'testRandom' branch if not exists
+        if (!gitWrapper.BranchExists(TestBranch))
+        {
+            Assert.IsTrue(gitWrapper.CheckoutBranch(TestBranch, create:true));
+        }
+        Assert.IsTrue(gitWrapper.CheckoutBranch(TestBranch));
+
+        if (string.IsNullOrEmpty(gitWrapper.Tag))
+        {
+            gitWrapper.SetTag("1.0.0");
+        }
+
+        Assert.IsNotNull(gitWrapper.Tag);
+
+        Console.WriteLine($"TestFirst - Current Directory: {Directory.GetCurrentDirectory()}");
+        Console.WriteLine($"TestFirst - Current Branch: {gitWrapper.Branch}");
+        Console.WriteLine($"TestFirst - Current Tag: {gitWrapper.Tag}");
+    }
+}

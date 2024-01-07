@@ -48,12 +48,12 @@ namespace NbuildTasks
             switch (Command)
             {
                 case GetTagCommand:
-                    Output = gitWrapper.GetTag();
+                    Output = gitWrapper.Tag;
                     Log.LogMessage($"In task: {Output}");
                     break;
 
                 case GetBranchCommand:
-                    Output = gitWrapper.GetBranch();
+                    Output = gitWrapper.Branch;
                     Log.LogMessage($"In Task: {Output}");
                     break;
 
@@ -101,7 +101,7 @@ namespace NbuildTasks
                     {
                         Tag = TaskParameter;
                         Console.WriteLine($"Tag: {Tag}");
-                        Output = gitWrapper.PushTag(gitWrapper.GetBranch(), Tag) ? "True" : "False";
+                        Output = gitWrapper.PushTag(Tag) ? "True" : "False";
                     }
                     else
                     {

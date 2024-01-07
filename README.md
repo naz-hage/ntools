@@ -16,8 +16,11 @@ This repository contains a collection of software tools designed to automate var
 ## Nbuild
 [Nbuild](./Nbuild/README.md) is a tool that launches MSBuild with a target to build. It simplifies the build process and makes it easier to manage your projects.
 
+## Ngit
+[Ngit](./Ngit/README.md) is simple wrapper for `Git` tool that peroform simple commands such as get tag and set tag.
+
 ## NbuildTasks
-[NbuildTasks](./NbuildTasks/README.md) is a class library that exposes MSBuild tasks. It is used by Nbuild to perform various tasks.
+[NbuildTasks](./NbuildTasks/README.md) is a class library that exposes `MSBuild` tasks. It is used by `Nbuild` to perform various tasks during the build of any project.
 
 ## Launcher
 [Launcher](./launcher/README.md) is class library which is used by Nbackup to launch `robocopy` and wait for it to complete. This ensures that the backup process is fully completed before the program continues.

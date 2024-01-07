@@ -1,13 +1,12 @@
 ﻿using NbuildTasks;
 using Ngit;
 
-namespace ngit.Tests
+namespace NgitTests
 {
     [TestClass()]
     public class CommandTests 
     {
         private static Cli Options { get; set; } = new Cli() { 
-            Organization = "_git",
             Url = "https://nazhage.visualstudio.com",
             Verbose = false
         };

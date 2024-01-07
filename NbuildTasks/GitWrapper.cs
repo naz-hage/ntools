@@ -2,24 +2,38 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Threading;
 
 namespace NbuildTasks
 {
     public class GitWrapper
     {
-        private const string GitBinary = @"c:\program files\Git\cmd\git.exe";
-        private readonly Parameters Parameters = new Launcher.Parameters
+        private const string GitBinary = @"git.exe";
+        public readonly Parameters Parameters = new Launcher.Parameters
         {
             WorkingDir = Environment.CurrentDirectory,
             FileName = GitBinary,
             RedirectStandardOutput = true,
             Verbose = false
         };
+        public  string DevDrive { get; set; } = "c:";
+        public string MainDir { get; set; } = "source";
+
+        public GitWrapper( string project = null)
+        {
+            if (project == null )
+            {
+                Parameters.WorkingDir = Environment.CurrentDirectory;
+            }
+            else
+            {
+                Parameters.WorkingDir = $@"{DevDrive}\{MainDir}\{project}";
+            }
+        }
 
         public string Branch { get { return GetBranch(); } }
-        public string Tag { get { return GetTag(); } }
 
+        public string Tag { get { return GetTag(); } }
 
         public string AutoTag(string buildType)
         {
@@ -31,11 +45,11 @@ namespace NbuildTasks
 
             if (buildType.Equals("Staging", StringComparison.OrdinalIgnoreCase))
             {
-                return AutoTagStaging();
+                return StagingTag();
             }
             else if (buildType.Equals("Production", StringComparison.OrdinalIgnoreCase))
             {
-                return AutoTagProduction();
+                return ProductionTag();
             }
             else
             {
@@ -45,131 +59,40 @@ namespace NbuildTasks
 
         }
 
-        private string AutoTagProduction()
+        public string SetAutoTag(string buildType)
         {
-            var currentTag = GetTag();
+            var nextTag = String.Empty;
 
-            return ProductionTag(currentTag);
-        }
-
-        /// <summary>
-        /// Push new Tag to remote repo
-        /// </summary>
-        /// <param name="branch"></param>
-        /// <param name="newTag"></param>
-        /// <returns>True if command is successful, otherwise False</returns>
-        public bool PushTag(string branch, string newTag)
-        {
-            if (string.IsNullOrEmpty(branch) || string.IsNullOrEmpty(newTag))
+            if (!string.IsNullOrEmpty(buildType))
             {
-                return false;
-            }
-
-            Parameters.Arguments = $"push origin {branch} {newTag}";
-            var result = Launcher.Launcher.Start(Parameters);
-            if ((result.Code == 0) && (result.Output.Count >= 0))
-            {
-                foreach (var line in result.Output)
+                nextTag = AutoTag(buildType);
+                if (!string.IsNullOrEmpty(nextTag) && SetTag(nextTag))
                 {
-                    if (Parameters.Verbose) Console.WriteLine(line);
-                    if (line.Contains("fatal"))
-                    {
-                        return false;
-                    }
-                }
-                return true;
-            }
-            return false;
-        }
-
-        public bool SetTag(string newTag)
-        {
-            if (string.IsNullOrEmpty(newTag)) return false;
-
-            if (!IsValidTag(newTag)) return false;
-
-            bool resultSetTag = true;
-            Parameters.Arguments = $"tag -a {newTag} HEAD -m \"Automated tag\"";
-            var result = Launcher.Launcher.Start(Parameters);
-            if ((result.Code == 0) && (result.Output.Count >= 0))
-            {
-                foreach (var line in result.Output)
-                {
-                    if (Parameters.Verbose) Console.WriteLine(line);
-                    if (line.Contains("fatal"))
-                    {
-                        resultSetTag = false;
-                        break;
-                    }
-                    else
-                    {
-                        resultSetTag = true;
-                    }
+                    return nextTag;
                 }
             }
 
-            return resultSetTag;
-        }
-        private bool IsValid4Tag(string newTag)
-        {
-            if (string.IsNullOrEmpty(newTag))
-            {
-                return false;
-            }
-
-            string[] items = newTag.Split('.');
-            if (items == null || items.Length != 4)
-            {
-                return false;
-            }
-            else
-            {
-                foreach (var item in items)
-                {
-                    if (!UInt32.TryParse(item, out _))
-                    {
-                        return false;
-                    }
-                }
-            }
-            return true;
+            return nextTag;
         }
 
-        public bool IsValidTag(string newTag)
+        //private string AutoTagProduction()
+        //{
+        //    var currentTag = GetTag();
+
+        //    return ProductionTag(currentTag);
+        //}
+
+        //private string AutoTagStaging()
+        //{
+        //    var currentTag = GetTag();
+
+        //    return StagingTag(currentTag);
+
+        //}
+
+        public string StagingTag()
         {
-            if (string.IsNullOrEmpty(newTag))
-            {
-                return false;
-            }
-
-
-
-            string[] items = newTag.Split('.');
-            if (items == null || items.Length != 3)
-            {
-                return false;
-            }
-            else
-            {
-                foreach (var item in items)
-                {
-                    if (!UInt32.TryParse(item, out _))
-                    {
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Given a valid tag, get staging tag
-        /// given a valid tag m.n.p.b, staging tag is m.n.p.b+1
-        /// </summary>
-        /// <param name="tag"></param>
-        /// <returns>return valid stagging tag, otherwise null if failed</returns>
-        public string StagingTag(string tag)
-        {
+            var tag = GetTag();
             if (tag == null)
             {
                 return null;
@@ -199,8 +122,9 @@ namespace NbuildTasks
         /// </summary>
         /// <param name="tag"></param>
         /// <returns>return valid Production tag, otherwise null if failed</returns>
-        public string ProductionTag(string tag)
+        public string ProductionTag()
         {
+            var tag = GetTag();
             if (tag == null)
             {
                 return null;
@@ -242,15 +166,119 @@ namespace NbuildTasks
             }
         }
 
-        private string AutoTagStaging()
+        /// <summary>
+        /// Push new Tag to remote repo
+        /// </summary>
+        /// <param name="branch"></param>
+        /// <param name="newTag"></param>
+        /// <returns>True if command is successful, otherwise False</returns>
+        public bool PushTag(string newTag)
         {
-            var currentTag = GetTag();
-
-            return StagingTag(currentTag);
-
+            Parameters.Arguments = $"push origin {Branch} {newTag}";
+            var result = Launcher.Launcher.Start(Parameters);
+            if ((result.Code == 0) && (result.Output.Count >= 0))
+            {
+                foreach (var line in result.Output)
+                {
+                    if (Parameters.Verbose) Console.WriteLine(line);
+                    if (line.Contains("fatal"))
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            return false;
         }
 
-        public string GetBranch()
+        public bool SetTag(string newTag)
+        {
+            if (string.IsNullOrEmpty(newTag)) return false;
+
+            if (!IsValidTag(newTag)) return false;
+
+            if (LocalTagExists(newTag)) DeleteTag(newTag);
+
+            bool resultSetTag = true;
+            Parameters.Arguments = $"tag -a {newTag} HEAD -m \"Automated tag\"";
+
+            var result = Launcher.Launcher.Start(Parameters);
+            if ((result.Code == 0) && (result.Output.Count >= 0))
+            {
+                foreach (var line in result.Output)
+                {
+                    if (Parameters.Verbose) Console.WriteLine(line);
+                    if (line.Contains("fatal"))
+                    {
+                        resultSetTag = false;
+                        break;
+                    }
+                    else
+                    {
+                        resultSetTag = PushTag(newTag);
+                    }
+                }
+            }
+            return resultSetTag;
+        }
+        
+        private bool IsValid4Tag(string newTag)
+        {
+            if (string.IsNullOrEmpty(newTag))
+            {
+                return false;
+            }
+
+            string[] items = newTag.Split('.');
+            if (items == null || items.Length != 4)
+            {
+                return false;
+            }
+            else
+            {
+                foreach (var item in items)
+                {
+                    if (!UInt32.TryParse(item, out _))
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        public bool IsValidTag(string newTag)
+        {
+            if (string.IsNullOrEmpty(newTag))
+            {
+                return false;
+            }
+
+            string[] items = newTag.Split('.');
+            if (items == null || items.Length != 3)
+            {
+                return false;
+            }
+            else
+            {
+                foreach (var item in items)
+                {
+                    if (!UInt32.TryParse(item, out _))
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Given a valid tag, get staging tag
+        /// given a valid tag m.n.p.b, staging tag is m.n.p.b+1
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <returns>return valid stagging tag, otherwise null if failed</returns>
+        private string GetBranch()
         {
             var branch = string.Empty;
             Parameters.Arguments = $"branch";
@@ -274,7 +302,7 @@ namespace NbuildTasks
             return branch;
         }
 
-        public string GetTag()
+        private string GetTag()
         {
             Parameters.Arguments = $"describe --abbrev=0 --tags";
             var result = Launcher.Launcher.Start(Parameters);
@@ -295,16 +323,86 @@ namespace NbuildTasks
             }
         }
 
+        public bool LocalTagExists(string tag)
+        {
+            return ListLocalTags().Any(x => x.Contains(tag));
+        }
+
+        public bool RemoteTagExists(string tag)
+        {
+            return ListRemoteTags().Any(x => x.Contains(tag));
+        }
+
         public bool DeleteTag(string tag)
         {
-            if (!IsValidTag(tag)) return false;
-            bool resultDeleteTag = DeleteLocalTag(tag);
-            if (resultDeleteTag)
+            bool bResult = false;
+
+            // check if tag exists
+            if (ListLocalTags().Contains(tag))
+                bResult = DeleteLocalTag(tag);
+            else
+                bResult = true;
+            
+            var remoteTags = ListRemoteTags();
+            if (bResult && remoteTags.Any (x => x.Contains(tag))) 
+                bResult = DeleteRemoteTag(tag);
+
+            return bResult;
+        }
+
+        public List<string> ListLocalTags()
+        {
+            Parameters.Arguments = $"tag --list";
+            var result = Launcher.Launcher.Start(Parameters);
+            if (result.Code == 0 && result.Output.Count >= 1)
             {
-                resultDeleteTag = DeleteRemoteTag(tag);
+                return result.Output.ToList();
+            }
+            else
+            {
+                return new List<string>();
+            }
+        }
+
+        private List<string> DeleteRemoteTags(string url)
+        {
+            var tags = new List<string>();
+            Parameters.Arguments = $"ls-remote --tags {url}";
+            var result = Launcher.Launcher.Start(Parameters);
+            if (result.Code == 0 && result.Output.Count >= 1)
+            {
+                foreach (var line in result.Output)
+                {
+                    // extract tag from line
+                    var items = line.Split('/');
+                    var tag = items.Last();
+                    Console.WriteLine($"{line} -deleting {tag}");
+                    DeleteRemoteTag(tag);
+                    tags.Add(line);
+                }
             }
 
-            return resultDeleteTag;
+            return tags;
+        }
+
+        public List<string> ListRemoteTags()
+        {
+            var tags = new List<string>();
+            Parameters.Arguments = $"ls-remote --tags";
+            var result = Launcher.Launcher.Start(Parameters);
+            if (result.Code == 0 && result.Output.Count >= 1)
+            {
+                foreach (var line in result.Output)
+                {
+                    // extract tag from line
+                    var items = line.Split('/');
+                    var tag = items.Last();
+                    if (IsValid4Tag(tag) || IsValidTag(tag))
+                        tags.Add(tag);
+                }
+            }
+
+            return tags;
         }
 
         private bool DeleteLocalTag(string tag)
@@ -343,7 +441,89 @@ namespace NbuildTasks
             return false;
         }
 
-        /// <summary>
+        public bool CloneProject(string url)
+        {
+            if (string.IsNullOrEmpty(url))
+            {
+                return false;
+            }
+            var result = ResultHelper.New();
+            // extract project name from url
+            var projectName = url.Split('/').Last().Split('.').First();
+            if (string.IsNullOrEmpty(projectName))
+            {
+                return false;
+            }
+            // change to project directory
+            var DevDir = $"{DevDrive}\\{MainDir}";
+        
+            var solutionDir = $@"{DevDir}\{projectName}";
+            if (!System.IO.Directory.Exists(solutionDir))
+            {
+                Parameters.WorkingDir = DevDir;
+                Parameters.Arguments = $"clone {url} ";
+                result = Launcher.Launcher.Start(Parameters);
+                if ((result.Code == 0) && (result.Output.Count >= 0))
+                {
+                    if (CheckForErrorAndDisplayOutput(result.Output))
+                    {
+                        return false;
+                    }
+                }
+            }
+            return result.Code == 0;
+        }
+
+        public bool CheckoutBranch(string branch, bool create = false)
+        {
+            ResultHelper result;
+            if (create && !BranchExists(branch))
+            {
+                Parameters.Arguments = $"checkout -b {branch}";
+                result = Launcher.Launcher.Start(Parameters);
+            }
+            else
+            {
+                // checkout
+                Parameters.Arguments = $"checkout {branch}";
+                result = Launcher.Launcher.Start(Parameters);
+            }
+
+            if (result.Code == 0 && result.Output.Count >= 1)
+            {
+                if (CheckForErrorAndDisplayOutput(result.Output))
+                {
+                    return false;
+                }
+            }
+
+            return Branch == branch;
+        }
+
+        public bool BranchExists(string branch)
+        {
+            if (string.IsNullOrEmpty(branch)) return false;
+            return ListBranches().Contains(branch);
+        }
+
+        public List<string> ListBranches()
+        {
+            var branches = new List<string>();
+            Parameters.Arguments = $"branch --list";
+            var result = Launcher.Launcher.Start(Parameters);
+            if (result.Code == 0 && result.Output.Count >= 1)
+            {
+                foreach (var line in result.Output)
+                {
+                    // branch names stars on the 3rd char.
+                    // current branch starts with a '* '
+                    // others start with '  '
+                    branches.Add(line.Substring(2));  //branches.Add(line[2..])
+                }
+            }
+
+            return branches;
+        }
         private bool CheckForErrorAndDisplayOutput(List<string> lines)
         {
             foreach (var line in lines)

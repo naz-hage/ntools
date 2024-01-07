@@ -14,7 +14,7 @@ try
     {
         case "git":
             var gitWrapper = new GitWrapper();
-            Console.WriteLine($"Branch: {gitWrapper.GetBranch()} | Tag: {gitWrapper.GetTag()}");
+            Console.WriteLine($"Branch: {gitWrapper.Branch} | Tag: {gitWrapper.Tag}");
             Console.WriteLine($"Exit (0)");
             Environment.Exit(0);
             break;

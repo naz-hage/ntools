@@ -7,17 +7,13 @@ namespace Ngit
 {
     public class Command
     {
-        public const string GetBranchCommand = "getbranch";
-        public const string GetTagCommand = "gettag";
+        public const string GetBranchCommand = "branch";
+        public const string GetTagCommand = "tag";
         public const string SetTagCommand = "settag";
         public const string PushTagCommand = "pushtag";
-        public const string AutoTagCommand = "autotag";   // Increment tag based on branch and build type but don't set it
-        public const string SetAutoTagCommand = "setautotag";   // Increment tag based on branch and build type and set it
-        public const string SetBranchCommand = "setbranch";
-        public const string CreateBranchCommand = "createbranch";
+        public const string AutoTagCommand = "autotag";
         public const string DeleteTagCommand = "deletetag";
         public const string CloneCommand = "clone";
-        public const string SetRemoteCommand = "setremote";
 
         private static readonly GitWrapper  GitWrapper= new();
 
@@ -29,15 +25,11 @@ namespace Ngit
             {
                 GetBranchCommand => DisplayBranch(),
                 GetTagCommand => DisplayTag(),
-                AutoTagCommand => AutoTag(options) == string.Empty? RetCode.AutoTagFailed : RetCode.Success,
+                AutoTagCommand => SetAutoTag(options),
                 SetTagCommand => SetTag(options),
                 PushTagCommand => PushTag(options),
-                SetBranchCommand => SetBranch(options),
-                CreateBranchCommand => CreateBranch(options),
-                SetAutoTagCommand => SetAutoTag(options),
                 DeleteTagCommand => DeleteTag(options),
                 CloneCommand => Clone(options),
-                SetRemoteCommand => SetBranch(options),
                 _ => Default(options)
             };
 
@@ -116,7 +108,7 @@ namespace Ngit
             
             if (!string.IsNullOrEmpty(options.Tag))
             {
-                var nextTag = GitWrapper.PushTag(GitWrapper.Branch, options.Tag);
+                var nextTag = GitWrapper.PushTag(options.Tag);
                 //Colorizer.WriteLine($"[{ConsoleColor.Green}!{nextTag}]");
                 ReturnCode = RetCode.Success;
             }
@@ -149,7 +141,6 @@ namespace Ngit
         public static RetCode DeleteTag(Cli options)
         {
            var retCode = RetCode.InvalidParameter;
-
             
             if (!string.IsNullOrEmpty(options.Tag))
             {
@@ -197,16 +188,6 @@ namespace Ngit
             }
 
             return retCode;
-        }
-
-        public static RetCode CreateBranch(Cli options)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static RetCode SetBranch(Cli options)
-        {
-            throw new NotImplementedException();
         }
 
         private static void DisplayResults(string branch, string tag)

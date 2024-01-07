@@ -47,7 +47,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LauncherTest", "LauncherTes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ngit", "Ngit\Ngit.csproj", "{432E20EA-0A75-4D7B-8683-9DF1A8B1D3B1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ngitTests", "NgitTests\ngitTests.csproj", "{A6C392C4-1290-40CD-AE5A-9282CA554FD7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NgitTests", "NgitTests\NgitTests.csproj", "{A6C392C4-1290-40CD-AE5A-9282CA554FD7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

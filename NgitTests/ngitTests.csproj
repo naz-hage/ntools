@@ -30,6 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\NbuildTasks\NbuildTasks.csproj" />
     <ProjectReference Include="..\ngit\Ngit.csproj" />
   </ItemGroup>
 
