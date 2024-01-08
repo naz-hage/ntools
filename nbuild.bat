@@ -17,12 +17,12 @@ if "%1"=="/?" (
 msbuild %CMD%
 if ERRORLEVEL 1 (
     echo %ERRORLEVEL%
-    ngit -git getbranch
+    ngit -c branch
     echo %0 '%1' FAILED
     echo %0 '%1' FAILED >>%BUILD_LOG%
     EXIT /B1
 ) else (
-    ngit -git getbranch
+    ngit -c branch
     echo %0 '%1' SUCCEEDED 
     echo %0 '%1' SUCCEEDED >>%BUILD_LOG%
 )

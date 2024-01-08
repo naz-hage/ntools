@@ -1,6 +1,7 @@
 ﻿using Launcher;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 
@@ -16,8 +17,8 @@ namespace NbuildTasks
             RedirectStandardOutput = true,
             Verbose = false
         };
-        public  string DevDrive { get; set; } = "c:";
-        public string MainDir { get; set; } = "source";
+        public  string DevDrive { get; set; } = "d:";
+        public string MainDir { get; set; } = "a";
 
         public GitWrapper( string project = null)
         {
@@ -200,28 +201,42 @@ namespace NbuildTasks
             if (LocalTagExists(newTag)) DeleteTag(newTag);
 
             bool resultSetTag = true;
-            Parameters.Arguments = $"tag -a {newTag} HEAD -m \"Automated tag\"";
-
-            var result = Launcher.Launcher.Start(Parameters);
-            if ((result.Code == 0) && (result.Output.Count >= 0))
+            for (int i = 0; i < 2; i++)
             {
-                foreach (var line in result.Output)
+                // delete tag if exists
+                if (TagExist(newTag)) DeleteTag(newTag);
+
+                Parameters.Arguments = $"tag -a {newTag} HEAD -m \"Automated tag\"";
+
+                var result = Launcher.Launcher.Start(Parameters);
+                if ((result.Code == 0) && (result.Output.Count >= 0))
                 {
-                    if (Parameters.Verbose) Console.WriteLine(line);
-                    if (line.Contains("fatal"))
+                    foreach (var line in result.Output)
                     {
-                        resultSetTag = false;
-                        break;
-                    }
-                    else
-                    {
-                        resultSetTag = PushTag(newTag);
+                        if (Parameters.Verbose) Console.WriteLine(line);
+                        if (line.Contains("fatal"))
+                        {
+                            resultSetTag = false;
+                            break;
+                        }
+                        else
+                        {
+                            resultSetTag = PushTag(newTag);
+                        }
                     }
                 }
+                Console.WriteLine($"SetTag round: {++i}");
+                if (resultSetTag) break;
             }
+
             return resultSetTag;
         }
-        
+
+        private bool TagExist(string newTag)
+        {
+            return LocalTagExists(newTag) || RemoteTagExists(newTag);
+        }
+
         private bool IsValid4Tag(string newTag)
         {
             if (string.IsNullOrEmpty(newTag))
@@ -458,8 +473,13 @@ namespace NbuildTasks
             var DevDir = $"{DevDrive}\\{MainDir}";
         
             var solutionDir = $@"{DevDir}\{projectName}";
-            if (!System.IO.Directory.Exists(solutionDir))
+            if (!Directory.Exists(solutionDir))
             {
+                if (!Directory.Exists(DevDir))
+                {
+                    Directory.CreateDirectory(DevDir);
+                }
+
                 Parameters.WorkingDir = DevDir;
                 Parameters.Arguments = $"clone {url} ";
                 result = Launcher.Launcher.Start(Parameters);

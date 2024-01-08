@@ -5,7 +5,7 @@ namespace NgitTests;
 [TestClass]
 public class TestFirst 
 {
-    public const string TestProject = "https://nazhage.visualstudio.com/_git/random";
+    public const string TestProject = "https://github.com/naz-hage/getting-started";
     public const string TestBranch = "testRandom";
     public static string? ProjectName { get; set; }
 
@@ -46,7 +46,7 @@ public class TestFirst
         // change to project directory
         Directory.SetCurrentDirectory(solutionDir);
 
-        Assert.IsTrue(File.Exists($"{ProjectName}.sln"));
+        Assert.IsTrue(File.Exists($"README.md"));
 
         // create 'testRandom' branch if not exists
         if (!gitWrapper.BranchExists(TestBranch))

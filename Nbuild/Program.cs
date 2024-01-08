@@ -142,7 +142,7 @@ namespace Nbuild
             var parameters = new Parameters
             {
                 FileName = "ngit.exe",
-                Arguments = $"-git getbranch",
+                Arguments = $"-c branch",
                 WorkingDir = Environment.CurrentDirectory,
                 RedirectStandardOutput = false,
                 Verbose = false,

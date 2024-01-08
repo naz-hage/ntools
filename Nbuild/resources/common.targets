@@ -41,7 +41,7 @@
 			<TestResultsFolder>$(DevDrive)\TestResults</TestResultsFolder>
 		</PropertyGroup>
 
-		<RedError Condition="'$(ProductVersion)' == ''" Message="Error: Version property is not defined. Type Ngit.exe -git settag -project [] -branch [] -tag 0.0.1" />
+		<RedError Condition="'$(ProductVersion)' == ''" Message="Error: Version property is not defined. Type Ngit.exe -c settag -tag 0.0.1" />
 		<RedError Condition="'$(SolutionName)' == ''" Message="Error: SolutionName property is not defined." />
 		<RedError Condition="'$(DeploymentFolder)' == ''" Message="Error: DeploymentFolder property is not defined." />
 
@@ -247,7 +247,7 @@
 		<!-- Increment version for a staging build -->
 		<Target Name="AUTOTAG_STAGING">
 			<!--
-			<Exec Command='$(NbuildExe) -git autotag -project $(SolutionName) -buildtype staging' ConsoleToMSBuild="true">
+			<Exec Command='$(NbuildExe) -c autotag  -buildtype staging' ConsoleToMSBuild="true">
 				<Output TaskParameter="ConsoleOutput" PropertyName="ProductVersion" />
 			</Exec>
 			-->
@@ -267,7 +267,7 @@
 		<Target Name="SET_TAG" AfterTargets="AUTOTAG_STAGING;AUTOTAG_PRODUCTION">
 			<Message Text="Git Next tag: $(ProductVersion)"/>
 
-			<!-- <Exec Command='$(NbuildExe) -git settag -project $(SolutionName) -tag $(ProductVersion)' ConsoleToMSBuild="true">
+			<!-- <Exec Command='$(NbuildExe) -c settag  -tag $(ProductVersion)' ConsoleToMSBuild="true">
 		  <Output TaskParameter="ConsoleOutput" PropertyName="Result" />
 	  </Exec> -->
 
@@ -290,7 +290,7 @@
 			<RedError Condition="'$(GitBranch)' != 'main'" Message="Error: Must be on main branch for a production release." />
 
 			<!-- 
-				<Exec Command='$(NbuildExe) -git autotag -project $(SolutionName) -buildtype production' ConsoleToMSBuild="true">
+				<Exec Command='$(NbuildExe) -c autotag  -buildtype production' ConsoleToMSBuild="true">
 		  			<Output TaskParameter="ConsoleOutput" PropertyName="ProductVersion" />
 	  			</Exec> 
 			-->
@@ -306,7 +306,7 @@
 
 		<Target Name="GET_TAG">
 			<!-- 
-				<Exec Command='$(NbuildExe) -git gettag -project $(SolutionName)' ConsoleToMSBuild="true">
+				<Exec Command='$(NbuildExe) -c gettag ' ConsoleToMSBuild="true">
 		  			<Output TaskParameter="ConsoleOutput" PropertyName="ProductVersion" />
 	  			</Exec>
 	  			<Message Text="Git tag: $(ProductVersion)"/> 
@@ -335,7 +335,7 @@
 		</Target>
 
 		<Target Name="GIT_BRANCH">
-			<!-- <Exec Command='$(NbuildExe) -git getbranch -project $(SolutionName)' ConsoleToMSBuild="true">
+			<!-- <Exec Command='$(NbuildExe) -c getbranch' ConsoleToMSBuild="true">
 		  <Output TaskParameter="ConsoleOutput" PropertyName="GitBranch" />
 	  </Exec>
 
