@@ -170,27 +170,18 @@ public class GitWrapperTests : TestFirst
 [TestMethod()]
     public void DeleteTagTest()
     {
-        //// Arrange - Delete add local and remote tags
-        //foreach (var tag in GitWrapper.ListLocalTags())
-        //{
-        //    Assert.IsTrue(GitWrapper.DeleteTag(tag));
-        //}
-
-        //foreach (var tag in GitWrapper.ListRemoteTags())
-        //{
-        //    Assert.IsTrue(GitWrapper.DeleteTag(tag));
-        //}
-
+        // Arrange
         var initialTag = InitTag();
+        var currentTag = GitWrapper.Tag;
+        Assert.IsNotNull(currentTag);
 
-        for (int i = 0; i < 2; i++)
-        {
-            var currentTag = GitWrapper.Tag;
-            Assert.IsNotNull(currentTag);
+        // Act
+        var result = GitWrapper.DeleteTag(currentTag);
 
-            Assert.IsTrue(GitWrapper.DeleteTag(currentTag));
-        }
+        // Assert
+        Assert.IsTrue(result);
 
+        // reinitialize tag in case no tags are left
         Assert.IsNotNull(InitTag());
     }
 
