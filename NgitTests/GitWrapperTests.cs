@@ -152,18 +152,44 @@ public class GitWrapperTests : TestFirst
         }
     }
 
-    [TestMethod()]
+    private string InitTag()
+    {
+        // Arrange
+        var tag = GitWrapper.Tag;
+        if (string.IsNullOrEmpty(tag))
+        {
+            tag = "1.0.0";
+            Assert.IsTrue(GitWrapper.SetTag(tag));
+        }
+
+        return tag;
+    }
+
+[TestMethod()]
     public void DeleteTagTest()
     {
+        // Arrange - Delete add local and remote tags
+        foreach (var tag in GitWrapper.ListLocalTags())
+        {
+            Assert.IsTrue(GitWrapper.DeleteTag(tag));
+        }
+
+        foreach (var tag in GitWrapper.ListRemoteTags())
+        {
+            Assert.IsTrue(GitWrapper.DeleteTag(tag));
+        }
+
+        var initialTag = InitTag();
+
         for (int i = 0; i < 2; i++)
         {
             var currentTag = GitWrapper.Tag;
             Assert.IsNotNull(currentTag);
 
             Assert.IsTrue(GitWrapper.DeleteTag(currentTag));
-
-            Assert.AreNotEqual(currentTag, GitWrapper.Tag);
         }
+
+        Assert.IsNotNull(InitTag());
     }
 
     [TestMethod()]
