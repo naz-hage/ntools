@@ -450,6 +450,8 @@ namespace NbuildTasks
 
         private bool DeleteLocalTag(string tag)
         {
+            if (!LocalTagExists(tag)) return true;
+            
             Parameters.Arguments = $"tag -d {tag}";
             var result = Launcher.Launcher.Start(Parameters);
             if (result.Code == 0 && result.Output.Count >= 1)
@@ -468,6 +470,8 @@ namespace NbuildTasks
 
         private bool DeleteRemoteTag(string tag)
         {
+            if (!RemoteTagExists(tag)) return true;
+
             Parameters.Arguments = $"push origin :refs/tags/{tag}";
             var result = Launcher.Launcher.Start(Parameters);
             if (result.Code == 0 && result.Output.Count >= 1)
