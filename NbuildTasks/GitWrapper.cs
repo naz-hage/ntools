@@ -3,14 +3,15 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Policy;
 using System.Threading;
 
 namespace NbuildTasks
 {
     public class GitWrapper
     {
-        private const string GitBinary = @"git.exe";
-        public readonly Parameters Parameters = new Launcher.Parameters
+        private const string GitBinary = @"C:\Program Files\Git\cmd\git.exe";
+        public static readonly Parameters Parameters = new Launcher.Parameters
         {
             WorkingDir = Environment.CurrentDirectory,
             FileName = GitBinary,
@@ -30,6 +31,33 @@ namespace NbuildTasks
             {
                 Parameters.WorkingDir = $@"{DevDrive}\{MainDir}\{project}";
             }
+
+            // print Parameters
+            Console.WriteLine($"GitWrapper.Parameters.WorkingDir: {Parameters.WorkingDir}");
+        }
+
+        public bool SetWorkingDir(string url)
+        {
+            var projectName = url.Split('/').Last().Split('.').First();
+            if (string.IsNullOrEmpty(projectName))
+            {
+                return false;
+            }
+            // change to project directory
+            var DevDir = $"{DevDrive}\\{MainDir}";
+
+            var solutionDir = $@"{DevDir}\{projectName}";
+
+            if (string.IsNullOrEmpty(projectName))
+            {
+                Parameters.WorkingDir = Environment.CurrentDirectory;
+            }
+            else
+            {
+                Parameters.WorkingDir = solutionDir;
+            }
+
+            return true;
         }
 
         public string Branch { get { return GetBranch(); } }
@@ -456,6 +484,8 @@ namespace NbuildTasks
             return false;
         }
 
+        
+
         public bool CloneProject(string url)
         {
             if (string.IsNullOrEmpty(url))
@@ -473,7 +503,8 @@ namespace NbuildTasks
             var DevDir = $"{DevDrive}\\{MainDir}";
         
             var solutionDir = $@"{DevDir}\{projectName}";
-            if (!Directory.Exists(solutionDir))
+            var dirExists = Directory.Exists(solutionDir);
+            if (!dirExists)
             {
                 if (!Directory.Exists(DevDir))
                 {
@@ -489,8 +520,17 @@ namespace NbuildTasks
                     {
                         return false;
                     }
+                    // reset working directory so other dir commands can be executed
+                    SetWorkingDir(url);
                 }
             }
+            else
+            {
+                Console.WriteLine($"Directory {solutionDir} already exists");
+            }
+
+            // change to solution directory 
+            Directory.SetCurrentDirectory(solutionDir);
             return result.Code == 0;
         }
 
@@ -529,6 +569,7 @@ namespace NbuildTasks
         public List<string> ListBranches()
         {
             var branches = new List<string>();
+            Console.WriteLine($"ListBranches.Parameters.WorkingDir: {Parameters.WorkingDir}");
             Parameters.Arguments = $"branch --list";
             var result = Launcher.Launcher.Start(Parameters);
             if (result.Code == 0 && result.Output.Count >= 1)

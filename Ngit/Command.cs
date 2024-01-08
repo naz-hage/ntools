@@ -1,4 +1,5 @@
 ﻿using CommandLine;
+using Launcher;
 using NbuildTasks;
 using OutputColorizer;
 using static Ngit.Enums;
@@ -33,6 +34,7 @@ namespace Ngit
                 _ => Default(options)
             };
 
+            Console.WriteLine($"Command.Parameters.WorkingDir: {GitWrapper.Parameters.WorkingDir}");
             DisplayResults(GitWrapper.Branch, GitWrapper.Tag);
 
             return retCode;
@@ -135,7 +137,22 @@ namespace Ngit
 
         public static RetCode Clone(Cli options)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(options.Url))
+            {
+                Colorizer.WriteLine($"[{ConsoleColor.Red}!Error: valid url is required]");
+                Parser.DisplayHelp<Cli>(HelpFormat.Full);
+                return RetCode.InvalidParameter;
+            }
+
+            var result = GitWrapper.CloneProject(options.Url) ? 0 : RetCode.CloneProjectFailed;
+            if (result == 0)
+            {
+                // reset Parameters.WorkingDir
+                var solutionDir = GitWrapper.Parameters.WorkingDir;
+                GitWrapper.Parameters.WorkingDir = solutionDir;
+            }
+
+            return result;
         }
 
         public static RetCode DeleteTag(Cli options)
