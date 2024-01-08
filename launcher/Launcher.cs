@@ -31,7 +31,7 @@ namespace Launcher
             Verbose = verbose;
 
             // Output verbose message if required.
-            if (Verbose) Console.WriteLine($"launcher=>{fileName} {arguments}");
+            if (Verbose) Console.WriteLine($" -Launcher=>{fileName} {arguments}");
 
             try
             {
@@ -68,9 +68,19 @@ namespace Launcher
                         }
                     }
 
+                    // display exit code and process.output
+                    if (Verbose)
+                    {
+                        Console.WriteLine($" -Output:");
+                        foreach (var line in result.Output)
+                        {
+                            Console.WriteLine($"   {line}");
+                        }
 
-                    // Output verbose message if required.
-                    if (Verbose) Console.WriteLine($"Exit Code: {process.ExitCode}");
+                        Console.WriteLine($" -Code: {process.ExitCode}");
+                    }
+
+                    
 
                     // Set the exit code in the result object and return it.
                     result.Code = process.ExitCode;
