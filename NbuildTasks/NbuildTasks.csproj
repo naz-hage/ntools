@@ -22,7 +22,7 @@
 	
     <PropertyGroup>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-    <AppendTargetFrameworkToOutputPath>True</AppendTargetFrameworkToOutputPath>
+    <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
 
   <ItemGroup>

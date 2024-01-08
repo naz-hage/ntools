@@ -15,7 +15,7 @@ namespace NbuildTasks
             WorkingDir = Environment.CurrentDirectory,
             FileName = GitBinary,
             RedirectStandardOutput = true,
-            Verbose = false
+            Verbose = true
         };
         public  string DevDrive { get; set; } = "d:";
         public string MainDir { get; set; } = "a";

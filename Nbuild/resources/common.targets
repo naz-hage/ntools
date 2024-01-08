@@ -11,9 +11,9 @@
     - @REM for more information, please visit <TBD>		
 	Reference: https://learn.microsoft.com/en-us/visualstudio/msbuild/walkthrough-using-msbuild?view=vs-2022
 	-->
-	<UsingTask TaskName="NbuildTasks.ColorMessage" AssemblyFile="$(BuildTools)\netstandard2.0\NbuildTasks.dll"/>
-	<UsingTask TaskName="NbuildTasks.RedError" AssemblyFile="$(BuildTools)\netstandard2.0\NbuildTasks.dll" />
-	<UsingTask TaskName="NbuildTasks.Git" AssemblyFile="$(BuildTools)\netstandard2.0\NbuildTasks.dll" />
+	<UsingTask TaskName="NbuildTasks.ColorMessage" AssemblyFile="$(BuildTools)\NbuildTasks.dll"/>
+	<UsingTask TaskName="NbuildTasks.RedError" AssemblyFile="$(BuildTools)\NbuildTasks.dll" />
+	<UsingTask TaskName="NbuildTasks.Git" AssemblyFile="$(BuildTools)\NbuildTasks.dll" />
 
 	<PropertyGroup>
 		<!--The SolutionName should be replaced in nbuild.targets-->

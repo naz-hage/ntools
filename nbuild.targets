@@ -121,10 +121,8 @@
 				CLEAN;
                 GET_TAG;
                 SOLUTION;
-                TEST;
                 SAVE_ARTIFACTS;
                 PACKAGE;
-				DEPLOY
 				">
 		<Exec Command='dir "$(DeploymentFolder)"'></Exec>
 		<Message Text="==> DONE"/>
