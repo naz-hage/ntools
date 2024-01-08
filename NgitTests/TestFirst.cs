@@ -57,7 +57,7 @@ public class TestFirst
 
         if (string.IsNullOrEmpty(gitWrapper.Tag))
         {
-            gitWrapper.SetTag("1.0.0");
+            Assert.IsTrue(gitWrapper.SetTag("1.0.0"));
         }
 
         Assert.IsNotNull(gitWrapper.Tag);

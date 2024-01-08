@@ -83,7 +83,7 @@ jobs:
       run: dotnet build
 
     - name: Execute unit tests
-      run: dotnet test
+      run: dotnet test --logger "console;verbosity=normal;DOTNET_CLI_TELEMETRY_OPTOUT=1" --verbosity normal
 
     # 0:Matches Multiple schemas when only one must validate
     # - name: Push

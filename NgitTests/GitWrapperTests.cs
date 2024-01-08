@@ -25,7 +25,19 @@ public class GitWrapperTests : TestFirst
     [TestMethod()]
     public void GetCurrentTagTest()
     {
-        Assert.AreNotEqual(string.Empty, GitWrapper.Tag);
+        // Arrange
+        var tag = GitWrapper.Tag;
+        if (string.IsNullOrEmpty(tag))
+        {
+            tag = "1.0.0";
+            Assert.IsTrue(GitWrapper.SetTag(tag));
+        }
+
+        // Act
+        var currentTag = GitWrapper.Tag;
+
+        // Assert
+        Assert.AreNotEqual(string.Empty, currentTag);
     }
 
     [TestMethod()]
