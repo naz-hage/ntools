@@ -49,6 +49,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ngit", "Ngit\Ngit.csproj", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ngitTests", "NgitTests\ngitTests.csproj", "{8430480D-E960-409B-8191-D088CC187E90}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NbuildTasksTests", "NbuildTasksTests\NbuildTasksTests.csproj", "{F98C96D6-AF6D-40EB-BFA2-73600DE146B2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -95,6 +97,10 @@ Global
 		{8430480D-E960-409B-8191-D088CC187E90}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8430480D-E960-409B-8191-D088CC187E90}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8430480D-E960-409B-8191-D088CC187E90}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F98C96D6-AF6D-40EB-BFA2-73600DE146B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F98C96D6-AF6D-40EB-BFA2-73600DE146B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F98C96D6-AF6D-40EB-BFA2-73600DE146B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F98C96D6-AF6D-40EB-BFA2-73600DE146B2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -17,8 +17,8 @@
 	
     <Target Name="ARTIFACTS" DependsOnTargets="GET_TAG">
       <PropertyGroup>
-        <ArtifactsFolder>$(ArtifactsDir)\$(SolutionName)\release\$(ProjectVersion)</ArtifactsFolder>
-		
+        <ArtifactsFolder>$(ArtifactsDir)\$(SolutionName)\release\$(ProductVersion)</ArtifactsFolder>
+		<ArtifactsTestResultsFolder>$(ArtifactsDir)\$(SolutionName)\TestResults\$(ProductVersion)</ArtifactsTestResultsFolder>
       </PropertyGroup>  
       <ItemGroup>
             <BinaryFiles Include="

@@ -16,7 +16,7 @@
     <Target Name="ARTIFACTS" DependsOnTargets="GET_TAG">
       <PropertyGroup>
         <ArtifactsFolder>$(ArtifactsDir)\$(SolutionName)\$(TargetRelease)\$(ProductVersion)</ArtifactsFolder>
-		
+		<ArtifactsTestResultsFolder>$(ArtifactsDir)\$(SolutionName)\TestResults\$(ProductVersion)</ArtifactsTestResultsFolder>
       </PropertyGroup>  
       <ItemGroup>
             <BinaryFiles 
@@ -203,6 +203,5 @@
                 STAGING_LOCAL;
                 DEPLOY">
 	</Target>
-
 
 </Project>

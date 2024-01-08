@@ -38,7 +38,6 @@
 			<OutputPathDebug>$(SolutionDir)\$(TargetDebug)</OutputPathDebug>
 			<ArtifactsDir>$(DevDrive)\Artifacts</ArtifactsDir>
 			<TestFilesFolder>$(DevDrive)\Test</TestFilesFolder>
-			<TestResultsFolder>$(DevDrive)\TestResults</TestResultsFolder>
 		</PropertyGroup>
 
 		<RedError Condition="'$(ProductVersion)' == ''" Message="Error: Version property is not defined. Type Ngit.exe -c settag -tag 0.0.1" />
@@ -208,13 +207,15 @@
 		<Message Text="==> COMMON_DONE"/>
 	</Target>
 
-	<Target Name="TEST">
-		<Exec Command='"c:\program files\dotnet\dotnet.exe" test --configuration $(TargetDebug) --logger "console;verbosity=normal;DOTNET_CLI_TELEMETRY_OPTOUT=1" %(DotNetTestFiles.Identity) --collect:"XPlat Code Coverage" --logger trx --results-directory:$(TestResultsFolder) --verbosity normal'/>
+	<Target Name="TEST" DependsOnTargets="ARTIFACTS;GET_TAG">
+		<RemoveDir Directories="$(ArtifactsTestResultsFolder)"></RemoveDir>
+		<!--To colllect code coverage, add the following option to the test command: --collect:"XPlat Code Coverage"-->
+		<Exec Command='"c:\program files\dotnet\dotnet.exe" test --configuration $(TargetDebug) --logger "console;verbosity=normal;DOTNET_CLI_TELEMETRY_OPTOUT=1" %(DotNetTestFiles.Identity) --logger trx --results-directory:$(ArtifactsTestResultsFolder) --verbosity normal'/>
 		<Message Text="==> COMMON_DONE"/>
 	</Target>
 
-	<Target Name="TEST_RELEASE">
-		<Exec Command='"c:\program files\dotnet\dotnet.exe" test --configuration $(TargetRelease) --logger "console;verbosity=normal;DOTNET_CLI_TELEMETRY_OPTOUT=1" %(DotNetTestFiles.Identity) --collect:"XPlat Code Coverage" --logger trx --results-directory:$(TestResultsFolder) --verbosity normal'/>
+	<Target Name="TEST_RELEASE" DependsOnTargets="ARTIFACTS;GET_TAG">
+		<Exec Command='"c:\program files\dotnet\dotnet.exe" test --configuration $(TargetRelease) --logger "console;verbosity=normal;DOTNET_CLI_TELEMETRY_OPTOUT=1" %(DotNetTestFiles.Identity) --collect:"XPlat Code Coverage" --logger trx --results-directory:$(ArtifactsTestResultsFolder) --verbosity normal'/>
 		<Message Text="==> COMMON_DONE"/>
 	</Target>
 
