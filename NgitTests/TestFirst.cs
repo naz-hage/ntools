@@ -39,7 +39,7 @@ public class TestFirst
         var solutionDir = $@"{gitWrapper.DevDrive}\{gitWrapper.MainDir}\{ProjectName}";
         if (!Directory.Exists(solutionDir))
         {
-            Assert.IsTrue(gitWrapper.CloneProject(TestProject));
+            Assert.AreEqual(0, gitWrapper.CloneProject(TestProject).Code);
         }
         Assert.IsTrue(Directory.Exists(solutionDir));
 

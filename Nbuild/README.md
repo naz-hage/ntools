@@ -1,9 +1,9 @@
 
-# nbuild.exe
-- Nbuild.exe generates `nbuild.bat` to the solution folder and uses `common.targets` from $(ProgramFiles)\Nbuild.
+# Nb.exe (Nbuild)
+- Nb.exe generates `nbuild.bat` to the solution folder and uses `common.targets` from $(ProgramFiles)\Nbuild.
 - Expects `nbuild.targets` file in the solution folder.
 - Usage:
-    nbuild.exe [-cmd value]
+    nb.exe [-cmd value]
   - cmd       : command. value = [targets]
          targets         -> list targets in nbuild.targets and common.targets files (string, default=)
   - v         : verbose. value = [true | false] (true or false, default=False)

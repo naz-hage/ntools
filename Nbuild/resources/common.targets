@@ -19,8 +19,10 @@
 		<!--The SolutionName should be replaced in nbuild.targets-->
     	<SolutionName></SolutionName>
 		<DeploymentFolder></DeploymentFolder>
-		<DevDrive>C:</DevDrive>
-		<MainDir>Source</MainDir>
+		<DevDrive Condition=" '$(DevDrive)' == '' ">$(DevDrive)</DevDrive>
+		<DevDrive Condition=" '$(DevDrive)' == '' ">C:</DevDrive>
+		<MainDir Condition=" '$(MainDir)' == '' ">$(MainDir)</MainDir>
+		<MainDir Condition=" '$(MainDir)' == '' ">Source</MainDir>
 		<DevDir>$(DevDrive)\$(MainDir)</DevDir>
 		<BuildTools>$(ProgramFiles)\nbuild</BuildTools>
 		<CommonTargetsVersion>6.2.0</CommonTargetsVersion>
@@ -28,7 +30,7 @@
 	
 	<Target Name="PROPERTIES" DependsOnTargets="TAG">
 		<PropertyGroup>
-			<NbuildExe>"$(BuildTools)\ngit.exe"</NbuildExe>
+			<NbuildExe>"$(BuildTools)\ng.exe"</NbuildExe>
 			<NugetExe>$(BuildTools)\nuget.exe</NugetExe>
 			<ZipExe>$(ProgramFiles)\BuildTools\7-Zip\7z.exe</ZipExe>
 			<TargetRelease>Release</TargetRelease>

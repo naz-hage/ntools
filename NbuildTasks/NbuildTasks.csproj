@@ -27,10 +27,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.8.3" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ProjectReference Include="..\launcher\Launcher.csproj" />
+    <PackageReference Include="ntools-launcher" Version="1.0.18" />
   </ItemGroup>
 
 </Project>

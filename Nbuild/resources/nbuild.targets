@@ -9,7 +9,7 @@
 	
 	<PropertyGroup>
         <!-- The name of the solution  must be filled.  it's normally the folder where the *.sln resides-->
-		<SolutionName></SolutionName>
+		<SolutionName>$([System.IO.Path]::GetFileNameWithoutExtension('$(MSBuildProjectDirectory)'))</SolutionName>
         <!-- The deployment folder must be filled.  This is the location when the app deployed or installed -->
         <DeploymentFolder></DeploymentFolder>
 	</PropertyGroup>

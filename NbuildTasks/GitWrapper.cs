@@ -3,8 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Policy;
-using System.Threading;
+using static NbuildTasks.Enums;
 
 namespace NbuildTasks
 {
@@ -18,13 +17,27 @@ namespace NbuildTasks
             RedirectStandardOutput = true,
         };
 
-        public  string DevDrive { get; set; } = "d:";
-        public string MainDir { get; set; } = "a";
+        public  string DevDrive { get; set; } = "d:";  // This default was chosen because of GitHub Actions
+        public string MainDir { get; set; } = "a";  // This default was chosen because of GitHub Actions
 
         public GitWrapper( string project = null, bool verbose = false)
         {
             Parameters.Verbose = verbose;
+
+            // Read Environment variables DevDrive and MainDir and set Properties respectively
             
+            var devDrive = Environment.GetEnvironmentVariable("DevDrive");
+            if (!string.IsNullOrEmpty(devDrive))
+            {
+                DevDrive = devDrive;
+            }
+
+            var mainDir = Environment.GetEnvironmentVariable("MainDir");
+            if (!string.IsNullOrEmpty(mainDir))
+            {
+                MainDir = mainDir;
+            }
+
             if (project == null )
             {
                 Parameters.WorkingDir = Environment.CurrentDirectory;
@@ -265,7 +278,7 @@ namespace NbuildTasks
                         }
                     }
                 }
-                Console.WriteLine($"SetTag round: {++i}");
+                if (Parameters.Verbose) Console.WriteLine($"SetTag try: {++i}");
                 if (resultSetTag) break;
             }
 
@@ -347,8 +360,7 @@ namespace NbuildTasks
 
                     if (line.StartsWith("*"))
                     {
-                        //branch = line[2..];
-                        branch = line.Substring(2);
+                        branch = line.Substring(2); // //branch = line[2..]
                         break;
                     }
                 }
@@ -502,19 +514,21 @@ namespace NbuildTasks
 
         
 
-        public bool CloneProject(string url)
+        public ResultHelper CloneProject(string url)
         {
             if (string.IsNullOrEmpty(url))
             {
-                return false;
+                return ResultHelper.Fail(ResultHelper.InvalidParameter, $"Invalid url: {url}");
             }
-            var result = ResultHelper.New();
+            
             // extract project name from url
             var projectName = url.Split('/').Last().Split('.').First();
             if (string.IsNullOrEmpty(projectName))
             {
-                return false;
+                return ResultHelper.Fail(ResultHelper.InvalidParameter, $"Invalid url: {url}");
             }
+
+            var result = ResultHelper.New();
             // change to project directory
             var DevDir = $"{DevDrive}\\{MainDir}";
         
@@ -534,7 +548,7 @@ namespace NbuildTasks
                 {
                     if (CheckForErrorAndDisplayOutput(result.Output))
                     {
-                        return false;
+                        return ResultHelper.Fail((int)RetCode.CloneProjectFailed, $"Failed to clone project: {projectName}");
                     }
                     // reset working directory so other dir commands can be executed
                     SetWorkingDir(url);
@@ -542,12 +556,11 @@ namespace NbuildTasks
             }
             else
             {
-                Console.WriteLine($"Directory {solutionDir} already exists");
+                return ResultHelper.Fail((int)RetCode.CloneProjectFailed, $"Project already exists: {solutionDir}");
             }
-
             // change to solution directory 
             Directory.SetCurrentDirectory(solutionDir);
-            return result.Code == 0;
+            return result;
         }
 
         public bool CheckoutBranch(string branch, bool create = false)

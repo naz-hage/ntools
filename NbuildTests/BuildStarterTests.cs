@@ -8,6 +8,8 @@ namespace Nbuild.Tests
     [TestClass()]
     public class BuildStarterTests
     {
+        private const string NbuildAssemblyName = "Nb.dll"; // "Nbuild.dll"
+
         [TestMethod()]
         public void GetTargetsTest()
         {
@@ -43,7 +45,8 @@ namespace Nbuild.Tests
             // Act
             var executingAssemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             Assert.IsNotNull(executingAssemblyDirectory);
-            string resourcePath = Path.Combine(executingAssemblyDirectory, "Nbuild.dll");
+            
+            string resourcePath = Path.Combine(executingAssemblyDirectory, NbuildAssemblyName);
             string targetFileName = Path.Combine(executingAssemblyDirectory, "commom.targets");
 
             ResourceHelper.ExtractEmbeddedResourceFromAssembly(resourcePath, "Nbuild.resources.common.targets", targetFileName);
@@ -67,7 +70,7 @@ namespace Nbuild.Tests
             var executingAssemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             Assert.IsNotNull(executingAssemblyDirectory);
 
-            string resourcePath = Path.Combine(executingAssemblyDirectory, "Nbuild.dll");
+            string resourcePath = Path.Combine(executingAssemblyDirectory, NbuildAssemblyName);
             string targetFileName = Path.Combine(executingAssemblyDirectory, "nbuild.targets");
 
             ResourceHelper.ExtractEmbeddedResourceFromAssembly(resourcePath, "Nbuild.resources.nbuild.targets", targetFileName);

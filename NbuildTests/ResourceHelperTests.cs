@@ -7,6 +7,7 @@ namespace Nbuild.Tests
     [TestClass()]
     public class ResourceHelperTests
     {
+        private const string NbuildAssemblyName = "Nb.dll"; // "Nbuild.dll"
         [TestMethod()]
         public void ExtractEmbeddedResourceFromAssemblyTest()
         {
@@ -16,7 +17,7 @@ namespace Nbuild.Tests
             Assert.IsNotNull(executingAssemblyDirectory);
             
             string targetFileName = Path.Combine(executingAssemblyDirectory, "commom.targets");
-            var assembly = Path.Combine(executingAssemblyDirectory, "Nbuild.dll");
+            var assembly = Path.Combine(executingAssemblyDirectory, NbuildAssemblyName);
 
             // Act
             ResourceHelper.ExtractEmbeddedResourceFromAssembly(assembly, resourceLocation, targetFileName);

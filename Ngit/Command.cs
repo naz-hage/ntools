@@ -1,8 +1,7 @@
 ﻿using CommandLine;
-using Launcher;
 using NbuildTasks;
 using OutputColorizer;
-using static Ngit.Enums;
+using static NbuildTasks.Enums;
 
 namespace Ngit
 {
@@ -37,7 +36,8 @@ namespace Ngit
             };
 
             if (options.Verbose) Console.WriteLine($"Command.Parameters.WorkingDir: {GitWrapper.Parameters.WorkingDir}");
-            DisplayResults(GitWrapper.Branch, GitWrapper.Tag);
+
+            if (retCode == RetCode.Success) DisplayResults(GitWrapper.Branch, GitWrapper.Tag);
 
             return retCode;
         }
@@ -147,15 +147,21 @@ namespace Ngit
                 return RetCode.InvalidParameter;
             }
 
-            var result = GitWrapper.CloneProject(options.Url) ? 0 : RetCode.CloneProjectFailed;
-            if (result == 0)
+            var result = GitWrapper.CloneProject(options.Url);;
+            if (result.IsSuccess())
             {
                 // reset Parameters.WorkingDir
                 var solutionDir = GitWrapper.Parameters.WorkingDir;
                 GitWrapper.Parameters.WorkingDir = solutionDir;
+
+                Colorizer.WriteLine($"[{ConsoleColor.Green}!√ Project cloned to `{solutionDir}`.]");
+            }
+            else
+            {
+                Colorizer.WriteLine($"[{ConsoleColor.Red}!X {result.Output[0]}]");
             }
 
-            return result;
+            return (RetCode)result.Code;
         }
 
         public static RetCode DeleteTag(Cli options)
@@ -213,9 +219,17 @@ namespace Ngit
         private static void DisplayResults(string branch, string tag)
         {
             var project = Path.GetFileName(Directory.GetCurrentDirectory());
-            Colorizer.WriteLine($"[{ConsoleColor.DarkMagenta}!Project [{ConsoleColor.Yellow}!{project}] " +
+            if (!string.IsNullOrEmpty(branch))
+            { 
+                Colorizer.WriteLine($"[{ConsoleColor.DarkMagenta}!Project [{ConsoleColor.Yellow}!{project}] " +
                                                         $"Branch [{ConsoleColor.Yellow}!{branch}] " +
                                                         $"Tag [{ConsoleColor.Yellow}!{tag}]]");
+            }
+            else
+            {
+                Colorizer.WriteLine($"[{ConsoleColor.Red}!Error: [{ConsoleColor.Yellow}!{project}] directory is not a git repository]");
+                Parser.DisplayHelp<Cli>(HelpFormat.Full);
+            }
         }
 
     }

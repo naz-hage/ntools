@@ -7,7 +7,7 @@ set BUILD_LOG=nbuild.log
 set PROJECT=nbuild.targets
 
 if "%1"=="/?" (
-    Nbuild.exe -cmd targets
+    Nb -cmd targets
 ) else if "%1"=="" (
     set CMD=%PROJECT% -fl -flp:logfile=%BUILD_LOG%;verbosity=normal
 ) else (
@@ -17,12 +17,12 @@ if "%1"=="/?" (
 msbuild %CMD%
 if ERRORLEVEL 1 (
     echo %ERRORLEVEL%
-    ngit -c branch
+    ng -c branch
     echo %0 '%1' FAILED
     echo %0 '%1' FAILED >>%BUILD_LOG%
     EXIT /B1
 ) else (
-    ngit -c branch
+    ng -c branch
     echo %0 '%1' SUCCEEDED 
     echo %0 '%1' SUCCEEDED >>%BUILD_LOG%
 )

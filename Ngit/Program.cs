@@ -5,7 +5,7 @@ using NbuildTasks;
 using Ngit;
 using OutputColorizer;
 using System.Diagnostics;
-using static Ngit.Enums;
+using static NbuildTasks.Enums;
 
 
 var watch = Stopwatch.StartNew();

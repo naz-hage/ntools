@@ -26,6 +26,7 @@
 	<PropertyGroup>
 		<GenerateAssemblyInfo>true</GenerateAssemblyInfo>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<AssemblyName>Nb</AssemblyName>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -47,7 +48,6 @@
 	  <PackageReference Include="CommandLine.Net" Version="2.3.0" />
 	</ItemGroup>
  <ItemGroup>
-    <ProjectReference Include="..\launcher\Launcher.csproj" />
     <ProjectReference Include="..\NbuildTasks\NbuildTasks.csproj" />
   </ItemGroup>
 

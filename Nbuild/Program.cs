@@ -11,8 +11,7 @@ namespace Nbuild
     {
         private const string CmdTargets = "targets";
         private const string CmdHelp = "--help";
-        
-
+        private const string NgitAssemblyExe = "ng.exe";
         private static readonly List<string> Targets = [BuildStarter.BuildFileName, BuildStarter.CommonBuildFileName];
 
         static int Main(string[] args)
@@ -106,7 +105,7 @@ namespace Nbuild
                 // display elapsed time in HH:MM:SS.MS format
                 Console.WriteLine($"nbuild completed in {watch.Elapsed:hh\\:mm\\:ss\\.ff} (hh:mm:ss.ff) with {buildResult.Code}");
 
-                Colorizer.WriteLine($"[{ConsoleColor.Green}!√ Build completed successfully.]");
+                Colorizer.WriteLine($"[{ConsoleColor.Green}!√ Build completed.]");
             }
             else
             {
@@ -141,7 +140,7 @@ namespace Nbuild
         {
             var parameters = new Parameters
             {
-                FileName = "ngit.exe",
+                FileName = NgitAssemblyExe,
                 Arguments = $"-c branch",
                 WorkingDir = Environment.CurrentDirectory,
                 RedirectStandardOutput = false,
