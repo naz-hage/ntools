@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using NbuildTasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,7 +9,7 @@ namespace NbuildTasks.Tests
     [TestClass()]
     public class GitWrapperTests : TestFirst
     {
-        private readonly GitWrapper GitWrapper = new GitWrapper(ProjectName);
+        private readonly GitWrapper GitWrapper = new(ProjectName);
 
         public GitWrapperTests()
         {
@@ -256,6 +257,23 @@ namespace NbuildTasks.Tests
 
             // Assert
             Assert.AreNotEqual(0, localTags.Count);
+        }
+
+        [TestMethod()]
+        public void SetWorkingDirTest()
+        {
+            // Arrange
+            var gitWrapper = new GitWrapper(ProjectName);
+
+            var workingDir = ProjectName;
+            var solutionDir = $@"{gitWrapper.DevDrive}\{gitWrapper.MainDir}\{ProjectName}";
+
+            // Act
+            var result = gitWrapper.SetWorkingDir(workingDir);
+
+            // Assert
+            Assert.IsTrue(result);
+            Assert.AreEqual(solutionDir, gitWrapper.GetWorkingDir());
         }
     }
 }

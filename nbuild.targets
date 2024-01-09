@@ -13,7 +13,7 @@
 	</PropertyGroup>
 	
 	
-    <Target Name="ARTIFACTS" DependsOnTargets="GET_TAG">
+    <Target Name="ARTIFACTS" DependsOnTargets="TAG">
       <PropertyGroup>
         <ArtifactsFolder>$(ArtifactsDir)\$(SolutionName)\$(TargetRelease)\$(ProductVersion)</ArtifactsFolder>
 		<ArtifactsTestResultsFolder>$(ArtifactsDir)\$(SolutionName)\TestResults\$(ProductVersion)</ArtifactsTestResultsFolder>
@@ -47,7 +47,7 @@
         <Message Text="==> DONE"/>
     </Target>
 
-	<Target Name="NUGET_PACK" DependsOnTargets="GET_TAG">
+	<Target Name="NUGET_PACK" DependsOnTargets="TAG">
 		<PropertyGroup>
 			<NugetPackagePath>$(ArtifactsDir)\$(SolutionName)\Nuget\$(ProductVersion)</NugetPackagePath>
 			<LocalNugetFeed>$(ArtifactsDir)\nupkgs</LocalNugetFeed>
@@ -70,7 +70,7 @@
 		<Message Text="==> DONE"/>	
 	</Target>
 
-	<Target Name="PACKAGE" DependsOnTargets="ARTIFACTS;GET_TAG">
+	<Target Name="PACKAGE" DependsOnTargets="ARTIFACTS;TAG">
 		<Message Text="Staging tag: $(ProductVersion)"/>
 		<Message Text="Artifacts folder: $(ArtifactsFolder)"/>
 		<Message Text="Removing  file $(ArtifactsFolder).zip"> </Message>
@@ -119,7 +119,7 @@
 	
 	<Target Name="TEST_STAGING_DEPLOY" DependsOnTargets="
 				CLEAN;
-                GET_TAG;
+                TAG;
                 SOLUTION;
                 SAVE_ARTIFACTS;
                 PACKAGE;

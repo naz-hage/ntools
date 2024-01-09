@@ -31,7 +31,11 @@ namespace Launcher
             Verbose = verbose;
 
             // Output verbose message if required.
-            if (Verbose) Console.WriteLine($" -Launcher=>{fileName} {arguments}");
+            if (Verbose)
+            {
+                Console.WriteLine($" -Launcher   => {fileName} {arguments}");
+                Console.WriteLine($" -WorkingDir => {workingDir}");
+            }
 
             try
             {

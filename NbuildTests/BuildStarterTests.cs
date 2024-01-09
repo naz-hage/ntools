@@ -34,7 +34,7 @@ namespace Nbuild.Tests
                 "SET_TAG",
                 "GIT_PULL",
                 "AUTOTAG_PRODUCTION",
-                "GET_TAG",
+                "TAG",
                 "PUSH_TAG",
                 "GIT_BRANCH",
                 "SingleProject",

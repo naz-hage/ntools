@@ -20,7 +20,7 @@ namespace NgitTests
             Options.GitCommand = Command.GetTagCommand;
             
             // Act
-            var actual = Command.DisplayTag();
+            var actual = Command.DisplayTag(Options);
 
             // Assert
             Assert.IsTrue(actual == Enums.RetCode.Success);
@@ -34,7 +34,7 @@ namespace NgitTests
             Options.Verbose = true;
 
             // Act
-            var actual = Command.DisplayTag();
+            var actual = Command.DisplayTag(Options);
 
             // Assert
             Assert.IsTrue(actual == Enums.RetCode.Success);

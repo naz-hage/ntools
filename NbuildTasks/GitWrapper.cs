@@ -16,13 +16,15 @@ namespace NbuildTasks
             WorkingDir = Environment.CurrentDirectory,
             FileName = GitBinary,
             RedirectStandardOutput = true,
-            Verbose = true
         };
+
         public  string DevDrive { get; set; } = "d:";
         public string MainDir { get; set; } = "a";
 
-        public GitWrapper( string project = null)
+        public GitWrapper( string project = null, bool verbose = false)
         {
+            Parameters.Verbose = verbose;
+            
             if (project == null )
             {
                 Parameters.WorkingDir = Environment.CurrentDirectory;
@@ -33,8 +35,16 @@ namespace NbuildTasks
             }
 
             // print Parameters
-            Console.WriteLine($"GitWrapper.Parameters.WorkingDir: {Parameters.WorkingDir}");
+            if (verbose) Console.WriteLine($"GitWrapper.Parameters.WorkingDir: {Parameters.WorkingDir}");
         }
+
+        public string GetWorkingDir()
+        {
+            if (Parameters.Verbose) Console.WriteLine($"GitWrapper.Parameters.WorkingDir: {Parameters.WorkingDir}");
+
+            return Parameters.WorkingDir;
+        }
+
 
         public bool SetWorkingDir(string url)
         {
@@ -56,6 +66,8 @@ namespace NbuildTasks
             {
                 Parameters.WorkingDir = solutionDir;
             }
+
+            if (Parameters.Verbose) Console.WriteLine($"GitWrapper.Parameters.WorkingDir: {Parameters.WorkingDir}");
 
             return true;
         }
@@ -573,7 +585,7 @@ namespace NbuildTasks
         public List<string> ListBranches()
         {
             var branches = new List<string>();
-            Console.WriteLine($"ListBranches.Parameters.WorkingDir: {Parameters.WorkingDir}");
+            
             Parameters.Arguments = $"branch --list";
             var result = Launcher.Launcher.Start(Parameters);
             if (result.Code == 0 && result.Output.Count >= 1)

@@ -15,7 +15,7 @@
 	</PropertyGroup>
 	
 	
-    <Target Name="ARTIFACTS" DependsOnTargets="GET_TAG">
+    <Target Name="ARTIFACTS" DependsOnTargets="TAG">
       <PropertyGroup>
         <ArtifactsFolder>$(ArtifactsDir)\$(SolutionName)\release\$(ProductVersion)</ArtifactsFolder>
 		<ArtifactsTestResultsFolder>$(ArtifactsDir)\$(SolutionName)\TestResults\$(ProductVersion)</ArtifactsTestResultsFolder>

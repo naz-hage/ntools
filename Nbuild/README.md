@@ -23,7 +23,7 @@
 - The following target is required in nbuild.targets:
     - ARTIFACTS: The folder where the artifacts are copied to.
         ```xml
-        <Target Name="ARTIFACTS" DependsOnTargets="GET_TAG">
+        <Target Name="ARTIFACTS" DependsOnTargets="TAG">
         <!--The folder where the artifacts are copied to-->
         <ItemGroup>
             <BinaryFiles Include="$(Solut
@@ -43,9 +43,9 @@
 | --- | --- |
 | PROPERTIES | Sets up properties for the build process, reads the Git tag, checks if essential properties are defined, and prints out some properties and git information. |
 | CLEAN | Cleans the solution by removing the output directories and deleting the obj directories. |
-| STAGING | Executes a series of targets for staging: CLEAN, GET_TAG, AUTOTAG_STAGING, SOLUTION, TEST, SAVE_ARTIFACTS, PACKAGE. |
+| STAGING | Executes a series of targets for staging: CLEAN, TAG, AUTOTAG_STAGING, SOLUTION, TEST, SAVE_ARTIFACTS, PACKAGE. |
 | STAGING_DEPLOY | Executes the STAGING target and then the DEPLOY target. |
-| PRODUCTION | Executes a series of targets for production: CLEAN, GET_TAG, |AUTOTAG_PRODUCTION, SOLUTION, TEST, SAVE_ARTIFACTS, PACKAGE. |
+| PRODUCTION | Executes a series of targets for production: CLEAN, TAG, |AUTOTAG_PRODUCTION, SOLUTION, TEST, SAVE_ARTIFACTS, PACKAGE. |
 | PRODUCTION_DEPLOY | Executes the PRODUCTION target and then the DEPLOY target. |
 | AUTOTAG_STAGING | Sets the build type to STAGING. |
 | AUTOTAG_PRODUCTION | Sets the build type to PRODUCTION and updates the main branch of the git repository. |
@@ -65,7 +65,7 @@
 | AUTOTAG_STAGING | Increments version for a staging build |
 | SET_TAG | Sets version for a staging build |
 | GIT_PULL | Pulls the latest changes from git |
-| GET_TAG | Gets the latest tag from git |
+| TAG | Gets the latest tag from git |
 | PUSH_TAG | Pushes the current tag to the remote repository |
 | GIT_BRANCH | Gets the current branch from git |
 | HandleError | Prints a high importance message stating that an error occurred while reading the version file. |

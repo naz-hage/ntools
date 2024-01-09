@@ -22,10 +22,12 @@ namespace Ngit
         {
             if (GitWrapper == null) return RetCode.GitWrapperFailed;
 
+            GitWrapper.Parameters.Verbose = options.Verbose;
+
             var retCode = options.GitCommand switch
             {
                 GetBranchCommand => DisplayBranch(),
-                GetTagCommand => DisplayTag(),
+                GetTagCommand => DisplayTag(options),
                 AutoTagCommand => SetAutoTag(options),
                 SetTagCommand => SetTag(options),
                 PushTagCommand => PushTag(options),
@@ -34,17 +36,18 @@ namespace Ngit
                 _ => Default(options)
             };
 
-            Console.WriteLine($"Command.Parameters.WorkingDir: {GitWrapper.Parameters.WorkingDir}");
+            if (options.Verbose) Console.WriteLine($"Command.Parameters.WorkingDir: {GitWrapper.Parameters.WorkingDir}");
             DisplayResults(GitWrapper.Branch, GitWrapper.Tag);
 
             return retCode;
         }
 
-        public static RetCode DisplayTag()
+        public static RetCode DisplayTag(Cli options)
         {
             RetCode ReturnCode = RetCode.InvalidParameter;
 
-            Colorizer.WriteLine($"[{ConsoleColor.Green}!{GitWrapper.Tag}]");
+            if(options.Verbose) Colorizer.WriteLine($"[{ConsoleColor.Green}!{GitWrapper.Tag}]");
+
             if (!string.IsNullOrEmpty(GitWrapper.Branch))
             {
                 ReturnCode = RetCode.Success;
