@@ -68,7 +68,6 @@ namespace Nbuild
             var result = Launcher.Launcher.Start(parameters);
 
             DisplayLog(5);
-            DisplayTag();
             return result;
         }
 
@@ -101,7 +100,7 @@ namespace Nbuild
             }
         }
 
-        private static void DisplayLog(int lastLines)
+        public static void DisplayLog(int lastLines)
         {
             string logFilePath = Path.Combine(Environment.CurrentDirectory, LogFile);
             if (File.Exists(logFilePath))
@@ -119,15 +118,44 @@ namespace Nbuild
             }
         }
 
-        private static void DisplayTag()
+        public static ResultHelper DisplayTargets()
         {
-            //print tag.txt to console
-            string tagFilePath = Path.Combine(Environment.CurrentDirectory, "tag.txt");
-            if (File.Exists(tagFilePath))
+            string[] targetsFiles = Directory.GetFiles(Environment.CurrentDirectory, "*.targets", SearchOption.TopDirectoryOnly);
+            try
             {
-                string tag = File.ReadAllText(tagFilePath);
-                Console.WriteLine($"Tag: {tag}");
+                foreach (var targetsFile in targetsFiles)
+                {
+                    Console.WriteLine($"{targetsFile} Targets:");
+                    Console.WriteLine($"----------------------");
+                    foreach (var targetName in BuildStarter.GetTargets(Path.Combine(Environment.CurrentDirectory, targetsFile)))
+                    {
+                        Console.WriteLine(targetName);
+                    }
+                    Console.WriteLine();
+
+                    Console.WriteLine($"Imported Targets:");
+                    Console.WriteLine($"----------------------");
+                    foreach (var item in BuildStarter.GetImportAttributes(targetsFile, "Project"))
+                    {
+                        // replace $(ProgramFiles) with environment variable
+                        var importItem = item.Replace("$(ProgramFiles)", Environment.GetEnvironmentVariable("ProgramFiles"));
+                        Console.WriteLine($"{importItem} Targets:");
+                        Console.WriteLine($"----------------------");
+                        foreach (var targetName in BuildStarter.GetTargets(importItem))
+                        {
+                            Console.WriteLine(targetName);
+                        }
+                        Console.WriteLine();
+
+                    }
+                }
             }
+            catch (Exception ex)
+            {
+                return ResultHelper.Fail( -1, $"Exception occurred: {ex.Message}");
+            }
+
+            return ResultHelper.Success();
         }
 
         public static IEnumerable<string> GetImportAttributes(string filePath, string attributeName)

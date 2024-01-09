@@ -5,13 +5,14 @@ using OutputColorizer;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 
 namespace Nbackup
 {
     class Program
     {
         private const string ResourceLocation = "Nbackup.Resources.Nbackup.json";
-        
+        public static string AssemblyNameExe = "Backup";
         public static int ReturnCode { get; private set; }
 
         static int Main(string[] args)
@@ -21,13 +22,9 @@ namespace Nbackup
             if (!Parser.TryParse(args, out Cli options))
             {
                 ReturnCode = ResultHelper.InvalidParameter;
-                if (!args[0].Equals("--help", StringComparison.CurrentCultureIgnoreCase)) Console.WriteLine($"backup completed with '{ReturnCode}'");
+                if (!args[0].Equals("--help", StringComparison.CurrentCultureIgnoreCase)) Console.WriteLine($"{AssemblyNameExe} Completed with '{ReturnCode}'");
                 return ReturnCode;
             }
-
-            
-
-            
 
             if (!string.IsNullOrEmpty(options.Extract))
             {
@@ -60,9 +57,9 @@ namespace Nbackup
 
             watch.Stop();
 
-            Console.WriteLine($"Backup completed in {watch.ElapsedMilliseconds/1000.00} s with {result.Code}");
+            Console.WriteLine($"{AssemblyNameExe} Completed in {watch.ElapsedMilliseconds/1000.00} s with {result.Code}");
             // display elapsed time in HH:MM:SS.MS format
-            Console.WriteLine($"Backup completed in {watch.Elapsed:hh\\:mm\\:ss\\.ff} (hh:mm:ss.ff) with {result.Code}");
+            Console.WriteLine($"{AssemblyNameExe} Completed in {watch.Elapsed:hh\\:mm\\:ss\\.ff} (hh:mm:ss.ff) with {result.Code}");
             return result.Code;
         }
     }

@@ -13,12 +13,12 @@ namespace Nbuild
         private const string CmdHelp = "--help";
         private const string NgitAssemblyExe = "ng.exe";
         private static readonly List<string> Targets = [BuildStarter.BuildFileName, BuildStarter.CommonBuildFileName];
+        private static readonly int linesToDisplay = 10;
 
         static int Main(string[] args)
         {
             Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{Nversion.Get()}]\n");
             var buildResult = ResultHelper.New();
-            var watch = Stopwatch.StartNew();
             string? target = null;
             Cli options;
             
@@ -39,7 +39,7 @@ namespace Nbuild
                 if (!Parser.TryParse(args, out options))
                 {
                     if (!args[0].Equals("--help", StringComparison.CurrentCultureIgnoreCase))
-                        Console.WriteLine($"nbuild completed with '-1'");
+                        Console.WriteLine($"build completed with '-1'");
                     return 0;
                 }
 
@@ -48,48 +48,9 @@ namespace Nbuild
                     switch (options.Command)
                     {
                         case var d when d == CmdTargets:
-                            // project required
-                            // find all *.targets files
-                            string[] targetsFiles = Directory.GetFiles(Environment.CurrentDirectory, "*.targets", SearchOption.TopDirectoryOnly);
-                            
-
-                            try
-                            {
-                                foreach (var targetsFile in targetsFiles)
-                                {
-                                    Console.WriteLine($"{targetsFile} Targets:");
-                                    Console.WriteLine($"----------------------");
-                                    foreach (var targetName in BuildStarter.GetTargets(Path.Combine(Environment.CurrentDirectory, targetsFile)))
-                                    {
-                                        Console.WriteLine(targetName);
-                                    }
-                                    Console.WriteLine();
-
-                                    Console.WriteLine($"Imported Targets:");
-                                    Console.WriteLine($"----------------------");
-                                    foreach (var item in BuildStarter.GetImportAttributes(targetsFile, "Project"))
-                                    {
-                                        // replace $(ProgramFiles) with environment variable
-                                        var importItem = item.Replace("$(ProgramFiles)", Environment.GetEnvironmentVariable("ProgramFiles"));
-                                        Console.WriteLine($"{importItem} Targets:");
-                                        Console.WriteLine($"----------------------");
-                                        foreach (var targetName in BuildStarter.GetTargets(importItem))
-                                        {
-                                            Console.WriteLine(targetName);
-                                        }
-                                        Console.WriteLine();
-
-                                    }
-                                }
-
-                                buildResult = ResultHelper.Success();
-                            }
-                            catch (Exception ex)
-                            {
-                                buildResult = ResultHelper.Fail(-1, ex.Message);
-                            }
+                            buildResult = BuildStarter.DisplayTargets();
                             break;
-
+    
                         default:
                             buildResult = ResultHelper.Fail(-1, $"Invalid Command: '{options.Command}'");
                             break;
@@ -101,18 +62,10 @@ namespace Nbuild
 
             if (buildResult.IsSuccess())
             {
-                watch.Stop();
-                // display elapsed time in HH:MM:SS.MS format
-                Console.WriteLine($"nbuild completed in {watch.Elapsed:hh\\:mm\\:ss\\.ff} (hh:mm:ss.ff) with {buildResult.Code}");
-
                 Colorizer.WriteLine($"[{ConsoleColor.Green}!√ Build completed.]");
             }
             else
             {
-                watch.Stop();
-                // display elapsed time in HH:MM:SS.MS format
-                
-
                 if (buildResult.Code == int.MaxValue)
                 {
                     // Display Help
@@ -120,21 +73,20 @@ namespace Nbuild
                 }
                 else
                 {
-                    Console.WriteLine($"nbuild completed in {watch.Elapsed:hh\\:mm\\:ss\\.ff} (hh:mm:ss.ff) with {buildResult.Code}");
+                    Colorizer.WriteLine($"[{ConsoleColor.Red}!X Last {linesToDisplay} lines from error]");
+                    foreach (var item in buildResult.Output.TakeLast(linesToDisplay))
+                    {
+                        Colorizer.WriteLine($"[{ConsoleColor.Yellow}! {item}]");
+                    }
 
-                    if (buildResult.Output.Count > 0)
-                    {
-                        Colorizer.WriteLine($"[{ConsoleColor.Red}!X Build failed:\n X {buildResult.Output[0]}]");
-                    }
-                    else
-                    {
-                        Colorizer.WriteLine($"[{ConsoleColor.Red}!X Build failed]");
-                    }
+                    Colorizer.WriteLine($"[{ConsoleColor.Red}!X Build failed with code: {buildResult.Code}]");
                 }
             }
 
             return (int)buildResult.Code;
         }
+
+        
 
         private static void DisplayGitInfo()
         {
