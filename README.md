@@ -1,34 +1,57 @@
 # Software Tools Collection
 
-This repository contains a collection of software tools designed to automate various tasks on Windows clients.
+This repository contains a collection of software tools designed to automate various tasks on Windows clients.  This tasks can run on local devlopment machines or GitHub Actions.
 
 ## Table of Contents
 1. [Nbackup](#nbackup)
 2. [Nbuild](#nbuild)
 3. [NbuildTasks](#nbuildtasks)
-4. [Launcher](#launcher)
-5. [Installation](#installation)
-6. [Usage](#usage)
+4. [Installation](#installation)
+5. [Usage](#usage)
 
 ## Nbackup
 [Nbackup](./Nbackup/README.md) is a tool that leverages `robocopy` to backup a list of files and folders from a source to a destination. It is designed to be reliable and efficient, ensuring that your data is safe.
 
-## Nbuild
+## Nbuild (Nb)
 [Nbuild](./Nbuild/README.md) is a tool that launches MSBuild with a target to build. It simplifies the build process and makes it easier to manage your projects.
 
-## Ngit
+## Ngit (Ng)
 [Ngit](./Ngit/README.md) is simple wrapper for `Git` tool that peroform simple commands such as get tag and set tag.
 
 ## NbuildTasks
 [NbuildTasks](./NbuildTasks/README.md) is a class library that exposes `MSBuild` tasks. It is used by `Nbuild` to perform various tasks during the build of any project.
 
-## Launcher
-[Launcher](./launcher/README.md) is class library which is used by Nbackup to launch `robocopy` and wait for it to complete. This ensures that the backup process is fully completed before the program continues.
-
-
-
 ## Installation
-(installation instructions will be provided after the first release)
+- Download the latest release from the [releases](https://github.com/naz-hage/ntools/releases/) page and extract the zip file to a folder `%ProgramFiles%/nbuild` on your computer.  Add the folder to your `PATH` environment variable.
+- Use the command line : `curl -L -o ntools.zip  https://github.com/naz-hage/ntools/releases/download/1.0.42/ntools-1.0.42.zip`
 
 ## Usage
-(usage examples will be provided after the first release)
+Once installation is complete, you can use the tools from the command line.  Open a Terminal and navigate to your solution folder.
+
+- Examples: 
+-   Build a solution:
+
+    ```cmd
+    nb.exe solution
+    ```
+- Clean a solution:
+
+    ```cmd
+    nb.exe clean
+    ```
+
+- Run tests on a solution:
+
+    ```cmd
+    nb.exe test
+    ```
+- Create a staging build:
+
+    ```cmd
+    nb.exe staging
+    ```
+- Get help:
+    
+        ```cmd
+        nb.exe --help
+        ```
