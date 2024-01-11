@@ -1,6 +1,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
 	<!--This targets file can be used only if it imported by common.targets-->
+    
 	<!-- Display Dotnet version specified in TargetNodeVersion property and install-->
     <Target Name="DOTNET_INSTALL" DependsOnTargets="IS_ADMIN">
         <PropertyGroup>

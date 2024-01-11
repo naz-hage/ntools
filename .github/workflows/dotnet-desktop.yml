@@ -71,9 +71,18 @@ jobs:
     # Install the .NET Core workload
     - name: Install .NET Core
       uses: actions/setup-dotnet@v3
+                
+   
       with:
         dotnet-version: 8.0
 
+    #  Upload a test output file
+    # - name: Upload test output
+    #   uses: actions/upload-artifact@v2
+    #   with:
+    #     name: Test Output
+    #     path: test_output.txt
+    
     # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v1

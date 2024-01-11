@@ -106,10 +106,10 @@ namespace Nbuild.Tests
             string targetFileName = ExtractCommonTargetsFile();
 
             // Act
-            var result = BuildStarter.ExtractTagetsAndComments(targetFileName);
+            var result = BuildStarter.GetTargetsAndComments(targetFileName);
 
             // Assert
-            Assert.IsTrue(result == 0);
+            Assert.AreNotEqual(0, result.Count());
         }
 
         [TestMethod()]

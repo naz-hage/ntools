@@ -39,8 +39,8 @@ namespace NbuildTasks
                 MainDir = mainDir;
             }
             // hard code for now to debug GitHub Actions failures
-            DevDrive = "d:";
-            MainDir = "a";
+            //DevDrive = "d:";
+            //MainDir = "a";
 
             if (project == null )
             {
