@@ -31,12 +31,16 @@ namespace NbuildTasks
             {
                 DevDrive = devDrive;
             }
+            
 
             var mainDir = Environment.GetEnvironmentVariable("MainDir");
             if (!string.IsNullOrEmpty(mainDir))
             {
                 MainDir = mainDir;
             }
+            // hard code for now to debug GitHub Actions failures
+            DevDrive = "d:";
+            MainDir = "a";
 
             if (project == null )
             {
