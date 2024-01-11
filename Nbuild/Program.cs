@@ -2,8 +2,6 @@
 using Launcher;
 using NbuildTasks;
 using OutputColorizer;
-using System.Diagnostics;
-using System.Xml.Linq;
 
 namespace Nbuild
 {
@@ -12,7 +10,6 @@ namespace Nbuild
         private const string CmdTargets = "targets";
         private const string CmdHelp = "--help";
         private const string NgitAssemblyExe = "ng.exe";
-        private static readonly List<string> Targets = [BuildStarter.BuildFileName, BuildStarter.CommonBuildFileName];
         private static readonly int linesToDisplay = 10;
 
         static int Main(string[] args)
@@ -22,16 +19,15 @@ namespace Nbuild
             string? target = null;
             Cli options;
             
-
             if (args.Length == 0)
             {
-                options = new Cli();
+                options = new Cli() { Verbose = true };
                 buildResult = BuildStarter.Build(target, options.Verbose);
             }
             else if (args.Length == 1 && !args[0].Contains(CmdHelp, StringComparison.InvariantCultureIgnoreCase))
             {
                 target = args[0];
-                options = new Cli();
+                options = new Cli() { Verbose = true };
                 buildResult = BuildStarter.Build(target, options.Verbose);
             }
             else
@@ -58,7 +54,7 @@ namespace Nbuild
                 }
             }
 
-            DisplayGitInfo();
+
 
             if (buildResult.IsSuccess())
             {
@@ -73,15 +69,16 @@ namespace Nbuild
                 }
                 else
                 {
-                    Colorizer.WriteLine($"[{ConsoleColor.Red}!X Last {linesToDisplay} lines from error]");
                     foreach (var item in buildResult.Output.TakeLast(linesToDisplay))
                     {
-                        Colorizer.WriteLine($"[{ConsoleColor.Yellow}! {item}]");
+                        Colorizer.WriteLine($"[{ConsoleColor.Red}! {item}]");
                     }
 
-                    Colorizer.WriteLine($"[{ConsoleColor.Red}!X Build failed with code: {buildResult.Code}]");
+                    Colorizer.WriteLine($"[{ConsoleColor.Red}!X Build failed!]");
                 }
             }
+            
+            DisplayGitInfo();
 
             return (int)buildResult.Code;
         }
@@ -102,11 +99,8 @@ namespace Nbuild
             var resultHelper = Launcher.Launcher.Start(parameters);
             if (!resultHelper.IsSuccess())
             {
-                Console.WriteLine($"==> Failed tp display git info");
+                Console.WriteLine($"==> Failed to display git info");
             }
         }
-
-    
-
     }
 }

@@ -1,0 +1,126 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<!--This targets file can be used only if it imported by common.targets-->
+
+    <!-- Display the current git status -->
+    <Target Name="GIT_STATUS" >
+
+        <Exec Command='git status --porcelain' ConsoleToMSBuild="true">
+            <Output TaskParameter="ConsoleOutput" PropertyName="GitStatus" />
+        </Exec>
+        <Message Importance="high" Text="Git Status: $(GitStatus)" />
+
+        <Message Text="==> COMMON_DONE"/>
+    </Target>
+
+    <!-- Increment version for a staging build -->
+    <Target Name="AUTOTAG_STAGING">
+        <!--
+        <Exec Command='$(NbuildExe) -c autotag  -buildtype staging' ConsoleToMSBuild="true">
+            <Output TaskParameter="ConsoleOutput" PropertyName="ProductVersion" />
+        </Exec>
+        -->
+
+        <Git Command="AutoTag" TaskParameter="Staging">
+            <Output TaskParameter="Output" PropertyName="ProductVersion"/>
+        </Git>
+        <Message Text="Task - Git Next Tag:'$(ProductVersion)'"/>
+
+        <RedError Condition="'$(ProductVersion)' == ''" Message="AutoTag Staging Failed: Product Version property is not defined." />
+
+        <Message Text="==> COMMON_DONE"/>
+    </Target>
+
+
+    <!-- Set version for a staging build -->
+    <Target Name="SET_TAG" AfterTargets="AUTOTAG_STAGING;AUTOTAG_PRODUCTION">
+        <Message Text="Git Next tag: $(ProductVersion)"/>
+
+        <!-- <Exec Command='$(NbuildExe) -c settag  -tag $(ProductVersion)' ConsoleToMSBuild="true">
+        <Output TaskParameter="ConsoleOutput" PropertyName="Result" />
+    </Exec> -->
+
+        <Git Command="SetTag" TaskParameter="$(ProductVersion)">
+            <Output TaskParameter="Output" PropertyName="ProductVersion"/>
+        </Git>
+        <Message Text="Task - Git Next Tag:'$(ProductVersion)'"/>
+
+        <RedError Condition="'$(ProductVersion)' == ''" Message="SetTag Failed: Product Version property is not defined." />
+
+        <Message Text="==> COMMON_DONE"/>
+    </Target>
+
+    <!-- Get the latest tag from git -->
+    <Target Name="GIT_PULL" DependsOnTargets="GIT_BRANCH">
+        <Exec Command='git pull -r'/>
+    </Target>
+
+    <Target Name="AUTOTAG_PRODUCTION" DependsOnTargets="GIT_BRANCH">
+        <RedError Condition="'$(GitBranch)' != 'main'" Message="Error: Must be on main branch for a production release." />
+
+        <!-- 
+            <Exec Command='$(NbuildExe) -c autotag  -buildtype production' ConsoleToMSBuild="true">
+                <Output TaskParameter="ConsoleOutput" PropertyName="ProductVersion" />
+            </Exec> 
+        -->
+
+        <Git Command="AutoTag" TaskParameter="Production">
+            <Output TaskParameter="Output" PropertyName="ProductVersion"/>
+        </Git>
+        <Message Text="Task - Git Next Tag:'$(ProductVersion)'"/>
+
+        <RedError Condition="'$(ProductVersion)' == ''" Message="AutoTag Production Failed: Product Version property is not defined." />
+        <Message Text="==> COMMON_DONE"/>
+    </Target>
+
+    <!-- Get the tag from git -->
+    <Target Name="TAG" >
+        <!-- 
+            <Exec Command='$(NbuildExe) -c gettag ' ConsoleToMSBuild="true">
+                <Output TaskParameter="ConsoleOutput" PropertyName="ProductVersion" />
+            </Exec>
+            <Message Text="Git tag: $(ProductVersion)"/> 
+        -->
+
+        <Git Command="GetTag" >
+            <Output TaskParameter="Output" PropertyName="ProductVersion"/>
+        </Git>
+        <Message Text="Task - Git Tag:'$(ProductVersion)'"/>
+
+        <RedError Condition="'$(ProductVersion)' == ''" Message="GetTag Failed: Product Version property is not defined." />
+        <Message Text="==> COMMON_DONE"/>
+    </Target>
+
+    <!-- Push the tag to the remote repo -->
+    <Target Name="PUSH_TAG" DependsOnTargets="GIT_BRANCH;TAG">
+
+        <Git Command="PushTag" TaskParameter="$(ProductVersion)">
+            <Output TaskParameter="Output" PropertyName="Result"/>
+        </Git>
+
+        <Message Text="Task - Git Push Tag Result:'$(Result)'"/>
+
+        <RedError Condition="'$(Result)' != 'True'" Message="DeteteTag Failed: Product Version property is not defined." />
+
+        <Message Text="==> COMMON_DONE"/>
+    </Target>
+
+    <!-- Get the current git branch -->
+    <Target Name="GIT_BRANCH" >
+        <!-- <Exec Command='$(NbuildExe) -c getbranch' ConsoleToMSBuild="true">
+        <Output TaskParameter="ConsoleOutput" PropertyName="GitBranch" />
+    </Exec>
+
+    <Message Text="Git Branch: $(GitBranch)"/> -->
+
+        <Git Command="GetBranch">
+            <Output TaskParameter="Output" PropertyName="GitBranch"/>
+        </Git>
+        <Message Text="Task - Git Branch:'$(GitBranch)'"/>
+
+        <RedError Condition="'$(GitBranch)' == ''" Message="GetBranch Failed: GitBranch property is not defined." />
+
+        <Message Text="==> COMMON_DONE"/>
+    </Target>
+
+</Project>
+

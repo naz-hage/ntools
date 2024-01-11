@@ -1,5 +1,8 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
+	<!--This targets file can be used only if it imported by common.targets-->
+	
+	<!-- Download node version specified in TargetNodeVersion property and install-->
     <Target Name="NODE_INSTALL" DependsOnTargets="IS_ADMIN">
         <PropertyGroup>
             <TargetNodeVersion>21.5.0</TargetNodeVersion>
@@ -33,6 +36,16 @@
         
         <Message Text="Node.js installed version: $(NodeVersion)" />
         <Message Text="==> NODE_DONE"/>
+    </Target>
+
+	<!-- Display the installed note version -->
+    <Target Name="NODE_VERSION" >
+        <PropertyGroup>
+            <NodeExe>$(ProgramFiles)\nodejs\node.exe</NodeExe>
+        </PropertyGroup>
+        <Exec Command='"$(NodeExe)" --version'  Condition="Exists('$(NodeExe)')" />
+        <Message Text="Node.js installed version: $(NodeVersion)" />
+        <Message Text="==> NODE_DONE"/> 
     </Target>
 
 </Project>

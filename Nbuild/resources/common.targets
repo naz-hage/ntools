@@ -11,13 +11,10 @@
     - @REM for more information, please visit <TBD>		
 	Reference: https://learn.microsoft.com/en-us/visualstudio/msbuild/walkthrough-using-msbuild?view=vs-2022
 	-->
-	<UsingTask TaskName="NbuildTasks.ColorMessage" AssemblyFile="$(BuildTools)\NbuildTasks.dll"/>
-	<UsingTask TaskName="NbuildTasks.RedError" AssemblyFile="$(BuildTools)\NbuildTasks.dll" />
-	<UsingTask TaskName="NbuildTasks.Git" AssemblyFile="$(BuildTools)\NbuildTasks.dll" />
 
 	<PropertyGroup>
 		<!--The SolutionName should be replaced in nbuild.targets-->
-    	<SolutionName></SolutionName>
+		<SolutionName></SolutionName>
 		<DeploymentFolder></DeploymentFolder>
 		<DevDrive Condition=" '$(DevDrive)' == '' ">$(DevDrive)</DevDrive>
 		<DevDrive Condition=" '$(DevDrive)' == '' ">C:</DevDrive>
@@ -28,6 +25,17 @@
 		<CommonTargetsVersion>6.2.0</CommonTargetsVersion>
 	</PropertyGroup>
 	
+	<UsingTask TaskName="NbuildTasks.ColorMessage" AssemblyFile="$(BuildTools)\NbuildTasks.dll"/>
+	<UsingTask TaskName="NbuildTasks.RedError" AssemblyFile="$(BuildTools)\NbuildTasks.dll" />
+	<UsingTask TaskName="NbuildTasks.Git" AssemblyFile="$(BuildTools)\NbuildTasks.dll" />
+
+	<Import Project="$(BuildTools)\node.targets"/>
+	<Import Project="$(BuildTools)\dotnet.targets"/>
+	<Import Project="$(BuildTools)\mongodb.targets"/>
+	<Import Project="$(BuildTools)\nuget.targets"/>
+	<Import Project="$(BuildTools)\ngit.targets"/>
+	
+	<!-- Common properties that will be used by all targets -->
 	<Target Name="PROPERTIES" DependsOnTargets="TAG">
 		<PropertyGroup>
 			<NbuildExe>"$(BuildTools)\ng.exe"</NbuildExe>
@@ -59,7 +67,8 @@
 		<OnError ExecuteTargets="HandleError"/>
 	</Target>
 
-	<Target Name="CLEAN">
+	<!-- Clean up the project and artifacts folder -->
+	<Target Name="CLEAN" >
 		<MSBuild Projects="$(SolutionDir)\$(SolutionName).sln" Targets="Clean" Properties="Configuration=$(TargetRelease);Platform=Any CPU" />
 		<MSBuild Projects="$(SolutionDir)\$(SolutionName).sln" Targets="Clean" Properties="Configuration=$(TargetDebug);Platform=Any CPU"/>
 		
@@ -81,6 +90,7 @@
 		<Message Text="==> COMMON_DONE"/>
 	</Target>
 
+	<!-- Create a staging package for testing -->
 	<Target Name="STAGING" DependsOnTargets="
                 CLEAN;
                 TAG;
@@ -91,7 +101,7 @@
                 PACKAGE">
   </Target>
 
-  <!-- Perform a production release -->
+  <!-- Perform a production package for release -->
   <Target Name="PRODUCTION" DependsOnTargets="
                 CLEAN;
                 GIT_PULL;
@@ -104,35 +114,35 @@
   
   </Target>
 
-
+	<!-- Create a staging package and deploy for testing -->
 	<Target Name="STAGING_DEPLOY" DependsOnTargets="
                             STAGING;
                             DEPLOY">
 		<Message Text="==> COMMON_DONE"/>
 	</Target>
-	
-	
-	
+
+	<!-- Create a production package and deploy for release -->	
 	<Target Name="PRODUCTION_DEPLOY" DependsOnTargets="
                             PRODUCTION;
                             DEPLOY">
 		<Message Text="==> COMMON_DONE"/>
 	</Target>
-	
 
-
+	<!-- Build the solution Release configuration  using dotnet build-->
 	<Target Name="SOLUTION" DependsOnTargets="TAG">
 		<Message Text="Git tag: $(ProductVersion)"/>
 		<Exec Command='dotnet build $(SolutionDir)\$(SolutionName).sln --configuration $(TargetRelease) /p:FileVersion=$(ProductVersion) /p:AssemblyVersion=$(ProductVersion) /p:UICulture="en-US" /p:Culture="en-US"' ></Exec>
 		<Message Text="==> COMMON_DONE"/>
 	</Target>
 
-	<Target Name="SOLUTION_MSBUILD">
+	<!-- Build the solution Release configuration  using MSBuild-->
+	<Target Name="SOLUTION_MSBUILD" DependsOnTargets="TAG">
 		<Exec Command="dotnet restore"></Exec>
 		<MSBuild Projects="$(SolutionDir)\$(SolutionName).sln" Properties="Configuration=$(TargetRelease);Platform=Any CPU;Version=$(ProductVersion);AssemblyVersion=$(ProductVersion);UICulture=en-US;Culture=en-US"/>
 		<Message Text="==> COMMON_DONE"/>
 	</Target>
 
+	<!-- Create a packahe for the solution default is a zip file of all artifacts -->
 	<Target Name="PACKAGE" DependsOnTargets="ARTIFACTS;TAG">
 		<Exec Command='"$(ZipExe)" a -r -tzip $(ArtifactsFolder).zip $(ArtifactsFolder)\*'/>
 		<RemoveDir Directories="$(ArtifactsFolder);
@@ -140,11 +150,12 @@
 		<Message Text="==> COMMON_DONE"/>
 	</Target>
 
+	<!-- Save the artifacts to the artifacts folder -->
 	<Target Name="SAVE_ARTIFACTS" DependsOnTargets="ARTIFACTS;TAG">
 		<Error Condition="'$(ArtifactsFolder)' == ''" Text="Error: ArtifactsFolder property is not defined." />
 		<Message Text="ArtifactsFolder: $(ArtifactsFolder)"/>
 
-		
+
 		<Copy SourceFiles="@(BinaryFiles)"
 			  DestinationFolder="$(ArtifactsFolder)"
 			  Condition="'@(BinaryFiles, ' ')' != ''"
@@ -192,7 +203,8 @@
 
 		<Message Text="==> COMMON_DONE"/>
 	</Target>
-
+	
+	<!-- Deploy the package. default is to extract artifacts into DeploymentProperty folder -->
 	<Target Name="DEPLOY" DependsOnTargets="IS_ADMIN;ARTIFACTS">
 		<RedError Condition="'$(IsAdmin)' == false" Message="Must be an admin to deploy project: '$(SolutionName)'." />
 		<RedError Condition="'$(DeploymentFolder)' == ''" Message="Error: DeploymentFolder property is not defined." />
@@ -209,6 +221,7 @@
 		<Message Text="==> COMMON_DONE"/>
 	</Target>
 
+	<!-- Run all tests using dotnet test in debug mode -->
 	<Target Name="TEST" DependsOnTargets="ARTIFACTS;TAG">
 		<RemoveDir Directories="$(ArtifactsTestResultsFolder)"></RemoveDir>
 		<!--To colllect code coverage, add the following option to the test command: collect:"XPlat Code Coverage"-->
@@ -216,12 +229,14 @@
 		<Message Text="==> COMMON_DONE"/>
 	</Target>
 
+	<!-- Run all tests using dotnet test in release mode -->
 	<Target Name="TEST_RELEASE" DependsOnTargets="ARTIFACTS;TAG">
 		<Exec Command='"c:\program files\dotnet\dotnet.exe" test --configuration $(TargetRelease) --logger "console;verbosity=normal;DOTNET_CLI_TELEMETRY_OPTOUT=1" %(DotNetTestFiles.Identity) --collect:"XPlat Code Coverage" --logger trx --results-directory:$(ArtifactsTestResultsFolder) --verbosity normal'/>
 		<Message Text="==> COMMON_DONE"/>
 	</Target>
 
-	<Target Name="IS_ADMIN">
+	<!-- Check if current process is running in admin mode AdminCheckExitCode property is set -->
+	<Target Name="IS_ADMIN" >
 	    <Exec Command="net session" ContinueOnError="true">
 			<Output TaskParameter="ExitCode" PropertyName="AdminCheckExitCode"/>
 		</Exec>
@@ -234,134 +249,13 @@
 		<Message Text="IsAdmin: $(IsAdmin)" />
 	</Target>
 
-	<!--Git targets Start-->
-
-		<!-- Display the current git status -->
-		<Target Name="GIT_STATUS" >
-
-			<Exec Command='git status --porcelain' ConsoleToMSBuild="true">
-				<Output TaskParameter="ConsoleOutput" PropertyName="GitStatus" />
-			</Exec>
-			<Message Importance="high" Text="Git Status: $(GitStatus)" />
-
-			<Message Text="==> COMMON_DONE"/>
-		</Target>
-
-		<!-- Increment version for a staging build -->
-		<Target Name="AUTOTAG_STAGING">
-			<!--
-			<Exec Command='$(NbuildExe) -c autotag  -buildtype staging' ConsoleToMSBuild="true">
-				<Output TaskParameter="ConsoleOutput" PropertyName="ProductVersion" />
-			</Exec>
-			-->
-
-			<Git Command="AutoTag" TaskParameter="Staging">
-				<Output TaskParameter="Output" PropertyName="ProductVersion"/>
-			</Git>
-			<Message Text="Task - Git Next Tag:'$(ProductVersion)'"/>
-
-			<RedError Condition="'$(ProductVersion)' == ''" Message="AutoTag Staging Failed: Product Version property is not defined." />
-
-			<Message Text="==> COMMON_DONE"/>
-		</Target>
-
-
-		<!-- Set version for a staging build -->
-		<Target Name="SET_TAG" AfterTargets="AUTOTAG_STAGING;AUTOTAG_PRODUCTION">
-			<Message Text="Git Next tag: $(ProductVersion)"/>
-
-			<!-- <Exec Command='$(NbuildExe) -c settag  -tag $(ProductVersion)' ConsoleToMSBuild="true">
-		  <Output TaskParameter="ConsoleOutput" PropertyName="Result" />
-	  </Exec> -->
-
-			<Git Command="SetTag" TaskParameter="$(ProductVersion)">
-				<Output TaskParameter="Output" PropertyName="ProductVersion"/>
-			</Git>
-			<Message Text="Task - Git Next Tag:'$(ProductVersion)'"/>
-
-			<RedError Condition="'$(ProductVersion)' == ''" Message="SetTag Failed: Product Version property is not defined." />
-
-			<Message Text="==> COMMON_DONE"/>
-		</Target>
-
-		<!-- Get the latest tag from git -->
-		<Target Name="GIT_PULL" DependsOnTargets="GIT_BRANCH">
-			<Exec Command='git pull -r'/>
-		</Target>
-
-		<Target Name="AUTOTAG_PRODUCTION" DependsOnTargets="GIT_BRANCH">
-			<RedError Condition="'$(GitBranch)' != 'main'" Message="Error: Must be on main branch for a production release." />
-
-			<!-- 
-				<Exec Command='$(NbuildExe) -c autotag  -buildtype production' ConsoleToMSBuild="true">
-		  			<Output TaskParameter="ConsoleOutput" PropertyName="ProductVersion" />
-	  			</Exec> 
-			-->
-
-			<Git Command="AutoTag" TaskParameter="Production">
-				<Output TaskParameter="Output" PropertyName="ProductVersion"/>
-			</Git>
-			<Message Text="Task - Git Next Tag:'$(ProductVersion)'"/>
-
-			<RedError Condition="'$(ProductVersion)' == ''" Message="AutoTag Production Failed: Product Version property is not defined." />
-			<Message Text="==> COMMON_DONE"/>
-		</Target>
-
-		<Target Name="TAG">
-			<!-- 
-				<Exec Command='$(NbuildExe) -c gettag ' ConsoleToMSBuild="true">
-		  			<Output TaskParameter="ConsoleOutput" PropertyName="ProductVersion" />
-	  			</Exec>
-	  			<Message Text="Git tag: $(ProductVersion)"/> 
-			-->
-
-			<Git Command="GetTag" >
-				<Output TaskParameter="Output" PropertyName="ProductVersion"/>
-			</Git>
-			<Message Text="Task - Git Tag:'$(ProductVersion)'"/>
-
-			<RedError Condition="'$(ProductVersion)' == ''" Message="GetTag Failed: Product Version property is not defined." />
-			<Message Text="==> COMMON_DONE"/>
-		</Target>
-
-		<Target Name="PUSH_TAG" DependsOnTargets="GIT_BRANCH;TAG">
-
-			<Git Command="PushTag" TaskParameter="$(ProductVersion)">
-				<Output TaskParameter="Output" PropertyName="Result"/>
-			</Git>
-
-			<Message Text="Task - Git Push Tag Result:'$(Result)'"/>
-
-			<RedError Condition="'$(Result)' != 'True'" Message="DeteteTag Failed: Product Version property is not defined." />
-
-			<Message Text="==> COMMON_DONE"/>
-		</Target>
-
-		<Target Name="GIT_BRANCH">
-			<!-- <Exec Command='$(NbuildExe) -c getbranch' ConsoleToMSBuild="true">
-		  <Output TaskParameter="ConsoleOutput" PropertyName="GitBranch" />
-	  </Exec>
-
-	  <Message Text="Git Branch: $(GitBranch)"/> -->
-
-			<Git Command="GetBranch">
-				<Output TaskParameter="Output" PropertyName="GitBranch"/>
-			</Git>
-			<Message Text="Task - Git Branch:'$(GitBranch)'"/>
-
-			<RedError Condition="'$(GitBranch)' == ''" Message="GetBranch Failed: GitBranch property is not defined." />
-
-
-			<Message Text="==> COMMON_DONE"/>
-		</Target>
-		<!--Git Targets End-->
-
-
-	<Target Name="SingleProject">
+	<!--Example how to build a single project -->
+	<Target Name="SingleProject" >
 		<Exec Command='dotnet build $(SolutionDir)\nbuild\nbuild.csproj --configuration $(TargetRelease) --runtime win-x64 /p:FileVersion=$(ProductVersion) /p:AssemblyVersion=$(ProductVersion)'></Exec>
 	</Target>
 
-	<Target Name="HandleError">
+	<!--Error handling placeholder -->
+	<Target Name="HandleError" >
 		<Message Text="An error occurred while reading the version file." Importance="high"/>
 	</Target>	
 </Project>

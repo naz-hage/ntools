@@ -14,7 +14,7 @@
         <DeploymentFolder></DeploymentFolder>
 	</PropertyGroup>
 	
-	
+	<!--Setup the ARTIFACTS folder for binaries and test results-->
     <Target Name="ARTIFACTS" DependsOnTargets="TAG">
       <PropertyGroup>
         <ArtifactsFolder>$(ArtifactsDir)\$(SolutionName)\release\$(ProductVersion)</ArtifactsFolder>

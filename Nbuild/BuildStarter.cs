@@ -2,6 +2,8 @@
 using NbuildTasks;
 using OutputColorizer;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -10,48 +12,40 @@ namespace Nbuild
     public class BuildStarter
     {
         public static string LogFile { get; set; } = "nbuild.log";
-        public const string BuildFileName = "nbuild.targets";
-        public const string CommonBuildFileName = "common.targets";
+        private const string BuildFileName = "nbuild.targets";
+        private const string CommonBuildFileName = "common.targets";
         private const string NbuildBatchFile = "Nbuild.bat";
         private const string ResourceLocation = "Nbuild.resources.nbuild.bat";
 
         public static ResultHelper Build(string? target, bool verbose)
         {
-            string buildXmlPath = Path.Combine(Environment.CurrentDirectory, BuildFileName);
+            string nbuildPath = Path.Combine(Environment.CurrentDirectory, BuildFileName);
             string commonBuildXmlPath = Path.Combine($"{Environment.GetEnvironmentVariable("ProgramFiles")}\\nbuild", CommonBuildFileName);
 
-      
-            // Always extract nbuild.bat common.targets.xml
-            ResourceHelper.ExtractEmbeddedResourceFromCallingAssembly(ResourceLocation, Path.Combine(Environment.CurrentDirectory, NbuildBatchFile));
-            Colorizer.WriteLine($"[{ConsoleColor.Yellow}!Extracted '{NbuildBatchFile}' to {Environment.CurrentDirectory}]\n");
-
-            if (!File.Exists(buildXmlPath))
+            if (!File.Exists(nbuildPath))
             {
-                return ResultHelper.Fail(-1, $"'{buildXmlPath}' not found.");
+                return ResultHelper.Fail(-1, $"'{nbuildPath}' not found.");
             }
 
             // check if target is valid
-            if (!string.IsNullOrEmpty(target) &&
-                !BuildStarter.GetTargets(buildXmlPath).Contains(target, StringComparer.OrdinalIgnoreCase) &&
-                !BuildStarter.GetTargets(commonBuildXmlPath).Contains(target, StringComparer.OrdinalIgnoreCase))
-                return ResultHelper.Fail(-11, $"Target '{target}' not found in {buildXmlPath} or {commonBuildXmlPath}");
+            if (!ValidTarget(target))
+            {
+                return ResultHelper.Fail(-1, $"Target '{target}' not found");
+            }
+
+            ExtractBatchFile();
 
             Console.WriteLine($"MSBuild started with '{target ?? "Default"}' target");
 
-            return LaunchBuild(buildXmlPath, target, verbose);
-        }
-
-        private static ResultHelper LaunchBuild(string buildFile, string? target, bool verbose = true)
-        {
             string cmd;
 
             if (string.IsNullOrEmpty(target))
             {
-                cmd = $"{buildFile} -fl -flp:logfile={LogFile};verbosity=normal";
+                cmd = $"{nbuildPath} -fl -flp:logfile={LogFile};verbosity=normal";
             }
             else
             {
-                cmd = $"{buildFile} /t:{target} -fl -flp:logfile={LogFile};verbosity=normal";
+                cmd = $"{nbuildPath} /t:{target} -fl -flp:logfile={LogFile};verbosity=normal";
             }
 
             var parameters = new Parameters
@@ -59,8 +53,8 @@ namespace Nbuild
                 WorkingDir = Directory.GetCurrentDirectory(),
                 FileName = "msbuild.exe",
                 Arguments = cmd,
-                Verbose = verbose,
-                RedirectStandardOutput = !verbose,
+                Verbose = true,
+                RedirectStandardOutput = false,
             };
 
             Console.WriteLine($"==> {parameters.FileName} {parameters.Arguments}");
@@ -69,6 +63,50 @@ namespace Nbuild
 
             DisplayLog(5);
             return result;
+        }
+
+        public static bool ValidTarget(string targetsFile, string? target)
+        {
+            return GetTargets(targetsFile).Contains(target, StringComparer.OrdinalIgnoreCase);
+        }
+
+    public static bool ValidTarget(string? target)
+        {
+            // check if target is valid in the current directory
+            string nbuildPath = Path.Combine(Environment.CurrentDirectory, BuildFileName);
+            if (ValidTarget(nbuildPath, target)) return true;
+
+            // check if target is valid in the target files in $(ProgramFiles)\nbuild
+            
+            List<string> TargetFiles =
+            [
+                "common.targets",
+                "node.targets",
+                "nuget.targets",
+                "ngit.targets",
+                "dotnet.targets",
+                "mongodb.targets",
+            ];
+
+            bool found = false;
+            foreach (var targetFile in TargetFiles)
+            {
+                var path = Path.Combine($"{Environment.GetEnvironmentVariable("ProgramFiles")}\\nbuild", targetFile);
+                if (ValidTarget(path, target))
+                {
+                    found = true;
+                    break;
+                }
+            }
+
+            return found;
+        }
+
+        private static void ExtractBatchFile()
+        {
+            // Always extract nbuild.bat common.targets.xml
+            ResourceHelper.ExtractEmbeddedResourceFromCallingAssembly(ResourceLocation, Path.Combine(Environment.CurrentDirectory, NbuildBatchFile));
+            Colorizer.WriteLine($"[{ConsoleColor.Yellow}!Extracted '{NbuildBatchFile}' to {Environment.CurrentDirectory}]\n");
         }
 
         public static IEnumerable<string> GetTargets(string targetsFile)
@@ -100,7 +138,7 @@ namespace Nbuild
             }
         }
 
-        public static void DisplayLog(int lastLines)
+        private static void DisplayLog(int lastLines)
         {
             string logFilePath = Path.Combine(Environment.CurrentDirectory, LogFile);
             if (File.Exists(logFilePath))
@@ -127,7 +165,7 @@ namespace Nbuild
                 {
                     Console.WriteLine($"{targetsFile} Targets:");
                     Console.WriteLine($"----------------------");
-                    foreach (var targetName in BuildStarter.GetTargets(Path.Combine(Environment.CurrentDirectory, targetsFile)))
+                    foreach (var targetName in GetTargets(Path.Combine(Environment.CurrentDirectory, targetsFile)))
                     {
                         Console.WriteLine(targetName);
                     }
@@ -135,13 +173,13 @@ namespace Nbuild
 
                     Console.WriteLine($"Imported Targets:");
                     Console.WriteLine($"----------------------");
-                    foreach (var item in BuildStarter.GetImportAttributes(targetsFile, "Project"))
+                    foreach (var item in GetImportAttributes(targetsFile, "Project"))
                     {
                         // replace $(ProgramFiles) with environment variable
                         var importItem = item.Replace("$(ProgramFiles)", Environment.GetEnvironmentVariable("ProgramFiles"));
                         Console.WriteLine($"{importItem} Targets:");
                         Console.WriteLine($"----------------------");
-                        foreach (var targetName in BuildStarter.GetTargets(importItem))
+                        foreach (var targetName in GetTargets(importItem))
                         {
                             Console.WriteLine(targetName);
                         }
@@ -152,7 +190,7 @@ namespace Nbuild
             }
             catch (Exception ex)
             {
-                return ResultHelper.Fail( -1, $"Exception occurred: {ex.Message}");
+                return ResultHelper.Fail(-1, $"Exception occurred: {ex.Message}");
             }
 
             return ResultHelper.Success();
@@ -179,6 +217,51 @@ namespace Nbuild
                     }
                 }
             }
+        }
+
+        public static int ExtractTagetsAndComments(string targetFileName)
+        {
+            var filePath = Path.Combine(Environment.CurrentDirectory, targetFileName);
+            string[] lines = File.ReadAllLines(filePath);
+
+            StringBuilder commentBuilder = new StringBuilder();
+            bool isComment = false;
+
+            foreach (string line in lines)
+            {
+                string trimmedLine = line.Trim();
+
+                if (trimmedLine.StartsWith("<!--") && trimmedLine.EndsWith("-->"))
+                {
+                    commentBuilder.Clear(); // reset the comment
+                    // Single-line comment
+                    commentBuilder.Append(trimmedLine.Substring(4, trimmedLine.Length - 7).Trim());
+                    isComment = false;
+                }
+                else if (trimmedLine.StartsWith("<!--"))
+                {
+                    commentBuilder.Clear(); // reset the comment
+                    isComment = true;
+                    commentBuilder.Append(trimmedLine.Substring(4).Trim());
+                }
+                else if (trimmedLine.EndsWith("-->"))
+                {
+                    isComment = false;
+                    commentBuilder.Append(trimmedLine.Substring(0, trimmedLine.Length - 3).Trim());
+                }
+                else if (isComment)
+                {
+                    commentBuilder.Append(" " + trimmedLine);
+                }
+                else if (trimmedLine.StartsWith("<Target "))
+                {
+                    var targetName = line.Trim().Split(' ')[1].Split('=')[1].Trim('"');
+                    Console.WriteLine($"{targetName}: {commentBuilder.ToString().Trim()}");
+
+                    commentBuilder.Clear(); // reset the comment
+                }
+            }
+            return 0;
         }
     }
 }

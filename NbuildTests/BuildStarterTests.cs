@@ -2,6 +2,8 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NbuildTasks;
 using System.Reflection;
+using System.Xml.Linq;
+using System.Text;
 
 namespace Nbuild.Tests
 {
@@ -13,9 +15,20 @@ namespace Nbuild.Tests
         [TestMethod()]
         public void GetTargetsTest()
         {
-            // Add test code here
+            List<string> expectedNgitTargets =
+            [
+                "GIT_STATUS",
+                "AUTOTAG_STAGING",
+                "SET_TAG",
+                "GIT_PULL",
+                "AUTOTAG_PRODUCTION",
+                "TAG",
+                "PUSH_TAG",
+                "GIT_BRANCH"
+            ];
+
             // Arrange
-            List<string> expected =
+            List<string> expectedCommonTargets =
             [
                 "PROPERTIES",
                 "CLEAN",
@@ -31,25 +44,12 @@ namespace Nbuild.Tests
                 "TEST",
                 "TEST_RELEASE",
                 "IS_ADMIN",
-                "GIT_STATUS",
-                "AUTOTAG_STAGING",
-                "SET_TAG",
-                "GIT_PULL",
-                "AUTOTAG_PRODUCTION",
-                "TAG",
-                "PUSH_TAG",
-                "GIT_BRANCH",
                 "SingleProject",
-                "HandleError"];
+                "HandleError"
+            ];
 
             // Act
-            var executingAssemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            Assert.IsNotNull(executingAssemblyDirectory);
-            
-            string resourcePath = Path.Combine(executingAssemblyDirectory, NbuildAssemblyName);
-            string targetFileName = Path.Combine(executingAssemblyDirectory, "commom.targets");
-
-            ResourceHelper.ExtractEmbeddedResourceFromAssembly(resourcePath, "Nbuild.resources.common.targets", targetFileName);
+            string targetFileName = ExtractCommonTargetsFile();
 
             // Assert
             Console.WriteLine($"ResourcePath: {targetFileName}");
@@ -60,7 +60,19 @@ namespace Nbuild.Tests
             Console.WriteLine($"{string.Join(",\n", actual.Select(a => $"\"{a}\""))}");
 
             // assert that arrays actual and expected are equal
-            CollectionAssert.AreEqual(expected, actual, StringComparer.OrdinalIgnoreCase);
+            CollectionAssert.AreEqual(expectedCommonTargets, actual, StringComparer.OrdinalIgnoreCase);
+        }
+
+        private static string ExtractCommonTargetsFile()
+        {
+            var executingAssemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            Assert.IsNotNull(executingAssemblyDirectory);
+
+            string resourcePath = Path.Combine(executingAssemblyDirectory, NbuildAssemblyName);
+            string targetFileName = Path.Combine(executingAssemblyDirectory, "commom.targets");
+
+            ResourceHelper.ExtractEmbeddedResourceFromAssembly(resourcePath, "Nbuild.resources.common.targets", targetFileName);
+            return targetFileName;
         }
 
         [TestMethod()]
@@ -84,6 +96,69 @@ namespace Nbuild.Tests
 
             // Assert
             Assert.IsTrue(fileNames.Count() > 0);
+        }
+
+        [TestMethod()]
+
+        public void ExtractCommentsFromTargets()
+        {
+            // Arrange
+            string targetFileName = ExtractCommonTargetsFile();
+
+            // Act
+            var result = BuildStarter.ExtractTagetsAndComments(targetFileName);
+
+            // Assert
+            Assert.IsTrue(result == 0);
+        }
+
+        [TestMethod()]
+        public void ValidTargetTest()
+        {
+            Dictionary<string, bool> ngitTargets = new()
+            {
+                { "GIT_STATUS", true },
+                { "AUTOTAG_STAGING", true },
+                { "SET_TAG", true },
+                { "GIT_PULL", true },
+                { "AUTOTAG_PRODUCTION", true },
+                { "TAG", true },
+                { "PUSH_TAG", true },
+                { "GIT_BRANCH", true },
+            };  
+            // Arrange
+            string targetFileName = ExtractCommonTargetsFile();
+            Dictionary<string, bool> commonTargets = new Dictionary<string, bool>
+            {
+                { "PROPERTIES", true },
+                { "CLEAN", true },
+                { "STAGING", true },
+                { "PRODUCTION", true },
+                { "STAGING_DEPLOY", true },
+                { "PRODUCTION_DEPLOY", true },
+                { "SOLUTION", true },
+                { "SOLUTION_MSBUILD", true },
+                { "PACKAGE", true },
+                { "SAVE_ARTIFACTS", true },
+                { "DEPLOY", true },
+                { "TEST", true },
+                { "TEST_RELEASE", true },
+                { "IS_ADMIN", true },
+                { "JUNK_TARGET", false },
+                { "SingleProject", true },
+                { "HandleError", true },
+            };
+
+            // Act
+
+            foreach (var target in commonTargets)
+            {
+                // Act
+                bool isValid = BuildStarter.ValidTarget(targetFileName, target.Key);
+                
+                // Assert
+                Assert.AreEqual(target.Value, isValid);
+            }
         }
     }
 }
