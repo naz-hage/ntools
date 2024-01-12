@@ -1,0 +1,39 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<!--This targets file can be used only if it imported by common.targets-->
+	
+	<!-- Display the installed nuget version -->
+	<Target Name="NUGET_VERSION" AfterTargets="DOWNLOAD_NUGET">
+		<Message Text="$(NugetExe) $(NugetExe)" />
+		
+		<!-- Call the PowerShell script and capture nuget version output into  NugetVersion property-->
+        <Exec Command='powershell -File "$(BuildTools)\GetFileVersion.ps1" "$(NugetExe)"' ConsoleToMSBuild="true">
+            <Output TaskParameter="ConsoleOutput" PropertyName="NugetVersion" />
+        </Exec>
+
+		<Message Text="$(NugetExe) version: $(NugetVersion)" />
+	</Target>
+
+	<!-- Download latest nuget.exe and install -->
+	<Target Name="NUGET_INSTALL" DependsOnTargets="IS_ADMIN">
+		<RedError Condition="'$(IsAdmin)' == false" Message="Must be an admin to install Nuget" />
+		<PropertyGroup>
+			<NugetTempExe>c:\temp\nuget.exe</NugetTempExe>
+			<DownloadUrl>https://dist.nuget.org/win-x86-commandline/latest/nuget.exe</DownloadUrl>
+		</PropertyGroup>
+
+		<!-- Delete NugetTempExe if it exists -->
+		<Exec Command='if exist "$(NugetTempExe)" del "$(NugetTempExe)"' ContinueOnError="true" />		
+
+		<Exec Command='powershell -Command "Invoke-WebRequest -OutFile $(NugetTempExe) $(DownloadUrl)"' />
+		 
+		 <!-- Move nuget.exe from NugetTempExe to NugetExe -->
+		<Exec Command='move /Y "$(NugetTempExe)" "$(NugetExe)"' />
+
+		<!-- Delete NugetTempExe if it exists -->
+		<Exec Command='if exist "$(NugetTempExe)" del "$(NugetTempExe)"' ContinueOnError="true" />		
+
+		<Message Text="==> NUGET_DONE"/>
+	</Target>
+
+</Project>

@@ -1,0 +1,58 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<!-- Reference: https://learn.microsoft.com/en-us/visualstudio/msbuild/walkthrough-using-msbuild?view=vs-2022 -->
+
+	<!-- This file is a sample nbuild.targets to be used in other projects -->
+	<Import Project="$(ProgramFiles)\nbuild\common.targets" />
+    <Import Project="$(ProgramFiles)\nbuild\node.targets"/>
+    <Import Project="$(ProgramFiles)\nbuild\nuget.targets"/>
+	
+	<PropertyGroup>
+        <!-- The name of the solution  must be filled.  it's normally the folder where the *.sln resides-->
+		<SolutionName>$([System.IO.Path]::GetFileNameWithoutExtension('$(MSBuildProjectDirectory)'))</SolutionName>
+        <!-- The deployment folder must be filled.  This is the location when the app deployed or installed -->
+        <DeploymentFolder></DeploymentFolder>
+	</PropertyGroup>
+	
+	<!--Setup the ARTIFACTS folder for binaries and test results-->
+    <Target Name="ARTIFACTS" DependsOnTargets="TAG">
+      <PropertyGroup>
+        <ArtifactsFolder>$(ArtifactsDir)\$(SolutionName)\release\$(ProductVersion)</ArtifactsFolder>
+		<ArtifactsTestResultsFolder>$(ArtifactsDir)\$(SolutionName)\TestResults\$(ProductVersion)</ArtifactsTestResultsFolder>
+      </PropertyGroup>  
+      <ItemGroup>
+            <BinaryFiles Include="
+                        $(SolutionDir)\Release\*.exe;
+                        $(SolutionDir)\Release\*.exe.config;
+                        $(SolutionDir)\Release\*.json;  
+                        $(SolutionDir)\Release\*.dll"
+						 
+                        Exclude="
+						$(SolutionDir)\Release\**\*.pdb;
+						$(SolutionDir)\Release\testhost.*"
+						/>
+
+            <DataFiles Include="
+                       $(SolutionDir)\Release\Data\*.json"
+                      />
+
+            <TestFiles Include="
+                       $(SolutionDir)\Debug\**\*.*;
+                       " />
+
+		    <ArtifactsBlobs Include = "$(ArtifactsFolder)\**\*.*" />
+
+            <RunTimesNetStandard20 Include = "
+								   $(SolutionDir)\Release\netstandard2.0\*.*"
+                                    Exclude="
+						            $(SolutionDir)\Release\**\*.pdb"
+						            />
+		  
+        </ItemGroup>
+		
+		<RemoveDir Directories="$(ArtifactsFolder)" />
+		
+        <Message Text="==> DONE"/>
+    </Target>
+
+</Project>

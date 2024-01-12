@@ -396,16 +396,9 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+# ntools addition
 /__azurite_db_blob_extent__.json
 /__azurite_db_blob__.json
-/BUILD_TYPE.TXT
-/GIT_BRANCH.TXT
-/TAG.TXT
-/nuget.exe
 /nuget-push.bat
-/NUGET_API_KEY.TXT
-/LocalNugetFeed
-/test/Properties/launchSettings.json
-/build.xml
-/version.txt
-/Build.bat
+**/launchSettings.json
+

@@ -1,32 +1,57 @@
-# ntools
-Collection of useful tools which automates various tasks on Windows client.
+# Software Tools Collection
 
-- **nBackup** - A .NET executable which relies on robocopy to backup a list of folders from source and destination.
-nBackup command line options:
- 
-```
- nBackup.exe [-src value] [-dest value] [-opt value] [-input value] [-verbose value] [-performbackup value]
+This repository contains a collection of software tools designed to automate various tasks on Windows clients.  This tasks can run on local devlopment machines or GitHub Actions.
 
- 
-      - `src`           : Source Folder (string, default=)
-      - `dest`          : Destination folder (string, default=)
-      - `opt`           : Backup Options (string, default=/s /XD .git /XD .vs /XD TestResults /XF *.exe /XF *.dll /XF *.pdb /e)
-      - `input`         : input backup file which specifies source, destination and backup options. See [backup.json](./nBackup/Data/backup.json) for a sample input backup json file. (string, default=)
-      - `verbose`       : Values: true | false.  Default is false (true or false, default=False)
-      - `performbackup` : Values: true | false.  false displays options and does not perform backup (default=True)
+## Table of Contents
+1. [Nbackup](#nbackup)
+2. [Nbuild](#nbuild)
+3. [NbuildTasks](#nbuildtasks)
+4. [Installation](#installation)
+5. [Usage](#usage)
 
-            - if `input` option is specified, the `src`, `dest`, and `opt` options are ignored.
-            - if `input` option is not specified, the `src`, `dest`, and `opt` options are required.
+## Nbackup
+[Nbackup](./Nbackup/README.md) is a tool that leverages `robocopy` to backup a list of files and folders from a source to a destination. It is designed to be reliable and efficient, ensuring that your data is safe.
 
-```
-- [**Launcher**](./launcher/README.md) - The launcher class is used by nBackup to launch robocopy and wait for it to complete.
+## Nbuild (Nb)
+[Nbuild](./Nbuild/README.md) is a tool that launches MSBuild with a target to build. It simplifies the build process and makes it easier to manage your projects.
 
-## Additional information:
-- There are several predefined MSBuild properties that can be used during builds. Here are a few examples:
-    - `$(MSBuildProjectFile)`: The file name of the project file.
-    - `$(MSBuildProjectName)`: The file name of the project file without the extension.
-    - `$(MSBuildProjectExtension)`: The extension of the project file.
-    - `$(MSBuildProjectFullPath)`: The absolute path of the project file.
-    - `$(MSBuildThisFileDirectory)`: The directory of the MSBuild file that is currently being processed.
- 
-You can find the complete list of predefined [MSBuild properties in the Microsoft documentation](https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild-reserved-and-well-known-properties?view=vs-2022).
+## Ngit (Ng)
+[Ngit](./Ngit/README.md) is simple wrapper for `Git` tool that perform simple commands such as get tag and set tag.
+
+## NbuildTasks
+[NbuildTasks](./NbuildTasks/README.md) is a class library that exposes `MSBuild` tasks. It is used by `Nbuild` to perform various tasks during the build of any project.
+
+## Installation
+- Download the latest release from the [releases](https://github.com/naz-hage/ntools/releases/) page and extract the zip file to the folder `%ProgramFiles%/nbuild` on your computer.  Add the folder to your `PATH` environment variable.
+- Use the command line : `curl -L -o ntools.zip  https://github.com/naz-hage/ntools/releases/download/1.0.42/ntools-1.0.42.zip`
+
+## Usage
+Once installation is complete, you can use the NTools from the command line.  Open a Terminal and navigate to your solution folder.
+
+- Examples: 
+-   Build a solution:
+
+    ```cmd
+    nb.exe solution
+    ```
+- Clean a solution:
+
+    ```cmd
+    nb.exe clean
+    ```
+
+- Run tests on a solution:
+
+    ```cmd
+    nb.exe test
+    ```
+- Create a staging build:
+
+    ```cmd
+    nb.exe staging
+    ```
+- Display available options:
+    
+        ```cmd
+        nb.exe -cmd targets
+        ```

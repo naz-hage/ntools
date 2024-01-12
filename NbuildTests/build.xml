@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project Name="nbuild" default="build">
+  <Target Name="build">
+    <!-- Add build steps here -->
+  </Target>
+  <Target Name="clean">
+    <!-- Add clean steps here -->
+  </Target>
+  <Target Name="rebuild" depends="clean,build">
+    <!-- Add rebuild steps here -->
+  </Target>
+</project>

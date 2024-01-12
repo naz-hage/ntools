@@ -3,13 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31825.309
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "test", "test\test.csproj", "{675AB480-2D5C-43C2-A9FA-2B2D85830A16}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "launcherTests", "LauncherTests\launcherTests.csproj", "{BE437ED5-EBDE-4B6C-9B4F-BA7E0D5898CC}"
-	ProjectSection(ProjectDependencies) = postProject
-		{675AB480-2D5C-43C2-A9FA-2B2D85830A16} = {675AB480-2D5C-43C2-A9FA-2B2D85830A16}
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{80B7EE8D-BFD5-4F31-BC37-103FDDACEA23}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{E9FCB2FE-4245-44DF-A7DE-189496E1431F}"
@@ -20,14 +13,34 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{35AAB912-8196-4DE2-B5DA-98E9F4340A8D}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
+		nbuild.bat = nbuild.bat
+		nbuild.log = nbuild.log
+		nbuild.targets = nbuild.targets
+		nbuildTests\nbuildTests.csproj = nbuildTests\nbuildTests.csproj
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Launcher", "launcher\Launcher.csproj", "{7196E4C6-77BF-4B00-BD4A-431575EFE920}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nbackup", "nBackup\Nbackup.csproj", "{1E00CF48-2881-478B-AC19-A9AE90910F44}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nBackup", "nBackup\nBackup.csproj", "{1E00CF48-2881-478B-AC19-A9AE90910F44}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NbackupTests", "nBackupTests\NbackupTests.csproj", "{79DD18A9-0E82-4F97-8353-1E5D8BC844BA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{36875C3B-0953-4936-BB31-2402515DCBAA} = {36875C3B-0953-4936-BB31-2402515DCBAA}
+	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nBackupTests", "nBackupTests\nBackupTests.csproj", "{79DD18A9-0E82-4F97-8353-1E5D8BC844BA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NbuildTasks", "NbuildTasks\NbuildTasks.csproj", "{36875C3B-0953-4936-BB31-2402515DCBAA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nbuild", "nbuild\Nbuild.csproj", "{6E288918-A193-42FC-93A7-8457BF284B82}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NbuildTests", "NbuildTests\NbuildTests.csproj", "{EFB85C8C-26C3-4A6F-919F-3534CD238975}"
+	ProjectSection(ProjectDependencies) = postProject
+		{36875C3B-0953-4936-BB31-2402515DCBAA} = {36875C3B-0953-4936-BB31-2402515DCBAA}
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ngit", "Ngit\Ngit.csproj", "{432E20EA-0A75-4D7B-8683-9DF1A8B1D3B1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ngitTests", "NgitTests\ngitTests.csproj", "{8430480D-E960-409B-8191-D088CC187E90}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NbuildTasksTests", "NbuildTasksTests\NbuildTasksTests.csproj", "{F98C96D6-AF6D-40EB-BFA2-73600DE146B2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,18 +48,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{675AB480-2D5C-43C2-A9FA-2B2D85830A16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{675AB480-2D5C-43C2-A9FA-2B2D85830A16}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{675AB480-2D5C-43C2-A9FA-2B2D85830A16}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{675AB480-2D5C-43C2-A9FA-2B2D85830A16}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BE437ED5-EBDE-4B6C-9B4F-BA7E0D5898CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BE437ED5-EBDE-4B6C-9B4F-BA7E0D5898CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BE437ED5-EBDE-4B6C-9B4F-BA7E0D5898CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BE437ED5-EBDE-4B6C-9B4F-BA7E0D5898CC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7196E4C6-77BF-4B00-BD4A-431575EFE920}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7196E4C6-77BF-4B00-BD4A-431575EFE920}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7196E4C6-77BF-4B00-BD4A-431575EFE920}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7196E4C6-77BF-4B00-BD4A-431575EFE920}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1E00CF48-2881-478B-AC19-A9AE90910F44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1E00CF48-2881-478B-AC19-A9AE90910F44}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1E00CF48-2881-478B-AC19-A9AE90910F44}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -55,6 +56,30 @@ Global
 		{79DD18A9-0E82-4F97-8353-1E5D8BC844BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79DD18A9-0E82-4F97-8353-1E5D8BC844BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{79DD18A9-0E82-4F97-8353-1E5D8BC844BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36875C3B-0953-4936-BB31-2402515DCBAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36875C3B-0953-4936-BB31-2402515DCBAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36875C3B-0953-4936-BB31-2402515DCBAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36875C3B-0953-4936-BB31-2402515DCBAA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E288918-A193-42FC-93A7-8457BF284B82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E288918-A193-42FC-93A7-8457BF284B82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E288918-A193-42FC-93A7-8457BF284B82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E288918-A193-42FC-93A7-8457BF284B82}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EFB85C8C-26C3-4A6F-919F-3534CD238975}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFB85C8C-26C3-4A6F-919F-3534CD238975}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFB85C8C-26C3-4A6F-919F-3534CD238975}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFB85C8C-26C3-4A6F-919F-3534CD238975}.Release|Any CPU.Build.0 = Release|Any CPU
+		{432E20EA-0A75-4D7B-8683-9DF1A8B1D3B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{432E20EA-0A75-4D7B-8683-9DF1A8B1D3B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{432E20EA-0A75-4D7B-8683-9DF1A8B1D3B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{432E20EA-0A75-4D7B-8683-9DF1A8B1D3B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8430480D-E960-409B-8191-D088CC187E90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8430480D-E960-409B-8191-D088CC187E90}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8430480D-E960-409B-8191-D088CC187E90}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8430480D-E960-409B-8191-D088CC187E90}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F98C96D6-AF6D-40EB-BFA2-73600DE146B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F98C96D6-AF6D-40EB-BFA2-73600DE146B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F98C96D6-AF6D-40EB-BFA2-73600DE146B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F98C96D6-AF6D-40EB-BFA2-73600DE146B2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

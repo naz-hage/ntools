@@ -71,19 +71,33 @@ jobs:
     # Install the .NET Core workload
     - name: Install .NET Core
       uses: actions/setup-dotnet@v3
+                
+   
       with:
         dotnet-version: 8.0
 
+    #  Upload a test output file
+    # - name: Upload test output
+    #   uses: actions/upload-artifact@v2
+    #   with:
+    #     name: Test Output
+    #     path: test_output.txt
+    
     # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v1
 
+    - name: Install dependencies
+      run: dotnet restore
+
     # Execute all unit tests in the solution
     - name: Build the solution
-      run: dotnet build
+      run: dotnet build --no-restore --verbosity normal
 
     - name: Execute unit tests
-      run: dotnet test
+      run: dotnet test --no-build --verbosity normal
+      env:
+        DOTNET_CLI_TELEMETRY_OPTOUT: 1
 
     # 0:Matches Multiple schemas when only one must validate
     # - name: Push

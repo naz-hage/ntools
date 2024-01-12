@@ -6,7 +6,7 @@ using System.IO;
 using System.Text;
 using System.Text.Json;
 
-namespace nbackup
+namespace Nbackup
 {
     public class NBackup
     {
@@ -120,12 +120,6 @@ namespace nbackup
                     result.Code = ResultHelper.Exception;
                     Console.WriteLine($"An exception occurred: {ex.Message}");
                 }
-            }
-            else if (!string.IsNullOrEmpty(options.Source) &&
-                !string.IsNullOrEmpty(options.Destination) &&
-                !string.IsNullOrEmpty(options.Backup))
-            {
-                result = NBackup.Perform(options.Source, options.Destination, options.Backup);
             }
             else
             {

@@ -6,10 +6,10 @@
 	  <Nullable>enable</Nullable>
     <Version></Version>
     <AssemblyVersion></AssemblyVersion>
-    <Authors>blue-man</Authors>
-    <Company>blue-man</Company>
+    <Authors>naz-hage</Authors>
+    <Company>naz-hage</Company>
     <Product>Backup automation</Product>
-    <Copyright>2020-2023</Copyright>
+    <Copyright>2020-2024</Copyright>
   </PropertyGroup>
 
 
@@ -28,19 +28,18 @@
 
   <ItemGroup>
     <PackageReference Include="CommandLine.Net" Version="2.3.0" />
+    <PackageReference Include="ntools-launcher" Version="1.0.18" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\launcher\Launcher.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="Resources\Nbackup.json" />
+	</ItemGroup>
 
 	<ItemGroup>
-		<Content Include="Data\backup.json">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</Content>
+	  <ProjectReference Include="..\NbuildTasks\NbuildTasks.csproj" />
 	</ItemGroup>
 </Project>

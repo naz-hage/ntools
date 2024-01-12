@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "backup": {
-      "commandName": "Project",
-      "commandLineArgs": "-input data\\backup.json"
-    }
-  }
-}
