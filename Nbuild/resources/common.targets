@@ -101,7 +101,7 @@
                 PACKAGE">
   </Target>
 
-  <!-- Perform a production package for release -->
+  <!-- Create a production package for release -->
   <Target Name="PRODUCTION" DependsOnTargets="
                 CLEAN;
                 GIT_PULL;
