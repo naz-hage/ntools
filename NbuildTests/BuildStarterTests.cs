@@ -32,6 +32,8 @@ namespace Nbuild.Tests
             [
                 "PROPERTIES",
                 "CLEAN",
+                "INSTALL_DEP",
+                "TELEMETRY_OPT_OUT",
                 "STAGING",
                 "PRODUCTION",
                 "STAGING_DEPLOY",
@@ -42,7 +44,7 @@ namespace Nbuild.Tests
                 "SAVE_ARTIFACTS",
                 "DEPLOY",
                 "TEST",
-                "TEST_RELEASE",
+                "TEST_DEBUG",
                 "IS_ADMIN",
                 "SingleProject",
                 "HandleError"
@@ -132,6 +134,8 @@ namespace Nbuild.Tests
             {
                 { "PROPERTIES", true },
                 { "CLEAN", true },
+                { "INSTALL_DEP", true },
+                { "TELEMETRY_OPT_OUT", true },
                 { "STAGING", true },
                 { "PRODUCTION", true },
                 { "STAGING_DEPLOY", true },
@@ -142,7 +146,7 @@ namespace Nbuild.Tests
                 { "SAVE_ARTIFACTS", true },
                 { "DEPLOY", true },
                 { "TEST", true },
-                { "TEST_RELEASE", true },
+                { "TEST_DEBUG", true },
                 { "IS_ADMIN", true },
                 { "JUNK_TARGET", false },
                 { "SingleProject", true },

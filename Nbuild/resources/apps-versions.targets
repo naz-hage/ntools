@@ -1,0 +1,19 @@
+﻿<Project InitialTargets="PROPERTIES" DefaultTargets="SOLUTION"
+    xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<PropertyGroup>
+		<NodeAppName>Node</NodeAppName>
+		<NodeTargetVersion>21.5.0</NodeTargetVersion>
+
+
+		<DownloadsDirectory>c:\NToolsDownloads</DownloadsDirectory>
+
+	</PropertyGroup>
+
+	<Target Name="APP_COMMON" DependsOnTargets="IS_ADMIN" >
+		<RedError Condition="'$(IsAdmin)' == false" Message="Must be an admin to install $(NodeAppName)" />
+		
+		<MakeDir Directories="$(DownloadsDirectory)" Condition="!Exists('$(DownloadsDirectory)')"/>
+		<Exec Command='icacls "$(DownloadsDirectory)" /grant Administrators:(OI)(CI)F /inheritance:r' />
+	</Target>
+</Project>

@@ -3,11 +3,12 @@
 This repository contains a collection of software tools designed to automate various tasks on Windows clients.  This tasks can run on local devlopment machines or GitHub Actions.
 
 ## Table of Contents
-1. [Nbackup](#nbackup)
-2. [Nbuild](#nbuild)
-3. [NbuildTasks](#nbuildtasks)
-4. [Installation](#installation)
-5. [Usage](#usage)
+1. [Nbackup](#Nbackup)
+2. [Nbuild](#Nbuild)
+3. [Ngit](#Ngit)
+4. [NbuildTasks](#nbuildtasks)
+5. [Installation](#Installation)
+6. [Usage](#Usage)
 
 ## Nbackup
 [Nbackup](./Nbackup/README.md) is a tool that leverages `robocopy` to backup a list of files and folders from a source to a destination. It is designed to be reliable and efficient, ensuring that your data is safe.

@@ -3,7 +3,7 @@
 @echo off
 @rem Since nbuild.exe is in use, prebuild.bat is used to deploy ntools locally
 "C:\Program Files\BuildTools\7-Zip\7z.exe" x C:\Artifacts\ntools\Release\%1.zip -o"C:\Program Files\Nbuild" -y
-
+@rem goto end
 set SRC=release\netstandard2.0
 set DST=%programfiles%\nbuild\netstandard2.0
 set FILES=NbuildTasks.dll launcher.dll
@@ -13,7 +13,8 @@ for %%F in (%FILES%) do (
 
 set SRC=c:\source\ntools\nbuild\resources
 set DST=%programfiles%\nbuild
-set FILES=common.targets node.targets mongodb.targets ngit.targets
+set FILES=common.targets node.targets mongodb.targets ngit.targets apps-versions.targets
 for %%F in (%FILES%) do (
     xcopy "%SRC%\%%F" "%DST%\" /d /y
 )
+:end

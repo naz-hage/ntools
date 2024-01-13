@@ -28,7 +28,10 @@
 	<UsingTask TaskName="NbuildTasks.ColorMessage" AssemblyFile="$(BuildTools)\NbuildTasks.dll"/>
 	<UsingTask TaskName="NbuildTasks.RedError" AssemblyFile="$(BuildTools)\NbuildTasks.dll" />
 	<UsingTask TaskName="NbuildTasks.Git" AssemblyFile="$(BuildTools)\NbuildTasks.dll" />
+	<UsingTask TaskName="NbuildTasks.WebDownload" AssemblyFile="$(BuildTools)\NbuildTasks.dll" />
+	<UsingTask TaskName="NbuildTasks.FileVersion" AssemblyFile="$(BuildTools)\NbuildTasks.dll" />
 
+	<Import Project="$(BuildTools)\apps-versions.targets"/>
 	<Import Project="$(BuildTools)\node.targets"/>
 	<Import Project="$(BuildTools)\dotnet.targets"/>
 	<Import Project="$(BuildTools)\mongodb.targets"/>
@@ -90,6 +93,18 @@
 		<Message Text="==> COMMON_DONE"/>
 	</Target>
 
+	<!-- Install dependencies -->
+	<Target Name="INSTALL_DEP" >
+		<Exec Command="dotnet restore"/>
+		<Message Text="==> COMMON_DONE"/>
+	</Target>
+
+	<!-- Opt out of the DOTNET_CLI_TELEMETRY_OPTOUT - move to common -->
+	<Target Name="TELEMETRY_OPT_OUT" AfterTargets="AUTOTAG_PRODUCTION">
+		<Exec Command='setx DOTNET_CLI_TELEMETRY_OPTOUT 1'/>
+		<Message Text="==> DONE"/>
+	</Target>
+
 	<!-- Create a staging package for testing -->
 	<Target Name="STAGING" DependsOnTargets="
                 CLEAN;
@@ -129,9 +144,9 @@
 	</Target>
 
 	<!-- Build the solution Release configuration  using dotnet build-->
-	<Target Name="SOLUTION" DependsOnTargets="TAG">
+	<Target Name="SOLUTION" DependsOnTargets="TAG;INSTALL_DEP">
 		<Message Text="Git tag: $(ProductVersion)"/>
-		<Exec Command='dotnet build $(SolutionDir)\$(SolutionName).sln --configuration $(TargetRelease) /p:FileVersion=$(ProductVersion) /p:AssemblyVersion=$(ProductVersion) /p:UICulture="en-US" /p:Culture="en-US"' ></Exec>
+		<Exec Command='dotnet build --no-restore $(SolutionDir)\$(SolutionName).sln --configuration $(TargetRelease) /p:FileVersion=$(ProductVersion) /p:AssemblyVersion=$(ProductVersion) /p:UICulture="en-US" /p:Culture="en-US"' />
 		<Message Text="==> COMMON_DONE"/>
 	</Target>
 
@@ -221,17 +236,17 @@
 		<Message Text="==> COMMON_DONE"/>
 	</Target>
 
-	<!-- Run all tests using dotnet test in debug mode -->
+	<!-- Run all tests using dotnet test in Release mode -->
 	<Target Name="TEST" DependsOnTargets="ARTIFACTS;TAG">
 		<RemoveDir Directories="$(ArtifactsTestResultsFolder)"></RemoveDir>
 		<!--To colllect code coverage, add the following option to the test command: collect:"XPlat Code Coverage"-->
-		<Exec Command='"c:\program files\dotnet\dotnet.exe" test --configuration $(TargetDebug) --logger "console;verbosity=normal;DOTNET_CLI_TELEMETRY_OPTOUT=1" %(DotNetTestFiles.Identity) --logger trx --results-directory:$(ArtifactsTestResultsFolder) --verbosity normal'/>
+		<Exec Command='dotnet test --configuration $(TargetRelease) --logger "console;verbosity=normal" %(DotNetTestFiles.Identity) --logger trx --results-directory:$(ArtifactsTestResultsFolder) --verbosity normal'/>
 		<Message Text="==> COMMON_DONE"/>
 	</Target>
 
-	<!-- Run all tests using dotnet test in release mode -->
-	<Target Name="TEST_RELEASE" DependsOnTargets="ARTIFACTS;TAG">
-		<Exec Command='"c:\program files\dotnet\dotnet.exe" test --configuration $(TargetRelease) --logger "console;verbosity=normal;DOTNET_CLI_TELEMETRY_OPTOUT=1" %(DotNetTestFiles.Identity) --collect:"XPlat Code Coverage" --logger trx --results-directory:$(ArtifactsTestResultsFolder) --verbosity normal'/>
+	<!-- Run all tests using dotnet test in Debug mode -->
+	<Target Name="TEST_DEBUG" DependsOnTargets="ARTIFACTS;TAG">
+		<Exec Command='dotnet.exe test --configuration $(TargetDebug) --logger "console;verbosity=normal" %(DotNetTestFiles.Identity) --collect:"XPlat Code Coverage" --logger trx --results-directory:$(ArtifactsTestResultsFolder) --verbosity normal'/>
 		<Message Text="==> COMMON_DONE"/>
 	</Target>
 

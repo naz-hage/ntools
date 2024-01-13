@@ -4,14 +4,12 @@
 	
 	<Import Project="$(ProgramFiles)\Nbuild\common.targets"/>
 
-	
 	<PropertyGroup>
         <!-- This is the folder where the *.sln resides-->
 		<SolutionName>$([System.IO.Path]::GetFileNameWithoutExtension('$(MSBuildProjectDirectory)'))</SolutionName>
         <!-- This is the location when the app deployed or installed -->
         <DeploymentFolder>$(ProgramFiles)\Nbuild</DeploymentFolder>
 	</PropertyGroup>
-	
 	
     <Target Name="ARTIFACTS" DependsOnTargets="TAG">
       <PropertyGroup>
@@ -41,7 +39,6 @@
                                     Exclude="
 						            $(SolutionDir)\$(TargetRelease)\**\*.pdb"
 						            />
-		  
         </ItemGroup>
 		
         <Message Text="==> DONE"/>
@@ -204,4 +201,38 @@
                 DEPLOY">
 	</Target>
 
+	<!-- Test for FileVersion task and powershell GetFileVersion.ps1-->
+	<Target Name="FILE_VERSION"  DependsOnTargets="ARTIFACTS">
+		<PropertyGroup>
+			<FileName>$(SolutionDir)\$(TargetRelease)\nb.exe</FileName>
+		</PropertyGroup>
+		<Exec Command='powershell -File "$(BuildTools)\GetFileVersion.ps1" "$(FileName)"' ConsoleToMSBuild="true">
+			<Output TaskParameter="ConsoleOutput" PropertyName="Version" />
+		</Exec>
+		<Message Text="Powershell File version: $(Version)" />
+
+		<FileVersion Name="%(BinaryFiles.Identity)" Condition="'%(Extension)'=='.exe' Or '%(Extension)'=='.dll'" >
+			<Output TaskParameter="Output" PropertyName="Version"/>
+		</FileVersion>
+		<Message Text="File version: $(Version)" />
+		
+		<Message Text="==> DONE"/>
+	</Target>
+	
+	<!-- Test File Download-->
+	<Target Name="FILE_DOWNLOAD" DependsOnTargets="APP_COMMON">
+		<PropertyGroup>
+			<WebUri>https://aka.ms/vs/17/release/vs_BuildTools.exe</WebUri>
+			<FileName>$(DownloadsDirectory)\vs_BuildTools.exe</FileName>
+		</PropertyGroup>
+		<RedError Condition="'$(IsAdmin)' == false" Message="Must be an admin to install $(NodeAppName)" />
+
+		<Delete Files="$(FileName)" Condition="Exists('$(FileName)') == true" />
+
+		<WebDownload WebUri="$(WebUri)" FileName="$(FileName)" />
+
+		<Exec Command='$(FileName) --add Microsoft.VisualStudio.Workload.MSBuildTools --quiet'></Exec>
+		<Message Text="==> DONE"/>
+	</Target>
+	
 </Project>
