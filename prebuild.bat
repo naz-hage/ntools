@@ -13,7 +13,7 @@ for %%F in (%FILES%) do (
 
 set SRC=c:\source\ntools\nbuild\resources
 set DST=%programfiles%\nbuild
-set FILES=common.targets node.targets mongodb.targets ngit.targets apps-versions.targets
+set FILES=common.targets node.targets mongodb.targets ngit.targets apps-versions.targets git.targets dotnet.targets code.targets
 for %%F in (%FILES%) do (
     xcopy "%SRC%\%%F" "%DST%\" /d /y
 )

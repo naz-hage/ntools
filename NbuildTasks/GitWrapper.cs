@@ -479,18 +479,14 @@ namespace NbuildTasks
         private bool DeleteLocalTag(string tag)
         {
             if (!LocalTagExists(tag)) return true;
-            
+
             Parameters.Arguments = $"tag -d {tag}";
             var result = Launcher.Launcher.Start(Parameters);
-            if (result.Code == 0 && result.Output.Count >= 1)
+            if (result.Code == 0 
+                    && result.Output.Count >= 1 
+                    && result.Output.Exists(line => line.StartsWith($"Deleted tag '{tag}'")))
             {
-                foreach (var line in result.Output)
-                {
-                    if (line.StartsWith($"Deleted tag '{tag}'"))
-                    {
-                        return true;
-                    }
-                }
+                return true;
             }
 
             return false;
@@ -531,7 +527,12 @@ namespace NbuildTasks
             {
                 return ResultHelper.Fail(ResultHelper.InvalidParameter, $"Invalid url: {url}");
             }
-
+            // check if dev drive exists
+            if (!Directory.Exists(DevDrive))
+            {
+                return ResultHelper.Fail(ResultHelper.InvalidParameter, $"Invalid DevDrive: {DevDrive}");
+            }
+            
             var result = ResultHelper.New();
             // change to project directory
             var DevDir = $"{DevDrive}\\{MainDir}";
@@ -548,7 +549,7 @@ namespace NbuildTasks
                 Parameters.WorkingDir = DevDir;
                 Parameters.Arguments = $"clone {url} ";
                 result = Launcher.Launcher.Start(Parameters);
-                if ((result.Code == 0) && (result.Output.Count >= 0))
+                if ((result.Code == 0) && (result.Output.Count > 0))
                 {
                     if (CheckForErrorAndDisplayOutput(result.Output))
                     {

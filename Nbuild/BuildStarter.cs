@@ -78,10 +78,12 @@ public class BuildStarter
         List<string> TargetFiles =
         [
             "common.targets",
+            "git.targets",
+            "dotnet.targets",
+            "code.targets",
             "node.targets",
             "nuget.targets",
             "ngit.targets",
-            "dotnet.targets",
             "mongodb.targets",
         ];
 

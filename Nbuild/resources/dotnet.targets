@@ -1,17 +1,67 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
 	<!--This targets file can be used only if it imported by common.targets-->
-    
-	<!-- Display Dotnet version specified in TargetNodeVersion property and install-->
-    <Target Name="DOTNET_INSTALL" DependsOnTargets="IS_ADMIN">
+   <Target Name="DOTNET_SDK_DOWNLOAD" >
+
+
+   <PropertyGroup>
+      <WebUri>https://download.visualstudio.microsoft.com/download/pr/cb56b18a-e2a6-4f24-be1d-fc4f023c9cc8/be3822e20b990cf180bb94ea8fbc42fe/dotnet-sdk-$(DotnetSdkTargetVersion)-win-x64.exe</WebUri>
+        <FileName>$(DownloadsDirectory)\dotnet-sdk-$(DotnetSdkTargetVersion)-win-x64.exe</FileName>
+    </PropertyGroup>
+    <Delete Files="$(FileName)" Condition="Exists('$(FileName)') == true" />
+    <WebDownload WebUri="$(WebUri)" FileName="$(FileName)" />
+    <Message Text="==> DOTNET_SDK_DONE"/>
+   </Target>
+
+    <Target Name="DOTNET_SDK_INSTALL" DependsOnTargets="DOTNET_SDK_DOWNLOAD" >
         <PropertyGroup>
-            <TargetNodeVersion>21.5.0</TargetNodeVersion>
-            <DotnetExe></DotnetExe>
-            <FilePath></FilePath>
-            <!-- visit https://nodejs.org/dist/ to get the latest stable version -->
-           
+            <DotNetExe>$(ProgramFiles)\dotnet\dotnet.exe</DotNetExe>
         </PropertyGroup>
-        <Message Text="==> NODE_DONE"/>
+        <Exec Command='"$(FileName)" /quiet /norestart' />
+        
+        <Exec Command='"$(DotNetExe)" --version' Condition="Exists('$(DotNetExe)')" ContinueOnError="true"/>
+        <RedError Condition="'$(IsAdmin)' == false" Message="Must be an admin to install dotnet" />
+        <FileVersion Name="$(DotNetExe)" Condition="Exists('$(DotNetExe)')" >
+            <Output TaskParameter="Output" PropertyName="DotNetVersion" />
+        </FileVersion>
+        <Message Text="dotnet is not installed" Condition="'$(DotNetVersion)' == ''" />
+        <!-- Display the file version -->
+        <Message Text="dotnet Version is $(DotNetVersion)" Condition="'$(DotNetVersion)' != ''" />
+        <Message Text="Installing dotnet" Condition="!Exists('$(DotNetExe)') or '$(DotNetVersion)' == '' or '$(DotNetVersion)' &lt; '$(DotNetTargetVersion)'"/>
+        <Exec Command='"$(FileName)" /SILENT /NORESTART /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS /SP- /LOG' Condition="'$(DotNetVersion)' == '' Or '$(DotNetVersion)' &lt; '$(DotNetTargetVersion)'" />
+        <Delete Files="$(FileName)" Condition="Exists('$(FileName)') == true" />
+        <Exec Command='"$(DotNetExe)" --version'  Condition="Exists('$(DotNetExe)')" />
+        <FileVersion Name="$(DotNetExe)" Condition="Exists('$(DotNetExe)')" >
+            <Output TaskParameter="Output" PropertyName="DotNetVersion" />
+        </FileVersion>
+        <Message Text="dotnet installed version: $(DotNetVersion)" />
+        <Message Text="==> DOTNET_SDK_DONE"/>
+
     </Target>
 
+    <Target Name="DOTNET_DOWNLOAD">
+        <PropertyGroup>
+            <WebUri>https://download.visualstudio.microsoft.com/download/pr/f18288f6-1732-415b-b577-7fb46510479a/a98239f751a7aed31bc4aa12f348a9bf/windowsdesktop-runtime-$(DotNetTargetVersion)-win-x64.exe</WebUri>
+            <FileName>$(DownloadsDirectory)\windowsdesktop-runtime-$(DotNetTargetVersion)-win-x64.exe</FileName>
+        </PropertyGroup>
+        <Delete Files="$(FileName)" Condition="Exists('$(FileName)') == true" />
+        <WebDownload WebUri="$(WebUri)" FileName="$(FileName)" />
+        <Message Text="==> DOTNET_DONE"/>
+    </Target>
+
+    <Target Name="DOTNET_INSTALL" DependsOnTargets="DOTNET_DOWNLOAD" >
+        <PropertyGroup>
+            <DotNetExe>$(ProgramFiles)\dotnet\dotnet.exe</DotNetExe>
+        </PropertyGroup>
+
+        <Exec Command='"$(FileName)" /quiet /norestart' />
+        
+        <Exec Command='"$(DotNetExe)" --version'  Condition="Exists('$(DotNetExe)')" />
+        <FileVersion Name="$(DotNetExe)" Condition="Exists('$(DotNetExe)')" >
+            <Output TaskParameter="Output" PropertyName="DotNetVersion" />
+        </FileVersion>
+        <Message Text="dotnet installed version: $(DotNetVersion)" />
+        <Message Text="==> DOTNET_DONE"/>   
+    </Target>
 </Project>
+

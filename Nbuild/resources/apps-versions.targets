@@ -2,12 +2,27 @@
     xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
 	<PropertyGroup>
+		<DownloadsDirectory>c:\NToolsDownloads</DownloadsDirectory>
+		
 		<NodeAppName>Node</NodeAppName>
 		<NodeTargetVersion>21.5.0</NodeTargetVersion>
 
+		<GitAppName>Git</GitAppName>
+		<GitPatch>1</GitPatch>
+		<!-- visit https://git-scm.com/download/win to get the latest stable version 
+			Git version contains .windows in the end, e.g. 2.33.0.windows.$(GitPatch)
+			Strip .windows from GitVersion for comparision 
+		-->
+		<GitTargetVersion>2.43.0</GitTargetVersion>
 
-		<DownloadsDirectory>c:\NToolsDownloads</DownloadsDirectory>
+		<DotNetAppName>dotnet</DotNetAppName>
+		<DotNetTargetVersion>8.0.1</DotNetTargetVersion>
 
+		<DotnetSdkAppName>dotnet-sdk</DotnetSdkAppName>
+		<DotnetSdkTargetVersion>8.0.101</DotnetSdkTargetVersion>
+
+ 		<CodeAppName>Code</CodeAppName>
+		<CodeTargetVersion>1.85.1</CodeTargetVersion> 
 	</PropertyGroup>
 
 	<Target Name="APP_COMMON" DependsOnTargets="IS_ADMIN" >

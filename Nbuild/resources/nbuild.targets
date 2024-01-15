@@ -4,9 +4,7 @@
 
 	<!-- This file is a sample nbuild.targets to be used in other projects -->
 	<Import Project="$(ProgramFiles)\nbuild\common.targets" />
-    <Import Project="$(ProgramFiles)\nbuild\node.targets"/>
-    <Import Project="$(ProgramFiles)\nbuild\nuget.targets"/>
-	
+
 	<PropertyGroup>
         <!-- The name of the solution  must be filled.  it's normally the folder where the *.sln resides-->
 		<SolutionName>$([System.IO.Path]::GetFileNameWithoutExtension('$(MSBuildProjectDirectory)'))</SolutionName>

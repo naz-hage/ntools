@@ -67,19 +67,6 @@
 		<Message Text="==> DONE"/>	
 	</Target>
 
-	<Target Name="PACKAGE" DependsOnTargets="ARTIFACTS;TAG">
-		<Message Text="Staging tag: $(ProductVersion)"/>
-		<Message Text="Artifacts folder: $(ArtifactsFolder)"/>
-		<Message Text="Removing  file $(ArtifactsFolder).zip"> </Message>
-		<Delete Files="$(ArtifactsFolder).zip"/>
-
-		
-		
-		<Exec Command='"$(ZipExe)" a -r -tzip $(ArtifactsFolder).zip $(ArtifactsFolder)\*'/>
-		
-		<Message Text="==> DONE"/>
-	</Target>
-
 	<Target Name="CLEAN_ARTIFACTS" AfterTargets="PACKAGE">
 		<Message Text="Removing $(ArtifactsFolder)"> </Message>
 		<RemoveDir Directories="$(ArtifactsFolder);"/>
@@ -125,7 +112,7 @@
 		<Message Text="==> DONE"/>
 	</Target>
 
-	<Target Name="TEST_GIT">
+	<Target Name="TEST_GIT" >
 		<Git Command="GetBranch">
 			<Output TaskParameter="Output" PropertyName="GitBranch"/>
 		</Git>
@@ -140,26 +127,13 @@
 
 		<RedError Condition="'$(ProductVersion)' == ''" Message="GetTag Failed: Product Version property is not defined." />
 
-		<!--<Git Command="DeleteTag" TaskParameter="$(ProductVersion)">
-			<Output TaskParameter="Output" PropertyName="Result"/>
-		</Git>
-		<Message Text="Task - Git Delete Tag Result:'$(Result)'"/>
-
-		<RedError Condition="'$(Result)' != 'True'" Message="DeteteTag Failed: Product Version property is not defined." />-->
-		
+	
 		<Git Command="AutoTag" TaskParameter="Staging">
 			<Output TaskParameter="Output" PropertyName="ProductVersion"/>
 		</Git>
 		<Message Text="Task - Git Next Tag:'$(ProductVersion)'"/>
 
 		<RedError Condition="'$(ProductVersion)' == ''" Message="AutoTag Staging Failed: Product Version property is not defined." />
-
-		<!--<Git Command="AutoTag" TaskParameter="Production">
-			<Output TaskParameter="Output" PropertyName="ProductVersion"/>
-		</Git>
-		<Message Text="Task - Git Next Tag:'$(ProductVersion)'"/>
-
-		<RedError Condition="'$(ProductVersion)' == ''" Message="AutoTag Production Failed: Product Version property is not defined." />-->
 
 		<Git Command="SetTag" TaskParameter="$(ProductVersion)">
 			<Output TaskParameter="Output" PropertyName="ProductVersion"/>
@@ -186,19 +160,17 @@
 		<Message Text="==> DONE"/>
 	</Target>
 
-	<Target Name="STAGING_LOCAL" DependsOnTargets="
-				CLEAN;
-                AUTOTAG_STAGING;
+	<Target Name="LOCAL" DependsOnTargets="
                 SOLUTION;
-                TEST;
                 SAVE_ARTIFACTS;
-                PACKAGE;
-				DEPLOY">
+                PACKAGE"
+				>
 	</Target>
 
 	<Target Name="DEPLOY_LOCAL" DependsOnTargets="
                 STAGING_LOCAL;
                 DEPLOY">
+		<Exec Command='dir "$(DeploymentFolder)"'></Exec>
 	</Target>
 
 	<!-- Test for FileVersion task and powershell GetFileVersion.ps1-->

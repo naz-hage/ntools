@@ -32,8 +32,10 @@
 	<UsingTask TaskName="NbuildTasks.FileVersion" AssemblyFile="$(BuildTools)\NbuildTasks.dll" />
 
 	<Import Project="$(BuildTools)\apps-versions.targets"/>
-	<Import Project="$(BuildTools)\node.targets"/>
+	<Import Project="$(BuildTools)\git.targets"/>
 	<Import Project="$(BuildTools)\dotnet.targets"/>
+	<Import Project="$(BuildTools)\code.targets"/>
+	<Import Project="$(BuildTools)\node.targets"/>
 	<Import Project="$(BuildTools)\mongodb.targets"/>
 	<Import Project="$(BuildTools)\nuget.targets"/>
 	<Import Project="$(BuildTools)\ngit.targets"/>
@@ -51,6 +53,7 @@
 			<OutputPathDebug>$(SolutionDir)\$(TargetDebug)</OutputPathDebug>
 			<ArtifactsDir>$(DevDrive)\Artifacts</ArtifactsDir>
 			<TestFilesFolder>$(DevDrive)\Test</TestFilesFolder>
+			
 		</PropertyGroup>
 
 		<RedError Condition="'$(ProductVersion)' == ''" Message="Error: Version property is not defined. Type Ngit.exe -c settag -tag 0.0.1" />
@@ -61,9 +64,9 @@
 		<Message Text="Solution Name: $(SolutionName)"/>
 		<Message Text="Solution Dir: $(SolutionDir)"/>
 		<Message Text="Product Version: $(ProductVersion)"/>
-		<Exec Command="git remote -v"></Exec>
-		<Exec Command="git branch"></Exec>
-		<Exec Command="git describe" ConsoleToMSBuild="true"></Exec>
+		<Exec Command="git remote -v" ContinueOnError="True"></Exec>
+		<Exec Command="git branch" ContinueOnError="True"></Exec>
+		<Exec Command="git describe" ConsoleToMSBuild="true" ContinueOnError="True" ></Exec>
 		<Message Text="MSBuild = $(MSBuildToolsPath) Version = VS$(VisualStudioVersion)"/>
 
 		<Message Text="==> COMMON_DONE"/>
@@ -159,7 +162,7 @@
 
 	<!-- Create a packahe for the solution default is a zip file of all artifacts -->
 	<Target Name="PACKAGE" DependsOnTargets="ARTIFACTS;TAG">
-		<Exec Command='"$(ZipExe)" a -r -tzip $(ArtifactsFolder).zip $(ArtifactsFolder)\*'/>
+		<Exec Command='powershell -Command "Compress-Archive -Path $(ArtifactsFolder)\* -DestinationPath $(ArtifactsFolder).zip" -Force'/>
 		<RemoveDir Directories="$(ArtifactsFolder);
 							"/> 
 		<Message Text="==> COMMON_DONE"/>
@@ -229,7 +232,7 @@
 			<SetupDir>$(TEMP)\home</SetupDir>
 		</PropertyGroup>
 		
-		<Exec Command='"$(ZipExe)" x $(ArtifactsFolder).zip -o"$(DeploymentFolder)" -y'/>
+		<Exec Command='powershell -Command "Expand-Archive -Path $(ArtifactsFolder).zip -DestinationPath $(DeploymentFolder) -Force"'/>
 
 		<RemoveDir Directories="$(SetupDir)"></RemoveDir>
 		<Message Text="Deployed Success to $(DeploymentFolder)"/>
