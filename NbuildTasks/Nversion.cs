@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace NbuildTasks
 {
-    public class Nversion
+    public static class Nversion
     {
         public const string ExecutingAssembly = "executing";
 

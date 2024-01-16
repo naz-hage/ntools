@@ -6,10 +6,7 @@ function GetFileVersion {
     )   
 
     $versionInfo = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($FilePath)
-    $versionInfo.FileVersion
-
-    # Return the version info object
-    #return $versionInfo.FileVersion
+    return $versionInfo.FileVersion
 }
 
 function Main {
@@ -17,11 +14,11 @@ function Main {
         [string]$FilePath
     )
 
-    # Call Get-FileVersions function with the specified path
-    
-    GetFileVersion -FilePath $FilePath
+    # Call GetFileVersion function with the specified path
+    return GetFileVersion -FilePath $FilePath
 }
-
+    
+# Call Main function with the first argument
 Main -FilePath $args[0]
 
 

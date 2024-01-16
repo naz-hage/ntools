@@ -13,8 +13,10 @@
 	
     <Target Name="ARTIFACTS" DependsOnTargets="TAG">
       <PropertyGroup>
-        <ArtifactsFolder>$(ArtifactsDir)\$(SolutionName)\$(TargetRelease)\$(ProductVersion)</ArtifactsFolder>
-		<ArtifactsTestResultsFolder>$(ArtifactsDir)\$(SolutionName)\TestResults\$(ProductVersion)</ArtifactsTestResultsFolder>
+		 <ArtifactsSolutionFolder>$(ArtifactsDir)\$(SolutionName)</ArtifactsSolutionFolder>
+		 <SetupFolder>$(ArtifactsSolutionFolder)\release</SetupFolder>
+        <ArtifactsFolder>$(ArtifactsSolutionFolder)\$(TargetRelease)\$(ProductVersion)</ArtifactsFolder>
+		<ArtifactsTestResultsFolder>$(ArtifactsSolutionFolder)\TestResults\$(ProductVersion)</ArtifactsTestResultsFolder>
       </PropertyGroup>  
       <ItemGroup>
             <BinaryFiles 
@@ -44,29 +46,7 @@
         <Message Text="==> DONE"/>
     </Target>
 
-	<Target Name="NUGET_PACK" DependsOnTargets="TAG">
-		<PropertyGroup>
-			<NugetPackagePath>$(ArtifactsDir)\$(SolutionName)\Nuget\$(ProductVersion)</NugetPackagePath>
-			<LocalNugetFeed>$(ArtifactsDir)\nupkgs</LocalNugetFeed>
-		</PropertyGroup>
-		<Exec Command='"$(NugetExe)" pack $(SolutionDir)\launcher\ntools-launcher.nuspec -Version $(ProductVersion) -OutputDirectory $(NugetPackagePath)'/>
-		<Exec Command='rd $(LocalNugetFeed)\ntools-launcher\$(ProductVersion) /s /q'/>
-		<Exec Command='"$(NugetExe)" add $(NugetPackagePath)\$(SolutionName)-launcher.$(ProductVersion).nupkg -Source "$(LocalNugetFeed)"'/>
-		<Message Text="==> DONE"/>
-		</Target>
 	
-	<Target Name="NUGET_PUBLISH">
-		<PropertyGroup>
-			<NugetApiKey>$(USERPROFILE)\NugetApiKey.txt</NugetApiKey>
-		</PropertyGroup>
-		<ReadLinesFromFile File="$(ApiKeyFile)">
-		<Output TaskParameter="Lines" PropertyName="NugetApiKey" />
-		</ReadLinesFromFile>
-		<MSBuild Projects="$(SolutionDir)\launcher\launcher.csproj" Properties="Configuration=$(TargetRelease);Platform=Any CPU;Version=$(ProductVersion);AssemblyVersion=$(ProductVersion)"/>
-		<Exec Command='$(NugetExe) push $(NugetPackagePath)\$(SolutionName)-launcher.$(ProductVersion).nupkg -Source https://api.nuget.org/v3/index.json -ApiKey $(NugetApiKey)'/>
-		<Message Text="==> DONE"/>	
-	</Target>
-
 	<Target Name="CLEAN_ARTIFACTS" AfterTargets="PACKAGE">
 		<Message Text="Removing $(ArtifactsFolder)"> </Message>
 		<RemoveDir Directories="$(ArtifactsFolder);"/>
@@ -174,7 +154,7 @@
 	</Target>
 
 	<!-- Test for FileVersion task and powershell GetFileVersion.ps1-->
-	<Target Name="FILE_VERSION"  DependsOnTargets="ARTIFACTS">
+	<Target Name="FILE_VERSIONS"  DependsOnTargets="ARTIFACTS">
 		<PropertyGroup>
 			<FileName>$(SolutionDir)\$(TargetRelease)\nb.exe</FileName>
 		</PropertyGroup>

@@ -30,6 +30,9 @@
 	<UsingTask TaskName="NbuildTasks.Git" AssemblyFile="$(BuildTools)\NbuildTasks.dll" />
 	<UsingTask TaskName="NbuildTasks.WebDownload" AssemblyFile="$(BuildTools)\NbuildTasks.dll" />
 	<UsingTask TaskName="NbuildTasks.FileVersion" AssemblyFile="$(BuildTools)\NbuildTasks.dll" />
+	<UsingTask TaskName="NbuildTasks.UnZip" AssemblyFile="$(BuildTools)\NbuildTasks.dll" />
+	<UsingTask TaskName="NbuildTasks.Zip" AssemblyFile="$(BuildTools)\NbuildTasks.dll" />
+	
 
 	<Import Project="$(BuildTools)\apps-versions.targets"/>
 	<Import Project="$(BuildTools)\git.targets"/>
@@ -45,7 +48,7 @@
 		<PropertyGroup>
 			<NbuildExe>"$(BuildTools)\ng.exe"</NbuildExe>
 			<NugetExe>$(BuildTools)\nuget.exe</NugetExe>
-			<ZipExe>$(ProgramFiles)\BuildTools\7-Zip\7z.exe</ZipExe>
+			<ZipExe>$(ProgramFiles)\7-Zip\7z.exe</ZipExe>
 			<TargetRelease>Release</TargetRelease>
 			<TargetDebug>Debug</TargetDebug>
 			<SolutionDir>$(DevDir)\$(SolutionName)</SolutionDir>
@@ -162,9 +165,11 @@
 
 	<!-- Create a packahe for the solution default is a zip file of all artifacts -->
 	<Target Name="PACKAGE" DependsOnTargets="ARTIFACTS;TAG">
-		<Exec Command='powershell -Command "Compress-Archive -Path $(ArtifactsFolder)\* -DestinationPath $(ArtifactsFolder).zip" -Force'/>
-		<RemoveDir Directories="$(ArtifactsFolder);
-							"/> 
+		<!-- <Exec Command='powershell -Command "Compress-Archive -Path $(ArtifactsFolder)\* -DestinationPath $(ArtifactsFolder).zip" -Force'/> -->
+		<!-- <Zip Path="$(ArtifactsFolder)" FileName="$(ArtifactsFolder).zip"/> -->
+		<Exec Command='"$(ZipExe)" a -r -tzip $(ArtifactsFolder).zip $(ArtifactsFolder)\*'/>
+		
+		<RemoveDir Directories="$(ArtifactsFolder);"/> 
 		<Message Text="==> COMMON_DONE"/>
 	</Target>
 
@@ -232,8 +237,10 @@
 			<SetupDir>$(TEMP)\home</SetupDir>
 		</PropertyGroup>
 		
-		<Exec Command='powershell -Command "Expand-Archive -Path $(ArtifactsFolder).zip -DestinationPath $(DeploymentFolder) -Force"'/>
+		<!-- <Exec Command='powershell -Command &quot;Expand-Archive -Path c:\Artifacts\ntools\Release\1.1.11.zip -DestinationPath "C:\Program Files\Nbuild" -Force&quot;'/> -->
+		<!-- <Unzip FileName="$(ArtifactsFolder).zip" Destination="C:\Program Files\Nbuild" /> -->
 
+		<Exec Command='"$(ZipExe)" x $(ArtifactsFolder).zip -o"$(DeploymentFolder)" -y'/>
 		<RemoveDir Directories="$(SetupDir)"></RemoveDir>
 		<Message Text="Deployed Success to $(DeploymentFolder)"/>
 		<Message Text="==> COMMON_DONE"/>

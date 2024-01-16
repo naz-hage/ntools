@@ -1,8 +1,5 @@
-﻿using Launcher;
-using Microsoft.Build.Framework;
+﻿using Microsoft.Build.Framework;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace NbuildTasks
 {
