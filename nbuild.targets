@@ -187,4 +187,67 @@
 		<Message Text="==> DONE"/>
 	</Target>
 	
+	<!-- Download Nbuild specified in the NbuildTargetVersion -->
+	<Target Name="NBUILD_DOWNLOAD" DependsOnTargets="IS_ADMIN">
+		<PropertyGroup>
+		<WebUri>https://github.com/naz-hage/ntools/releases/download/$(NbuildTargetVersion)/$(NbuildTargetVersion).zip</WebUri>
+		<FileName>$(DownloadsDirectory)\NBuildTools.zip</FileName>
+		</PropertyGroup>
+
+		<RedError Condition="'$(IsAdmin)' == false" Message="Must be an admin to install $(NbuildAppName)" />
+        
+        <Delete Files="$(FileName)" Condition="Exists('$(FileName)') == true" />
+        
+        <WebDownload WebUri="$(WebUri)" FileName="$(FileName)" />
+        
+        <Message Text="==> NBUILD_DONE"/>
+	</Target>
+
+	<!-- Install Nbuild specified in the NbuildTargetVersion -->
+	<Target Name="NBUILD_INSTALL" DependsOnTargets="IS_ADMIN">
+		<PropertyGroup>
+            <FileExe>$(ProgramFiles)\Nbuild\nb.exe</FileExe>
+        </PropertyGroup>
+        <Exec Command='"$(FileExe)" --version' Condition="Exists('$(FileExe)')" />
+        
+        <RedError Condition="'$(IsAdmin)' == false" Message="Must be an admin to install $(CodeAppName)" />
+        
+        <FileVersion Name="$(FileExe)" Condition="Exists('$(FileExe)')" >
+            <Output TaskParameter="Output" PropertyName="Version" />
+        </FileVersion>
+
+        <Message Text="$(CodeAppName) is not installed" Condition="'$(Version)' == ''" />
+        <!-- Display the file version -->
+        <Message Text="$(CodeAppName) Version is $(Version)" Condition="'$(Version)' != ''" />
+
+        <Message Text="Installing $(CodeAppName)" Condition="!Exists('$(FileExe)') or '$(Version)' == '' or '$(Version)' &lt; '$(CodeTargetVersion)'"/>
+        <Exec Command='"$(ZipExe)" x $(FileName) -o"C:\Program Files\Nbuild" ' Condition="'$(Verion)' == '' Or '$(Version)' &lt; '$(CodeTargetVersion)'" />
+
+        <Delete Files="$(FileName)" Condition="Exists('$(FileName)') == true" />
+
+        <Exec Command='"$(FileExe)" --version'  Condition="Exists('$(FileExe)')" />
+
+        <FileVersion Name="$(FileExe)" Condition="Exists('$(FileExe)')" >
+            <Output TaskParameter="Output" PropertyName="Version" />
+        </FileVersion>
+
+        <Message Text="$(CodeAppName) installed version: $(Version)" />
+        <Message Text="==> CODE_DONE"/>
+	</Target>
+
+
+	<!-- Setup Prerequisite Development Environment -->
+	<Target Name="PRE_TOOLS">
+		<Exec Command='powershell -command ".\InstallPrerequisites.ps1"' WorkingDirectory="$(SolutionDir)\Nbuild\resources"/>
+
+	    <Message Text="==> DONE"/>
+	</Target>
+
+	<!-- Setup Development Environment -->
+	<Target Name="DEV_ENV" DependsOnTargets="
+					PRE_TOOLS;
+					">
+
+	    <Message Text="==> DONE"/>
+	</Target>
 </Project>

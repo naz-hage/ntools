@@ -4,8 +4,7 @@
 # to run this script, run the following command in an elevated PS window:
 # .\Install7zip.ps1
 
-# This script will download and install the latest version of the MSBuild tools
-# It will also install the .NET 4.7.2 SDK if it is not already installed. Then is will install the NBuildTools
+# This script will download and install the latest version of the 7zip
 
 function Test-Administratorpriviledges {
     if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))

@@ -1,3 +1,5 @@
+# .\InstallPoershell.ps1
+
 function CheckIfPoweShellInstalled {
     param (
         [Parameter(Mandatory=$true)]

@@ -1,3 +1,4 @@
+# .\InstallNbuild.ps1
 
 function InstallNBuildTools {
     # download the NBuildTools zip file 

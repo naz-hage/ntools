@@ -2,10 +2,9 @@
 # To get PS Execution Policy to allow this script to run, run the following command in an elevated PS window:
 # Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope LocalMachine
 # to run this script, run the following command in an elevated PS window:
-# .\InstallMsbuild.ps1
+# .\InstallPrerequisites.ps1
 
-# This script will download and install the latest version of the MSBuild tools
-# It will also install the .NET 4.7.2 SDK if it is not already installed. Then is will install the NBuildTools
+# This script will download and install the Prerequisites tools for a dev environment
 
 function Test-Administratorpriviledges {
     if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))
@@ -30,7 +29,7 @@ function Main {
     .\Install7zip.ps1 23.01
 
     # Install MSBuildTools version 17    
-    InstallMsBuildTools 17
+    InstallVSBuildTools 17
    
    # Install NBuildTools version 1.1.0
    .\InstallNBuild.ps1 1.1.0

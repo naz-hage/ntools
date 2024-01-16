@@ -4,6 +4,10 @@
 	<PropertyGroup>
 		<DownloadsDirectory>c:\NToolsDownloads</DownloadsDirectory>
 		
+		<!-- Modify when new Nbuild is released -->
+		<NbuildAppName>Nbuild</NbuildAppName>
+		<NbuildTargetVersion>1.1.0</NbuildTargetVersion>
+
 		<NodeAppName>Node</NodeAppName>
 		<NodeTargetVersion>21.5.0</NodeTargetVersion>
 
