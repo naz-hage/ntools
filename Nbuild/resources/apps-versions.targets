@@ -32,6 +32,7 @@
 		<DockerTargetVersion>4.26.1</DockerTargetVersion>
 	</PropertyGroup>
 
+	<!-- Defines the download location for the apps -->
 	<Target Name="APP_COMMON" DependsOnTargets="IS_ADMIN" >
 		<RedError Condition="'$(IsAdmin)' == false" Message="Must be an admin to install $(NodeAppName)" />
 		

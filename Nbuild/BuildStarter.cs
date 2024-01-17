@@ -13,6 +13,8 @@ public class BuildStarter
     private const string CommonBuildFileName = "common.targets";
     private const string NbuildBatchFile = "Nbuild.bat";
     private const string ResourceLocation = "Nbuild.resources.nbuild.bat";
+    private const string TargetsMd = "targets.md";
+
 
     public static ResultHelper Build(string? target, bool verbose)
     {
@@ -175,7 +177,7 @@ public class BuildStarter
             {
                 var targetName = line.Trim().Split(' ')[1].Split('=')[1].Trim('"');
                 //Console.WriteLine($"{targetName, -20}: {commentBuilder.ToString().Trim()}");
-                yield return $"{targetName,-19}: {commentBuilder.ToString().Trim()}";
+                yield return $"{targetName,-19} | {commentBuilder.ToString().Trim()}";
                 commentBuilder.Clear(); // reset the comment
             }
         }
@@ -199,45 +201,54 @@ public class BuildStarter
         }
     }
 
-    public static ResultHelper DisplayTargets()
-    {
-        string[] targetsFiles = Directory.GetFiles(Environment.CurrentDirectory, "*.targets", SearchOption.TopDirectoryOnly);
-        try
-        {
-            foreach (var targetsFile in targetsFiles)
-            {
-                Console.WriteLine($"{targetsFile} Targets:");
-                Console.WriteLine($"----------------------");
-                foreach (var targetName in GetTargetsAndComments(Path.Combine(Environment.CurrentDirectory, targetsFile)))
-                {
-                    Console.WriteLine(targetName);
-                }
-                Console.WriteLine();
+    //public static ResultHelper DisplayTargets(string directoryPath)
+    //{
+    //    // replace $(BuildTools) with environment variable ProgramFiles/Nbuild
+    //    directoryPath = directoryPath.Replace("$(BuildTools)", $"{Environment.GetEnvironmentVariable("ProgramFiles")}\\nbuild");
+    //    string[] targetsFiles = Directory.GetFiles(directoryPath, "*.targets", SearchOption.TopDirectoryOnly);
+    //    try
+    //    {
+    //        foreach (var targetsFile in targetsFiles)
+    //        {
+    //            Console.WriteLine($"{targetsFile} Targets:");
+    //            Console.WriteLine($"----------------------");
+    //            foreach (var targetName in GetTargetsAndComments(Path.Combine(directoryPath, targetsFile)))
+    //            {
+    //                Console.WriteLine(targetName);
+    //            }
+    //            Console.WriteLine();
 
-                Console.WriteLine($"Imported Targets:");
-                Console.WriteLine($"----------------------");
-                foreach (var item in GetImportAttributes(targetsFile, "Project"))
-                {
-                    // replace $(ProgramFiles) with environment variable
-                    var importItem = item.Replace("$(ProgramFiles)", Environment.GetEnvironmentVariable("ProgramFiles"));
-                    Console.WriteLine($"{importItem} Targets:");
-                    Console.WriteLine($"----------------------");
-                    foreach (var targetName in GetTargetsAndComments(importItem))
-                    {
-                        Console.WriteLine(targetName);
-                    }
-                    Console.WriteLine();
+    //            Console.WriteLine($"Imported Targets:");
+    //            Console.WriteLine($"----------------------");
+    //            foreach (var item in GetImportAttributes(targetsFile, "Project"))
+    //            {
+    //                // replace $(ProgramFiles) with environment variable
+    //                var importItem = item.Replace("$(ProgramFiles)", Environment.GetEnvironmentVariable("ProgramFiles"));
+    //                importItem = importItem.Replace("$(BuildTools)", $"{Environment.GetEnvironmentVariable("ProgramFiles")}\\nbuild");
+    //                Console.WriteLine($"{importItem} Targets:");
+    //                Console.WriteLine($"----------------------");
+    //                foreach (var targetName in GetTargetsAndComments(importItem))
+    //                {
+    //                    Console.WriteLine(targetName);
+    //                }
+    //                Console.WriteLine();
 
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            return ResultHelper.Fail(-1, $"Exception occurred: {ex.Message}");
-        }
+    //                // Recursive call for each imported project directory
+    //                if (importItem != null)
+    //                {
+    //                    var importItemDirectory = Path.GetDirectoryName(importItem);
+    //                    if (importItemDirectory != null) DisplayTargets(importItemDirectory);
+    //                }
+    //            }
+    //        }
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return ResultHelper.Fail(-1, $"Exception occurred: {ex.Message}");
+    //    }
 
-        return ResultHelper.Success();
-    }
+    //    return ResultHelper.Success();
+    //}
 
     public static IEnumerable<string> GetImportAttributes(string filePath, string attributeName)
     {
@@ -262,6 +273,69 @@ public class BuildStarter
         }
     }
 
+    public static ResultHelper DisplayTargetsInFile(string filePath)
+    {
+        //replace $(BuildTools) with environment variable ProgramFiles/Nbuild
+        filePath = filePath.Replace("$(BuildTools)", $"{Environment.GetEnvironmentVariable("ProgramFiles")}\\nbuild");
+        try
+        {
+            using (StreamWriter writer = new StreamWriter(TargetsMd, true))
+            {
+                Console.WriteLine($"{filePath} Targets:");
+                writer.WriteLine($"- **{filePath} Targets**\n");
+                Console.WriteLine($"----------------------");
+                writer.WriteLine("| **Target Name** | **Description** |");
+                writer.WriteLine("| --- | --- |");
 
+                foreach (var targetAndDescription in GetTargetsAndComments(filePath))
+                {
+                    Console.WriteLine(targetAndDescription);
+
+                    writer.WriteLine($"| {targetAndDescription} |");
+                }
+                Console.WriteLine();
+                writer.WriteLine("\n");
+
+            }
+            var importItems = GetImportAttributes(filePath, "Project");
+            foreach (var item in importItems)
+            {
+                // replace $(ProgramFiles) with environment variable
+                var importItem = item.Replace("$(ProgramFiles)", Environment.GetEnvironmentVariable("ProgramFiles"));
+                importItem = importItem.Replace("$(BuildTools)", $"{Environment.GetEnvironmentVariable("ProgramFiles")}\\nbuild");
+
+                using (StreamWriter writer = new StreamWriter(TargetsMd, true))
+                {
+                    Console.WriteLine($"Imported Targets:");
+                    //writer.WriteLine($"- Imported Targets: {importItem}\n");
+                    Console.WriteLine($"----------------------");
+                }
+                // Recursive call for each imported target file
+                DisplayTargetsInFile(importItem);
+            }
+            
+        }
+        catch (Exception ex)
+        {
+            return ResultHelper.Fail(-1, $"Exception occurred: {ex.Message}");
+        }
+
+        return ResultHelper.Success();
+    }
+
+    public static ResultHelper DisplayTargets(string directoryPath)
+    {
+        if (File.Exists(TargetsMd))
+        {
+            File.Delete(TargetsMd);
+        }
+
+        string[] targetsFiles = Directory.GetFiles(directoryPath, "*.targets", SearchOption.TopDirectoryOnly);
+        foreach (var targetsFile in targetsFiles)
+        {
+            DisplayTargetsInFile(targetsFile);
+        }
+        return ResultHelper.Success();
+    }
 }
 

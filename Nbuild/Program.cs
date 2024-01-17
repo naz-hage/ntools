@@ -43,7 +43,7 @@ public class Program
             {
                 result = options.Command switch
                 {
-                    var d when d == CmdTargets => BuildStarter.DisplayTargets(),
+                    var d when d == CmdTargets => BuildStarter.DisplayTargets(Environment.CurrentDirectory),
                     _ => ResultHelper.Fail(-1, $"Invalid Command: '{options.Command}'"),
                 };
             }
