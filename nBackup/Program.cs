@@ -5,7 +5,6 @@ using OutputColorizer;
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Reflection;
 
 namespace Nbackup
 {
@@ -32,7 +31,7 @@ namespace Nbackup
                 {
                     File.Delete(options.Extract);
                 }
-                
+
                 if (ResourceHelper.RessourceExistInCallingAssembly(ResourceLocation))
                 {
                     if (!ResourceHelper.ExtractEmbeddedResourceFromCallingAssembly(ResourceLocation, options.Extract))
@@ -57,7 +56,7 @@ namespace Nbackup
 
             watch.Stop();
 
-            Console.WriteLine($"{AssemblyNameExe} Completed in {watch.ElapsedMilliseconds/1000.00} s with {result.Code}");
+            Console.WriteLine($"{AssemblyNameExe} Completed in {watch.ElapsedMilliseconds / 1000.00} s with {result.Code}");
             // display elapsed time in HH:MM:SS.MS format
             Console.WriteLine($"{AssemblyNameExe} Completed in {watch.Elapsed:hh\\:mm\\:ss\\.ff} (hh:mm:ss.ff) with {result.Code}");
             return result.Code;

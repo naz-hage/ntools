@@ -1,9 +1,8 @@
-﻿using System;
-using System.Data;
+﻿using Microsoft.Build.Framework;
+using Microsoft.Build.Utilities;
+using System;
 using System.IO;
 using System.IO.Compression;
-using Microsoft.Build.Framework;
-using Microsoft.Build.Utilities;
 
 namespace NbuildTasks
 {

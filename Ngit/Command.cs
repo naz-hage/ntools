@@ -15,7 +15,7 @@ namespace Ngit
         public const string DeleteTagCommand = "deletetag";
         public const string CloneCommand = "clone";
 
-        private static readonly GitWrapper  GitWrapper= new();
+        private static readonly GitWrapper GitWrapper = new();
 
         public static RetCode Process(Cli options)
         {
@@ -46,7 +46,7 @@ namespace Ngit
         {
             RetCode ReturnCode = RetCode.InvalidParameter;
 
-            if(options.Verbose) Colorizer.WriteLine($"[{ConsoleColor.Green}!{GitWrapper.Tag}]");
+            if (options.Verbose) Colorizer.WriteLine($"[{ConsoleColor.Green}!{GitWrapper.Tag}]");
 
             if (!string.IsNullOrEmpty(GitWrapper.Branch))
             {
@@ -59,19 +59,19 @@ namespace Ngit
         public static RetCode DisplayBranch()
         {
             RetCode ReturnCode = RetCode.InvalidParameter;
-            
+
             if (!string.IsNullOrEmpty(GitWrapper.Branch))
             {
                 ReturnCode = RetCode.Success;
             }
-            
+
             return ReturnCode;
         }
 
         public static string AutoTag(Cli options)
         {
             var nextTag = string.Empty;
-            
+
             if (!string.IsNullOrEmpty(options.BuildType))
             {
                 nextTag = GitWrapper.AutoTag(options.BuildType);
@@ -110,7 +110,7 @@ namespace Ngit
         public static RetCode PushTag(Cli options)
         {
             RetCode ReturnCode;
-            
+
             if (!string.IsNullOrEmpty(options.Tag))
             {
                 var nextTag = GitWrapper.PushTag(options.Tag);
@@ -147,7 +147,7 @@ namespace Ngit
                 return RetCode.InvalidParameter;
             }
 
-            var result = GitWrapper.CloneProject(options.Url);;
+            var result = GitWrapper.CloneProject(options.Url); ;
             if (result.IsSuccess())
             {
                 // reset Parameters.WorkingDir
@@ -166,8 +166,8 @@ namespace Ngit
 
         public static RetCode DeleteTag(Cli options)
         {
-           var retCode = RetCode.InvalidParameter;
-            
+            var retCode = RetCode.InvalidParameter;
+
             if (!string.IsNullOrEmpty(options.Tag))
             {
                 if (!GitWrapper.DeleteTag(options.Tag))
@@ -220,7 +220,7 @@ namespace Ngit
         {
             var project = Path.GetFileName(Directory.GetCurrentDirectory());
             if (!string.IsNullOrEmpty(branch))
-            { 
+            {
                 Colorizer.WriteLine($"[{ConsoleColor.DarkMagenta}!Project [{ConsoleColor.Yellow}!{project}] " +
                                                         $"Branch [{ConsoleColor.Yellow}!{branch}] " +
                                                         $"Tag [{ConsoleColor.Yellow}!{tag}]]");

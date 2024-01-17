@@ -4,10 +4,10 @@ namespace Nbackup
 {
     public class Cli
     {
-        [OptionalArgument("", "i", "input json file which specifies source, destination and backup options.")] 
+        [OptionalArgument("", "i", "input json file which specifies source, destination and backup options.")]
         public string? Input { get; set; }
 
-        [OptionalArgument("", "e", "Extract input json example file to current directory.")] 
+        [OptionalArgument("", "e", "Extract input json example file to current directory.")]
         public string? Extract { get; set; }
 
         [OptionalArgument(false, "v", "Verbose level")]

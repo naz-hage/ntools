@@ -27,7 +27,7 @@ namespace NbuildTasks
             {
                 Log.LogError($"Failed to download {WebUri} to {FileName}: {result.Output[0]}");
             }
-            
+
             return !Log.HasLoggedErrors;
         }
     }

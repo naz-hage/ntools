@@ -1,9 +1,6 @@
-﻿using Nbuild;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NbuildTasks;
 using System.Reflection;
-using System.Xml.Linq;
-using System.Text;
 
 namespace Nbuild.Tests
 {
@@ -127,7 +124,7 @@ namespace Nbuild.Tests
                 { "TAG", true },
                 { "PUSH_TAG", true },
                 { "GIT_BRANCH", true },
-            };  
+            };
             // Arrange
             string targetFileName = ExtractCommonTargetsFile();
             Dictionary<string, bool> commonTargets = new Dictionary<string, bool>
@@ -159,7 +156,7 @@ namespace Nbuild.Tests
             {
                 // Act
                 bool isValid = BuildStarter.ValidTarget(targetFileName, target.Key);
-                
+
                 // Assert
                 Assert.AreEqual(target.Value, isValid);
             }

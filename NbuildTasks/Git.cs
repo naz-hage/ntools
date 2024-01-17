@@ -5,7 +5,7 @@ namespace NbuildTasks
 {
     public class Git : Microsoft.Build.Utilities.Task
     {
-        
+
         private const string GetTagCommand = "GetTag";
         private const string GetBranchCommand = "GetBranch";
         private const string AutoTagCommand = "AutoTag";
@@ -16,7 +16,7 @@ namespace NbuildTasks
         private const string DeleteTagCommand = "DeleteTag";
         private const string PushTagCommand = "PushTag";
 
-        
+
 
         [Required]
         public string Command { get; set; }
@@ -116,7 +116,7 @@ namespace NbuildTasks
             {
                 Log.LogError($"No output from command: {Command}");
             }
-            
+
             return !Log.HasLoggedErrors; // Return true if no errors were logged
         }
 

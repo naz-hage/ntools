@@ -17,21 +17,21 @@ namespace NbuildTasks
             RedirectStandardOutput = true,
         };
 
-        public  string DevDrive { get; set; } = "d:";  // This default was chosen because of GitHub Actions
+        public string DevDrive { get; set; } = "d:";  // This default was chosen because of GitHub Actions
         public string MainDir { get; set; } = "a";  // This default was chosen because of GitHub Actions
 
-        public GitWrapper( string project = null, bool verbose = false)
+        public GitWrapper(string project = null, bool verbose = false)
         {
             Parameters.Verbose = verbose;
 
             // Read Environment variables DevDrive and MainDir and set Properties respectively
-            
+
             var devDrive = Environment.GetEnvironmentVariable("DevDrive");
             if (!string.IsNullOrEmpty(devDrive))
             {
                 DevDrive = devDrive;
             }
-            
+
 
             var mainDir = Environment.GetEnvironmentVariable("MainDir");
             if (!string.IsNullOrEmpty(mainDir))
@@ -42,7 +42,7 @@ namespace NbuildTasks
             //DevDrive = "d:";
             //MainDir = "a";
 
-            if (project == null )
+            if (project == null)
             {
                 Parameters.WorkingDir = Environment.CurrentDirectory;
             }
@@ -89,9 +89,9 @@ namespace NbuildTasks
             return true;
         }
 
-        public string Branch { get { return GetBranch(); } }
+        public string Branch => GetBranch();
 
-        public string Tag { get { return GetTag(); } }
+        public string Tag => GetTag();
 
         public string AutoTag(string buildType)
         {
@@ -413,9 +413,9 @@ namespace NbuildTasks
                 bResult = DeleteLocalTag(tag);
             else
                 bResult = true;
-            
+
             var remoteTags = ListRemoteTags();
-            if (bResult && remoteTags.Any (x => x.Contains(tag))) 
+            if (bResult && remoteTags.Any(x => x.Contains(tag)))
                 bResult = DeleteRemoteTag(tag);
 
             return bResult;
@@ -482,8 +482,8 @@ namespace NbuildTasks
 
             Parameters.Arguments = $"tag -d {tag}";
             var result = Launcher.Launcher.Start(Parameters);
-            if (result.Code == 0 
-                    && result.Output.Count >= 1 
+            if (result.Code == 0
+                    && result.Output.Count >= 1
                     && result.Output.Exists(line => line.StartsWith($"Deleted tag '{tag}'")))
             {
                 return true;
@@ -512,7 +512,7 @@ namespace NbuildTasks
             return false;
         }
 
-        
+
 
         public ResultHelper CloneProject(string url)
         {
@@ -520,7 +520,7 @@ namespace NbuildTasks
             {
                 return ResultHelper.Fail(ResultHelper.InvalidParameter, $"Invalid url: {url}");
             }
-            
+
             // extract project name from url
             var projectName = url.Split('/').Last().Split('.').First();
             if (string.IsNullOrEmpty(projectName))
@@ -532,11 +532,11 @@ namespace NbuildTasks
             {
                 return ResultHelper.Fail(ResultHelper.InvalidParameter, $"Invalid DevDrive: {DevDrive}");
             }
-            
+
             var result = ResultHelper.New();
             // change to project directory
             var DevDir = $"{DevDrive}\\{MainDir}";
-        
+
             var solutionDir = $@"{DevDir}\{projectName}";
             var dirExists = Directory.Exists(solutionDir);
             if (!dirExists)
@@ -603,7 +603,7 @@ namespace NbuildTasks
         public List<string> ListBranches()
         {
             var branches = new List<string>();
-            
+
             Parameters.Arguments = $"branch --list";
             var result = Launcher.Launcher.Start(Parameters);
             if (result.Code == 0 && result.Output.Count >= 1)

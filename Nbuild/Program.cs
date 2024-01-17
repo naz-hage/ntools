@@ -18,7 +18,7 @@ public class Program
         var buildResult = ResultHelper.New();
         string? target = null;
         Cli options;
-        
+
         if (args.Length == 0)
         {
             options = new Cli() { Verbose = true };
@@ -77,13 +77,13 @@ public class Program
                 Colorizer.WriteLine($"[{ConsoleColor.Red}!X Build failed!]");
             }
         }
-        
+
         DisplayGitInfo();
 
         return (int)buildResult.Code;
     }
 
-    
+
 
     private static void DisplayGitInfo()
     {

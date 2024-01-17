@@ -1,9 +1,6 @@
 ﻿using Microsoft.Build.Framework;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Text;
 
 namespace NbuildTasks
 {
@@ -17,7 +14,7 @@ namespace NbuildTasks
 
         public override bool Execute()
         {
-            if (!Path.IsPathRooted(Name)) 
+            if (!Path.IsPathRooted(Name))
             {
                 Log.LogError($"Task - Path is not rooted: {Name}");
             }

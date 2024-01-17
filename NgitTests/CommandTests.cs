@@ -4,21 +4,22 @@ using Ngit;
 namespace NgitTests
 {
     [TestClass()]
-    public class CommandTests 
+    public class CommandTests
     {
-        private static Cli Options { get; set; } = new Cli() { 
+        private static Cli Options { get; set; } = new Cli()
+        {
             Url = "https://nazhage.visualstudio.com",
             Verbose = false
         };
 
         private static GitWrapper Git { get; set; } = new GitWrapper();
-        
+
         [TestMethod]
         public void DisplayTagTest()
         {
             // Arrange
             Options.GitCommand = Command.GetTagCommand;
-            
+
             // Act
             var actual = Command.DisplayTag(Options);
 

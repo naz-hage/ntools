@@ -74,7 +74,7 @@ public class BuildStarter
         if (ValidTarget(nbuildPath, target)) return true;
 
         // check if target is valid in the target files in $(ProgramFiles)\nbuild
-        
+
         List<string> TargetFiles =
         [
             "common.targets",
@@ -175,7 +175,7 @@ public class BuildStarter
             {
                 var targetName = line.Trim().Split(' ')[1].Split('=')[1].Trim('"');
                 //Console.WriteLine($"{targetName, -20}: {commentBuilder.ToString().Trim()}");
-                yield return $"{targetName, -19}: {commentBuilder.ToString().Trim()}";
+                yield return $"{targetName,-19}: {commentBuilder.ToString().Trim()}";
                 commentBuilder.Clear(); // reset the comment
             }
         }
@@ -262,6 +262,6 @@ public class BuildStarter
         }
     }
 
-    
+
 }
 

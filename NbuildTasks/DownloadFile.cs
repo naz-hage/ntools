@@ -8,7 +8,7 @@ namespace NbuildTasks
 {
     public static class DownloadFile
     {
-        public static  async Task<ResultHelper> DownloadFileAsync(this HttpClient client, Uri uri, string fileName)
+        public static async Task<ResultHelper> DownloadFileAsync(this HttpClient client, Uri uri, string fileName)
         {
             var result = ResultHelper.New();
             try
@@ -21,7 +21,7 @@ namespace NbuildTasks
 
                 // Check if fileName contains invalid characters
                 var invalidChars = Path.GetInvalidFileNameChars();
-        
+
                 if (Path.GetFileName(fileName).IndexOfAny(invalidChars) >= 0) throw new ArgumentException("Invalid file name. Contains invalid characters.", nameof(fileName));
 
                 var response = await client.GetAsync(uri);

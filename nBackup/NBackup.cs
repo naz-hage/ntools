@@ -10,7 +10,7 @@ namespace Nbackup
 {
     public class NBackup
     {
-        private static readonly Dictionary<string, string?> _environmentVariables = new (){
+        private static readonly Dictionary<string, string?> _environmentVariables = new(){
                 { "USERPROFILE", Environment.GetEnvironmentVariable("USERPROFILE") },
                 { "USERNAME", Environment.GetEnvironmentVariable("USERNAME") },
                 { "APPDATA", Environment.GetEnvironmentVariable("APPDATA") },
@@ -175,8 +175,8 @@ namespace Nbackup
 
             //foreach (var item in result.Output)
             //{
-                
-                
+
+
 
             //    if (item.Trim().StartsWith("Dirs :") ||
             //        item.Trim().StartsWith("Files :") ||
@@ -246,6 +246,9 @@ namespace Nbackup
             }
         }
 
-        private static bool IsNotNull([NotNullWhen(true)] object? obj) => obj != null;
+        private static bool IsNotNull([NotNullWhen(true)] object? obj)
+        {
+            return obj != null;
+        }
     }
 }
