@@ -142,7 +142,7 @@ public class BuildStarter
         var filePath = Path.Combine(Environment.CurrentDirectory, targetFileName);
         string[] lines = File.ReadAllLines(filePath);
 
-        StringBuilder commentBuilder = new StringBuilder();
+        StringBuilder commentBuilder = new();
         bool isComment = false;
 
         foreach (string line in lines)

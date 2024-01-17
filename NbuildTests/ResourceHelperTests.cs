@@ -2,7 +2,7 @@
 using NbuildTasks;
 using System.Reflection;
 
-namespace Nbuild.Tests
+namespace NbuildTests
 {
     [TestClass()]
     public class ResourceHelperTests

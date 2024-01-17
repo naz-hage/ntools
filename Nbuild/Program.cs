@@ -15,20 +15,20 @@ public class Program
     static int Main(string[] args)
     {
         Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{Nversion.Get()}]\n");
-        var buildResult = ResultHelper.New();
+        var result = ResultHelper.New();
         string? target = null;
         Cli options;
 
         if (args.Length == 0)
         {
             options = new Cli() { Verbose = true };
-            buildResult = BuildStarter.Build(target, options.Verbose);
+            result = BuildStarter.Build(target, options.Verbose);
         }
         else if (args.Length == 1 && !args[0].Contains(CmdHelp, StringComparison.InvariantCultureIgnoreCase))
         {
             target = args[0];
             options = new Cli() { Verbose = true };
-            buildResult = BuildStarter.Build(target, options.Verbose);
+            result = BuildStarter.Build(target, options.Verbose);
         }
         else
         {
@@ -41,35 +41,30 @@ public class Program
 
             if (options != null && !string.IsNullOrEmpty(options.Command))
             {
-                switch (options.Command)
+                result = options.Command switch
                 {
-                    case var d when d == CmdTargets:
-                        buildResult = BuildStarter.DisplayTargets();
-                        break;
-
-                    default:
-                        buildResult = ResultHelper.Fail(-1, $"Invalid Command: '{options.Command}'");
-                        break;
-                }
+                    var d when d == CmdTargets => BuildStarter.DisplayTargets(),
+                    _ => ResultHelper.Fail(-1, $"Invalid Command: '{options.Command}'"),
+                };
             }
         }
 
 
 
-        if (buildResult.IsSuccess())
+        if (result.IsSuccess())
         {
             Colorizer.WriteLine($"[{ConsoleColor.Green}!√ Build completed.]");
         }
         else
         {
-            if (buildResult.Code == int.MaxValue)
+            if (result.Code == int.MaxValue)
             {
                 // Display Help
                 Parser.DisplayHelp<Cli>(HelpFormat.Full);
             }
             else
             {
-                foreach (var item in buildResult.Output.TakeLast(linesToDisplay))
+                foreach (var item in result.Output.TakeLast(linesToDisplay))
                 {
                     Colorizer.WriteLine($"[{ConsoleColor.Red}! {item}]");
                 }
@@ -80,7 +75,7 @@ public class Program
 
         DisplayGitInfo();
 
-        return (int)buildResult.Code;
+        return (int)result.Code;
     }
 
 

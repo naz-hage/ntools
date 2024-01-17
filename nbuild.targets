@@ -10,7 +10,8 @@
         <!-- This is the location when the app deployed or installed -->
         <DeploymentFolder>$(ProgramFiles)\Nbuild</DeploymentFolder>
 	</PropertyGroup>
-	
+
+	<!--Setup the ARTIFACTS folders for binaries and test results - override -->
     <Target Name="ARTIFACTS" DependsOnTargets="TAG">
       <PropertyGroup>
 		 <ArtifactsSolutionFolder>$(ArtifactsDir)\$(SolutionName)</ArtifactsSolutionFolder>
@@ -47,51 +48,14 @@
     </Target>
 
 	
+	<!--Delete the ARTIFACTS folder after PACKAGE target is completed-->
 	<Target Name="CLEAN_ARTIFACTS" AfterTargets="PACKAGE">
 		<Message Text="Removing $(ArtifactsFolder)"> </Message>
 		<RemoveDir Directories="$(ArtifactsFolder);"/>
 		<Message Text="==> DONE"/>
 	</Target>
 
-	<Target Name="CLEAN_TEST" DependsOnTargets="IS_ADMIN">
-		<ItemGroup>
-			<NGitFiles
-						Exclude="
-						 $(SolutionDir)\$(TargetRelease)\**\*.pdb;
-						 $(SolutionDir)\$(TargetRelease)\test.*;
-						 $(SolutionDir)\$(TargetRelease)\*test*;
-						 $(SolutionDir)\$(TargetRelease)\Nuget*;
-						 $(SolutionDir)\$(TargetRelease)\*CodeCoverage*"
-
-						Include="
-                        $(SolutionDir)\$(TargetRelease)\ngit*;
-						$(SolutionDir)\$(TargetRelease)\launcher*;
-                        $(SolutionDir)\Nbuild\resources\*.targets;
-                        $(SolutionDir)\$(TargetRelease)\commandline.dll;  
-                        $(SolutionDir)\$(TargetRelease)\OutputColorizer.dll"
-						/>
-		</ItemGroup>
-		<Exec Command='del "$(DeploymentFolder)" /q' />
-		<Copy SourceFiles="@(NGitFiles)"
-			DestinationFolder="$(DeploymentFolder)"
-			Condition="'@(NGitFiles, ' ')' != ''"
-			SkipUnchangedFiles="true" />
-		<Exec Command='dir "$(DeploymentFolder)"'></Exec>
-
-		<Message Text="==> DONE"/>
-	</Target>
-	
-	<Target Name="TEST_STAGING_DEPLOY" DependsOnTargets="
-				CLEAN;
-                TAG;
-                SOLUTION;
-                SAVE_ARTIFACTS;
-                PACKAGE;
-				">
-		<Exec Command='dir "$(DeploymentFolder)"'></Exec>
-		<Message Text="==> DONE"/>
-	</Target>
-
+	<!--Temporary Target to test the Git Task-->
 	<Target Name="TEST_GIT" >
 		<Git Command="GetBranch">
 			<Output TaskParameter="Output" PropertyName="GitBranch"/>
@@ -140,17 +104,12 @@
 		<Message Text="==> DONE"/>
 	</Target>
 
+	<!--Build local staging without incrementing the version-->
 	<Target Name="LOCAL" DependsOnTargets="
                 SOLUTION;
                 SAVE_ARTIFACTS;
                 PACKAGE"
 				>
-	</Target>
-
-	<Target Name="DEPLOY_LOCAL" DependsOnTargets="
-                STAGING_LOCAL;
-                DEPLOY">
-		<Exec Command='dir "$(DeploymentFolder)"'></Exec>
 	</Target>
 
 	<!-- Test for FileVersion task and powershell GetFileVersion.ps1-->
@@ -168,22 +127,6 @@
 		</FileVersion>
 		<Message Text="File version: $(Version)" />
 		
-		<Message Text="==> DONE"/>
-	</Target>
-	
-	<!-- Test File Download-->
-	<Target Name="FILE_DOWNLOAD" DependsOnTargets="APP_COMMON">
-		<PropertyGroup>
-			<WebUri>https://aka.ms/vs/17/release/vs_BuildTools.exe</WebUri>
-			<FileName>$(DownloadsDirectory)\vs_BuildTools.exe</FileName>
-		</PropertyGroup>
-		<RedError Condition="'$(IsAdmin)' == false" Message="Must be an admin to install $(NodeAppName)" />
-
-		<Delete Files="$(FileName)" Condition="Exists('$(FileName)') == true" />
-
-		<WebDownload WebUri="$(WebUri)" FileName="$(FileName)" />
-
-		<Exec Command='$(FileName) --add Microsoft.VisualStudio.Workload.MSBuildTools --quiet'></Exec>
 		<Message Text="==> DONE"/>
 	</Target>
 	
@@ -235,9 +178,8 @@
         <Message Text="==> CODE_DONE"/>
 	</Target>
 
-
 	<!-- Setup Prerequisite Development Environment -->
-	<Target Name="PRE_TOOLS">
+	<Target Name="PRE_TOOLS" >
 		<Exec Command='powershell -command ".\InstallPrerequisites.ps1"' WorkingDirectory="$(SolutionDir)\Nbuild\resources"/>
 
 	    <Message Text="==> DONE"/>

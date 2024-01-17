@@ -1,9 +1,10 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NbuildTasks;
 using System;
 using System.IO;
 using System.Linq;
 
-namespace NbuildTasks.Tests
+namespace NbuildTasksTests
 {
     [TestClass]
     public class TestFirst

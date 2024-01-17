@@ -1,8 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Nbuild;
 using NbuildTasks;
 using System.Reflection;
 
-namespace Nbuild.Tests
+namespace NbuildTests
 {
     [TestClass()]
     public class BuildStarterTests
@@ -98,7 +99,6 @@ namespace Nbuild.Tests
         }
 
         [TestMethod()]
-
         public void ExtractCommentsFromTargets()
         {
             // Arrange
@@ -127,7 +127,7 @@ namespace Nbuild.Tests
             };
             // Arrange
             string targetFileName = ExtractCommonTargetsFile();
-            Dictionary<string, bool> commonTargets = new Dictionary<string, bool>
+            Dictionary<string, bool> commonTargets = new()
             {
                 { "PROPERTIES", true },
                 { "CLEAN", true },
