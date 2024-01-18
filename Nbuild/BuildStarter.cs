@@ -279,7 +279,7 @@ public class BuildStarter
         filePath = filePath.Replace("$(BuildTools)", $"{Environment.GetEnvironmentVariable("ProgramFiles")}\\nbuild");
         try
         {
-            using (StreamWriter writer = new StreamWriter(TargetsMd, true))
+            using (StreamWriter writer = new(TargetsMd, true))
             {
                 Console.WriteLine($"{filePath} Targets:");
                 writer.WriteLine($"- **{filePath} Targets**\n");
@@ -304,7 +304,7 @@ public class BuildStarter
                 var importItem = item.Replace("$(ProgramFiles)", Environment.GetEnvironmentVariable("ProgramFiles"));
                 importItem = importItem.Replace("$(BuildTools)", $"{Environment.GetEnvironmentVariable("ProgramFiles")}\\nbuild");
 
-                using (StreamWriter writer = new StreamWriter(TargetsMd, true))
+                using (StreamWriter writer = new(TargetsMd, true))
                 {
                     Console.WriteLine($"Imported Targets:");
                     //writer.WriteLine($"- Imported Targets: {importItem}\n");
@@ -313,7 +313,7 @@ public class BuildStarter
                 // Recursive call for each imported target file
                 DisplayTargetsInFile(importItem);
             }
-            
+
         }
         catch (Exception ex)
         {

@@ -1,5 +1,5 @@
-﻿using System.Text.Json;
-using CommandLine;
+﻿using CommandLine;
+using System.Text.Json;
 
 namespace Nbuild
 {
@@ -34,7 +34,7 @@ namespace Nbuild
             }
 
             var listAppData = (JsonSerializer.Deserialize<NbuildApps>(json) ?? throw new ParserException("Failed to parse json to AppData object", null)) ?? throw new ParserException("Failed to parse json to AppData object", null);
- 
+
             foreach (var appData in listAppData.NbuildAppList)
             {
                 yield return Validate(appData);

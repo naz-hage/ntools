@@ -1,23 +1,23 @@
 ﻿using Launcher;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Nbuild;
 using NbuildTasks;
 using System.Reflection;
-using System.Xml.Linq;
 
-namespace Nbuild.Tests
+namespace NbuildTests
 {
     [TestClass()]
     public class CommandTests
     {
-        private const string NbuildAssemblyName = "Nb.dll"; 
-        private const string NbuildAppListJsonFile = "NbuildAppList.json";
-        private readonly string ResourceLocation = "Nbuild.resources.NbuildAppList.json";
+        private const string NbuildAssemblyName = "Nb.dll";
+        private const string NbuildAppListJsonFile = "NbuildAppListTest.json";
+        private readonly string ResourceLocation = "Nbuild.resources.NbuildAppListTest.json";
 
         [TestMethod()]
         public void InstallFromJsonFileTest()
         {
             // Arrange read json from file from embedded resource
-            
+
             string? executingAssemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             Assert.IsNotNull(executingAssemblyDirectory);
 
@@ -63,7 +63,7 @@ namespace Nbuild.Tests
                 ""InstallArgs"": ""-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force"",
                 ""InstallPath"": ""C:\\Temp\\nbuild2""
             }";
-            
+
             var appdata = NbuildApp.FromJson(json);
 
             // Act
@@ -102,7 +102,7 @@ namespace Nbuild.Tests
             Assert.AreEqual("Invalid json input: Name is missing or empty", result.Output[0]);
         }
 
-         [TestMethod()]
+        [TestMethod()]
         public void InstallExceptionAppFileNameTest()
         {
             // Arrange with json and no AppFileName defined

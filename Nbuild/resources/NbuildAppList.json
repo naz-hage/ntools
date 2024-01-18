@@ -1,14 +1,14 @@
 {
   "NbuildAppList": [
     {
-      "Name": "nbuild",
+      "Name": "Visual Studio MS Build Tools",
       "Version": "1.1.0",
-      "AppFileName": "nb.exe",
-      "WebDownloadFile": "https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip",
-      "DownloadedFile": "$(Version).zip",
-      "InstallCommand": "powershell.exe",
-      "InstallArgs": "-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force",
-      "InstallPath": "C:\\Temp\\nbuild2"
+      "AppFileName": "msbuild.exe",
+      "WebDownloadFile": "https://aka.ms/vs/$(Version)/release/vs_BuildTools.exe",
+      "DownloadedFile": "vs_BuildTools.exe",
+      "InstallCommand": "vs_BuildTools.exe",
+      "InstallArgs": "--add Microsoft.VisualStudio.Workload.MSBuildTools Microsoft.NetCore.Component.SDK Microsoft.VisualStudio.Workload.ManagedDesktop Microsoft.VisualStudio.Workload.NetWeb --quiet",
+      "InstallPath": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\MSBuild\\Current\\Bin\\amd64"
     }
   ]
 }

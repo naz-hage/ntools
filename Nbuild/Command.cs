@@ -1,6 +1,6 @@
 ﻿using Launcher;
 using NbuildTasks;
-using System.Diagnostics;
+using OutputColorizer;
 using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 
@@ -84,8 +84,18 @@ namespace Nbuild
                     WorkingDir = DownloadsDirectory
                 };
 
-                var result2 = Launcher.Launcher.Start(parameters);
-                return result2;
+                var resultInstall = Launcher.Launcher.Start(parameters);
+                
+                if (resultInstall.IsSuccess())
+                {
+                    Colorizer.WriteLine($"[{ConsoleColor.Green}!√ {appData.Name} {appData.Version} installed.]");
+                }
+                else
+                {
+                    Colorizer.WriteLine($"[{ConsoleColor.Red}!X {appData.Name} {appData.Version} failed to install: {resultInstall.Output[0]}]");
+                }
+
+                return resultInstall;
             }
             else
             {

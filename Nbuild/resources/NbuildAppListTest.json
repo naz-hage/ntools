@@ -1,0 +1,14 @@
+{
+  "NbuildAppList": [
+    {
+      "Name": "nbuild",
+      "Version": "1.1.0",
+      "AppFileName": "nb.exe",
+      "WebDownloadFile": "https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip",
+      "DownloadedFile": "$(Version).zip",
+      "InstallCommand": "powershell.exe",
+      "InstallArgs": "-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force",
+      "InstallPath": "C:\\Temp\\nbuild2"
+    }
+  ]
+}

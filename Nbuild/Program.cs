@@ -2,7 +2,6 @@
 using Launcher;
 using NbuildTasks;
 using OutputColorizer;
-using System.Drawing.Text;
 
 namespace Nbuild;
 
@@ -41,6 +40,8 @@ public class Program
                 return 0;
             }
 
+            var currentDirectory = Environment.CurrentDirectory;
+
             if (options != null && !string.IsNullOrEmpty(options.Command))
             {
                 result = options.Command switch
@@ -50,6 +51,9 @@ public class Program
                     _ => ResultHelper.Fail(-1, $"Invalid Command: '{options.Command}'"),
                 };
             }
+
+            // return to current directory because the command might have changed it
+            Environment.CurrentDirectory = currentDirectory;
         }
 
 
