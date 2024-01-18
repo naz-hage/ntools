@@ -31,15 +31,19 @@
     - WSL
     - .NET Core SDK
     - .NET Core Runtime
-- Add Ninstallexe to download and install applications from the web.
+- Add -i json option to Nv.exe to download and install applications from the web.
     - Use json input metadata.json file is used to specify the application to download and install.
-    - Input json specify 
-        - Name
-        - Version
-        - Url
-        - InstallDir
-        - InstallFile
-        - InstallArgs
+    - Sample file:
+        ```json
+        {
+            "Name": "Sample Application",
+            "Version": "1.0.0",
+            "Url": "https://example.com/sample-application",
+            "InstallDir": "C:/Program Files/Sample Application",
+            "InstallFile": "setup.exe",
+            "InstallArgs": "/silent /norestart"
+        }
+        ```
     - Output json specify 
         - Name
         - InstalledVersion

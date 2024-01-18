@@ -24,6 +24,8 @@ namespace NbuildTasks
 
                 if (Path.GetFileName(fileName).IndexOfAny(invalidChars) >= 0) throw new ArgumentException("Invalid file name. Contains invalid characters.", nameof(fileName));
 
+                if (File.Exists(fileName)) File.Delete(fileName);
+
                 var response = await client.GetAsync(uri);
                 if (!response.IsSuccessStatusCode) throw new FileNotFoundException($"'{uri}' not found. status: {response.StatusCode}", nameof(uri));
 

@@ -2,12 +2,14 @@
 using Launcher;
 using NbuildTasks;
 using OutputColorizer;
+using System.Drawing.Text;
 
 namespace Nbuild;
 
 public class Program
 {
     private const string CmdTargets = "targets";
+    private const string CmdInstall = "install";
     private const string CmdHelp = "--help";
     private const string NgitAssemblyExe = "ng.exe";
     private static readonly int linesToDisplay = 10;
@@ -44,6 +46,7 @@ public class Program
                 result = options.Command switch
                 {
                     var d when d == CmdTargets => BuildStarter.DisplayTargets(Environment.CurrentDirectory),
+                    var d when d == CmdInstall => Command.Install(options.Json),
                     _ => ResultHelper.Fail(-1, $"Invalid Command: '{options.Command}'"),
                 };
             }
