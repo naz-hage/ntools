@@ -52,6 +52,28 @@ namespace Nbuild
             }
         }
 
+        private static string? Download (NbuildApp nbuildApp)
+        {
+            if (nbuildApp == null || string.IsNullOrEmpty(nbuildApp.WebDownloadFile))
+            {
+                return null;
+            }
+
+            var fileName = $"{DownloadsDirectory}\\{nbuildApp.DownloadedFile}";
+            var httpClient = new HttpClient();
+            var result = Task.Run(async () => await httpClient.DownloadFileAsync(new Uri(nbuildApp.WebDownloadFile), fileName)).Result;
+
+            if (result.IsSuccess() && File.Exists(fileName))
+            {
+                return fileName;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+
         private static ResultHelper Install(NbuildApp appData)
         {
             //PrepareDonloadsDirectory();
@@ -77,12 +99,9 @@ namespace Nbuild
                 return ResultHelper.Success();
             }
 
+            var fileName = Download(appData);
 
-            var fileName = $"{DownloadsDirectory}\\{appData.DownloadedFile}";
-            var httpClient = new HttpClient();
-            var result = Task.Run(async () => await httpClient.DownloadFileAsync(new Uri(appData.WebDownloadFile), fileName)).Result;
-
-            if (result.IsSuccess())
+            if (fileName != null)
             {
                 // Install the downloaded file
                 var parameters = new Launcher.Parameters
@@ -116,7 +135,7 @@ namespace Nbuild
             }
             else
             {
-                return ResultHelper.Fail(-1, $"Failed to download {appData.WebDownloadFile} to {appData.DownloadedFile}: {result.Output[0]}");
+                return ResultHelper.Fail(-1, $"Failed to download {appData.WebDownloadFile} to {appData.DownloadedFile}");
             }
         }
 

@@ -4,7 +4,7 @@
       "Name": "Visual Studio MS Build Tools",
       "Version": "1.1.0",
       "AppFileName": "msbuild.exe",
-      "WebDownloadFile": "https://aka.ms/vs/$(Version)/release/vs_BuildTools.exe",
+      "WebDownloadFile": "https://aka.ms/vs/17/release/vs_BuildTools.exe",
       "DownloadedFile": "vs_BuildTools.exe",
       "InstallCommand": "vs_BuildTools.exe",
       "InstallArgs": "--add Microsoft.VisualStudio.Workload.MSBuildTools Microsoft.NetCore.Component.SDK Microsoft.VisualStudio.Workload.ManagedDesktop Microsoft.VisualStudio.Workload.NetWeb --quiet",
