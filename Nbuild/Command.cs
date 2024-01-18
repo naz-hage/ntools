@@ -10,9 +10,11 @@ namespace Nbuild
     public static class Command
     {
         private static readonly string DownloadsDirectory = $"{Environment.GetEnvironmentVariable("Temp")}\\nb"; // "C:\\NToolsDownloads";
+        private static bool Verbose = true;
 
-        public static ResultHelper Install(string? json)
+        public static ResultHelper Install(string? json, bool verbose = true)
         {
+            Verbose = verbose;
             if (string.IsNullOrEmpty(json))
             {
                 return ResultHelper.Fail(-1, $"json cannot be null");
@@ -28,8 +30,14 @@ namespace Nbuild
                 if (json.Contains("NbuildAppList"))
                 {
                     var appDataList = NbuildApp.FromMultiJson(json);
+                    if (appDataList == null) return ResultHelper.Fail(-1, $"Invalid json input");
+
+                    if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{appDataList.Count()} apps to install.]");
+
                     foreach (var appData in appDataList)
                     {
+                        if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{appData.Name} {appData.Version} to install.]");
+
                         var result = Install(appData);
                         if (!result.IsSuccess())
                         {
@@ -103,6 +111,8 @@ namespace Nbuild
 
             if (fileName != null)
             {
+                if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{appData.Name} {appData.Version} downloaded.]");
+
                 // Install the downloaded file
                 var parameters = new Launcher.Parameters
                 {
@@ -160,6 +170,8 @@ namespace Nbuild
             {
                 return false;
             }
+            if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{nbuildApp.Name} {nbuildApp.Version} current version: {currentVersion}]");
+
 
             var result = Version.TryParse(currentVersion, out Version? currentVersionParsed);
             if (!result)
@@ -173,6 +185,7 @@ namespace Nbuild
                 return false;
             }
 
+            if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{nbuildApp.Name} current version: {currentVersion} >=  {nbuildApp.Version}: {currentVersionParsed >= versionParsed}]");
             return currentVersionParsed >= versionParsed;
         }
 
