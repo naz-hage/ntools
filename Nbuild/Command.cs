@@ -1,6 +1,7 @@
 ﻿using Launcher;
 using NbuildTasks;
 using OutputColorizer;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 
@@ -70,6 +71,13 @@ namespace Nbuild
 
             if (!Directory.Exists(DownloadsDirectory)) Directory.CreateDirectory(DownloadsDirectory);
 
+            if (InstalledAppFileVersionGreterOrEqual(appData))
+            {
+                Colorizer.WriteLine($"[{ConsoleColor.Green}!√ {appData.Name} {appData.Version} already installed.]");
+                return ResultHelper.Success();
+            }
+
+
             var fileName = $"{DownloadsDirectory}\\{appData.DownloadedFile}";
             var httpClient = new HttpClient();
             var result = Task.Run(async () => await httpClient.DownloadFileAsync(new Uri(appData.WebDownloadFile), fileName)).Result;
@@ -88,7 +96,16 @@ namespace Nbuild
                 
                 if (resultInstall.IsSuccess())
                 {
-                    Colorizer.WriteLine($"[{ConsoleColor.Green}!√ {appData.Name} {appData.Version} installed.]");
+                    // Check if the app was installed successfully
+                    if (InstalledAppFileVersionGreterOrEqual(appData))
+                    {
+                        Colorizer.WriteLine($"[{ConsoleColor.Green}!√ {appData.Name} {appData.Version} installed.]");
+                    }
+                    else
+                    {
+                        Colorizer.WriteLine($"[{ConsoleColor.Red}!X {appData.Name} {appData.Version} failed to install: {resultInstall.Output[0]}]");
+                    }
+                    //resultInstall = Update(appData);
                 }
                 else
                 {
@@ -101,6 +118,71 @@ namespace Nbuild
             {
                 return ResultHelper.Fail(-1, $"Failed to download {appData.WebDownloadFile} to {appData.DownloadedFile}: {result.Output[0]}");
             }
+        }
+
+        private static string? GetNbuildAppFileVersion(NbuildApp nbuildApp)
+        {
+            var appFile = $"{nbuildApp.InstallPath}\\{nbuildApp.AppFileName}";
+            try
+            {
+                FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(appFile);
+                return fileVersionInfo.FileVersion;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        private static bool InstalledAppFileVersionGreterOrEqual(NbuildApp nbuildApp)
+        {
+            var currentVersion = GetNbuildAppFileVersion(nbuildApp);
+            if (currentVersion == null)
+            {
+                return false;
+            }
+
+            var result = Version.TryParse(currentVersion, out Version? currentVersionParsed);
+            if (!result)
+            {
+                return false;
+            }
+
+            result = Version.TryParse(nbuildApp.Version, out Version? versionParsed);
+            if (!result)
+            {
+                return false;
+            }
+
+            return currentVersionParsed >= versionParsed;
+        }
+
+
+        // Examine if this method is needed
+        private static ResultHelper Update(NbuildApp nbuildApp)
+        {
+            var currentVersion = GetNbuildAppFileVersion(nbuildApp);
+            if (currentVersion == null)
+            {
+                return ResultHelper.Fail(-1, $"Failed to get current version of {nbuildApp.Name}");
+            }
+
+            if (currentVersion == nbuildApp.Version)
+            {
+                return ResultHelper.Success();
+            }
+
+            var result = Install(nbuildApp);
+            if (result.IsSuccess())
+            {
+                Colorizer.WriteLine($"[{ConsoleColor.Green}!√ {nbuildApp.Name} {nbuildApp.Version} updated.]");
+            }
+            else
+            {
+                Colorizer.WriteLine($"[{ConsoleColor.Red}!X {nbuildApp.Name} {nbuildApp.Version} failed to update: {result.Output[0]}]");
+            }
+
+            return result;
         }
 
         private static void PrepareDonloadsDirectory()
