@@ -259,7 +259,14 @@ namespace Nbuild
             try
             {
                 FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(appFile);
-                return fileVersionInfo.FileVersion;
+
+                // return file Version as combined string of all parts : major, minor, build, patch
+                if (fileVersionInfo != null)
+                {
+                       return $"{fileVersionInfo.FileMajorPart}.{fileVersionInfo.FileMinorPart}.{fileVersionInfo.FileBuildPart}.{fileVersionInfo.FilePrivatePart}";
+                }
+
+                return null;
             }
             catch (Exception)
             {
