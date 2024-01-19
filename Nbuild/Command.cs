@@ -9,7 +9,7 @@ namespace Nbuild
 {
     public static class Command
     {
-        private static readonly string DownloadsDirectory = $"{Environment.GetEnvironmentVariable("Temp")}\\nb"; // "C:\\NToolsDownloads";
+        private static readonly string DownloadsDirectory = $"{Environment.GetEnvironmentVariable("Temp")}\\nb"; // "C:\\NToolsDownloads" $"{Environment.GetEnvironmentVariable("Temp")}\\nb"
         private static bool Verbose = false;
 
         public static bool TestMode
@@ -29,6 +29,17 @@ namespace Nbuild
         }
 
         private static bool _testMode = IsTestMode();
+
+        static Command()
+        {
+            // Examine this method when we implement the logic to require admin
+            //PrepareDonloadsDirectory();
+            if (!Directory.Exists(DownloadsDirectory))
+            {
+                Directory.CreateDirectory(DownloadsDirectory);
+            }
+
+        }
 
         private static bool IsTestMode()
         {
@@ -71,7 +82,7 @@ namespace Nbuild
 
                     foreach (var appData in appDataList)
                     {
-                        Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Installing {appData.Name} {appData.Version}...]");
+                        
 
                         var result = Install(appData);
                         if (!result.IsSuccess())
@@ -101,29 +112,37 @@ namespace Nbuild
 
         public static ResultHelper List (string? json)
         {
-             var appDataList = NbuildApp.FromMultiJson(json);
-            if (appDataList == null) return ResultHelper.Fail(-1, $"Invalid json input");
-
-            if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{appDataList.Count()} apps to list.]");
-
-            // print header
-            Colorizer.WriteLine($"[{ConsoleColor.Yellow}! App               | Target Version | Installed version]");
-            Colorizer.WriteLine($"[{ConsoleColor.Yellow}! ------------------|----------------|------------------]");
-            foreach (var appData in appDataList)
+            try
             {
-                // display app and installed version
-                // InstalledAppFileVersionGreterOrEqual is true, print green, else print red
-                if (InstalledAppFileVersionGreterOrEqual(appData))
+                var appDataList = NbuildApp.FromMultiJson(json);
+                if (appDataList == null) return ResultHelper.Fail(-1, $"Invalid json input");
+
+                if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{appDataList.Count()} apps to list.]");
+
+                // print header
+                Colorizer.WriteLine($"[{ConsoleColor.Yellow}! App               | Target Version | Installed version]");
+                Colorizer.WriteLine($"[{ConsoleColor.Yellow}! ------------------|----------------|------------------]");
+                foreach (var appData in appDataList)
                 {
-                    Colorizer.WriteLine($"[{ConsoleColor.Green}! {appData.Name,-17} | {appData.Version,-14} | {GetNbuildAppFileVersion(appData)}]");
+                    // display app and installed version
+                    // InstalledAppFileVersionGreterOrEqual is true, print green, else print red
+                    if (InstalledAppFileVersionGreterOrEqual(appData))
+                    {
+                        Colorizer.WriteLine($"[{ConsoleColor.Green}! {appData.Name,-17} | {appData.Version,-14} | {GetNbuildAppFileVersion(appData)}]");
+                    }
+                    else
+                    {
+                        Colorizer.WriteLine($"[{ConsoleColor.Red}! {appData.Name,-17} | {appData.Version,-14} | {GetNbuildAppFileVersion(appData)}]");
+                    }
                 }
-                else
-                {
-                    Colorizer.WriteLine($"[{ConsoleColor.Red}! {appData.Name,-17} | {appData.Version,-14} | {GetNbuildAppFileVersion(appData)}]");
-                }
+
+                Console.WriteLine();
+            }
+            catch (Exception ex)
+            {
+                return ResultHelper.Fail(-1, ex.Message);
             }
 
-            Console.WriteLine();
             return ResultHelper.Success();
         }
 
@@ -148,14 +167,15 @@ namespace Nbuild
             foreach (var appData in appDataList)
             {
                 // download app
-                var fileName = DownloadApp(appData);
+                var result = DownloadApp(appData);
                 
-                if (fileName != null && File.Exists(fileName))
+                if (result.IsSuccess())
                 {
                     Colorizer.WriteLine($"[{ConsoleColor.Green}! {appData.Name,-18} | {appData.DownloadedFile,-30} |]");
                 }
                 else
                 {
+                    Colorizer.WriteLine($"[{ConsoleColor.Red}! Failed to download {appData.WebDownloadFile} to {appData.DownloadedFile}. {result.Output[0]}]");
                     Colorizer.WriteLine($"[{ConsoleColor.Red}! {appData.Name,-18} | {appData.DownloadedFile,-30} |]");
                 }
             }
@@ -165,25 +185,18 @@ namespace Nbuild
             return ResultHelper.Success();
         }
 
-        private static string? DownloadApp (NbuildApp nbuildApp)
+        private static ResultHelper DownloadApp (NbuildApp nbuildApp)
         {
             if (nbuildApp == null || string.IsNullOrEmpty(nbuildApp.WebDownloadFile))
             {
-                return null;
+                return ResultHelper.Fail(-1, $"WebDownloadFile is invalid");
             }
 
             var fileName = $"{DownloadsDirectory}\\{nbuildApp.DownloadedFile}";
             var httpClient = new HttpClient();
             var result = Task.Run(async () => await httpClient.DownloadFileAsync(new Uri(nbuildApp.WebDownloadFile), fileName)).Result;
 
-            if (result.IsSuccess() && File.Exists(fileName))
-            {
-                return fileName;
-            }
-            else
-            {
-                return null;
-            }
+            return result;
         }
 
         private static ResultHelper Install(NbuildApp appData)
@@ -211,11 +224,12 @@ namespace Nbuild
                 return ResultHelper.Success();
             }
 
-            var fileName = DownloadApp(appData);
+            Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Downloading ex{appData.Name} {appData.Version}]");
+            var result = DownloadApp(appData);
 
-            if (fileName != null)
+            if (result.IsSuccess())
             {
-                if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{appData.Name} {appData.Version} downloaded.]");
+                Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{appData.Name} {appData.Version} downloaded.]");
 
                 // Install the downloaded file
                 var parameters = new Launcher.Parameters
@@ -225,6 +239,7 @@ namespace Nbuild
                     WorkingDir = DownloadsDirectory
                 };
 
+                Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Installing {appData.Name} {appData.Version}]");
                 var resultInstall = Launcher.Launcher.Start(parameters);
                 
                 if (resultInstall.IsSuccess())
@@ -249,7 +264,7 @@ namespace Nbuild
             }
             else
             {
-                return ResultHelper.Fail(-1, $"Failed to download {appData.WebDownloadFile} to {appData.DownloadedFile}");
+                return ResultHelper.Fail(-1, $"Failed to download {appData.WebDownloadFile} to {appData.DownloadedFile}. {result.Output[0]}");
             }
         }
 
