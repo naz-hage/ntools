@@ -12,8 +12,44 @@ namespace Nbuild
         private static readonly string DownloadsDirectory = $"{Environment.GetEnvironmentVariable("Temp")}\\nb"; // "C:\\NToolsDownloads";
         private static bool Verbose = false;
 
+        public static bool TestMode
+        {
+            get { return _testMode; }
+            set
+            {
+                if (IsTestMode())
+                {
+                    _testMode = value;
+                }
+                else
+                {
+                    throw new InvalidOperationException("TestMode can only be set in test mode.");
+                }
+            }
+        }
+
+        private static bool _testMode = IsTestMode();
+
+        private static bool IsTestMode()
+        {
+            // Add your logic here to determine if the application is running in test mode
+            // For example, you can check an environment variable or a configuration setting
+            // Return true if the application is running in test mode, false otherwise
+            // return true until we implement the logic
+            return true;
+        }
+
         public static ResultHelper Install(string? json)
         {
+            // check if admin
+            if (!Launcher.CurrentProcess.IsElevated())
+            {
+                if (!TestMode)
+                {
+                    return ResultHelper.Fail(-1, $"You must run this command as an administrator");
+                }
+            }
+
             if (string.IsNullOrEmpty(json))
             {
                 return ResultHelper.Fail(-1, $"json cannot be null");
@@ -43,6 +79,8 @@ namespace Nbuild
                             return result;
                         }
                     }
+
+                    Console.WriteLine();
                     // all apps installed successfully
                     return ResultHelper.Success();
                 }
@@ -55,7 +93,9 @@ namespace Nbuild
             }
             catch (Exception ex)
             {
+                Console.WriteLine();
                 return ResultHelper.Fail(-1, $"Invalid json input: {ex.Message}");
+
             }
         }
 
@@ -83,10 +123,49 @@ namespace Nbuild
                 }
             }
 
+            Console.WriteLine();
             return ResultHelper.Success();
         }
 
-        private static string? Download (NbuildApp nbuildApp)
+        public static ResultHelper Download(string? json)
+        {
+            // check if admin
+            if (!Launcher.CurrentProcess.IsElevated())
+            {
+                if (!Command.TestMode)
+                {
+                    return ResultHelper.Fail(-1, $"You must run this command as an administrator");
+                }
+            }
+            var appDataList = NbuildApp.FromMultiJson(json);
+            if (appDataList == null) return ResultHelper.Fail(-1, $"Invalid json input");
+
+            Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{appDataList.Count()} apps to download to {DownloadsDirectory}]");
+
+            // print header
+            Colorizer.WriteLine($"[{ConsoleColor.Yellow}! App                | Download File                  |]");
+            Colorizer.WriteLine($"[{ConsoleColor.Yellow}! -------------------|--------------------------------|]");
+            foreach (var appData in appDataList)
+            {
+                // download app
+                var fileName = DownloadApp(appData);
+                
+                if (fileName != null && File.Exists(fileName))
+                {
+                    Colorizer.WriteLine($"[{ConsoleColor.Green}! {appData.Name,-18} | {appData.DownloadedFile,-30} |]");
+                }
+                else
+                {
+                    Colorizer.WriteLine($"[{ConsoleColor.Red}! {appData.Name,-18} | {appData.DownloadedFile,-30} |]");
+                }
+            }
+
+            Console.WriteLine();
+
+            return ResultHelper.Success();
+        }
+
+        private static string? DownloadApp (NbuildApp nbuildApp)
         {
             if (nbuildApp == null || string.IsNullOrEmpty(nbuildApp.WebDownloadFile))
             {
@@ -132,7 +211,7 @@ namespace Nbuild
                 return ResultHelper.Success();
             }
 
-            var fileName = Download(appData);
+            var fileName = DownloadApp(appData);
 
             if (fileName != null)
             {

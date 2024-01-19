@@ -42,7 +42,7 @@
     },
     {
       "Name": "Git for Windows",
-      "Version": "2.43.1",
+      "Version": "2.43.0",
       "AppFileName": "git.exe",
       "WebDownloadFile": "https://github.com/git-for-windows/git/releases/download/v$(Version).windows.1/Git-$(Version)-64-bit.exe",
       "DownloadedFile": "Git-$(Version)-64-bit.exe",
@@ -52,7 +52,7 @@
     },
     {
       "Name": "Powershell",
-      "Version": "7.4.1.500",
+      "Version": "7.4.1",
       "AppFileName": "pwsh.exe",
       "WebDownloadFile": "https://github.com/PowerShell/PowerShell/releases/download/v$(Version)/PowerShell-$(Version)-win-x64.msi",
       "DownloadedFile": "PowerShell-$(Version)-win-x64.msi",
