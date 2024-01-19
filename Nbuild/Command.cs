@@ -10,11 +10,10 @@ namespace Nbuild
     public static class Command
     {
         private static readonly string DownloadsDirectory = $"{Environment.GetEnvironmentVariable("Temp")}\\nb"; // "C:\\NToolsDownloads";
-        private static bool Verbose = true;
+        private static bool Verbose = false;
 
-        public static ResultHelper Install(string? json, bool verbose = true)
+        public static ResultHelper Install(string? json)
         {
-            Verbose = verbose;
             if (string.IsNullOrEmpty(json))
             {
                 return ResultHelper.Fail(-1, $"json cannot be null");
@@ -60,17 +59,28 @@ namespace Nbuild
             }
         }
 
-        public static ResultHelper List (string? json, bool verbose = true)
+        public static ResultHelper List (string? json)
         {
-
-            var appDataList = NbuildApp.FromMultiJson(json);
+             var appDataList = NbuildApp.FromMultiJson(json);
             if (appDataList == null) return ResultHelper.Fail(-1, $"Invalid json input");
 
+            if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{appDataList.Count()} apps to list.]");
+
+            // print header
+            Colorizer.WriteLine($"[{ConsoleColor.Yellow}! App               | Target Version | Installed version]");
+            Colorizer.WriteLine($"[{ConsoleColor.Yellow}! ------------------|----------------|------------------]");
             foreach (var appData in appDataList)
             {
                 // display app and installed version
-                Colorizer.WriteLine($"[{ConsoleColor.Yellow}! App: {appData.Name} | Target Version: {appData.Version} | Installed version: {GetNbuildAppFileVersion(appData)}]");
-
+                // InstalledAppFileVersionGreterOrEqual is true, print green, else print red
+                if (InstalledAppFileVersionGreterOrEqual(appData))
+                {
+                    Colorizer.WriteLine($"[{ConsoleColor.Green}! {appData.Name,-17} | {appData.Version,-14} | {GetNbuildAppFileVersion(appData)}]");
+                }
+                else
+                {
+                    Colorizer.WriteLine($"[{ConsoleColor.Red}! {appData.Name,-17} | {appData.Version,-14} | {GetNbuildAppFileVersion(appData)}]");
+                }
             }
 
             return ResultHelper.Success();
@@ -147,7 +157,7 @@ namespace Nbuild
                     }
                     else
                     {
-                        Colorizer.WriteLine($"[{ConsoleColor.Red}!X {appData.Name} {appData.Version} failed to install: {resultInstall.Output[0]}]");
+                        Colorizer.WriteLine($"[{ConsoleColor.Red}!X {appData.Name} {appData.Version} failed to install]");
                     }
                     //resultInstall = Update(appData);
                 }
@@ -200,7 +210,7 @@ namespace Nbuild
                 return false;
             }
 
-            if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{nbuildApp.Name} current version: {currentVersion} >=  {nbuildApp.Version}: {currentVersionParsed >= versionParsed}]");
+            //if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{nbuildApp.Name} current version: {currentVersion} >=  {nbuildApp.Version}: {currentVersionParsed >= versionParsed}]");
             return currentVersionParsed >= versionParsed;
         }
 
