@@ -71,7 +71,7 @@ namespace Nbuild
 
                     foreach (var appData in appDataList)
                     {
-                        if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{appData.Name} {appData.Version} to install.]");
+                        Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Installing {appData.Name} {appData.Version}...]");
 
                         var result = Install(appData);
                         if (!result.IsSuccess())
