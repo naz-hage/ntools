@@ -1,4 +1,5 @@
 {
+  "Version": "1.2.0",
   "NbuildAppList": [
     {
       "Name": "Ntools",
@@ -17,7 +18,7 @@
       "WebDownloadFile": "https://aka.ms/vs/17/release/vs_BuildTools.exe",
       "DownloadedFile": "vs_BuildTools.exe",
       "InstallCommand": "vs_BuildTools.exe",
-      "InstallArgs": "--add Microsoft.VisualStudio.Workload.MSBuildTools Microsoft.NetCore.Component.SDK Microsoft.VisualStudio.Workload.ManagedDesktop Microsoft.VisualStudio.Workload.NetWeb --quiet",
+      "InstallArgs": "--add Microsoft.VisualStudio.Workload.MSBuildTools Microsoft.NetCore.Component.SDK Microsoft.VisualStudio.Workload.ManagedDesktop Microsoft.VisualStudio.Workload.NetWeb --quiet --wait",
       "InstallPath": "$(ProgramFilesX86)\\Microsoft Visual Studio\\2022\\BuildTools\\MSBuild\\Current\\Bin\\amd64"
     },
     {
@@ -27,7 +28,7 @@
       "WebDownloadFile": "https://aka.ms/vs/17/release/vs_Community.exe",
       "DownloadedFile": "vs_Community.exe",
       "InstallCommand": "vs_Community.exe",
-      "InstallArgs": "--add Microsoft.VisualStudio.Workload.NetWeb Microsoft.VisualStudio.Workload.NetDesktop Microsoft.VisualStudio.Workload.Azure Microsoft.VisualStudio.Workload.Data --quiet",
+      "InstallArgs": "--add Microsoft.VisualStudio.Workload.CoreEditor Microsoft.VisualStudio.Workload.Azure Microsoft.VisualStudio.Workload.ManagedDesktop Microsoft.VisualStudio.Workload.NativeDesktop Microsoft.VisualStudio.Workload.NetWeb Microsoft.VisualStudio.Workload.NetDesktop Microsoft.VisualStudio.Workload.Azure Microsoft.VisualStudio.Workload.Data --quiet",
       "InstallPath": "$(ProgramFiles)\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE"
     },
     {

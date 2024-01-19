@@ -32,11 +32,24 @@ namespace Nbuild
                 }
             }
 
-            var listAppData = (JsonSerializer.Deserialize<NbuildApps>(json) ?? throw new ParserException("Failed to parse json to AppData object", null)) ?? throw new ParserException("Failed to parse json to AppData object", null);
-
-            foreach (var appData in listAppData.NbuildAppList)
+            try
             {
-                yield return Validate(appData);
+                var listAppData = JsonSerializer.Deserialize<NbuildApps>(json) ?? throw new ParserException("Failed to parse json to AppData object", null);
+
+                // make sure version matches 1.2.0
+                if (listAppData.Version != "1.2.0")
+                {
+                    throw new ParserException($"Version {listAppData.Version} is not supported. Please use version 1.2.0", null);
+                }
+
+                foreach (var appData in listAppData.NbuildAppList)
+                {
+                    yield return Validate(appData);
+                }
+            }
+            catch (JsonException ex)
+            {
+                throw new ParserException("Failed to deserialize JSON. Required elements are missing.", ex);
             }
         }
 
