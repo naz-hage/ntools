@@ -1,4 +1,5 @@
-﻿using CommandLine;
+﻿using System.Configuration;
+using CommandLine;
 using Launcher;
 using NbuildTasks;
 using OutputColorizer;
@@ -9,6 +10,7 @@ public class Program
 {
     private const string CmdTargets = "targets";
     private const string CmdInstall = "install";
+    private const string CmdList = "list";
     private const string CmdHelp = "--help";
     private const string NgitAssemblyExe = "ng.exe";
     private static readonly int linesToDisplay = 10;
@@ -48,6 +50,7 @@ public class Program
                 {
                     var d when d == CmdTargets => BuildStarter.DisplayTargets(Environment.CurrentDirectory),
                     var d when d == CmdInstall => Command.Install(options.Json),
+                    var d when d == CmdList => Command.List(options.Json),
                     _ => ResultHelper.Fail(-1, $"Invalid Command: '{options.Command}'"),
                 };
             }

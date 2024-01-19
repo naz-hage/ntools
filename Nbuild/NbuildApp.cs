@@ -109,6 +109,8 @@ namespace Nbuild
             appData.InstallArgs = appData.InstallArgs.Replace("$(InstallPath)", appData.InstallPath);
             appData.InstallCommand = appData.InstallCommand.Replace("$(Version)", appData.Version);
             appData.InstallPath = appData.InstallPath?.Replace("$(Version)", appData.Version);
+            string programFiles = Environment.GetFolderPath (Environment.SpecialFolder.ProgramFiles);
+            appData.InstallPath = appData.InstallPath?.Replace("$(ProgramFiles)", programFiles);
 
             return appData;
         }

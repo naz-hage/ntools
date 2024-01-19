@@ -60,6 +60,22 @@ namespace Nbuild
             }
         }
 
+        public static ResultHelper List (string? json, bool verbose = true)
+        {
+
+            var appDataList = NbuildApp.FromMultiJson(json);
+            if (appDataList == null) return ResultHelper.Fail(-1, $"Invalid json input");
+
+            foreach (var appData in appDataList)
+            {
+                // display app and installed version
+                Colorizer.WriteLine($"[{ConsoleColor.Yellow}! App: {appData.Name} | Target Version: {appData.Version} | Installed version: {GetNbuildAppFileVersion(appData)}]");
+
+            }
+
+            return ResultHelper.Success();
+        }
+
         private static string? Download (NbuildApp nbuildApp)
         {
             if (nbuildApp == null || string.IsNullOrEmpty(nbuildApp.WebDownloadFile))
@@ -80,7 +96,6 @@ namespace Nbuild
                 return null;
             }
         }
-
 
         private static ResultHelper Install(NbuildApp appData)
         {
@@ -188,7 +203,6 @@ namespace Nbuild
             if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{nbuildApp.Name} current version: {currentVersion} >=  {nbuildApp.Version}: {currentVersionParsed >= versionParsed}]");
             return currentVersionParsed >= versionParsed;
         }
-
 
         // Examine if this method is needed
         private static ResultHelper Update(NbuildApp nbuildApp)

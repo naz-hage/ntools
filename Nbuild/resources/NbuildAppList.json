@@ -29,6 +29,16 @@
       "InstallCommand": "7zip.exe",
       "InstallArgs": "/S /D=\"c:\\Program Files\\7-Zip\"",
       "InstallPath": "c:\\Program Files\\7-Zip"
+    },
+    {
+      "Name": "Git for Windows",
+      "Version": "2.43.1",
+      "AppFileName": "git.exe",
+      "WebDownloadFile": "https://github.com/git-for-windows/git/releases/download/v$(Version).windows.1/Git-$(Version)-64-bit.exe",
+      "DownloadedFile": "Git-$(Version)-64-bit.exe",
+      "InstallCommand": "Git-$(Version)-64-bit.exe",
+      "InstallArgs": "/SILENT /NORESTART /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS /SP- /LOG",
+      "InstallPath": "$(ProgramFiles)\\Git\\bin"
     }
   ]
 }
