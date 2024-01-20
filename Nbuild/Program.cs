@@ -1,5 +1,4 @@
-﻿using System.Configuration;
-using CommandLine;
+﻿using CommandLine;
 using Launcher;
 using NbuildTasks;
 using OutputColorizer;

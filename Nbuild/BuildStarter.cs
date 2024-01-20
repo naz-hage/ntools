@@ -36,17 +36,9 @@ public class BuildStarter
 
         Console.WriteLine($"MSBuild started with '{target ?? "Default"}' target");
 
-        string cmd;
-
-        if (string.IsNullOrEmpty(target))
-        {
-            cmd = $"{nbuildPath} -fl -flp:logfile={LogFile};verbosity=normal";
-        }
-        else
-        {
-            cmd = $"{nbuildPath} /t:{target} -fl -flp:logfile={LogFile};verbosity=normal";
-        }
-
+        string cmd = string.IsNullOrEmpty(target)
+            ? $"{nbuildPath} -fl -flp:logfile={LogFile};verbosity=normal"
+            : $"{nbuildPath} /t:{target} -fl -flp:logfile={LogFile};verbosity=normal";
         var parameters = new Parameters
         {
             WorkingDir = Directory.GetCurrentDirectory(),

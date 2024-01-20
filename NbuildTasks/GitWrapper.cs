@@ -38,18 +38,9 @@ namespace NbuildTasks
             {
                 MainDir = mainDir;
             }
-            // hard code for now to debug GitHub Actions failures
-            //DevDrive = "d:";
-            //MainDir = "a";
 
-            if (project == null)
-            {
-                Parameters.WorkingDir = Environment.CurrentDirectory;
-            }
-            else
-            {
-                Parameters.WorkingDir = $@"{DevDrive}\{MainDir}\{project}";
-            }
+
+            Parameters.WorkingDir = project == null ? Environment.CurrentDirectory : $@"{DevDrive}\{MainDir}\{project}";
 
             // print Parameters
             if (verbose) Console.WriteLine($"GitWrapper.Parameters.WorkingDir: {Parameters.WorkingDir}");
@@ -75,14 +66,7 @@ namespace NbuildTasks
 
             var solutionDir = $@"{DevDir}\{projectName}";
 
-            if (string.IsNullOrEmpty(projectName))
-            {
-                Parameters.WorkingDir = Environment.CurrentDirectory;
-            }
-            else
-            {
-                Parameters.WorkingDir = solutionDir;
-            }
+            Parameters.WorkingDir = string.IsNullOrEmpty(projectName) ? Environment.CurrentDirectory : solutionDir;
 
             if (Parameters.Verbose) Console.WriteLine($"GitWrapper.Parameters.WorkingDir: {Parameters.WorkingDir}");
 
@@ -207,14 +191,7 @@ namespace NbuildTasks
                 try
                 {
                     string productionTag = string.Join(".", version);
-                    if (IsValidTag(productionTag))
-                    {
-                        return productionTag;
-                    }
-                    else
-                    {
-                        return null;
-                    }
+                    return IsValidTag(productionTag) ? productionTag : null;
                 }
                 catch (Exception ex)
                 {
@@ -377,21 +354,9 @@ namespace NbuildTasks
         {
             Parameters.Arguments = $"describe --abbrev=0 --tags";
             var result = Launcher.Launcher.Start(Parameters);
-            if ((result.Code == 0) && (result.Output.Count == 1))
-            {
-                if (CheckForErrorAndDisplayOutput(result.Output))
-                {
-                    return string.Empty;
-                }
-                else
-                {
-                    return result.Output[0];
-                }
-            }
-            else
-            {
-                return string.Empty;
-            }
+            return (result.Code == 0) && (result.Output.Count == 1)
+                ? CheckForErrorAndDisplayOutput(result.Output) ? string.Empty : result.Output[0]
+                : string.Empty;
         }
 
         public bool LocalTagExists(string tag)
@@ -406,13 +371,9 @@ namespace NbuildTasks
 
         public bool DeleteTag(string tag)
         {
-            bool bResult = false;
+            bool bResult = !ListLocalTags().Contains(tag) || DeleteLocalTag(tag);
 
             // check if tag exists
-            if (ListLocalTags().Contains(tag))
-                bResult = DeleteLocalTag(tag);
-            else
-                bResult = true;
 
             var remoteTags = ListRemoteTags();
             if (bResult && remoteTags.Any(x => x.Contains(tag)))
@@ -425,14 +386,7 @@ namespace NbuildTasks
         {
             Parameters.Arguments = $"tag --list";
             var result = Launcher.Launcher.Start(Parameters);
-            if (result.Code == 0 && result.Output.Count >= 1)
-            {
-                return result.Output.ToList();
-            }
-            else
-            {
-                return new List<string>();
-            }
+            return result.Code == 0 && result.Output.Count >= 1 ? result.Output.ToList() : new List<string>();
         }
 
         private List<string> DeleteRemoteTags(string url)
@@ -482,14 +436,9 @@ namespace NbuildTasks
 
             Parameters.Arguments = $"tag -d {tag}";
             var result = Launcher.Launcher.Start(Parameters);
-            if (result.Code == 0
+            return result.Code == 0
                     && result.Output.Count >= 1
-                    && result.Output.Exists(line => line.StartsWith($"Deleted tag '{tag}'")))
-            {
-                return true;
-            }
-
-            return false;
+                    && result.Output.Exists(line => line.StartsWith($"Deleted tag '{tag}'"));
         }
 
         private bool DeleteRemoteTag(string tag)
@@ -596,8 +545,7 @@ namespace NbuildTasks
 
         public bool BranchExists(string branch)
         {
-            if (string.IsNullOrEmpty(branch)) return false;
-            return ListBranches().Contains(branch);
+            return !string.IsNullOrEmpty(branch) && ListBranches().Contains(branch);
         }
 
         public List<string> ListBranches()
@@ -623,15 +571,8 @@ namespace NbuildTasks
         {
             foreach (var line in lines)
             {
-                if (line.ToLower().Contains("error") ||
-                    line.ToLower().Contains("fatal"))
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                return line.ToLower().Contains("error") ||
+                    line.ToLower().Contains("fatal");
             }
             return false;
         }

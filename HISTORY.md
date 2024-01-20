@@ -1,58 +1,22 @@
 [Next](#next)
 
-## Version 1.2.0 - 05-jan-24
+## Version 1.2.0 - 22-jan-24
 - See [issue#5](https://github.com/naz-hage/ntools/issues/5)
-- The following lines belong in dotnet.targets file
-        <!-- 
-            <Exec Command='"$(DotNetExe)" --version' Condition="Exists('$(DotNetExe)')" />
-        <RedError Condition="'$(IsAdmin)' == false" Message="Must be an admin to install dotnet" />
-        <FileVersion Name="$(DotNetExe)" Condition="Exists('$(DotNetExe)')" >
-            <Output TaskParameter="Output" PropertyName="DotNetVersion" />
-        </FileVersion>
-        <Message Text="dotnet is not installed" Condition="'$(DotNetVersion)' == ''" />
-        <!-- Display the file version -->
-        <Message Text="dotnet Version is $(DotNetVersion)" Condition="'$(DotNetVersion)' != ''" />
-        <Message Text="Installing dotnet" Condition="!Exists('$(DotNetExe)') or '$(DotNetVersion)' == '' or '$(DotNetVersion)' &lt; '$(DotNetTargetVersion)'"/>
-        <Exec Command='"$(FileName)" /SILENT /NORESTART /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS /SP- /LOG' Condition="'$(DotNetVersion)' == '' Or '$(DotNetVersion)' &lt; '$(DotNetTargetVersion)'" />
-        <Delete Files="$(FileName)" Condition="Exists('$(FileName)') == true" /> 
-        -->
-    - if dotnet is not installed, the dotnet --version command will fail and the file version will not be displayed. in this release , we always install dotnet.  This is a temporary fix until we can figure out how to get the file version of dotnet.
 - Add NbuildTask to download and install applications from the web.
-
- Add targets to install
+ - Add targets to install
     - Git
     - Nodejs
     - VSCode
-    - Windows Terminal
     - VS2020
-    - VS Build Tools
     - Postman
     - Docker Desktop
     - WSL
-    - .NET Core SDK
-    - .NET Core Runtime
-- Add -i json option to Nv.exe to download and install applications from the web.
-    - Use json input metadata.json file is used to specify the application to download and install.
-    - Sample file:
-        ```json
-        {
-            "Name": "Sample Application",
-            "Version": "1.0.0",
-            "Url": "https://example.com/sample-application",
-            "InstallDir": "C:/Program Files/Sample Application",
-            "InstallFile": "setup.exe",
-            "InstallArgs": "/silent /norestart"
-        }
-        ```
-    - Output json specify 
-        - Name
-        - InstalledVersion
-        - InstalledDir
-        - InstallationStatus
--
-    
-
-
+    - Dotnet Core SDK
+    - Dotnet Core Runtime
+- Add -i [list | download | install] and -json option to Nb.exe to download and install applications from the web.
+    - Use json input applist.json file to specify the applications to download and install.
+    - Sample json file: [NbuildAppListTest](./Nbuild/resources/NbuildAppListTest.json)
+        
 ## Version 1.1.0 - 05-jan-24
 - Move Launcher project to its own public repo [ntools-launcher](https://github.com/naz-hage/ntools-launcher). Publish Launcher 1.1.0 to nuget.org and unlist 1.0.0.5
   - Target .netstandard2.0 project to supprt MS build tasks.  MS Build tasks only support .netstandard2.0. 

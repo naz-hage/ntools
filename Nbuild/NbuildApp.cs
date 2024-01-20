@@ -106,7 +106,6 @@ namespace Nbuild
                 throw new ParserException("AppFileName is missing or empty", null);
             }
 
-            
 
             // Replace $(Version) with the actual version in appData.Version
             // Replace $(InstallPath) with the actual version in appData.InstallPath
@@ -116,9 +115,9 @@ namespace Nbuild
             appData.InstallArgs = appData.InstallArgs.Replace("$(InstallPath)", appData.InstallPath);
             appData.InstallCommand = appData.InstallCommand.Replace("$(Version)", appData.Version);
             appData.InstallPath = appData.InstallPath.Replace("$(Version)", appData.Version);
-            
-            string programFiles = Environment.GetFolderPath (Environment.SpecialFolder.ProgramFiles);
-            
+
+            string programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+
             appData.InstallPath = appData.InstallPath.Replace("$(ProgramFiles)", programFiles);
             appData.InstallArgs = appData.InstallArgs.Replace("$(ProgramFiles)", programFiles);
 
@@ -126,8 +125,9 @@ namespace Nbuild
             appData.InstallPath = appData.InstallPath.Replace("$(ProgramFilesX86)", programFilesX86);
             appData.InstallArgs = appData.InstallArgs.Replace("$(ProgramFilesX86)", programFilesX86);
 
-            if (!Path.IsPathRooted(appData.InstallPath)) throw new ParserException($"App: {appData.Name}, InstallPath {appData.InstallPath} must be rooted. i.e. C:\\Program Files\\Nbuild", null);
-            return appData;
+            return !Path.IsPathRooted(appData.InstallPath)
+                ? throw new ParserException($"App: {appData.Name}, InstallPath {appData.InstallPath} must be rooted. i.e. C:\\Program Files\\Nbuild", null)
+                : appData;
         }
     }
 }

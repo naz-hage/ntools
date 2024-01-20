@@ -108,7 +108,7 @@
 	<!--Build local staging without incrementing the version-->
 	<Target Name="LOCAL" DependsOnTargets="
                 SOLUTION;
-                SAVE_ARTIFACTS;
+                COPY_ARTIFACTS;
                 PACKAGE"
 				>
 	</Target>

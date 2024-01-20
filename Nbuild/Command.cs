@@ -17,14 +17,7 @@ namespace Nbuild
             get { return _testMode; }
             set
             {
-                if (IsTestMode())
-                {
-                    _testMode = value;
-                }
-                else
-                {
-                    throw new InvalidOperationException("TestMode can only be set in test mode.");
-                }
+                _testMode = IsTestMode() ? value : throw new InvalidOperationException("TestMode can only be set in test mode.");
             }
         }
 
@@ -82,7 +75,7 @@ namespace Nbuild
 
                     foreach (var appData in appDataList)
                     {
-                        
+
 
                         var result = Install(appData);
                         if (!result.IsSuccess())
@@ -110,7 +103,7 @@ namespace Nbuild
             }
         }
 
-        public static ResultHelper List (string? json)
+        public static ResultHelper List(string? json)
         {
             try
             {
@@ -168,7 +161,7 @@ namespace Nbuild
             {
                 // download app
                 var result = DownloadApp(appData);
-                
+
                 if (result.IsSuccess())
                 {
                     Colorizer.WriteLine($"[{ConsoleColor.Green}! {appData.Name,-18} | {appData.DownloadedFile,-30} |]");
@@ -185,7 +178,7 @@ namespace Nbuild
             return ResultHelper.Success();
         }
 
-        private static ResultHelper DownloadApp (NbuildApp nbuildApp)
+        private static ResultHelper DownloadApp(NbuildApp nbuildApp)
         {
             if (nbuildApp == null || string.IsNullOrEmpty(nbuildApp.WebDownloadFile))
             {
@@ -241,7 +234,7 @@ namespace Nbuild
 
                 Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Installing {appData.Name} {appData.Version}]");
                 var resultInstall = Launcher.Launcher.Start(parameters);
-                
+
                 if (resultInstall.IsSuccess())
                 {
                     // Check if the app was installed successfully
@@ -276,12 +269,9 @@ namespace Nbuild
                 FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(appFile);
 
                 // return file Version as combined string of all parts : major, minor, build, patch
-                if (fileVersionInfo != null)
-                {
-                       return $"{fileVersionInfo.FileMajorPart}.{fileVersionInfo.FileMinorPart}.{fileVersionInfo.FileBuildPart}.{fileVersionInfo.FilePrivatePart}";
-                }
-
-                return null;
+                return fileVersionInfo != null
+                    ? $"{fileVersionInfo.FileMajorPart}.{fileVersionInfo.FileMinorPart}.{fileVersionInfo.FileBuildPart}.{fileVersionInfo.FilePrivatePart}"
+                    : null;
             }
             catch (Exception)
             {

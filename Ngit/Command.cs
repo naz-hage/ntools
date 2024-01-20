@@ -170,12 +170,7 @@ namespace Ngit
 
             if (!string.IsNullOrEmpty(options.Tag))
             {
-                if (!GitWrapper.DeleteTag(options.Tag))
-                    retCode = RetCode.DeleteTagFailed;
-                else
-                {
-                    retCode = RetCode.Success;
-                }
+                retCode = !GitWrapper.DeleteTag(options.Tag) ? RetCode.DeleteTagFailed : RetCode.Success;
             }
             else
             {

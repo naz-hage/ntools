@@ -118,7 +118,7 @@
                 AUTOTAG_STAGING;
 				SOLUTION;
                 TEST;
-				SAVE_ARTIFACTS;
+				COPY_ARTIFACTS;
                 PACKAGE">
   </Target>
 
@@ -130,7 +130,7 @@
                 AUTOTAG_PRODUCTION;
                 SOLUTION;
 				TEST;
-                SAVE_ARTIFACTS;
+                COPY_ARTIFACTS;
                 PACKAGE">
   
   </Target>
@@ -174,7 +174,7 @@
 	</Target>
 
 	<!-- Save the artifacts to the artifacts folder -->
-	<Target Name="SAVE_ARTIFACTS" DependsOnTargets="ARTIFACTS;TAG">
+	<Target Name="COPY_ARTIFACTS" DependsOnTargets="ARTIFACTS;TAG">
 		<Error Condition="'$(ArtifactsFolder)' == ''" Text="Error: ArtifactsFolder property is not defined." />
 		<Message Text="ArtifactsFolder: $(ArtifactsFolder)"/>
 
