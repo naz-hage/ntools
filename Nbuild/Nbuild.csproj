@@ -30,6 +30,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Remove="resources\app-code.json" />
 	  <None Remove="resources\dotnet.targets" />
 	</ItemGroup>
 
@@ -40,6 +41,7 @@
 		<EmbeddedResource Include="resources\mongodb.targets" />
 		<EmbeddedResource Include="resources\nbuild.bat" />
 		<EmbeddedResource Include="resources\nbuild.targets" />
+		<EmbeddedResource Include="resources\app-code.json" />
 		<EmbeddedResource Include="resources\node.targets" />
 		<EmbeddedResource Include="resources\nuget.targets" />
 		<EmbeddedResource Include="resources\NbuildAppListTest.json" />

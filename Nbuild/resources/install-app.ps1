@@ -115,7 +115,7 @@ function Main {
     #$webDownloadFile = $gitConfig["WebDownloadFile"]
 
     # check if Git is installed
-    $installed = CheckIfAppInstalled "git.json"
+    $installed = CheckIfAppInstalled "app-git.json"
     if ($installed) {
         Write-Host "Git version: $version is already installed."
     }

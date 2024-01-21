@@ -17,7 +17,7 @@
       "AppFileName": "devenv.exe",
       "WebDownloadFile": "https://aka.ms/vs/17/release/vs_Community.exe",
       "DownloadedFile": "vs_Community.exe",
-      "InstallCommand": "vs_Community.exe",
+      "InstallCommand": "$(DownloadedFile)",
       "InstallArgs": "--add Microsoft.VisualStudio.Workload.CoreEditor Microsoft.VisualStudio.Workload.Azure Microsoft.VisualStudio.Workload.ManagedDesktop Microsoft.VisualStudio.Workload.NativeDesktop Microsoft.VisualStudio.Workload.NetWeb Microsoft.VisualStudio.Workload.NetDesktop Microsoft.VisualStudio.Workload.Azure Microsoft.VisualStudio.Workload.Data --quiet --wait",
       "InstallPath": "$(ProgramFiles)\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE"
     },
@@ -27,7 +27,7 @@
       "AppFileName": "7z.exe",
       "WebDownloadFile": "https://www.7-zip.org/a/7z2301-x64.exe",
       "DownloadedFile": "7zip.exe",
-      "InstallCommand": "7zip.exe",
+      "InstallCommand": "$(DownloadedFile)",
       "InstallArgs": "/S /D=\"$(ProgramFiles)\\7-Zip\"",
       "InstallPath": "$(ProgramFiles)\\7-Zip"
     },
@@ -37,7 +37,7 @@
       "AppFileName": "git.exe",
       "WebDownloadFile": "https://github.com/git-for-windows/git/releases/download/v$(Version).windows.1/Git-$(Version)-64-bit.exe",
       "DownloadedFile": "Git-$(Version)-64-bit.exe",
-      "InstallCommand": "Git-$(Version)-64-bit.exe",
+      "InstallCommand": "$(DownloadedFile)",
       "InstallArgs": "/SILENT /NORESTART /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS /SP- /LOG",
       "InstallPath": "$(ProgramFiles)\\Git\\bin"
     },
@@ -50,6 +50,16 @@
       "InstallCommand": "msiexec.exe",
       "InstallArgs": "/i PowerShell-$(Version)-win-x64.msi /quiet",
       "InstallPath": "$(ProgramFiles)\\PowerShell\\7"
+    },
+    {
+      "Name": "Visual Studio Code",
+      "Version": "1.85.2",
+      "AppFileName": "Code.exe",
+      "WebDownloadFile": "https://aka.ms/win32-x64-system-stable",
+      "DownloadedFile": "VSCodeSetup-x64-$(Version).exe",
+      "InstallCommand": "$(DownloadedFile)",
+      "InstallArgs": "/silent /mergetasks=!runcode,addcontextmenufiles,addcontextmenufolders",
+      "InstallPath": "$(ProgramFiles)\\Microsoft VS Code"
     }
   ]
 }
