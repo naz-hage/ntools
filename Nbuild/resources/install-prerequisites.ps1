@@ -26,15 +26,13 @@ function Main {
     Test-Administratorpriviledges
 
     # Install 7zip version 23.01
-    .\Install7zip.ps1 23.01
+    .\install-7zip.ps1 23.01
 
     # Install MSBuildTools version 17    
-    InstallVSBuildTools 17
+    .\install-vs-build-tools 17
    
-   # Install NBuildTools version 1.1.0
-   .\InstallNBuild.ps1 1.1.0
-
-
+   # Install NTools version 1.1.0
+   .\install-ntools.ps1 1.1.0
 }
 
 # Run the Main function

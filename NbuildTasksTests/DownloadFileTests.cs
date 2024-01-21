@@ -15,22 +15,23 @@ namespace NbuildTasksTests
         public async Task DownloadFileTaskAsyncTestAsync()
         {
             // Arrange
+            
             var httpClient = new HttpClient();
-            Uri uri = new("https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe");
-            string fileName = "Docker.Desktop.Installer.exe";
+            Uri webDownloadFile = new("https://dist.nuget.org/win-x86-commandline/latest/nuget.exe");
+            string downloadedFile = "nuget.exe";
 
             // setup file name to download to temp folder because devtools is protected
-            fileName = Path.Combine(Path.GetTempPath(), Path.GetFileName(fileName));
-            if (File.Exists(fileName))
+            downloadedFile = Path.Combine(Path.GetTempPath(), Path.GetFileName(downloadedFile));
+            if (File.Exists(downloadedFile))
             {
-                File.Delete(fileName);
+                File.Delete(downloadedFile);
             }
 
             // Act
-            var result = await httpClient.DownloadFileAsync(uri, fileName);
+            var result = await httpClient.DownloadFileAsync(webDownloadFile, downloadedFile);
 
             // Assert
-            Assert.IsTrue(File.Exists(fileName));
+            Assert.IsTrue(File.Exists(downloadedFile));
             Assert.IsTrue(result.IsSuccess());
         }
 

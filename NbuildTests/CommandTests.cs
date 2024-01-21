@@ -14,6 +14,34 @@ namespace NbuildTests
         private readonly string ResourceLocation = "Nbuild.resources.NbuildAppListTest.json";
 
         [TestMethod()]
+        public void DownloaTest()
+        {
+            // Arrange
+
+            var json = @"{
+                ""Version"": ""1.2.0"",
+                ""NbuildAppList"": [
+                {
+                ""Name"": ""nbuild"",
+                ""Version"": ""1.1.0"",
+                ""AppFileName"": ""nb.exe"",
+                ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
+                ""DownloadedFile"": ""$(Version).zip"",
+                ""InstallCommand"": ""powershell.exe"",
+                ""InstallArgs"": ""-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force"",
+                ""InstallPath"": ""C:\\Temp\\nbuild2""
+                }
+            ]
+            }";
+
+            // Act
+            var result = Command.Download(json);
+
+            // Assert
+            Assert.IsTrue(result.IsSuccess());
+        }
+
+        [TestMethod()]
         public void InstallFromJsonFileTest()
         {
             // Arrange read json from file from embedded resource

@@ -1,6 +1,6 @@
 # .\InstallPoershell.ps1
 
-function CheckIfPoweShellInstalled {
+function CheckIfPowerShellInstalled {
     param (
         [Parameter(Mandatory=$true)]
         [string]$powershellVersion
@@ -19,8 +19,7 @@ function CheckIfPoweShellInstalled {
 }
 
 
-
-function  InstallPoweShell {
+function  InstallPowerShell {
     param (
         [Parameter(Mandatory=$true)]
         [string]$powershellVersion
@@ -39,7 +38,7 @@ function  InstallPoweShell {
     Start-Process -FilePath msiexec.exe -ArgumentList "/i $powershellOutput /quiet" -Wait
 
     # check if PowerShell is installed
-    $powershellInstalled = CheckIfPoweShellInstalled $powershellVersion
+    $powershellInstalled = CheckIfPowerShellInstalled $powershellVersion
     if ($powershellInstalled) {
         Write-Host "PowerShell version: $powershellVersion is already installed."
         return
@@ -53,14 +52,14 @@ function  InstallPoweShell {
 function Main {
     
     $version = "7.4.1"
-    $powershellInstalled = CheckIfPoweShellInstalled $version
+    $powershellInstalled = CheckIfPowerShellInstalled $version
     if ($powershellInstalled) {
         Write-Host "PowerShell version: $version is already installed."
     }
     else
     {
         Write-Host "Installing PowerShell version: $version ..."
-        InstallPoweShell $version
+        InstallPowerShell $version
     }
 }
 

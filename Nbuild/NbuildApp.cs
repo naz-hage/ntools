@@ -110,22 +110,27 @@ namespace Nbuild
             // Replace $(Version) with the actual version in appData.Version
             // Replace $(InstallPath) with the actual version in appData.InstallPath
             appData.WebDownloadFile = appData.WebDownloadFile.Replace("$(Version)", appData.Version);
-            appData.DownloadedFile = appData.DownloadedFile.Replace("$(Version)", appData.Version);
-            appData.InstallArgs = appData.InstallArgs.Replace("$(Version)", appData.Version);
-            appData.InstallArgs = appData.InstallArgs.Replace("$(InstallPath)", appData.InstallPath);
-            appData.InstallCommand = appData.InstallCommand.Replace("$(Version)", appData.Version);
-            appData.InstallPath = appData.InstallPath.Replace("$(Version)", appData.Version);
 
+            appData.DownloadedFile = appData.DownloadedFile.Replace("$(Version)", appData.Version);
+            appData.DownloadedFile = appData.DownloadedFile.Replace("$(AppFileName)", appData.AppFileName);
+
+            appData.InstallCommand = appData.InstallCommand.Replace("$(Version)", appData.Version);
             appData.InstallCommand = appData.InstallCommand.Replace("$(DownloadedFile)", appData.DownloadedFile);
 
             string programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
-
-            appData.InstallPath = appData.InstallPath.Replace("$(ProgramFiles)", programFiles);
-            appData.InstallArgs = appData.InstallArgs.Replace("$(ProgramFiles)", programFiles);
-
             string programFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
-            appData.InstallPath = appData.InstallPath.Replace("$(ProgramFilesX86)", programFilesX86);
+
+            appData.InstallArgs = appData.InstallArgs.Replace("$(Version)", appData.Version);
+            appData.InstallArgs = appData.InstallArgs.Replace("$(InstallPath)", appData.InstallPath);
+            appData.InstallArgs = appData.InstallArgs.Replace("$(AppFileName)", appData.AppFileName);
+
+            appData.InstallArgs = appData.InstallArgs.Replace("$(ProgramFiles)", programFiles);
             appData.InstallArgs = appData.InstallArgs.Replace("$(ProgramFilesX86)", programFilesX86);
+
+            appData.InstallPath = appData.InstallPath.Replace("$(Version)", appData.Version);
+            appData.InstallPath = appData.InstallPath.Replace("$(ProgramFiles)", programFiles);
+            appData.InstallPath = appData.InstallPath.Replace("$(ProgramFilesX86)", programFilesX86);
+
 
             return !Path.IsPathRooted(appData.InstallPath)
                 ? throw new ParserException($"App: {appData.Name}, InstallPath {appData.InstallPath} must be rooted. i.e. C:\\Program Files\\Nbuild", null)

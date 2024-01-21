@@ -10,7 +10,7 @@ namespace Nbuild
     public static class Command
     {
         private static readonly string DownloadsDirectory = $"{Environment.GetEnvironmentVariable("Temp")}\\nb"; // "C:\\NToolsDownloads" $"{Environment.GetEnvironmentVariable("Temp")}\\nb"
-        private static bool Verbose = false;
+        private static readonly bool Verbose = false;
 
         public static bool TestMode
         {
@@ -36,6 +36,13 @@ namespace Nbuild
 
         private static bool IsTestMode()
         {
+            // Check if running in GitHub Actions
+            var githubActions = Environment.GetEnvironmentVariable("GITHUB_ACTIONS");
+            if (!string.IsNullOrEmpty(githubActions) && githubActions.Equals("true", StringComparison.CurrentCultureIgnoreCase))
+            {
+                return false; // Running in GitHub Actions, not in test mode
+            }
+
             // Add your logic here to determine if the application is running in test mode
             // For example, you can check an environment variable or a configuration setting
             // Return true if the application is running in test mode, false otherwise
@@ -110,22 +117,23 @@ namespace Nbuild
                 var appDataList = NbuildApp.FromMultiJson(json);
                 if (appDataList == null) return ResultHelper.Fail(-1, $"Invalid json input");
 
-                if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{appDataList.Count()} apps to list.]");
+                Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{appDataList.Count()} apps to list:]");
 
                 // print header
-                Colorizer.WriteLine($"[{ConsoleColor.Yellow}! App               | Target Version | Installed version]");
-                Colorizer.WriteLine($"[{ConsoleColor.Yellow}! ------------------|----------------|------------------]");
+                Colorizer.WriteLine($"[{ConsoleColor.Yellow}!|--------------------|----------------|-------------------|]");
+                Colorizer.WriteLine($"[{ConsoleColor.Yellow}!| App name           | Target version | Installed version |]");
+                Colorizer.WriteLine($"[{ConsoleColor.Yellow}!|--------------------|----------------|-------------------|]");
                 foreach (var appData in appDataList)
                 {
                     // display app and installed version
                     // InstalledAppFileVersionGreterOrEqual is true, print green, else print red
                     if (InstalledAppFileVersionGreterOrEqual(appData))
                     {
-                        Colorizer.WriteLine($"[{ConsoleColor.Green}! {appData.Name,-17} | {appData.Version,-14} | {GetNbuildAppFileVersion(appData)}]");
+                        Colorizer.WriteLine($"[{ConsoleColor.Green}!| {appData.Name,-18} | {appData.Version,-14} | {GetNbuildAppFileVersion(appData), -18}|]");
                     }
                     else
                     {
-                        Colorizer.WriteLine($"[{ConsoleColor.Red}! {appData.Name,-17} | {appData.Version,-14} | {GetNbuildAppFileVersion(appData)}]");
+                        Colorizer.WriteLine($"[{ConsoleColor.Red}!| {appData.Name,-18} | {appData.Version,-14} | {GetNbuildAppFileVersion(appData),-18}|]");
                     }
                 }
 
@@ -155,22 +163,28 @@ namespace Nbuild
             Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{appDataList.Count()} apps to download to {DownloadsDirectory}]");
 
             // print header
-            Colorizer.WriteLine($"[{ConsoleColor.Yellow}! App                | Download File                  |]");
-            Colorizer.WriteLine($"[{ConsoleColor.Yellow}! -------------------|--------------------------------|]");
+            Colorizer.WriteLine($"[{ConsoleColor.Yellow}! |--------------------|--------------------------------|-----------------|]");
+            Colorizer.WriteLine($"[{ConsoleColor.Yellow}! | App name           | Downloaded File                | (hh:mm:ss.ff)   |]");
+            Colorizer.WriteLine($"[{ConsoleColor.Yellow}! |--------------------|--------------------------------|-----------------|]");
             foreach (var appData in appDataList)
             {
+                var stopWatch = new Stopwatch();
+                stopWatch.Start();
                 // download app
                 var result = DownloadApp(appData);
 
+                stopWatch.Stop();
+
                 if (result.IsSuccess())
                 {
-                    Colorizer.WriteLine($"[{ConsoleColor.Green}! {appData.Name,-18} | {appData.DownloadedFile,-30} |]");
+                    Colorizer.WriteLine($"[{ConsoleColor.Green}! | {appData.Name,-18} | {appData.DownloadedFile,-30} | {stopWatch.Elapsed,-16:hh\\:mm\\:ss\\.ff}|]");
                 }
                 else
                 {
                     Colorizer.WriteLine($"[{ConsoleColor.Red}! Failed to download {appData.WebDownloadFile} to {appData.DownloadedFile}. {result.Output[0]}]");
-                    Colorizer.WriteLine($"[{ConsoleColor.Red}! {appData.Name,-18} | {appData.DownloadedFile,-30} |]");
+                    Colorizer.WriteLine($"[{ConsoleColor.Red}! | {appData.Name,-18} | {appData.DownloadedFile,-30} | {stopWatch.Elapsed,-16:hh\\:mm\\:ss\\.ff}|]");
                 }
+                
             }
 
             Console.WriteLine();
@@ -233,6 +247,8 @@ namespace Nbuild
                 };
 
                 Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Installing {appData.Name} {appData.Version}]");
+                if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Command: {appData.InstallCommand}]");
+                if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Args: {appData.InstallArgs}]");
                 var resultInstall = Launcher.Launcher.Start(parameters);
 
                 if (resultInstall.IsSuccess())

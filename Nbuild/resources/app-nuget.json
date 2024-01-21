@@ -1,0 +1,16 @@
+{
+    "Version": "1.2.0",
+    "NbuildAppList": [
+      {
+        "Name": "Nuget",
+        "Version": "6.8.0.131",
+        "AppFileName": "nuget.exe",
+        "WebDownloadFile": "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe",
+        "DownloadedFile": "$(AppFileName)",
+        "InstallCommand": "xcopy.exe",
+        "InstallArgs": "$(AppFileName) \"$(InstallPath)\\$(AppFileName)\" /d /y",
+        "InstallPath": "$(ProgramFiles)\\NBuild"
+      }
+    ]
+  }
+  
