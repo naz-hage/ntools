@@ -1,0 +1,10 @@
+{
+    "Name": "Git for Windows",
+    "Version": "2.43.0",
+    "AppFileName": "git.exe",
+    "WebDownloadFile": "https://github.com/git-for-windows/git/releases/download/v$(Version).windows.1/Git-$(Version)-64-bit.exe",
+    "DownloadedFile": "Git-$(Version)-64-bit.exe",
+    "InstallCommand": "Git-$(Version)-64-bit.exe",
+    "InstallArgs": "/SILENT /NORESTART /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS /SP- /LOG",
+    "InstallPath": "$(ProgramFiles)\\Git\\bin"
+  }
