@@ -26,28 +26,25 @@ namespace Nbuild
         static Command()
         {
             // Examine this method when we implement the logic to require admin
-            //PrepareDonloadsDirectory();
-            if (!Directory.Exists(DownloadsDirectory))
-            {
-                Directory.CreateDirectory(DownloadsDirectory);
-            }
+            if (!TestMode) DownloadsDirectory = "C:\\NToolsDownloads";
+            PrepareDownloadsDirectory();
+           
 
         }
 
         private static bool IsTestMode()
         {
             // Check if running in GitHub Actions
-            var githubActions = Environment.GetEnvironmentVariable("GITHUB_ACTIONS");
+            var githubActions = Environment.GetEnvironmentVariable("GITHUB_ACTIONS", EnvironmentVariableTarget.Process);
+            githubActions = Environment.GetEnvironmentVariable("GITHUB_ACTIONS", EnvironmentVariableTarget.Machine);
+            githubActions = Environment.GetEnvironmentVariable("GITHUB_ACTIONS", EnvironmentVariableTarget.User);
             if (!string.IsNullOrEmpty(githubActions) && githubActions.Equals("true", StringComparison.CurrentCultureIgnoreCase))
             {
-                return false; // Running in GitHub Actions, not in test mode
+                return true; // Running in GitHub Actions, in test mode
             }
 
-            // Add your logic here to determine if the application is running in test mode
-            // For example, you can check an environment variable or a configuration setting
-            // Return true if the application is running in test mode, false otherwise
-            // return true until we implement the logic
-            return true;
+            // defaut is not in test mode
+            return false;
         }
 
         public static ResultHelper Install(string? json)
@@ -160,7 +157,7 @@ namespace Nbuild
             var appDataList = NbuildApp.FromMultiJson(json);
             if (appDataList == null) return ResultHelper.Fail(-1, $"Invalid json input");
 
-            Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{appDataList.Count()} apps to download to {DownloadsDirectory}]");
+            Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{appDataList.ToList().Count} apps to download to {DownloadsDirectory}]");
 
             // print header
             Colorizer.WriteLine($"[{ConsoleColor.Yellow}! |--------------------|--------------------------------|-----------------|]");
@@ -348,23 +345,29 @@ namespace Nbuild
             return result;
         }
 
-        private static void PrepareDonloadsDirectory()
+        private static void PrepareDownloadsDirectory()
         {
-
             if (!Directory.Exists(DownloadsDirectory))
             {
                 Directory.CreateDirectory(DownloadsDirectory);
             }
 
-            // Perform a runtime check for the Windows platform
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (!TestMode)
             {
-                // Set access control for the download directory to administrators only
-                var directorySecurity = new DirectorySecurity();
-                directorySecurity.AddAccessRule(new FileSystemAccessRule("Administrators", FileSystemRights.FullControl, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
-
-                var directoryInfo = new DirectoryInfo(DownloadsDirectory);
-                directoryInfo.SetAccessControl(directorySecurity);
+                // Perform a runtime check for the Windows platform
+                // icacls "$(DownloadsDirectory)" /grant Administrators:(OI)(CI)F /inheritance:r
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    var folder = $"{Environment.GetFolderPath(Environment.SpecialFolder.System)}";
+                    var parameters = new Launcher.Parameters
+                    {
+                        FileName = $"{folder}\\icacls.exe",
+                        Arguments = $"{DownloadsDirectory} /grant Administrators:(OI)(CI)F /inheritance:r",
+                        WorkingDir = $"{DownloadsDirectory}",
+                        Verbose = true
+                    };
+                    var resultInstall = Launcher.Launcher.Start(parameters);
+                }
             }
         }
     }

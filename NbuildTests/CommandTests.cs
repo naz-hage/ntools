@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Nbuild;
 using NbuildTasks;
+using OutputColorizer;
 using System.Reflection;
 
 namespace NbuildTests
@@ -14,9 +15,18 @@ namespace NbuildTests
         private readonly string ResourceLocation = "Nbuild.resources.NbuildAppListTest.json";
 
         [TestMethod()]
-        public void DownloaTest()
+        public void DownloadTest()
         {
-            // Arrange
+            // Arrange with GITHUB_ACTIONS environment variable set to true
+            //var parameters = new Launcher.Parameters
+            //{
+            //    FileName = "setx",
+            //    Arguments = "GITHUB_ACTIONS true",
+            //    WorkingDir = Environment.CurrentDirectory,
+            //    Verbose = true
+            //};
+            //var resultInstall = Launcher.Launcher.Start(parameters);
+            //Assert.IsTrue(resultInstall.IsSuccess());
 
             var json = @"{
                 ""Version"": ""1.2.0"",
@@ -39,6 +49,19 @@ namespace NbuildTests
 
             // Assert
             Assert.IsTrue(result.IsSuccess());
+
+            //teardown
+            //parameters = new Launcher.Parameters
+            //{
+            //    //FileName = "setx",
+            //    FileName = "REG",
+            //    //Arguments = "GITHUB_ACTIONS \"\"",
+            //    Arguments = "delete HKCU\\Environment /F /V GITHUB_ACTIONS",
+            //    WorkingDir = Environment.CurrentDirectory,
+            //    Verbose = true
+            //};
+            //resultInstall = Launcher.Launcher.Start(parameters);
+            //Assert.IsTrue(resultInstall.IsSuccess());
         }
 
         [TestMethod()]

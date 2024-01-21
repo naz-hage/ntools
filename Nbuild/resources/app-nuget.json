@@ -8,7 +8,7 @@
         "WebDownloadFile": "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe",
         "DownloadedFile": "$(AppFileName)",
         "InstallCommand": "xcopy.exe",
-        "InstallArgs": "$(AppFileName) \"$(InstallPath)\\$(AppFileName)\" /d /y",
+        "InstallArgs": "$(AppFileName) \"$(InstallPath)\\\" /d /y",
         "InstallPath": "$(ProgramFiles)\\NBuild"
       }
     ]
