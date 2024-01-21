@@ -217,7 +217,7 @@ namespace Nbuild
                 return ResultHelper.Success();
             }
 
-            Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Downloading ex{appData.Name} {appData.Version}]");
+            Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Downloading {appData.Name} {appData.Version}]");
             var result = DownloadApp(appData);
 
             if (result.IsSuccess())
