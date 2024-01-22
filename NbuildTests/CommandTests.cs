@@ -13,7 +13,7 @@ namespace NbuildTests
         // Constants for test setup
         private const string NbuildAssemblyName = "Nb.dll";
         private const string NbuildAppListJsonFile = "NbuildAppListTest.json";
-        private const string GitHubActions = "GITHUB_ACTIONS";
+        private const string GitHubActions = "LOCAL_TEST";
 
         // Local test mode flag
         private bool? LocalTestMode;

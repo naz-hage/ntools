@@ -41,7 +41,7 @@ namespace Nbuild
         private static bool IsTestMode()
         {
             // Check if running in GitHub Actions
-            var githubActions = Environment.GetEnvironmentVariable("GITHUB_ACTIONS", EnvironmentVariableTarget.User);
+            var githubActions = Environment.GetEnvironmentVariable("LOCAL_TEST", EnvironmentVariableTarget.User);
             if (!string.IsNullOrEmpty(githubActions) && githubActions.Equals("true", StringComparison.CurrentCultureIgnoreCase))
             {
                 return true; // Running in GitHub Actions, in test mode
