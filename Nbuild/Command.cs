@@ -27,17 +27,13 @@ namespace Nbuild
         {
             // Examine this method when we implement the logic to require admin
             if (!TestMode) DownloadsDirectory = "C:\\NToolsDownloads";
-            PrepareDownloadsDirectory();
-           
-
+            
         }
 
         private static bool IsTestMode()
         {
             // Check if running in GitHub Actions
-            var githubActions = Environment.GetEnvironmentVariable("GITHUB_ACTIONS", EnvironmentVariableTarget.Process);
-            githubActions = Environment.GetEnvironmentVariable("GITHUB_ACTIONS", EnvironmentVariableTarget.Machine);
-            githubActions = Environment.GetEnvironmentVariable("GITHUB_ACTIONS", EnvironmentVariableTarget.User);
+            var githubActions = Environment.GetEnvironmentVariable("GITHUB_ACTIONS", EnvironmentVariableTarget.User);
             if (!string.IsNullOrEmpty(githubActions) && githubActions.Equals("true", StringComparison.CurrentCultureIgnoreCase))
             {
                 return true; // Running in GitHub Actions, in test mode
@@ -47,16 +43,52 @@ namespace Nbuild
             return false;
         }
 
-        public static ResultHelper Install(string? json)
+        private static bool CanRunCommand()
         {
-            // check if admin
             if (!Launcher.CurrentProcess.IsElevated())
             {
                 if (!TestMode)
                 {
-                    return ResultHelper.Fail(-1, $"You must run this command as an administrator");
+                    return false;
                 }
             }
+            else
+            {
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    var folder = $"{Environment.GetFolderPath(Environment.SpecialFolder.System)}";
+                    var parameters = new Launcher.Parameters
+                    {
+                        FileName = $"{folder}\\icacls.exe",
+                        Arguments = $"{DownloadsDirectory} /grant Administrators:(OI)(CI)F /inheritance:r",
+                        WorkingDir = Environment.CurrentDirectory,
+                        Verbose = true
+                    };
+
+                    var resultInstall = Launcher.Launcher.Start(parameters);
+                    if (resultInstall.IsSuccess())
+                    {
+                        Colorizer.WriteLine($"[{ConsoleColor.Green}!√ {DownloadsDirectory} ACL updated.]");
+                    }
+                    else
+                    {
+
+                        Colorizer.WriteLine($"[{ConsoleColor.Red}!X {DownloadsDirectory} ACL failed to update: {resultInstall.Output[0]}]");
+                        return false;
+                    }
+                }
+            }
+
+            if (!Directory.Exists(DownloadsDirectory)) Directory.CreateDirectory(DownloadsDirectory);
+
+            // all good caller allowed to run this command
+            return true;
+        }
+
+        public static ResultHelper Install(string? json)
+        {
+            // check if caller is admin or in test mode
+            if (!CanRunCommand()) return ResultHelper.Fail(-1, $"You must run this command as an administrator");
 
             if (string.IsNullOrEmpty(json))
             {
@@ -65,6 +97,7 @@ namespace Nbuild
 
             if (File.Exists(json))
             {
+                Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Reading {json}]");
                 json = File.ReadAllText(json);
             }
 
@@ -147,13 +180,8 @@ namespace Nbuild
         public static ResultHelper Download(string? json)
         {
             // check if admin
-            if (!Launcher.CurrentProcess.IsElevated())
-            {
-                if (!Command.TestMode)
-                {
-                    return ResultHelper.Fail(-1, $"You must run this command as an administrator");
-                }
-            }
+            if (!CanRunCommand()) return ResultHelper.Fail(-1, $"You must run this command as an administrator");
+
             var appDataList = NbuildApp.FromMultiJson(json);
             if (appDataList == null) return ResultHelper.Fail(-1, $"Invalid json input");
 
@@ -205,7 +233,7 @@ namespace Nbuild
 
         private static ResultHelper Install(NbuildApp appData)
         {
-            //PrepareDonloadsDirectory();
+            if (!CanRunCommand()) return ResultHelper.Fail(-1, $"You must run this command as an administrator");
 
             if (string.IsNullOrEmpty(appData.DownloadedFile) ||
                 string.IsNullOrEmpty(appData.WebDownloadFile) ||
@@ -350,24 +378,6 @@ namespace Nbuild
             if (!Directory.Exists(DownloadsDirectory))
             {
                 Directory.CreateDirectory(DownloadsDirectory);
-            }
-
-            if (!TestMode)
-            {
-                // Perform a runtime check for the Windows platform
-                // icacls "$(DownloadsDirectory)" /grant Administrators:(OI)(CI)F /inheritance:r
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    var folder = $"{Environment.GetFolderPath(Environment.SpecialFolder.System)}";
-                    var parameters = new Launcher.Parameters
-                    {
-                        FileName = $"{folder}\\icacls.exe",
-                        Arguments = $"{DownloadsDirectory} /grant Administrators:(OI)(CI)F /inheritance:r",
-                        WorkingDir = $"{DownloadsDirectory}",
-                        Verbose = true
-                    };
-                    var resultInstall = Launcher.Launcher.Start(parameters);
-                }
             }
         }
     }

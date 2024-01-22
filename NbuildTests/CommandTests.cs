@@ -10,24 +10,74 @@ namespace NbuildTests
     [TestClass()]
     public class CommandTests
     {
+        // Constants for test setup
         private const string NbuildAssemblyName = "Nb.dll";
         private const string NbuildAppListJsonFile = "NbuildAppListTest.json";
+        private const string GitHubActions = "GITHUB_ACTIONS";
+
+        // Local test mode flag
+        private bool? LocalTestMode;
+
+        // Resource location for test setup
         private readonly string ResourceLocation = "Nbuild.resources.NbuildAppListTest.json";
 
+        // Method to teardown test mode flag
+        private void TeardownTestModeFlag()
+        {
+            // If local test mode is set, unset it
+            if (LocalTestMode.HasValue)
+            {
+                // tear test mode
+                var parameters = new Launcher.Parameters
+                {
+                    FileName = "REG",
+                    Arguments = $"delete HKCU\\Environment /F /V {GitHubActions}",
+                    WorkingDir = Environment.CurrentDirectory,
+                    Verbose = true
+                };
+
+                Assert.IsTrue(Launcher.Launcher.Start(parameters).IsSuccess());
+            }
+
+            // delete all files in the downloads folder
+            var downloads = $"{Environment.GetEnvironmentVariable("Temp")}\\nb";
+            var files = Directory.GetFiles(downloads, "*.*");
+            foreach (var file in files)
+            {
+                Console.WriteLine($"Deleting {file}");
+                File.Delete(file);
+            }
+        }
+
+        // Method to setup test mode flag
+        private void SetupTestModeFlag()
+        {
+            var githubActions = Environment.GetEnvironmentVariable(GitHubActions, EnvironmentVariableTarget.User);
+            if (string.IsNullOrEmpty(githubActions))
+            {
+                // on local machine, Set GitHubActions to true
+                LocalTestMode = true;
+
+                // setup test mode
+                var parameters = new Launcher.Parameters
+                {
+                    FileName = "setx",
+                    Arguments = $"{GitHubActions} true",
+                    WorkingDir = Environment.CurrentDirectory,
+                    Verbose = true
+                };
+                var resultInstall = Launcher.Launcher.Start(parameters);
+                Assert.IsTrue(resultInstall.IsSuccess());
+            }
+        }
+
+        // Test method for download functionality
         [TestMethod()]
         public void DownloadTest()
         {
-            // Arrange with GITHUB_ACTIONS environment variable set to true
-            //var parameters = new Launcher.Parameters
-            //{
-            //    FileName = "setx",
-            //    Arguments = "GITHUB_ACTIONS true",
-            //    WorkingDir = Environment.CurrentDirectory,
-            //    Verbose = true
-            //};
-            //var resultInstall = Launcher.Launcher.Start(parameters);
-            //Assert.IsTrue(resultInstall.IsSuccess());
-
+            // Arrange
+            SetupTestModeFlag();
+            // JSON string for test setup
             var json = @"{
                 ""Version"": ""1.2.0"",
                 ""NbuildAppList"": [
@@ -51,22 +101,14 @@ namespace NbuildTests
             Assert.IsTrue(result.IsSuccess());
 
             //teardown
-            //parameters = new Launcher.Parameters
-            //{
-            //    //FileName = "setx",
-            //    FileName = "REG",
-            //    //Arguments = "GITHUB_ACTIONS \"\"",
-            //    Arguments = "delete HKCU\\Environment /F /V GITHUB_ACTIONS",
-            //    WorkingDir = Environment.CurrentDirectory,
-            //    Verbose = true
-            //};
-            //resultInstall = Launcher.Launcher.Start(parameters);
-            //Assert.IsTrue(resultInstall.IsSuccess());
+            TeardownTestModeFlag();
         }
 
+        // Test method for install from JSON file functionality
         [TestMethod()]
         public void InstallFromJsonFileTest()
         {
+            SetupTestModeFlag();
             // Arrange read json from file from embedded resource
 
             string? executingAssemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -89,8 +131,12 @@ namespace NbuildTests
 
             // Assert
             Assert.IsTrue(result2);
+
+            // teardown
+            TeardownTestModeFlag();
         }
 
+        // Test method for install functionality
         [TestMethod()]
         public void InstallTest()
         {
@@ -104,6 +150,8 @@ namespace NbuildTests
             //     ""InstallArgs"": ""x $(Version).zip -o\""C:\\Temp\\nbuild2\"" -y""
             // }";
             // Use this json to test the install command in GitHub Actions because it doesn't have 7-Zip installed
+            SetupTestModeFlag();
+
             var json = @"{
                 ""Name"": ""nbuild"",
                 ""Version"": ""1.1.0"",
@@ -129,8 +177,12 @@ namespace NbuildTests
 
             // Assert
             Assert.IsTrue(result2);
+
+            // teardown
+            TeardownTestModeFlag();
         }
 
+        // Test method for install exception when name is not defined
         [TestMethod()]
         public void InstallExceptionNameTest()
         {
@@ -153,6 +205,7 @@ namespace NbuildTests
             Assert.AreEqual("Invalid json input: Name is missing or empty", result.Output[0]);
         }
 
+        // Test method for install exception when AppFileName is not defined
         [TestMethod()]
         public void InstallExceptionAppFileNameTest()
         {
@@ -175,6 +228,7 @@ namespace NbuildTests
             Assert.AreEqual(result.Output[0], "Invalid json input: AppFileName is missing or empty");
         }
 
+        // Test method for install exception when WebDownloadFile is not defined
         [TestMethod()]
         public void InstallExceptionWebDownloadFileTest()
         {
@@ -197,6 +251,7 @@ namespace NbuildTests
             Assert.AreEqual(result.Output[0], "Invalid json input: WebDownloadFile is missing or empty");
         }
 
+        // Test method for install exception when DownloadedFile is not defined
         [TestMethod()]
         public void InstallExceptionDownloadedFileTest()
         {
@@ -219,6 +274,7 @@ namespace NbuildTests
             Assert.AreEqual(result.Output[0], "Invalid json input: DownloadedFile is missing or empty");
         }
 
+        // Test method for install exception when InstallCommand is not defined
         [TestMethod()]
         public void InstallExceptionInstallCommandTest()
         {
@@ -241,6 +297,7 @@ namespace NbuildTests
             Assert.AreEqual(result.Output[0], "Invalid json input: InstallCommand is missing or empty");
         }
 
+        // Test method for install exception when InstallArgs is not defined
         [TestMethod()]
         public void InstallExceptionInstallArgsTest()
         {
@@ -263,6 +320,7 @@ namespace NbuildTests
             Assert.AreEqual(result.Output[0], "Invalid json input: InstallArgs is missing or empty");
         }
 
+        // Test method for install exception when InstallPath is not defined
         [TestMethod()]
         public void InstallExceptionInstallPathTest()
         {
