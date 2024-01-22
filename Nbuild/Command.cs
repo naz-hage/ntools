@@ -26,8 +26,16 @@ namespace Nbuild
         static Command()
         {
             // Examine this method when we implement the logic to require admin
-            if (!TestMode) DownloadsDirectory = "C:\\NToolsDownloads";
-            
+            if (!TestMode || Launcher.CurrentProcess.IsElevated())
+            {
+                DownloadsDirectory = "C:\\NToolsDownloads";
+            }
+            else
+            {
+                DownloadsDirectory = $"{Environment.GetEnvironmentVariable("Temp")}\\nb";
+            }
+
+            if (!Directory.Exists(DownloadsDirectory)) Directory.CreateDirectory(DownloadsDirectory); 
         }
 
         private static bool IsTestMode()
