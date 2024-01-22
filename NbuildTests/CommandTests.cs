@@ -38,15 +38,6 @@ namespace NbuildTests
 
                 Assert.IsTrue(Launcher.Launcher.Start(parameters).IsSuccess());
             }
-
-            // delete all files in the downloads folder
-            var downloads = $"{Environment.GetEnvironmentVariable("Temp")}\\nb";
-            var files = Directory.GetFiles(downloads, "*.*");
-            foreach (var file in files)
-            {
-                Console.WriteLine($"Deleting {file}");
-                File.Delete(file);
-            }
         }
 
         // Method to setup test mode flag
