@@ -193,4 +193,16 @@
 
 	    <Message Text="==> DONE"/>
 	</Target>
+
+	<!--Update the ntools-launcher nuget package in the local feed fot testing - not needed for normal builds-->
+	<Target Name ="NUGET_UPDATE">
+		<!--Nuget does not support updating a package in the local feed without version - so we need to remove it first-->
+		<Exec Command='dotnet remove package ntools-launcher"' WorkingDirectory='$(SolutionDir)\Nbackup'></Exec>
+		<Exec Command='dotnet remove package ntools-launcher"' WorkingDirectory='$(SolutionDir)\Ngit'></Exec>
+		<Exec Command='dotnet remove package ntools-launcher"' WorkingDirectory='$(SolutionDir)\NbuildTasks'></Exec>
+		<Exec Command='dotnet add package ntools-launcher  --source "C:\Artifacts\nupkgs"' WorkingDirectory='$(SolutionDir)\Nbackup'></Exec>
+		<Exec Command='dotnet add package ntools-launcher  --source "C:\Artifacts\nupkgs"' WorkingDirectory='$(SolutionDir)\Ngit'></Exec>
+		<Exec Command='dotnet add package ntools-launcher  --source "C:\Artifacts\nupkgs"' WorkingDirectory='$(SolutionDir)\NbuildTasks'></Exec>
+	</Target>
+
 </Project>

@@ -60,7 +60,7 @@ namespace NbuildTasksTests
                 // Act
                 var result = await httpClient.DownloadFileAsync(item.Key, fileName);
 
-                Console.WriteLine($"output: {result.Output[0]}");
+                Console.WriteLine($"output: {result.GetFirstOutput()}");
 
                 // Assert
                 Assert.IsFalse(result.IsSuccess());

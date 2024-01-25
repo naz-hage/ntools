@@ -123,6 +123,7 @@ namespace Nbuild
             appData.InstallArgs = appData.InstallArgs.Replace("$(Version)", appData.Version);
             appData.InstallArgs = appData.InstallArgs.Replace("$(InstallPath)", appData.InstallPath);
             appData.InstallArgs = appData.InstallArgs.Replace("$(AppFileName)", appData.AppFileName);
+            appData.InstallArgs = appData.InstallArgs.Replace("$(DownloadedFile)", appData.DownloadedFile);
 
             appData.InstallArgs = appData.InstallArgs.Replace("$(ProgramFiles)", programFiles);
             appData.InstallArgs = appData.InstallArgs.Replace("$(ProgramFilesX86)", programFilesX86);

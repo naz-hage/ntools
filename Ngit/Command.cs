@@ -158,7 +158,7 @@ namespace Ngit
             }
             else
             {
-                Colorizer.WriteLine($"[{ConsoleColor.Red}!X {result.Output[0]}]");
+                Colorizer.WriteLine($"[{ConsoleColor.Red}!X {result.GetFirstOutput()}]");
             }
 
             return (RetCode)result.Code;

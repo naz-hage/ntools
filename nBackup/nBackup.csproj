@@ -28,7 +28,7 @@
 
   <ItemGroup>
     <PackageReference Include="CommandLine.Net" Version="2.3.0" />
-    <PackageReference Include="ntools-launcher" Version="1.0.18" />
+    <PackageReference Include="ntools-launcher" Version="1.1.0" />
   </ItemGroup>
 
   <ItemGroup>

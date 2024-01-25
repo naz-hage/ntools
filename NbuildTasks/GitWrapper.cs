@@ -1,4 +1,4 @@
-﻿using Launcher;
+﻿using Ntools;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,11 +10,12 @@ namespace NbuildTasks
     public class GitWrapper
     {
         private const string GitBinary = @"C:\Program Files\Git\cmd\git.exe";
-        public static readonly Parameters Parameters = new Launcher.Parameters
+        public static readonly Parameters Parameters = new Parameters
         {
             WorkingDir = Environment.CurrentDirectory,
             FileName = GitBinary,
             RedirectStandardOutput = true,
+            RedirectStandardError = true,
         };
 
         public string DevDrive { get; set; } = "d:";  // This default was chosen because of GitHub Actions
@@ -210,7 +211,7 @@ namespace NbuildTasks
         public bool PushTag(string newTag)
         {
             Parameters.Arguments = $"push origin {Branch} {newTag}";
-            var result = Launcher.Launcher.Start(Parameters);
+            var result = Launcher.Start(Parameters);
             if ((result.Code == 0) && (result.Output.Count >= 0))
             {
                 foreach (var line in result.Output)
@@ -242,7 +243,7 @@ namespace NbuildTasks
 
                 Parameters.Arguments = $"tag -a {newTag} HEAD -m \"Automated tag\"";
 
-                var result = Launcher.Launcher.Start(Parameters);
+                var result = Launcher.Start(Parameters);
                 if ((result.Code == 0) && (result.Output.Count >= 0))
                 {
                     foreach (var line in result.Output)
@@ -331,7 +332,7 @@ namespace NbuildTasks
         {
             var branch = string.Empty;
             Parameters.Arguments = $"branch";
-            var result = Launcher.Launcher.Start(Parameters);
+            var result = Launcher.Start(Parameters);
             if ((result.Code == 0) && (result.Output.Count > 0))
             {
 
@@ -353,9 +354,9 @@ namespace NbuildTasks
         private string GetTag()
         {
             Parameters.Arguments = $"describe --abbrev=0 --tags";
-            var result = Launcher.Launcher.Start(Parameters);
+            var result = Launcher.Start(Parameters);
             return (result.Code == 0) && (result.Output.Count == 1)
-                ? CheckForErrorAndDisplayOutput(result.Output) ? string.Empty : result.Output[0]
+                ? CheckForErrorAndDisplayOutput(result.Output) ? string.Empty : result.GetFirstOutput()
                 : string.Empty;
         }
 
@@ -385,7 +386,7 @@ namespace NbuildTasks
         public List<string> ListLocalTags()
         {
             Parameters.Arguments = $"tag --list";
-            var result = Launcher.Launcher.Start(Parameters);
+            var result = Launcher.Start(Parameters);
             return result.Code == 0 && result.Output.Count >= 1 ? result.Output.ToList() : new List<string>();
         }
 
@@ -393,7 +394,7 @@ namespace NbuildTasks
         {
             var tags = new List<string>();
             Parameters.Arguments = $"ls-remote --tags {url}";
-            var result = Launcher.Launcher.Start(Parameters);
+            var result = Launcher.Start(Parameters);
             if (result.Code == 0 && result.Output.Count >= 1)
             {
                 foreach (var line in result.Output)
@@ -414,7 +415,7 @@ namespace NbuildTasks
         {
             var tags = new List<string>();
             Parameters.Arguments = $"ls-remote --tags";
-            var result = Launcher.Launcher.Start(Parameters);
+            var result = Launcher.Start(Parameters);
             if (result.Code == 0 && result.Output.Count >= 1)
             {
                 foreach (var line in result.Output)
@@ -435,7 +436,7 @@ namespace NbuildTasks
             if (!LocalTagExists(tag)) return true;
 
             Parameters.Arguments = $"tag -d {tag}";
-            var result = Launcher.Launcher.Start(Parameters);
+            var result = Launcher.Start(Parameters);
             return result.Code == 0
                     && result.Output.Count >= 1
                     && result.Output.Exists(line => line.StartsWith($"Deleted tag '{tag}'"));
@@ -446,7 +447,7 @@ namespace NbuildTasks
             if (!RemoteTagExists(tag)) return true;
 
             Parameters.Arguments = $"push origin :refs/tags/{tag}";
-            var result = Launcher.Launcher.Start(Parameters);
+            var result = Launcher.Start(Parameters);
             if (result.Code == 0 && result.Output.Count >= 1)
             {
                 foreach (var line in result.Output)
@@ -482,7 +483,7 @@ namespace NbuildTasks
                 return ResultHelper.Fail(ResultHelper.InvalidParameter, $"Invalid DevDrive: {DevDrive}");
             }
 
-            var result = ResultHelper.New();
+            ResultHelper result;
             // change to project directory
             var DevDir = $"{DevDrive}\\{MainDir}";
 
@@ -497,7 +498,7 @@ namespace NbuildTasks
 
                 Parameters.WorkingDir = DevDir;
                 Parameters.Arguments = $"clone {url} ";
-                result = Launcher.Launcher.Start(Parameters);
+                result = Launcher.Start(Parameters);
                 if ((result.Code == 0) && (result.Output.Count > 0))
                 {
                     if (CheckForErrorAndDisplayOutput(result.Output))
@@ -523,13 +524,13 @@ namespace NbuildTasks
             if (create && !BranchExists(branch))
             {
                 Parameters.Arguments = $"checkout -b {branch}";
-                result = Launcher.Launcher.Start(Parameters);
+                result = Launcher.Start(Parameters);
             }
             else
             {
                 // checkout
                 Parameters.Arguments = $"checkout {branch}";
-                result = Launcher.Launcher.Start(Parameters);
+                result = Launcher.Start(Parameters);
             }
 
             if (result.Code == 0 && result.Output.Count >= 1)
@@ -553,7 +554,7 @@ namespace NbuildTasks
             var branches = new List<string>();
 
             Parameters.Arguments = $"branch --list";
-            var result = Launcher.Launcher.Start(Parameters);
+            var result = Launcher.Start(Parameters);
             if (result.Code == 0 && result.Output.Count >= 1)
             {
                 foreach (var line in result.Output)

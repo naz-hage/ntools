@@ -1,5 +1,5 @@
 ﻿using CommandLine;
-using Launcher;
+using Ntools;
 using NbuildTasks;
 using OutputColorizer;
 
@@ -42,8 +42,6 @@ public class Program
                 return 0;
             }
 
-            var currentDirectory = Environment.CurrentDirectory;
-
             if (options != null && !string.IsNullOrEmpty(options.Command))
             {
                 result = options.Command switch
@@ -55,12 +53,7 @@ public class Program
                     _ => ResultHelper.Fail(-1, $"Invalid Command: '{options.Command}'"),
                 };
             }
-
-            // return to current directory because the command might have changed it
-            Environment.CurrentDirectory = currentDirectory;
         }
-
-
 
         if (result.IsSuccess())
         {
@@ -102,7 +95,7 @@ public class Program
             Verbose = false,
         };
 
-        var resultHelper = Launcher.Launcher.Start(parameters);
+        var resultHelper = Launcher.Start(parameters);
         if (!resultHelper.IsSuccess())
         {
             Console.WriteLine($"==> Failed to display git info");

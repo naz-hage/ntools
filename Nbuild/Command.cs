@@ -1,9 +1,8 @@
-﻿using Launcher;
+﻿using Ntools;
 using NbuildTasks;
 using OutputColorizer;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Security.AccessControl;
 
 namespace Nbuild
 {
@@ -26,7 +25,7 @@ namespace Nbuild
         static Command()
         {
             // Examine this method when we implement the logic to require admin
-            if (!TestMode || Launcher.CurrentProcess.IsElevated())
+            if (!TestMode || Ntools.CurrentProcess.IsElevated())
             {
                 DownloadsDirectory = "C:\\NToolsDownloads";
             }
@@ -53,7 +52,7 @@ namespace Nbuild
 
         private static bool CanRunCommand()
         {
-            if (!Launcher.CurrentProcess.IsElevated())
+            if (!Ntools.CurrentProcess.IsElevated())
             {
                 if (!TestMode)
                 {
@@ -65,7 +64,7 @@ namespace Nbuild
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
                     var folder = $"{Environment.GetFolderPath(Environment.SpecialFolder.System)}";
-                    var parameters = new Launcher.Parameters
+                    var parameters = new Parameters
                     {
                         FileName = $"{folder}\\icacls.exe",
                         Arguments = $"{DownloadsDirectory} /grant Administrators:(OI)(CI)F /inheritance:r",
@@ -73,7 +72,7 @@ namespace Nbuild
                         Verbose = true
                     };
 
-                    var resultInstall = Launcher.Launcher.Start(parameters);
+                    var resultInstall = Launcher.Start(parameters);
                     if (resultInstall.IsSuccess())
                     {
                         Colorizer.WriteLine($"[{ConsoleColor.Green}!√ {DownloadsDirectory} ACL updated.]");
@@ -214,7 +213,7 @@ namespace Nbuild
                 }
                 else
                 {
-                    Colorizer.WriteLine($"[{ConsoleColor.Red}! Failed to download {appData.WebDownloadFile} to {appData.DownloadedFile}. {result.Output[0]}]");
+                    Colorizer.WriteLine($"[{ConsoleColor.Red}! Failed to download {appData.WebDownloadFile} to {appData.DownloadedFile}. {result.GetFirstOutput()}]");
                     Colorizer.WriteLine($"[{ConsoleColor.Red}! | {appData.Name,-18} | {appData.DownloadedFile,-30} | {stopWatch.Elapsed,-16:hh\\:mm\\:ss\\.ff}|]");
                 }
                 
@@ -272,17 +271,19 @@ namespace Nbuild
                 Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{appData.Name} {appData.Version} downloaded.]");
 
                 // Install the downloaded file
-                var parameters = new Launcher.Parameters
+                var parameters = new Parameters
                 {
                     FileName = appData.InstallCommand,
                     Arguments = appData.InstallArgs,
-                    WorkingDir = DownloadsDirectory
+                    WorkingDir = DownloadsDirectory,
+                    Verbose = Verbose
                 };
 
                 Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Installing {appData.Name} {appData.Version}]");
+                if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Working Directory: {parameters.WorkingDir}]");
                 if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Command: {appData.InstallCommand}]");
                 if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Args: {appData.InstallArgs}]");
-                var resultInstall = Launcher.Launcher.Start(parameters);
+                var resultInstall = Launcher.Start(parameters);
 
                 if (resultInstall.IsSuccess())
                 {
@@ -299,14 +300,14 @@ namespace Nbuild
                 }
                 else
                 {
-                    Colorizer.WriteLine($"[{ConsoleColor.Red}!X {appData.Name} {appData.Version} failed to install: {resultInstall.Output[0]}]");
+                    Colorizer.WriteLine($"[{ConsoleColor.Red}!X {appData.Name} {appData.Version} failed to install: {resultInstall.GetFirstOutput()}]");
                 }
 
                 return resultInstall;
             }
             else
             {
-                return ResultHelper.Fail(-1, $"Failed to download {appData.WebDownloadFile} to {appData.DownloadedFile}. {result.Output[0]}");
+                return ResultHelper.Fail(-1, $"Failed to download {appData.WebDownloadFile} to {appData.DownloadedFile}. {result.GetFirstOutput()}");
             }
         }
 
@@ -352,41 +353,6 @@ namespace Nbuild
 
             //if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{nbuildApp.Name} current version: {currentVersion} >=  {nbuildApp.Version}: {currentVersionParsed >= versionParsed}]");
             return currentVersionParsed >= versionParsed;
-        }
-
-        // Examine if this method is needed
-        private static ResultHelper Update(NbuildApp nbuildApp)
-        {
-            var currentVersion = GetNbuildAppFileVersion(nbuildApp);
-            if (currentVersion == null)
-            {
-                return ResultHelper.Fail(-1, $"Failed to get current version of {nbuildApp.Name}");
-            }
-
-            if (currentVersion == nbuildApp.Version)
-            {
-                return ResultHelper.Success();
-            }
-
-            var result = Install(nbuildApp);
-            if (result.IsSuccess())
-            {
-                Colorizer.WriteLine($"[{ConsoleColor.Green}!√ {nbuildApp.Name} {nbuildApp.Version} updated.]");
-            }
-            else
-            {
-                Colorizer.WriteLine($"[{ConsoleColor.Red}!X {nbuildApp.Name} {nbuildApp.Version} failed to update: {result.Output[0]}]");
-            }
-
-            return result;
-        }
-
-        private static void PrepareDownloadsDirectory()
-        {
-            if (!Directory.Exists(DownloadsDirectory))
-            {
-                Directory.CreateDirectory(DownloadsDirectory);
-            }
         }
     }
 }
