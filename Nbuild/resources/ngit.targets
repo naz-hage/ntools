@@ -13,7 +13,7 @@
     </Target>
 
     <!-- Increment version for a staging build -->
-    <Target Name="AUTOTAG_STAGING">
+    <Target Name="AUTOTAG_STAGING" >
         <!--
         <Exec Command='$(NbuildExe) -c autotag  -buildtype staging' ConsoleToMSBuild="true">
             <Output TaskParameter="ConsoleOutput" PropertyName="ProductVersion" />
@@ -54,6 +54,7 @@
         <Exec Command='git pull -r'/>
     </Target>
 
+    <!-- Increment version for a production build -->
     <Target Name="AUTOTAG_PRODUCTION" DependsOnTargets="GIT_BRANCH">
         <RedError Condition="'$(GitBranch)' != 'main'" Message="Error: Must be on main branch for a production release." />
 

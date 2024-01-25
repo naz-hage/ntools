@@ -1,0 +1,85 @@
+{
+  "Version": "1.2.0",
+  "NbuildAppList": [
+    {
+      "Name": "Ntools",
+      "Version": "1.1.0",
+      "AppFileName": "nb.exe",
+      "WebDownloadFile": "https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip",
+      "DownloadedFile": "$(Version).zip",
+      "InstallCommand": "powershell.exe",
+      "InstallArgs": "-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force",
+      "InstallPath": "$(ProgramFiles)\\Nbuild"
+    },
+    {
+      "Name": "Visual Studio 2022",
+      "Version": "17.0.0",
+      "AppFileName": "devenv.exe",
+      "WebDownloadFile": "https://aka.ms/vs/17/release/vs_Community.exe",
+      "DownloadedFile": "vs_Community.exe",
+      "InstallCommand": "$(DownloadedFile)",
+      "InstallArgs": "--add Microsoft.VisualStudio.Workload.CoreEditor Microsoft.VisualStudio.Workload.Azure Microsoft.VisualStudio.Workload.ManagedDesktop Microsoft.VisualStudio.Workload.NativeDesktop Microsoft.VisualStudio.Workload.NetWeb Microsoft.VisualStudio.Workload.NetDesktop Microsoft.VisualStudio.Workload.Azure Microsoft.VisualStudio.Workload.Data --quiet --wait",
+      "InstallPath": "$(ProgramFiles)\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE"
+    },
+    {
+      "Name": "7-zip",
+      "Version": "23.01",
+      "AppFileName": "7z.exe",
+      "WebDownloadFile": "https://www.7-zip.org/a/7z2301-x64.exe",
+      "DownloadedFile": "7zip.exe",
+      "InstallCommand": "$(DownloadedFile)",
+      "InstallArgs": "/S /D=\"$(ProgramFiles)\\7-Zip\"",
+      "InstallPath": "$(ProgramFiles)\\7-Zip"
+    },
+    {
+      "Name": "Git for Windows",
+      "Version": "2.43.0",
+      "AppFileName": "git.exe",
+      "WebDownloadFile": "https://github.com/git-for-windows/git/releases/download/v$(Version).windows.1/Git-$(Version)-64-bit.exe",
+      "DownloadedFile": "Git-$(Version)-64-bit.exe",
+      "InstallCommand": "$(DownloadedFile)",
+      "InstallArgs": "/SILENT /NORESTART /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS /SP- /LOG",
+      "InstallPath": "$(ProgramFiles)\\Git\\bin"
+    },
+    {
+      "Name": "Powershell",
+      "Version": "7.4.1",
+      "AppFileName": "pwsh.exe",
+      "WebDownloadFile": "https://github.com/PowerShell/PowerShell/releases/download/v$(Version)/PowerShell-$(Version)-win-x64.msi",
+      "DownloadedFile": "PowerShell-$(Version)-win-x64.msi",
+      "InstallCommand": "msiexec.exe",
+      "InstallArgs": "/i PowerShell-$(Version)-win-x64.msi /quiet",
+      "InstallPath": "$(ProgramFiles)\\PowerShell\\7"
+    },
+    {
+      "Name": "Visual Studio Code",
+      "Version": "1.85.2",
+      "AppFileName": "Code.exe",
+      "WebDownloadFile": "https://aka.ms/win32-x64-system-stable",
+      "DownloadedFile": "VSCodeSetup-x64-$(Version).exe",
+      "InstallCommand": "$(DownloadedFile)",
+      "InstallArgs": "/silent /mergetasks=!runcode,addcontextmenufiles,addcontextmenufolders",
+      "InstallPath": "$(ProgramFiles)\\Microsoft VS Code"
+    },
+    {
+      "Name": "Docker",
+      "Version": "4.26.1",
+      "AppFileName": "Docker Desktop.exe",
+      "WebDownloadFile": "https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe",
+      "DownloadedFile": "Docker Desktop Installer.exe",
+      "InstallCommand": "$(DownloadedFile)",
+      "InstallArgs": "install --quiet",
+      "InstallPath": "$(ProgramFiles)\\Docker\\Docker\\"
+    },
+    {
+      "Name": "Nuget",
+      "Version": "6.8.0.131",
+      "AppFileName": "nuget.exe",
+      "WebDownloadFile": "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe",
+      "DownloadedFile": "$(AppFileName)",
+      "InstallCommand": "xcopy.exe",
+      "InstallArgs": "$(AppFileName) \"$(InstallPath)\\\" /d /y",
+      "InstallPath": "$(ProgramFiles)\\NBuild"
+    }
+  ]
+}

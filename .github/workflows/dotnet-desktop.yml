@@ -95,11 +95,18 @@ jobs:
       run: dotnet build --no-restore --verbosity normal
 
     - name: Execute unit tests
+      #run: dotnet test --no-build --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
       run: dotnet test --no-build --verbosity normal
       env:
         DOTNET_CLI_TELEMETRY_OPTOUT: 1
 
-    # 0:Matches Multiple schemas when only one must validate
+    #- name: Publish code coverage report
+    #  uses: actions/upload-artifact@v2
+    #  with:
+    #   name: Code Coverage
+    #   path: ./coverage.opencover.xml
+
+# 0:Matches Multiple schemas when only one must validate
     # - name: Push
     #   uses: actions/setup-dotnet@v3
     #   with:

@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace NbuildTasks
 {
-    public class Nversion
+    public static class Nversion
     {
         public const string ExecutingAssembly = "executing";
 
@@ -14,7 +14,7 @@ namespace NbuildTasks
         /// <returns>The formatted string containing the file description, product name, company name, legal copyright, and file version.</returns>
         public static string Get(string assembly = "")
         {
-            
+
             FileVersionInfo fileVersionInfo = FileVersionInfo
                                                 .GetVersionInfo(Assembly
                                                 .GetEntryAssembly()

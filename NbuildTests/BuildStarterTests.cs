@@ -1,11 +1,9 @@
-﻿using Nbuild;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Nbuild;
 using NbuildTasks;
 using System.Reflection;
-using System.Xml.Linq;
-using System.Text;
 
-namespace Nbuild.Tests
+namespace NbuildTests
 {
     [TestClass()]
     public class BuildStarterTests
@@ -32,6 +30,8 @@ namespace Nbuild.Tests
             [
                 "PROPERTIES",
                 "CLEAN",
+                "INSTALL_DEP",
+                "TELEMETRY_OPT_OUT",
                 "STAGING",
                 "PRODUCTION",
                 "STAGING_DEPLOY",
@@ -39,10 +39,10 @@ namespace Nbuild.Tests
                 "SOLUTION",
                 "SOLUTION_MSBUILD",
                 "PACKAGE",
-                "SAVE_ARTIFACTS",
+                "COPY_ARTIFACTS",
                 "DEPLOY",
                 "TEST",
-                "TEST_RELEASE",
+                "TEST_DEBUG",
                 "IS_ADMIN",
                 "SingleProject",
                 "HandleError"
@@ -99,7 +99,6 @@ namespace Nbuild.Tests
         }
 
         [TestMethod()]
-
         public void ExtractCommentsFromTargets()
         {
             // Arrange
@@ -125,13 +124,15 @@ namespace Nbuild.Tests
                 { "TAG", true },
                 { "PUSH_TAG", true },
                 { "GIT_BRANCH", true },
-            };  
+            };
             // Arrange
             string targetFileName = ExtractCommonTargetsFile();
-            Dictionary<string, bool> commonTargets = new Dictionary<string, bool>
+            Dictionary<string, bool> commonTargets = new()
             {
                 { "PROPERTIES", true },
                 { "CLEAN", true },
+                { "INSTALL_DEP", true },
+                { "TELEMETRY_OPT_OUT", true },
                 { "STAGING", true },
                 { "PRODUCTION", true },
                 { "STAGING_DEPLOY", true },
@@ -139,10 +140,10 @@ namespace Nbuild.Tests
                 { "SOLUTION", true },
                 { "SOLUTION_MSBUILD", true },
                 { "PACKAGE", true },
-                { "SAVE_ARTIFACTS", true },
+                { "COPY_ARTIFACTS", true },
                 { "DEPLOY", true },
                 { "TEST", true },
-                { "TEST_RELEASE", true },
+                { "TEST_DEBUG", true },
                 { "IS_ADMIN", true },
                 { "JUNK_TARGET", false },
                 { "SingleProject", true },
@@ -155,7 +156,7 @@ namespace Nbuild.Tests
             {
                 // Act
                 bool isValid = BuildStarter.ValidTarget(targetFileName, target.Key);
-                
+
                 // Assert
                 Assert.AreEqual(target.Value, isValid);
             }

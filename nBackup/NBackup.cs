@@ -10,7 +10,7 @@ namespace Nbackup
 {
     public class NBackup
     {
-        private static readonly Dictionary<string, string?> _environmentVariables = new (){
+        private static readonly Dictionary<string, string?> _environmentVariables = new(){
                 { "USERPROFILE", Environment.GetEnvironmentVariable("USERPROFILE") },
                 { "USERNAME", Environment.GetEnvironmentVariable("USERNAME") },
                 { "APPDATA", Environment.GetEnvironmentVariable("APPDATA") },
@@ -33,11 +33,6 @@ namespace Nbackup
                                 IsNotNull(backup.Destination) &&
                                 IsNotNull(backup.BackupOptions))
                             {
-                                //Console.WriteLine($"    --> Source      :   {backup.Source}");
-                                //Console.WriteLine($"    --> Destination :   {backup.Destination}");
-                                //Console.WriteLine($"    --> roboCopyOptions: {backup.BackupOptions}");
-                                //Console.WriteLine();
-
                                 backup.Source = ReplaceEnvironmentVariables(backup.Source);
 
                                 backup.Destination = ReplaceEnvironmentVariables(backup.Destination);
@@ -162,34 +157,6 @@ namespace Nbackup
 
             ResultHelper result = Launcher.Launcher.Start(parameters);
 
-            //// display the last 7 lines of result.Output
-            //int start = result.Output.Count - 9;
-            //if (start < 0)
-            //{
-            //    start = 0;
-            //}
-            //for (int i = start; i < result.Output.Count; i++)
-            //{
-            //    Console.WriteLine(result.Output[i]);
-            //}
-
-            //foreach (var item in result.Output)
-            //{
-                
-                
-
-            //    if (item.Trim().StartsWith("Dirs :") ||
-            //        item.Trim().StartsWith("Files :") ||
-            //        item.Trim().StartsWith("Bytes :") ||
-            //        item.Trim().StartsWith("Times :") ||
-            //        item.Trim().StartsWith("Ended :") ||
-            //        item.ToLower().Trim().Contains("error") ||
-            //        item.Contains("Total    Copied"))
-            //    {
-            //        Console.WriteLine(item);
-            //    }
-            //}
-
             return result;
         }
 
@@ -246,6 +213,9 @@ namespace Nbackup
             }
         }
 
-        private static bool IsNotNull([NotNullWhen(true)] object? obj) => obj != null;
+        private static bool IsNotNull([NotNullWhen(true)] object? obj)
+        {
+            return obj != null;
+        }
     }
 }

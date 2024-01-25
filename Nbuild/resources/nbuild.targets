@@ -4,9 +4,7 @@
 
 	<!-- This file is a sample nbuild.targets to be used in other projects -->
 	<Import Project="$(ProgramFiles)\nbuild\common.targets" />
-    <Import Project="$(ProgramFiles)\nbuild\node.targets"/>
-    <Import Project="$(ProgramFiles)\nbuild\nuget.targets"/>
-	
+
 	<PropertyGroup>
         <!-- The name of the solution  must be filled.  it's normally the folder where the *.sln resides-->
 		<SolutionName>$([System.IO.Path]::GetFileNameWithoutExtension('$(MSBuildProjectDirectory)'))</SolutionName>
@@ -14,7 +12,7 @@
         <DeploymentFolder></DeploymentFolder>
 	</PropertyGroup>
 	
-	<!--Setup the ARTIFACTS folder for binaries and test results-->
+	<!--Setup the ARTIFACTS folders for binaries and test results-->
     <Target Name="ARTIFACTS" DependsOnTargets="TAG">
       <PropertyGroup>
         <ArtifactsFolder>$(ArtifactsDir)\$(SolutionName)\release\$(ProductVersion)</ArtifactsFolder>

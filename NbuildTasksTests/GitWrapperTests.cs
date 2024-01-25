@@ -1,10 +1,10 @@
-﻿using NbuildTasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NbuildTasks;
 using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace NbuildTasks.Tests
+namespace NbuildTasksTests
 {
     [TestClass()]
     public class GitWrapperTests : TestFirst

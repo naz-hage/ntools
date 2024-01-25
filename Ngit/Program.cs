@@ -4,8 +4,6 @@ using CommandLine;
 using NbuildTasks;
 using Ngit;
 using OutputColorizer;
-using System.Diagnostics;
-using System.Reflection;
 using static NbuildTasks.Enums;
 
 
@@ -30,7 +28,7 @@ if (!string.IsNullOrEmpty(options.GitCommand))
 
 if (ReturnCode != RetCode.Success)
 {
-    
+
     Colorizer.WriteLine($"{NgitAssemblyExe} Completed with [{ConsoleColor.Red}!'{ReturnCode}']");
 }
 

@@ -1,13 +1,14 @@
 ﻿using CommandLine;
 using Launcher;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Nbackup;
 using NbuildTasks;
 using System;
 using System.IO;
 using System.Reflection;
 using System.Text.Json;
 
-namespace Nbackup.Tests
+namespace NbackupTests
 {
     [TestClass()]
     public class NBackupTests

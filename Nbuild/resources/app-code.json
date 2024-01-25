@@ -1,0 +1,15 @@
+{
+  "Version": "1.2.0",
+  "NbuildAppList": [
+    {
+      "Name": "Visual Studio Code",
+      "Version": "1.85.2",
+      "AppFileName": "Code.exe",
+      "WebDownloadFile": "https://aka.ms/win32-x64-system-stable",
+      "DownloadedFile": "VSCodeSetup-x64-$(Version).exe",
+      "InstallCommand": "$(DownloadedFile)",
+      "InstallArgs": "/silent /mergetasks=!runcode,addcontextmenufiles,addcontextmenufolders",
+      "InstallPath": "$(ProgramFiles)\\Microsoft VS Code"
+    }
+  ]
+}

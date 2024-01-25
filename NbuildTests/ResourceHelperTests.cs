@@ -2,7 +2,7 @@
 using NbuildTasks;
 using System.Reflection;
 
-namespace Nbuild.Tests
+namespace NbuildTests
 {
     [TestClass()]
     public class ResourceHelperTests
@@ -15,7 +15,7 @@ namespace Nbuild.Tests
             string resourceLocation = "Nbuild.resources.common.targets";
             string? executingAssemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             Assert.IsNotNull(executingAssemblyDirectory);
-            
+
             string targetFileName = Path.Combine(executingAssemblyDirectory, "commom.targets");
             var assembly = Path.Combine(executingAssemblyDirectory, NbuildAssemblyName);
 

@@ -17,39 +17,30 @@ namespace NbuildTasks
             RedirectStandardOutput = true,
         };
 
-        public  string DevDrive { get; set; } = "d:";  // This default was chosen because of GitHub Actions
+        public string DevDrive { get; set; } = "d:";  // This default was chosen because of GitHub Actions
         public string MainDir { get; set; } = "a";  // This default was chosen because of GitHub Actions
 
-        public GitWrapper( string project = null, bool verbose = false)
+        public GitWrapper(string project = null, bool verbose = false)
         {
             Parameters.Verbose = verbose;
 
             // Read Environment variables DevDrive and MainDir and set Properties respectively
-            
+
             var devDrive = Environment.GetEnvironmentVariable("DevDrive");
             if (!string.IsNullOrEmpty(devDrive))
             {
                 DevDrive = devDrive;
             }
-            
+
 
             var mainDir = Environment.GetEnvironmentVariable("MainDir");
             if (!string.IsNullOrEmpty(mainDir))
             {
                 MainDir = mainDir;
             }
-            // hard code for now to debug GitHub Actions failures
-            //DevDrive = "d:";
-            //MainDir = "a";
 
-            if (project == null )
-            {
-                Parameters.WorkingDir = Environment.CurrentDirectory;
-            }
-            else
-            {
-                Parameters.WorkingDir = $@"{DevDrive}\{MainDir}\{project}";
-            }
+
+            Parameters.WorkingDir = project == null ? Environment.CurrentDirectory : $@"{DevDrive}\{MainDir}\{project}";
 
             // print Parameters
             if (verbose) Console.WriteLine($"GitWrapper.Parameters.WorkingDir: {Parameters.WorkingDir}");
@@ -75,23 +66,16 @@ namespace NbuildTasks
 
             var solutionDir = $@"{DevDir}\{projectName}";
 
-            if (string.IsNullOrEmpty(projectName))
-            {
-                Parameters.WorkingDir = Environment.CurrentDirectory;
-            }
-            else
-            {
-                Parameters.WorkingDir = solutionDir;
-            }
+            Parameters.WorkingDir = string.IsNullOrEmpty(projectName) ? Environment.CurrentDirectory : solutionDir;
 
             if (Parameters.Verbose) Console.WriteLine($"GitWrapper.Parameters.WorkingDir: {Parameters.WorkingDir}");
 
             return true;
         }
 
-        public string Branch { get { return GetBranch(); } }
+        public string Branch => GetBranch();
 
-        public string Tag { get { return GetTag(); } }
+        public string Tag => GetTag();
 
         public string AutoTag(string buildType)
         {
@@ -207,14 +191,7 @@ namespace NbuildTasks
                 try
                 {
                     string productionTag = string.Join(".", version);
-                    if (IsValidTag(productionTag))
-                    {
-                        return productionTag;
-                    }
-                    else
-                    {
-                        return null;
-                    }
+                    return IsValidTag(productionTag) ? productionTag : null;
                 }
                 catch (Exception ex)
                 {
@@ -377,21 +354,9 @@ namespace NbuildTasks
         {
             Parameters.Arguments = $"describe --abbrev=0 --tags";
             var result = Launcher.Launcher.Start(Parameters);
-            if ((result.Code == 0) && (result.Output.Count == 1))
-            {
-                if (CheckForErrorAndDisplayOutput(result.Output))
-                {
-                    return string.Empty;
-                }
-                else
-                {
-                    return result.Output[0];
-                }
-            }
-            else
-            {
-                return string.Empty;
-            }
+            return (result.Code == 0) && (result.Output.Count == 1)
+                ? CheckForErrorAndDisplayOutput(result.Output) ? string.Empty : result.Output[0]
+                : string.Empty;
         }
 
         public bool LocalTagExists(string tag)
@@ -406,16 +371,12 @@ namespace NbuildTasks
 
         public bool DeleteTag(string tag)
         {
-            bool bResult = false;
+            bool bResult = !ListLocalTags().Contains(tag) || DeleteLocalTag(tag);
 
             // check if tag exists
-            if (ListLocalTags().Contains(tag))
-                bResult = DeleteLocalTag(tag);
-            else
-                bResult = true;
-            
+
             var remoteTags = ListRemoteTags();
-            if (bResult && remoteTags.Any (x => x.Contains(tag))) 
+            if (bResult && remoteTags.Any(x => x.Contains(tag)))
                 bResult = DeleteRemoteTag(tag);
 
             return bResult;
@@ -425,14 +386,7 @@ namespace NbuildTasks
         {
             Parameters.Arguments = $"tag --list";
             var result = Launcher.Launcher.Start(Parameters);
-            if (result.Code == 0 && result.Output.Count >= 1)
-            {
-                return result.Output.ToList();
-            }
-            else
-            {
-                return new List<string>();
-            }
+            return result.Code == 0 && result.Output.Count >= 1 ? result.Output.ToList() : new List<string>();
         }
 
         private List<string> DeleteRemoteTags(string url)
@@ -479,21 +433,12 @@ namespace NbuildTasks
         private bool DeleteLocalTag(string tag)
         {
             if (!LocalTagExists(tag)) return true;
-            
+
             Parameters.Arguments = $"tag -d {tag}";
             var result = Launcher.Launcher.Start(Parameters);
-            if (result.Code == 0 && result.Output.Count >= 1)
-            {
-                foreach (var line in result.Output)
-                {
-                    if (line.StartsWith($"Deleted tag '{tag}'"))
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
+            return result.Code == 0
+                    && result.Output.Count >= 1
+                    && result.Output.Exists(line => line.StartsWith($"Deleted tag '{tag}'"));
         }
 
         private bool DeleteRemoteTag(string tag)
@@ -516,7 +461,7 @@ namespace NbuildTasks
             return false;
         }
 
-        
+
 
         public ResultHelper CloneProject(string url)
         {
@@ -524,18 +469,23 @@ namespace NbuildTasks
             {
                 return ResultHelper.Fail(ResultHelper.InvalidParameter, $"Invalid url: {url}");
             }
-            
+
             // extract project name from url
             var projectName = url.Split('/').Last().Split('.').First();
             if (string.IsNullOrEmpty(projectName))
             {
                 return ResultHelper.Fail(ResultHelper.InvalidParameter, $"Invalid url: {url}");
             }
+            // check if dev drive exists
+            if (!Directory.Exists(DevDrive))
+            {
+                return ResultHelper.Fail(ResultHelper.InvalidParameter, $"Invalid DevDrive: {DevDrive}");
+            }
 
             var result = ResultHelper.New();
             // change to project directory
             var DevDir = $"{DevDrive}\\{MainDir}";
-        
+
             var solutionDir = $@"{DevDir}\{projectName}";
             var dirExists = Directory.Exists(solutionDir);
             if (!dirExists)
@@ -548,7 +498,7 @@ namespace NbuildTasks
                 Parameters.WorkingDir = DevDir;
                 Parameters.Arguments = $"clone {url} ";
                 result = Launcher.Launcher.Start(Parameters);
-                if ((result.Code == 0) && (result.Output.Count >= 0))
+                if ((result.Code == 0) && (result.Output.Count > 0))
                 {
                     if (CheckForErrorAndDisplayOutput(result.Output))
                     {
@@ -595,14 +545,13 @@ namespace NbuildTasks
 
         public bool BranchExists(string branch)
         {
-            if (string.IsNullOrEmpty(branch)) return false;
-            return ListBranches().Contains(branch);
+            return !string.IsNullOrEmpty(branch) && ListBranches().Contains(branch);
         }
 
         public List<string> ListBranches()
         {
             var branches = new List<string>();
-            
+
             Parameters.Arguments = $"branch --list";
             var result = Launcher.Launcher.Start(Parameters);
             if (result.Code == 0 && result.Output.Count >= 1)
@@ -622,15 +571,8 @@ namespace NbuildTasks
         {
             foreach (var line in lines)
             {
-                if (line.ToLower().Contains("error") ||
-                    line.ToLower().Contains("fatal"))
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                return line.ToLower().Contains("error") ||
+                    line.ToLower().Contains("fatal");
             }
             return false;
         }
