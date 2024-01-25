@@ -1,4 +1,4 @@
-﻿using Launcher;
+﻿using Ntools;
 using NbuildTasks;
 using OutputColorizer;
 using System.Text;
@@ -15,8 +15,7 @@ public class BuildStarter
     private const string ResourceLocation = "Nbuild.resources.nbuild.bat";
     private const string TargetsMd = "targets.md";
 
-
-    public static ResultHelper Build(string? target, bool verbose)
+    public static ResultHelper Build(string? target, bool verbose = false)
     {
         string nbuildPath = Path.Combine(Environment.CurrentDirectory, BuildFileName);
         string commonBuildXmlPath = Path.Combine($"{Environment.GetEnvironmentVariable("ProgramFiles")}\\nbuild", CommonBuildFileName);
@@ -50,7 +49,7 @@ public class BuildStarter
 
         Console.WriteLine($"==> {parameters.FileName} {parameters.Arguments}");
 
-        var result = Launcher.Launcher.Start(parameters);
+        var result = Launcher.Start(parameters);
 
         DisplayLog(5);
         return result;

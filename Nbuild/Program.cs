@@ -1,5 +1,5 @@
 ﻿using CommandLine;
-using Launcher;
+using Ntools;
 using NbuildTasks;
 using OutputColorizer;
 
@@ -60,8 +60,6 @@ public class Program
             Environment.CurrentDirectory = currentDirectory;
         }
 
-
-
         if (result.IsSuccess())
         {
             Colorizer.WriteLine($"[{ConsoleColor.Green}!√ Build completed.]");
@@ -102,7 +100,7 @@ public class Program
             Verbose = false,
         };
 
-        var resultHelper = Launcher.Launcher.Start(parameters);
+        var resultHelper = Launcher.Start(parameters);
         if (!resultHelper.IsSuccess())
         {
             Console.WriteLine($"==> Failed to display git info");

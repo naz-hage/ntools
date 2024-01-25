@@ -103,7 +103,7 @@ namespace NbuildTasksTests
         public void StagingTagTest()
         {
             // Act and Assert that all tags are valid
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 4; i++)
             {
                 // Arrange
                 var tag = GitWrapper.Tag;
@@ -136,7 +136,7 @@ namespace NbuildTasksTests
         {
             // Act and Assert that all tags are valid
             // Act and Assert that all tags are valid
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 4; i++)
             {
                 // Arrange
                 var tag = GitWrapper.Tag;

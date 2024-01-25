@@ -1,4 +1,4 @@
-﻿using Launcher;
+using Ntools;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -155,7 +155,7 @@ namespace Nbackup
                 Verbose = verbose
             };
 
-            ResultHelper result = Launcher.Launcher.Start(parameters);
+            ResultHelper result = Launcher.Start(parameters);
 
             return result;
         }

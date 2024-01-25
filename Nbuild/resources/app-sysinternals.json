@@ -1,0 +1,15 @@
+{
+    "Version": "1.2.0",
+    "NbuildAppList": [
+      {
+        "Name": "SysInternalsSuite",
+        "Version": "2.20.0.0",
+        "AppFileName": "sigcheck64.exe",
+        "WebDownloadFile": "https://download.sysinternals.com/files/SysinternalsSuite.zip",
+        "DownloadedFile": "SysinternalsSuite.zip",
+        "InstallCommand": "powershell.exe",
+        "InstallArgs": "-Command Expand-Archive -Path '\"$(DownloadedFile)\"' -DestinationPath '\"$(ProgramFiles)\\SysInternalsSuite\"' -Force",
+        "InstallPath": "$(ProgramFiles)\\SysInternalsSuite"
+      }
+    ]
+  }
