@@ -198,10 +198,10 @@
 	<!-- Download Nbuild specified in the NbuildTargetVersion -->
 	<Target Name="NBUILD_DOWNLOAD" DependsOnTargets="IS_ADMIN">
 		<PropertyGroup>
-		<WebUri>https://github.com/naz-hage/ntools/releases/download/$(NbuildTargetVersion)/$(NbuildTargetVersion).zip</WebUri>
-		<FileName>$(DownloadsDirectory)\NBuildTools.zip</FileName>
+			<WebUri>https://github.com/naz-hage/ntools/releases/download/$(NbuildTargetVersion)/$(NbuildTargetVersion).zip</WebUri>
+			<FileName>$(DownloadsDirectory)\NBuildTools.zip</FileName>
 		</PropertyGroup>
-
+	</Target>
 
 	<!--Update the ntools-launcher nuget package in the local feed fot testing - not needed for normal builds-->
 	<Target Name ="NUGET_UPDATE">

@@ -156,7 +156,6 @@ namespace Nbackup
             };
 
             ResultHelper result = Launcher.Start(parameters);
-            ResultHelper result = Launcher.Launcher.Start(parameters);
 
             return result;
         }
