@@ -1,4 +1,4 @@
-﻿using Ntools;
+using Ntools;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Nbuild;
 using NbuildTasks;
@@ -28,6 +28,7 @@ namespace NbuildTests
             if (LocalTestMode.HasValue)
             {
                 // tear test mode
+
                 var parameters = new Parameters
                 {
                     FileName = "REG",
@@ -35,6 +36,7 @@ namespace NbuildTests
                     WorkingDir = Environment.CurrentDirectory,
                     Verbose = true
                 };
+
 
                 Assert.IsTrue(Launcher.Start(parameters).IsSuccess());
             }
@@ -50,6 +52,7 @@ namespace NbuildTests
                 LocalTestMode = true;
 
                 // setup test mode
+
                 var parameters = new Parameters
                 {
                     FileName = "setx",
@@ -57,6 +60,7 @@ namespace NbuildTests
                     WorkingDir = Environment.CurrentDirectory,
                     Verbose = true
                 };
+
                 var resultInstall = Launcher.Start(parameters);
                 Assert.IsTrue(resultInstall.IsSuccess());
             }
@@ -115,6 +119,7 @@ namespace NbuildTests
 
             if (!result.IsSuccess() && result.Output.Count > 0)
             {
+
                 Console.WriteLine(result.GetFirstOutput());
             }
 
@@ -161,6 +166,7 @@ namespace NbuildTests
 
             if (!result.IsSuccess() && result.Output.Count > 0)
             {
+
                 Console.WriteLine(result.GetFirstOutput());
             }
 
@@ -193,6 +199,7 @@ namespace NbuildTests
             ResultHelper result = Command.Install(json);
 
             // Assert an failed json parsing is returned 
+
             Assert.AreEqual("Invalid json input: Name is missing or empty", result.GetFirstOutput());
         }
 
@@ -216,6 +223,7 @@ namespace NbuildTests
 
             // Assert a failed json parsing is returned 
             Assert.IsFalse(result.IsSuccess());
+
             Assert.AreEqual(result.GetFirstOutput(), "Invalid json input: AppFileName is missing or empty");
         }
 
@@ -239,6 +247,7 @@ namespace NbuildTests
 
             // Assert a failed json parsing is returned 
             Assert.IsFalse(result.IsSuccess());
+
             Assert.AreEqual(result.GetFirstOutput(), "Invalid json input: WebDownloadFile is missing or empty");
         }
 
@@ -262,6 +271,7 @@ namespace NbuildTests
 
             // Assert a failed json parsing is returned 
             Assert.IsFalse(result.IsSuccess());
+
             Assert.AreEqual(result.GetFirstOutput(), "Invalid json input: DownloadedFile is missing or empty");
         }
 
@@ -285,6 +295,7 @@ namespace NbuildTests
 
             // Assert a failed json parsing is returned 
             Assert.IsFalse(result.IsSuccess());
+
             Assert.AreEqual(result.GetFirstOutput(), "Invalid json input: InstallCommand is missing or empty");
         }
 
@@ -308,6 +319,7 @@ namespace NbuildTests
 
             // Assert a failed json parsing is returned 
             Assert.IsFalse(result.IsSuccess());
+
             Assert.AreEqual(result.GetFirstOutput(), "Invalid json input: InstallArgs is missing or empty");
         }
 
@@ -331,6 +343,7 @@ namespace NbuildTests
 
             // Assert a failed json parsing is returned 
             Assert.IsFalse(result.IsSuccess());
+
             Assert.AreEqual(result.GetFirstOutput(), "Invalid json input: InstallPath is missing or empty");
         }
     }

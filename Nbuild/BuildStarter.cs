@@ -15,7 +15,6 @@ public class BuildStarter
     private const string ResourceLocation = "Nbuild.resources.nbuild.bat";
     private const string TargetsMd = "targets.md";
 
-
     public static ResultHelper Build(string? target, bool verbose = false)
     {
         string nbuildPath = Path.Combine(Environment.CurrentDirectory, BuildFileName);

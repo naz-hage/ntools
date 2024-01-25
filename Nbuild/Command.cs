@@ -26,6 +26,7 @@ namespace Nbuild
         {
             // Examine this method when we implement the logic to require admin
             if (!TestMode || Ntools.CurrentProcess.IsElevated())
+
             {
                 DownloadsDirectory = "C:\\NToolsDownloads";
             }
@@ -71,6 +72,7 @@ namespace Nbuild
                         WorkingDir = Environment.CurrentDirectory,
                         Verbose = true
                     };
+
 
                     var resultInstall = Launcher.Start(parameters);
                     if (resultInstall.IsSuccess())
@@ -271,6 +273,7 @@ namespace Nbuild
                 Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{appData.Name} {appData.Version} downloaded.]");
 
                 // Install the downloaded file
+
                 var parameters = new Parameters
                 {
                     FileName = appData.InstallCommand,
@@ -300,6 +303,7 @@ namespace Nbuild
                 }
                 else
                 {
+
                     Colorizer.WriteLine($"[{ConsoleColor.Red}!X {appData.Name} {appData.Version} failed to install: {resultInstall.GetFirstOutput()}]");
                 }
 
@@ -307,6 +311,7 @@ namespace Nbuild
             }
             else
             {
+
                 return ResultHelper.Fail(-1, $"Failed to download {appData.WebDownloadFile} to {appData.DownloadedFile}. {result.GetFirstOutput()}");
             }
         }

@@ -1,4 +1,4 @@
-﻿using Ntools;
+using Ntools;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -156,6 +156,7 @@ namespace Nbackup
             };
 
             ResultHelper result = Launcher.Start(parameters);
+            ResultHelper result = Launcher.Launcher.Start(parameters);
 
             return result;
         }

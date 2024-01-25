@@ -25,6 +25,7 @@ namespace NbuildTasks
             }
             else
             {
+
                 Log.LogError($"Failed to download {WebUri} to {FileName}: {result.GetFirstOutput()}");
             }
 

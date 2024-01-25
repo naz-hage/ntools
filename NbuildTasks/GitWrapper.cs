@@ -354,6 +354,7 @@ namespace NbuildTasks
         private string GetTag()
         {
             Parameters.Arguments = $"describe --abbrev=0 --tags";
+
             var result = Launcher.Start(Parameters);
             return (result.Code == 0) && (result.Output.Count == 1)
                 ? CheckForErrorAndDisplayOutput(result.Output) ? string.Empty : result.GetFirstOutput()
@@ -386,6 +387,7 @@ namespace NbuildTasks
         public List<string> ListLocalTags()
         {
             Parameters.Arguments = $"tag --list";
+
             var result = Launcher.Start(Parameters);
             return result.Code == 0 && result.Output.Count >= 1 ? result.Output.ToList() : new List<string>();
         }
@@ -436,6 +438,7 @@ namespace NbuildTasks
             if (!LocalTagExists(tag)) return true;
 
             Parameters.Arguments = $"tag -d {tag}";
+
             var result = Launcher.Start(Parameters);
             return result.Code == 0
                     && result.Output.Count >= 1
@@ -498,6 +501,7 @@ namespace NbuildTasks
 
                 Parameters.WorkingDir = DevDir;
                 Parameters.Arguments = $"clone {url} ";
+
                 result = Launcher.Start(Parameters);
                 if ((result.Code == 0) && (result.Output.Count > 0))
                 {
