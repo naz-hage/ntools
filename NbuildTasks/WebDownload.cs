@@ -10,7 +10,6 @@ namespace NbuildTasks
         [Required]
         public string WebUri { get; set; }
 
-
         [Required]
         public string FileName { get; set; }
 

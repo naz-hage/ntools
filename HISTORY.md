@@ -1,4 +1,14 @@
 [Next](#next)
+## Version 1.2.0 - 22-jan-24
+- Fix [issue #27](https://github.com/naz-hage/ntools/issues/27)
+- Update to ntools-launcher 1.2.0
+- Use $"{Environment.GetFolderPath(Environment.SpecialFolder.System)}" for c:\windows\system32
+- When Using ntools-launcher use default Process::StartInfo
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                WindowStyle = ProcessWindowStyle.Hidden,
+                CreateNoWindow = false,
+                UseShellExecute = false,
 
 ## Version 1.2.0 - 22-jan-24
 - See [issue#5](https://github.com/naz-hage/ntools/issues/5)

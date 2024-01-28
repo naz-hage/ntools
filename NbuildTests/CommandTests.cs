@@ -4,6 +4,8 @@ using Nbuild;
 using NbuildTasks;
 using OutputColorizer;
 using System.Reflection;
+using System.Diagnostics;
+using System.Collections;
 
 namespace NbuildTests
 {
@@ -28,17 +30,20 @@ namespace NbuildTests
             if (LocalTestMode.HasValue)
             {
                 // tear test mode
-
-                var parameters = new Parameters
+                var process = new Process
                 {
-                    FileName = "REG",
-                    Arguments = $"delete HKCU\\Environment /F /V {GitHubActions}",
-                    WorkingDir = Environment.CurrentDirectory,
-                    Verbose = true
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "REG.exe",
+                        Arguments = $"delete HKCU\\Environment /F /V {GitHubActions}",
+                        WorkingDirectory = $"{Environment.GetFolderPath(Environment.SpecialFolder.System)}",
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        CreateNoWindow = true
+                    }
                 };
 
-
-                Assert.IsTrue(Launcher.Start(parameters).IsSuccess());
+                Assert.IsTrue(process.LockStart(false).IsSuccess());
             }
         }
 
@@ -52,17 +57,29 @@ namespace NbuildTests
                 LocalTestMode = true;
 
                 // setup test mode
-
-                var parameters = new Parameters
+                var process = new Process
                 {
-                    FileName = "setx",
-                    Arguments = $"{GitHubActions} true",
-                    WorkingDir = Environment.CurrentDirectory,
-                    Verbose = true
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "setx.exe",
+                        Arguments = $"{GitHubActions} true",
+                        WorkingDirectory = $"{Environment.GetFolderPath(Environment.SpecialFolder.System)}",
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        CreateNoWindow = true
+                    }
                 };
 
-                var resultInstall = Launcher.Start(parameters);
-                Assert.IsTrue(resultInstall.IsSuccess());
+                // Get all environment variables
+                IDictionary environmentVariables = Environment.GetEnvironmentVariables();
+
+                // Iterate over the environment variables and print them
+                foreach (DictionaryEntry entry in environmentVariables)
+                {
+                    Console.WriteLine($"{entry.Key}: {entry.Value}");
+                }
+
+                Assert.IsTrue(process.LockStart(true).IsSuccess());
             }
         }
 

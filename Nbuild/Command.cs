@@ -65,16 +65,19 @@ namespace Nbuild
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
                     var folder = $"{Environment.GetFolderPath(Environment.SpecialFolder.System)}";
-                    var parameters = new Parameters
+                    var process = new Process
                     {
-                        FileName = $"{folder}\\icacls.exe",
-                        Arguments = $"{DownloadsDirectory} /grant Administrators:(OI)(CI)F /inheritance:r",
-                        WorkingDir = Environment.CurrentDirectory,
-                        Verbose = true
-                    };
-
-
-                    var resultInstall = Launcher.Start(parameters);
+                        StartInfo =
+                        {
+                            WorkingDirectory = Environment.CurrentDirectory,
+                            FileName = $"{folder}\\icacls.exe",
+                            Arguments = $"{DownloadsDirectory} /grant Administrators:(OI)(CI)F /inheritance:r",
+                            RedirectStandardOutput = true,
+                            RedirectStandardError = true,
+                            UseShellExecute = false
+                        }
+                    };  
+                    var resultInstall = process.LockStart(Verbose);
                     if (resultInstall.IsSuccess())
                     {
                         Colorizer.WriteLine($"[{ConsoleColor.Green}!√ {DownloadsDirectory} ACL updated.]");
@@ -273,20 +276,24 @@ namespace Nbuild
                 Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{appData.Name} {appData.Version} downloaded.]");
 
                 // Install the downloaded file
-
-                var parameters = new Parameters
+                var process = new Process
                 {
-                    FileName = appData.InstallCommand,
-                    Arguments = appData.InstallArgs,
-                    WorkingDir = DownloadsDirectory,
-                    Verbose = Verbose
+                    StartInfo =
+                    {
+                        WorkingDirectory = DownloadsDirectory,
+                        FileName = appData.InstallCommand,
+                        Arguments = appData.InstallArgs,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false
+                    }
                 };
 
                 Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Installing {appData.Name} {appData.Version}]");
-                if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Working Directory: {parameters.WorkingDir}]");
+                if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Working Directory: {process.StartInfo.WorkingDirectory}]");
                 if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Command: {appData.InstallCommand}]");
                 if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Args: {appData.InstallArgs}]");
-                var resultInstall = Launcher.Start(parameters);
+                var resultInstall = process.LockStart(true);
 
                 if (resultInstall.IsSuccess())
                 {

@@ -14,8 +14,8 @@ namespace NbuildTasksTests
         public GitWrapperTests()
         {
             Console.WriteLine($"Current Directory: {Directory.GetCurrentDirectory()}");
-            Console.WriteLine($"GitWrapper.Parameters.WorkingDir: {GitWrapper.Parameters.WorkingDir}");
-            Assert.AreEqual(GitWrapper.Parameters.WorkingDir, Directory.GetCurrentDirectory());
+            Console.WriteLine($"GitWrapper.Parameters.WorkingDir: {GitWrapper.Process.StartInfo.WorkingDirectory}");
+            Assert.AreEqual(GitWrapper.Process.StartInfo.WorkingDirectory, Directory.GetCurrentDirectory());
             Console.WriteLine($"Current Branch: {GitWrapper.Branch}");
             Console.WriteLine($"Current Tag: {GitWrapper.Tag}");
         }

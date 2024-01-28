@@ -21,7 +21,7 @@ namespace Ngit
         {
             if (GitWrapper == null) return RetCode.GitWrapperFailed;
 
-            GitWrapper.Parameters.Verbose = options.Verbose;
+            GitWrapper.Verbose = options.Verbose;
 
             var retCode = options.GitCommand switch
             {
@@ -35,7 +35,7 @@ namespace Ngit
                 _ => Default(options)
             };
 
-            if (options.Verbose) Console.WriteLine($"Command.Parameters.WorkingDir: {GitWrapper.Parameters.WorkingDir}");
+            if (options.Verbose) Console.WriteLine($"Command.Process.StartInfo.WorkingDirectory: {GitWrapper.Process.StartInfo.WorkingDirectory}");
 
             if (retCode == RetCode.Success) DisplayResults(GitWrapper.Branch, GitWrapper.Tag);
 
@@ -150,9 +150,9 @@ namespace Ngit
             var result = GitWrapper.CloneProject(options.Url); ;
             if (result.IsSuccess())
             {
-                // reset Parameters.WorkingDir
-                var solutionDir = GitWrapper.Parameters.WorkingDir;
-                GitWrapper.Parameters.WorkingDir = solutionDir;
+                // reset Process.StartInfo.WorkingDirectory
+                var solutionDir = GitWrapper.Process.StartInfo.WorkingDirectory;
+                GitWrapper.Process.StartInfo.WorkingDirectory = solutionDir;
 
                 Colorizer.WriteLine($"[{ConsoleColor.Green}!√ Project cloned to `{solutionDir}`.]");
             }

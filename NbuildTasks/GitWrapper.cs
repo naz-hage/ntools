@@ -1,6 +1,7 @@
 ﻿using Ntools;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using static NbuildTasks.Enums;
@@ -9,21 +10,38 @@ namespace NbuildTasks
 {
     public class GitWrapper
     {
-        private const string GitBinary = @"C:\Program Files\Git\cmd\git.exe";
-        public static readonly Parameters Parameters = new Parameters
+        private const string GitBinary = "git.exe";
+        //public static readonly Parameters Parameters = new Parameters
+        //{
+        //    WorkingDir = Environment.CurrentDirectory,
+        //    FileName = GitBinary,
+        //    RedirectStandardOutput = true,
+        //    RedirectStandardError = true,
+        //};
+
+        public static Process Process = new Process
         {
-            WorkingDir = Environment.CurrentDirectory,
-            FileName = GitBinary,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
+            StartInfo = new ProcessStartInfo
+            {
+                WorkingDirectory = Environment.CurrentDirectory,
+                FileName = ShellUtility.GetFullPathOfFile(GitBinary),
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                WindowStyle = ProcessWindowStyle.Hidden,
+                CreateNoWindow = false,
+                UseShellExecute = false,
+            }
         };
+
+        
+        public bool Verbose = false;
 
         public string DevDrive { get; set; } = "d:";  // This default was chosen because of GitHub Actions
         public string MainDir { get; set; } = "a";  // This default was chosen because of GitHub Actions
 
         public GitWrapper(string project = null, bool verbose = false)
         {
-            Parameters.Verbose = verbose;
+            Verbose = verbose;
 
             // Read Environment variables DevDrive and MainDir and set Properties respectively
 
@@ -41,17 +59,17 @@ namespace NbuildTasks
             }
 
 
-            Parameters.WorkingDir = project == null ? Environment.CurrentDirectory : $@"{DevDrive}\{MainDir}\{project}";
+            Process.StartInfo.WorkingDirectory = project == null ? Environment.CurrentDirectory : $@"{DevDrive}\{MainDir}\{project}";
 
             // print Parameters
-            if (verbose) Console.WriteLine($"GitWrapper.Parameters.WorkingDir: {Parameters.WorkingDir}");
+            if (verbose) Console.WriteLine($"GitWrapper.Process.StartInfo.WorkingDirectory: {Process.StartInfo.WorkingDirectory}");
         }
 
         public string GetWorkingDir()
         {
-            if (Parameters.Verbose) Console.WriteLine($"GitWrapper.Parameters.WorkingDir: {Parameters.WorkingDir}");
+            if (Verbose) Console.WriteLine($"GitWrapper.Process.StartInfo.WorkingDirectory: {Process.StartInfo.WorkingDirectory}");
 
-            return Parameters.WorkingDir;
+            return Process.StartInfo.WorkingDirectory;
         }
 
 
@@ -67,9 +85,9 @@ namespace NbuildTasks
 
             var solutionDir = $@"{DevDir}\{projectName}";
 
-            Parameters.WorkingDir = string.IsNullOrEmpty(projectName) ? Environment.CurrentDirectory : solutionDir;
+            Process.StartInfo.WorkingDirectory = string.IsNullOrEmpty(projectName) ? Environment.CurrentDirectory : solutionDir;
 
-            if (Parameters.Verbose) Console.WriteLine($"GitWrapper.Parameters.WorkingDir: {Parameters.WorkingDir}");
+            if (Verbose) Console.WriteLine($"GitWrapper.Process.StartInfo.WorkingDirectory: {Process.StartInfo.WorkingDirectory}");
 
             return true;
         }
@@ -210,13 +228,14 @@ namespace NbuildTasks
         /// <returns>True if command is successful, otherwise False</returns>
         public bool PushTag(string newTag)
         {
-            Parameters.Arguments = $"push origin {Branch} {newTag}";
-            var result = Launcher.Start(Parameters);
+            Process.StartInfo.Arguments = $"push origin {Branch} {newTag}";
+
+            var result = Process.LockStart(Verbose);
             if ((result.Code == 0) && (result.Output.Count >= 0))
             {
                 foreach (var line in result.Output)
                 {
-                    if (Parameters.Verbose) Console.WriteLine(line);
+                    if (Verbose) Console.WriteLine(line);
                     if (line.Contains("fatal"))
                     {
                         return false;
@@ -241,14 +260,14 @@ namespace NbuildTasks
                 // delete tag if exists
                 if (TagExist(newTag)) DeleteTag(newTag);
 
-                Parameters.Arguments = $"tag -a {newTag} HEAD -m \"Automated tag\"";
+                Process.StartInfo.Arguments = $"tag -a {newTag} HEAD -m \"Automated tag\"";
 
-                var result = Launcher.Start(Parameters);
+                var result = Process.LockStart(Verbose);
                 if ((result.Code == 0) && (result.Output.Count >= 0))
                 {
                     foreach (var line in result.Output)
                     {
-                        if (Parameters.Verbose) Console.WriteLine(line);
+                        if (Verbose) Console.WriteLine(line);
                         if (line.Contains("fatal"))
                         {
                             resultSetTag = false;
@@ -260,7 +279,7 @@ namespace NbuildTasks
                         }
                     }
                 }
-                if (Parameters.Verbose) Console.WriteLine($"SetTag try: {++i}");
+                if (Verbose) Console.WriteLine($"SetTag try: {++i}");
                 if (resultSetTag) break;
             }
 
@@ -331,14 +350,14 @@ namespace NbuildTasks
         private string GetBranch()
         {
             var branch = string.Empty;
-            Parameters.Arguments = $"branch";
-            var result = Launcher.Start(Parameters);
+            Process.StartInfo.Arguments = $"branch";
+            var result = Process.LockStart(Verbose);
             if ((result.Code == 0) && (result.Output.Count > 0))
             {
 
                 foreach (var line in result.Output)
                 {
-                    if (Parameters.Verbose) Console.WriteLine(line);
+                    if (Verbose) Console.WriteLine(line);
 
                     if (line.StartsWith("*"))
                     {
@@ -353,9 +372,9 @@ namespace NbuildTasks
 
         private string GetTag()
         {
-            Parameters.Arguments = $"describe --abbrev=0 --tags";
+            Process.StartInfo.Arguments = $"describe --abbrev=0 --tags";
 
-            var result = Launcher.Start(Parameters);
+            var result = Process.LockStart(Verbose);
             return (result.Code == 0) && (result.Output.Count == 1)
                 ? CheckForErrorAndDisplayOutput(result.Output) ? string.Empty : result.GetFirstOutput()
                 : string.Empty;
@@ -386,17 +405,17 @@ namespace NbuildTasks
 
         public List<string> ListLocalTags()
         {
-            Parameters.Arguments = $"tag --list";
+            Process.StartInfo.Arguments = $"tag --list";
 
-            var result = Launcher.Start(Parameters);
+            var result = Process.LockStart(Verbose);
             return result.Code == 0 && result.Output.Count >= 1 ? result.Output.ToList() : new List<string>();
         }
 
         private List<string> DeleteRemoteTags(string url)
         {
             var tags = new List<string>();
-            Parameters.Arguments = $"ls-remote --tags {url}";
-            var result = Launcher.Start(Parameters);
+            Process.StartInfo.Arguments = $"ls-remote --tags {url}";
+            var result = Process.LockStart(Verbose);
             if (result.Code == 0 && result.Output.Count >= 1)
             {
                 foreach (var line in result.Output)
@@ -416,8 +435,8 @@ namespace NbuildTasks
         public List<string> ListRemoteTags()
         {
             var tags = new List<string>();
-            Parameters.Arguments = $"ls-remote --tags";
-            var result = Launcher.Start(Parameters);
+            Process.StartInfo.Arguments = $"ls-remote --tags";
+            var result = Process.LockStart(Verbose);
             if (result.Code == 0 && result.Output.Count >= 1)
             {
                 foreach (var line in result.Output)
@@ -437,9 +456,9 @@ namespace NbuildTasks
         {
             if (!LocalTagExists(tag)) return true;
 
-            Parameters.Arguments = $"tag -d {tag}";
+            Process.StartInfo.Arguments = $"tag -d {tag}";
 
-            var result = Launcher.Start(Parameters);
+            var result = Process.LockStart(Verbose);
             return result.Code == 0
                     && result.Output.Count >= 1
                     && result.Output.Exists(line => line.StartsWith($"Deleted tag '{tag}'"));
@@ -449,8 +468,8 @@ namespace NbuildTasks
         {
             if (!RemoteTagExists(tag)) return true;
 
-            Parameters.Arguments = $"push origin :refs/tags/{tag}";
-            var result = Launcher.Start(Parameters);
+            Process.StartInfo.Arguments = $"push origin :refs/tags/{tag}";
+            var result = Process.LockStart(Verbose);
             if (result.Code == 0 && result.Output.Count >= 1)
             {
                 foreach (var line in result.Output)
@@ -499,10 +518,10 @@ namespace NbuildTasks
                     Directory.CreateDirectory(DevDir);
                 }
 
-                Parameters.WorkingDir = DevDir;
-                Parameters.Arguments = $"clone {url} ";
+                Process.StartInfo.WorkingDirectory = DevDir;
+                Process.StartInfo.Arguments = $"clone {url} ";
 
-                result = Launcher.Start(Parameters);
+                result = Process.LockStart(Verbose);
                 if ((result.Code == 0) && (result.Output.Count > 0))
                 {
                     if (CheckForErrorAndDisplayOutput(result.Output))
@@ -527,14 +546,14 @@ namespace NbuildTasks
             ResultHelper result;
             if (create && !BranchExists(branch))
             {
-                Parameters.Arguments = $"checkout -b {branch}";
-                result = Launcher.Start(Parameters);
+                Process.StartInfo.Arguments = $"checkout -b {branch}";
+                result = Process.LockStart(Verbose);
             }
             else
             {
                 // checkout
-                Parameters.Arguments = $"checkout {branch}";
-                result = Launcher.Start(Parameters);
+                Process.StartInfo.Arguments = $"checkout {branch}";
+                result = Process.LockStart(Verbose);
             }
 
             if (result.Code == 0 && result.Output.Count >= 1)
@@ -557,8 +576,8 @@ namespace NbuildTasks
         {
             var branches = new List<string>();
 
-            Parameters.Arguments = $"branch --list";
-            var result = Launcher.Start(Parameters);
+            Process.StartInfo.Arguments = $"branch --list";
+            var result = Process.LockStart(Verbose);            
             if (result.Code == 0 && result.Output.Count >= 1)
             {
                 foreach (var line in result.Output)

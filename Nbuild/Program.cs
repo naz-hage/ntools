@@ -2,6 +2,7 @@
 using Ntools;
 using NbuildTasks;
 using OutputColorizer;
+using System.Diagnostics;
 
 namespace Nbuild;
 
@@ -87,23 +88,25 @@ public class Program
         return (int)result.Code;
     }
 
-
-
     private static void DisplayGitInfo()
     {
-        var parameters = new Parameters
+        var process = new Process
         {
-            FileName = NgitAssemblyExe,
-            Arguments = $"-c branch",
-            WorkingDir = Environment.CurrentDirectory,
-            RedirectStandardOutput = false,
-            Verbose = false,
+            StartInfo =
+            {
+                WorkingDirectory = Environment.CurrentDirectory,
+                FileName = ShellUtility.GetFullPathOfFile(NgitAssemblyExe),
+                Arguments = $"-c branch",
+                RedirectStandardOutput = false,
+                RedirectStandardError = false,
+                UseShellExecute = false,
+            },
         };
 
-        var resultHelper = Launcher.Start(parameters);
+        var resultHelper = process.LockStart(false); 
         if (!resultHelper.IsSuccess())
         {
-            Console.WriteLine($"==> Failed to display git info");
+            Console.WriteLine($"==> Failed to display git info:{resultHelper.GetFirstOutput()}");
         }
     }
 }

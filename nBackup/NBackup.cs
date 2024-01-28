@@ -1,6 +1,7 @@
 using Ntools;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
@@ -146,16 +147,15 @@ namespace Nbackup
         /// <returns></returns>
         public static ResultHelper Perform(string source, string destination, string backupOptions, bool verbose = false)
         {
-            Parameters parameters = new()
-            {
-                WorkingDir = @"c:\windows\system32",
-                FileName = "robocopy.exe",
-                Arguments = $"\"{source}\" \"{destination}\" {backupOptions}",
-                RedirectStandardOutput = true,
-                Verbose = verbose
-            };
-
-            ResultHelper result = Launcher.Start(parameters);
+            var process = new Process
+            { 
+                StartInfo = {
+                    WorkingDirectory = $"{Environment.SpecialFolder.System}\\system32",
+                    FileName = "robocopy.exe",
+                    Arguments = $"\"{source}\" \"{destination}\" {backupOptions}",
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true } };
+            var result = process.LockStart(verbose);
 
             return result;
         }

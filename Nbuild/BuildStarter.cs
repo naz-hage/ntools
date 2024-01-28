@@ -3,6 +3,7 @@ using NbuildTasks;
 using OutputColorizer;
 using System.Text;
 using System.Xml;
+using System.Diagnostics;
 
 namespace Nbuild;
 
@@ -14,6 +15,7 @@ public class BuildStarter
     private const string NbuildBatchFile = "Nbuild.bat";
     private const string ResourceLocation = "Nbuild.resources.nbuild.bat";
     private const string TargetsMd = "targets.md";
+    private const string MsbuildExe = "msbuild.exe";
 
     public static ResultHelper Build(string? target, bool verbose = false)
     {
@@ -35,26 +37,36 @@ public class BuildStarter
 
         Console.WriteLine($"MSBuild started with '{target ?? "Default"}' target");
 
+        LogFile = Path.Combine(Environment.CurrentDirectory, LogFile);
         string cmd = string.IsNullOrEmpty(target)
             ? $"{nbuildPath} -fl -flp:logfile={LogFile};verbosity=normal"
             : $"{nbuildPath} /t:{target} -fl -flp:logfile={LogFile};verbosity=normal";
-        var parameters = new Parameters
+
+        //  Get location of msbuild.exe
+        var msbuildPath = ShellUtility.GetFullPathOfFile(MsbuildExe);
+
+        var process = new Process
         {
-            WorkingDir = Directory.GetCurrentDirectory(),
-            FileName = "msbuild.exe",
-            Arguments = cmd,
-            Verbose = true,
-            RedirectStandardOutput = false,
+            StartInfo = new ProcessStartInfo
+            {
+                WorkingDirectory = Path.GetDirectoryName(msbuildPath),
+                FileName = MsbuildExe,
+                Arguments = cmd,
+                RedirectStandardOutput = false,
+                RedirectStandardError = false,
+                UseShellExecute = false,
+                CreateNoWindow = false,
+            }
         };
 
-        Console.WriteLine($"==> {parameters.FileName} {parameters.Arguments}");
+        Console.WriteLine($"==> {process.StartInfo.FileName} {process.StartInfo.Arguments}");
 
-        var result = Launcher.Start(parameters);
+        var result = process.LockStart(true);
 
         DisplayLog(5);
         return result;
     }
-
+        
     public static bool ValidTarget(string targetsFile, string? target)
     {
         return GetTargets(targetsFile).Contains(target, StringComparer.OrdinalIgnoreCase);

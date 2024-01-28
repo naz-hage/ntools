@@ -5,9 +5,9 @@ namespace NbuildTasks
 {
     public class Git : Microsoft.Build.Utilities.Task
     {
-
         private const string GetTagCommand = "GetTag";
         private const string GetBranchCommand = "GetBranch";
+
         private const string AutoTagCommand = "AutoTag";
         private const string StagingBuildType = "Staging";
         private const string ProductionBuildType = "Production";
@@ -16,15 +16,11 @@ namespace NbuildTasks
         private const string DeleteTagCommand = "DeleteTag";
         private const string PushTagCommand = "PushTag";
 
-
-
         [Required]
         public string Command { get; set; }
 
-        public string BuildType { get; set; }
-
-        public string Tag { get; set; }
-
+        // Only required for SetTag, DeleteTag, PushTag as tag parameter
+        // and for AutoTag as build type parameter
         public string TaskParameter { get; set; }
 
         [Output]
@@ -32,36 +28,32 @@ namespace NbuildTasks
 
         public override bool Execute()
         {
-            if (!string.IsNullOrEmpty(Command))
+            if (string.IsNullOrEmpty(Command))
             {
-                Console.WriteLine($"Command: {Command}");
-            }
-            else
-            {
-                Log.LogError("Command is null or empty");
+                Log.LogError("NbuildTask: Command is null or empty");
                 return !Log.HasLoggedErrors;
             }
-            var gitWrapper = new GitWrapper();
+            Log.LogMessage($"NbuildTask: {Command}");
+            var gitWrapper = new GitWrapper(project: null, verbose: false);
             switch (Command)
             {
                 case GetTagCommand:
                     Output = gitWrapper.Tag;
-                    Log.LogMessage($"In task: {Output}");
+                    Log.LogMessage($"NbuildTask: {Output}");
                     break;
 
                 case GetBranchCommand:
                     Output = gitWrapper.Branch;
-                    Log.LogMessage($"In Task: {Output}");
+                    Log.LogMessage($"NbuildTask: {Output}");
                     break;
 
                 case AutoTagCommand:
                     if (!string.IsNullOrEmpty(TaskParameter) &&
                         (TaskParameter == StagingBuildType || TaskParameter == ProductionBuildType))
                     {
-                        BuildType = TaskParameter;
-                        Console.WriteLine($"BuildType: {BuildType}");
+                        Log.LogMessage($"BuildType: {TaskParameter}");
 
-                        Output = gitWrapper.AutoTag(BuildType);
+                        Output = gitWrapper.AutoTag(TaskParameter);
                     }
                     else
                     {
@@ -72,19 +64,17 @@ namespace NbuildTasks
                 case SetTagCommand:
                     if (!string.IsNullOrEmpty(TaskParameter))
                     {
-                        Tag = TaskParameter;
-                        Console.WriteLine($"Tag: {Tag}");
+                        Log.LogMessage($"Tag: {TaskParameter}");
                     }
 
-                    Output = gitWrapper.SetTag(Tag) ? Tag : "";
+                    Output = gitWrapper.SetTag(TaskParameter) ? TaskParameter : "";
                     break;
 
                 case DeleteTagCommand:
                     if (!string.IsNullOrEmpty(TaskParameter))
                     {
-                        Tag = TaskParameter;
-                        Console.WriteLine($"Tag: {Tag}");
-                        Output = gitWrapper.DeleteTag(Tag) ? "True" : "False";
+                        Log.LogMessage($"Tag: {TaskParameter}");
+                        Output = gitWrapper.DeleteTag(TaskParameter) ? "True" : "False";
                     }
                     else
                     {
@@ -96,15 +86,13 @@ namespace NbuildTasks
                 case PushTagCommand:
                     if (!string.IsNullOrEmpty(TaskParameter))
                     {
-                        Tag = TaskParameter;
-                        Console.WriteLine($"Tag: {Tag}");
-                        Output = gitWrapper.PushTag(Tag) ? "True" : "False";
+                        Log.LogMessage($"Tag: {TaskParameter}");
+                        Output = gitWrapper.PushTag(TaskParameter) ? "True" : "False";
                     }
                     else
                     {
                         Log.LogError($"Tag is null or empty");
                     }
-
                     break;
 
                 default:
@@ -117,10 +105,9 @@ namespace NbuildTasks
                 Log.LogError($"No output from command: {Command}");
             }
 
+            Log.LogMessage($"Output: {Output}");
+
             return !Log.HasLoggedErrors; // Return true if no errors were logged
         }
-
-
-
     }
 }
