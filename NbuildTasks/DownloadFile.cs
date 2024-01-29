@@ -30,7 +30,7 @@ namespace NbuildTasks
                 if (!response.IsSuccessStatusCode) throw new FileNotFoundException($"'{uri}' not found. status: {response.StatusCode}", nameof(uri));
 
                 using (var s = await client.GetStreamAsync(uri))
-                using (var fs = new FileStream(fileName, FileMode.CreateNew))
+                using (var fs = new FileStream(fileName, FileMode.Create))
                 {
                     await s.CopyToAsync(fs);
                 }

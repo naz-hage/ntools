@@ -6,7 +6,7 @@
 | CLEAN_ARTIFACTS     | Delete the ARTIFACTS folder after PACKAGE target is completed |
 | TEST_GIT            | Temporary Target to test the Git Task |
 | LOCAL               | Build local staging without incrementing the version |
-| FILE_VERSIONS       | Test for FileVersion task and powershell GetFileVersion.ps1 |
+| FILE_VERSIONS       | Test for FileVersion task and powershell file-version.ps1 |
 | NBUILD_DOWNLOAD     | Download Nbuild specified in the NbuildTargetVersion |
 | NBUILD_INSTALL      | Install Nbuild specified in the NbuildTargetVersion |
 | PRE_TOOLS           | Setup Prerequisite Development Environment |

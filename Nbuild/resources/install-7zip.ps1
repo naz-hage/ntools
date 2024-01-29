@@ -28,7 +28,7 @@ function CheckIf7zipInstalled {
      else
      {
         # check if the version is correct
-        $sevenZipVersion = .\GetFileVersion.ps1 $sevenZipPath
+        $sevenZipVersion = .\file-version.ps1 $sevenZipPath
         Write-Host "7zip version: $sevenZipVersion is found."
         if ($sevenZipVersion -ne $version) {
             return $false
@@ -71,7 +71,7 @@ function Install7zip {
         {
             Write-Host "7zip downloaded successfully."
             #display the file version
-            $sevenZipVersion = .\GetFileVersion.ps1 $output
+            $sevenZipVersion = .\file-version.ps1 $output
             Write-Host "Downloaded 7zip version: $sevenZipVersion"
         }   
 

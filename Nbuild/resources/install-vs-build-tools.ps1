@@ -52,7 +52,7 @@ function CheckIfMsBuildToolsInstalled {
         return $false
     }
 
-    $msbuildVersion = .\GetFileVersion.ps1 $msbuildPath
+    $msbuildVersion = .\file-version.ps1 $msbuildPath
     write-host "MSBuild Version: $msbuildVersion"
 
     if ($null -eq $msbuildVersion) {
