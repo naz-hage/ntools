@@ -7,7 +7,7 @@
 		<Message Text="$(NugetExe) $(NugetExe)" />
 		
 		<!-- Call the PowerShell script and capture nuget version output into  NugetVersion property-->
-        <Exec Command='powershell -File "$(BuildTools)\GetFileVersion.ps1" "$(NugetExe)"' ConsoleToMSBuild="true">
+        <Exec Command='powershell -File "$(BuildTools)\file-version.ps1" "$(NugetExe)"' ConsoleToMSBuild="true">
             <Output TaskParameter="ConsoleOutput" PropertyName="NugetVersion" />
         </Exec>
 

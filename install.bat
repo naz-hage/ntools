@@ -27,15 +27,20 @@ if not exist "%DownloadsDirectory%" mkdir "%DownloadsDirectory%"
 :: Grant Administrators full control of the Downloads directory
 %SystemRoot%\System32\icacls.exe "%DownloadsDirectory%" /grant Administrators:(OI)(CI)F /inheritance:r
 
-:: Download the installer
-powershell.exe -Command "Invoke-WebRequest -Uri !INSTALLER_URL! -OutFile !INSTALLER_PATH!"
+:: Download the installer if it doesn't already exist
+if not exist "%INSTALLER_PATH%" powershell.exe -Command "Invoke-WebRequest -Uri !INSTALLER_URL! -OutFile !INSTALLER_PATH!"
 
 :: Run the installer
 !INSTALLER_PATH! /quiet /norestart
 
 :: Install latest Ntools from github
-powershell.exe -Command "nbuild/resources/install-ntools.ps1"
+:: save current directory
+set currentdir=%cd%
+cd nbuild\resources
+powershell.exe -Command ".\install-ntools.ps1"
 
+:: Restore current directory
+cd %currentdir%
 
 :: Delete the installer
 del !INSTALLER_PATH!

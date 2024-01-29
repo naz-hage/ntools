@@ -124,8 +124,6 @@ namespace Nbuild
 
                     foreach (var appData in appDataList)
                     {
-
-
                         var result = Install(appData);
                         if (!result.IsSuccess())
                         {
@@ -274,6 +272,13 @@ namespace Nbuild
             if (result.IsSuccess())
             {
                 Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{appData.Name} {appData.Version} downloaded.]");
+
+                // workaround lauching powershell.exe. With the new ntools-launcher 1.2.0, we need find the path to powershell.exe
+                if (appData.InstallCommand.Contains("powershell.exe"))
+                {
+                    var powershellPath = $"{ShellUtility.GetFullPathOfFile("powershell.exe")}";
+                    appData.InstallCommand = $"{powershellPath}";
+                }
 
                 // Install the downloaded file
                 var process = new Process
