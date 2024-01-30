@@ -155,7 +155,7 @@ function Main {
     setx MainDir $mainDir
 
     # Install Ntools
-    InstallNtools $dotnetVersion
+    InstallNtools $nToolsVersion
 
     $nbExePath = "$env:ProgramFiles\Nbuild\nb.exe"
     & $nbExePath -c install -json ntools.json 
