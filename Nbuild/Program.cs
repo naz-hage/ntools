@@ -50,9 +50,9 @@ public class Program
                 result = options.Command switch
                 {
                     var d when d == CmdTargets => BuildStarter.DisplayTargets(Environment.CurrentDirectory),
-                    var d when d == CmdInstall => Command.Install(options.Json),
-                    var d when d == CmdList => Command.List(options.Json),
-                    var d when d == CmdDownload => Command.Download(options.Json),
+                    var d when d == CmdInstall => Command.Install(options.Json, options.Verbose),
+                    var d when d == CmdList => Command.List(options.Json, options.Verbose),
+                    var d when d == CmdDownload => Command.Download(options.Json, options.Verbose),
                     _ => ResultHelper.Fail(-1, $"Invalid Command: '{options.Command}'"),
                 };
             }

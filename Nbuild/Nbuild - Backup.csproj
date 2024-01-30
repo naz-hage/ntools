@@ -36,7 +36,7 @@
 	<ItemGroup>
 		<EmbeddedResource Include="resources\common.targets" />
 		<EmbeddedResource Include="resources\dotnet.targets" />
-		<EmbeddedResource Include="resources\GetFileVersion.ps1" />
+		<EmbeddedResource Include="resources\file-version.ps1" />
 		<EmbeddedResource Include="resources\mongodb.targets" />
 		<EmbeddedResource Include="resources\nbuild.bat" />
 		<EmbeddedResource Include="resources\nbuild.targets" />

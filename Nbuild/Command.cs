@@ -9,7 +9,7 @@ namespace Nbuild
     public static class Command
     {
         private static readonly string DownloadsDirectory = $"{Environment.GetEnvironmentVariable("Temp")}\\nb"; // "C:\\NToolsDownloads" $"{Environment.GetEnvironmentVariable("Temp")}\\nb"
-        private static readonly bool Verbose = false;
+        private static bool Verbose = false;
 
         public static bool TestMode
         {
@@ -51,7 +51,7 @@ namespace Nbuild
             return false;
         }
 
-        private static bool CanRunCommand()
+        private static bool CanRunCommand(bool modifyAcls=true)
         {
             if (!Ntools.CurrentProcess.IsElevated())
             {
@@ -62,7 +62,7 @@ namespace Nbuild
             }
             else
             {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && modifyAcls)
                 {
                     var folder = $"{Environment.GetFolderPath(Environment.SpecialFolder.System)}";
                     var process = new Process
@@ -74,9 +74,12 @@ namespace Nbuild
                             Arguments = $"{DownloadsDirectory} /grant Administrators:(OI)(CI)F /inheritance:r",
                             RedirectStandardOutput = true,
                             RedirectStandardError = true,
+                            WindowStyle = ProcessWindowStyle.Hidden,
+                            CreateNoWindow = false,
                             UseShellExecute = false
                         }
-                    };  
+                    };
+                    // update ACL on DownloadsDirectory
                     var resultInstall = process.LockStart(Verbose);
                     if (resultInstall.IsSuccess())
                     {
@@ -97,8 +100,9 @@ namespace Nbuild
             return true;
         }
 
-        public static ResultHelper Install(string? json)
+        public static ResultHelper Install(string? json, bool verbose = false)
         {
+            Verbose = verbose;
             // check if caller is admin or in test mode
             if (!CanRunCommand()) return ResultHelper.Fail(-1, $"You must run this command as an administrator");
 
@@ -124,8 +128,6 @@ namespace Nbuild
 
                     foreach (var appData in appDataList)
                     {
-
-
                         var result = Install(appData);
                         if (!result.IsSuccess())
                         {
@@ -152,8 +154,9 @@ namespace Nbuild
             }
         }
 
-        public static ResultHelper List(string? json)
+        public static ResultHelper List(string? json, bool verbose = false)
         {
+            Verbose = verbose;
             try
             {
                 var appDataList = NbuildApp.FromMultiJson(json);
@@ -189,8 +192,9 @@ namespace Nbuild
             return ResultHelper.Success();
         }
 
-        public static ResultHelper Download(string? json)
+        public static ResultHelper Download(string? json, bool verbose = false)
         {
+            Verbose = verbose;
             // check if admin
             if (!CanRunCommand()) return ResultHelper.Fail(-1, $"You must run this command as an administrator");
 
@@ -275,13 +279,15 @@ namespace Nbuild
             {
                 Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{appData.Name} {appData.Version} downloaded.]");
 
+
+
                 // Install the downloaded file
                 var process = new Process
                 {
                     StartInfo =
                     {
                         WorkingDirectory = DownloadsDirectory,
-                        FileName = appData.InstallCommand,
+                        FileName = $"{DownloadsDirectory}\\{appData.InstallCommand}",
                         Arguments = appData.InstallArgs,
                         RedirectStandardOutput = true,
                         RedirectStandardError = true,
@@ -289,38 +295,65 @@ namespace Nbuild
                     }
                 };
 
+                // Update the filename to the full path of powershell.exe or msiexec.exe
+                process.StartInfo.FileName = UpdateFileName(process.StartInfo.FileName);
+
                 Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Installing {appData.Name} {appData.Version}]");
                 if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Working Directory: {process.StartInfo.WorkingDirectory}]");
-                if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Command: {appData.InstallCommand}]");
-                if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Args: {appData.InstallArgs}]");
-                var resultInstall = process.LockStart(true);
-
+                if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}! FileName: {process.StartInfo.FileName}]");
+                if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Arguments: {process.StartInfo.Arguments}]");
+                // Install the downloaded file
+                if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Calling process.LockStart(Verbose)]");
+                var resultInstall = process.LockStart(Verbose);
                 if (resultInstall.IsSuccess())
+
                 {
                     // Check if the app was installed successfully
                     if (InstalledAppFileVersionGreterOrEqual(appData))
                     {
                         Colorizer.WriteLine($"[{ConsoleColor.Green}!√ {appData.Name} {appData.Version} installed.]");
+                        return ResultHelper.Success();
                     }
                     else
                     {
                         Colorizer.WriteLine($"[{ConsoleColor.Red}!X {appData.Name} {appData.Version} failed to install]");
+                        return ResultHelper.Fail(-1, $"Failed to install {appData.Name} {appData.Version}");
                     }
-                    //resultInstall = Update(appData);
                 }
                 else
                 {
 
-                    Colorizer.WriteLine($"[{ConsoleColor.Red}!X {appData.Name} {appData.Version} failed to install: {resultInstall.GetFirstOutput()}]");
+                    //Colorizer.WriteLine($"[{ConsoleColor.Red}!X {appData.Name} {appData.Version} failed to install: {resultInstall.GetFirstOutput()}]");
+                    Colorizer.WriteLine($"[{ConsoleColor.Red}!X {appData.Name} {appData.Version} failed to install: {process.ExitCode}]");
+                    return ResultHelper.Fail(process.ExitCode, $"Failed to install {appData.Name} {appData.Version}");
                 }
-
-                return resultInstall;
+               
+                //return resultInstall;
             }
             else
             {
-
                 return ResultHelper.Fail(-1, $"Failed to download {appData.WebDownloadFile} to {appData.DownloadedFile}. {result.GetFirstOutput()}");
             }
+        }
+
+        private static string UpdateFileName(string fileName)
+        {
+            var fileMappings = new Dictionary<string, string>
+            {
+                { "powershell", "powershell.exe" },
+                { "msiexec", "msiexec.exe" },
+                { "xcopy", "xcopy.exe" }
+            };
+
+            foreach (var mapping in fileMappings)
+            {
+                if (fileName.Contains(mapping.Key))
+                {
+                    return $"{ShellUtility.GetFullPathOfFile(mapping.Value)}";
+                }
+            }
+
+            return fileName;
         }
 
         private static string? GetNbuildAppFileVersion(NbuildApp nbuildApp)

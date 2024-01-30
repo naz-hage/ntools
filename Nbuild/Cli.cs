@@ -15,5 +15,6 @@ public class Cli
         "\t sample json file: https://github.com/naz-hage/ntools/blob/main/Nbuild/resources/NbuildAppListTest.json\"")]
     public string? Json { get; set; }
 
+    [OptionalArgument(false, "v", "set verbose level")]
     public bool Verbose { get; set; }
 }

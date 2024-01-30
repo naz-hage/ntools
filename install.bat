@@ -1,10 +1,9 @@
 @echo off
 SetLocal EnableDelayedExpansion
-set Version=8.0.1
-@echo.
-@echo This script downloads and installs the .NET Desktop Runtime Version %Version%.
-@echo It is intended to be used as a prerequisite setup local development environment.
-@echo.
+set DOTNET_VERSION=8.0.1
+set NTOOLS_VERSION=1.2.35
+set DEV_DRIVE=c:
+set MAIN_DIR=source
 :: Check if admin
 net session >nul 2>&1
 if %errorLevel% == 0 (
@@ -13,30 +12,13 @@ if %errorLevel% == 0 (
     echo Please run this script as an administrator.
     exit /b 1
 )
-
-:: URL for the .NET Desktop Runtime installer
-set INSTALLER_URL=https://download.visualstudio.microsoft.com/download/pr/f18288f6-1732-415b-b577-7fb46510479a/a98239f751a7aed31bc4aa12f348a9bf/windowsdesktop-runtime-%Version%-win-x64.exe
-
-:: Path where the installer will be downloaded
-set DownloadsDirectory=c:\NToolsDownloads
-set INSTALLER_PATH=%DownloadsDirectory%\dotnet_installer.exe
-
-:: Create the Downloads directory if it doesn't exist
-if not exist "%DownloadsDirectory%" mkdir "%DownloadsDirectory%"
-
-:: Grant Administrators full control of the Downloads directory
-%SystemRoot%\System32\icacls.exe "%DownloadsDirectory%" /grant Administrators:(OI)(CI)F /inheritance:r
-
-:: Download the installer
-powershell.exe -Command "Invoke-WebRequest -Uri !INSTALLER_URL! -OutFile !INSTALLER_PATH!"
-
-:: Run the installer
-!INSTALLER_PATH! /quiet /norestart
-
 :: Install latest Ntools from github
-powershell.exe -Command "nbuild/resources/install-ntools.ps1"
-
-
+:: save current directory
+set currentdir=%cd%
+cd nbuild\resources
+powershell.exe -Command ".\install-ntools.ps1" %DOTNET_VERSION% %NTOOLS_VERSION% %DEV_DRIVE% %MAIN_DIR%
+:: Restore current directory
+cd %currentdir%
 :: Delete the installer
 del !INSTALLER_PATH!
 @REM The .NET Desktop Runtime installer logs its activities to the Windows temporary directory %temp%. The exact location can vary, 

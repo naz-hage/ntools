@@ -113,12 +113,12 @@
 				>
 	</Target>
 
-	<!-- Test for FileVersion task and powershell GetFileVersion.ps1-->
+	<!-- Test for FileVersion task and powershell file-version.ps1-->
 	<Target Name="FILE_VERSIONS"  DependsOnTargets="ARTIFACTS">
 		<PropertyGroup>
 			<FileName>$(SolutionDir)\$(TargetRelease)\nb.exe</FileName>
 		</PropertyGroup>
-		<Exec Command='powershell -File "$(BuildTools)\GetFileVersion.ps1" "$(FileName)"' ConsoleToMSBuild="true">
+		<Exec Command='powershell -File "$(BuildTools)\file-version.ps1" "$(FileName)"' ConsoleToMSBuild="true">
 			<Output TaskParameter="ConsoleOutput" PropertyName="Version" />
 		</Exec>
 		<Message Text="Powershell File version: $(Version)" />
