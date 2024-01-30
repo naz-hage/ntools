@@ -104,6 +104,9 @@ function CheckIfDotnetInstalled {
     $InstalledDotnetVersion = (Get-Command dotnet -ErrorAction SilentlyContinue).Version
     Write-Host ".NET Core Version: $InstalledDotnetVersion is installed."
 
+    if ([string]::IsNullOrEmpty($InstalledDotnetVersion)) {
+        return $false
+    }
     if ([version]$InstalledDotnetVersion -ge [version]$dotnetVersion) {
         return $true
     }
@@ -173,4 +176,3 @@ function Main {
 
 # Call the Main function with the provided or default values
 Main -dotnetVersion $args[0] -nToolsVersion $args[1] -devDrive $args[2] -mainDir $args[3]
-
