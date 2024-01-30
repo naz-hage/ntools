@@ -70,6 +70,14 @@ function CheckIfNbuildInstalled {
     $deploymentPath = $env:ProgramFiles + "\NBuild"
     $nbuildTasksPath = "$deploymentPath\nbuildtasks.dll"
 
+    if (Test-Path -Path $nbuildTasksPath) {
+        Write-Host "nbuildtasks.dll exists."
+    }
+    else {
+        Write-Host "nbuildtasks.dll does not exist."
+        return $false
+    }
+
     # check version of nbuildtasks.dll
     $nbuildTasksVersion =& .\file-version.ps1 $nbuildTasksPath
     write-host "Installed NBuild Version: $nbuildTasksVersion"
