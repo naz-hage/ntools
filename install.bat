@@ -1,7 +1,7 @@
 @echo off
 SetLocal EnableDelayedExpansion
 set DOTNET_VERSION=8.0.1
-set NTOOLS_VERSION=1.2.34
+set NTOOLS_VERSION=1.2.35
 set DEV_DRIVE=c:
 set MAIN_DIR=source
 :: Check if admin

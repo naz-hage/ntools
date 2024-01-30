@@ -28,13 +28,18 @@ function InstallNtools {
     }
     else
     {
+        #https://github.com/naz-hage/ntools/releases/download/1.2.34/1.2.34.zip
         $url= "https://github.com/naz-hage/ntools/releases/download/$ntoolsversion/$ntoolsversion.zip"
         $output = "C:\NToolsDownloads\Ntools.zip"
+        
+        write-host "Downloading Ntools from $url"
         Invoke-WebRequest -Uri $url -OutFile $output
    
+        write-host "Downloaded Ntools to $output"
         $deploymentPath = $env:ProgramFiles + "\NBuild"
         
         # unzip the Ntools zip file
+        write-host "Unzipping Ntools to $deploymentPath"
         Expand-Archive -Path $output -DestinationPath $deploymentPath
 
         # check if nbuildtasks.dll exists in the deployment path

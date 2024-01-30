@@ -340,8 +340,9 @@ namespace Nbuild
         {
             var fileMappings = new Dictionary<string, string>
             {
-                { "powershell.exe", "powershell.exe" },
-                { "msiexec.exe", "msiexec.exe" }
+                { "powershell", "powershell.exe" },
+                { "msiexec", "msiexec.exe" },
+                { "xcopy", "xcopy.exe" }
             };
 
             foreach (var mapping in fileMappings)
