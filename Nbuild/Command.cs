@@ -1,5 +1,5 @@
-﻿using Ntools;
-using NbuildTasks;
+﻿using NbuildTasks;
+using Ntools;
 using OutputColorizer;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -25,17 +25,9 @@ namespace Nbuild
         static Command()
         {
             // Examine this method when we implement the logic to require admin
-            if (!TestMode || Ntools.CurrentProcess.IsElevated())
+            DownloadsDirectory = !TestMode || Ntools.CurrentProcess.IsElevated() ? "C:\\NToolsDownloads" : $"{Environment.GetEnvironmentVariable("Temp")}\\nb";
 
-            {
-                DownloadsDirectory = "C:\\NToolsDownloads";
-            }
-            else
-            {
-                DownloadsDirectory = $"{Environment.GetEnvironmentVariable("Temp")}\\nb";
-            }
-
-            if (!Directory.Exists(DownloadsDirectory)) Directory.CreateDirectory(DownloadsDirectory); 
+            if (!Directory.Exists(DownloadsDirectory)) Directory.CreateDirectory(DownloadsDirectory);
         }
 
         private static bool IsTestMode()
@@ -51,7 +43,7 @@ namespace Nbuild
             return false;
         }
 
-        private static bool CanRunCommand(bool modifyAcls=true)
+        private static bool CanRunCommand(bool modifyAcls = true)
         {
             if (!Ntools.CurrentProcess.IsElevated())
             {
@@ -152,9 +144,9 @@ namespace Nbuild
                 {
                     // display app and installed version
                     // InstalledAppFileVersionGreterOrEqual is true, print green, else print red
-                    if (InstalledAppFileVersionGreterOrEqual(appData))
+                    if (InstalledAppFileVersionGreaterOrEqual(appData))
                     {
-                        Colorizer.WriteLine($"[{ConsoleColor.Green}!| {appData.Name,-18} | {appData.Version,-14} | {GetNbuildAppFileVersion(appData), -18}|]");
+                        Colorizer.WriteLine($"[{ConsoleColor.Green}!| {appData.Name,-18} | {appData.Version,-14} | {GetNbuildAppFileVersion(appData),-18}|]");
                     }
                     else
                     {
@@ -205,7 +197,7 @@ namespace Nbuild
                     Colorizer.WriteLine($"[{ConsoleColor.Red}! Failed to download {appData.WebDownloadFile} to {appData.DownloadedFile}. {result.GetFirstOutput()}]");
                     Colorizer.WriteLine($"[{ConsoleColor.Red}! | {appData.Name,-18} | {appData.DownloadedFile,-30} | {stopWatch.Elapsed,-16:hh\\:mm\\:ss\\.ff}|]");
                 }
-                
+
             }
 
             Console.WriteLine();
@@ -246,7 +238,7 @@ namespace Nbuild
 
             if (!Directory.Exists(DownloadsDirectory)) Directory.CreateDirectory(DownloadsDirectory);
 
-            if (InstalledAppFileVersionGreterOrEqual(appData))
+            if (InstalledAppFileVersionGreaterOrEqual(appData))
             {
                 Colorizer.WriteLine($"[{ConsoleColor.Green}!√ {appData.Name} {appData.Version} already installed.]");
                 return ResultHelper.Success();
@@ -259,15 +251,13 @@ namespace Nbuild
             {
                 Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{appData.Name} {appData.Version} downloaded.]");
 
-
-
                 // Install the downloaded file
                 var process = new Process
                 {
                     StartInfo =
                     {
                         WorkingDirectory = DownloadsDirectory,
-                        FileName = $"{DownloadsDirectory}\\{appData.InstallCommand}",
+                        FileName = $"{appData.InstallCommand}",
                         Arguments = appData.InstallArgs,
                         RedirectStandardOutput = true,
                         RedirectStandardError = true,
@@ -289,7 +279,7 @@ namespace Nbuild
 
                 {
                     // Check if the app was installed successfully
-                    if (InstalledAppFileVersionGreterOrEqual(appData))
+                    if (InstalledAppFileVersionGreaterOrEqual(appData))
                     {
                         Colorizer.WriteLine($"[{ConsoleColor.Green}!√ {appData.Name} {appData.Version} installed.]");
                         return ResultHelper.Success();
@@ -307,7 +297,7 @@ namespace Nbuild
                     Colorizer.WriteLine($"[{ConsoleColor.Red}!X {appData.Name} {appData.Version} failed to install: {process.ExitCode}]");
                     return ResultHelper.Fail(process.ExitCode, $"Failed to install {appData.Name} {appData.Version}");
                 }
-               
+
                 //return resultInstall;
             }
             else
@@ -334,7 +324,7 @@ namespace Nbuild
             }
         }
 
-        private static bool InstalledAppFileVersionGreterOrEqual(NbuildApp nbuildApp)
+        private static bool InstalledAppFileVersionGreaterOrEqual(NbuildApp nbuildApp)
         {
             var currentVersion = GetNbuildAppFileVersion(nbuildApp);
             if (currentVersion == null)

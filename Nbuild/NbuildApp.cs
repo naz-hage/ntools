@@ -47,30 +47,6 @@ namespace Nbuild
 
         }
 
-        public static NbuildApp FromJson(string? json)
-        {
-            if (string.IsNullOrEmpty(json))
-            {
-                throw new ArgumentNullException(nameof(json));
-            }
-
-            // check if json is a file path
-            if (File.Exists(json))
-            {
-                json = File.ReadAllText(json);
-
-                if (string.IsNullOrEmpty(json))
-                {
-                    throw new ArgumentNullException(nameof(json));
-                }
-            }
-
-            var appData = JsonSerializer.Deserialize<NbuildApp>(json) ?? throw new ParserException("Failed to parse json to AppData object", null);
-
-
-            return Validate(appData);
-        }
-
         private static NbuildApp Validate(NbuildApp appData)
         {
             if (string.IsNullOrEmpty(appData.Name))

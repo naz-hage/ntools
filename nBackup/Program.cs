@@ -1,6 +1,6 @@
 ﻿using CommandLine;
-using Ntools;
 using NbuildTasks;
+using Ntools;
 using OutputColorizer;
 using System;
 using System.Diagnostics;

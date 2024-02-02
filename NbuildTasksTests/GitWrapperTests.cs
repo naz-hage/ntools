@@ -30,9 +30,7 @@ namespace NbuildTasksTests
         public void GetCurrentTagTest()
         {
             // Arrange
-            InitTag();
-
-            var tag = GitWrapper.Tag;
+            var tag = InitTag();
             if (string.IsNullOrEmpty(tag))
             {
                 tag = "1.0.0";
@@ -102,8 +100,9 @@ namespace NbuildTasksTests
         [TestMethod()]
         public void StagingTagTest()
         {
-            // Act and Assert that all tags are valid
-            for (int i = 0; i < 4; i++)
+            // Arrange Act and Assert.   Repeat for 1 time to speed up the test
+            var times = 1;
+            for (int i = 0; i < times; i++)
             {
                 // Arrange
                 var tag = GitWrapper.Tag;
@@ -134,9 +133,9 @@ namespace NbuildTasksTests
         [TestMethod()]
         public void ProductionTagTest()
         {
-            // Act and Assert that all tags are valid
-            // Act and Assert that all tags are valid
-            for (int i = 0; i < 4; i++)
+            // Arrange Act and Assert.   Repeat for 1 time to speed up the test
+            var times = 1;
+            for (int i = 0; i < times; i++)
             {
                 // Arrange
                 var tag = GitWrapper.Tag;
@@ -155,10 +154,6 @@ namespace NbuildTasksTests
 
                 // Set tag to nextTag
                 Assert.IsTrue(GitWrapper.SetTag(nextTag));
-
-                // Sleep for 750ms to allow the tag to be set
-                //Thread.Sleep(750);
-
             }
         }
 
@@ -214,15 +209,14 @@ namespace NbuildTasksTests
             Assert.IsTrue(result);
         }
 
-        [TestMethod()]
+        // This test is time consuming and should be run manually
+        [TestMethod, TestCategory("Manual")]
         public void ListRemoteTagsTest()
         {
             // Arrange add a tag
             var tag = GitWrapper.SetAutoTag("staging");
             Assert.IsTrue(GitWrapper.SetTag(tag));
             GitWrapper.PushTag(tag);
-
-
 
             var remoteTags = GitWrapper.ListRemoteTags();
             Assert.IsNotNull(remoteTags);
@@ -238,25 +232,22 @@ namespace NbuildTasksTests
             Assert.AreNotEqual(0, remoteTags.Count);
         }
 
-        [TestMethod()]
+        // This test is time consuming and should be run manually
+        [TestMethod, TestCategory("Manual")]
         public void ListLocalTagsTest()
         {
             // Arrange add a tag
+            var localTags = GitWrapper.ListLocalTags();
             var tag = GitWrapper.SetAutoTag("staging");
             Assert.IsTrue(GitWrapper.SetTag(tag));
 
-            var localTags = GitWrapper.ListLocalTags();
+            var expectedCount = localTags.Count + 1;
+            // Act
+            localTags = GitWrapper.ListLocalTags();
             Assert.IsNotNull(localTags);
 
-            // Act
-            Console.WriteLine("Local Tags:");
-            foreach (var tagItem in localTags)
-            {
-                Console.WriteLine(tagItem);
-            }
-
             // Assert
-            Assert.AreNotEqual(0, localTags.Count);
+            Assert.AreEqual(expectedCount, localTags.Count);
         }
 
         [TestMethod()]

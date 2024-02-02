@@ -1,11 +1,10 @@
-using Ntools;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Nbuild;
 using NbuildTasks;
-using OutputColorizer;
-using System.Reflection;
-using System.Diagnostics;
+using Ntools;
 using System.Collections;
+using System.Diagnostics;
+using System.Reflection;
 
 namespace NbuildTests
 {
@@ -15,7 +14,7 @@ namespace NbuildTests
         // Constants for test setup
         private const string NbuildAssemblyName = "Nb.dll";
         private const string NbuildAppListJsonFile = "NbuildAppListTest.json";
-        private const string GitHubActions = "LOCAL_TEST";
+        private const string LocalTest = "LOCAL_TEST";
 
         // Local test mode flag
         private bool? LocalTestMode;
@@ -35,7 +34,7 @@ namespace NbuildTests
                     StartInfo = new ProcessStartInfo
                     {
                         FileName = "REG.exe",
-                        Arguments = $"delete HKCU\\Environment /F /V {GitHubActions}",
+                        Arguments = $"delete HKCU\\Environment /F /V {LocalTest}",
                         WorkingDirectory = $"{Environment.GetFolderPath(Environment.SpecialFolder.System)}",
                         UseShellExecute = false,
                         RedirectStandardOutput = true,
@@ -50,7 +49,7 @@ namespace NbuildTests
         // Method to setup test mode flag
         private void SetupTestModeFlag()
         {
-            var githubActions = Environment.GetEnvironmentVariable(GitHubActions, EnvironmentVariableTarget.User);
+            var githubActions = Environment.GetEnvironmentVariable(LocalTest, EnvironmentVariableTarget.User);
             if (string.IsNullOrEmpty(githubActions))
             {
                 // on local machine, Set GitHubActions to true
@@ -62,7 +61,7 @@ namespace NbuildTests
                     StartInfo = new ProcessStartInfo
                     {
                         FileName = "setx.exe",
-                        Arguments = $"{GitHubActions} true",
+                        Arguments = $"{LocalTest} true",
                         WorkingDirectory = $"{Environment.GetFolderPath(Environment.SpecialFolder.System)}",
                         UseShellExecute = false,
                         RedirectStandardOutput = true,
@@ -95,7 +94,7 @@ namespace NbuildTests
                 ""NbuildAppList"": [
                 {
                 ""Name"": ""nbuild"",
-                ""Version"": ""1.1.0"",
+                ""Version"": ""1.2.0"",
                 ""AppFileName"": ""nb.exe"",
                 ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
                 ""DownloadedFile"": ""$(Version).zip"",
@@ -156,7 +155,7 @@ namespace NbuildTests
             // Arrange "C:\Program Files\7-Zip\7z.exe" x C:\Artifacts\ntools\Release\%1.zip -o"C:\Program Files\Nbuild" -y
             // var json = @"{
             //     ""Name"": ""nbuild"",
-            //     ""Version"": ""1.1.0"",
+            //     ""Version"": ""1.2.0"",
             //     ""Url"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
             //     ""InstallFile"": ""$(Version).zip"",
             //     ""InstallCommand"": ""c:\\program files\\7-Zip\\7z.exe"",
@@ -170,7 +169,7 @@ namespace NbuildTests
                 ""NbuildAppList"": [
                     {
                         ""Name"": ""nbuild"",
-                        ""Version"": ""1.1.0"",
+                        ""Version"": ""1.2.35"",
                         ""AppFileName"": ""nb.exe"",
                         ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
                         ""DownloadedFile"": ""$(Version).zip"",
@@ -180,8 +179,6 @@ namespace NbuildTests
                     }
                 ]
             }";
-
-            var appdata = NbuildApp.GetApps(json);
 
             // Act
             ResultHelper result = Command.Install(json);
@@ -210,7 +207,7 @@ namespace NbuildTests
                 ""Version"": ""1.2.0"",
                 ""NbuildAppList"": [
                     {
-                    ""Version"": ""1.1.0"",
+                    ""Version"": ""1.2.0"",
                     ""AppFileName"": ""nb.exe"",
                     ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
                     ""DownloadedFile"": ""$(Version).zip"",
@@ -239,7 +236,7 @@ namespace NbuildTests
                 ""NbuildAppList"": [
                     {
                     ""Name"": ""nbuild"",
-                    ""Version"": ""1.1.0"",
+                    ""Version"": ""1.2.0"",
                     ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
                     ""DownloadedFile"": ""$(Version).zip"",
                     ""InstallCommand"": ""powershell.exe"",
@@ -268,7 +265,7 @@ namespace NbuildTests
                 ""NbuildAppList"": [
                     {
                     ""Name"": ""nbuild"",
-                    ""Version"": ""1.1.0"",
+                    ""Version"": ""1.2.0"",
                     ""AppFileName"": ""nb.exe"",
                     ""DownloadedFile"": ""$(Version).zip"",
                     ""InstallCommand"": ""powershell.exe"",
@@ -297,7 +294,7 @@ namespace NbuildTests
                 ""NbuildAppList"": [
                     {
                     ""Name"": ""nbuild"",
-                    ""Version"": ""1.1.0"",
+                    ""Version"": ""1.2.0"",
                     ""AppFileName"": ""nb.exe"",
                     ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
                     ""InstallCommand"": ""powershell.exe"",
@@ -326,7 +323,7 @@ namespace NbuildTests
                 ""NbuildAppList"": [
                 {
                 ""Name"": ""nbuild"",
-                ""Version"": ""1.1.0"",
+                ""Version"": ""1.2.0"",
                 ""AppFileName"": ""nb.exe"",
                 ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
                 ""DownloadedFile"": ""$(Version).zip"",
@@ -355,7 +352,7 @@ namespace NbuildTests
                 ""NbuildAppList"": [
                 {
                 ""Name"": ""nbuild"",
-                ""Version"": ""1.1.0"",
+                ""Version"": ""1.2.0"",
                 ""AppFileName"": ""nb.exe"",
                 ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
                 ""DownloadedFile"": ""$(Version).zip"",
@@ -384,7 +381,7 @@ namespace NbuildTests
                 ""NbuildAppList"": [
                 {
                 ""Name"": ""nbuild"",
-                ""Version"": ""1.1.0"",
+                ""Version"": ""1.2.0"",
                 ""AppFileName"": ""nb.exe"",
                 ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
                 ""DownloadedFile"": ""$(Version).zip"",

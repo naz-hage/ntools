@@ -1,6 +1,6 @@
 ﻿using CommandLine;
-using Ntools;
 using NbuildTasks;
+using Ntools;
 using OutputColorizer;
 using System.Diagnostics;
 
@@ -126,7 +126,7 @@ public class Program
             },
         };
 
-        var resultHelper = process.LockStart(false); 
+        var resultHelper = process.LockStart(false);
         if (!resultHelper.IsSuccess())
         {
             Console.WriteLine($"==> Failed to display git info:{resultHelper.GetFirstOutput()}");

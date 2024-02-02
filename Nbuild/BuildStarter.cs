@@ -1,9 +1,9 @@
-﻿using Ntools;
-using NbuildTasks;
+﻿using NbuildTasks;
+using Ntools;
 using OutputColorizer;
+using System.Diagnostics;
 using System.Text;
 using System.Xml;
-using System.Diagnostics;
 
 namespace Nbuild;
 
@@ -66,7 +66,7 @@ public class BuildStarter
         DisplayLog(5);
         return result;
     }
-        
+
     public static bool ValidTarget(string targetsFile, string? target)
     {
         return GetTargets(targetsFile).Contains(target, StringComparer.OrdinalIgnoreCase);

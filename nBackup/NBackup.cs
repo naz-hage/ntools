@@ -155,7 +155,8 @@ namespace Nbackup
                     FileName = "robocopy.exe",
                     Arguments = $"\"{source}\" \"{destination}\" {backupOptions}",
                     RedirectStandardOutput = true,
-                    RedirectStandardError = true } };
+                    RedirectStandardError = true }
+            };
 
             // Update the filename to the full path of executable in the PATH environment variable
             process.StartInfo.FileName = FileMappins.GetFullPathOfFile(process.StartInfo.FileName);
