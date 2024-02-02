@@ -97,7 +97,7 @@ public class Program
         return (int)result.Code;
     }
 
-    private static string UpdateJsonOption(Cli options)
+    private static string? UpdateJsonOption(Cli options)
     {
         if ((string.IsNullOrEmpty(options.Json) && !string.IsNullOrEmpty(options.Command)) &&
                     (options.Command.Equals(CmdInstall, StringComparison.InvariantCultureIgnoreCase) ||
@@ -110,10 +110,7 @@ public class Program
                 return options.Json;
             }
         }
-        else
-        {
-            options.Json = "";
-        }
+
         return options.Json;
     }
 
