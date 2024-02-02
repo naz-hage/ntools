@@ -2,8 +2,10 @@
 using NbuildTasks;
 using Ntools;
 using OutputColorizer;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Text.Json;
 
 namespace Nbuild
@@ -155,6 +157,8 @@ namespace Nbuild
         {
             Verbose = verbose;
             
+            if (!CanRunCommand()) return ResultHelper.Fail(-1, $"You must run this command as an administrator");
+
             var appDataList = GetApps(json);
 
             if (appDataList == null) return ResultHelper.Fail(-1, $"Invalid json input");
@@ -364,72 +368,85 @@ namespace Nbuild
 
             foreach (var appData in listAppData.NbuildAppList)
             {
-                yield return Validate(appData);
+                var valid = Validate(appData);
+                yield return valid;
             }
-
         }
 
         private static NbuildApp Validate(NbuildApp appData)
         {
             if (string.IsNullOrEmpty(appData.Name))
             {
-                throw new ParserException("Name is missing or empty", null);
+                throw new ParserException("Name is required", null);
             }
             if (string.IsNullOrEmpty(appData.WebDownloadFile))
             {
-                throw new ParserException("WebDownloadFile is missing or empty", null);
+                throw new ParserException("WebDownloadFile is required", null);
             }
             if (string.IsNullOrEmpty(appData.DownloadedFile))
             {
-                throw new ParserException("DownloadedFile is missing or empty", null);
+                throw new ParserException("DownloadedFile is required", null);
             }
             if (string.IsNullOrEmpty(appData.InstallCommand))
             {
-                throw new ParserException("InstallCommand is missing or empty", null);
+                throw new ParserException("InstallCommand is required", null);
             }
             if (string.IsNullOrEmpty(appData.InstallArgs))
             {
-                throw new ParserException("InstallArgs is missing or empty", null);
+                throw new ParserException("InstallArgs is required", null);
             }
             if (string.IsNullOrEmpty(appData.Version))
             {
-                throw new ParserException("Version is missing or empty", null);
+                throw new ParserException("Version is required", null);
             }
             if (string.IsNullOrEmpty(appData.InstallPath))
             {
-                throw new ParserException("InstallPath is missing or empty", null);
+                throw new ParserException("InstallPath is required", null);
             }
-            if (string.IsNullOrEmpty(appData.AppFileName))
+
+            // Perform validation
+            var validationResults = new List<ValidationResult>();
+            var validationContext = new ValidationContext(appData);
+            bool isValid = Validator.TryValidateObject(appData, validationContext, validationResults, true);
+
+            if (!isValid)
             {
-                throw new ParserException("AppFileName is missing or empty", null);
+                var sb = new StringBuilder();
+                foreach (var validationResult in validationResults)
+                {
+                    sb.Append($"{validationResult.ErrorMessage} ");
+                }
+                throw new ParserException(sb.ToString(), null);
             }
 
+            // Update variables with $(...)
+            appData.WebDownloadFile = appData.WebDownloadFile
+                .Replace("$(Version)", appData.Version)
+                .Replace("$(AppFileName)", appData.AppFileName);
 
-            // Replace $(Version) with the actual version in appData.Version
-            // Replace $(InstallPath) with the actual version in appData.InstallPath
-            appData.WebDownloadFile = appData.WebDownloadFile.Replace("$(Version)", appData.Version);
+            appData.DownloadedFile = appData.DownloadedFile
+                .Replace("$(Version)", appData.Version)
+                .Replace("$(AppFileName)", appData.AppFileName);
 
-            appData.DownloadedFile = appData.DownloadedFile.Replace("$(Version)", appData.Version);
-            appData.DownloadedFile = appData.DownloadedFile.Replace("$(AppFileName)", appData.AppFileName);
-
-            appData.InstallCommand = appData.InstallCommand.Replace("$(Version)", appData.Version);
-            appData.InstallCommand = appData.InstallCommand.Replace("$(DownloadedFile)", appData.DownloadedFile);
+            appData.InstallCommand = appData.InstallCommand
+                .Replace("$(Version)", appData.Version)
+                .Replace("$(DownloadedFile)", appData.DownloadedFile);
 
             string programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
             string programFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
 
-            appData.InstallArgs = appData.InstallArgs.Replace("$(Version)", appData.Version);
-            appData.InstallArgs = appData.InstallArgs.Replace("$(InstallPath)", appData.InstallPath);
-            appData.InstallArgs = appData.InstallArgs.Replace("$(AppFileName)", appData.AppFileName);
+            appData.InstallArgs = appData
+                .InstallArgs.Replace("$(Version)", appData.Version)
+                .Replace("$(InstallPath)", appData.InstallPath)
+                .Replace("$(AppFileName)", appData.AppFileName)
+                .Replace("$(DownloadedFile)", appData.DownloadedFile)
+                .Replace("$(ProgramFiles)", programFiles)
+                .Replace("$(ProgramFilesX86)", programFilesX86);
 
-            appData.InstallArgs = appData.InstallArgs.Replace("$(DownloadedFile)", appData.DownloadedFile);
-
-            appData.InstallArgs = appData.InstallArgs.Replace("$(ProgramFiles)", programFiles);
-            appData.InstallArgs = appData.InstallArgs.Replace("$(ProgramFilesX86)", programFilesX86);
-
-            appData.InstallPath = appData.InstallPath.Replace("$(Version)", appData.Version);
-            appData.InstallPath = appData.InstallPath.Replace("$(ProgramFiles)", programFiles);
-            appData.InstallPath = appData.InstallPath.Replace("$(ProgramFilesX86)", programFilesX86);
+            appData.InstallPath = appData.InstallPath
+                .Replace("$(Version)", appData.Version)
+                .Replace("$(ProgramFiles)", programFiles)
+                .Replace("$(ProgramFilesX86)", programFilesX86);
 
 
             return !Path.IsPathRooted(appData.InstallPath)

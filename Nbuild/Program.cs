@@ -49,6 +49,7 @@ public class Program
             {
                 if (options != null && !string.IsNullOrEmpty(options.Command))
                 {
+                    options.Json = UpdateJsonOption(options);
 
                     result = options.Command switch
                     {
@@ -62,7 +63,7 @@ public class Program
             }
             catch (Exception ex)
             {
-                Colorizer.WriteLine($"[{ConsoleColor.Green}!X Error occurred: {ex.Message}.]");
+                Colorizer.WriteLine($"[{ConsoleColor.Red}!X Error occurred: {ex.Message}.]");
             }
 
             // return to current directory because the command might have changed it

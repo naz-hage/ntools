@@ -38,11 +38,13 @@ namespace NbuildTests
                         WorkingDirectory = $"{Environment.GetFolderPath(Environment.SpecialFolder.System)}",
                         UseShellExecute = false,
                         RedirectStandardOutput = true,
+                        RedirectStandardError = true,
                         CreateNoWindow = true
                     }
                 };
 
-                Assert.IsTrue(process.LockStart(false).IsSuccess());
+                var result = process.LockStart(true);
+                Assert.IsTrue(result.IsSuccess());
             }
         }
 
@@ -80,6 +82,7 @@ namespace NbuildTests
 
                 Assert.IsTrue(process.LockStart(true).IsSuccess());
             }
+            LocalTestMode = true;
         }
 
         // Test method for download functionality
@@ -136,7 +139,7 @@ namespace NbuildTests
             if (!result.IsSuccess() && result.Output.Count > 0)
             {
 
-                Console.WriteLine(result.GetFirstOutput());
+                Console.WriteLine(result.GetFirstOutput().Trim(' '));
             }
 
             var result2 = result.IsSuccess();
@@ -186,7 +189,7 @@ namespace NbuildTests
             if (!result.IsSuccess() && result.Output.Count > 0)
             {
 
-                Console.WriteLine(result.GetFirstOutput());
+                Console.WriteLine(result.GetFirstOutput().Trim(' '));
             }
 
             var result2 = result.IsSuccess();
@@ -231,7 +234,7 @@ namespace NbuildTests
 
             // Assert an failed json parsing is returned 
 
-            Assert.AreEqual("Invalid json input: Name is missing or empty", result.GetFirstOutput());
+            Assert.AreEqual("Invalid json input: Name is required", result.GetFirstOutput().Trim(' '));
         }
 
         // Test method for install exception when AppFileName is not defined
@@ -268,7 +271,7 @@ namespace NbuildTests
             // Assert a failed json parsing is returned 
             Assert.IsFalse(result.IsSuccess());
 
-            Assert.AreEqual(result.GetFirstOutput(), "Invalid json input: AppFileName is missing or empty");
+            Assert.AreEqual(result.GetFirstOutput().Trim(' '), "Invalid json input: AppFileName is required");
         }
 
         // Test method for install exception when WebDownloadFile is not defined
@@ -305,7 +308,7 @@ namespace NbuildTests
             // Assert a failed json parsing is returned 
             Assert.IsFalse(result.IsSuccess());
 
-            Assert.AreEqual(result.GetFirstOutput(), "Invalid json input: WebDownloadFile is missing or empty");
+            Assert.AreEqual(result.GetFirstOutput().Trim(' '), "Invalid json input: WebDownloadFile is required");
         }
 
         // Test method for install exception when DownloadedFile is not defined
@@ -342,7 +345,7 @@ namespace NbuildTests
             // Assert a failed json parsing is returned 
             Assert.IsFalse(result.IsSuccess());
 
-            Assert.AreEqual(result.GetFirstOutput(), "Invalid json input: DownloadedFile is missing or empty");
+            Assert.AreEqual(result.GetFirstOutput().Trim(' '), "Invalid json input: DownloadedFile is required");
         }
 
         // Test method for install exception when InstallCommand is not defined
@@ -379,7 +382,7 @@ namespace NbuildTests
             // Assert a failed json parsing is returned 
             Assert.IsFalse(result.IsSuccess());
 
-            Assert.AreEqual(result.GetFirstOutput(), "Invalid json input: InstallCommand is missing or empty");
+            Assert.AreEqual(result.GetFirstOutput(), "Invalid json input: InstallCommand is required");
         }
 
         // Test method for install exception when InstallArgs is not defined
@@ -416,7 +419,7 @@ namespace NbuildTests
             // Assert a failed json parsing is returned 
             Assert.IsFalse(result.IsSuccess());
 
-            Assert.AreEqual(result.GetFirstOutput(), "Invalid json input: InstallArgs is missing or empty");
+            Assert.AreEqual(result.GetFirstOutput().Trim(' '), "Invalid json input: InstallArgs is required");
         }
 
         // Test method for install exception when InstallPath is not defined
@@ -453,7 +456,7 @@ namespace NbuildTests
             // Assert a failed json parsing is returned 
             Assert.IsFalse(result.IsSuccess());
 
-            Assert.AreEqual(result.GetFirstOutput(), "Invalid json input: InstallPath is missing or empty");
+            Assert.AreEqual(result.GetFirstOutput(), "Invalid json input: InstallPath is required");
         }
     }
 }
