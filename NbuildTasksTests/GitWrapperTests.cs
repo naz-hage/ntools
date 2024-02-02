@@ -44,8 +44,7 @@ namespace NbuildTasksTests
             Assert.AreNotEqual(string.Empty, currentTag);
         }
 
-        // Ignore this test because it is failing when run in GitHub Actions
-        [TestMethod(), Ignore]
+        [TestMethod, TestCategory("Manual"), Ignore("test because it is failing when run in GitHub Actions")]
         public void SetAutoTagTest()
         {
             var buildTypes = new List<string>
@@ -171,7 +170,7 @@ namespace NbuildTasksTests
         }
 
         // Ignore this test because it is failing when run in GitHub Actions
-        [TestMethod, Ignore]
+        [TestMethod, TestCategory("Manual"), Ignore("This test is intended to be run manually because it fails in GitHub Actions.")]
         public void DeleteTagTest()
         {
             // Arrange
@@ -232,8 +231,7 @@ namespace NbuildTasksTests
             Assert.AreNotEqual(0, remoteTags.Count);
         }
 
-        // This test is time consuming and should be run manually
-        [TestMethod, TestCategory("Manual")]
+        [TestMethod, TestCategory("Manual"), Ignore("This test is intended to be run manually because it is time consuming.")]
         public void ListLocalTagsTest()
         {
             // Arrange add a tag
