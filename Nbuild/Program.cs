@@ -47,6 +47,9 @@ public class Program
 
             if (options != null && !string.IsNullOrEmpty(options.Command))
             {
+                // update json option with default value
+                options.Json = UpdateJsonOption(options);
+
                 result = options.Command switch
                 {
                     var d when d == CmdTargets => BuildStarter.DisplayTargets(Environment.CurrentDirectory),
@@ -86,6 +89,26 @@ public class Program
         DisplayGitInfo();
 
         return (int)result.Code;
+    }
+
+    private static string UpdateJsonOption(Cli options)
+    {
+        if ((string.IsNullOrEmpty(options.Json) && !string.IsNullOrEmpty(options.Command)) &&
+                    (options.Command.Equals(CmdInstall, StringComparison.InvariantCultureIgnoreCase) ||
+                    options.Command.Equals(CmdList, StringComparison.InvariantCultureIgnoreCase) ||
+                    options.Command.Equals(CmdDownload, StringComparison.InvariantCultureIgnoreCase)))
+        {
+            options.Json = $"{Environment.GetEnvironmentVariable("ProgramFiles")}\\Nbuild\\ntools.json";
+            if (File.Exists(options.Json))
+            {
+                return options.Json;
+            }
+        }
+        else
+        {
+            options.Json = "";
+        }
+        return options.Json;
     }
 
     private static void DisplayGitInfo()

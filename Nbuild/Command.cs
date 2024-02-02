@@ -100,51 +100,31 @@ namespace Nbuild
             return true;
         }
 
-        public static ResultHelper Install(string? json, bool verbose = false)
+        public static ResultHelper Install(string json, bool verbose = false)
         {
             Verbose = verbose;
             // check if caller is admin or in test mode
             if (!CanRunCommand()) return ResultHelper.Fail(-1, $"You must run this command as an administrator");
 
-            if (string.IsNullOrEmpty(json))
-            {
-                return ResultHelper.Fail(-1, $"json cannot be null");
-            }
-
-            if (File.Exists(json))
-            {
-                Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Reading {json}]");
-                json = File.ReadAllText(json);
-            }
-
             try
             {
-                if (json.Contains("NbuildAppList"))
+                var appDataList = NbuildApp.GetApps(json);
+                if (appDataList == null) return ResultHelper.Fail(-1, $"Invalid json input");
+
+                if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{appDataList.Count()} apps to install.]");
+
+                foreach (var appData in appDataList)
                 {
-                    var appDataList = NbuildApp.FromMultiJson(json);
-                    if (appDataList == null) return ResultHelper.Fail(-1, $"Invalid json input");
-
-                    if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{appDataList.Count()} apps to install.]");
-
-                    foreach (var appData in appDataList)
+                    var result = Install(appData);
+                    if (!result.IsSuccess())
                     {
-                        var result = Install(appData);
-                        if (!result.IsSuccess())
-                        {
-                            return result;
-                        }
+                        return result;
                     }
-
-                    Console.WriteLine();
-                    // all apps installed successfully
-                    return ResultHelper.Success();
                 }
-                else
-                {
-                    var appData = NbuildApp.FromJson(json);
 
-                    return Install(appData);
-                }
+                Console.WriteLine();
+                // all apps installed successfully
+                return ResultHelper.Success();
             }
             catch (Exception ex)
             {
@@ -154,12 +134,12 @@ namespace Nbuild
             }
         }
 
-        public static ResultHelper List(string? json, bool verbose = false)
+        public static ResultHelper List(string json, bool verbose = false)
         {
             Verbose = verbose;
             try
             {
-                var appDataList = NbuildApp.FromMultiJson(json);
+                var appDataList = NbuildApp.GetApps(json);
                 if (appDataList == null) return ResultHelper.Fail(-1, $"Invalid json input");
 
                 Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{appDataList.Count()} apps to list:]");
@@ -192,13 +172,13 @@ namespace Nbuild
             return ResultHelper.Success();
         }
 
-        public static ResultHelper Download(string? json, bool verbose = false)
+        public static ResultHelper Download(string json, bool verbose = false)
         {
             Verbose = verbose;
             // check if admin
             if (!CanRunCommand()) return ResultHelper.Fail(-1, $"You must run this command as an administrator");
 
-            var appDataList = NbuildApp.FromMultiJson(json);
+            var appDataList = NbuildApp.GetApps(json);
             if (appDataList == null) return ResultHelper.Fail(-1, $"Invalid json input");
 
             Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{appDataList.ToList().Count} apps to download to {DownloadsDirectory}]");
@@ -295,8 +275,8 @@ namespace Nbuild
                     }
                 };
 
-                // Update the filename to the full path of powershell.exe or msiexec.exe
-                process.StartInfo.FileName = UpdateFileName(process.StartInfo.FileName);
+                // Update the filename to the full path of executable in the PATH environment variable
+                process.StartInfo.FileName = FileMappins.GetFullPathOfFile(process.StartInfo.FileName);
 
                 Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Installing {appData.Name} {appData.Version}]");
                 if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Working Directory: {process.StartInfo.WorkingDirectory}]");
@@ -334,26 +314,6 @@ namespace Nbuild
             {
                 return ResultHelper.Fail(-1, $"Failed to download {appData.WebDownloadFile} to {appData.DownloadedFile}. {result.GetFirstOutput()}");
             }
-        }
-
-        private static string UpdateFileName(string fileName)
-        {
-            var fileMappings = new Dictionary<string, string>
-            {
-                { "powershell", "powershell.exe" },
-                { "msiexec", "msiexec.exe" },
-                { "xcopy", "xcopy.exe" }
-            };
-
-            foreach (var mapping in fileMappings)
-            {
-                if (fileName.Contains(mapping.Key))
-                {
-                    return $"{ShellUtility.GetFullPathOfFile(mapping.Value)}";
-                }
-            }
-
-            return fileName;
         }
 
         private static string? GetNbuildAppFileVersion(NbuildApp nbuildApp)

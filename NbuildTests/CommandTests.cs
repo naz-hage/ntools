@@ -166,17 +166,22 @@ namespace NbuildTests
             SetupTestModeFlag();
 
             var json = @"{
-                ""Name"": ""nbuild"",
-                ""Version"": ""1.1.0"",
-                ""AppFileName"": ""nb.exe"",
-                ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
-                ""DownloadedFile"": ""$(Version).zip"",
-                ""InstallCommand"": ""powershell.exe"",
-                ""InstallArgs"": ""-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force"",
-                ""InstallPath"": ""C:\\Temp\\nbuild2""
+                ""Version"": ""1.2.0"",
+                ""NbuildAppList"": [
+                    {
+                        ""Name"": ""nbuild"",
+                        ""Version"": ""1.1.0"",
+                        ""AppFileName"": ""nb.exe"",
+                        ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
+                        ""DownloadedFile"": ""$(Version).zip"",
+                        ""InstallCommand"": ""powershell.exe"",
+                        ""InstallArgs"": ""-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force"",
+                        ""InstallPath"": ""C:\\Temp\\nbuild2""
+                    }
+                ]
             }";
 
-            var appdata = NbuildApp.FromJson(json);
+            var appdata = NbuildApp.GetApps(json);
 
             // Act
             ResultHelper result = Command.Install(json);
@@ -202,14 +207,18 @@ namespace NbuildTests
         {
             // Arrange with json and no name define ""Name"": ""nbuild"",
             var json = @"{
-
-                ""Version"": ""1.1.0"",
-                ""AppFileName"": ""nb.exe"",
-                ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
-                ""DownloadedFile"": ""$(Version).zip"",
-                ""InstallCommand"": ""powershell.exe"",
-                ""InstallArgs"": ""-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force"",
-                ""InstallPath"": ""C:\\Temp\\nbuild2""
+                ""Version"": ""1.2.0"",
+                ""NbuildAppList"": [
+                    {
+                    ""Version"": ""1.1.0"",
+                    ""AppFileName"": ""nb.exe"",
+                    ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
+                    ""DownloadedFile"": ""$(Version).zip"",
+                    ""InstallCommand"": ""powershell.exe"",
+                    ""InstallArgs"": ""-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force"",
+                    ""InstallPath"": ""C:\\Temp\\nbuild2""
+                    }
+                ]
             }";
 
             // Act
@@ -226,13 +235,18 @@ namespace NbuildTests
         {
             // Arrange with json and no AppFileName defined
             var json = @"{
-                ""Name"": ""nbuild"",
-                ""Version"": ""1.1.0"",
-                ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
-                ""DownloadedFile"": ""$(Version).zip"",
-                ""InstallCommand"": ""powershell.exe"",
-                ""InstallArgs"": ""-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force"",
-                ""InstallPath"": ""C:\\Temp\\nbuild2""
+                ""Version"": ""1.2.0"",
+                ""NbuildAppList"": [
+                    {
+                    ""Name"": ""nbuild"",
+                    ""Version"": ""1.1.0"",
+                    ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
+                    ""DownloadedFile"": ""$(Version).zip"",
+                    ""InstallCommand"": ""powershell.exe"",
+                    ""InstallArgs"": ""-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force"",
+                    ""InstallPath"": ""C:\\Temp\\nbuild2""
+                    }
+                ]
             }";
 
             // Act
@@ -250,13 +264,18 @@ namespace NbuildTests
         {
             // Arrange with json and no WebDownloadFile defined
             var json = @"{
-                ""Name"": ""nbuild"",
-                ""Version"": ""1.1.0"",
-                ""AppFileName"": ""nb.exe"",
-                ""DownloadedFile"": ""$(Version).zip"",
-                ""InstallCommand"": ""powershell.exe"",
-                ""InstallArgs"": ""-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force"",
-                ""InstallPath"": ""C:\\Temp\\nbuild2""
+                ""Version"": ""1.2.0"",
+                ""NbuildAppList"": [
+                    {
+                    ""Name"": ""nbuild"",
+                    ""Version"": ""1.1.0"",
+                    ""AppFileName"": ""nb.exe"",
+                    ""DownloadedFile"": ""$(Version).zip"",
+                    ""InstallCommand"": ""powershell.exe"",
+                    ""InstallArgs"": ""-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force"",
+                    ""InstallPath"": ""C:\\Temp\\nbuild2""
+                    }
+                ]
             }";
 
             // Act
@@ -274,13 +293,18 @@ namespace NbuildTests
         {
             // Arrange with json and no DownloadedFile defined
             var json = @"{
-                ""Name"": ""nbuild"",
-                ""Version"": ""1.1.0"",
-                ""AppFileName"": ""nb.exe"",
-                ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
-                ""InstallCommand"": ""powershell.exe"",
-                ""InstallArgs"": ""-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force"",
-                ""InstallPath"": ""C:\\Temp\\nbuild2""
+                ""Version"": ""1.2.0"",
+                ""NbuildAppList"": [
+                    {
+                    ""Name"": ""nbuild"",
+                    ""Version"": ""1.1.0"",
+                    ""AppFileName"": ""nb.exe"",
+                    ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
+                    ""InstallCommand"": ""powershell.exe"",
+                    ""InstallArgs"": ""-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force"",
+                    ""InstallPath"": ""C:\\Temp\\nbuild2""
+                    }
+                ]
             }";
 
             // Act
@@ -298,6 +322,9 @@ namespace NbuildTests
         {
             // Arrange with json and no InstallCommand defined
             var json = @"{
+                ""Version"": ""1.2.0"",
+                ""NbuildAppList"": [
+                {
                 ""Name"": ""nbuild"",
                 ""Version"": ""1.1.0"",
                 ""AppFileName"": ""nb.exe"",
@@ -305,6 +332,8 @@ namespace NbuildTests
                 ""DownloadedFile"": ""$(Version).zip"",
                 ""InstallArgs"": ""-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force"",
                 ""InstallPath"": ""C:\\Temp\\nbuild2""
+                    }
+                ]
             }";
 
             // Act
@@ -322,6 +351,9 @@ namespace NbuildTests
         {
             // Arrange with json and no InstallArgs defined
             var json = @"{
+                ""Version"": ""1.2.0"",
+                ""NbuildAppList"": [
+                {
                 ""Name"": ""nbuild"",
                 ""Version"": ""1.1.0"",
                 ""AppFileName"": ""nb.exe"",
@@ -329,6 +361,8 @@ namespace NbuildTests
                 ""DownloadedFile"": ""$(Version).zip"",
                 ""InstallCommand"": ""powershell.exe"",
                 ""InstallPath"": ""C:\\Temp\\nbuild2""
+                    }
+                ]
             }";
 
             // Act
@@ -346,6 +380,9 @@ namespace NbuildTests
         {
             // Arrange with json and no InstallPath defined
             var json = @"{
+                ""Version"": ""1.2.0"",
+                ""NbuildAppList"": [
+                {
                 ""Name"": ""nbuild"",
                 ""Version"": ""1.1.0"",
                 ""AppFileName"": ""nb.exe"",
@@ -353,6 +390,8 @@ namespace NbuildTests
                 ""DownloadedFile"": ""$(Version).zip"",
                 ""InstallCommand"": ""powershell.exe"",
                 ""InstallArgs"": ""-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force""
+                    }
+                ]
             }";
 
             // Act

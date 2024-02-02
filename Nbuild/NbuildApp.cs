@@ -14,7 +14,7 @@ namespace Nbuild
         public string? InstallArgs { get; set; }     // the arguments to pass to the install command. can use $(Version) and $(InstallPath) to substitute the version number
         public string? InstallPath { get; set; }     // The directory required to locate the AppFileName. path must be rooted. i.e. C:\Program Files\Nbuild can use $(Version) to substitute the version number
 
-        public static IEnumerable<NbuildApp> FromMultiJson(string? json)
+        public static IEnumerable<NbuildApp> GetApps(string json)
         {
             if (string.IsNullOrEmpty(json))
             {

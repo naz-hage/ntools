@@ -1,4 +1,12 @@
 [Next](#next)
+## Version 1.3.0 - 15-feb-24
+- Fix [issue #29](https://github.com/naz-hage/ntools/issues/29)
+- Add default value for -json option
+- Fix specifiying the process start info for ntools-launcher.
+  - if StartInfo.FileName uses executable name only that is in the system path, then the StartInfo.FileName witll be replaced with the full pathName.
+  - See FileMapping.cs file
+  - Add install.ps1 which is equivalent to install.bat.
+
 ## Version 1.2.0 - 22-jan-24
 - Fix [issue #27](https://github.com/naz-hage/ntools/issues/27)
 - Update to ntools-launcher 1.2.0

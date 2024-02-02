@@ -35,7 +35,7 @@ To get started with the NTools repository, follow these steps:
 
 1. Clone this repository to your local machine.
 2. Open a command prompt in administrative mode and navigate to the root folder of the repository.
-3. change the PowerShell execution policy to allow the installation script to run. Run the following command:
+3. Change the PowerShell execution policy to allow the installation script to run. Run the following command:
 
     ```cmd
     Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope Process

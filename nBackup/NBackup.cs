@@ -1,3 +1,4 @@
+using NbuildTasks;
 using Ntools;
 using System;
 using System.Collections.Generic;
@@ -95,7 +96,7 @@ namespace Nbackup
 
                                 if (options.PerformBackup)
                                 {
-                                    result = Perform(backup.Source, backup.Destination, backup.BackupOptions);
+                                    result = Perform(backup.Source, backup.Destination, backup.BackupOptions, options.Verbose);
 
                                     // Read log file and display last 12 lines
                                     DisplayOutput(result, backup);
@@ -148,13 +149,17 @@ namespace Nbackup
         public static ResultHelper Perform(string source, string destination, string backupOptions, bool verbose = false)
         {
             var process = new Process
-            { 
+            {
                 StartInfo = {
-                    WorkingDirectory = $"{Environment.SpecialFolder.System}\\system32",
+                    WorkingDirectory = Environment.GetFolderPath(Environment.SpecialFolder.System),
                     FileName = "robocopy.exe",
                     Arguments = $"\"{source}\" \"{destination}\" {backupOptions}",
                     RedirectStandardOutput = true,
                     RedirectStandardError = true } };
+
+            // Update the filename to the full path of executable in the PATH environment variable
+            process.StartInfo.FileName = FileMappins.GetFullPathOfFile(process.StartInfo.FileName);
+
             var result = process.LockStart(verbose);
 
             return result;
