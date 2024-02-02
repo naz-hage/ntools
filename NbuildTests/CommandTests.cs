@@ -131,7 +131,7 @@ namespace NbuildTests
             ResourceHelper.ExtractEmbeddedResourceFromAssembly(assembly, ResourceLocation, json);
 
             // Act
-            ResultHelper result = Command.Install(json);
+            var result = Command.Install(json);
 
             if (!result.IsSuccess() && result.Output.Count > 0)
             {
@@ -181,7 +181,7 @@ namespace NbuildTests
             }";
 
             // Act
-            ResultHelper result = Command.Install(json);
+            var result = Command.Install(json);
 
             if (!result.IsSuccess() && result.Output.Count > 0)
             {
@@ -218,8 +218,16 @@ namespace NbuildTests
                 ]
             }";
 
+            ResultHelper result;
             // Act
-            ResultHelper result = Command.Install(json);
+            try
+            {
+                result = Command.Install(json);
+            }
+            catch (Exception ex)
+            {
+                result = ResultHelper.Fail(-1, $"Invalid json input: {ex.Message}");
+            }
 
             // Assert an failed json parsing is returned 
 
@@ -246,8 +254,16 @@ namespace NbuildTests
                 ]
             }";
 
+            ResultHelper result;
             // Act
-            ResultHelper result = Command.Install(json);
+            try
+            {
+                result = Command.Install(json);
+            }
+            catch (Exception ex)
+            {
+                result = ResultHelper.Fail(-1, $"Invalid json input: {ex.Message}");
+            }
 
             // Assert a failed json parsing is returned 
             Assert.IsFalse(result.IsSuccess());
@@ -275,8 +291,16 @@ namespace NbuildTests
                 ]
             }";
 
+            ResultHelper result;
             // Act
-            ResultHelper result = Command.Install(json);
+            try
+            {
+                result = Command.Install(json);
+            }
+            catch (Exception ex)
+            {
+                result = ResultHelper.Fail(-1, $"Invalid json input: {ex.Message}");
+            }
 
             // Assert a failed json parsing is returned 
             Assert.IsFalse(result.IsSuccess());
@@ -304,8 +328,16 @@ namespace NbuildTests
                 ]
             }";
 
+            ResultHelper result;
             // Act
-            ResultHelper result = Command.Install(json);
+            try
+            {
+                result = Command.Install(json);
+            }
+            catch (Exception ex)
+            {
+                result = ResultHelper.Fail(-1, $"Invalid json input: {ex.Message}");
+            }
 
             // Assert a failed json parsing is returned 
             Assert.IsFalse(result.IsSuccess());
@@ -333,8 +365,16 @@ namespace NbuildTests
                 ]
             }";
 
+            ResultHelper result;
             // Act
-            ResultHelper result = Command.Install(json);
+            try
+            {
+                result = Command.Install(json);
+            }
+            catch (Exception ex)
+            {
+                result = ResultHelper.Fail(-1, $"Invalid json input: {ex.Message}");
+            }
 
             // Assert a failed json parsing is returned 
             Assert.IsFalse(result.IsSuccess());
@@ -362,8 +402,16 @@ namespace NbuildTests
                 ]
             }";
 
+            ResultHelper result;
             // Act
-            ResultHelper result = Command.Install(json);
+            try
+            {
+                result = Command.Install(json);
+            }
+            catch (Exception ex)
+            {
+                result = ResultHelper.Fail(-1, $"Invalid json input: {ex.Message}");
+            }
 
             // Assert a failed json parsing is returned 
             Assert.IsFalse(result.IsSuccess());
@@ -391,8 +439,16 @@ namespace NbuildTests
                 ]
             }";
 
+            ResultHelper result;
             // Act
-            ResultHelper result = Command.Install(json);
+            try
+            {
+                result = Command.Install(json);
+            }
+            catch (Exception ex)
+            {
+                result = ResultHelper.Fail(-1, $"Invalid json input: {ex.Message}");
+            }
 
             // Assert a failed json parsing is returned 
             Assert.IsFalse(result.IsSuccess());

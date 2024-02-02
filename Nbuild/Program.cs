@@ -45,19 +45,24 @@ public class Program
 
             var currentDirectory = Environment.CurrentDirectory;
 
-            if (options != null && !string.IsNullOrEmpty(options.Command))
+            try
             {
-                // update json option with default value
-                options.Json = UpdateJsonOption(options);
-
-                result = options.Command switch
+                if (options != null && !string.IsNullOrEmpty(options.Command))
                 {
-                    var d when d == CmdTargets => BuildStarter.DisplayTargets(Environment.CurrentDirectory),
-                    var d when d == CmdInstall => Command.Install(options.Json, options.Verbose),
-                    var d when d == CmdList => Command.List(options.Json, options.Verbose),
-                    var d when d == CmdDownload => Command.Download(options.Json, options.Verbose),
-                    _ => ResultHelper.Fail(-1, $"Invalid Command: '{options.Command}'"),
-                };
+
+                    result = options.Command switch
+                    {
+                        var d when d == CmdTargets => BuildStarter.DisplayTargets(Environment.CurrentDirectory),
+                        var d when d == CmdInstall => Command.Install(options.Json, options.Verbose),
+                        var d when d == CmdList => Command.List(options.Json, options.Verbose),
+                        var d when d == CmdDownload => Command.Download(options.Json, options.Verbose),
+                        _ => ResultHelper.Fail(-1, $"Invalid Command: '{options.Command}'"),
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                Colorizer.WriteLine($"[{ConsoleColor.Green}!X Error occurred: {ex.Message}.]");
             }
 
             // return to current directory because the command might have changed it
