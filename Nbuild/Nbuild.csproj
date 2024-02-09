@@ -44,6 +44,7 @@
 		<EmbeddedResource Include="resources\node.targets" />
 		<EmbeddedResource Include="resources\nuget.targets" />
 		<EmbeddedResource Include="resources\NbuildAppListTest.json" />
+		<EmbeddedResource Include="resources\ntools.json" />
 	</ItemGroup>
 	
 	<ItemGroup>

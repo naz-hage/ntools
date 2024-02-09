@@ -9,7 +9,9 @@
       "DownloadedFile": "$(Version).zip",
       "InstallCommand": "powershell.exe",
       "InstallArgs": "-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force",
-      "InstallPath": "C:\\Temp\\nbuild2"
+      "InstallPath": "C:\\Temp\\nbuild2",
+      "UninstallCommand": "powershell.exe",
+      "UninstallArgs": "-Command Remove-Item -Path '$(InstallPath)' -Recurse -Force"
     }
   ]
 }

@@ -103,7 +103,9 @@ namespace NbuildTests
                 ""DownloadedFile"": ""$(Version).zip"",
                 ""InstallCommand"": ""powershell.exe"",
                 ""InstallArgs"": ""-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force"",
-                ""InstallPath"": ""C:\\Temp\\nbuild2""
+                ""InstallPath"": ""C:\\Temp\\nbuild2"",
+                ""UninstallCommand"": ""powershell.exe"",
+                ""UninstallArgs"": ""-Command Remove-Item -Path '$(InstallPath)' -Recurse -Force""
                 }
             ]
             }";
@@ -178,7 +180,9 @@ namespace NbuildTests
                         ""DownloadedFile"": ""$(Version).zip"",
                         ""InstallCommand"": ""powershell.exe"",
                         ""InstallArgs"": ""-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force"",
-                        ""InstallPath"": ""C:\\Temp\\nbuild2""
+                        ""InstallPath"": ""C:\\Temp\\nbuild2"",
+                        ""UninstallCommand"": ""powershell.exe"",
+                        ""UninstallArgs"": ""-Command Remove-Item -Path '$(InstallPath)' -Recurse -Force""
                     }
                 ]
             }";
@@ -200,6 +204,63 @@ namespace NbuildTests
             // teardown
             TeardownTestModeFlag();
         }
+
+        // Test method for uninstall functionality
+        [TestMethod()]
+        public void UninstallTest()
+        {
+            // Arrange "C:\Program Files\7-Zip\7z.exe" x C:\Artifacts\ntools\Release\%1.zip -o"C:\Program Files\Nbuild" -y
+            // var json = @"{
+            //     ""Name"": ""nbuild"",
+            //     ""Version"": ""1.2.0"",
+            //     ""Url"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
+            //     ""InstallFile"": ""$(Version).zip"",
+            //     ""InstallCommand"": ""c:\\program files\\7-Zip\\7z.exe"",
+            //     ""InstallArgs"": ""x $(Version).zip -o\""C:\\Temp\\nbuild2\"" -y""
+            // }";
+            // Use this json to test the install command in GitHub Actions because it doesn't have 7-Zip installed
+            SetupTestModeFlag();
+
+            var json = @"{
+                ""Version"": ""1.2.0"",
+                ""NbuildAppList"": [
+                    {
+                        ""Name"": ""nbuild"",
+                        ""Version"": ""1.2.35"",
+                        ""AppFileName"": ""nb.exe"",
+                        ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
+                        ""DownloadedFile"": ""$(Version).zip"",
+                        ""InstallCommand"": ""powershell.exe"",
+                        ""InstallArgs"": ""-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force"",
+                        ""InstallPath"": ""C:\\Temp\\nbuild2"",
+                        ""UninstallCommand"": ""powershell.exe"",
+                        ""UninstallArgs"": ""-Command Remove-Item -Path '$(InstallPath)' -Recurse -Force""
+                    }
+                ]
+            }";
+            // Install the app first before uninstalling
+            var result = Command.Install(json);
+            Assert.IsTrue(result.IsSuccess());
+
+
+            // Act
+            result = Command.Uninstall(json, true);
+
+            if (!result.IsSuccess() && result.Output.Count > 0)
+            {
+
+                Console.WriteLine(result.GetFirstOutput().Trim(' '));
+            }
+
+            var result2 = result.IsSuccess();
+
+            // Assert
+            Assert.IsTrue(result2);
+
+            // teardown
+            TeardownTestModeFlag();
+        }
+
 
         // Test method for install exception when name is not defined
         [TestMethod()]
@@ -252,7 +313,9 @@ namespace NbuildTests
                     ""DownloadedFile"": ""$(Version).zip"",
                     ""InstallCommand"": ""powershell.exe"",
                     ""InstallArgs"": ""-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force"",
-                    ""InstallPath"": ""C:\\Temp\\nbuild2""
+                    ""InstallPath"": ""C:\\Temp\\nbuild2"",
+                    ""UninstallCommand"": ""powershell.exe"",
+                    ""UninstallArgs"": ""-Command Remove-Item -Path '$(InstallPath)' -Recurse -Force""
                     }
                 ]
             }";

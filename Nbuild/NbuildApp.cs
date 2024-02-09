@@ -22,7 +22,11 @@ namespace Nbuild
         public string? InstallCommand { get; set; }  // install command to run to install the app. i.e. setup.exe
         [Required(ErrorMessage = "InstallArgs is required")] 
         public string? InstallArgs { get; set; }     // the arguments to pass to the install command. can use $(Version) and $(InstallPath) to substitute the version number
-        [Required(ErrorMessage = "InstallPath is required")] 
+        [Required(ErrorMessage = "InstallPath is required")]
         public string? InstallPath { get; set; }     // The directory required to locate the AppFileName. path must be rooted. i.e. C:\Program Files\Nbuild can use $(Version) to substitute the version number
+        [Required(ErrorMessage = "UninstallCommand is required")] 
+        public string? UninstallCommand { get; set; }  // uninstall command to run to uninstall the app. i.e. setup.exe
+        [Required(ErrorMessage = "UninstallArgs is required")] 
+        public string? UninstallArgs { get; set; }     // the arguments to pass to the uninstall command. can use $(Version) and $(InstallPath) to substitute the version number
     }
 }

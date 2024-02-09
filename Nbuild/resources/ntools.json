@@ -9,7 +9,9 @@
       "DownloadedFile": "$(Version).zip",
       "InstallCommand": "powershell.exe",
       "InstallArgs": "-Command Expand-Archive -Path $(Version).zip -DestinationPath '$(InstallPath)' -Force",
-      "InstallPath": "$(ProgramFiles)\\Nbuild"
+      "InstallPath": "$(ProgramFiles)\\Nbuild",
+      "UninstallCommand": "powershell.exe",
+      "UninstallArgs": "-Command Remove-Item -Path '$(InstallPath)' -Recurse -Force"
     },
     {
       "Name": "Visual Studio 2022",
@@ -19,7 +21,9 @@
       "DownloadedFile": "vs_Community.exe",
       "InstallCommand": "$(DownloadedFile)",
       "InstallArgs": "--add Microsoft.VisualStudio.Workload.CoreEditor Microsoft.VisualStudio.Workload.Azure Microsoft.VisualStudio.Workload.ManagedDesktop Microsoft.VisualStudio.Workload.NativeDesktop Microsoft.VisualStudio.Workload.NetWeb Microsoft.VisualStudio.Workload.NetDesktop Microsoft.VisualStudio.Workload.Azure Microsoft.VisualStudio.Workload.Data --quiet --wait",
-      "InstallPath": "$(ProgramFiles)\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE"
+      "InstallPath": "$(ProgramFiles)\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE",
+      "UninstallCommand": "vs_installer.exe",
+      "UninstallArgs": "--uninstall --force --quiet"
     },
     {
       "Name": "7-zip",
@@ -29,7 +33,9 @@
       "DownloadedFile": "7zip.exe",
       "InstallCommand": "$(DownloadedFile)",
       "InstallArgs": "/S /D=\"$(ProgramFiles)\\7-Zip\"",
-      "InstallPath": "$(ProgramFiles)\\7-Zip"
+      "InstallPath": "$(ProgramFiles)\\7-Zip",
+      "UninstallCommand": "powershell.exe",
+      "UninstallArgs": "-Command Remove-Item -Path '$(InstallPath)' -Recurse -Force"
     },
     {
       "Name": "Git for Windows",
@@ -39,7 +45,9 @@
       "DownloadedFile": "Git-$(Version)-64-bit.exe",
       "InstallCommand": "$(DownloadedFile)",
       "InstallArgs": "/SILENT /NORESTART /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS /SP- /LOG",
-      "InstallPath": "$(ProgramFiles)\\Git\\bin"
+      "InstallPath": "$(ProgramFiles)\\Git\\bin",
+      "UninstallCommand": "$(InstallPath)\\unins000.exe",
+      "UninstallArgs": "/SILENT"
     },
     {
       "Name": "Powershell",
@@ -49,7 +57,9 @@
       "DownloadedFile": "PowerShell-$(Version)-win-x64.msi",
       "InstallCommand": "msiexec.exe",
       "InstallArgs": "/i PowerShell-$(Version)-win-x64.msi /quiet",
-      "InstallPath": "$(ProgramFiles)\\PowerShell\\7"
+      "InstallPath": "$(ProgramFiles)\\PowerShell\\7",
+      "UninstallCommand": "msiexec.exe",
+      "UninstallArgs": "/x PowerShell-$(Version)-win-x64.msi /quiet"
     },
     {
       "Name": "Visual Studio Code",
@@ -59,7 +69,9 @@
       "DownloadedFile": "VSCodeSetup-x64-$(Version).exe",
       "InstallCommand": "$(DownloadedFile)",
       "InstallArgs": "/silent /mergetasks=!runcode,addcontextmenufiles,addcontextmenufolders",
-      "InstallPath": "$(ProgramFiles)\\Microsoft VS Code"
+      "InstallPath": "$(ProgramFiles)\\Microsoft VS Code",
+      "UninstallCommand": "$(InstallPath)\\unins000.exe",
+      "UninstallArgs": "/SILENT"
     },
     {
       "Name": "Docker",
@@ -69,7 +81,9 @@
       "DownloadedFile": "Docker Desktop Installer.exe",
       "InstallCommand": "$(DownloadedFile)",
       "InstallArgs": "install --quiet",
-      "InstallPath": "$(ProgramFiles)\\Docker\\Docker\\"
+      "InstallPath": "$(ProgramFiles)\\Docker\\Docker\\",
+      "UninstallCommand": "$(InstallPath)\\Docker Desktop Installer.exe",
+      "UninstallArgs": "uninstall --quiet"
     },
     {
       "Name": "Nuget",
@@ -79,7 +93,9 @@
       "DownloadedFile": "$(AppFileName)",
       "InstallCommand": "xcopy.exe",
       "InstallArgs": "$(AppFileName) \"$(InstallPath)\\\" /d /y",
-      "InstallPath": "$(ProgramFiles)\\NBuild"
+      "InstallPath": "$(ProgramFiles)\\NBuild",
+      "UninstallCommand": "powershell.exe",
+      "UninstallArgs": "-Command Remove-Item -Path '$(InstallPath)\\$(AppFileName)' -Force"
     }
   ]
 }

@@ -10,6 +10,7 @@ public class Program
 {
     private const string CmdTargets = "targets";
     private const string CmdInstall = "install";
+    private const string CmdUninstall = "uninstall";
     private const string CmdList = "list";
     private const string CmdDownload = "download";
     private const string CmdHelp = "--help";
@@ -55,6 +56,7 @@ public class Program
                     {
                         var d when d == CmdTargets => BuildStarter.DisplayTargets(Environment.CurrentDirectory),
                         var d when d == CmdInstall => Command.Install(options.Json, options.Verbose),
+                        var d when d == CmdUninstall => Command.Uninstall(options.Json, options.Verbose),
                         var d when d == CmdList => Command.List(options.Json, options.Verbose),
                         var d when d == CmdDownload => Command.Download(options.Json, options.Verbose),
                         _ => ResultHelper.Fail(-1, $"Invalid Command: '{options.Command}'"),
@@ -101,6 +103,7 @@ public class Program
     {
         if ((string.IsNullOrEmpty(options.Json) && !string.IsNullOrEmpty(options.Command)) &&
                     (options.Command.Equals(CmdInstall, StringComparison.InvariantCultureIgnoreCase) ||
+                    options.Command.Equals(CmdUninstall, StringComparison.InvariantCultureIgnoreCase) ||
                     options.Command.Equals(CmdList, StringComparison.InvariantCultureIgnoreCase) ||
                     options.Command.Equals(CmdDownload, StringComparison.InvariantCultureIgnoreCase)))
         {
