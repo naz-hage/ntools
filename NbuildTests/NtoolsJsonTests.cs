@@ -11,6 +11,7 @@ namespace NbuildTests
     public class NtoolsJsonTests
     {
         private const string NbuildAssemblyName = "Nb.dll"; // "Nbuild.dll"
+
         [TestMethod()]
         public void ValidateNtoolsJsonTest()
         {
@@ -32,7 +33,7 @@ namespace NbuildTests
             ExtractToSingleAppJsonFile(targetFileName);
         }
 
-        private static void ExtractToSingleAppJsonFile(string targetFileName)
+        private void ExtractToSingleAppJsonFile(string targetFileName)
         {
             var json = File.ReadAllText(targetFileName);
 
@@ -48,7 +49,11 @@ namespace NbuildTests
             {
                 throw new ParserException($"Version {listAppData.Version} is not supported. Please use version 1.2.0", null);
             }
-            // create a new json file for each item in the json file and save it to the c:\temp folder
+
+            var appsFolder =@"c:\temp\apps"; 
+            if (!Directory.Exists(appsFolder)) Directory.CreateDirectory(appsFolder);
+
+            // create a new json file for each item in the json file and save it to the appsFolder directory
             foreach (var appData in listAppData.NbuildAppList)
             {
                 var appsOne = new NbuildApps("1.2.0", [appData]);
@@ -56,7 +61,7 @@ namespace NbuildTests
                 var jsonItem = JsonSerializer.Serialize(appsOne, new JsonSerializerOptions { WriteIndented = true });
                 var jsonFilename = $"app-{appData.Name}.json";
                 jsonFilename = jsonFilename.Replace(" ", "_");
-                var fileName = Path.Combine(@"c:\temp\apps", jsonFilename);
+                var fileName = Path.Combine(appsFolder, jsonFilename);
                 File.WriteAllText(fileName, jsonItem);
                 Console.WriteLine($"File: {fileName}");
             }
