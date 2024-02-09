@@ -9,7 +9,9 @@
       "DownloadedFile": "VSCodeSetup-x64-$(Version).exe",
       "InstallCommand": "$(DownloadedFile)",
       "InstallArgs": "/silent /mergetasks=!runcode,addcontextmenufiles,addcontextmenufolders",
-      "InstallPath": "$(ProgramFiles)\\Microsoft VS Code"
+      "InstallPath": "$(ProgramFiles)\\Microsoft VS Code",
+      "UninstallCommand": "$(InstallPath)\\unins000.exe",
+      "UninstallArgs": "/SILENT"
     }
   ]
 }

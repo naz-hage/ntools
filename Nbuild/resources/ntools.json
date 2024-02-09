@@ -82,8 +82,8 @@
       "InstallCommand": "$(DownloadedFile)",
       "InstallArgs": "install --quiet",
       "InstallPath": "$(ProgramFiles)\\Docker\\Docker\\",
-      "UninstallCommand": "$(InstallPath)\\Docker Desktop Installer.exe",
-      "UninstallArgs": "uninstall --quiet"
+      "UninstallCommand": "powershell.exe",
+      "UninstallArgs": "-Command \"& {Start-Process -FilePath '$(InstallPath)\\Docker Desktop Installer.exe' -ArgumentList 'uninstall --quiet' -NoNewWindow -Wait; while ((Get-Process 'Docker Desktop Installer' -ErrorAction SilentlyContinue) -or (Get-Process 'Docker' -ErrorAction SilentlyContinue)) { Start-Sleep -Seconds 5 }}\""
     },
     {
       "Name": "Nuget",

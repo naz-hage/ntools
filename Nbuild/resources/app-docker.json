@@ -1,18 +1,17 @@
 {
-    "Version": "1.2.0",
-    "NbuildAppList": [
-      {
-        "Name": "Docker",
-        "Version": "4.26.1",
-        "AppFileName": "Docker Desktop.exe",
-        "WebDownloadFile": "https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe",
-        "DownloadedFile": "Docker Desktop Installer.exe",
-        "InstallCommand": "$(DownloadedFile)",
-        "InstallArgs": "install --quiet",
-        "InstallPath": "$(ProgramFiles)\\Docker\\Docker\\",
-        "UninstallCommand": "$(InstallPath)\\Docker Desktop Installer.exe",
-        "UninstallArgs": "uninstall --quiet"
-      }
-    ]
-  }
-  
+  "Version": "1.2.0",
+  "NbuildAppList": [
+    {
+      "Name": "Docker",
+      "Version": "4.26.1",
+      "AppFileName": "Docker Desktop.exe",
+      "WebDownloadFile": "https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe",
+      "DownloadedFile": "Docker Desktop Installer.exe",
+      "InstallCommand": "$(DownloadedFile)",
+      "InstallArgs": "install --quiet",
+      "InstallPath": "$(ProgramFiles)\\Docker\\Docker\\",
+      "UninstallCommand": "powershell.exe",
+      "UninstallArgs": "-Command \u0022\u0026 {Start-Process -FilePath \u0027$(InstallPath)\\Docker Desktop Installer.exe\u0027 -ArgumentList \u0027uninstall --quiet\u0027 -NoNewWindow -Wait; while ((Get-Process \u0027Docker Desktop Installer\u0027 -ErrorAction SilentlyContinue) -or (Get-Process \u0027Docker\u0027 -ErrorAction SilentlyContinue)) { Start-Sleep -Seconds 5 }}\u0022"
+    }
+  ]
+}

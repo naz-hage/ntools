@@ -1,16 +1,18 @@
 {
     "Version": "1.2.0",
     "NbuildAppList": [
-    {
-        "Name": "VS MS Build Tools",
+      {
+        "Name": "Visual Studio Build Tools",
         "Version": "17.8.5.5502",
         "AppFileName": "msbuild.exe",
         "WebDownloadFile": "https://aka.ms/vs/17/release/vs_BuildTools.exe",
         "DownloadedFile": "vs_BuildTools.exe",
         "InstallCommand": "vs_BuildTools.exe",
         "InstallArgs": "--add Microsoft.VisualStudio.Workload.MSBuildTools Microsoft.NetCore.Component.SDK Microsoft.VisualStudio.Workload.ManagedDesktop Microsoft.VisualStudio.Workload.NetWeb --quiet --wait",
-        "InstallPath": "$(ProgramFilesX86)\\Microsoft Visual Studio\\2022\\BuildTools\\MSBuild\\Current\\Bin\\amd64"
-        }
+        "InstallPath": "$(ProgramFilesX86)\\Microsoft Visual Studio\\2022\\BuildTools\\MSBuild\\Current\\Bin\\amd64",
+        "UninstallCommand": "vs_installer.exe",
+        "UninstallArgs": "--uninstall --force --quiet"
+      }
     ]
   }
   
