@@ -560,6 +560,9 @@ namespace Nbuild
                 .Replace("$(Version)", nbuildApp.Version)
                 .Replace("$(ProgramFiles)", programFiles)
                 .Replace("$(ProgramFilesX86)", programFilesX86);
+
+            nbuildApp.UninstallCommand = nbuildApp.UninstallCommand!
+                .Replace("$(InstallPath)", nbuildApp.InstallPath);
         }
     }
 }

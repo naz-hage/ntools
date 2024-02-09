@@ -9,7 +9,9 @@
         "DownloadedFile": "Docker Desktop Installer.exe",
         "InstallCommand": "$(DownloadedFile)",
         "InstallArgs": "install --quiet",
-        "InstallPath": "$(ProgramFiles)\\Docker\\Docker\\"
+        "InstallPath": "$(ProgramFiles)\\Docker\\Docker\\",
+        "UninstallCommand": "$(InstallPath)\\Docker Desktop Installer.exe",
+        "UninstallArgs": "uninstall --quiet"
       }
     ]
   }
