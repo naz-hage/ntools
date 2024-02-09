@@ -508,9 +508,6 @@ namespace Nbuild
                 }
                 throw new ParserException(sb.ToString(), null);
             }
-
-            if (!Path.IsPathRooted(nbuildApp.InstallPath)) throw new ParserException($"App: {nbuildApp.Name}, InstallPath {nbuildApp.InstallPath} must be rooted. i.e. C:\\Program Files\\Nbuild", null);
-
             ValidJson = true;
             
         }
@@ -563,6 +560,8 @@ namespace Nbuild
 
             nbuildApp.UninstallCommand = nbuildApp.UninstallCommand!
                 .Replace("$(InstallPath)", nbuildApp.InstallPath);
+
+            if (!Path.IsPathRooted(nbuildApp.InstallPath)) throw new ParserException($"App: {nbuildApp.Name}, InstallPath {nbuildApp.InstallPath} must be rooted. i.e. C:\\Program Files\\Nbuild", null);
         }
     }
 }
