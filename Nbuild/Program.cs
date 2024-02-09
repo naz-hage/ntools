@@ -114,6 +114,11 @@ public class Program
             }
         }
 
+        if (!string.IsNullOrEmpty(options.Json))
+        {
+            options.Json = options.Json.Replace("$(ProgramFiles)", Environment.GetEnvironmentVariable("ProgramFiles"));
+        }
+
         return options.Json;
     }
 

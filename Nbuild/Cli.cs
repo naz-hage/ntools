@@ -15,7 +15,7 @@ public class Cli
         "\t - The install, uninstall, and download commands require admin privileges to run.")]
     public string? Command { get; set; }
 
-    [OptionalArgument("$(ProgramFiles)\\build\\tools.json", "json", "Specifies the JSON file that holds the list of apps. Only valid for the install, download, and list commands.\n" +
+    [OptionalArgument("$(ProgramFiles)\\nbuild\\ntools.json", "json", "Specifies the JSON file that holds the list of apps. Only valid for the install, download, and list commands.\n" +
         "\t Sample JSON file: https://github.com/naz-hage/ntools/blob/main/Nbuild/resources/NbuildAppListTest.json")]
     public string? Json { get; set; }
 
