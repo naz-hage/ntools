@@ -559,7 +559,10 @@ namespace Nbuild
                 .Replace("$(ProgramFilesX86)", programFilesX86);
 
             nbuildApp.UninstallCommand = nbuildApp.UninstallCommand!
-                .Replace("$(InstallPath)", nbuildApp.InstallPath);
+                .Replace("$(InstallPath)", nbuildApp.InstallPath)
+                .Replace("$(ProgramFiles)", programFiles)
+                .Replace("$(ProgramFilesX86)", programFilesX86);
+
 
             if (!Path.IsPathRooted(nbuildApp.InstallPath)) throw new ParserException($"App: {nbuildApp.Name}, InstallPath {nbuildApp.InstallPath} must be rooted. i.e. C:\\Program Files\\Nbuild", null);
         }
