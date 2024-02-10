@@ -188,7 +188,7 @@ namespace Nbuild
         public static ResultHelper Download(string? json, bool verbose = false)
         {
             Verbose = verbose;
-            
+
             if (!CanRunCommand()) return ResultHelper.Fail(-1, $"You must run this command as an administrator");
 
             var apps = GetApps(json);
@@ -508,7 +508,7 @@ namespace Nbuild
                 throw new ParserException(sb.ToString(), null);
             }
             ValidJson = true;
-            
+
         }
 
         // Update variables with $(...).  This should be called after validation of the appData

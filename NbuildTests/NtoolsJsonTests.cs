@@ -50,7 +50,7 @@ namespace NbuildTests
                 throw new ParserException($"Version {listAppData.Version} is not supported. Please use version 1.2.0", null);
             }
 
-            var appsFolder =@"c:\temp\apps"; 
+            var appsFolder = @"c:\temp\apps";
             if (!Directory.Exists(appsFolder)) Directory.CreateDirectory(appsFolder);
 
             // create a new json file for each item in the json file and save it to the appsFolder directory
