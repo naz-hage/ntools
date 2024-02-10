@@ -34,8 +34,8 @@
       "InstallCommand": "$(DownloadedFile)",
       "InstallArgs": "/S /D=\"$(ProgramFiles)\\7-Zip\"",
       "InstallPath": "$(ProgramFiles)\\7-Zip",
-      "UninstallCommand": "powershell.exe",
-      "UninstallArgs": "-Command Remove-Item -Path '$(InstallPath)' -Recurse -Force"
+      "UninstallCommand": "$(InstallPath)\\Uninstall.exe",
+      "UninstallArgs": "/S"
     },
     {
       "Name": "Git for Windows",

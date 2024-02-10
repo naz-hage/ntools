@@ -10,8 +10,8 @@
       "InstallCommand": "$(DownloadedFile)",
       "InstallArgs": "/S /D=\u0022$(ProgramFiles)\\7-Zip\u0022",
       "InstallPath": "$(ProgramFiles)\\7-Zip",
-      "UninstallCommand": "powershell.exe",
-      "UninstallArgs": "-Command Remove-Item -Path \u0027$(InstallPath)\u0027 -Recurse -Force"
+      "UninstallCommand": "$(InstallPath)\\Uninstall.exe",
+      "UninstallArgs": "/S"
     }
   ]
 }
