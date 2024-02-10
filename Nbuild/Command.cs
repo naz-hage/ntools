@@ -517,6 +517,9 @@ namespace Nbuild
         {
             if (!ValidJson) throw new InvalidOperationException("Json is not valid");
 
+            string programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+            string programFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+
             // Update variables with $(...)
             nbuildApp.WebDownloadFile = nbuildApp.WebDownloadFile!
                 .Replace("$(Version)", nbuildApp.Version)
@@ -526,16 +529,21 @@ namespace Nbuild
                 .Replace("$(Version)", nbuildApp.Version)
                 .Replace("$(AppFileName)", nbuildApp.AppFileName);
 
+            nbuildApp.InstallPath = nbuildApp.InstallPath!
+                .Replace("$(Version)", nbuildApp.Version)
+                .Replace("$(ProgramFiles)", programFiles)
+                .Replace("$(ProgramFilesX86)", programFilesX86);
+
             nbuildApp.InstallCommand = nbuildApp.InstallCommand!
                 .Replace("$(Version)", nbuildApp.Version)
                 .Replace("$(DownloadedFile)", nbuildApp.DownloadedFile);
 
             nbuildApp.UninstallCommand = nbuildApp.UninstallCommand!
                 .Replace("$(Version)", nbuildApp.Version)
-                .Replace("$(DownloadedFile)", nbuildApp.DownloadedFile);
-
-            string programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
-            string programFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+                .Replace("$(DownloadedFile)", nbuildApp.DownloadedFile)
+                .Replace("$(InstallPath)", nbuildApp.InstallPath)
+                .Replace("$(ProgramFiles)", programFiles)
+                .Replace("$(ProgramFilesX86)", programFilesX86);
 
             nbuildApp.InstallArgs = nbuildApp
                 .InstallArgs!.Replace("$(Version)", nbuildApp.Version)
@@ -550,16 +558,6 @@ namespace Nbuild
                 .Replace("$(InstallPath)", nbuildApp.InstallPath)
                 .Replace("$(AppFileName)", nbuildApp.AppFileName)
                 .Replace("$(DownloadedFile)", nbuildApp.DownloadedFile)
-                .Replace("$(ProgramFiles)", programFiles)
-                .Replace("$(ProgramFilesX86)", programFilesX86);
-
-            nbuildApp.InstallPath = nbuildApp.InstallPath!
-                .Replace("$(Version)", nbuildApp.Version)
-                .Replace("$(ProgramFiles)", programFiles)
-                .Replace("$(ProgramFilesX86)", programFilesX86);
-
-            nbuildApp.UninstallCommand = nbuildApp.UninstallCommand!
-                .Replace("$(InstallPath)", nbuildApp.InstallPath)
                 .Replace("$(ProgramFiles)", programFiles)
                 .Replace("$(ProgramFilesX86)", programFilesX86);
 
