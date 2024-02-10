@@ -4,7 +4,7 @@
     {
       "Name": "Ntools",
       "Version": "1.2.0",
-      "AppFileName": "nb.exe",
+      "AppFileName": "$(InstallPath)\\nb.exe",
       "WebDownloadFile": "https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip",
       "DownloadedFile": "$(Version).zip",
       "InstallCommand": "powershell.exe",
@@ -16,19 +16,19 @@
     {
       "Name": "Visual Studio 2022",
       "Version": "17.0.0",
-      "AppFileName": "devenv.exe",
+      "AppFileName": "$(InstallPath)\\Common7\\IDE\\devenv.exe",
       "WebDownloadFile": "https://aka.ms/vs/17/release/vs_Community.exe",
       "DownloadedFile": "vs_Community.exe",
       "InstallCommand": "$(DownloadedFile)",
       "InstallArgs": "--add Microsoft.VisualStudio.Workload.CoreEditor Microsoft.VisualStudio.Workload.Azure Microsoft.VisualStudio.Workload.ManagedDesktop Microsoft.VisualStudio.Workload.NativeDesktop Microsoft.VisualStudio.Workload.NetWeb Microsoft.VisualStudio.Workload.NetDesktop Microsoft.VisualStudio.Workload.Azure Microsoft.VisualStudio.Workload.Data --quiet --wait",
-      "InstallPath": "$(ProgramFiles)\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE",
+      "InstallPath": "$(ProgramFiles)\\Microsoft Visual Studio\\2022\\Community",
       "UninstallCommand": "$(ProgramFilesX86)\\Microsoft Visual Studio\\Installer\\vs_installer.exe",
-      "UninstallArgs": "uninstall --quiet --installPath $(ProgramFiles)\\Microsoft Visual Studio\\2022\\Community"
+      "UninstallArgs": "uninstall --quiet --installPath $(InstallPath)"
     },
     {
       "Name": "7-zip",
       "Version": "23.01",
-      "AppFileName": "7z.exe",
+      "AppFileName": "$(InstallPath)\\7z.exe",
       "WebDownloadFile": "https://www.7-zip.org/a/7z2301-x64.exe",
       "DownloadedFile": "7zip.exe",
       "InstallCommand": "$(DownloadedFile)",
@@ -40,19 +40,19 @@
     {
       "Name": "Git for Windows",
       "Version": "2.43.0",
-      "AppFileName": "git.exe",
+      "AppFileName": "$(InstallPath)\\bin\\git.exe",
       "WebDownloadFile": "https://github.com/git-for-windows/git/releases/download/v$(Version).windows.1/Git-$(Version)-64-bit.exe",
       "DownloadedFile": "Git-$(Version)-64-bit.exe",
       "InstallCommand": "$(DownloadedFile)",
       "InstallArgs": "/SILENT /NORESTART /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS /SP- /LOG",
-      "InstallPath": "$(ProgramFiles)\\Git\\bin",
+      "InstallPath": "$(ProgramFiles)\\Git",
       "UninstallCommand": "$(InstallPath)\\unins000.exe",
       "UninstallArgs": "/SILENT"
     },
     {
       "Name": "Powershell",
       "Version": "7.4.1",
-      "AppFileName": "pwsh.exe",
+      "AppFileName": "$(InstallPath)\\pwsh.exe",
       "WebDownloadFile": "https://github.com/PowerShell/PowerShell/releases/download/v$(Version)/PowerShell-$(Version)-win-x64.msi",
       "DownloadedFile": "PowerShell-$(Version)-win-x64.msi",
       "InstallCommand": "msiexec.exe",
@@ -64,7 +64,7 @@
     {
       "Name": "Visual Studio Code",
       "Version": "1.85.2",
-      "AppFileName": "Code.exe",
+      "AppFileName": "$(InstallPath)\\Code.exe",
       "WebDownloadFile": "https://aka.ms/win32-x64-system-stable",
       "DownloadedFile": "VSCodeSetup-x64-$(Version).exe",
       "InstallCommand": "$(DownloadedFile)",
@@ -76,7 +76,7 @@
     {
       "Name": "Docker",
       "Version": "4.26.1",
-      "AppFileName": "Docker Desktop.exe",
+      "AppFileName": "$(InstallPath)\\Docker Desktop.exe",
       "WebDownloadFile": "https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe",
       "DownloadedFile": "Docker Desktop Installer.exe",
       "InstallCommand": "$(DownloadedFile)",
@@ -88,14 +88,14 @@
     {
       "Name": "Nuget",
       "Version": "6.8.0.131",
-      "AppFileName": "nuget.exe",
+      "AppFileName": "$(InstallPath)\\nuget.exe",
       "WebDownloadFile": "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe",
-      "DownloadedFile": "$(AppFileName)",
+      "DownloadedFile": "nuget.exe",
       "InstallCommand": "xcopy.exe",
-      "InstallArgs": "$(AppFileName) \"$(InstallPath)\\\" /d /y",
+      "InstallArgs": "$(DownloadedFile) \"$(InstallPath)\\\" /d /y",
       "InstallPath": "$(ProgramFiles)\\NBuild",
       "UninstallCommand": "powershell.exe",
-      "UninstallArgs": "-Command Remove-Item -Path '$(InstallPath)\\$(AppFileName)' -Force"
+      "UninstallArgs": "-Command Remove-Item -Path '$(AppFileName)' -Force"
     }
   ]
 }

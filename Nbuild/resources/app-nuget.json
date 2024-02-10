@@ -4,14 +4,14 @@
     {
       "Name": "Nuget",
       "Version": "6.8.0.131",
-      "AppFileName": "nuget.exe",
+      "AppFileName": "$(InstallPath)\\nuget.exe",
       "WebDownloadFile": "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe",
-      "DownloadedFile": "$(AppFileName)",
+      "DownloadedFile": "nuget.exe",
       "InstallCommand": "xcopy.exe",
-      "InstallArgs": "$(AppFileName) \u0022$(InstallPath)\\\u0022 /d /y",
+      "InstallArgs": "$(DownloadedFile) \u0022$(InstallPath)\\\u0022 /d /y",
       "InstallPath": "$(ProgramFiles)\\NBuild",
       "UninstallCommand": "powershell.exe",
-      "UninstallArgs": "-Command Remove-Item -Path \u0027$(InstallPath)\\$(AppFileName)\u0027 -Force"
+      "UninstallArgs": "-Command Remove-Item -Path \u0027$(AppFileName)\u0027 -Force"
     }
   ]
 }

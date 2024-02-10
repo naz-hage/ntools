@@ -13,14 +13,14 @@ namespace NbuildTests
     {
         // Constants for test setup
         private const string NbuildAssemblyName = "Nb.dll";
-        private const string NbuildAppListJsonFile = "NbuildAppListTest.json";
+        private const string NbuildAppListJsonFile = "app-ntools.json";
         private const string LocalTest = "LOCAL_TEST";
 
         // Local test mode flag
         private bool? LocalTestMode;
 
         // Resource location for test setup
-        private readonly string ResourceLocation = "Nbuild.resources.NbuildAppListTest.json";
+        private readonly string ResourceLocation = "Nbuild.resources.app-ntools.json";
 
         // Method to teardown test mode flag
         private void TeardownTestModeFlag()
@@ -175,7 +175,7 @@ namespace NbuildTests
                     {
                         ""Name"": ""nbuild"",
                         ""Version"": ""1.2.35"",
-                        ""AppFileName"": ""nb.exe"",
+                        ""AppFileName"": ""$(InstallPath)\\nb.exe"",
                         ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
                         ""DownloadedFile"": ""$(Version).zip"",
                         ""InstallCommand"": ""powershell.exe"",
@@ -227,7 +227,7 @@ namespace NbuildTests
                     {
                         ""Name"": ""nbuild"",
                         ""Version"": ""1.2.35"",
-                        ""AppFileName"": ""nb.exe"",
+                        ""AppFileName"": ""$(InstallPath)\\nb.exe"",
                         ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
                         ""DownloadedFile"": ""$(Version).zip"",
                         ""InstallCommand"": ""powershell.exe"",

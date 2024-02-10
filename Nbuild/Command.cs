@@ -387,10 +387,9 @@ namespace Nbuild
 
         private static string? GetNbuildAppFileVersion(NbuildApp nbuildApp)
         {
-            var appFile = $"{nbuildApp.InstallPath}\\{nbuildApp.AppFileName}";
             try
             {
-                FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(appFile);
+                FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(nbuildApp.AppFileName!);
 
                 // return file Version as combined string of all parts : major, minor, build, patch
                 return fileVersionInfo != null
@@ -521,6 +520,14 @@ namespace Nbuild
             string programFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
 
             // Update variables with $(...)
+            nbuildApp.InstallPath = nbuildApp.InstallPath!
+                .Replace("$(Version)", nbuildApp.Version)
+                .Replace("$(ProgramFiles)", programFiles)
+                .Replace("$(ProgramFilesX86)", programFilesX86);
+
+            nbuildApp.AppFileName = nbuildApp.AppFileName!
+                .Replace("$(InstallPath)", nbuildApp.InstallPath);
+
             nbuildApp.WebDownloadFile = nbuildApp.WebDownloadFile!
                 .Replace("$(Version)", nbuildApp.Version)
                 .Replace("$(AppFileName)", nbuildApp.AppFileName);
@@ -528,11 +535,6 @@ namespace Nbuild
             nbuildApp.DownloadedFile = nbuildApp.DownloadedFile!
                 .Replace("$(Version)", nbuildApp.Version)
                 .Replace("$(AppFileName)", nbuildApp.AppFileName);
-
-            nbuildApp.InstallPath = nbuildApp.InstallPath!
-                .Replace("$(Version)", nbuildApp.Version)
-                .Replace("$(ProgramFiles)", programFiles)
-                .Replace("$(ProgramFilesX86)", programFilesX86);
 
             nbuildApp.InstallCommand = nbuildApp.InstallCommand!
                 .Replace("$(Version)", nbuildApp.Version)

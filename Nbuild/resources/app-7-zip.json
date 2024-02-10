@@ -4,7 +4,7 @@
     {
       "Name": "7-zip",
       "Version": "23.01",
-      "AppFileName": "7z.exe",
+      "AppFileName": "$(InstallPath)\\7z.exe",
       "WebDownloadFile": "https://www.7-zip.org/a/7z2301-x64.exe",
       "DownloadedFile": "7zip.exe",
       "InstallCommand": "$(DownloadedFile)",

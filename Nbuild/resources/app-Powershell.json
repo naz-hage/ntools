@@ -4,7 +4,7 @@
     {
       "Name": "Powershell",
       "Version": "7.4.1",
-      "AppFileName": "pwsh.exe",
+      "AppFileName": "$(InstallPath)\\pwsh.exe",
       "WebDownloadFile": "https://github.com/PowerShell/PowerShell/releases/download/v$(Version)/PowerShell-$(Version)-win-x64.msi",
       "DownloadedFile": "PowerShell-$(Version)-win-x64.msi",
       "InstallCommand": "msiexec.exe",

@@ -17,7 +17,7 @@
          download        -> Download apps specified in -json option, requires admin priviledges
          list            -> List apps specified in -json option (string, default=)
   - json : json file which holds apps list. Valid only for -c install | download | list option
-         sample json file: https://github.com/naz-hage/ntools/blob/main/Nbuild/resources/NbuildAppListTest.json" (string, default=)
+         sample json file: https://github.com/naz-hage/ntools/blob/main/Nbuild/resources/app-ntools.json" (string, default=)
 ```
 
 
