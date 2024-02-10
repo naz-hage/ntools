@@ -22,7 +22,7 @@
       "InstallCommand": "$(DownloadedFile)",
       "InstallArgs": "--add Microsoft.VisualStudio.Workload.CoreEditor Microsoft.VisualStudio.Workload.Azure Microsoft.VisualStudio.Workload.ManagedDesktop Microsoft.VisualStudio.Workload.NativeDesktop Microsoft.VisualStudio.Workload.NetWeb Microsoft.VisualStudio.Workload.NetDesktop Microsoft.VisualStudio.Workload.Azure Microsoft.VisualStudio.Workload.Data --quiet --wait",
       "InstallPath": "$(ProgramFiles)\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE",
-      "UninstallCommand": "vs_installer.exe",
+      "UninstallCommand": "$(ProgramFilesX86)\\Microsoft Visual Studio\\Installer\\vs_installer.exe",
       "UninstallArgs": "--uninstall --force --quiet"
     },
     {
