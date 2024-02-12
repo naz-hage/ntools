@@ -1,6 +1,5 @@
 # Set variables
 $DotnetVersion = "8.0.1"
-$NtoolsVersion = "1.2.57"
 $DevDrive = "c:"
 $MainDir = "source"
 
@@ -16,7 +15,8 @@ if (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
 # save current directory
 $currentdir = Get-Location
 Set-Location -Path "nbuild\resources"
-.\install-ntools.ps1 $DotnetVersion $NtoolsVersion $DevDrive $MainDir
+.\install-app.ps1 install .\app-Ntools.json
+.\install-ntools.ps1 $DotnetVersion $DevDrive $MainDir
 
 # Restore current directory
 Set-Location -Path $currentdir
