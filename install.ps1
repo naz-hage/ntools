@@ -1,5 +1,4 @@
 # Set variables
-$DotnetVersion = "8.0.1"
 $DevDrive = "c:"
 $MainDir = "source"
 
@@ -17,7 +16,7 @@ $currentdir = Get-Location
 Set-Location -Path "nbuild\resources"
 .\install-app.ps1 install .\app-Dotnet_Runtime.json
 .\install-app.ps1 install .\app-Ntools.json
-.\install-ntools.ps1 $DotnetVersion $DevDrive $MainDir
+.\install-ntools.ps1 $DevDrive $MainDir
 
 # Restore current directory
 Set-Location -Path $currentdir
