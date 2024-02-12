@@ -1,6 +1,6 @@
 # Set variables
 $DotnetVersion = "8.0.1"
-$NtoolsVersion = "1.2.35"
+$NtoolsVersion = "1.2.57"
 $DevDrive = "c:"
 $MainDir = "source"
 
