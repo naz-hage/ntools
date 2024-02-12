@@ -2,6 +2,18 @@
   "Version": "1.2.0",
   "NbuildAppList": [
     {
+      "Name": "Dotnet Runtime",
+      "Version": "8.0.1",
+      "AppFileName": "$(InstallPath)\\dotnet.exe",
+      "WebDownloadFile": "https://download.visualstudio.microsoft.com/download/pr/f18288f6-1732-415b-b577-7fb46510479a/a98239f751a7aed31bc4aa12f348a9bf/windowsdesktop-runtime-$(Version)-win-x64.exe",
+      "DownloadedFile": "dotnet_installer.exe",
+      "InstallCommand": "dotnet_installer.exe",
+      "InstallArgs": "/quiet /norestart\"",
+      "InstallPath": "$(ProgramFiles)\\dotnet",
+      "UninstallCommand": "dotnet_installer.exe",
+      "UninstallArgs": "/uninstall /quiet /norestart"
+    },
+    {
       "Name": "Visual Studio 2022",
       "Version": "17.0.0",
       "AppFileName": "$(InstallPath)\\Common7\\IDE\\devenv.exe",
@@ -84,6 +96,18 @@
       "InstallPath": "$(ProgramFiles)\\NBuild",
       "UninstallCommand": "powershell.exe",
       "UninstallArgs": "-Command Remove-Item -Path '$(AppFileName)' -Force"
+    },
+    {
+      "Name": "SysInternals",
+      "Version": "2.20.0.0",
+      "AppFileName": "$(InstallPath)\\sigcheck64.exe",
+      "WebDownloadFile": "https://download.sysinternals.com/files/SysinternalsSuite.zip",
+      "DownloadedFile": "SysinternalsSuite.zip",
+      "InstallCommand": "powershell.exe",
+      "InstallArgs": "-Command Expand-Archive -Path '\"$(DownloadedFile)\"' -DestinationPath '\"$(ProgramFiles)\\SysInternalsSuite\"' -Force",
+      "InstallPath": "$(ProgramFiles)\\SysInternalsSuite",
+      "UninstallCommand": "powershell.exe",
+      "UninstallArgs": "-Command Remove-Item -Path '$(InstallPath)' -Recurse -Force"
     }
   ]
 }
