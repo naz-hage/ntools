@@ -65,17 +65,12 @@ function InstallDotNetCore {
 function Main {
     param (
         [Parameter(Mandatory=$true)]
-        [string]$dotnetVersion,
-        [Parameter(Mandatory=$true)]
         [string]$devDrive,
         [Parameter(Mandatory=$true)]
         [string]$mainDir)
 
     # prepare the downloads directory
     PrepareDownloadsDirectory $downloadsDirectory
-
-    # Update the .NET Core version
-    InstallDotNetCore $dotnetVersion
 
     Write-Host "devDrive: $devDrive"
     Write-Host "mainDir: $mainDir"
@@ -89,4 +84,4 @@ function Main {
 }
 
 # Call the Main function with the provided or default values
-Main -dotnetVersion $args[0] -devDrive $args[1] -mainDir $args[2]
+Main -devDrive $args[0] -mainDir $args[1]

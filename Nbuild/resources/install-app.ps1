@@ -104,10 +104,12 @@ function  Install {
 
     # download the Git file
     $output = $downloadsDirectory + "\\" + $appInfo.DownloadedFile
+    
     # replace $(Version) with the version number
     $output = $output -replace '\$\(Version\)', $appInfo.Version
     $webUri = $appInfo.WebDownloadFile -replace '\$\(Version\)', $appInfo.Version
-    Invoke-WebRequest -Uri $webUri -OutFile $output -ProgressPreference Continue
+    Write-Host "Downloading $($webUri) to : $($output) ..."
+    Invoke-WebRequest -Uri $webUri -OutFile $output
 
 
     # install the Git file

@@ -1,6 +1,5 @@
 @echo off
 SetLocal EnableDelayedExpansion
-set DOTNET_VERSION=8.0.1
 set DEV_DRIVE=c:
 set MAIN_DIR=source
 :: Check if admin
@@ -15,8 +14,9 @@ if %errorLevel% == 0 (
 :: save current directory
 set currentdir=%cd%
 cd nbuild\resources
+powershell.exe -Command ".\install-app.ps1 install .\app-Dotnet_Runtime.json
 powershell.exe -Command ".\install-app.ps1 install .\app-Ntools.json
-powershell.exe -Command ".\install-ntools.ps1" %DOTNET_VERSION% %DEV_DRIVE% %MAIN_DIR%
+powershell.exe -Command ".\install-ntools.ps1" %DEV_DRIVE% %MAIN_DIR%
 :: Restore current directory
 cd %currentdir%
 :: Delete the installer
