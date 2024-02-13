@@ -15,7 +15,7 @@ namespace NbuildTests
         private const string NbuildAssemblyName = "Nb.dll";
         private const string NbuildAppListJsonFile = "app-ntools.json";
         private const string LocalTest = "LOCAL_TEST";
-
+        private const string VersionToTest = "1.2.59";
         // Local test mode flag
         private bool? LocalTestMode;
 
@@ -174,7 +174,7 @@ namespace NbuildTests
                 ""NbuildAppList"": [
                     {
                         ""Name"": ""nbuild"",
-                        ""Version"": ""1.2.35"",
+                        ""Version"": ""versionToTest"",
                         ""AppFileName"": ""$(InstallPath)\\nb.exe"",
                         ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
                         ""DownloadedFile"": ""$(Version).zip"",
@@ -186,6 +186,8 @@ namespace NbuildTests
                     }
                 ]
             }";
+            // replace versionToTest with the actual version
+            json = json.Replace("versionToTest", VersionToTest);
 
             // Act
             var result = Command.Install(json);
@@ -220,13 +222,13 @@ namespace NbuildTests
             // }";
             // Use this json to test the install command in GitHub Actions because it doesn't have 7-Zip installed
             SetupTestModeFlag();
-
+            
             var json = @"{
                 ""Version"": ""1.2.0"",
                 ""NbuildAppList"": [
                     {
                         ""Name"": ""nbuild"",
-                        ""Version"": ""1.2.35"",
+                        ""Version"": ""versionToTest"",
                         ""AppFileName"": ""$(InstallPath)\\nb.exe"",
                         ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
                         ""DownloadedFile"": ""$(Version).zip"",
@@ -238,6 +240,10 @@ namespace NbuildTests
                     }
                 ]
             }";
+
+            // replace versionToTest with the actual version
+            json = json.Replace("versionToTest", VersionToTest);
+
             // Install the app first before uninstalling
             var result = Command.Install(json);
             Assert.IsTrue(result.IsSuccess());
