@@ -147,7 +147,8 @@ namespace Nbuild
                 result = Uninstall(app);
                 if (!result.IsSuccess())
                 {
-                    break;
+                    // display error message and continue to next app
+                    Colorizer.WriteLine($"[{ConsoleColor.Red}!{result.GetFirstOutput()}]");
                 }
             }
 
@@ -346,6 +347,13 @@ namespace Nbuild
                 )
             {
                 return ResultHelper.Fail(-1, $"Invalid json input");
+            }
+
+            // if app is not installed, return success with app not installed message
+            if (!InstalledAppFileVersionGreaterOrEqual(nbuildApp))
+            {
+                Colorizer.WriteLine($"[{ConsoleColor.Yellow}!√ {nbuildApp.Name} {nbuildApp.Version} not installed.]");
+                return ResultHelper.Success();
             }
 
             // Uninstall the app
