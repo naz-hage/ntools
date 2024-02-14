@@ -108,6 +108,18 @@
       "InstallPath": "$(ProgramFiles)\\SysInternalsSuite",
       "UninstallCommand": "powershell.exe",
       "UninstallArgs": "-Command Remove-Item -Path '$(InstallPath)' -Recurse -Force"
+    },
+    {
+      "Name": "MongoDB",
+      "Version": "7.0.5",
+      "AppFileName": "$(InstallPath)\\7.0\\bin\\mongod.exe",
+      "WebDownloadFile": "https://fastdl.mongodb.org/windows/mongodb-windows-x86_64-$(Version)-signed.msi",
+      "DownloadedFile": "mongodb-windows-x86_64-$(Version)-signed.msi",
+      "InstallCommand": "msiexec.exe",
+      "InstallArgs": "/q /i $(DownloadedFile) INSTALLLOCATION=\"$(InstallPath)\" ADDLOCAL=\"all\"",
+      "InstallPath": "$(ProgramFiles)\\MongoDB\\Server",
+      "UninstallCommand": "NA",
+      "UninstallArgs": "NA"
     }
   ]
 }
