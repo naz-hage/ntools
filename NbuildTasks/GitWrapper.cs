@@ -11,13 +11,6 @@ namespace NbuildTasks
     public class GitWrapper
     {
         private const string GitBinary = "git.exe";
-        //public static readonly Parameters Parameters = new Parameters
-        //{
-        //    WorkingDir = Environment.CurrentDirectory,
-        //    FileName = GitBinary,
-        //    RedirectStandardOutput = true,
-        //    RedirectStandardError = true,
-        //};
 
         public static Process Process = new Process
         {
@@ -33,7 +26,7 @@ namespace NbuildTasks
             }
         };
 
-        
+
         public bool Verbose = false;
 
         public string DevDrive { get; set; } = "d:";  // This default was chosen because of GitHub Actions
@@ -577,7 +570,7 @@ namespace NbuildTasks
             var branches = new List<string>();
 
             Process.StartInfo.Arguments = $"branch --list";
-            var result = Process.LockStart(Verbose);            
+            var result = Process.LockStart(Verbose);
             if (result.Code == 0 && result.Output.Count >= 1)
             {
                 foreach (var line in result.Output)

@@ -4,12 +4,14 @@
     {
       "Name": "Visual Studio Code",
       "Version": "1.85.2",
-      "AppFileName": "Code.exe",
+      "AppFileName": "$(InstallPath)\\Code.exe",
       "WebDownloadFile": "https://aka.ms/win32-x64-system-stable",
       "DownloadedFile": "VSCodeSetup-x64-$(Version).exe",
       "InstallCommand": "$(DownloadedFile)",
       "InstallArgs": "/silent /mergetasks=!runcode,addcontextmenufiles,addcontextmenufolders",
-      "InstallPath": "$(ProgramFiles)\\Microsoft VS Code"
+      "InstallPath": "$(ProgramFiles)\\Microsoft VS Code",
+      "UninstallCommand": "$(InstallPath)\\unins000.exe",
+      "UninstallArgs": "/SILENT"
     }
   ]
 }

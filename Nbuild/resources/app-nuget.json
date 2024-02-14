@@ -1,16 +1,17 @@
 {
-    "Version": "1.2.0",
-    "NbuildAppList": [
-      {
-        "Name": "Nuget",
-        "Version": "6.8.0.131",
-        "AppFileName": "nuget.exe",
-        "WebDownloadFile": "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe",
-        "DownloadedFile": "$(AppFileName)",
-        "InstallCommand": "xcopy.exe",
-        "InstallArgs": "$(AppFileName) \"$(InstallPath)\\\" /d /y",
-        "InstallPath": "$(ProgramFiles)\\NBuild"
-      }
-    ]
-  }
-  
+  "Version": "1.2.0",
+  "NbuildAppList": [
+    {
+      "Name": "Nuget",
+      "Version": "6.8.0.131",
+      "AppFileName": "$(InstallPath)\\nuget.exe",
+      "WebDownloadFile": "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe",
+      "DownloadedFile": "nuget.exe",
+      "InstallCommand": "xcopy.exe",
+      "InstallArgs": "$(DownloadedFile) \u0022$(InstallPath)\\\u0022 /d /y",
+      "InstallPath": "$(ProgramFiles)\\NBuild",
+      "UninstallCommand": "powershell.exe",
+      "UninstallArgs": "-Command Remove-Item -Path \u0027$(AppFileName)\u0027 -Force"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "Version": "1.2.0",
+  "NbuildAppList": [
+    {
+      "Name": "7-zip",
+      "Version": "23.01",
+      "AppFileName": "$(InstallPath)\\7z.exe",
+      "WebDownloadFile": "https://www.7-zip.org/a/7z2301-x64.exe",
+      "DownloadedFile": "7zip.exe",
+      "InstallCommand": "$(DownloadedFile)",
+      "InstallArgs": "/S /D=\u0022$(ProgramFiles)\\7-Zip\u0022",
+      "InstallPath": "$(ProgramFiles)\\7-Zip",
+      "UninstallCommand": "$(InstallPath)\\Uninstall.exe",
+      "UninstallArgs": "/S"
+    }
+  ]
+}

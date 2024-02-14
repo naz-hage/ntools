@@ -15,7 +15,7 @@ namespace NbuildTasksTests
         public async Task DownloadFileTaskAsyncTestAsync()
         {
             // Arrange
-            
+
             var httpClient = new HttpClient();
             Uri webDownloadFile = new("https://dist.nuget.org/win-x86-commandline/latest/nuget.exe");
             string downloadedFile = "nuget.exe";

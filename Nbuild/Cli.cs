@@ -4,17 +4,21 @@ namespace Nbuild;
 
 public class Cli
 {
-    [OptionalArgument("", "c", "command. value = [targets | install | download | list | ]\n" +
-        "\t targets \t -> List available targets and save in targets.md file\n" +
-        "\t install \t -> Download and install apps specified in -json option, requires admin priviledges\n" +
-        "\t download \t -> Download apps specified in -json option, requires admin priviledges\n" +
-        "\t list    \t -> List apps specified in -json option")]
+    [OptionalArgument("", "c", "Specifies the command to execute. Possible values: targets, install, uninstall, download, list.\n" +
+        "\t targets \t -> Lists available targets and saves them in the targets.md file.\n" +
+        "\t install \t -> Downloads and installs apps specified in the -json option.\n" +
+        "\t uninstall \t -> Uninstalls apps specified in the -json option.\n" +
+        "\t download \t -> Downloads apps specified in the -json option.\n" +
+        "\t list \t\t -> Lists apps specified in the -json option.\n" +
+        "\t ----\n" +
+        "\t - By default, the -json option points to the ntools deployment folder: $(ProgramFiles)\\build\\tools.json.\n" +
+        "\t - The install, uninstall, and download commands require admin privileges to run.")]
     public string? Command { get; set; }
 
-    [OptionalArgument("", "json", "json file which holds apps list. Valid only for -c install | download | list option\n" +
-        "\t sample json file: https://github.com/naz-hage/ntools/blob/main/Nbuild/resources/NbuildAppListTest.json\"")]
+    [OptionalArgument("$(ProgramFiles)\\nbuild\\ntools.json", "json", "Specifies the JSON file that holds the list of apps. Only valid for the install, download, and list commands.\n" +
+        "\t Sample JSON file: https://github.com/naz-hage/ntools/blob/main/Nbuild/resources/app-ntools.json")]
     public string? Json { get; set; }
 
-    [OptionalArgument(false, "v", "set verbose level")]
+    [OptionalArgument(false, "v", "Sets the verbose level.")]
     public bool Verbose { get; set; }
 }

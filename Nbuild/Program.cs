@@ -1,6 +1,6 @@
 ﻿using CommandLine;
-using Ntools;
 using NbuildTasks;
+using Ntools;
 using OutputColorizer;
 using System.Diagnostics;
 
@@ -10,6 +10,7 @@ public class Program
 {
     private const string CmdTargets = "targets";
     private const string CmdInstall = "install";
+    private const string CmdUninstall = "uninstall";
     private const string CmdList = "list";
     private const string CmdDownload = "download";
     private const string CmdHelp = "--help";
@@ -45,16 +46,26 @@ public class Program
 
             var currentDirectory = Environment.CurrentDirectory;
 
-            if (options != null && !string.IsNullOrEmpty(options.Command))
+            try
             {
-                result = options.Command switch
+                if (options != null && !string.IsNullOrEmpty(options.Command))
                 {
-                    var d when d == CmdTargets => BuildStarter.DisplayTargets(Environment.CurrentDirectory),
-                    var d when d == CmdInstall => Command.Install(options.Json, options.Verbose),
-                    var d when d == CmdList => Command.List(options.Json, options.Verbose),
-                    var d when d == CmdDownload => Command.Download(options.Json, options.Verbose),
-                    _ => ResultHelper.Fail(-1, $"Invalid Command: '{options.Command}'"),
-                };
+                    options.Json = UpdateJsonOption(options);
+
+                    result = options.Command switch
+                    {
+                        var d when d == CmdTargets => BuildStarter.DisplayTargets(Environment.CurrentDirectory),
+                        var d when d == CmdInstall => Command.Install(options.Json, options.Verbose),
+                        var d when d == CmdUninstall => Command.Uninstall(options.Json, options.Verbose),
+                        var d when d == CmdList => Command.List(options.Json, options.Verbose),
+                        var d when d == CmdDownload => Command.Download(options.Json, options.Verbose),
+                        _ => ResultHelper.Fail(-1, $"Invalid Command: '{options.Command}'"),
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                Colorizer.WriteLine($"[{ConsoleColor.Red}!X Error occurred: {ex.Message}.]");
             }
 
             // return to current directory because the command might have changed it
@@ -88,6 +99,29 @@ public class Program
         return (int)result.Code;
     }
 
+    private static string? UpdateJsonOption(Cli options)
+    {
+        if ((string.IsNullOrEmpty(options.Json) && !string.IsNullOrEmpty(options.Command)) &&
+                    (options.Command.Equals(CmdInstall, StringComparison.InvariantCultureIgnoreCase) ||
+                    options.Command.Equals(CmdUninstall, StringComparison.InvariantCultureIgnoreCase) ||
+                    options.Command.Equals(CmdList, StringComparison.InvariantCultureIgnoreCase) ||
+                    options.Command.Equals(CmdDownload, StringComparison.InvariantCultureIgnoreCase)))
+        {
+            options.Json = $"{Environment.GetEnvironmentVariable("ProgramFiles")}\\Nbuild\\ntools.json";
+            if (File.Exists(options.Json))
+            {
+                return options.Json;
+            }
+        }
+
+        if (!string.IsNullOrEmpty(options.Json))
+        {
+            options.Json = options.Json.Replace("$(ProgramFiles)", Environment.GetEnvironmentVariable("ProgramFiles"));
+        }
+
+        return options.Json;
+    }
+
     private static void DisplayGitInfo()
     {
         var process = new Process
@@ -103,7 +137,7 @@ public class Program
             },
         };
 
-        var resultHelper = process.LockStart(false); 
+        var resultHelper = process.LockStart(false);
         if (!resultHelper.IsSuccess())
         {
             Console.WriteLine($"==> Failed to display git info:{resultHelper.GetFirstOutput()}");

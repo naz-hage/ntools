@@ -1,4 +1,21 @@
-# .\InstallPoershell.ps1
+# .\Install-app.ps1
+
+$downloadsDirectory = "c:\NToolsDownloads"
+
+function PrepareDownloadsDirectory {
+    param (
+        [Parameter(Mandatory=$true)]
+        [string]$directory)
+
+    # Create the Downloads directory if it doesn't exist
+    if (!(Test-Path -Path $directory)) {
+        New-Item -ItemType Directory -Path $directory | Out-Null
+    }
+
+    # Grant Administrators full control of the Downloads directory
+    icacls.exe $directory /grant 'Administrators:(OI)(CI)F' /inheritance:r
+    
+}
 
 function GetAppInfo {
     param (
@@ -11,19 +28,36 @@ function GetAppInfo {
     # $config = $json | ConvertFrom-Json
     # Retrieve elements using dot notation
 
-    $config = $json | ConvertFrom-Json
-        
-        $appInfo = @{
-            Name = $config.Name
-            Version = $config.Version
-            AppFileName = $config.AppFileName
-            WebDownloadFile = $config.WebDownloadFile
-            DownloadedFile = $config.DownloadedFile
-            InstallCommand = $config.InstallCommand
-            InstallArgs = $config.InstallArgs
-            InstallPath = $config.InstallPath
-        }
-        
+    $config = $json | ConvertFrom-Json | Select-Object -ExpandProperty NbuildAppList | Select-Object -First 1
+
+    $appInfo = @{
+        Name = $config.Name
+        Version = $config.Version
+        AppFileName = $config.AppFileName
+        WebDownloadFile = $config.WebDownloadFile
+        DownloadedFile = $config.DownloadedFile
+        InstallCommand = $config.InstallCommand
+        InstallArgs = $config.InstallArgs
+        InstallPath = $config.InstallPath
+        UninstallCommand = $config.UninstallCommand
+        UninstallArgs = $config.UninstallArgs            
+    }
+
+    # Update the InstallPath and AppFileName with the actual path
+    $appInfo.InstallPath = $appInfo.InstallPath -replace '\$\(ProgramFiles\)', $env:ProgramFiles
+    $appInfo.AppFileName = $appInfo.AppFileName -replace '\$\(InstallPath\)', $appInfo.InstallPath
+    $appInfo.AppFileName = $appInfo.AppFileName -replace '\$\(ProgramFiles\)', $env:ProgramFiles
+
+    $appInfo.InstallCommand = $appInfo.InstallCommand -replace '\$\(Version\)', $appInfo.Version
+    $appInfo.InstallArgs = $appInfo.InstallArgs -replace '\$\(InstallPath\)', $appInfo.InstallPath
+    $appInfo.InstallArgs = $appInfo.InstallArgs -replace '\$\(Version\)', $appInfo.Version
+
+    $appInfo.UninstallArgs = $appInfo.UninstallArgs -replace '\$\(InstallPath\)', $appInfo.InstallPath
+
+    $appInfo.DownloadedFile = $appInfo.DownloadedFile -replace '\$\(Version\)', $appInfo.Version
+
+    $appInfo.WebDownloadFile = $appInfo.WebDownloadFile -replace '\$\(Version\)', $appInfo.Version
+
     return $appInfo
 }
 
@@ -33,27 +67,29 @@ function CheckIfAppInstalled {
         [string]$json
     )
    
-    $config = GetAppInfo $json 
+    $appInfo = GetAppInfo $json
+    #$appInfo.InstallPath = $appInfo.InstallPath -replace '\$\(ProgramFiles\)', $env:ProgramFiles
+    #$appFileName = $appInfo.AppFileName -replace '\$\(InstallPath\)', $appInfo.InstallPath
+    #$appFileName = $appFileName -replace '\$\(ProgramFiles\)', $env:ProgramFiles
     # check if app is installed
-    $appFileName = $config.InstallPath + "\\" + $config.AppFileName
-    # replace $(ProgramFiles) with environment variable
-    $appFileName = $appFileName -replace '\$\(ProgramFiles\)', $env:ProgramFiles
-     if (-not (Test-Path -Path $appFileName)) {
-        Write-Host "$($config.Name) file: $appFileName is not found."
+     if (-not (Test-Path -Path $appInfo.AppFileName)) {
+        Write-Host "$($appInfo.Name) file: $($appInfo.AppFileName) is not found."
          return $false
      }
      else
      {
         # check if the version is correct
-        $installedVersion = & .\file-version.ps1 $appFileName
-        $targetVersion = $config.Version
-        Write-Host "$config.Name  version: $config.Version is found."
-        if ($installedVersion -ge $targetVersion) {
-            return $false
+        $installedVersion = & .\file-version.ps1 $appInfo.AppFileName
+        $targetVersion = $appInfo.Version
+        Write-Host "$($appInfo.Name)  version: $($appInfo.Version) is found."
+
+        # check if the installed version is greater than or equal to the target version
+        if ([version]$installedVersion -ge [version]$targetVersion) {
+            return $true
         }
         else
         {
-            return $true
+            return $false
         }
      }
 }
@@ -64,20 +100,23 @@ function  Install {
         [string]$json
     )
      # Retrieve elements using dot notation
-     $config = GetAppInfo $json
+     $appInfo = GetAppInfo $json
 
     # download the Git file
-    $output = "C:\NToolsDownloads\" + $config.DownloadedFile
+    $output = $downloadsDirectory + "\\" + $appInfo.DownloadedFile
+    
     # replace $(Version) with the version number
-    $output = $output -replace '\$\(Version\)', $config.Version
-    $webUri = $config.WebDownloadFile -replace '\$\(Version\)', $config.Version
+    $output = $output -replace '\$\(Version\)', $appInfo.Version
+    $webUri = $appInfo.WebDownloadFile -replace '\$\(Version\)', $appInfo.Version
+    Write-Host "Downloading $($webUri) to : $($output) ..."
     Invoke-WebRequest -Uri $webUri -OutFile $output
 
+
     # install the Git file
-    $installCommand = $config.InstallCommand -replace '\$\(Version\)', $config.Version
-    write-host "Installing $config.Name version: $config.Version ..."
+    $installCommand = $appInfo.InstallCommand -replace '\$\(Version\)', $appInfo.Version
+    write-host "Installing $($appInfo.Name) version: $($appInfo.Version) ..."
     write-host "Install command: $installCommand"
-    $installArgs=$config.InstallArgs
+    $installArgs=$appInfo.InstallArgs
     write-host "Install arguments: $installArgs"
     $workingFolder = "C:\NToolsDownloads"
     $process = Start-Process -FilePath $installCommand -ArgumentList $installArgs -WorkingDirectory $workingFolder -PassThru
@@ -86,43 +125,35 @@ function  Install {
     # check if Git is installed
     $installed = CheckIfAppInstalled $json
     if ($installed) {
-        Write-Host "Git version: $installed is installed successfully."
+        Write-Host "App $($appInfo.Name) version: $($appInfo.Version) is installed successfully."
         return
     }
     else
     {
-        Write-Host "Git version: $installed is not installed."
+        Write-Host "App $($appInfo.Name) version: $($appInfo.Version) is not installed."
     }
 }
 
 function Main {
+    param (
+        [Parameter(Mandatory=$true)]
+        [string]$command,
+        [Parameter(Mandatory=$true)]
+        [string]$json
+        )
 
-    # Retrieve elements using dot notation
-    # $gitConfig = GetAppInfo $json
-    # $version = $gitConfig.Version
-    # $name = $gitConfig.Name
-    # $appFileName = $gitConfig.AppFileName
-    # $webDownloadFile = $gitConfig.WebDownloadFile
-    # $downloadedFile = $gitConfig.DownloadedFile
-    # $installCommand = $gitConfig.InstallCommand
-    # $installArgs = $gitConfig.InstallArgs
-    # $installPath = $gitConfig.InstallPath
-    
+    PrepareDownloadsDirectory $downloadsDirectory
 
-    # Retrieve elements using square bracket notation
-    #$gitConfig = GetAppInfo $json
-    #$version = $gitConfig["Version"]
-    #$webDownloadFile = $gitConfig["WebDownloadFile"]
-
+    $app = GetAppInfo $json
     # check if Git is installed
-    $installed = CheckIfAppInstalled "app-git.json"
+    $installed = CheckIfAppInstalled $json
     if ($installed) {
-        Write-Host "Git version: $version is already installed."
+        Write-Host "App: $($app.Name) version: $($app.Version) or greater is already installed."
     }
     else {
-        Install $Json
+        Install $json
     }
 }
 
 # Run the Main function
-Main
+Main -command $args[0] -json $args[1]

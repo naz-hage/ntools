@@ -1,5 +1,4 @@
 ﻿using Microsoft.Build.Framework;
-using System;
 
 namespace NbuildTasks
 {

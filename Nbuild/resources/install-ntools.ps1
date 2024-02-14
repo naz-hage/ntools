@@ -13,86 +13,6 @@ function PrepareDownloadsDirectory {
     icacls.exe $downloadsDirectory /grant 'Administrators:(OI)(CI)F' /inheritance:r
     
 }
-function InstallNtools {
-    # download the Ntools zip file 
-    param (
-        [Parameter(Mandatory=$true)]
-        [string]$ntoolsversion
-    )
-
-    # check if Ntools are installed
-    $nbuildInstalled = CheckIfNbuildInstalled $ntoolsversion
-    if ($nbuildInstalled) {
-        Write-Host "Ntools version: $ntoolsversion or higher are already installed."
-        return
-    }
-    else
-    {
-        #https://github.com/naz-hage/ntools/releases/download/1.2.34/1.2.34.zip
-        $url= "https://github.com/naz-hage/ntools/releases/download/$ntoolsversion/$ntoolsversion.zip"
-        $output = "C:\NToolsDownloads\Ntools.zip"
-        
-        write-host "Downloading Ntools from $url"
-        Invoke-WebRequest -Uri $url -OutFile $output
-   
-        write-host "Downloaded Ntools to $output"
-        $deploymentPath = $env:ProgramFiles + "\NBuild"
-        
-        # unzip the Ntools zip file
-        write-host "Unzipping Ntools to $deploymentPath"
-        Expand-Archive -Path $output -DestinationPath $deploymentPath
-
-        # check if nbuildtasks.dll exists in the deployment path
-        $nbuildTasksPath = "$deploymentPath\nbuildtasks.dll"
-        if (Test-Path -Path $nbuildTasksPath) {
-            Write-Host "nbuildtasks.dll exists."
-
-            # add deployment path to the PATH environment variable if it doesn't already exist
-            $path = [Environment]::GetEnvironmentVariable("PATH", "Machine")
-            if ($path -notlike "*$deploymentPath*") {
-                Write-Host "Adding $deploymentPath to the PATH environment variable."
-                [Environment]::SetEnvironmentVariable("PATH", $path + ";$deploymentPath", "Machine")
-            }
-            else
-            {
-                Write-Host "$deploymentPath already exists in the PATH environment variable."
-            }
-        }
-        else
-        {
-            Write-Host "nbuildtasks.dll does not exist."
-        }
-    }
-}
-
-function CheckIfNbuildInstalled {
-    param (
-        [Parameter(Mandatory=$true)]
-        [string]$ntoolsversion
-    )
-
-    # check if nbuildtasks.dll exists in the deployment path
-    $deploymentPath = $env:ProgramFiles + "\NBuild"
-    $nbuildTasksPath = "$deploymentPath\nbuildtasks.dll"
-
-    if (!(Test-Path -Path $nbuildTasksPath)) {
-        Write-Host "nbuildtasks.dll does not exist."
-        return $false
-    }
-
-    # check version of nbuildtasks.dll
-    $nbuildTasksVersion =& .\file-version.ps1 $nbuildTasksPath
-    write-host "Installed NBuild Version: $nbuildTasksVersion"
-
-    if ($null -eq $nbuildTasksVersion) {
-        write-host "Ntools: $ntoolsversion are not installed."
-        return $false
-    }
-    else
-    {
-        return $true
-    }
-}
 
 function CheckIfDotnetInstalled {
     param (
@@ -145,10 +65,6 @@ function InstallDotNetCore {
 function Main {
     param (
         [Parameter(Mandatory=$true)]
-        [string]$dotnetVersion,
-        [Parameter(Mandatory=$true)]
-        [string]$nToolsVersion,
-        [Parameter(Mandatory=$true)]
         [string]$devDrive,
         [Parameter(Mandatory=$true)]
         [string]$mainDir)
@@ -156,10 +72,6 @@ function Main {
     # prepare the downloads directory
     PrepareDownloadsDirectory $downloadsDirectory
 
-    # Update the .NET Core version
-    InstallDotNetCore $dotnetVersion
-
-    Write-Host "Ntools Version: $nToolsVersion"
     Write-Host "devDrive: $devDrive"
     Write-Host "mainDir: $mainDir"
     
@@ -167,12 +79,9 @@ function Main {
     setx DevDrive $devDrive
     setx MainDir $mainDir
 
-    # Install Ntools
-    InstallNtools $nToolsVersion
-
     $nbExePath = "$env:ProgramFiles\Nbuild\nb.exe"
     & $nbExePath -c install -json ntools.json 
 }
 
 # Call the Main function with the provided or default values
-Main -dotnetVersion $args[0] -nToolsVersion $args[1] -devDrive $args[2] -mainDir $args[3]
+Main -devDrive $args[0] -mainDir $args[1]
