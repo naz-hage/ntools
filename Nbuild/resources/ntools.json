@@ -118,8 +118,8 @@
       "InstallCommand": "msiexec.exe",
       "InstallArgs": "/q /i $(DownloadedFile) INSTALLLOCATION=\"$(InstallPath)\" ADDLOCAL=\"all\"",
       "InstallPath": "$(ProgramFiles)\\MongoDB\\Server",
-      "UninstallCommand": "NA",
-      "UninstallArgs": "NA"
+      "UninstallCommand": "msiexec.exe",
+      "UninstallArgs": "/x {5068DEB0-4F95-43D9-B4F7-C28CAC776BF2} /qn"
     }
   ]
 }
