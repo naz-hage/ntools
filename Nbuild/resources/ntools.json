@@ -112,7 +112,7 @@
     {
       "Name": "MongoDB",
       "Version": "7.0.5",
-      "AppFileName": "$(InstallPath)\\7.0\\bin\\mongod.exe",
+      "AppFileName": "$(InstallPath)\\bin\\mongod.exe",
       "WebDownloadFile": "https://fastdl.mongodb.org/windows/mongodb-windows-x86_64-$(Version)-signed.msi",
       "DownloadedFile": "mongodb-windows-x86_64-$(Version)-signed.msi",
       "InstallCommand": "msiexec.exe",
