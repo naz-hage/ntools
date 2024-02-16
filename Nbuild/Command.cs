@@ -238,7 +238,7 @@ namespace Nbuild
 
             var fileName = $"{DownloadsDirectory}\\{nbuildApp.DownloadedFile}";
             var httpClient = new HttpClient();
-            var result = Task.Run(async () => await httpClient.DownloadFileAsync(new Uri(nbuildApp.WebDownloadFile), fileName)).Result;
+            var result = Task.Run(async () => await httpClient.DownloadAsync(new Uri(nbuildApp.WebDownloadFile), fileName)).Result;
 
             return result;
         }
