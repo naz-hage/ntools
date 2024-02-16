@@ -12,6 +12,7 @@ namespace Nbuild
 {
     public static class Command
     {
+        private const int MsiReturnCodeRestartRequired = 1603;
         private static readonly string DownloadsDirectory = $"{Environment.GetEnvironmentVariable("Temp")}\\nb"; // "C:\\NToolsDownloads" $"{Environment.GetEnvironmentVariable("Temp")}\\nb"
         private static bool Verbose = false;
         private static bool ValidJson = false;
@@ -263,7 +264,7 @@ namespace Nbuild
 
             if (InstalledAppFileVersionGreaterOrEqual(nbuildApp))
             {
-                Colorizer.WriteLine($"[{ConsoleColor.Green}!√ {nbuildApp.Name} {nbuildApp.Version} already installed.]");
+                Colorizer.WriteLine($"[{ConsoleColor.Yellow}!√ {nbuildApp.Name} {nbuildApp.Version} already installed.]");
                 return ResultHelper.Success();
             }
 
@@ -295,33 +296,22 @@ namespace Nbuild
                 if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Working Directory: {process.StartInfo.WorkingDirectory}]");
                 if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}! FileName: {process.StartInfo.FileName}]");
                 if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Arguments: {process.StartInfo.Arguments}]");
-                // Install the downloaded file
+                
                 if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Calling process.LockStart(Verbose)]");
                 var resultInstall = process.LockStart(Verbose);
                 if (resultInstall.IsSuccess())
-
                 {
                     // Check if the app was installed successfully
-                    if (InstalledAppFileVersionGreaterOrEqual(nbuildApp))
-                    {
-                        Colorizer.WriteLine($"[{ConsoleColor.Green}!√ {nbuildApp.Name} {nbuildApp.Version} installed.]");
-                        return ResultHelper.Success();
-                    }
-                    else
-                    {
-                        Colorizer.WriteLine($"[{ConsoleColor.Red}!X {nbuildApp.Name} {nbuildApp.Version} failed to install]");
-                        return ResultHelper.Fail(-1, $"Failed to install {nbuildApp.Name} {nbuildApp.Version}");
-                    }
+                    return SuccessfullInstall(nbuildApp, result);
                 }
                 else
                 {
-
+                    
                     //Colorizer.WriteLine($"[{ConsoleColor.Red}!X {appData.Name} {appData.Version} failed to install: {resultInstall.GetFirstOutput()}]");
                     Colorizer.WriteLine($"[{ConsoleColor.Red}!X {nbuildApp.Name} {nbuildApp.Version} failed to install: {process.ExitCode}]");
+                    DisplayCodeAndOutput(result);
                     return ResultHelper.Fail(process.ExitCode, $"Failed to install {nbuildApp.Name} {nbuildApp.Version}");
                 }
-
-                //return resultInstall;
             }
             else
             {
@@ -329,6 +319,37 @@ namespace Nbuild
             }
         }
 
+        private static ResultHelper SuccessfullInstall(NbuildApp nbuildApp, ResultHelper result)
+        {
+            if (InstalledAppFileVersionGreaterOrEqual(nbuildApp))
+            {
+                Colorizer.WriteLine($"[{ConsoleColor.Green}!√ {nbuildApp.Name} {nbuildApp.Version} installed.]");
+                return ResultHelper.Success();
+            }
+            else
+            {
+                if (result.Code == MsiReturnCodeRestartRequired)
+                {
+                    Colorizer.WriteLine($"[{ConsoleColor.Yellow}!√ {nbuildApp.Name} {nbuildApp.Version} installed.  Restart Required]");
+                    result.Code = 0;
+                    return result;
+                }
+
+                Colorizer.WriteLine($"[{ConsoleColor.Red}!X {nbuildApp.Name} {nbuildApp.Version} failed to install]");
+                // print out ResultHelper code and output
+                DisplayCodeAndOutput(result);
+                return ResultHelper.Fail(-1, $"Failed to install {nbuildApp.Name} {nbuildApp.Version}");
+            }
+        }
+
+        private static void DisplayCodeAndOutput(ResultHelper result)
+        {
+            Colorizer.WriteLine($"[{ConsoleColor.Yellow}!X Code: {result.Code}]");
+            foreach (var output in result.Output)
+            {
+                Colorizer.WriteLine($"[{ConsoleColor.Yellow}!X Output: {output}]");
+            }
+        }
 
         private static ResultHelper Uninstall(NbuildApp nbuildApp)
         {
@@ -379,8 +400,8 @@ namespace Nbuild
             if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Arguments: {process.StartInfo.Arguments}]");
 
             if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Calling process.LockStart(Verbose)]");
-            var resultInstall = process.LockStart(Verbose);
-            if (resultInstall.IsSuccess())
+            var result = process.LockStart(Verbose);
+            if (result.IsSuccess())
 
             {
                 Colorizer.WriteLine($"[{ConsoleColor.Green}!√ {nbuildApp.Name} {nbuildApp.Version} Uninstalled.]");
@@ -389,6 +410,7 @@ namespace Nbuild
             else
             {
                 Colorizer.WriteLine($"[{ConsoleColor.Red}!X {nbuildApp.Name} {nbuildApp.Version} failed to Uninstall: {process.ExitCode}]");
+                DisplayCodeAndOutput(result);
                 return ResultHelper.Fail(process.ExitCode, $"Failed to Uninstall {nbuildApp.Name} {nbuildApp.Version}");
             }
         }
