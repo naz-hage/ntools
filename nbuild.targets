@@ -266,4 +266,13 @@
 		<Message Text="==> DONE"/>
 	</Target>
 
+	<Target Name="GET_PRODUCT_CODES">
+		<Exec Command="wmic product where &quot;name like 'MongoDB%'&quot; get IdentifyingNumber, Name" ConsoleToMSBuild="true">
+			<Output TaskParameter="ConsoleOutput" PropertyName="ProductsList" />
+		</Exec>
+		<ItemGroup>
+			<Products Include="$(ProductsList.Split('&#xD;&#xA;', StringSplitOptions.RemoveEmptyEntries))" />
+		</ItemGroup>
+		<Message Text="@(Products)" Importance="high" />
+	</Target>
 </Project>
