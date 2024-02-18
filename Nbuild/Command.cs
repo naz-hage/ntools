@@ -218,7 +218,8 @@ namespace Nbuild
                 }
                 else
                 {
-                    Colorizer.WriteLine($"[{ConsoleColor.Red}! Failed to download {app.WebDownloadFile} to {app.DownloadedFile}. {result.GetFirstOutput()}]");
+                    Colorizer.WriteLine($"[{ConsoleColor.Red}! Failed to download {app.WebDownloadFile} to {app.DownloadedFile}]");
+                    Console.WriteLine($"Return: {result.GetFirstOutput()}");
                     Colorizer.WriteLine($"[{ConsoleColor.Red}! | {app.Name,-18} | {app.DownloadedFile,-30} | {stopWatch.Elapsed,-16:hh\\:mm\\:ss\\.ff}|]");
                 }
 
@@ -237,8 +238,33 @@ namespace Nbuild
             }
 
             var fileName = $"{DownloadsDirectory}\\{nbuildApp.DownloadedFile}";
+            
             var httpClient = new HttpClient();
-            var result = Task.Run(async () => await httpClient.DownloadAsync(new Uri(nbuildApp.WebDownloadFile), fileName)).Result;
+            // set host as trusted
+            var uri = new Uri(nbuildApp.WebDownloadFile);
+            if (uri == null) return ResultHelper.Fail(-1, $"Invalid uri");
+
+            Nfile.SetTrustedHosts([uri.Host]);
+            Uri uriResult;
+            var validUri = Uri.TryCreate(uri.ToString(), UriKind.Absolute, out uriResult!);
+            var extension = Path.GetExtension(uriResult!.AbsolutePath);
+            Nfile.SetAllowedExtensions([extension]);
+
+            var result = Task.Run(async () => await httpClient.DownloadAsync(uri, fileName)).Result;
+
+            if (Verbose)
+            {
+                // display download file signature and size
+                //result.DisplayCertificate();
+                if (result.DigitallySigned)
+                {
+                    Colorizer.WriteLine($"[{ConsoleColor.Yellow}! {fileName} is signed]");
+                }
+                else
+                {
+                    Colorizer.WriteLine($"[{ConsoleColor.Yellow}! {fileName} is not signed]");
+                }
+            }
 
             return result;
         }
@@ -293,11 +319,15 @@ namespace Nbuild
                 process.StartInfo.FileName = FileMappins.GetFullPathOfFile(process.StartInfo.FileName);
 
                 Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Installing {nbuildApp.Name} {nbuildApp.Version}]");
-                if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Working Directory: {process.StartInfo.WorkingDirectory}]");
-                if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}! FileName: {process.StartInfo.FileName}]");
-                if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Arguments: {process.StartInfo.Arguments}]");
-                
-                if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Calling process.LockStart(Verbose)]");
+                if (Verbose)
+                {
+                    Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Working Directory: {process.StartInfo.WorkingDirectory}]");
+                    Colorizer.WriteLine($"[{ConsoleColor.Yellow}! FileName: {process.StartInfo.FileName}]");
+                    Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Arguments: {process.StartInfo.Arguments}]");
+
+                    Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Calling process.LockStart(Verbose)]");
+                }
+
                 var resultInstall = process.LockStart(Verbose);
                 if (resultInstall.IsSuccess())
                 {

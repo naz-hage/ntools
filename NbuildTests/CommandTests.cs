@@ -97,7 +97,7 @@ namespace NbuildTests
                 ""NbuildAppList"": [
                 {
                 ""Name"": ""nbuild"",
-                ""Version"": ""1.2.0"",
+                ""Version"": ""1.3.0"",
                 ""AppFileName"": ""nb.exe"",
                 ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
                 ""DownloadedFile"": ""$(Version).zip"",
@@ -115,6 +115,50 @@ namespace NbuildTests
 
             // Assert
             Assert.IsTrue(result.IsSuccess());
+
+            //teardown
+            TeardownTestModeFlag();
+        }
+
+        [TestMethod()]
+        public void DownloadUriNotFoundTest()
+        {
+            // Arrange
+            SetupTestModeFlag();
+            // JSON string for test setup
+            var json = @"{
+                ""Version"": ""1.2.0"",
+                ""NbuildAppList"": [
+                {
+                ""Name"": ""nbuild"",
+                ""Version"": ""0.0.0"",
+                ""AppFileName"": ""nb.exe"",
+                ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
+                ""DownloadedFile"": ""$(Version).zip"",
+                ""InstallCommand"": ""powershell.exe"",
+                ""InstallArgs"": ""-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force"",
+                ""InstallPath"": ""C:\\Temp\\nbuild2"",
+                ""UninstallCommand"": ""powershell.exe"",
+                ""UninstallArgs"": ""-Command Remove-Item -Path '$(InstallPath)' -Recurse -Force""
+                }
+            ]
+            }";
+
+            try
+            {
+                // Act
+                var result = Command.Download(json, true);
+            }
+            catch (Exception ex)
+            {
+                // Assert
+                Assert.ThrowsException<ArgumentNullException>(() => { throw ex; });
+
+                // Assert
+                Assert.IsTrue(ex.Message.Contains("StatusCode: 404"));
+
+                Assert.IsTrue(ex.Message.Contains("Not Found"));
+            }
 
             //teardown
             TeardownTestModeFlag();
