@@ -3,7 +3,7 @@
   "NbuildAppList": [
     {
       "Name": "SysInternals",
-      "Version": "2.20.0.0",
+      "Version": "2.90.0.0",
       "AppFileName": "$(InstallPath)\\sigcheck64.exe",
       "WebDownloadFile": "https://download.sysinternals.com/files/SysinternalsSuite.zip",
       "DownloadedFile": "SysinternalsSuite.zip",

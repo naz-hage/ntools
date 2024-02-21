@@ -155,6 +155,7 @@ namespace Nbuild
 
             return result;
         }
+        
         public static ResultHelper List(string? json, bool verbose = false)
         {
             Verbose = verbose;
@@ -173,13 +174,17 @@ namespace Nbuild
             {
                 // display app and installed version
                 // InstalledAppFileVersionGreterOrEqual is true, print green, else print red
-                if (InstalledAppFileVersionGreaterOrEqual(app))
+                if (IsAppVersionEqual(app))
                 {
-                    Colorizer.WriteLine($"[{ConsoleColor.Green}!| {app.Name,-18} | {app.Version,-14} | {GetNbuildAppFileVersion(app),-18}|]");
+                    Colorizer.WriteLine($"[{ConsoleColor.Green}!| {app.Name,-18} | {app.Version,-14} | {GetAppFileVersion(app),-18}|]");
+                }
+                else if (IsAppVersionGreaterOrEqual(app))
+                {
+                    Colorizer.WriteLine($"[{ConsoleColor.Cyan}!| {app.Name,-18} | {app.Version,-14} | {GetAppFileVersion(app),-18}|]");
                 }
                 else
                 {
-                    Colorizer.WriteLine($"[{ConsoleColor.Red}!| {app.Name,-18} | {app.Version,-14} | {GetNbuildAppFileVersion(app),-18}|]");
+                    Colorizer.WriteLine($"[{ConsoleColor.Red}!| {app.Name,-18} | {app.Version,-14} | {GetAppFileVersion(app),-18}|]");
                 }
             }
 
@@ -283,9 +288,9 @@ namespace Nbuild
 
             if (!Directory.Exists(DownloadsDirectory)) Directory.CreateDirectory(DownloadsDirectory);
 
-            if (InstalledAppFileVersionGreaterOrEqual(nbuildApp))
+            if (IsAppVersionGreaterOrEqual(nbuildApp))
             {
-                Colorizer.WriteLine($"[{ConsoleColor.Yellow}!√ {nbuildApp.Name} {nbuildApp.Version} already installed.]");
+                Colorizer.WriteLine($"[{ConsoleColor.Yellow}!√ {nbuildApp.Name} {GetAppFileVersion(nbuildApp)} already installed.]");
                 return ResultHelper.Success();
             }
 
@@ -334,7 +339,7 @@ namespace Nbuild
                     
                     //Colorizer.WriteLine($"[{ConsoleColor.Red}!X {appData.Name} {appData.Version} failed to install: {resultInstall.GetFirstOutput()}]");
                     Colorizer.WriteLine($"[{ConsoleColor.Red}!X {nbuildApp.Name} {nbuildApp.Version} failed to install: {process.ExitCode}]");
-                    DisplayCodeAndOutput(result);
+                    if (Verbose) DisplayCodeAndOutput(result);
                     return ResultHelper.Fail(process.ExitCode, $"Failed to install {nbuildApp.Name} {nbuildApp.Version}");
                 }
             }
@@ -346,9 +351,9 @@ namespace Nbuild
 
         private static ResultHelper SuccessfullInstall(NbuildApp nbuildApp, ResultHelper result)
         {
-            if (InstalledAppFileVersionGreaterOrEqual(nbuildApp))
+            if (IsAppVersionGreaterOrEqual(nbuildApp))
             {
-                Colorizer.WriteLine($"[{ConsoleColor.Green}!√ {nbuildApp.Name} {nbuildApp.Version} installed.]");
+                Colorizer.WriteLine($"[{ConsoleColor.Green}!√ {nbuildApp.Name} {GetAppFileVersion(nbuildApp)} installed.]");
                 return ResultHelper.Success();
             }
             else
@@ -396,7 +401,7 @@ namespace Nbuild
             }
 
             // if app is not installed, return success with app not installed message
-            if (!InstalledAppFileVersionGreaterOrEqual(nbuildApp))
+            if (!IsAppVersionGreaterOrEqual(nbuildApp))
             {
                 Colorizer.WriteLine($"[{ConsoleColor.Yellow}!√ {nbuildApp.Name} {nbuildApp.Version} not installed.]");
                 return ResultHelper.Success();
@@ -440,7 +445,7 @@ namespace Nbuild
             }
         }
 
-        private static string? GetNbuildAppFileVersion(NbuildApp nbuildApp)
+        private static string? GetAppFileVersion(NbuildApp nbuildApp)
         {
             try
             {
@@ -457,30 +462,38 @@ namespace Nbuild
             }
         }
 
-        private static bool InstalledAppFileVersionGreaterOrEqual(NbuildApp nbuildApp)
+        private static bool IsAppVersionGreaterOrEqual(NbuildApp nbuildApp, bool equal = false)
         {
-            var currentVersion = GetNbuildAppFileVersion(nbuildApp);
+            var currentVersion = GetAppFileVersion(nbuildApp);
             if (currentVersion == null)
             {
                 return false;
             }
+
             if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{nbuildApp.Name} {nbuildApp.Version} current version: {currentVersion}]");
 
+            if (!Version.TryParse(currentVersion, out Version? currentVersionParsed)) return false;
 
-            var result = Version.TryParse(currentVersion, out Version? currentVersionParsed);
-            if (!result)
-            {
-                return false;
-            }
+            if (!Version.TryParse(nbuildApp.Version, out Version? versionParsed)) return false;
 
-            result = Version.TryParse(nbuildApp.Version, out Version? versionParsed);
-            if (!result)
-            {
-                return false;
-            }
-
-            //if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{nbuildApp.Name} current version: {currentVersion} >=  {nbuildApp.Version}: {currentVersionParsed >= versionParsed}]");
             return currentVersionParsed >= versionParsed;
+        }
+
+        private static bool IsAppVersionEqual(NbuildApp nbuildApp)
+        {
+            var currentVersion = GetAppFileVersion(nbuildApp);
+            if (currentVersion == null)
+            {
+                return false;
+            }
+
+            if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{nbuildApp.Name} {nbuildApp.Version} current version: {currentVersion}]");
+
+            if (!Version.TryParse(currentVersion, out Version? currentVersionParsed)) return false;
+
+            if (!Version.TryParse(nbuildApp.Version, out Version? versionParsed)) return false;
+
+            return currentVersionParsed == versionParsed;
         }
 
         public static IEnumerable<NbuildApp> GetApps(string? json)
