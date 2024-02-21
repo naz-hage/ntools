@@ -152,10 +152,7 @@ namespace NbuildTests
             catch (Exception ex)
             {
                 // Assert
-                Assert.ThrowsException<ArgumentNullException>(() => { throw ex; });
-
-                // Assert
-                Assert.IsTrue(ex.Message.Contains("StatusCode: 404"));
+                Assert.IsTrue(ex.Message.Contains("(404)"));
 
                 Assert.IsTrue(ex.Message.Contains("Not Found"));
             }

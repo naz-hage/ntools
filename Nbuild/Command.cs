@@ -201,7 +201,7 @@ namespace Nbuild
 
             // print header
             Colorizer.WriteLine($"[{ConsoleColor.Yellow}! |--------------------|--------------------------------|-----------------|]");
-            Colorizer.WriteLine($"[{ConsoleColor.Yellow}! | App name           | Downloaded File                | (hh:mm:ss.ff)   |]");
+            Colorizer.WriteLine($"[{ConsoleColor.Yellow}! | App name           | Downloaded file                | (hh:mm:ss.ff)   |]");
             Colorizer.WriteLine($"[{ConsoleColor.Yellow}! |--------------------|--------------------------------|-----------------|]");
             foreach (var app in apps)
             {
@@ -239,18 +239,13 @@ namespace Nbuild
 
             var fileName = $"{DownloadsDirectory}\\{nbuildApp.DownloadedFile}";
             
-            var httpClient = new HttpClient();
-            // set host as trusted
-            var uri = new Uri(nbuildApp.WebDownloadFile);
-            if (uri == null) return ResultHelper.Fail(-1, $"Invalid uri");
-
-            Nfile.SetTrustedHosts([uri.Host]);
-            Uri uriResult;
-            var validUri = Uri.TryCreate(uri.ToString(), UriKind.Absolute, out uriResult!);
-            var extension = Path.GetExtension(uriResult!.AbsolutePath);
+            // *** Important **
+            // Set trusted Host and extension.  This assumes that due diligence has been done to ensure the file is safe to download
+            Nfile.SetTrustedHosts([new Uri(nbuildApp.WebDownloadFile).Host]);
+            var extension = Path.GetExtension(new Uri(nbuildApp.WebDownloadFile).AbsolutePath);
             Nfile.SetAllowedExtensions([extension]);
 
-            var result = Task.Run(async () => await httpClient.DownloadAsync(uri, fileName)).Result;
+            var result = Task.Run(async () => await Nfile.DownloadAsync(nbuildApp.WebDownloadFile, fileName)).Result;
 
             if (Verbose)
             {
@@ -301,7 +296,7 @@ namespace Nbuild
             {
                 Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{nbuildApp.Name} {nbuildApp.Version} downloaded.]");
 
-                // Install the downloaded file
+                // Install the Downloaded file
                 var process = new Process
                 {
                     StartInfo =
