@@ -593,5 +593,24 @@ namespace NbuildTasks
             }
             return false;
         }
+
+        public bool IsGitRepository(string currentDirectory)
+        {
+            Process.StartInfo.Arguments = "rev-parse --is-inside-work-tree";
+            var result = Process.LockStart(Verbose);
+            if ((result.Code == 0) && (result.Output.Count >= 0))
+            {
+                foreach (var line in result.Output)
+                {
+                    if (Verbose) Console.WriteLine(line);
+                    if (line.Contains("fatal: not a git repository"))
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
     }
 }

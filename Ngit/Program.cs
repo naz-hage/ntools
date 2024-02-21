@@ -28,8 +28,15 @@ if (!string.IsNullOrEmpty(options.GitCommand))
 
 if (ReturnCode != RetCode.Success)
 {
-
-    Colorizer.WriteLine($"{NgitAssemblyExe} Completed with [{ConsoleColor.Red}!'{ReturnCode}']");
+    if (ReturnCode == RetCode.NotAGitRepository)
+    {
+       if (options.Verbose) Colorizer.WriteLine($"Current directory is not git repo [{ConsoleColor.Cyan}!'{RetCode.NotAGitRepository}']\n");
+       ReturnCode = RetCode.Success;
+    }
+    else
+    {
+        Colorizer.WriteLine($"{NgitAssemblyExe} Completed with [{ConsoleColor.Red}!'{ReturnCode}']\n");
+    }
 }
 
 return Convert.ToInt32(ReturnCode);

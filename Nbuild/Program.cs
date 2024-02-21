@@ -94,7 +94,7 @@ public class Program
             }
         }
 
-        DisplayGitInfo();
+        DisplayGitInfo(options!.Verbose);
 
         return (int)result.Code;
     }
@@ -122,7 +122,7 @@ public class Program
         return options.Json;
     }
 
-    private static void DisplayGitInfo()
+    private static void DisplayGitInfo(bool verbose)
     {
         var process = new Process
         {
@@ -140,7 +140,7 @@ public class Program
         var resultHelper = process.LockStart(false);
         if (!resultHelper.IsSuccess())
         {
-            Console.WriteLine($"==> Failed to display git info:{resultHelper.GetFirstOutput()}");
+            if (verbose) Console.WriteLine($"==> Failed to display git info:{resultHelper.GetFirstOutput()}");
         }
     }
 }
