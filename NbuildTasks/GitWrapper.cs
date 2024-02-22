@@ -65,7 +65,6 @@ namespace NbuildTasks
             return Process.StartInfo.WorkingDirectory;
         }
 
-
         public bool SetWorkingDir(string url)
         {
             var projectName = url.Split('/').Last().Split('.').First();
@@ -477,8 +476,6 @@ namespace NbuildTasks
             return false;
         }
 
-
-
         public ResultHelper CloneProject(string url)
         {
             if (string.IsNullOrEmpty(url))
@@ -584,6 +581,7 @@ namespace NbuildTasks
 
             return branches;
         }
+
         private bool CheckForErrorAndDisplayOutput(List<string> lines)
         {
             foreach (var line in lines)
