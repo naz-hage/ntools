@@ -63,7 +63,7 @@
     },
     {
       "Name": "Visual Studio Code",
-      "Version": "1.85.2",
+      "Version": "1.86.2.0",
       "AppFileName": "$(InstallPath)\\Code.exe",
       "WebDownloadFile": "https://aka.ms/win32-x64-system-stable",
       "DownloadedFile": "VSCodeSetup-x64-$(Version).exe",
@@ -75,7 +75,7 @@
     },
     {
       "Name": "Docker",
-      "Version": "4.26.1",
+      "Version": "4.27.2.0",
       "AppFileName": "$(InstallPath)\\Docker Desktop.exe",
       "WebDownloadFile": "https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe",
       "DownloadedFile": "Docker Desktop Installer.exe",
@@ -87,7 +87,7 @@
     },
     {
       "Name": "Nuget",
-      "Version": "6.8.0.131",
+      "Version": "6.9.1.3",
       "AppFileName": "$(InstallPath)\\nuget.exe",
       "WebDownloadFile": "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe",
       "DownloadedFile": "nuget.exe",
@@ -99,7 +99,7 @@
     },
     {
       "Name": "SysInternals",
-      "Version": "2.20.0.0",
+      "Version": "2.90.0.0",
       "AppFileName": "$(InstallPath)\\sigcheck64.exe",
       "WebDownloadFile": "https://download.sysinternals.com/files/SysinternalsSuite.zip",
       "DownloadedFile": "SysinternalsSuite.zip",

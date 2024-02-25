@@ -24,7 +24,7 @@
             GetTagFailed = -13,
             GetBranchFailed = -14,
             SetTagFailed = -15,
-
+            NotAGitRepository = -16,
         }
     }
 }

@@ -21,6 +21,8 @@ namespace Ngit
         {
             if (GitWrapper == null) return RetCode.GitWrapperFailed;
 
+            if (!GitWrapper.IsGitRepository(Environment.CurrentDirectory)) return RetCode.NotAGitRepository;
+
             GitWrapper.Verbose = options.Verbose;
 
             var retCode = options.GitCommand switch

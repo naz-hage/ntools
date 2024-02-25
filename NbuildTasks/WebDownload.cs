@@ -1,4 +1,5 @@
 ﻿using Microsoft.Build.Framework;
+using Ntools;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -15,8 +16,7 @@ namespace NbuildTasks
 
         public override bool Execute()
         {
-            HttpClient httpClient = new HttpClient();
-            var result = Task.Run(async () => await httpClient.DownloadFileAsync(new Uri(WebUri), FileName)).Result;
+            var result = Task.Run(async () => await Nfile.DownloadAsync(WebUri, FileName)).Result;
 
             if (result.IsSuccess())
             {

@@ -65,7 +65,6 @@ namespace NbuildTasks
             return Process.StartInfo.WorkingDirectory;
         }
 
-
         public bool SetWorkingDir(string url)
         {
             var projectName = url.Split('/').Last().Split('.').First();
@@ -477,8 +476,6 @@ namespace NbuildTasks
             return false;
         }
 
-
-
         public ResultHelper CloneProject(string url)
         {
             if (string.IsNullOrEmpty(url))
@@ -584,12 +581,32 @@ namespace NbuildTasks
 
             return branches;
         }
+
         private bool CheckForErrorAndDisplayOutput(List<string> lines)
         {
             foreach (var line in lines)
             {
                 return line.ToLower().Contains("error") ||
                     line.ToLower().Contains("fatal");
+            }
+            return false;
+        }
+
+        public bool IsGitRepository(string currentDirectory)
+        {
+            Process.StartInfo.Arguments = "rev-parse --is-inside-work-tree";
+            var result = Process.LockStart(Verbose);
+            if ((result.Code == 0) && (result.Output.Count >= 0))
+            {
+                foreach (var line in result.Output)
+                {
+                    if (Verbose) Console.WriteLine(line);
+                    if (line.Contains("fatal: not a git repository"))
+                    {
+                        return false;
+                    }
+                }
+                return true;
             }
             return false;
         }

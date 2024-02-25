@@ -30,7 +30,7 @@ for %%F in (%FILES%) do (
 :skip
 set SRC=%DevDrive%\%MainDir%\ntools\nbuild\resources
 set DST=%programfiles%\nbuild
-set FILES=common.targets node.targets mongodb.targets ngit.targets apps-versions.targets git.targets dotnet.targets code.targets
+set FILES=app-docker.json ntools.json
 for %%F in (%FILES%) do (
     xcopy "%SRC%\%%F" "%DST%\" /d /y
 )
