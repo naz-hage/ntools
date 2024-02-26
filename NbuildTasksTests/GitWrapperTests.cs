@@ -282,7 +282,16 @@ namespace NbuildTasks.Tests
             var result = gitWrapper.GetGitUserNameConfiguration();
 
             // Assert
-            Assert.IsNotNull(result);
+            // if running in GitHub Actions, git Email is not configured, if running locally, git is configured
+            // ignore the test if running in GitHub Actions
+            if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") == null)
+            {
+                Assert.IsNotNull(result);
+            }
+            else
+            {
+                Assert.Inconclusive();
+            }
         }
 
         [TestMethod()]
@@ -295,14 +304,16 @@ namespace NbuildTasks.Tests
             var result = gitWrapper.GetGitUserEmailConfiguration();
 
             // Assert
-            // Assert
             // if running in GitHub Actions, git Email is not configured, if running locally, git is configured
             // ignore the test if running in GitHub Actions
             if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") == null)
             {
                 Assert.IsNotNull(result);
             }
-
+            else
+            {
+                Assert.Inconclusive();
+            }
         }
 
         [TestMethod()]
@@ -320,6 +331,10 @@ namespace NbuildTasks.Tests
             if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") == null)
             {
                 Assert.IsTrue(result);
+            }
+            else
+            {
+                Assert.Inconclusive();
             }
         }
     }
