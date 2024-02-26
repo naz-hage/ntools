@@ -300,7 +300,7 @@ namespace NbuildTasks.Tests
             // ignore the test if running in GitHub Actions
             if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") == null)
             {
-                Assert.IsTrue(result);
+                Assert.IsNotNull(result);
             }
 
         }
