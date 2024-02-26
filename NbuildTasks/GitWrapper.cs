@@ -12,7 +12,7 @@ namespace NbuildTasks
     {
         private const string GitBinary = "git.exe";
 
-        public static Process Process = new Process
+        private static readonly Process Process = new Process
         {
             StartInfo = new ProcessStartInfo
             {
@@ -25,7 +25,6 @@ namespace NbuildTasks
                 UseShellExecute = false,
             }
         };
-
 
         public bool Verbose = false;
 
@@ -58,13 +57,6 @@ namespace NbuildTasks
             if (verbose) Console.WriteLine($"GitWrapper.Process.StartInfo.WorkingDirectory: {Process.StartInfo.WorkingDirectory}");
         }
 
-        public string GetWorkingDir()
-        {
-            if (Verbose) Console.WriteLine($"GitWrapper.Process.StartInfo.WorkingDirectory: {Process.StartInfo.WorkingDirectory}");
-
-            return Process.StartInfo.WorkingDirectory;
-        }
-
         public bool SetWorkingDir(string url)
         {
             var projectName = url.Split('/').Last().Split('.').First();
@@ -88,28 +80,10 @@ namespace NbuildTasks
 
         public string Tag => GetTag();
 
-        public string AutoTag(string buildType)
+        public string WorkingDirectory
         {
-            if (string.IsNullOrEmpty(buildType))
-            {
-                Console.WriteLine($"BuildType is null or empty");
-                return string.Empty;
-            }
-
-            if (buildType.Equals("Staging", StringComparison.OrdinalIgnoreCase))
-            {
-                return StagingTag();
-            }
-            else if (buildType.Equals("Production", StringComparison.OrdinalIgnoreCase))
-            {
-                return ProductionTag();
-            }
-            else
-            {
-                Console.WriteLine($"Unknown buildType: {buildType}");
-                return string.Empty;
-            }
-
+            get { return Process.StartInfo.WorkingDirectory; }
+            set { Process.StartInfo.WorkingDirectory = value; }
         }
 
         public string SetAutoTag(string buildType)
@@ -126,90 +100,6 @@ namespace NbuildTasks
             }
 
             return nextTag;
-        }
-
-        //private string AutoTagProduction()
-        //{
-        //    var currentTag = GetTag();
-
-        //    return ProductionTag(currentTag);
-        //}
-
-        //private string AutoTagStaging()
-        //{
-        //    var currentTag = GetTag();
-
-        //    return StagingTag(currentTag);
-
-        //}
-
-        public string StagingTag()
-        {
-            var tag = GetTag();
-            if (tag == null)
-            {
-                return null;
-            }
-
-            if (IsValid4Tag(tag))
-            {
-                string[] items4 = tag.Split('.');
-                tag = $"{items4[0]}.{items4[1]}.{items4[2]}";
-            }
-
-            if (!IsValidTag(tag))
-            {
-                return null;
-            }
-            else
-            {
-                string[] version = tag.Split('.');
-                version[2] = ((Int32.Parse(version.Last())) + 1).ToString();
-                return string.Join(".", version);
-            }
-        }
-
-        /// <summary>
-        /// Given a valid tag, get tag
-        /// given a valid tag m.n.p, production tag is m.n.p+1
-        /// </summary>
-        /// <param name="tag"></param>
-        /// <returns>return valid Production tag, otherwise null if failed</returns>
-        public string ProductionTag()
-        {
-            var tag = GetTag();
-            if (tag == null)
-            {
-                return null;
-            }
-
-            // for backward compatibility, convert 4 digits tag to 3 digits tag
-            if (IsValid4Tag(tag))
-            {
-                string[] items4 = tag.Split('.');
-                tag = $"{items4[0]}.{items4[1]}.{items4[2]}";
-            }
-
-            if (!IsValidTag(tag))
-            {
-                return null;
-            }
-            else
-            {
-                string[] version = tag.Split('.');
-                version[1] = ((Int32.Parse(version[1])) + 1).ToString();
-                version[2] = "0";
-                try
-                {
-                    string productionTag = string.Join(".", version);
-                    return IsValidTag(productionTag) ? productionTag : null;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Exception occurred when building a production tag: {ex.Message}");
-                    return null;
-                }
-            }
         }
 
         /// <summary>
@@ -281,56 +171,6 @@ namespace NbuildTasks
         private bool TagExist(string newTag)
         {
             return LocalTagExists(newTag) || RemoteTagExists(newTag);
-        }
-
-        private bool IsValid4Tag(string newTag)
-        {
-            if (string.IsNullOrEmpty(newTag))
-            {
-                return false;
-            }
-
-            string[] items = newTag.Split('.');
-            if (items == null || items.Length != 4)
-            {
-                return false;
-            }
-            else
-            {
-                foreach (var item in items)
-                {
-                    if (!UInt32.TryParse(item, out _))
-                    {
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }
-
-        public bool IsValidTag(string newTag)
-        {
-            if (string.IsNullOrEmpty(newTag))
-            {
-                return false;
-            }
-
-            string[] items = newTag.Split('.');
-            if (items == null || items.Length != 3)
-            {
-                return false;
-            }
-            else
-            {
-                foreach (var item in items)
-                {
-                    if (!UInt32.TryParse(item, out _))
-                    {
-                        return false;
-                    }
-                }
-            }
-            return true;
         }
 
         /// <summary>
@@ -610,5 +450,246 @@ namespace NbuildTasks
             }
             return false;
         }
+
+        /// <summary>
+        /// Check if git is Configured
+        /// </summary>
+        /// <param name="silent">If true, suppresses the console output for configuration instructions.</param>
+        /// <returns>True if git is configured, otherwise False</returns>
+        public bool IsGitConfigured(bool silent = false)
+        {
+            if (!string.IsNullOrEmpty(GetGitUserNameConfiguration()) && !string.IsNullOrEmpty(GetGitUserEmailConfiguration()))
+            {
+                return true;
+            }
+
+            if (!silent)
+            {
+                Console.WriteLine("Git is not configured. To configure git, run the commands below:\n");
+                Console.WriteLine("git config --global user.name <YourName>");
+                Console.WriteLine("git config --global user.email <your.email@example.com>");
+            }
+
+            return false;
+        }
+        
+        /// <summary>
+        /// Get git global user.name configuration.
+        /// </summary>
+        /// <returns>The git global user.name if configured, otherwise null.</returns>
+        public string GetGitUserNameConfiguration()
+        {
+            Process.StartInfo.Arguments = "config --global user.name";
+            var result = Process.LockStart(Verbose);
+            if ((result.Code == 0) && (result.Output.Count >= 0))
+            {
+                foreach (var line in result.Output)
+                {
+                    if (Verbose) Console.WriteLine(line);
+                    if (line.Contains("fatal: unable to read config file"))
+                    {
+                        return null;
+                    }
+                    else
+                    {
+                        return line;
+                    }
+                }
+                return null;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Get git global user.email configuration.
+        /// </summary>
+        /// <returns>The git global user.email if configured, otherwise null.</returns>
+        public string GetGitUserEmailConfiguration()
+        {
+            Process.StartInfo.Arguments = "config --global user.email";
+            var result = Process.LockStart(Verbose);
+            if ((result.Code == 0) && (result.Output.Count >= 0))
+            {
+                foreach (var line in result.Output)
+                {
+                    if (Verbose) Console.WriteLine(line);
+                    if (line.Contains("fatal: unable to read config file"))
+                    {
+                        return null;
+                    }
+                    else
+                    {
+                        return line;
+                    }
+                }
+                return null;
+            }
+            return null;
+        }
+
+        #region tag related methods
+        /// <summary>
+        /// Validates if the provided tag is a valid 4-part tag.
+        /// </summary>
+        /// <param name="tag">The tag to be validated.</param>
+        /// <returns><c>true</c> if the tag is valid; otherwise, <c>false</c>.</returns>
+        public bool IsValid4Tag(string tag)
+        {
+            if (string.IsNullOrEmpty(tag))
+            {
+                return false;
+            }
+
+            string[] items = tag.Split('.');
+            if (items == null || items.Length != 4)
+            {
+                return false;
+            }
+            else
+            {
+                foreach (var item in items)
+                {
+                    if (!UInt32.TryParse(item, out _))
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Determines whether the specified tag is a valid 3-part tag.
+        /// </summary>
+        /// <param name="tag">The tag to validate.</param>
+        /// <returns><c>true</c> if the tag is valid; otherwise, <c>false</c>.</returns>
+        public bool IsValidTag(string tag)
+        {
+            if (string.IsNullOrEmpty(tag))
+            {
+                return false;
+            }
+
+            string[] items = tag.Split('.');
+            if (items == null || items.Length != 3)
+            {
+                return false;
+            }
+            else
+            {
+                foreach (var item in items)
+                {
+                    if (!UInt32.TryParse(item, out _))
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Automatically generates a tag based on the build type.
+        /// </summary>
+        /// <param name="buildType">The build type: `production` or `staging`.</param>
+        /// <param name="tag">The tag.</param>
+        /// <returns>The generated tag if the buildType is `production` or `staging`.  Otherwise throw a message</returns>
+        public string AutoTag(string buildType)
+        {
+            if (string.IsNullOrEmpty(buildType))
+            {
+                Console.WriteLine($"BuildType is null or empty");
+                return string.Empty;
+            }
+
+            if (buildType.Equals(Enums.BuildType.STAGING.ToString(), StringComparison.OrdinalIgnoreCase))
+            {
+                return StagingTag();
+            }
+            else if (buildType.Equals(Enums.BuildType.PRODUCTION.ToString(), StringComparison.OrdinalIgnoreCase))
+            {
+                return ProductionTag();
+            }
+            else
+            {
+                Console.WriteLine($"Unknown buildType: {buildType}");
+                throw new ArgumentException($"Unknown buildType: {buildType}");
+            }
+        }
+
+
+        /// <summary>
+        /// Returns the staging tag based on the provided tag.
+        /// </summary>
+        /// <param name="tag">The tag to generate the staging tag from.</param>
+        /// <returns>The staging tag.</returns>
+        public string StagingTag()
+        {
+            var tag = Tag;
+            if (tag == null)
+            {
+                return null;
+            }
+
+            if (IsValid4Tag(tag))
+            {
+                string[] items4 = tag.Split('.');
+                tag = $"{items4[0]}.{items4[1]}.{items4[2]}";
+            }
+
+            if (!IsValidTag(tag))
+            {
+                return null;
+            }
+            else
+            {
+                string[] version = tag.Split('.');
+                version[2] = ((Int32.Parse(version.Last())) + 1).ToString();
+                return string.Join(".", version);
+            }
+        }
+
+        /// <summary>
+        /// Generates a production tag based on the provided tag.
+        /// </summary>
+        /// <param name="tag">The input tag.</param>
+        /// <returns>The generated production tag, or null if the input tag is invalid.</returns>
+        public string ProductionTag()
+        {
+            var tag = Tag;
+            if (tag == null)
+            {
+                return null;
+            }
+            
+            // for backward compatibility, convert 4 digits tag to 3 digits tag
+            if (IsValid4Tag(tag))
+            {
+                string[] items4 = tag.Split('.');
+                tag = $"{items4[0]}.{items4[1]}.{items4[2]}";
+            }
+
+            if (!IsValidTag(tag))
+            {
+                return null;
+            }
+            else
+            {
+                string[] version = tag.Split('.');
+                version[1] = ((Int32.Parse(version[1])) + 1).ToString();
+                version[2] = "0";
+                try
+                {
+                    string productionTag = string.Join(".", version);
+                    return IsValidTag(productionTag) ? productionTag : null;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Exception occurred when building a production tag: {ex.Message}");
+                    return null;
+                }
+            }
+        }
+        #endregion
     }
 }

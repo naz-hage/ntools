@@ -25,6 +25,7 @@
             GetBranchFailed = -14,
             SetTagFailed = -15,
             NotAGitRepository = -16,
+            GitNotConfigured = -17,
         }
     }
 }

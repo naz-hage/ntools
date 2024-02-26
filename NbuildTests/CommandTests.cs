@@ -176,8 +176,11 @@ namespace NbuildTests
 
             ResourceHelper.ExtractEmbeddedResourceFromAssembly(assembly, ResourceLocation, json);
 
+            // Replace C:\\Program Files\\Nbuild with C:\\Temp\\nbuild2
+            string jsonContent = File.ReadAllText(json);
+            jsonContent = jsonContent.Replace("$(ProgramFiles)", "C:\\\\Temp");
             // Act
-            var result = Command.Install(json);
+            var result = Command.Install(jsonContent);
 
             if (!result.IsSuccess() && result.Output.Count > 0)
             {

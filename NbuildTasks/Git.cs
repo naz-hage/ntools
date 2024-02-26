@@ -8,8 +8,6 @@ namespace NbuildTasks
         private const string GetBranchCommand = "GetBranch";
 
         private const string AutoTagCommand = "AutoTag";
-        private const string StagingBuildType = "Staging";
-        private const string ProductionBuildType = "Production";
 
         private const string SetTagCommand = "SetTag";
         private const string DeleteTagCommand = "DeleteTag";
@@ -34,6 +32,12 @@ namespace NbuildTasks
             }
             Log.LogMessage($"NbuildTask: {Command}");
             var gitWrapper = new GitWrapper(project: null, verbose: false);
+            if (!gitWrapper.IsGitConfigured())
+            {
+                Log.LogError("Git is not configured");
+                return !Log.HasLoggedErrors;
+            }
+
             switch (Command)
             {
                 case GetTagCommand:
@@ -48,11 +52,11 @@ namespace NbuildTasks
 
                 case AutoTagCommand:
                     if (!string.IsNullOrEmpty(TaskParameter) &&
-                        (TaskParameter == StagingBuildType || TaskParameter == ProductionBuildType))
+                        Enums.BuildType.TryParse<Enums.BuildType>(TaskParameter, true, out var buildType))
                     {
                         Log.LogMessage($"BuildType: {TaskParameter}");
 
-                        Output = gitWrapper.AutoTag(TaskParameter);
+                        Output = gitWrapper.AutoTag(buildType.ToString());
                     }
                     else
                     {
