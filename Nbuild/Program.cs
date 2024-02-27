@@ -175,10 +175,16 @@ public class Program
     }
 
     /// <summary>
-    /// Updates the JSON option based on the provided command.
+    /// Updates the Json property of the provided Cli options object.
+    /// If the Json property is null or empty and the Command property matches certain values, 
+    /// the Json property is set to a default path.
+    /// If the Json property contains a placeholder for the ProgramFiles environment variable, 
+    /// this placeholder is replaced with the actual value of the environment variable.
+    /// If a file does not exist at the path specified by the Json property, a FileNotFoundException is thrown.
     /// </summary>
-    /// <param name="options">The command line options.</param>
-    /// <returns>The updated JSON option.</returns>
+    /// <param name="options">The Cli options object to update.</param>
+    /// <returns>The updated Json property of the Cli options object.</returns>
+    /// <exception cref="FileNotFoundException">Thrown when no file exists at the path specified by the Json property.</exception>
     private static string? UpdateJsonOption(Cli options)
     {
         if ((string.IsNullOrEmpty(options.Json) && !string.IsNullOrEmpty(options.Command)) &&
@@ -188,15 +194,16 @@ public class Program
                     options.Command.Equals(CmdDownload, StringComparison.InvariantCultureIgnoreCase)))
         {
             options.Json = $"{Environment.GetEnvironmentVariable("ProgramFiles")}\\Nbuild\\ntools.json";
-            if (File.Exists(options.Json))
-            {
-                return options.Json;
-            }
         }
 
         if (!string.IsNullOrEmpty(options.Json))
         {
             options.Json = options.Json.Replace("$(ProgramFiles)", Environment.GetEnvironmentVariable("ProgramFiles"));
+        }
+
+        if (!File.Exists(options.Json))
+        {
+            throw new FileNotFoundException($"Json File '{options.Json}' not found");
         }
 
         return options.Json;
