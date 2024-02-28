@@ -16,9 +16,15 @@ public class Cli
     public string? Command { get; set; }
 
     [OptionalArgument("$(ProgramFiles)\\nbuild\\ntools.json", "json", "Specifies the JSON file that holds the list of apps. Only valid for the install, download, and list commands.\n" +
-        "\t Sample JSON file: https://github.com/naz-hage/ntools/blob/main/Nbuild/resources/app-ntools.json")]
+        "\t Sample JSON file: https://github.com/naz-hage/ntools/blob/main/Nbuild/resources/app-ntools.json\n" +
+        "\t ")]
     public string? Json { get; set; }
 
-    [OptionalArgument(false, "v", "Sets the verbose level.")]
+    [OptionalArgument(false, "v", "Optional parameter which sets the console output verbose level\n" +
+        "\t ----\n" +
+        "\t - if no command line options are specified with the -v option , i.e.: 'Nb.exe staging -v true` \n" +
+        "\t   `Nb` will run an MSbuild target `staging` defined in a `nbuild.targets` file which present in the solution folder.\n" +
+        "\t   Run `Nb.exe -t Targets` to list the available targets. \n" +
+        "\t -v Possible Values:")]
     public bool Verbose { get; set; }
 }
