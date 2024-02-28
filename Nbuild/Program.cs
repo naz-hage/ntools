@@ -143,35 +143,6 @@ public class Program
             default:
                 return ResultHelper.Fail(int.MaxValue, "Display Help");
         }
-
-        //if (args.Length == 1)
-        //{
-        //    options = new Cli() { Verbose = true };
-        //    return BuildStarter.Build(null, verbose);
-        //}
-        //else if (args.Length == 1 && args[0].Contains(CmdHelp, StringComparison.InvariantCultureIgnoreCase))
-        //{
-        //    return ResultHelper.Fail(int.MaxValue, "Display Help");
-        //}
-        //else if (args.Length == 1 && !args[0].Contains(CmdHelp, StringComparison.InvariantCultureIgnoreCase))
-        //{
-        //    string? target = args[0];
-
-        //    return BuildStarter.Build(target, verbose);
-        //}
-        //else if (args.Length == 3
-        //    && args[1].Equals("-v", StringComparison.InvariantCultureIgnoreCase)
-        //    && (bool.TryParse(args[2], out verbose)))
-        //{
-        //    options.Verbose = verbose;
-        //    string? target = args[0];
-
-        //    return BuildStarter.Build(target, verbose);
-        //}
-        //else
-        //{
-        //    return ResultHelper.Fail(CodeTargetNotRunning, "Target not specified");
-        //}
     }
 
     /// <summary>
