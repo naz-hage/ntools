@@ -23,6 +23,8 @@ namespace Ngit
 
             if (!GitWrapper.IsGitRepository(Environment.CurrentDirectory)) return RetCode.NotAGitRepository;
 
+            if (!GitWrapper.IsGitConfigured()) return RetCode.GitNotConfigured;
+
             GitWrapper.Verbose = options.Verbose;
 
             var retCode = options.GitCommand switch
@@ -37,7 +39,7 @@ namespace Ngit
                 _ => Default(options)
             };
 
-            if (options.Verbose) Console.WriteLine($"Command.Process.StartInfo.WorkingDirectory: {GitWrapper.Process.StartInfo.WorkingDirectory}");
+            if (options.Verbose) Console.WriteLine($"Command.Process.StartInfo.WorkingDirectory: {GitWrapper.WorkingDirectory}");
 
             if (retCode == RetCode.Success) DisplayResults(GitWrapper.Branch, GitWrapper.Tag);
 
@@ -153,8 +155,8 @@ namespace Ngit
             if (result.IsSuccess())
             {
                 // reset Process.StartInfo.WorkingDirectory
-                var solutionDir = GitWrapper.Process.StartInfo.WorkingDirectory;
-                GitWrapper.Process.StartInfo.WorkingDirectory = solutionDir;
+                var solutionDir = GitWrapper.WorkingDirectory;
+                GitWrapper.WorkingDirectory = solutionDir;
 
                 Colorizer.WriteLine($"[{ConsoleColor.Green}!√ Project cloned to `{solutionDir}`.]");
             }

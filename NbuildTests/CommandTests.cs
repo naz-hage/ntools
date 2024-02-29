@@ -5,6 +5,7 @@ using Ntools;
 using System.Collections;
 using System.Diagnostics;
 using System.Reflection;
+using System.Text.Json;
 
 namespace NbuildTests
 {
@@ -176,8 +177,17 @@ namespace NbuildTests
 
             ResourceHelper.ExtractEmbeddedResourceFromAssembly(assembly, ResourceLocation, json);
 
+            // Replace C:\\Program Files\\Nbuild with C:\\Temp\\nbuild2
+            string jsonContent = File.ReadAllText(json);
+            jsonContent = jsonContent.Replace("$(ProgramFiles)\\\\Nbuild", "C:\\\\Temp");
+
+            // print json content to console as indented json
+
+            Console.WriteLine(jsonContent);
+           
+
             // Act
-            var result = Command.Install(json);
+            var result = Command.Install(jsonContent);
 
             if (!result.IsSuccess() && result.Output.Count > 0)
             {

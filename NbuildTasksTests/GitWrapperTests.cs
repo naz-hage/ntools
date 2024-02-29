@@ -1,10 +1,11 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NbuildTasks;
+﻿using NbuildTasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace NbuildTasksTests
+
+namespace NbuildTasks.Tests
 {
     [TestClass()]
     public class GitWrapperTests : TestFirst
@@ -14,8 +15,8 @@ namespace NbuildTasksTests
         public GitWrapperTests()
         {
             Console.WriteLine($"Current Directory: {Directory.GetCurrentDirectory()}");
-            Console.WriteLine($"GitWrapper.Parameters.WorkingDir: {GitWrapper.Process.StartInfo.WorkingDirectory}");
-            Assert.AreEqual(GitWrapper.Process.StartInfo.WorkingDirectory, Directory.GetCurrentDirectory());
+            Console.WriteLine($"GitWrapper.Parameters.WorkingDir: {GitWrapper.WorkingDirectory}");
+            Assert.AreEqual(GitWrapper.WorkingDirectory, Directory.GetCurrentDirectory());
             Console.WriteLine($"Current Branch: {GitWrapper.Branch}");
             Console.WriteLine($"Current Tag: {GitWrapper.Tag}");
         }
@@ -47,14 +48,20 @@ namespace NbuildTasksTests
         [TestMethod, TestCategory("Manual"), Ignore("test because it is failing when run in GitHub Actions")]
         public void SetAutoTagTest()
         {
+            // Arrange
             var buildTypes = new List<string>
             {
-                "staging", "production"
+                Enums.BuildType.STAGING.ToString(), Enums.BuildType.PRODUCTION.ToString()
             };
 
             Console.WriteLine("Test for SetAutoTagTest");
             foreach (var buildType in buildTypes)
             {
+                var test = Enums.BuildType.TryParse<Enums.BuildType>(buildType, true, out var buildTypeOut);
+
+                Assert.IsTrue(test);
+                Assert.AreEqual(buildType, buildTypeOut.ToString());
+
                 Console.WriteLine($"Current tag: {GitWrapper.Tag}");
                 var tag = GitWrapper.SetAutoTag(buildType);
                 Console.WriteLine($"expected Tag: {tag}, buildType: {buildType}");
@@ -213,7 +220,7 @@ namespace NbuildTasksTests
         public void ListRemoteTagsTest()
         {
             // Arrange add a tag
-            var tag = GitWrapper.SetAutoTag("staging");
+            var tag = GitWrapper.SetAutoTag(Enums.BuildType.STAGING.ToString());
             Assert.IsTrue(GitWrapper.SetTag(tag));
             GitWrapper.PushTag(tag);
 
@@ -236,7 +243,7 @@ namespace NbuildTasksTests
         {
             // Arrange add a tag
             var localTags = GitWrapper.ListLocalTags();
-            var tag = GitWrapper.SetAutoTag("staging");
+            var tag = GitWrapper.SetAutoTag(Enums.BuildType.STAGING.ToString());
             Assert.IsTrue(GitWrapper.SetTag(tag));
 
             var expectedCount = localTags.Count + 1;
@@ -262,7 +269,73 @@ namespace NbuildTasksTests
 
             // Assert
             Assert.IsTrue(result);
-            Assert.AreEqual(solutionDir, gitWrapper.GetWorkingDir());
+            Assert.AreEqual(solutionDir, gitWrapper.WorkingDirectory);
+        }
+
+        [TestMethod()]
+        public void GetGitUserNameConfigurationTest()
+        {
+            // Arrange
+            var gitWrapper = new GitWrapper(project: null, verbose: true);
+
+            // Act
+            var result = gitWrapper.GetGitUserNameConfiguration();
+
+            // Assert
+            // if running in GitHub Actions, git Email is not configured, if running locally, git is configured
+            // ignore the test if running in GitHub Actions
+            if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") == null)
+            {
+                Assert.IsNotNull(result);
+            }
+            else
+            {
+                Assert.Inconclusive();
+            }
+        }
+
+        [TestMethod()]
+        public void GetGitUserEmailConfigurationTest()
+        {
+            // Arrange
+            var gitWrapper = new GitWrapper(project: null, verbose: true);
+
+            // Act
+            var result = gitWrapper.GetGitUserEmailConfiguration();
+
+            // Assert
+            // if running in GitHub Actions, git Email is not configured, if running locally, git is configured
+            // ignore the test if running in GitHub Actions
+            if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") == null)
+            {
+                Assert.IsNotNull(result);
+            }
+            else
+            {
+                Assert.Inconclusive();
+            }
+        }
+
+        [TestMethod()]
+        public void IsGitConfiguredTest()
+        {
+            // Arrange
+            var gitWrapper = new GitWrapper(project: null, verbose: true);
+
+            // Act
+            var result = gitWrapper.IsGitConfigured();
+
+            // Assert
+            // if running in GitHub Actions, git UserName is not configured, if running locally, git is configured
+            // ignore the test if running in GitHub Actions
+            if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") == null)
+            {
+                Assert.IsTrue(result);
+            }
+            else
+            {
+                Assert.Inconclusive();
+            }
         }
     }
 }

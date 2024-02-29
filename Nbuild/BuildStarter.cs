@@ -17,6 +17,12 @@ public class BuildStarter
     private const string TargetsMd = "targets.md";
     private const string MsbuildExe = "msbuild.exe";
 
+    /// <summary>
+    /// Builds the specified target using nbuild.
+    /// </summary>
+    /// <param name="target">The target to build. If null, the default target will be built.</param>
+    /// <param name="verbose">Specifies whether to display verbose output during the build process.</param>
+    /// <returns>A <see cref="ResultHelper"/> object representing the result of the build operation.</returns>
     public static ResultHelper Build(string? target, bool verbose = false)
     {
         string nbuildPath = Path.Combine(Environment.CurrentDirectory, BuildFileName);
@@ -35,7 +41,7 @@ public class BuildStarter
 
         ExtractBatchFile();
 
-        Console.WriteLine($"MSBuild started with '{target ?? "Default"}' target");
+        Console.WriteLine($"MSBuild started with Target: '{target ?? "Default"}' | verbose:{ verbose}");
 
         LogFile = Path.Combine(Environment.CurrentDirectory, LogFile);
         string cmd = string.IsNullOrEmpty(target)
@@ -61,7 +67,7 @@ public class BuildStarter
 
         Console.WriteLine($"==> {process.StartInfo.FileName} {process.StartInfo.Arguments}");
 
-        var result = process.LockStart(true);
+        var result = process.LockStart(verbose);
 
         DisplayLog(5);
         return result;
