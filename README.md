@@ -22,12 +22,11 @@ Don't hesitate to write an [issue](https://github.com/naz-hage/ntools/issues) if
 [Nbackup](./Nbackup/README.md) is a tool that leverages `robocopy` to backup a list of files and folders from a source to a destination. It is designed to be reliable and efficient, ensuring that your data is safe.
 - Nbackup command line options:
 ```
- Nbackup.exe [-i value] [-n value] [-performbackup value]
-
- 
-      - `i`       : input backup file which specifies source, destination and backup options. See [backup.json](./nBackup/Data/backup.json) for a sample input backup json file. (string, default=)
-      - `v`       : Verbose Values: true | false.  Default is false (true or false, default=False)
-      - `performbackup` : Values: true | false.  false displays options and does not perform backup (default=True)
+ Nbackup.exe [-i value] [-e value] [-v value] [-performbackup value]
+  - i             : input json file which specifies source, destination and backup options. (string, default=)
+  - e             : Extract input json example file to current directory. (string, default=)
+  - v             : Verbose level (true or false, default=False)
+  - performbackup :  Set to false to verify json file without backup (true or false, default=True)
 ```
 ## Nbuild (Nb)
 [Nbuild](./Nbuild/README.md) is a tool that launches MSBuild with a target to build. It simplifies the build process and makes it easier to manage your projects.
@@ -43,15 +42,25 @@ Don't hesitate to write an [issue](https://github.com/naz-hage/ntools/issues) if
 - Nb.exe generates `nbuild.bat` to the solution folder and uses `common.targets` from $(ProgramFiles)\Nbuild.
 - Expects `nbuild.targets` file in the solution folder.
 ```cmd
- Usage:
- Nb.exe [-c value] [-json value]
-  - c    : command. value = [targets | install | download | list | ]
-         targets         -> List available targets and save in targets.md file
-         install         -> Download and install apps specified in -json option, requires admin priviledges
-         download        -> Download apps specified in -json option, requires admin priviledges
-         list            -> List apps specified in -json option (string, default=)
-  - json : json file which holds apps list. Valid only for -c install | download | list option
-         sample json file: https://github.com/naz-hage/ntools/blob/main/Nbuild/resources/app-ntools.json" (string, default=)
+ Nb.exe [-c value] [-json value] [-v value]
+  - c    : Specifies the command to execute. Possible values: targets, install, uninstall, download, list.
+         targets         -> Lists available targets and saves them in the targets.md file.
+         install         -> Downloads and installs apps specified in the -json option.
+         uninstall       -> Uninstalls apps specified in the -json option.
+         download        -> Downloads apps specified in the -json option.
+         list            -> Lists apps specified in the -json option.
+         ----
+         - By default, the -json option points to the ntools deployment folder: $(ProgramFiles)\build\tools.json.
+         - The install, uninstall, and download commands require admin privileges to run. (string, default=)
+  - json : Specifies the JSON file that holds the list of apps. Only valid for the install, download, and list commands.
+         Sample JSON file: https://github.com/naz-hage/ntools/blob/main/Nbuild/resources/app-ntools.json
+          (string, default=$(ProgramFiles)\nbuild\ntools.json)
+  - v    : Optional parameter which sets the console output verbose level
+         ----
+         - if no command line options are specified with the -v option , i.e.: 'Nb.exe staging -v true`
+           `Nb` will run an MSbuild target `staging` defined in a `nbuild.targets` file which present in the solution folder.
+           Run `Nb.exe -t Targets` to list the available targets.
+         -v Possible Values: (true or false, default=False)
 ```
 
 
@@ -126,22 +135,18 @@ Don't hesitate to write an [issue](https://github.com/naz-hage/ntools/issues) if
 
 Usage:
  ```batch
- Ng.exe [-git value] [-org value] [-url value] [-branch value] [-tag value] [-buildtype value] [-v value]
-  - git       : git Command, value= [gettag | settag| autotag| autoversion| deletetag | getbranch | setbranch| createbranch]
-         gettag          -> Get tag of a branch for a given project
-         settag          -> Set specied tag of a branch for a given project
-         autotag                 -> Set next tag based of branch and project on STAGING vs.PRODUCTION build (commit to remote repo)
-         autoversion     -> Equivalent to `autotag` cmd (Does not commit to remote repo)
-         deletetag       -> Delete specified tag of a branch for a given Project
-         getbranch       -> Get the current branch for a given project
-         setbranch       -> Set/checkout specified branch for a given project
-         createbranch    -> Create specified branch for a given project
-         clone           -> Clone a Project (string, default=)
-  - org       : Organization Name (string, default=)
-  - url       : GitHub Url Name (string, default=)
-  - branch    : Branch Name (string, default=)
-  - tag       : Tag Name (string, default=)
-  - buildtype : Values: STAGING | PRODUCTION (string, default=)
+Ng.exe [-c value] [-url value] [-tag value] [-buildtype value] [-v value]
+  - c         : git Command, value= [tag | settag| autotag| setautotag| deletetag | branch | clone]
+     tag         -> Get the current tag
+     autotag     -> Set next tag based on the build type: STAGING vs.PRODUCTION
+     pushtag     -> push specified tag in -tag option to remote repo
+     settag      -> Set specified tag in -tag option
+     deletetag   -> Delete specified tag in -tag option
+     branch      -> Get the current branch
+     clone       -> Clone specified Git repo in the -url option (string, default=)
+  - url       : Git repo path (string, default=)
+  - tag       : Tag used for -c settag and -c deletetag (string, default=)
+  - buildtype : Build type used for -c autotag and -c setautotag Values: STAGING | PRODUCTION (string, default=)
   - v         : verbose. value = [true | false] (true or false, default=False)
  ```
 ## NbuildTasks
