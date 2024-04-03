@@ -16,6 +16,15 @@ Don't settle for mediocre tools when you can have the `NTools` at your disposal.
 
 Don't hesitate to write an [issue](https://github.com/naz-hage/`NTools`/issues) if you have any questions or suggestions.
 
+## Table of contents
+1. [Installation](#installation)
+2. [Ntools](#ntools)
+    - [Nbackup](#nbackup)
+    - [Nbuild](#nbuild)
+    - [Ngit](#ngit)
+    - [NbuildTasks](#nbuildtasks)
+3. [Additional Information](#additional-information)
+
 ## Installation
 To get started with the `NTools` repository, follow these steps:
 
@@ -37,16 +46,8 @@ To get started with the `NTools` repository, follow these steps:
    This command will install the Dotnet Core Desktop runtime and download the `NTools` from GitHub. The tools will be installed in the `C:\Program Files\Nbuild` folder.
 
 ## NTools
-1. [Nbackup](#Nbackup)
-2. [Nbuild](#Nbuild)
-    - [nbuild.targets](#nbuild.targets)
-    - [common.targets](#common.targets)
-3. [Ngit](#Ngit)
-4. [NbuildTasks](#Nbuildtasks)
-5. [Installation](#Installation)
-6. [Usage](#Usage)
 
-## Nbackup
+### Nbackup
 `Nbackup` is a tool that leverages `robocopy` to backup a list of files and folders from a source to a destination. It is designed to be reliable and efficient, ensuring that your data is safe.
 - Nbackup command line options:
 ```
@@ -56,7 +57,7 @@ To get started with the `NTools` repository, follow these steps:
   - v             : Verbose level (true or false, default=False)
   - performbackup :  Set to false to verify json file without backup (true or false, default=True)
 ```
-## Nbuild
+### Nbuild
 `Nbuild` (`Nb`) is a tool that launches MSBuild with a target to build.
 
 - Nb.exe is a command line tool that installs the development tools and runtimes required to build and test the solution. It is a wrapper for MSBuild and provides a simplified interface for building solutions. It also provides a way to define and run custom targets.
@@ -130,7 +131,7 @@ Open a Terminal and navigate to your solution folder.
     Nb.exe -c targets
     ```
 
-### nbuild.targets
+**nbuild.targets**:
 - `nbuild.targets` is a MSBuild file that imports `common.targets`.
 - The following properties are required in `nbuild.targets`:
     - SolutionName: The name of the solution file.
@@ -151,7 +152,7 @@ Open a Terminal and navigate to your solution folder.
             <BinaryFiles Include="$(Solut
         ```
                     
-### common.targets
+**common.targets**:
 - `common.targets` is imported by `nbuild.targets`.
 
 - Common TARGETS:
@@ -188,7 +189,7 @@ Open a Terminal and navigate to your solution folder.
 | HandleError | Prints a high importance message stating that an error occurred while reading the version file. |
 
 
-## Ngit
+### Ngit
 `Ngit` (`Ng`) is simple wrapper for `Git` tool that perform simple commands such as get tag and set tag.
 
 **Usage**:
@@ -207,7 +208,7 @@ Ng.exe [-c value] [-url value] [-tag value] [-buildtype value] [-v value]
   - buildtype : Build type used for -c autotag and -c setautotag Values: STAGING | PRODUCTION (string, default=)
   - v         : verbose. value = [true | false] (true or false, default=False)
  ```
-## NbuildTasks
+### NbuildTasks
 `NbuildTasks` is a class library that exposes `MSBuild` tasks. It is used by `Nbuild` to perform various tasks such as web download and tools installation during the build of any project.
 
 NbuildTasks defines a few additional Tasks that can be used during builds. Here are a few examples:
