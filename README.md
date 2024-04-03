@@ -16,7 +16,7 @@ Don't settle for mediocre tools when you can have the `NTools` at your disposal.
 
 Don't hesitate to write an [issue](https://github.com/naz-hage/`NTools`/issues) if you have any questions or suggestions.
 
-# Installation
+## Installation
 To get started with the `NTools` repository, follow these steps:
 
 1. Clone this repository to your local machine.
@@ -36,7 +36,7 @@ To get started with the `NTools` repository, follow these steps:
 
    This command will install the Dotnet Core Desktop runtime and download the `NTools` from GitHub. The tools will be installed in the `C:\Program Files\Nbuild` folder.
 
-# NTools
+## NTools
 1. [Nbackup](#Nbackup)
 2. [Nbuild](#Nbuild)
     - [nbuild.targets](#nbuild.targets)
