@@ -400,3 +400,4 @@ FodyWeavers.xsd
 /__azurite_db_blob__.json
 /nuget-push.bat
 **/launchSettings.json
+/site
