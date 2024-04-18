@@ -79,6 +79,18 @@ function Main {
     setx DevDrive $devDrive
     setx MainDir $mainDir
 
+    # add deployment path to the PATH environment variable if it doesn't already exist
+    $deploymentPath = $env:ProgramFiles + "\NBuild"
+    $path = [Environment]::GetEnvironmentVariable("PATH", "Machine")
+    if ($path -notlike "*$deploymentPath*") {
+        Write-Host "Adding $deploymentPath to the PATH environment variable."
+        [Environment]::SetEnvironmentVariable("PATH", $path + ";$deploymentPath", "Machine")
+    }
+    else
+    {
+        Write-Host "$deploymentPath already exists in the PATH environment variable."
+    }
+
     $nbExePath = "$env:ProgramFiles\Nbuild\nb.exe"
     & $nbExePath -c install -json ntools.json 
 }
