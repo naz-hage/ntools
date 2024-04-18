@@ -1,0 +1,23 @@
+site_name: Ntools
+site_description: Software Tools Collection.
+site_author: naz-hage
+repo_name: ntools
+repo_url: https://github.com/naz-hage/ntools
+edit_uri: edit/main/docs/
+
+theme:
+  name: readthedocs
+  language: en
+
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - Usage: usage.md
+  - Ntools:
+      - Nbackup: ntools/nbackup.md
+      - Nbuild: ntools/nbuild.md
+      - NbuildTasks: ntools/nbuildtasks.md
+      - Ngit: ntools/ngit.md
+  - Additional information: 
+      - additional-information.md
+      - changelog.md
