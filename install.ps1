@@ -1,6 +1,12 @@
-# Set variables
-$DevDrive = "c:"
-$MainDir = "source"
+[cmdletbinding()]
+param(
+    [Parameter(Mandatory = $false)]
+    [String]
+    $DevDrive = "C:",
+    [Parameter(Mandatory = $false)]
+    [String]
+    $MainDir = "source"
+)
 
 # Check if admin
 if (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
