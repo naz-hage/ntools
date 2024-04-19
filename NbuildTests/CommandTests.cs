@@ -5,7 +5,6 @@ using Ntools;
 using System.Collections;
 using System.Diagnostics;
 using System.Reflection;
-using System.Text.Json;
 
 namespace NbuildTests
 {
@@ -21,7 +20,7 @@ namespace NbuildTests
         private bool? LocalTestMode;
 
         // Resource location for test setup
-        private readonly string ResourceLocation = "Nbuild.resources.app-ntools.json";
+        private readonly string ResourceLocation = "Nbuild.app-ntools.json"; //"Nbuild.resources.app-ntools.json";
 
         // Method to teardown test mode flag
         private void TeardownTestModeFlag()
@@ -174,6 +173,18 @@ namespace NbuildTests
 
             string json = Path.Combine(executingAssemblyDirectory, NbuildAppListJsonFile);
             var assembly = Path.Combine(executingAssemblyDirectory, NbuildAssemblyName);
+
+            // Obtain the Assembly object representing the currently Nb.dll assembly
+            Assembly nbAssembly = Assembly.LoadFrom(assembly);
+
+            // Call GetManifestResourceNames on the executingAssembly object
+            string[] resources = nbAssembly.GetManifestResourceNames();
+            Console.WriteLine($"Resources in the assembly: {assembly}");
+
+            foreach (string resource in resources)
+            {
+                Console.WriteLine(resource);
+            }
 
             ResourceHelper.ExtractEmbeddedResourceFromAssembly(assembly, ResourceLocation, json);
 

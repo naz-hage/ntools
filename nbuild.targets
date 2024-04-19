@@ -180,21 +180,19 @@
         <Message Text="==> CODE_DONE"/>
 	</Target>
 
-	<!-- Setup Prerequisite Development Environment -->
-	<Target Name="PRE_TOOLS" >
-		<Exec Command='powershell -command ".\InstallPrerequisites.ps1"' WorkingDirectory="$(SolutionDir)\Nbuild\resources"/>
-
-	    <Message Text="==> DONE"/>
-	</Target>
-
 	<!-- Setup Development Environment -->
-	<Target Name="DEV_ENV" DependsOnTargets="
-					PRE_TOOLS;
-					">
+	<Target Name="DEV_SETUP" DependsOnTargets="IS_ADMIN">
+		<Exec Command='powershell -command ".\Install.ps1"' WorkingDirectory="$(SolutionDir)\DevSetup"/>
 
 	    <Message Text="==> DONE"/>
 	</Target>
-	
+
+	<!-- Build docs locally for testing -->
+	<Target Name="MKDOCS" >
+		<Exec Command='mkdocs build' WorkingDirectory="$(SolutionDir)"/>
+		<Exec Command='mkdocs serve' WorkingDirectory="$(SolutionDir)"/>
+	    <Message Text="==> DONE"/>
+	</Target>
 	<!-- Download Nbuild specified in the NbuildTargetVersion -->
 	<Target Name="NBUILD_DOWNLOAD" DependsOnTargets="IS_ADMIN">
 		<PropertyGroup>
@@ -244,20 +242,6 @@
 
         <Message Text="$(CodeAppName) installed version: $(Version)" />
         <Message Text="==> CODE_DONE"/>
-	</Target>
-
-	<!-- Setup Prerequisite Development Environment -->
-	<Target Name="PRE_TOOLS" >
-		<Exec Command='powershell -command ".\install.ps1"' WorkingDirectory="$(SolutionDir)"/>
-
-	    <Message Text="==> DONE"/>
-	</Target>
-
-	<!-- Setup Development Environment -->
-	<Target Name="DEV_ENV" DependsOnTargets="
-					PRE_TOOLS;
-					">
-	    <Message Text="==> DONE"/>
 	</Target>
 
 	<!-- Update App metadata json files in nbuild\resources -->

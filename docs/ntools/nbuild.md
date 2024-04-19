@@ -15,7 +15,7 @@ More details on `nbuild.targets` and `common.targets` can be found at the end of
 **Generates:**
 
 - `nbuild.bat` used to run MSBuild to build any target defined in `*.targets` files.
-- [`targets.md`](./targets.md) which lists all the targets defined in `*.targets` files.
+- [common targets](#commontargets) which lists all the targets defined in `*.targets` files.
 
 ### Usage
 ```cmd
