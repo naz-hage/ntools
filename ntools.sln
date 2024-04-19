@@ -8,6 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{E9FCB2FE-4245-44DF-A7DE-189496E1431F}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\dotnet-desktop.yml = .github\workflows\dotnet-desktop.yml
+		.github\workflows\publish-docs.yml = .github\workflows\publish-docs.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{35AAB912-8196-4DE2-B5DA-98E9F4340A8D}"
