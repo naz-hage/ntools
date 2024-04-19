@@ -46,6 +46,7 @@ function GetAppInfo {
     $appInfo.AppFileName = $appInfo.AppFileName -replace '\$\(ProgramFiles\)', $env:ProgramFiles
 
     $appInfo.InstallCommand = $appInfo.InstallCommand -replace '\$\(Version\)', $appInfo.Version
+    
     $appInfo.InstallArgs = $appInfo.InstallArgs -replace '\$\(InstallPath\)', $appInfo.InstallPath
     $appInfo.InstallArgs = $appInfo.InstallArgs -replace '\$\(Version\)', $appInfo.Version
 
@@ -54,7 +55,7 @@ function GetAppInfo {
     $appInfo.DownloadedFile = $appInfo.DownloadedFile -replace '\$\(Version\)', $appInfo.Version
 
     $appInfo.WebDownloadFile = $appInfo.WebDownloadFile -replace '\$\(Version\)', $appInfo.Version
-
+    $appInfo.InstallCommand = $appInfo.InstallCommand -replace '\$\(DownloadedFile\)', $appInfo.DownloadedFile
     return $appInfo
 }
 

@@ -108,6 +108,18 @@
       "InstallPath": "$(ProgramFiles)\\SysInternalsSuite",
       "UninstallCommand": "powershell.exe",
       "UninstallArgs": "-Command Remove-Item -Path '$(InstallPath)' -Recurse -Force"
+    },
+    {
+      "Name": "Python",
+      "Version": "3.12.2",
+      "AppFileName": "$(InstallPath)\\python.exe",
+      "WebDownloadFile": "https://www.python.org/ftp/python/$(Version)/python-$(Version)-amd64.exe",
+      "DownloadedFile": "python-$(Version)-amd64.exe",
+      "InstallCommand": "$(DownloadedFile)",
+      "InstallArgs": "/quiet InstallAllUsers=1 PrependPath=1",
+      "InstallPath": "$(ProgramFiles)\\Python\\$(Version)\\",
+      "UninstallCommand": "msiexec.exe",
+      "UninstallArgs": "/x {0001-0001-0001-0001-0001-0001} /qn"
     }
   ]
 }

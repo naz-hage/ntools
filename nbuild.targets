@@ -246,7 +246,7 @@
 
 	<!-- Update App metadata json files in nbuild\resources -->
 	<Target Name="UPDATE_APPS" AfterTargets="TEST">
-	    <Exec Command='xcopy c:\temp\apps\*.* .\nbuild\resources /d /y' WorkingDirectory="$(SolutionDir)"/>
+	    <Exec Command='xcopy c:\temp\apps\*.* .\DevSetup /d /y' WorkingDirectory="$(SolutionDir)"/>
 		<Message Text="==> DONE"/>
 	</Target>
 
