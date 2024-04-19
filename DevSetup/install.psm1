@@ -1,30 +1,4 @@
-<#
-.SYNOPSIS
-    This script installs an application based on the provided JSON configuration file.
 
-.DESCRIPTION
-    The script contains functions to prepare the downloads directory, retrieve application information from the JSON file,
-    check if the application is already installed, install the application, and perform the main installation process.
-
-.PARAMETER directory
-    The directory path where the downloads directory will be created.
-
-.PARAMETER jsonFile
-    The path to the JSON configuration file containing the application information.
-
-.PARAMETER command
-    The command to execute for the main installation process.
-
-.PARAMETER json
-    The path to the JSON configuration file containing the application information.
-
-.NOTES
-    Author: Your Name
-    Date:   Current Date
-
-.EXAMPLE
-    Install-App -directory "C:\Downloads" -jsonFile "C:\Config\app.json" -command "install" -json "C:\Config\app.json"
-#>
 function PrepareDownloadsDirectory {
     param (
         [Parameter(Mandatory=$true)]
@@ -39,9 +13,6 @@ function PrepareDownloadsDirectory {
     icacls.exe $directory /grant 'Administrators:(OI)(CI)F' /inheritance:r
     
 }
-
-$downloadsDirectory = "c:\NToolsDownloads"
-$MyInvocation.MyCommand.Name = Split-Path -Leaf $PSCommandPath
 
 function GetAppInfo {
     param (
@@ -184,9 +155,6 @@ function MainInstallApp {
 }
 
 $downloadsDirectory = "c:\NToolsDownloads"
-$MyInvocation.MyCommand.Name = Split-Path -Leaf $PSCommandPath
-
-
 
 function CheckIfDotnetInstalled {
     param (
