@@ -43,6 +43,8 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "*" ]
+  workflow_call:
+
 
 jobs:
 
