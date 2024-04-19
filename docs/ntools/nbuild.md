@@ -30,7 +30,7 @@ More details on `nbuild.targets` and `common.targets` can be found at the end of
          - By default, the -json option points to the `NTools` deployment folder: $(ProgramFiles)\build\tools.json.
          - The install, uninstall, and download commands require admin privileges to run. (string, default=)
   - json : Specifies the JSON file that holds the list of apps. Only valid for the install, download, and list commands.
-         Sample JSON file: https://github.com/naz-hage/`NTools`/blob/main/Nbuild/resources/app-`NTools`.json
+         Sample JSON file: https://github.com/naz-hage/`NTools`/blob/main/DevSetup//app-`NTools`.json
           (string, default=$(ProgramFiles)\nbuild\`NTools`.json)
   - v    : Optional parameter which sets the console output verbose level
          ----
