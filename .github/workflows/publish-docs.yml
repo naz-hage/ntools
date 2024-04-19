@@ -39,4 +39,4 @@ jobs:
         - name: Update docs	
           run: |	
             mkdocs build	
-            mkdocs gh-deploy	
+            mkdocs gh-deploy --force
