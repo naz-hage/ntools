@@ -8,7 +8,7 @@
       "WebDownloadFile": "https://www.python.org/ftp/python/$(Version)/python-$(Version)-amd64.exe",
       "DownloadedFile": "python-$(Version)-amd64.exe",
       "InstallCommand": "$(DownloadedFile)",
-      "InstallArgs": "/quiet InstallAllUsers=1 PrependPath=1",
+      "InstallArgs": "/quiet InstallAllUsers=1 PrependPath=1 TargetDir=\u0022$(InstallPath)\\\u0022",
       "InstallPath": "$(ProgramFiles)\\Python\\$(Version)\\",
       "UninstallCommand": "msiexec.exe",
       "UninstallArgs": "/x {0001-0001-0001-0001-0001-0001} /qn"
