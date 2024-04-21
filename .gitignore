@@ -401,3 +401,4 @@ FodyWeavers.xsd
 /nuget-push.bat
 **/launchSettings.json
 /site
+/targets.md
