@@ -1,5 +1,3 @@
-## Nbuild
-
 - [Usage](#usage)
 - [nbuild.targets](#nbuildtargets)
 - [common.targets](#commontargets)

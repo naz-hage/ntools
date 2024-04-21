@@ -10,13 +10,14 @@ theme:
   language: en
 
 nav:
-  - Home: index.md
-  - Installation: installation.md
-  - Usage: usage.md
-  - Ntools:
+  - Getting Started: 
+    - overview.md
+    - installation.md
+    - usage.md
+  - List of Tools:
       - Nbackup: ntools/nbackup.md
       - Nbuild: ntools/nbuild.md
       - NbuildTasks: ntools/nbuildtasks.md
       - Ngit: ntools/ngit.md
-  - Additional information: 
+  - Revisions: 
       - changelog.md

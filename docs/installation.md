@@ -1,5 +1,7 @@
 
-## Installation
+### Prerequisites
+- Install the latest version of [64-bit Git for Windows](https://git-scm.com/download/win) on your machine.
+
 To get started with the `NTools` repository, follow these steps:
 
 - Open a PowerShell in administrative mode.  Let's assume that the source code will be cloned to the `c:\source` folder.
@@ -26,3 +28,9 @@ cd ntools\DevSetup
 - This command will install the Dotnet Core Desktop runtime and download the `NTools` from GitHub, then installs the Ntools in the `%ProgramFiles%\Nbuild` folder.  The `%ProgramFiles%\Nbuild` will be added to the system path.  The `Install.ps1` script also sets up the following environment variables:
     - `%DevDrive%` is a string parameter that represents the drive where the development environment will be set up. It is not mandatory , and if it is not provided when the script is run, it will default to `C:`.
     - `%MainDir%` is also a string parameter that represents the main directory where the development environment will be set up. It is not mandatory, and if it is not provided when the script is run, it will default to `source`.
+
+- If you prefer to use a different drive or directory, you can specify the `%DevDrive%` and `%MainDir%` parameters when running the script. For example, to install the development tools on the `D:` drive in the `Development` directory, run the following command:
+
+```cmd
+.\install.ps1 -DevDrive D -MainDir Development
+```

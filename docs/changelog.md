@@ -1,4 +1,3 @@
-[Next](#next)
 ## Version 1.4.0 - 25-apr-24
 
 - Complete [issue #37](https://github.com/naz-hage/ntools/issues/37)
@@ -61,9 +60,7 @@
 
 - Use DevDrive and MainDir from environment variables if they exist.  Otherwise, use default values.
     - This applies to common.targets and NbuildTasks
-
 - Refactor Nbackup - remove cli options src, dest, and options and use json input only file instead.
-- 
 - Update documentation
 - Reference: [issue#23](https://github.com/naz-hage/ntools/issues/23)
 
