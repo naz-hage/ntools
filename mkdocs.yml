@@ -11,7 +11,7 @@ theme:
 
 nav:
   - Getting Started: 
-    - overview.md
+    - Overview: index.md
     - installation.md
     - usage.md
   - List of Tools:
