@@ -161,5 +161,76 @@ namespace NbuildTests
                 Assert.AreEqual(target.Value, isValid);
             }
         }
+
+        [TestMethod]
+        public void TestSingleLineCommentAndTarget()
+        {
+            // Arrange
+            string testFileName = "testFile.txt";
+            File.WriteAllLines(testFileName, new string[]
+            {
+                    "<!-- Single-line comment -->",
+                    "<Target Name=\"Target1\" />"
+            });
+
+            // Act
+            var result = BuildStarter.GetTargetsAndComments(testFileName).ToList();
+
+            // Assert
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual("Target1             | Single-line comment", result[0]);
+
+            // Cleanup
+            File.Delete(testFileName);
+        }
+
+        [TestMethod]
+        public void TestMultiLineCommentAndTarget()
+        {
+            // Arrange
+            string testFileName = "testFile.txt";
+            File.WriteAllLines(testFileName, new string[]
+            {
+            "<!-- Start of",
+            "multi-line comment -->",
+            "<Target Name=\"Target2\" />"
+            });
+
+            // Act
+            var result = BuildStarter.GetTargetsAndComments(testFileName).ToList();
+
+            // Assert
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual("Target2             | Start of multi-line comment", result[0]);
+
+            // Cleanup
+            File.Delete(testFileName);
+        }
+
+        [TestMethod]
+        public void TestMultipleTargets()
+        {
+            // Arrange
+            string testFileName = "testFile.txt";
+            File.WriteAllLines(testFileName, new string[]
+            {
+            "<!-- Comment for Target1 -->",
+            "<Target Name=\"Target1\" />",
+            "</Target>",
+            "<!-- Comment for Target2 -->",
+            "<Target Name=\"Target2\" />"
+            });
+
+            // Act
+            var result = BuildStarter.GetTargetsAndComments(testFileName).ToList();
+
+            // Assert
+            Assert.AreEqual(2, result.Count);
+            Assert.AreEqual("Target1             | Comment for Target1", result[0]);
+            Assert.AreEqual("Target2             | Comment for Target2", result[1]);
+
+            // Cleanup
+            File.Delete(testFileName);
+        }
     }
 }

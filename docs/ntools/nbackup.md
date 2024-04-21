@@ -10,3 +10,27 @@
   - v             : Verbose level (true or false, default=False)
   - performbackup :  Set to false to verify json file without backup (true or false, default=True)
 ```
+
+A sample json file is provided below:
+
+```json
+{
+  "BackupsList": [
+    {
+      "Source": ".",
+      "Destination": "%APPDATA%\\ntools",
+      "ExcludeFolders": [
+        ".git",
+        ".vs"
+      ],
+      "ExcludeFiles": [
+        "*.exe",
+        "*.dll",
+        "*.pdb"
+      ],
+      "LogFile": "%APPDATA%\\backup.log",
+      "BackupOptions": "/V /R:5 /W:5 /MT:16 /dcopy:DAT /copy:DT"
+    }
+  ]
+}
+```

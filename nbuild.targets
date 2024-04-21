@@ -189,7 +189,7 @@
 
 	<!-- Build docs locally for testing -->
 	<Target Name="MKDOCS" >
-		<Exec Command='mkdocs build' WorkingDirectory="$(SolutionDir)"/>
+		<Exec Command='mkdocs build -d %userprofile%\ntools' WorkingDirectory="$(SolutionDir)"/>
 		<Exec Command='mkdocs serve' WorkingDirectory="$(SolutionDir)"/>
 	    <Message Text="==> DONE"/>
 	</Target>
@@ -250,7 +250,9 @@
 		<Message Text="==> DONE"/>
 	</Target>
 
-	<Target Name="GET_PRODUCT_CODES">
+	<!-- Example to get the installation 
+		Product code used for uninstallation of product -->
+	<Target Name="GET_PRODUCT_CODES" >
 		<Exec Command="wmic product where &quot;name like 'MongoDB%'&quot; get IdentifyingNumber, Name" ConsoleToMSBuild="true">
 			<Output TaskParameter="ConsoleOutput" PropertyName="ProductsList" />
 		</Exec>

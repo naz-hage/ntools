@@ -1,4 +1,10 @@
 ## Nbuild
+
+- [Usage](#usage)
+- [nbuild.targets](#nbuildtargets)
+- [common.targets](#commontargets)
+- [Examples](#examples)
+
 `Nbuild` (`Nb`) is a tool that launches MSBuild with a target to build.
 
 - Nb.exe is a command line tool that installs the development tools and runtimes required to build and test the solution. It is a wrapper for MSBuild and provides a simplified interface for building solutions. It also provides a way to define and run custom targets.
@@ -15,7 +21,7 @@ More details on `nbuild.targets` and `common.targets` can be found at the end of
 **Generates:**
 
 - `nbuild.bat` used to run MSBuild to build any target defined in `*.targets` files.
-- [common targets](#commontargets) which lists all the targets defined in `*.targets` files.
+- [common targets](nbuild-targets.md) which lists all the targets defined in `*.targets` files.
 
 ### Usage
 ```cmd
@@ -43,36 +49,6 @@ More details on `nbuild.targets` and `common.targets` can be found at the end of
 
 **If the -json option is not specified, the default json file `$(ProgramFiles)\Nbuild\`NTools`.json` is used if it exists**. 
 
-### Examples
-
-Open a Terminal and navigate to your solution folder.
-
--   Build a solution:
-
-```cmd
-Nb.exe solution
-```
-- Clean a solution:
-
-```cmd
-Nb.exe clean
-```
-
-- Run tests on a solution:
-
-```cmd
-Nb.exe test
-```
-- Create a staging build:
-
-```cmd
-Nb.exe staging
-```
-- Display available options:
-    
-```cmd
-Nb.exe -c targets
-```
 
 ### nbuild.targets
 - `nbuild.targets` is a MSBuild file that imports `common.targets`.
@@ -80,10 +56,10 @@ Nb.exe -c targets
     - SolutionName: The name of the solution file.
 ```xml
 <PropertyGroup>
-    <!--The GUID should be replaced with the solution name-->
-    <SolutionName></SolutionName>
-    <DeploymentFolder>$(ProgramFiles)\Nbuild</DeploymentFolder>
-    </PropertyGroup>
+  <!--The GUID should be replaced with the solution name-->
+  <SolutionName>$([System.IO.Path]::GetFileNameWithoutExtension('$(MSBuildProjectDirectory)'))</SolutionName>
+  <DeploymentFolder>$(ProgramFiles)\Nbuild</DeploymentFolder>
+</PropertyGroup>
 ```
 
 - The following target is required in `nbuild.targets`:
@@ -100,35 +76,24 @@ Nb.exe -c targets
 
 - Common TARGETS:
 
-| Target Name | Description |
+| **Target Name** | **Description** |
 | --- | --- |
-| PROPERTIES | Sets up properties for the build process, reads the Git tag, checks if essential properties are defined, and prints out some properties and git information. |
-| CLEAN | Cleans the solution by removing the output directories and deleting the obj directories. |
-| STAGING | Executes a series of targets for staging: CLEAN, TAG, AUTOTAG_STAGING, SOLUTION, TEST, SAVE_ARTIFACTS, PACKAGE. |
-| STAGING_DEPLOY | Executes the STAGING target and then the DEPLOY target. |
-| PRODUCTION | Executes a series of targets for production: CLEAN, TAG, |AUTOTAG_PRODUCTION, SOLUTION, TEST, SAVE_ARTIFACTS, PACKAGE. |
-| PRODUCTION_DEPLOY | Executes the PRODUCTION target and then the DEPLOY target. |
-| AUTOTAG_STAGING | Sets the build type to STAGING. |
-| AUTOTAG_PRODUCTION | Sets the build type to PRODUCTION and updates the main branch of the git repository. |
-| AUTOTAG_PRODUCTION | Increments version for a production build, but only if the current branch is 'main' || SIGN_PRODUCT | Placeholder target for signing the product. Currently, it does not perform any actions. |
-| GIT_TAG | Commits changes to the git repository, pulls the latest changes, pushes the changes, and creates a tag. |
-| AUTOTAG | Gets the git branch, reads the build type, and automatically creates a tag based on the branch and build type. |
-| SOLUTION | Builds the solution using the `dotnet build` command with the specified configuration, version, and culture. |
-| SOLUTION_MSBUILD | Restores the solution's dependencies with `dotnet restore` and then builds the solution using MSBuild with the specified configuration, platform, version, and culture. |
-| PACKAGE | Creates a zip file of the artifacts folder and then removes the artifacts folder. |
-| SAVE_ARTIFACTS | Copies various types of files (binary files, EnUSFiles, ref, RunTimesLib, Default, RunTimesLibNet, RunTimesNetStandard20, RunTimesNative) to the artifacts folder. |
-| Deploy | Checks if the user is an administrator and if the DeploymentFolder property is defined. If both conditions are met, it extracts the zip file of the artifacts folder to the deployment folder and then removes the setup folder. |
-| TEST | Runs tests on the solution with the `dotnet test` command with the specified configuration and logger settings. |
-| TEST_RELEASE | Similar to TEST, but uses the release configuration. |
-| SingleProject | Demonstrate how to build a single projec. Builds a specific project (`nbuild\nbuild.csproj`) using the `dotnet build` command with the specified configuration, runtime, version. |
-| IS_ADMIN | Checks if the user is an administrator by running the `net session` command and sets the `IsAdmin` property based on the exit code. |
-| GIT_STATUS | Displays the current git status |
-| AUTOTAG_STAGING | Increments version for a staging build |
-| SET_TAG | Sets version for a staging build |
-| GIT_PULL | Pulls the latest changes from git |
-| TAG | Gets the latest tag from git |
-| PUSH_TAG | Pushes the current tag to the remote repository |
-| GIT_BRANCH | Gets the current branch from git |
-| HandleError | Prints a high importance message stating that an error occurred while reading the version file. |
-
+| PROPERTIES          | Common properties that will be used by all targets |
+| CLEAN               | Clean up the project and artifacts folder |
+| INSTALL_DEP         | Install dependencies |
+| TELEMETRY_OPT_OUT   | Opt out of the DOTNET_CLI_TELEMETRY_OPTOUT - move to common |
+| STAGING             | Create a staging package for testing |
+| PRODUCTION          | Create a production package for release |
+| STAGING_DEPLOY      | Create a staging package and deploy for testing |
+| PRODUCTION_DEPLOY   | Create a production package and deploy for release |
+| SOLUTION            | Build the solution Release configuration  using dotnet build |
+| SOLUTION_MSBUILD    | Build the solution Release configuration  using MSBuild |
+| PACKAGE             | Create a packahe for the solution default is a zip file of all artifacts |
+| COPY_ARTIFACTS      | Save the artifacts to the artifacts folder |
+| DEPLOY              | Deploy the package. default is to extract artifacts into DeploymentProperty folder |
+| TEST                | Run all tests using dotnet test in Release mode |
+| TEST_DEBUG          | Run all tests using dotnet test in Debug mode |
+| IS_ADMIN            | Check if current process is running in admin mode AdminCheckExitCode property is set |
+| SingleProject       | Example how to build a single project |
+| HandleError         | Error handling placeholder |
 

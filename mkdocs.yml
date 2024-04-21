@@ -1,4 +1,4 @@
-site_name: Ntools
+site_name: Ntools - Work in Progress
 site_description: Software Tools Collection.
 site_author: naz-hage
 repo_name: ntools
@@ -19,5 +19,4 @@ nav:
       - NbuildTasks: ntools/nbuildtasks.md
       - Ngit: ntools/ngit.md
   - Additional information: 
-      - additional-information.md
       - changelog.md
