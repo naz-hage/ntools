@@ -1,3 +1,5 @@
+The table below lists all available targets for the Nbuild tool. 
+
 - **c:\source\ntools\nbuild.targets Targets**
 
 | **Target Name** | **Description** |
@@ -9,8 +11,13 @@
 | FILE_VERSIONS       | Test for FileVersion task and powershell file-version.ps1 |
 | NBUILD_DOWNLOAD     | Download Nbuild specified in the NbuildTargetVersion |
 | NBUILD_INSTALL      | Install Nbuild specified in the NbuildTargetVersion |
-| PRE_TOOLS           | Setup Prerequisite Development Environment |
-| DEV_ENV             | Setup Development Environment |
+| DEV_SETUP           | Setup Development Environment |
+| MKDOCS              | Build docs locally for testing |
+| NBUILD_DOWNLOAD     | Download Nbuild specified in the NbuildTargetVersion |
+|                     | Update the ntools-launcher nuget package in the local feed fot testing - not needed for normal builds |
+| NBUILD_INSTALL      | Install Nbuild specified in the NbuildTargetVersion |
+| UPDATE_APPS         | Update App metadata json files in nbuild\resources |
+| GET_PRODUCT_CODES   | Example to get the installation Product code used for uninstallation of product |
 
 
 - **C:\Program Files\Nbuild\common.targets Targets**
@@ -28,7 +35,7 @@
 | SOLUTION            | Build the solution Release configuration  using dotnet build |
 | SOLUTION_MSBUILD    | Build the solution Release configuration  using MSBuild |
 | PACKAGE             | Create a packahe for the solution default is a zip file of all artifacts |
-| SAVE_ARTIFACTS      | Save the artifacts to the artifacts folder |
+| COPY_ARTIFACTS      | Save the artifacts to the artifacts folder |
 | DEPLOY              | Deploy the package. default is to extract artifacts into DeploymentProperty folder |
 | TEST                | Run all tests using dotnet test in Release mode |
 | TEST_DEBUG          | Run all tests using dotnet test in Debug mode |

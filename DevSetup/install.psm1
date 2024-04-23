@@ -1,6 +1,3 @@
-# .\Install-app.ps1
-
-$downloadsDirectory = "c:\NToolsDownloads"
 
 function PrepareDownloadsDirectory {
     param (
@@ -49,6 +46,7 @@ function GetAppInfo {
     $appInfo.AppFileName = $appInfo.AppFileName -replace '\$\(ProgramFiles\)', $env:ProgramFiles
 
     $appInfo.InstallCommand = $appInfo.InstallCommand -replace '\$\(Version\)', $appInfo.Version
+    
     $appInfo.InstallArgs = $appInfo.InstallArgs -replace '\$\(InstallPath\)', $appInfo.InstallPath
     $appInfo.InstallArgs = $appInfo.InstallArgs -replace '\$\(Version\)', $appInfo.Version
 
@@ -57,7 +55,7 @@ function GetAppInfo {
     $appInfo.DownloadedFile = $appInfo.DownloadedFile -replace '\$\(Version\)', $appInfo.Version
 
     $appInfo.WebDownloadFile = $appInfo.WebDownloadFile -replace '\$\(Version\)', $appInfo.Version
-
+    $appInfo.InstallCommand = $appInfo.InstallCommand -replace '\$\(DownloadedFile\)', $appInfo.DownloadedFile
     return $appInfo
 }
 
@@ -79,7 +77,8 @@ function CheckIfAppInstalled {
      else
      {
         # check if the version is correct
-        $installedVersion = & .\file-version.ps1 $appInfo.AppFileName
+        #$installedVersion = & .\file-version.ps1 $appInfo.AppFileName
+        $installedVersion = MainFileVersion -FilePath $appInfo.AppFileName
         $targetVersion = $appInfo.Version
         Write-Host "$($appInfo.Name)  version: $($appInfo.Version) is found."
 
@@ -134,7 +133,7 @@ function  Install {
     }
 }
 
-function Main {
+function MainInstallApp {
     param (
         [Parameter(Mandatory=$true)]
         [string]$command,
@@ -153,7 +152,148 @@ function Main {
     else {
         Install $json
     }
+    Write-OutputMessage $MyInvocation.MyCommand.Name "Installation of $($app.Name) completed successfully."
 }
 
-# Run the Main function
-Main -command $args[0] -json $args[1]
+$downloadsDirectory = "c:\NToolsDownloads"
+
+function CheckIfDotnetInstalled {
+    param (
+        [Parameter(Mandatory=$true)]
+        [string]$dotnetVersion
+    )
+
+    # check if nbuildtasks.dll exists in the deployment path
+    $InstalledDotnetVersion = (Get-Command dotnet -ErrorAction SilentlyContinue).Version
+    Write-Host ".NET Core Version: $InstalledDotnetVersion is installed."
+
+    if ([string]::IsNullOrEmpty($InstalledDotnetVersion)) {
+        return $false
+    }
+    if ([version]$InstalledDotnetVersion -ge [version]$dotnetVersion) {
+        return $true
+    }
+    else
+    {
+        return $false
+    }
+}
+
+function InstallDotNetCore {
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$dotnetVersion)
+   
+    # Check if .NET Core is installed
+    if (CheckIfDotnetInstalled $dotnetVersion) {
+        return
+    }   
+    else
+    {
+        $dotnetInstallerUrl = "https://download.visualstudio.microsoft.com/download/pr/f18288f6-1732-415b-b577-7fb46510479a/a98239f751a7aed31bc4aa12f348a9bf/windowsdesktop-runtime-%dotnetVersion%-win-x64.exe"
+
+        # Path where the installer will be downloaded
+        $installerPath = Join-Path -Path $downloadsDirectory -ChildPath "dotnet_installer.exe"
+
+        # Download the installer if it doesn't already exist
+        if (!(Test-Path -Path $installerPath)) {
+            Invoke-WebRequest -Uri $dotnetInstallerUrl -OutFile $installerPath
+        }
+    
+        # Run the installer
+        Start-Process -FilePath $installerPath -ArgumentList "/quiet", "/norestart" -NoNewWindow -Wait
+    }   
+}
+
+function MainInstallNtools {
+    # prepare the downloads directory
+    PrepareDownloadsDirectory $downloadsDirectory
+
+    # add deployment path to the PATH environment variable if it doesn't already exist
+    $deploymentPath = $env:ProgramFiles + "\NBuild"
+    $path = [Environment]::GetEnvironmentVariable("PATH", "Machine")
+    if ($path -notlike "*$deploymentPath*") {
+        Write-OutputMessage $MyInvocation.MyCommand.Name "Adding $deploymentPath to the PATH environment variable."
+        [Environment]::SetEnvironmentVariable("PATH", $path + ";$deploymentPath", "Machine")
+    }
+    else
+    {
+        Write-OutputMessage $MyInvocation.MyCommand.Name "$deploymentPath already exists in the PATH environment variable."
+    }
+
+    $nbExePath = "$deploymentPath\nb.exe"
+    $nbToolsPath = "$deploymentPath\ntools.json"
+    & $nbExePath -c install -json $nbToolsPath
+
+    Write-OutputMessage $MyInvocation.MyCommand.Name "Completed successfully."
+}
+
+function SetDevEnvironmentVariables {
+    param (
+        [Parameter(Mandatory=$true)]
+        [string]$devDrive,
+        [Parameter(Mandatory=$true)]
+        [string]$mainDir)
+
+    Write-Host "devDrive: $devDrive"
+    Write-Host "mainDir: $mainDir"
+    
+    # set DevDrive and MainDir environment variables
+    setx DevDrive $devDrive
+    setx MainDir $mainDir
+
+    Write-OutputMessage $MyInvocation.MyCommand.Name "DevDrive and MainDir environment variables set successfully."
+}
+
+# Simple function to write output to the console with a new line
+function Write-OutputMessage {
+    param(
+        [Parameter(Mandatory = $true)]
+        [String]
+        $Prefix,
+        [Parameter(Mandatory = $true)]
+        [String]
+        $Message
+    )
+
+    $dateTime = Get-Date -Format "yyyy-MM-dd hh:mm tt"
+
+    
+    
+    # append to the log file install.log
+    if (!(Test-Path -Path "install.log")) {
+        New-Item -ItemType File -Path "install.log" -Force
+    }
+
+    if ($Message -eq "EmtpyLine") {
+        Add-Content -Path "install.log" -Value ""
+        Write-Output ""
+    } else {
+        Write-Output "$dateTime $Prefix : $Message"
+        Write-Output ""
+        Add-Content -Path "install.log" -Value "$dateTime | $Prefix | $Message"
+    }
+}
+
+function GetFileVersion {
+    param (
+        [Parameter(Mandatory=$true)]
+        [string]$FilePath
+    )   
+
+    $versionInfo = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($FilePath)
+    # return the all file version parts joined by a dot
+    return ($versionInfo.FileMajorPart, $versionInfo.FileMinorPart, $versionInfo.FileBuildPart, $versionInfo.FilePrivatePart) -join "."
+}
+
+
+function MainFileVersion {
+    param (
+        [string]$FilePath
+    )
+
+    # Call GetFileVersion function with the specified path
+    return GetFileVersion -FilePath $FilePath
+}
+
+Export-ModuleMember -Function PrepareDownloadsDirectory, GetAppInfo, CheckIfAppInstalled, Install, MainInstallApp, CheckIfDotnetInstalled, InstallDotNetCore, MainInstallNtools, SetDevEnvironmentVariables, Write-OutputMessage, GetFileVersion, MainFileVersion

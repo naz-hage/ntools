@@ -73,11 +73,22 @@ public class BuildStarter
         return result;
     }
 
+    // <summary>
+    /// Checks if the specified target is valid in the given targets file.
+    /// </summary>
+    /// <param name="targetsFile">The path to the targets file.</param>
+    /// <param name="target">The target to check.</param>
+    /// <returns>True if the target is valid, false otherwise.</returns>
     public static bool ValidTarget(string targetsFile, string? target)
     {
         return GetTargets(targetsFile).Contains(target, StringComparer.OrdinalIgnoreCase);
     }
 
+    /// <summary>
+    /// Checks if the specified target is valid in the given targets file.
+    /// </summary>
+    /// <param name="target">The target to check.</param>
+    /// <returns>True if the target is valid, false otherwise.</returns>
     public static bool ValidTarget(string? target)
     {
         // check if target is valid in the current directory
@@ -89,14 +100,14 @@ public class BuildStarter
         List<string> TargetFiles =
         [
             "common.targets",
-            "git.targets",
-            "dotnet.targets",
-            "code.targets",
-            "node.targets",
-            "nuget.targets",
-            "ngit.targets",
-            "mongodb.targets",
-        ];
+                "git.targets",
+                "dotnet.targets",
+                "code.targets",
+                "node.targets",
+                "nuget.targets",
+                "ngit.targets",
+                "mongodb.targets",
+            ];
 
         bool found = false;
         foreach (var targetFile in TargetFiles)
@@ -111,7 +122,10 @@ public class BuildStarter
 
         return found;
     }
-
+    
+    ///<summary>
+    /// Extracts the batch file from the embedded resource.
+    /// </summary>
     private static void ExtractBatchFile()
     {
         // Always extract nbuild.bat common.targets.xml
@@ -119,27 +133,32 @@ public class BuildStarter
         Colorizer.WriteLine($"[{ConsoleColor.Yellow}!Extracted '{NbuildBatchFile}' to {Environment.CurrentDirectory}]\n");
     }
 
+    /// <summary>
+    /// Retrieves the targets from the specified XML document.
+    /// </summary>
+    /// <param name="targetsFile">The path to the XML document.</param>
+    /// <returns>An enumerable collection of target names.</returns>
     public static IEnumerable<string> GetTargets(string targetsFile)
     {
-        var buildXmllFile = Path.Combine(Environment.CurrentDirectory, targetsFile);
-        if (!File.Exists(targetsFile))
+        var buildXmlFile = Path.Combine(Environment.CurrentDirectory, targetsFile);
+        if (!File.Exists(buildXmlFile))
         {
-            throw new FileNotFoundException($"'{targetsFile}' file not found.", buildXmllFile);
+            throw new FileNotFoundException($"'{targetsFile}' file not found.", buildXmlFile);
         }
 
-        XmlDocument doc = new();
-        doc.Load(targetsFile);
+        XmlDocument doc = new XmlDocument();
+        doc.Load(buildXmlFile);
 
-        XmlNodeList? targets = doc.GetElementsByTagName("Target");
+        XmlNodeList targets = doc.GetElementsByTagName("Target");
 
         if (targets != null)
         {
-            foreach (XmlNode? target in targets)
+            foreach (XmlNode target in targets)
             {
-                if (target != null && target.Attributes != null && target.Attributes["Name"] != null)
+                if (target.Attributes != null && target.Attributes["Name"] != null)
                 {
                     var attributeName = target?.Attributes?["Name"]?.Value;
-                    if (attributeName != null)
+                    if (!string.IsNullOrEmpty(attributeName))
                     {
                         yield return attributeName;
                     }
@@ -148,6 +167,11 @@ public class BuildStarter
         }
     }
 
+    /// <summary>
+    /// Parses the specified file and returns a sequence of strings where each string contains a target name and its associated comment.
+    /// </summary>
+    /// <param name="targetFileName">The name of the file to parse. The file should be in the current directory.</param>
+    /// <returns>A sequence of strings where each string is in the format "TargetName | Comment".</returns>
     public static IEnumerable<string> GetTargetsAndComments(string targetFileName)
     {
         var filePath = Path.Combine(Environment.CurrentDirectory, targetFileName);
@@ -160,6 +184,7 @@ public class BuildStarter
         {
             string trimmedLine = line.Trim();
 
+            // Single-line comment
             if (trimmedLine.StartsWith("<!--") && trimmedLine.EndsWith("-->"))
             {
                 commentBuilder.Clear(); // reset the comment
@@ -167,31 +192,49 @@ public class BuildStarter
                 commentBuilder.Append(trimmedLine.Substring(4, trimmedLine.Length - 7).Trim());
                 isComment = false;
             }
+            // start of multi-line comment
             else if (trimmedLine.StartsWith("<!--"))
             {
                 commentBuilder.Clear(); // reset the comment
                 isComment = true;
                 commentBuilder.Append(trimmedLine.Substring(4).Trim());
             }
+            // End of multi-line comment
             else if (trimmedLine.EndsWith("-->"))
             {
                 isComment = false;
-                commentBuilder.Append(trimmedLine.Substring(0, trimmedLine.Length - 3).Trim());
+                commentBuilder.Append(" " + trimmedLine.Substring(0, trimmedLine.Length - 3).Trim());
             }
+            // Multi-line comment
             else if (isComment)
             {
                 commentBuilder.Append(" " + trimmedLine);
             }
+            // Target line, extract target name
             else if (trimmedLine.StartsWith("<Target "))
             {
-                var targetName = line.Trim().Split(' ')[1].Split('=')[1].Trim('"');
-                //Console.WriteLine($"{targetName, -20}: {commentBuilder.ToString().Trim()}");
+                string targetName = string.Empty;
+                string[] parts = line.Trim().Split(' ');
+                if (parts.Length > 1)
+                {
+                    string[] subParts = parts[1].Split('=');
+                    if (subParts.Length > 1)
+                    {
+                        targetName = subParts[1].Trim('"');
+                        // Rest of your code that uses targetName...
+                    }
+                }
+
                 yield return $"{targetName,-19} | {commentBuilder.ToString().Trim()}";
                 commentBuilder.Clear(); // reset the comment
             }
         }
     }
 
+    /// <summary>
+    /// Displays the log file content.
+    /// </summary>
+    /// <param name="lastLines">The number of last lines to display.</param>
     private static void DisplayLog(int lastLines)
     {
         string logFilePath = Path.Combine(Environment.CurrentDirectory, LogFile);
@@ -210,67 +253,24 @@ public class BuildStarter
         }
     }
 
-    //public static ResultHelper DisplayTargets(string directoryPath)
-    //{
-    //    // replace $(BuildTools) with environment variable ProgramFiles/Nbuild
-    //    directoryPath = directoryPath.Replace("$(BuildTools)", $"{Environment.GetEnvironmentVariable("ProgramFiles")}\\nbuild");
-    //    string[] targetsFiles = Directory.GetFiles(directoryPath, "*.targets", SearchOption.TopDirectoryOnly);
-    //    try
-    //    {
-    //        foreach (var targetsFile in targetsFiles)
-    //        {
-    //            Console.WriteLine($"{targetsFile} Targets:");
-    //            Console.WriteLine($"----------------------");
-    //            foreach (var targetName in GetTargetsAndComments(Path.Combine(directoryPath, targetsFile)))
-    //            {
-    //                Console.WriteLine(targetName);
-    //            }
-    //            Console.WriteLine();
-
-    //            Console.WriteLine($"Imported Targets:");
-    //            Console.WriteLine($"----------------------");
-    //            foreach (var item in GetImportAttributes(targetsFile, "Project"))
-    //            {
-    //                // replace $(ProgramFiles) with environment variable
-    //                var importItem = item.Replace("$(ProgramFiles)", Environment.GetEnvironmentVariable("ProgramFiles"));
-    //                importItem = importItem.Replace("$(BuildTools)", $"{Environment.GetEnvironmentVariable("ProgramFiles")}\\nbuild");
-    //                Console.WriteLine($"{importItem} Targets:");
-    //                Console.WriteLine($"----------------------");
-    //                foreach (var targetName in GetTargetsAndComments(importItem))
-    //                {
-    //                    Console.WriteLine(targetName);
-    //                }
-    //                Console.WriteLine();
-
-    //                // Recursive call for each imported project directory
-    //                if (importItem != null)
-    //                {
-    //                    var importItemDirectory = Path.GetDirectoryName(importItem);
-    //                    if (importItemDirectory != null) DisplayTargets(importItemDirectory);
-    //                }
-    //            }
-    //        }
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        return ResultHelper.Fail(-1, $"Exception occurred: {ex.Message}");
-    //    }
-
-    //    return ResultHelper.Success();
-    //}
-
+    /// <summary>
+    /// Retrieves the values of the specified attribute from the Import elements in the XML document.
+    /// </summary>
+    /// <param name="filePath">The path to the XML document.</param>
+    /// <param name="attributeName">The name of the attribute to retrieve.</param>
+    /// <returns>An enumerable collection of attribute values.</returns>
     public static IEnumerable<string> GetImportAttributes(string filePath, string attributeName)
     {
-        XmlDocument doc = new();
+        XmlDocument doc = new XmlDocument();
         doc.Load(filePath);
 
-        XmlNodeList? imports = doc.GetElementsByTagName("Import");
+        XmlNodeList imports = doc.GetElementsByTagName("Import");
 
         if (imports != null)
         {
-            foreach (XmlNode? import in imports)
+            foreach (XmlNode import in imports)
             {
-                if (import != null && import.Attributes != null && import.Attributes[attributeName] != null)
+                if (import.Attributes != null && import.Attributes[attributeName] != null)
                 {
                     var projectName = import?.Attributes?[attributeName]?.Value;
                     if (projectName != null)
@@ -282,6 +282,11 @@ public class BuildStarter
         }
     }
 
+    /// <summary>
+    /// Displays the targets in the specified file.
+    /// </summary>
+    /// <param name="filePath">The path to the target file.</param>
+    /// <returns>A <see cref="ResultHelper"/> object representing the result of the operation.</returns>
     public static ResultHelper DisplayTargetsInFile(string filePath)
     {
         //replace $(BuildTools) with environment variable ProgramFiles/Nbuild
@@ -296,11 +301,18 @@ public class BuildStarter
                 writer.WriteLine("| **Target Name** | **Description** |");
                 writer.WriteLine("| --- | --- |");
 
-                foreach (var targetAndDescription in GetTargetsAndComments(filePath))
+                var targets = GetTargetsAndComments(filePath).ToList();
+                if (targets.Count > 0)
                 {
-                    Console.WriteLine(targetAndDescription);
-
-                    writer.WriteLine($"| {targetAndDescription} |");
+                    foreach (var targetAndDescription in targets)
+                    {
+                        Console.WriteLine(targetAndDescription);
+                        writer.WriteLine($"| {targetAndDescription} |");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("No targets found.");
                 }
                 Console.WriteLine();
                 writer.WriteLine("\n");
@@ -332,6 +344,11 @@ public class BuildStarter
         return ResultHelper.Success();
     }
 
+    /// <summary>
+    /// Displays the targets in the specified directory.
+    /// </summary>
+    /// <param name="directoryPath">The path to the directory containing the target files.</param>
+    /// <returns>A <see cref="ResultHelper"/> object representing the result of the operation.</returns>
     public static ResultHelper DisplayTargets(string directoryPath)
     {
         if (File.Exists(TargetsMd))
@@ -342,7 +359,11 @@ public class BuildStarter
         string[] targetsFiles = Directory.GetFiles(directoryPath, "*.targets", SearchOption.TopDirectoryOnly);
         foreach (var targetsFile in targetsFiles)
         {
-            DisplayTargetsInFile(targetsFile);
+            var result = DisplayTargetsInFile(targetsFile);
+            if (!result.IsSuccess())
+            {
+                return result;
+            }
         }
         return ResultHelper.Success();
     }
