@@ -14,6 +14,8 @@ nav:
     - Overview: index.md
     - installation.md
     - usage.md
+    - How to setup your development environment: setup.md
+    - How to add a new development tool to your project: addtool.md
   - List of Tools:
       - Nbackup: ntools/nbackup.md
       - Nbuild: ntools/nbuild.md

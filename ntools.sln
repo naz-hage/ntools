@@ -73,6 +73,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{B79CBB23-C
 		docs\index.md = docs\index.md
 		docs\installation.md = docs\installation.md
 		docs\overview.md = docs\overview.md
+		docs\setup.md = docs\setup.md
 		docs\usage.md = docs\usage.md
 	EndProjectSection
 EndProject
