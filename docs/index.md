@@ -13,4 +13,10 @@ The [installation](installation.md) process is straightforward, and the tools ar
 
 Don't settle for mediocre tools when you can have the `NTools` at your disposal. Try them out today and witness the difference they can make in your development workflow. Enhancements are added Regularly! 
 
+Delivering a high-quality software product requires the use of the right development tools. It is crucial to have a stable developement environment with a reliable method to install and uninstall these tools. The tools should be installed in a standardized location, and it is important to keep track of their versions. Additionally, the installation process should only proceed if the tool is not already installed, and the tool should be uninstalled if it is no longer needed.
+
+- [How to add a new tool to your project](addtool.md)
+- [How to setup your project](setup.md)
+
+
 Don't hesitate to write an [issue](https://github.com/naz-hage/NTools/issues) if you have any questions or suggestions.
