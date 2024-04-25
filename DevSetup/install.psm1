@@ -253,14 +253,15 @@ function SetDevEnvironmentVariables {
         [Parameter(Mandatory=$true)]
         [string]$mainDir)
 
-    Write-Host "devDrive: $devDrive"
-    Write-Host "mainDir: $mainDir"
-    
-    # set DevDrive and MainDir environment variables
-    setx DevDrive $devDrive
-    setx MainDir $mainDir
+    # Set the environment variables for the current user
+    [System.Environment]::SetEnvironmentVariable("devDrive", $devDrive, [System.EnvironmentVariableTarget]::User)
+    [System.Environment]::SetEnvironmentVariable("mainDir", $mainDir, [System.EnvironmentVariableTarget]::User)
 
-    Write-OutputMessage $MyInvocation.MyCommand.Name "DevDrive and MainDir environment variables set successfully."
+    # Read and display the environment variables
+    $newDevDrive = [System.Environment]::GetEnvironmentVariable("devDrive", [System.EnvironmentVariableTarget]::User)
+    $newMainDir = [System.Environment]::GetEnvironmentVariable("mainDir", [System.EnvironmentVariableTarget]::User)
+    
+    Write-OutputMessage $MyInvocation.MyCommand.Name "DevDrive set to '$newDevDrive' and MainDir set to '$newMainDir' successfully."
 }
 
 # Simple function to write output to the console with a new line

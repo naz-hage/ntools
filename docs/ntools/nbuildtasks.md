@@ -1,7 +1,27 @@
 ## NbuildTasks
-`NbuildTasks` is a class library that exposes custom `MSBuild` tasks. It is used by `Nbuild` to perform various tasks such as web download and tools installation during the build of any project.
+`NbuildTasks` (nbuildtasks.dll) is a class library that exposes custom `MSBuild` tasks. It is used by `Nbuild` to perform various tasks such as web download and tools installation during the build of any project.
 
-Here is an example custom Tasks that can be used during builds:
+### List of Tasks
+| Task Name | Description |
+| --- | --- |
+| [RedError](#rederror) | Displays an error message in red color in the console output. |
+| [Git](#git) | Git commands such as get or set the tag from the branch or build type and displays it in the console output. |
+| [ColorMessage](#colormessage) | Displays a message in the console output with the specified color. |
+| [FileVersion](#fileversion) | Gets the version of the specified file. |
+| [WebDownload](#webdownload)  | Downloads a file from the specified URL. |
+| [Unzip](#unzip)  | Unzips the specified file. |
+| [Zip](#zip)  | Zips the specified file. |
+
+Here are examples of custom Tasks that can be used during builds:
+
+### RedError
+```xml
+<!-- This target uses the `RedError` task to display an error message in red color -->
+<Target Name="RED_ERROR">
+    <RedError Message="This is an error message displayed in Red" />
+</Target>
+```
+### Git
 ```xml
 <Target Name="TAG">
     <-- This target uses the `GetTag` task to display the tag from a branch -->
@@ -10,15 +30,57 @@ Here is an example custom Tasks that can be used during builds:
     </GetTag>
     <Message Text="Tag: $(Tag)" Importance="high" />
 </Target>
-
-<Target Name="REDERROR">
-    <-- This target uses the `RedError` task to display an error message in red color -->
-    <RedError Message="This is an error message displayed in Red" />
+```
+### ColorMessage
+```xml
+<!-- This target uses the `ColorMessage` task to display a message with a specified color -->
+<Target Name="COLOR_MESSAGE">
+    <ColorMessage Message="This is a message displayed in Yellow" Color="Yellow" />
 </Target>
 ```
-- The `RedError` task will display an error message in red color in the console output.
-- The `GetTag` task will get the tag from the branch and build type and display it in the console output.
+### FileVersion
+```xml
+    <!-- This target uses the `FileVersion` task to file version of sepecified file -->
+    <Target Name="FILE_VERSION">
+		<PropertyGroup>
+			<FileExe>$(ProgramFiles)\Nbuild\nb.exe</FileExe>
+		</PropertyGroup>
 
+		<FileVersion Name="$(FileExe)" Condition="Exists('$(FileExe)')" >
+			<Output TaskParameter="Output" PropertyName="Version" />
+		</FileVersion>
+	</Target>
+```
+### WebDownload
+```xml
+<Target Name="WEB_DOWNLOAD">
+    <!-- This target uses the `WebDownload` task to download a file from a specified URL -->
+    <GetTag Branch="$(Branch)" BuildType="$(BuildType)">
+        <Output TaskParameter="Tag" PropertyName="Tag" />
+    </GetTag>
+    <Message Text="Tag: $(Tag)" Importance="high" />
+</Target>
+```
+### Unzip
+```xml
+<Target Name="UNZIP">
+    <!-- This target uses the `Unzip` task to decompress a specified file -->
+    <GetTag Branch="$(Branch)" BuildType="$(BuildType)">
+        <Output TaskParameter="Tag" PropertyName="Tag" />
+    </GetTag>
+    <Message Text="Tag: $(Tag)" Importance="high" />
+</Target>
+```
+### Zip
+```xml
+<Target Name="ZIP">
+    <!-- This target uses the `Zip` task to compress a specified file -->
+    <GetTag Branch="$(Branch)" BuildType="$(BuildType)">
+        <Output TaskParameter="Tag" PropertyName="Tag" />
+    </GetTag>
+    <Message Text="Tag: $(Tag)" Importance="high" />
+</Target>
+```
 You can also find the complete list of predefined [MSBuild properties in the Microsoft documentation](https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild-reserved-and-well-known-properties?view=vs-2022).
 
 - Here are few examples:

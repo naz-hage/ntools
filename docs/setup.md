@@ -65,3 +65,5 @@ Write-OutputMessage $fileName "EmtpyLine"
 ```
 
 This script sets up the development environment for your project, installs `NTools` and the necessary development tools, and sets the development environment variables.
+
+A file called [`nbuild.targets`](./ntools/nbuild-targets.md) is required in the solution folder. This file imports the `common.targets` file located in the `$(ProgramFiles)\Nbuild` folder. The `NTools` repository includes multiple target files, which can be found in the `nbuild-targets.md` file.

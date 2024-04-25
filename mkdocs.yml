@@ -13,13 +13,14 @@ nav:
   - Getting Started: 
     - Overview: index.md
     - installation.md
-    - usage.md
-    - How to setup your development environment: setup.md
-    - How to add a new development tool to your project: addtool.md
+    - Build - Test - Deploy: usage.md
+    - Setup your development environment: setup.md
+    - Add a new development tool to your project: addtool.md
   - List of Tools:
-      - Nbackup: ntools/nbackup.md
-      - Nbuild: ntools/nbuild.md
+      - Nbackup (nbackup.exe): ntools/nbackup.md
+      - Nbuild (nb.exe): ntools/nbuild.md
+      - Ngit (ng.exe): ntools/ngit.md
+  - Custom Build Tasks:
       - NbuildTasks: ntools/nbuildtasks.md
-      - Ngit: ntools/ngit.md
   - Revisions: 
       - changelog.md

@@ -1,10 +1,11 @@
 ## Software Tools Collection
 
-This repository contains a collection of software tools specifically designed to automate various build and test tasks on Windows clients. Whether you are a developer working on your local machine or using GitHub Actions for continuous integration, these tools will greatly simplify your workflow and enhance your productivity.
+This repository contains a collection of software tools specifically designed to automate various build and test tasks on Windows clients. Whether you are a developer working on your local machine or using GitHub Actions for continuous integration, these tools will greatly simplify your workflow and enhance your productivity.  The early release is provide build, test and deploy .NET core deskop and web applications.  This can be extended to other languages and platforms in the future.
 
 With the `NTools`, you can effortlessly:
 
-- Set up your development environment quickly and lay the development foundation for all your projects- Backup your files and folders
+- Set up your development environment quickly and lay the development foundation for all your projects
+- Backup your files and folders
 - Build your projects with ease
 - Perform Git operations seamlessly
 - Leverage powerful MSBuild tasks

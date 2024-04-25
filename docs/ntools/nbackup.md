@@ -1,4 +1,4 @@
-`Nbackup` is a tool that leverages `robocopy` to backup a list of files and folders from a source to a destination. It is designed to be reliable and efficient, ensuring that your data is safe.
+`Nbackup`  (`nbackup.exe`) is a tool that leverages `robocopy` to backup a list of files and folders from a source to a destination. It is designed to be reliable and efficient, ensuring that your data is safe.
 
 ### Usage
 
