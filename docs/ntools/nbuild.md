@@ -39,64 +39,7 @@ Below is a full list of options that can be used with `Nb.exe`:
 **If the -json option is not specified, the default json file `$(ProgramFiles)\Nbuild\NTools.json` is used**. 
 
 ### nbuild.targets
-- `nbuild.targets` is a MSBuild project file that imports `common.targets`
-- `nbuild.targets` must include the `SolutionName` and `DeploymentFolder` [property](#required-properties). It should also define the [ARTIFACTS(](#artifacts) target. 
-- `nbuild.targets` imports the [common.targets](#commontargets) file located in the `$(ProgramFiles)\Nbuild` folder. The `ntools` repository includes multiple target files, which can be found in the [targets](nbuild-targets.md) file.
-- `nbuild.targets` can include any additional properties and targets that are specific to the solution.  
-- `nbuild.targets` file is located in the solution folder.
-
-### Required Properties
-- The following properties are required in `nbuild.targets`:
-    - SolutionName: The name of the solution file.
-```xml
-<PropertyGroup>
-  <!--The GUID should be replaced with the solution name-->
-  <SolutionName>$([System.IO.Path]::GetFileNameWithoutExtension('$(MSBuildProjectDirectory)'))</SolutionName>
-  <DeploymentFolder>$(ProgramFiles)\Nbuild</DeploymentFolder>
-</PropertyGroup>
-```
-
-### Artifacts
-- The following target is required in `nbuild.targets`:
-    - ARTIFACTS: The folder where the artifacts are copied to.
-```xml
-<!--Setup the ARTIFACTS folders for binaries and test results - override -->
-    <Target Name="ARTIFACTS" DependsOnTargets="TAG">
-      <PropertyGroup>
-		 <ArtifactsSolutionFolder>$(ArtifactsDir)\$(SolutionName)</ArtifactsSolutionFolder>
-		 <SetupFolder>$(ArtifactsSolutionFolder)\release</SetupFolder>
-        <ArtifactsFolder>$(ArtifactsSolutionFolder)\$(TargetRelease)\$(ProductVersion)</ArtifactsFolder>
-		<ArtifactsTestResultsFolder>$(ArtifactsSolutionFolder)\TestResults\$(ProductVersion)</ArtifactsTestResultsFolder>
-      </PropertyGroup>  
-      <ItemGroup>
-            <BinaryFiles 
-						Exclude="
-						 $(SolutionDir)\$(TargetRelease)\**\*.pdb;
-						 $(SolutionDir)\$(TargetRelease)\test.*;
-						 $(SolutionDir)\$(TargetRelease)\*test*;
-						 $(SolutionDir)\$(TargetRelease)\Nuget*;
-						 $(SolutionDir)\$(TargetRelease)\*CodeCoverage*"
-
-						Include="
-                        $(SolutionDir)\$(TargetRelease)\*.exe;
-                        $(SolutionDir)\$(TargetRelease)\*.exe.config;
-                        $(SolutionDir)\$(TargetRelease)\*.json;
-						$(SolutionDir)\Nbuild\resources\*.targets;
-						$(SolutionDir)\Nbuild\resources\*.ps1;
-						$(SolutionDir)\Nbuild\resources\*.json;
-                        $(SolutionDir)\$(TargetRelease)\*.dll"
-						/>
-
-            <RunTimesNetStandard20 Include = "
-								   $(SolutionDir)\$(TargetRelease)\netstandard2.0\*.*"
-                                    Exclude="
-						            $(SolutionDir)\$(TargetRelease)\**\*.pdb"
-						            />
-        </ItemGroup>
-		
-        <Message Text="==> DONE"/>
-    </Target>
-```
+See [nbuild.targets](../setup.md#nbuildtargets) for more information on how to create a `nbuild.targets` file.
                     
 ### common.targets
 - The `common.targets` file includes all the defaults targets needed to build, test and deploy a solution.  The `common.targets` file is located in the `$(ProgramFiles)\Nbuild` folder.  The `nbuild.targets` file in the solution folder imports the `common.targets` file

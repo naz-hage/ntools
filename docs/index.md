@@ -19,10 +19,11 @@ Delivering a high-quality software product requires the use of the right develop
 - [How to install ntools](installation.md)
 - [Practice using ntools](usage.md)
 - [How to setup your project](setup.md)
-- [How to add a new tool to your project](addtool.md)
-- [How to add a new property to your project](addproperty.md)
-- [How to add a new target to your project](addtarget.md)
-- [How to add a new task to your project](addtask.md)
-- [How to add a new condition to your project](addcondition.md)
+    - [Dev Setup](setup.md#devsetup)
+    - [Add a new tool](setup.md#add-a-new-tool)
+    - [Add a new property](addproperty.md)
+    - [Add a new target](addtarget.md)
+    - [Add a new task](addtask.md)
+    - [Add a new condition](addcondition.md)
 
 Don't hesitate to write an [issue](https://github.com/naz-hage/NTools/issues) if you have any questions or suggestions.
