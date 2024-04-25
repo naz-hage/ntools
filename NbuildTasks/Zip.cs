@@ -31,6 +31,8 @@ namespace NbuildTasks
                 }
 
                 ZipFile.CreateFromDirectory(Path, FileName);
+                Log.LogMessage($"Zipped {Path} to {FileName}");
+
                 return true;
             }
             catch (Exception ex)

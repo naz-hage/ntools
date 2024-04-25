@@ -141,7 +141,34 @@ Nb.exe -c install -json apps.json
 
 
 ### Add a new property
+In MSBuild, a project file is an XML file that describes a software build process. It includes three important elements: Property, PropertyGroup, and Item.
 
+- **Property**: A property in MSBuild is a named value that you can refer to in the project file. Properties are key-value pairs and are defined inside PropertyGroup elements.  In the example below, the Configuration property is set to Debug.
+
+```xml
+<PropertyGroup>
+    <Configuration>Debug</Configuration>
+</PropertyGroup>
+```
+
+- **PropertyGroup**: A PropertyGroup is a container for properties. It can contain one or more Property elements. PropertyGroup elements can appear anywhere in the project file, and you can have multiple PropertyGroup elements in a project file.  In the example below, the Configuration and Platform properties are set to Debug and AnyCPU, respectively.
+
+```xml
+<PropertyGroup>
+    <Configuration>Debug</Configuration>
+    <Platform>AnyCPU</Platform>
+</PropertyGroup>
+```
+
+- **Item**: An item in MSBuild is a piece of data that has a type and can be a file, a directory, or any other piece of data that you want to operate on. Items are grouped into ItemGroup elements.  In the example below, the Program.cs file is included in the project.
+
+```xml
+<ItemGroup>
+    <Compile Include="Program.cs" />
+</ItemGroup>
+```
+
+For more detailed information, you can refer to the official MSBuild documentation: [MSBuild Project File Schema Reference](https://docs.microsoft.com/en-us/visualstudio/msbuild/msbuild-project-file-schema-reference?view=vs-2019)
 ### Add a new target
 
 A target is a named sequence of tasks that represents something to be built or done. For more information, see [Targets](https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild-targets?view=vs-2022).

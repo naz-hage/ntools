@@ -1,6 +1,6 @@
 ## Software Tools Collection
 
-This repository contains a collection of software tools specifically designed to automate various build and test tasks on Windows clients. Whether you are a developer working on your local machine or using GitHub Actions for continuous integration, these tools will greatly simplify your workflow and enhance your productivity.  The early release is provide build, test and deploy .NET core deskop and web applications.  This can be extended to other languages and platforms in the future.
+This repository contains a collection of software tools specifically designed to automate various build and test tasks on Windows clients. Whether you are a developer working on your local machine or using GitHub Actions for continuous integration, these tools will greatly simplify your workflow and enhance your productivity.  This release facilitates build, test and deploy of .NET core deskop and web applications.  This can be extended to other languages and platforms in the future.
 
 With the `ntools`, you can effortlessly:
 
@@ -21,9 +21,9 @@ Delivering a high-quality software product requires the use of the right develop
 - [How to setup your project](setup.md)
     - [Dev Setup](setup.md#devsetup)
     - [Add a new tool](setup.md#add-a-new-tool)
-    - [Add a new property](addproperty.md)
-    - [Add a new target](addtarget.md)
-    - [Add a new task](addtask.md)
-    - [Add a new condition](addcondition.md)
+    - [Add a new property](setup.md#add-a-new-property)
+    - [Add a new target](setup.md#add-a-new-target)
+    - [Add a new task](setup.md#add-a-new-task)
+    - [Add a new condition](setup.md#add-a-new-condition)
 
 Don't hesitate to write an [issue](https://github.com/naz-hage/NTools/issues) if you have any questions or suggestions.

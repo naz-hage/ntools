@@ -53,32 +53,45 @@ Here are examples of custom Tasks that can be used during builds:
 ```
 ### WebDownload
 ```xml
-<Target Name="WEB_DOWNLOAD">
-    <!-- This target uses the `WebDownload` task to download a file from a specified URL -->
-    <GetTag Branch="$(Branch)" BuildType="$(BuildType)">
-        <Output TaskParameter="Tag" PropertyName="Tag" />
-    </GetTag>
-    <Message Text="Tag: $(Tag)" Importance="high" />
+<!-- This target uses the `WebDownload` task to download a file from a specified URL -->
+<Target Name="WEB_DOWNLOAD" DependsOnTargets="IS_ADMIN" >
+	<PropertyGroup>
+		<!-- visit https://nodejs.org/dist/ to get the latest stable version -->
+        <DownloadsDirectory>c:\NtoolsDownloads</DownloadsDirectory>
+        <NodeAppName>Node.js</NodeAppName>
+        <NodeTargetVersion>21.5.0</NodeTargetVersion>
+		<WebUri>https://nodejs.org/dist/v$(NodeTargetVersion)/node-v$(NodeTargetVersion)-x64.msi</WebUri>
+		<FileName>$(DownloadsDirectory)\node-v$(NodeTargetVersion)-x64.msi</FileName>
+	</PropertyGroup>
+	<RedError Condition="'$(IsAdmin)' == false" Message="Must be an admin to install $(NodeAppName)" />
+	<Delete Files="$(FileName)" Condition="Exists('$(FileName)') == true" />
+	<WebDownload WebUri="$(WebUri)" FileName="$(FileName)" />
+	<Message Text="==> NODE_DONE"/>
 </Target>
 ```
+
 ### Unzip
 ```xml
+<!-- This target uses the `Unzip` task to decompress a specified file -->
 <Target Name="UNZIP">
-    <!-- This target uses the `Unzip` task to decompress a specified file -->
-    <GetTag Branch="$(Branch)" BuildType="$(BuildType)">
-        <Output TaskParameter="Tag" PropertyName="Tag" />
-    </GetTag>
-    <Message Text="Tag: $(Tag)" Importance="high" />
+	<PropertyGroup>
+		<FileName>c:\temp\source.zip</FileName>
+		<Path>c:\temp\test1</Path>
+	</PropertyGroup>
+	<Unzip FileName="$(FileName)" Destination="$(Path)" />
+	<Message Text="==> ZIP_DONE"/>
 </Target>
 ```
 ### Zip
 ```xml
+<!-- This target uses the `Zip` task to compress a specified file -->
 <Target Name="ZIP">
-    <!-- This target uses the `Zip` task to compress a specified file -->
-    <GetTag Branch="$(Branch)" BuildType="$(BuildType)">
-        <Output TaskParameter="Tag" PropertyName="Tag" />
-    </GetTag>
-    <Message Text="Tag: $(Tag)" Importance="high" />
+	<PropertyGroup>
+		<FileName>c:\temp\source.zip</FileName>
+		<Path>c:\temp\test</Path>
+	</PropertyGroup>
+	<Zip FileName="$(FileName)" Path="$(Path)" />
+	<Message Text="==> ZIP_DONE"/>
 </Target>
 ```
 You can also find the complete list of predefined [MSBuild properties in the Microsoft documentation](https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild-reserved-and-well-known-properties?view=vs-2022).
