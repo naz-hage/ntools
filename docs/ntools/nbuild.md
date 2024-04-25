@@ -23,11 +23,11 @@ Below is a full list of options that can be used with `Nb.exe`:
          download        -> Downloads apps specified in the -json option.
          list            -> Lists apps specified in the -json option.
          ----
-         - By default, the -json option points to the `NTools` deployment folder: $(ProgramFiles)\build\tools.json.
+         - By default, the -json option points to the `ntools` deployment folder: $(ProgramFiles)\build\ntools.json.
          - The install, uninstall, and download commands require admin privileges to run. (string, default=)
   - json : Specifies the JSON file that holds the list of apps. Only valid for the install, download, and list commands.
-         Sample JSON file: https://github.com/naz-hage/`NTools`/blob/main/DevSetup//app-`NTools`.json
-          (string, default=$(ProgramFiles)\nbuild\`NTools`.json)
+         Sample JSON file: https://github.com/naz-hage/ntools/blob/main/DevSetup/app-Ntools.json
+          (string, default=$(ProgramFiles)\nbuild\NTools.json)
   - v    : Optional parameter which sets the console output verbose level
          ----
          - if no command line options are specified with the -v option , i.e.: 'Nb.exe staging -v true`
@@ -41,7 +41,7 @@ Below is a full list of options that can be used with `Nb.exe`:
 ### nbuild.targets
 - `nbuild.targets` is a MSBuild project file that imports `common.targets`
 - `nbuild.targets` must include the `SolutionName` and `DeploymentFolder` [property](#required-properties). It should also define the [ARTIFACTS(](#artifacts) target. 
-- `nbuild.targets` imports the [common.targets](#commontargets) file located in the `$(ProgramFiles)\Nbuild` folder. The `NTools` repository includes multiple target files, which can be found in the [targets](nbuild-targets.md) file.
+- `nbuild.targets` imports the [common.targets](#commontargets) file located in the `$(ProgramFiles)\Nbuild` folder. The `ntools` repository includes multiple target files, which can be found in the [targets](nbuild-targets.md) file.
 - `nbuild.targets` can include any additional properties and targets that are specific to the solution.  
 - `nbuild.targets` file is located in the solution folder.
 

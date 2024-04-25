@@ -1,14 +1,11 @@
 
-### Prerequisites
-- Install the latest version of [64-bit Git for Windows](https://git-scm.com/download/win) on your machine.
-
-To get started with the `NTools` repository, follow these steps:
+To get started with `ntools`, you need to install the latest version of [64-bit Git for Windows](https://git-scm.com/download/win) on your machine, then follow these steps:
 
 - Open a PowerShell in administrative mode.  By convention, two environment variables, `%DevDrive%='c:'` and `%MainDir%='source'` will be used through this document 
 - Clone this repository to your local machine from the `%MainDir%` folder.
 ```cmd
 cd c:\source
-git clone https://github.com/naz-hage/NTools
+git clone https://github.com/naz-hage/ntools
 ```
 - Change the PowerShell execution policy to allow the installation script to run. Run the following command:
 
@@ -22,10 +19,10 @@ This command will allow the installation script to run. Once the installation is
 - Run the following command to install the Development tools:
 
 ```cmd
-cd ntools\DevSetup
+cd c:\source\ntools\DevSetup
 .\install.ps1
 ```
-- This command will install the Dotnet Core Desktop runtime and download the `NTools` from GitHub, installs the Ntools in the `%ProgramFiles%\Nbuild` folder, and sets up the nTools development environment.  The `%ProgramFiles%\Nbuild` will be added to the system path.  
+- This command will install the Dotnet Core Desktop runtime and download the `ntools` from GitHub, installs the ntools package in the `%ProgramFiles%\Nbuild` folder, sets up the nTools development environment, adds the `%ProgramFiles%\Nbuild` will be added to the system path.  
 - The `Install.ps1` script also sets up the following environment variables:
     - `%DevDrive%` is a string parameter that represents the drive where the development environment will be set up. It is not mandatory , and if it is not provided when the script is run, it will default to `C:`.
     - `%MainDir%` is also a string parameter that represents the main directory where the development environment will be set up. It is not mandatory, and if it is not provided when the script is run, it will default to `source`.
@@ -37,3 +34,5 @@ cd ntools\DevSetup
 ```
 
 - After the installation is complete, check out the [nbuild.targets](./ntools/nbuild-targets.md) for more all the available targets, and navigate to [Usage](usage.md) to learn how to execute a build target.
+
+ntools is now installed on your machine, and you can start using it to learn how to build and run [additonal targets](usage.md). If you have any questions or encounter any issues during the installation process, please don't hesitate to write an an [issue](https://github.com/naz-hage/NTools/issues). We're here to help!

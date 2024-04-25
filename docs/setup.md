@@ -1,4 +1,4 @@
-- After installing `NTools`, two environment variables, `DEVDRIVE` and `MAINDIR`, are created.
+- After installing `ntools`, two environment variables, `DEVDRIVE` and `MAINDIR`, are created.
 - When you create a new project, for example `MyProject`, clone the project into the `%DEVDRIVE%\%MAINDIR%` directory. Your file structure should look like this:
 ```cmd
 c:\source\MyProject
@@ -64,6 +64,6 @@ Write-OutputMessage $fileName "Completed installation script."
 Write-OutputMessage $fileName "EmtpyLine"
 ```
 
-This script sets up the development environment for your project, installs `NTools` and the necessary development tools, and sets the development environment variables.
+This script sets up the development environment for your project, installs `ntools` and the necessary development tools, and sets the development environment variables.
 
-A file called [`nbuild.targets`](./ntools/nbuild-targets.md) is required in the solution folder. This file imports the `common.targets` file located in the `$(ProgramFiles)\Nbuild` folder. The `NTools` repository includes multiple target files, which can be found in the `nbuild-targets.md` file.
+A file called [`nbuild.targets`](./ntools/nbuild-targets.md) is required in the solution folder. This file imports the `common.targets` file located in the `$(ProgramFiles)\Nbuild` folder. The `ntools` repository includes multiple target files, which can be found in the `nbuild-targets.md` file.

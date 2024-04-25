@@ -11,7 +11,7 @@ public class Cli
         "\t download \t -> Downloads apps specified in the -json option.\n" +
         "\t list \t\t -> Lists apps specified in the -json option.\n" +
         "\t ----\n" +
-        "\t - By default, the -json option points to the ntools deployment folder: $(ProgramFiles)\\build\\tools.json.\n" +
+        "\t - By default, the -json option points to the ntools deployment folder: $(ProgramFiles)\\build\\ntools.json.\n" +
         "\t - The install, uninstall, and download commands require admin privileges to run.")]
     public string? Command { get; set; }
 
