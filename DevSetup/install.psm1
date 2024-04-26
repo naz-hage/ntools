@@ -1,3 +1,10 @@
+# local variables
+$downloadsDirectory = "c:\NToolsDownloads"
+$deploymentPath = $env:ProgramFiles + "\NBuild"
+$nbToolsPath = "$deploymentPath\ntools.json"
+
+# global variables
+$global:NbExePath = "$deploymentPath\nb.exe"
 
 function PrepareDownloadsDirectory {
     param (
@@ -11,7 +18,6 @@ function PrepareDownloadsDirectory {
 
     # Grant Administrators full control of the Downloads directory
     icacls.exe $directory /grant 'Administrators:(OI)(CI)F' /inheritance:r
-    
 }
 
 function GetAppInfo {
@@ -41,6 +47,7 @@ function GetAppInfo {
     }
 
     # Update the InstallPath and AppFileName with the actual path
+
     $appInfo.InstallPath = $appInfo.InstallPath -replace '\$\(ProgramFiles\)', $env:ProgramFiles
     $appInfo.AppFileName = $appInfo.AppFileName -replace '\$\(InstallPath\)', $appInfo.InstallPath
     $appInfo.AppFileName = $appInfo.AppFileName -replace '\$\(ProgramFiles\)', $env:ProgramFiles
@@ -56,9 +63,10 @@ function GetAppInfo {
 
     $appInfo.WebDownloadFile = $appInfo.WebDownloadFile -replace '\$\(Version\)', $appInfo.Version
     $appInfo.InstallCommand = $appInfo.InstallCommand -replace '\$\(DownloadedFile\)', $appInfo.DownloadedFile
+    $appInfo.InstallArgs = $appInfo.InstallArgs -replace '\$\(DownloadedFile\)', $appInfo.DownloadedFile
+
     return $appInfo
 }
-
 function CheckIfAppInstalled {
     param (
         [Parameter(Mandatory=$true)]
@@ -101,7 +109,7 @@ function  Install {
      # Retrieve elements using dot notation
      $appInfo = GetAppInfo $json
 
-    # download the Git file
+    # download the App
     $output = $downloadsDirectory + "\\" + $appInfo.DownloadedFile
     
     # replace $(Version) with the version number
@@ -110,18 +118,31 @@ function  Install {
     Write-Host "Downloading $($webUri) to : $($output) ..."
     Invoke-WebRequest -Uri $webUri -OutFile $output
 
-
-    # install the Git file
+    # install the App
     $installCommand = $appInfo.InstallCommand -replace '\$\(Version\)', $appInfo.Version
     write-host "Installing $($appInfo.Name) version: $($appInfo.Version) ..."
     write-host "Install command: $installCommand"
     $installArgs=$appInfo.InstallArgs
     write-host "Install arguments: $installArgs"
-    $workingFolder = "C:\NToolsDownloads"
-    $process = Start-Process -FilePath $installCommand -ArgumentList $installArgs -WorkingDirectory $workingFolder -PassThru
-    $process.WaitForExit()
+    write-host "App file Nane: $($appInfo.AppFileName) ..."
 
-    # check if Git is installed
+    $timeout = New-TimeSpan -Minutes 10
+    $sw = [Diagnostics.Stopwatch]::StartNew()
+    
+    Start-Process -FilePath $installCommand -ArgumentList $installArgs -WorkingDirectory $downloadsDirectory -Wait
+    
+    # Wait for App to be installed or timeout
+    while (!(Test-Path $appInfo.AppFileName) -and $sw.elapsed -lt $timeout) {
+        Start-Sleep -Seconds 5
+    }
+    
+    if ($sw.elapsed -ge $timeout) {
+        Write-Output "Installation timed out."
+    } else {
+        Write-Output "Installation completed."
+    }
+
+    # check if App is installed
     $installed = CheckIfAppInstalled $json
     if ($installed) {
         Write-Host "App $($appInfo.Name) version: $($appInfo.Version) is installed successfully."
@@ -155,7 +176,7 @@ function MainInstallApp {
     Write-OutputMessage $MyInvocation.MyCommand.Name "Installation of $($app.Name) completed successfully."
 }
 
-$downloadsDirectory = "c:\NToolsDownloads"
+
 
 function CheckIfDotnetInstalled {
     param (
@@ -210,7 +231,6 @@ function MainInstallNtools {
     PrepareDownloadsDirectory $downloadsDirectory
 
     # add deployment path to the PATH environment variable if it doesn't already exist
-    $deploymentPath = $env:ProgramFiles + "\NBuild"
     $path = [Environment]::GetEnvironmentVariable("PATH", "Machine")
     if ($path -notlike "*$deploymentPath*") {
         Write-OutputMessage $MyInvocation.MyCommand.Name "Adding $deploymentPath to the PATH environment variable."
@@ -221,9 +241,7 @@ function MainInstallNtools {
         Write-OutputMessage $MyInvocation.MyCommand.Name "$deploymentPath already exists in the PATH environment variable."
     }
 
-    $nbExePath = "$deploymentPath\nb.exe"
-    $nbToolsPath = "$deploymentPath\ntools.json"
-    & $nbExePath -c install -json $nbToolsPath
+    & $global:NbExePath -c install -json $nbToolsPath
 
     Write-OutputMessage $MyInvocation.MyCommand.Name "Completed successfully."
 }
@@ -235,14 +253,15 @@ function SetDevEnvironmentVariables {
         [Parameter(Mandatory=$true)]
         [string]$mainDir)
 
-    Write-Host "devDrive: $devDrive"
-    Write-Host "mainDir: $mainDir"
-    
-    # set DevDrive and MainDir environment variables
-    setx DevDrive $devDrive
-    setx MainDir $mainDir
+    # Set the environment variables for the current user
+    [System.Environment]::SetEnvironmentVariable("devDrive", $devDrive, [System.EnvironmentVariableTarget]::User)
+    [System.Environment]::SetEnvironmentVariable("mainDir", $mainDir, [System.EnvironmentVariableTarget]::User)
 
-    Write-OutputMessage $MyInvocation.MyCommand.Name "DevDrive and MainDir environment variables set successfully."
+    # Read and display the environment variables
+    $newDevDrive = [System.Environment]::GetEnvironmentVariable("devDrive", [System.EnvironmentVariableTarget]::User)
+    $newMainDir = [System.Environment]::GetEnvironmentVariable("mainDir", [System.EnvironmentVariableTarget]::User)
+    
+    Write-OutputMessage $MyInvocation.MyCommand.Name "DevDrive set to '$newDevDrive' and MainDir set to '$newMainDir' successfully."
 }
 
 # Simple function to write output to the console with a new line
@@ -296,4 +315,4 @@ function MainFileVersion {
     return GetFileVersion -FilePath $FilePath
 }
 
-Export-ModuleMember -Function PrepareDownloadsDirectory, GetAppInfo, CheckIfAppInstalled, Install, MainInstallApp, CheckIfDotnetInstalled, InstallDotNetCore, MainInstallNtools, SetDevEnvironmentVariables, Write-OutputMessage, GetFileVersion, MainFileVersion
+Export-ModuleMember -Function PrepareDownloadsDirectory, GetAppInfo, CheckIfAppInstalled, Install, MainInstallApp, CheckIfDotnetInstalled, InstallDotNetCore, MainInstallNtools, SetDevEnvironmentVariables, Write-OutputMessage, GetFileVersion, MainFileVersion, nbExePath

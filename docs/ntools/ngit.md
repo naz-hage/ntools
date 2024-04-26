@@ -1,4 +1,4 @@
-`Ngit` (`Ng`) is simple wrapper for `Git` tool that perform simple commands such as get tag and set tag.
+`Ngit` (`ng.exe`) is simple wrapper for `Git` tool that perform simple commands such as get tag and set tag.
 
 ### Usage
 ```batch

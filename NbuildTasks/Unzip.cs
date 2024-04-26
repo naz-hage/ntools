@@ -34,6 +34,9 @@ namespace NbuildTasks
                 Directory.CreateDirectory(Destination);
 
                 ZipFile.ExtractToDirectory(FileName, Destination);
+
+                Log.LogMessage($"Unzipped {FileName} to {Destination}");
+
                 return true;
             }
             catch (Exception ex)

@@ -56,55 +56,6 @@
 		<Message Text="==> DONE"/>
 	</Target>
 
-	<!--Temporary Target to test the Git Task-->
-	<Target Name="TEST_GIT" >
-		<Git Command="GetBranch">
-			<Output TaskParameter="Output" PropertyName="GitBranch"/>
-		</Git>
-		<Message Text="Task - Git Branch:'$(GitBranch)'"/>
-
-		<RedError Condition="'$(GitBranch)' == ''" Message="GetBranch Failed: GitBranch property is not defined." />
-
-		<Git Command="GetTag" >
-			<Output TaskParameter="Output" PropertyName="ProductVersion"/>
-		</Git>
-		<Message Text="Task - Git Tag:'$(ProductVersion)'"/>
-
-		<RedError Condition="'$(ProductVersion)' == ''" Message="GetTag Failed: Product Version property is not defined." />
-
-	
-		<Git Command="AutoTag" TaskParameter="Staging">
-			<Output TaskParameter="Output" PropertyName="ProductVersion"/>
-		</Git>
-		<Message Text="Task - Git Next Tag:'$(ProductVersion)'"/>
-
-		<RedError Condition="'$(ProductVersion)' == ''" Message="AutoTag Staging Failed: Product Version property is not defined." />
-
-		<Git Command="SetTag" TaskParameter="$(ProductVersion)">
-			<Output TaskParameter="Output" PropertyName="ProductVersion"/>
-		</Git>
-		<Message Text="Task - Git Next Tag:'$(ProductVersion)'"/>
-
-		<RedError Condition="'$(ProductVersion)' == ''" Message="SetTag Failed: Product Version property is not defined." />
-
-		<Git Command="PushTag" TaskParameter="$(ProductVersion)">
-			<Output TaskParameter="Output" PropertyName="ProductVersion"/>
-		</Git>
-
-		<Message Text="Task - Git Push Tag Result:'$(Result)'"/>
-
-		<RedError Condition="'$(Result)' != 'True'" Message="DeteteTag Failed: Product Version property is not defined." />
-
-		<Git Command="DeleteTag" TaskParameter="$(ProductVersion)">
-			<Output TaskParameter="Output" PropertyName="Result"/>
-		</Git>
-		<Message Text="Task - Git Delete Tag Result:'$(Result)'"/>
-
-		<RedError Condition="'$(Result)' != 'True'" Message="DeteteTag Failed: Product Version property is not defined." />
-
-		<Message Text="==> DONE"/>
-	</Target>
-
 	<!--Build local staging without incrementing the version-->
 	<Target Name="LOCAL" DependsOnTargets="
                 SOLUTION;
@@ -189,6 +140,7 @@
 
 	<!-- Build docs locally for testing -->
 	<Target Name="MKDOCS" >
+		<Exec Command='pip install mkdocs' WorkingDirectory="$(SolutionDir)"/>
 		<Exec Command='mkdocs build -d %userprofile%\ntools' WorkingDirectory="$(SolutionDir)"/>
 		<Exec Command='mkdocs serve' WorkingDirectory="$(SolutionDir)"/>
 	    <Message Text="==> DONE"/>
@@ -261,4 +213,5 @@
 		</ItemGroup>
 		<Message Text="@(Products)" Importance="high" />
 	</Target>
+	
 </Project>

@@ -163,7 +163,7 @@
 		<Message Text="==> COMMON_DONE"/>
 	</Target>
 
-	<!-- Create a packahe for the solution default is a zip file of all artifacts -->
+	<!-- Create a package for the solution default is a zip file of all artifacts -->
 	<Target Name="PACKAGE" DependsOnTargets="ARTIFACTS;TAG">
 		<!-- <Exec Command='powershell -Command "Compress-Archive -Path $(ArtifactsFolder)\* -DestinationPath $(ArtifactsFolder).zip" -Force'/> -->
 		<!-- <Zip Path="$(ArtifactsFolder)" FileName="$(ArtifactsFolder).zip"/> -->
