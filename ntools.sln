@@ -64,22 +64,23 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DevSetup", "DevSetup", "{35
 		DevSetup\install.log = DevSetup\install.log
 		DevSetup\install.ps1 = DevSetup\install.ps1
 		DevSetup\install.psm1 = DevSetup\install.psm1
+		DevSetup\setenv.ps1 = DevSetup\setenv.ps1
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{B79CBB23-CB3B-4934-921E-59BF51B96B93}"
 	ProjectSection(SolutionItems) = preProject
-		docs\additional-information.md = docs\additional-information.md
 		docs\changelog.md = docs\changelog.md
 		docs\index.md = docs\index.md
 		docs\installation.md = docs\installation.md
-		docs\overview.md = docs\overview.md
 		docs\setup.md = docs\setup.md
 		docs\usage.md = docs\usage.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ntools", "ntools", "{DBDD07F6-003B-4E2D-8BBA-651A29E54445}"
 	ProjectSection(SolutionItems) = preProject
+		docs\ntools\devsetup.md = docs\ntools\devsetup.md
 		docs\ntools\nbackup.md = docs\ntools\nbackup.md
+		docs\ntools\nbuild-targets.md = docs\ntools\nbuild-targets.md
 		docs\ntools\nbuild.md = docs\ntools\nbuild.md
 		docs\ntools\nbuildtasks.md = docs\ntools\nbuildtasks.md
 		docs\ntools\ngit.md = docs\ntools\ngit.md
