@@ -34,7 +34,7 @@ The table below lists all available targets for the Nbuild tool.
 | PRODUCTION_DEPLOY   | Create a production package and deploy for release |
 | SOLUTION            | Build the solution Release configuration  using dotnet build |
 | SOLUTION_MSBUILD    | Build the solution Release configuration  using MSBuild |
-| PACKAGE             | Create a packahe for the solution default is a zip file of all artifacts |
+| PACKAGE             | Create a package for the solution default is a zip file of all artifacts |
 | COPY_ARTIFACTS      | Save the artifacts to the artifacts folder |
 | DEPLOY              | Deploy the package. default is to extract artifacts into DeploymentProperty folder |
 | TEST                | Run all tests using dotnet test in Release mode |

@@ -40,7 +40,7 @@ Here are examples of custom Tasks that can be used during builds:
 ```
 ### FileVersion
 ```xml
-    <!-- This target uses the `FileVersion` task to file version of sepecified file -->
+    <!-- This target uses the `FileVersion` task to file version of specified file -->
     <Target Name="FILE_VERSION">
 		<PropertyGroup>
 			<FileExe>$(ProgramFiles)\Nbuild\nb.exe</FileExe>

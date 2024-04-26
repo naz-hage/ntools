@@ -89,8 +89,8 @@ c:\source\MyProject\... other project test files
 
 ### Add a new tool
 
-- When looking for new development tool for your projet, your need the following:
-    - Web location to download the tool and the mame of the downloaded file.  This file will be used to install the tool
+- When looking for new development tool for your project, your need the following:
+    - Web location to download the tool and the name of the downloaded file.  This file will be used to install the tool
     - Command and arguments to install and uninstall the tool
     - Location where the tool will be installed
     - Location of the tool File name.  This file name will be used to check if the tool is already installed
