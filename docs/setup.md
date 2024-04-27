@@ -30,7 +30,7 @@ c:\source\MyProject\... other project test files
 ### nbuild.targets
 - `nbuild.targets` is a MSBuild project file that imports `common.targets`
 - `nbuild.targets` must include the `SolutionName` and `DeploymentFolder` [property](#required-properties). It should also define the [ARTIFACTS](#artifacts) target. 
-- `nbuild.targets` imports the [common.targets](#commontargets) file located in the `$(ProgramFiles)\Nbuild` folder. The `ntools` repository includes multiple target files, which can be found in the [targets](nbuild-targets.md) file.
+- `nbuild.targets` imports the [common.targets](../ntools/nbuild/#commontargets) file located in the `$(ProgramFiles)\Nbuild` folder. The `ntools` repository includes multiple target files, which can be found in the [targets](../ntools/nbuild-targets/) file.
 - `nbuild.targets` can include any additional properties and targets that are specific to the solution.  
 - `nbuild.targets` file is located in the solution folder.
 
