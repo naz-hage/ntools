@@ -48,9 +48,19 @@ public class BuildStarter
             ? $"{nbuildPath} -fl -flp:logfile={LogFile};verbosity=normal"
             : $"{nbuildPath} /t:{target} -fl -flp:logfile={LogFile};verbosity=normal";
 
+        if (verbose)
+        {
+            Console.WriteLine($"==> {cmd}");
+        }
+
         //  Get location of msbuild.exe
         //var msbuildPath = ShellUtility.GetFullPathOfFile(MsbuildExe);
         var msbuildPath = FindMsBuild64BitPath();
+
+        if (verbose)
+        {
+            Console.WriteLine($"MSBuild Path: {msbuildPath}");
+        }
 
         var process = new Process
         {
@@ -287,7 +297,7 @@ public class BuildStarter
     /// Retrieves the path to the 64-bit MSBuild executable.
     /// </summary>
     /// <returns>The path to the 64-bit MSBuild executable, or null if not found.</returns>
-    public static string? FindMsBuild64BitPath()
+    public static string? FindMsBuild64BitPath(bool verbose = false)
     {
         // Define the directories where msbuild.exe might be located
         var possibleDirectories = new[]
@@ -297,12 +307,37 @@ public class BuildStarter
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Microsoft.NET", "Framework64")
         };
 
+        if (Environment.Is64BitOperatingSystem)
+        {
+            possibleDirectories = possibleDirectories
+                .Concat([Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "MSBuild")])
+                .ToArray();
+        }
+
+        if (verbose)
+        {
+            Console.WriteLine("Searching for msbuild.exe in the following directories:");
+            foreach (var dir in possibleDirectories)
+            {
+                Console.WriteLine(dir);
+            }
+        }
+
         // Search for msbuild.exe in the directories and their subdirectories
         var msbuildPaths = possibleDirectories
             .Where(Directory.Exists)
             .SelectMany(dir => Directory.EnumerateFiles(dir, "msbuild.exe", SearchOption.AllDirectories))
             .Where(path => !path.Contains("Preview") && path.Contains("amd64"))
             .ToList();
+
+        if (verbose)
+        {
+            Console.WriteLine("Found the following msbuild.exe paths:");
+            foreach (var path in msbuildPaths)
+            {
+                Console.WriteLine(path);
+            }
+        }
 
         // Return the first path found, or null if no path was found
         return msbuildPaths.FirstOrDefault();
