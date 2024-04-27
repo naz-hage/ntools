@@ -55,7 +55,7 @@ public class BuildStarter
 
         //  Get location of msbuild.exe
         //var msbuildPath = ShellUtility.GetFullPathOfFile(MsbuildExe);
-        var msbuildPath = FindMsBuild64BitPath();
+        var msbuildPath = FindMsBuild64BitPath(verbose: true);
 
         if (verbose)
         {
