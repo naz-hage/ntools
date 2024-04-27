@@ -302,17 +302,9 @@ public class BuildStarter
         // Define the directories where msbuild.exe might be located
         var possibleDirectories = new[]
         {
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Microsoft Visual Studio"),
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Microsoft Visual Studio"),
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Microsoft.NET", "Framework64")
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin"),
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Microsoft Visual Studio\\2022\\Enterprise\\MSBuild\\Current\\Bin"),
         };
-
-        if (Environment.Is64BitOperatingSystem)
-        {
-            possibleDirectories = possibleDirectories
-                .Concat([Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "MSBuild")])
-                .ToArray();
-        }
 
         if (verbose)
         {
