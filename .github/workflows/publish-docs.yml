@@ -1,28 +1,27 @@
 name: publish-docs
-# Controls when the workflow will run
 on:
   workflow_run:
-    workflows: [dotnet-desktop]
+    workflows: [dotnet-desktop]  # Chain to the dotnet-desktop workflow
     types:
       - completed
-  workflow_dispatch:
+      - successful  # Only trigger on successful completion
 
 jobs:
-    docs:
-      # The type of runner that the job will run on
-      runs-on: ubuntu-latest
-      # Steps represent a sequence of tasks that will be executed as part of the job
-      steps:
-        - uses: actions/checkout@v4
-        - name: Set up Python
-          uses: actions/setup-python@v5
-          with:
-            python-version: '3.12'
-        - name: Install dependencies	
-          run: |	
-            python -m pip install --upgrade pip	
-            pip install mkdocs	
-        - name: Update docs	
-          run: |	
-            mkdocs build	
-            mkdocs gh-deploy --force
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if previous workflow was successful
+        if: github.event.workflow_run.conclusion == 'success'  # Check if the previous workflow was successful
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies  
+        run: |  
+          python -m pip install --upgrade pip  
+          pip install mkdocs  
+      - name: Update docs  
+        run: |  
+          mkdocs build  
+          mkdocs gh-deploy --force
