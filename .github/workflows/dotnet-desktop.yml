@@ -175,7 +175,7 @@ jobs:
         run: |  
           pwd
           ls
-          cd ..
+          cd ntools
           ls
           mkdocs build  
           mkdocs gh-deploy --force
