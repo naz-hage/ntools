@@ -174,5 +174,8 @@ jobs:
       - name: Update docs  
         run: |  
           pwd
+          ls
+          cd ..
+          ls
           mkdocs build  
           mkdocs gh-deploy --force
