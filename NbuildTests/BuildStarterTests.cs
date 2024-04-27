@@ -1,9 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Nbuild;
 using NbuildTasks;
 using System.Reflection;
 
-namespace NbuildTests
+namespace Nbuild.Tests
 {
     [TestClass()]
     public class BuildStarterTests
@@ -231,6 +230,22 @@ namespace NbuildTests
 
             // Cleanup
             File.Delete(testFileName);
+        }
+
+        [TestMethod()]
+        public void FindMsBuildPathTest()
+        {
+            // Arrange
+            var buildStarter = new BuildStarter();
+
+            // Act
+            var msBuildPath = BuildStarter.FindMsBuild64BitPath();
+
+            Console.WriteLine($"MSBuild Path: {msBuildPath}");
+
+            // Assert not null and contains amd64
+            Assert.IsNotNull(msBuildPath);
+            Assert.IsTrue(msBuildPath.Contains("amd64"));
         }
     }
 }

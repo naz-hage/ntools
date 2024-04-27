@@ -49,7 +49,8 @@ public class BuildStarter
             : $"{nbuildPath} /t:{target} -fl -flp:logfile={LogFile};verbosity=normal";
 
         //  Get location of msbuild.exe
-        var msbuildPath = ShellUtility.GetFullPathOfFile(MsbuildExe);
+        //var msbuildPath = ShellUtility.GetFullPathOfFile(MsbuildExe);
+        var msbuildPath = FindMsBuild64BitPath();
 
         var process = new Process
         {
@@ -283,66 +284,91 @@ public class BuildStarter
     }
 
     /// <summary>
+    /// Retrieves the path to the 64-bit MSBuild executable.
+    /// </summary>
+    /// <returns>The path to the 64-bit MSBuild executable, or null if not found.</returns>
+    public static string? FindMsBuild64BitPath()
+    {
+        // Define the directories where msbuild.exe might be located
+        var possibleDirectories = new[]
+        {
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Microsoft Visual Studio"),
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Microsoft Visual Studio"),
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Microsoft.NET", "Framework64")
+        };
+
+        // Search for msbuild.exe in the directories and their subdirectories
+        var msbuildPaths = possibleDirectories
+            .Where(Directory.Exists)
+            .SelectMany(dir => Directory.EnumerateFiles(dir, "msbuild.exe", SearchOption.AllDirectories))
+            .Where(path => !path.Contains("Preview") && path.Contains("amd64"))
+            .ToList();
+
+        // Return the first path found, or null if no path was found
+        return msbuildPaths.FirstOrDefault();
+    }
+
+    /// <summary>
     /// Displays the targets in the specified file.
     /// </summary>
     /// <param name="filePath">The path to the target file.</param>
     /// <returns>A <see cref="ResultHelper"/> object representing the result of the operation.</returns>
     public static ResultHelper DisplayTargetsInFile(string filePath)
-    {
-        //replace $(BuildTools) with environment variable ProgramFiles/Nbuild
-        filePath = filePath.Replace("$(BuildTools)", $"{Environment.GetEnvironmentVariable("ProgramFiles")}\\nbuild");
-        try
         {
-            using (StreamWriter writer = new(TargetsMd, true))
+            //replace $(BuildTools) with environment variable ProgramFiles/Nbuild
+            filePath = filePath.Replace("$(BuildTools)", $"{Environment.GetEnvironmentVariable("ProgramFiles")}\\nbuild");
+            try
             {
-                Console.WriteLine($"{filePath} Targets:");
-                writer.WriteLine($"- **{filePath} Targets**\n");
-                Console.WriteLine($"----------------------");
-                writer.WriteLine("| **Target Name** | **Description** |");
-                writer.WriteLine("| --- | --- |");
-
-                var targets = GetTargetsAndComments(filePath).ToList();
-                if (targets.Count > 0)
-                {
-                    foreach (var targetAndDescription in targets)
-                    {
-                        Console.WriteLine(targetAndDescription);
-                        writer.WriteLine($"| {targetAndDescription} |");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("No targets found.");
-                }
-                Console.WriteLine();
-                writer.WriteLine("\n");
-
-            }
-            var importItems = GetImportAttributes(filePath, "Project");
-            foreach (var item in importItems)
-            {
-                // replace $(ProgramFiles) with environment variable
-                var importItem = item.Replace("$(ProgramFiles)", Environment.GetEnvironmentVariable("ProgramFiles"));
-                importItem = importItem.Replace("$(BuildTools)", $"{Environment.GetEnvironmentVariable("ProgramFiles")}\\nbuild");
-
                 using (StreamWriter writer = new(TargetsMd, true))
                 {
-                    Console.WriteLine($"Imported Targets:");
-                    //writer.WriteLine($"- Imported Targets: {importItem}\n");
+                    Console.WriteLine($"{filePath} Targets:");
+                    writer.WriteLine($"- **{filePath} Targets**\n");
                     Console.WriteLine($"----------------------");
+                    writer.WriteLine("| **Target Name** | **Description** |");
+                    writer.WriteLine("| --- | --- |");
+
+                    var targets = GetTargetsAndComments(filePath).ToList();
+                    if (targets.Count > 0)
+                    {
+                        foreach (var targetAndDescription in targets)
+                        {
+                            Console.WriteLine(targetAndDescription);
+                            writer.WriteLine($"| {targetAndDescription} |");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("No targets found.");
+                    }
+                    Console.WriteLine();
+                    writer.WriteLine("\n");
+
                 }
-                // Recursive call for each imported target file
-                DisplayTargetsInFile(importItem);
+                var importItems = GetImportAttributes(filePath, "Project");
+                foreach (var item in importItems)
+                {
+                    // replace $(ProgramFiles) with environment variable
+                    var importItem = item.Replace("$(ProgramFiles)", Environment.GetEnvironmentVariable("ProgramFiles"));
+                    importItem = importItem.Replace("$(BuildTools)", $"{Environment.GetEnvironmentVariable("ProgramFiles")}\\nbuild");
+
+                    using (StreamWriter writer = new(TargetsMd, true))
+                    {
+                        Console.WriteLine($"Imported Targets:");
+                        //writer.WriteLine($"- Imported Targets: {importItem}\n");
+                        Console.WriteLine($"----------------------");
+                    }
+                    // Recursive call for each imported target file
+                    DisplayTargetsInFile(importItem);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return ResultHelper.Fail(-1, $"Exception occurred: {ex.Message}");
             }
 
+            return ResultHelper.Success();
         }
-        catch (Exception ex)
-        {
-            return ResultHelper.Fail(-1, $"Exception occurred: {ex.Message}");
-        }
-
-        return ResultHelper.Success();
-    }
 
     /// <summary>
     /// Displays the targets in the specified directory.
