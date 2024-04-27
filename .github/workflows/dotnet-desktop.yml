@@ -160,9 +160,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build]
     steps:
-      - name: Check if previous workflow was successful
-        if: github.event.workflow_run.conclusion == 'success'  # Check if the previous workflow was successful
-        uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -173,9 +170,6 @@ jobs:
           pip install mkdocs  
       - name: Update docs  
         run: |  
-          pwd
-          ls
-          cd ntools
           ls
           mkdocs build  
           mkdocs gh-deploy --force
