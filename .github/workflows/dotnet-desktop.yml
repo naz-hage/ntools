@@ -56,6 +56,8 @@ jobs:
     env:
       Solution_Name: ntools.sln                         # Replace with your solution name, i.e. MyWpfApp.sln.
       Test_Project_Path: LauncherTests                 # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
+      DevDrive: 'D:'
+      MainDir: 'a\ntools'
 #       Wap_Project_Directory: your-wap-project-directory-name    # Replace with the Wap project directory relative to the solution, i.e. MyWpfApp.Package.
 #       Wap_Project_Path: your-wap-project-path                   # Replace with the path to your Wap project, i.e. MyWpf.App.Package\MyWpfApp.Package.wapproj.
 
@@ -83,6 +85,35 @@ jobs:
     # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v2
+
+    # Install ntools
+    - name: Install ntools
+      run: |
+        cd ./DevSetup
+        ./install-ntools.ps1 -devDrive "${{ env.DevDrive }}" -mainDir "${{ env.MainDir }}"
+      shell: pwsh
+      working-directory: ${{ github.workspace }}
+
+    # Set ProgramFilesPath
+    - name: Set ProgramFilesPath
+      run: |
+        $programFilesPath = [System.Environment]::GetFolderPath('ProgramFiles')
+        echo "ProgramFilesPath=$programFilesPath" | Out-File -FilePath $env:GITHUB_ENV -Append
+      shell: pwsh
+   
+    # Configure Git
+    - name: Configure Git
+      run: |
+        git config --global user.name "gitHub-actions"
+        git config --global user.email "actions@github.com"
+
+    # Build Staging using ntools
+    - name: Run nb.exe
+      run: |
+        & dotnet build --configuration Debug --verbosity normal
+        & "Debug/nb.exe" solution -v true
+      shell: pwsh
+      working-directory: ${{ github.workspace }}
 
     - name: Install dependencies
       run: dotnet restore
