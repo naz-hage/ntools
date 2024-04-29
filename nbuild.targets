@@ -213,5 +213,11 @@
 		</ItemGroup>
 		<Message Text="@(Products)" Importance="high" />
 	</Target>
-	
+
+	<!-- push production tag -->
+	<Target Name="PUSH_TAG" DependsOnTargets="TAG" AfterTargets="PRODUCTION" >
+		<Git Command="PushTag" TaskParameter="$(ProductVersion)" >
+		</Git>
+	</Target>
+
 </Project>
