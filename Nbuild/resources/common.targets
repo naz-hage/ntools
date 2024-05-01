@@ -15,12 +15,16 @@
 	<PropertyGroup>
 		<!--The SolutionName should be replaced in nbuild.targets-->
 		<SolutionName></SolutionName>
-		<DeploymentFolder></DeploymentFolder>
-		<DevDrive Condition=" '$(DevDrive)' == '' ">$(DevDrive)</DevDrive>
-		<DevDrive Condition=" '$(DevDrive)' == '' ">C:</DevDrive>
-		<MainDir Condition=" '$(MainDir)' == '' ">$(MainDir)</MainDir>
-		<MainDir Condition=" '$(MainDir)' == '' ">Source</MainDir>
-		<DevDir>$(DevDrive)\$(MainDir)</DevDir>
+		<SolutionName>$([System.IO.Path]::GetFileNameWithoutExtension('$(MSBuildProjectDirectory)'))</SolutionName>
+		<DevDriveRaw>$([System.IO.Path]::GetPathRoot('$(MSBuildProjectDirectory)'))</DevDriveRaw>
+		<MainDirRaw>$(MSBuildProjectDirectory.Replace('$(DevDriveRaw)', '').Replace('$(SolutionName)', ''))</MainDirRaw>
+
+		<!-- Trim the trailing backslash -->
+		<DevDrive>$(DevDriveRaw.TrimEnd('\\'))</DevDrive>
+		<MainDir>$(MainDirRaw.TrimEnd('\\'))</MainDir>
+		<SolutionDir>$(DevDrive)\$(SolutionName)</SolutionDir>
+		<!-- This is the location when the app deployed or installed -->
+		<DeploymentFolder>$(ProgramFiles)\Nbuild</DeploymentFolder>
 		<BuildTools>$(ProgramFiles)\nbuild</BuildTools>
 		<CommonTargetsVersion>6.2.0</CommonTargetsVersion>
 	</PropertyGroup>
@@ -51,7 +55,7 @@
 			<ZipExe>$(ProgramFiles)\7-Zip\7z.exe</ZipExe>
 			<TargetRelease>Release</TargetRelease>
 			<TargetDebug>Debug</TargetDebug>
-			<SolutionDir>$(DevDir)\$(SolutionName)</SolutionDir>
+			<SolutionDir>$(DevDrive)\$(MainDir)\$(SolutionName)</SolutionDir>			
 			<OutputPathRelease>$(SolutionDir)\$(TargetRelease)</OutputPathRelease>
 			<OutputPathDebug>$(SolutionDir)\$(TargetDebug)</OutputPathDebug>
 			<ArtifactsDir>$(DevDrive)\Artifacts</ArtifactsDir>

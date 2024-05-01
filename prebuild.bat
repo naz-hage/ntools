@@ -20,18 +20,4 @@ if "%1"=="" (
 set DeploymentFolder=C:\Program Files\Nbuild
 set NtoolsArtifactsFolder=C:\Artifacts\ntools\Release\%tag%.zip
 "C:\Program Files\7-Zip\7z.exe" x %NtoolsArtifactsFolder% -o"C:\Program Files\Nbuild" -y
-goto skip
-set SRC=release\netstandard2.0
-set DST=%programfiles%\nbuild\netstandard2.0
-set FILES=NbuildTasks.dll launcher.dll
-for %%F in (%FILES%) do (
-    xcopy "%SRC%\%%F" "%DST%\" /d /y
-)
-:skip
-set SRC=%DevDrive%\%MainDir%\ntools\nbuild\resources
-set DST=%programfiles%\nbuild
-set FILES=app-docker.json ntools.json
-for %%F in (%FILES%) do (
-    xcopy "%SRC%\%%F" "%DST%\" /d /y
-)
 :end

@@ -19,8 +19,6 @@ jobs:
     env:
       Solution_Name: ntools.sln                         # Replace with your solution name, i.e. MyWpfApp.sln.
       Test_Project_Path: LauncherTests                 # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
-      DevDrive: 'D:'
-      MainDir: 'a\ntools'
 
     steps:
     - name: Checkout
@@ -51,7 +49,7 @@ jobs:
     - name: Install ntools
       run: |
         cd ./DevSetup
-        ./install-ntools.ps1 -devDrive "${{ env.DevDrive }}" -mainDir "${{ env.MainDir }}"
+        ./install-ntools.ps1
       shell: pwsh
       working-directory: ${{ github.workspace }}
 

@@ -8,7 +8,7 @@ using static NbuildTasks.Enums;
 
 namespace NbuildTasks
 {
-    public class GitWrapper
+    public class GitWrapper : NtoolsEnvironmentVariables
     {
         private const string GitBinary = "git.exe";
 
@@ -28,28 +28,16 @@ namespace NbuildTasks
 
         public bool Verbose = false;
 
-        public string DevDrive { get; set; } = "d:";  // This default was chosen because of GitHub Actions
-        public string MainDir { get; set; } = "a";  // This default was chosen because of GitHub Actions
-
-        public GitWrapper(string project = null, bool verbose = false)
-        {
+        /// <summary>
+        /// Initializes a new instance of the GitWrapper class.
+        /// Once Successful, The MainDir and DevDrive are set by the base class NtoolsEnvironmentVariables
+        /// </summary>
+        /// <param name="project">The project directory.</param>
+        /// <param name="verbose">A flag indicating whether to enable verbose output.</param>
+        /// <param name="testMode">A flag indicating whether to enable test mode.</param>
+        public GitWrapper(string project = null, bool verbose = false, bool testMode = false) : base(testMode)
+        { 
             Verbose = verbose;
-
-            // Read Environment variables DevDrive and MainDir and set Properties respectively
-
-            var devDrive = Environment.GetEnvironmentVariable("DevDrive");
-            if (!string.IsNullOrEmpty(devDrive))
-            {
-                DevDrive = devDrive;
-            }
-
-
-            var mainDir = Environment.GetEnvironmentVariable("MainDir");
-            if (!string.IsNullOrEmpty(mainDir))
-            {
-                MainDir = mainDir;
-            }
-
 
             Process.StartInfo.WorkingDirectory = project == null ? Environment.CurrentDirectory : $@"{DevDrive}\{MainDir}\{project}";
 
@@ -64,7 +52,8 @@ namespace NbuildTasks
             {
                 return false;
             }
-            // change to project directory
+
+              // change to project directory
             var DevDir = $"{DevDrive}\\{MainDir}";
 
             var solutionDir = $@"{DevDir}\{projectName}";
