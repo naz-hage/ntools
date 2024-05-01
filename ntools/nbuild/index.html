@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="naz-hage" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Nbuild (nb.exe) - Ntools - Work in Progress</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Nbuild (nb.exe)";
+        var mkdocs_page_input_path = "ntools/nbuild.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Ntools - Work in Progress
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../usage/">Practice</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../setup/">Setup your project</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">List of Tools</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../nbackup/">Nbackup (nbackup.exe)</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Nbuild (nb.exe)</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#nbuildtargets">nbuild.targets</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#commontargets">common.targets</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ngit/">Ngit (ng.exe)</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Custom Build Tasks</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../nbuildtasks/">NbuildTasks</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Revisions</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../changelog/">Changelog</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Ntools - Work in Progress</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">List of Tools</li>
+      <li class="breadcrumb-item active">Nbuild (nb.exe)</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/naz-hage/ntools/edit/main/docs/ntools/nbuild.md">Edit on ntools</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <ul>
+<li><a href="#usage">Usage</a></li>
+<li><a href="#nbuildtargets">nbuild.targets</a></li>
+<li><a href="#commontargets">common.targets</a></li>
+<li><a href="../../usage/">Examples</a></li>
+</ul>
+<hr />
+<h1 id="nbuild">Nbuild</h1>
+<ul>
+<li><code>Nbuild</code> (<code>nb.exe</code>) is a wrapper for <a href="https://docs.microsoft.com/en-us/visualstudio/msbuild/msbuild">MSBuild</a> that simplifies building solutions and provides a way to define and run custom targets.</li>
+<li><code>Nb.exe</code> is also a command line tool that installs the development tools and run times required to build and test any solution.<ul>
+<li>To build a target type <code>Nb.exe [Target Name]</code></li>
+<li>The list of targets is generated by running the <code>Nb.exe -c targets</code> command.</li>
+</ul>
+</li>
+<li><code>Nb.exe</code> expects the <a href="#nbuildtargets">nbuild.targets</a> file to be present in the solution folder.</li>
+</ul>
+<p>Below is a full list of options that can be used with <code>Nb.exe</code>:</p>
+<h3 id="usage">Usage</h3>
+<pre><code class="language-cmd"> Nb.exe [-c value] [-json value] [-v value]
+  - c    : Specifies the command to execute. Possible values: targets, install, uninstall, download, list.
+         targets         -&gt; Lists available targets and saves them in the targets.md file.
+         install         -&gt; Downloads and installs apps specified in the -json option.
+         uninstall       -&gt; Uninstalls apps specified in the -json option.
+         download        -&gt; Downloads apps specified in the -json option.
+         list            -&gt; Lists apps specified in the -json option.
+         ----
+         - By default, the -json option points to the `ntools` deployment folder: $(ProgramFiles)\build\ntools.json.
+         - The install, uninstall, and download commands require admin privileges to run. (string, default=)
+  - json : Specifies the JSON file that holds the list of apps. Only valid for the install, download, and list commands.
+         Sample JSON file: https://github.com/naz-hage/ntools/blob/main/DevSetup/app-Ntools.json
+          (string, default=$(ProgramFiles)\nbuild\NTools.json)
+  - v    : Optional parameter which sets the console output verbose level
+         ----
+         - if no command line options are specified with the -v option , i.e.: 'Nb.exe staging -v true`
+           `Nb` will run an MSbuild target `staging` defined in a `nbuild.targets` file which present in the solution folder.
+           Run `Nb.exe -t Targets` to list the available targets.
+         -v Possible Values: (true or false, default=False)
+</code></pre>
+<p><strong>If the -json option is not specified, the default json file <code>$(ProgramFiles)\Nbuild\NTools.json</code> is used</strong>. </p>
+<h3 id="nbuildtargets">nbuild.targets</h3>
+<p>See <a href="../../setup/#nbuildtargets">nbuild.targets</a> for more information on how to create a <code>nbuild.targets</code> file.</p>
+<h3 id="commontargets">common.targets</h3>
+<ul>
+<li>The <code>common.targets</code> file includes all the defaults targets needed to build, test and deploy a solution.  The <code>common.targets</code> file is located in the <code>$(ProgramFiles)\Nbuild</code> folder.  The <code>nbuild.targets</code> file in the solution folder imports the <code>common.targets</code> file</li>
+</ul>
+<p>Below is list of common targets that are defined in the <code>common.targets</code> file</p>
+<table>
+<thead>
+<tr>
+<th><strong>Target Name</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PROPERTIES</td>
+<td>Common properties that will be used by all targets</td>
+</tr>
+<tr>
+<td>CLEAN</td>
+<td>Clean up the project and artifacts folder</td>
+</tr>
+<tr>
+<td>INSTALL_DEP</td>
+<td>Install dependencies</td>
+</tr>
+<tr>
+<td>TELEMETRY_OPT_OUT</td>
+<td>Opt out of the DOTNET_CLI_TELEMETRY_OPTOUT - move to common</td>
+</tr>
+<tr>
+<td>STAGING</td>
+<td>Create a staging package for testing</td>
+</tr>
+<tr>
+<td>PRODUCTION</td>
+<td>Create a production package for release</td>
+</tr>
+<tr>
+<td>STAGING_DEPLOY</td>
+<td>Create a staging package and deploy for testing</td>
+</tr>
+<tr>
+<td>PRODUCTION_DEPLOY</td>
+<td>Create a production package and deploy for release</td>
+</tr>
+<tr>
+<td>SOLUTION</td>
+<td>Build the solution Release configuration  using dotnet build</td>
+</tr>
+<tr>
+<td>SOLUTION_MSBUILD</td>
+<td>Build the solution Release configuration  using MSBuild</td>
+</tr>
+<tr>
+<td>PACKAGE</td>
+<td>Create a package for the solution default is a zip file of all artifacts</td>
+</tr>
+<tr>
+<td>COPY_ARTIFACTS</td>
+<td>Save the artifacts to the artifacts folder</td>
+</tr>
+<tr>
+<td>DEPLOY</td>
+<td>Deploy the package. default is to extract artifacts into DeploymentProperty folder</td>
+</tr>
+<tr>
+<td>TEST</td>
+<td>Run all tests using dotnet test in Release mode</td>
+</tr>
+<tr>
+<td>TEST_DEBUG</td>
+<td>Run all tests using dotnet test in Debug mode</td>
+</tr>
+<tr>
+<td>IS_ADMIN</td>
+<td>Check if current process is running in admin mode AdminCheckExitCode property is set</td>
+</tr>
+<tr>
+<td>SingleProject</td>
+<td>Example how to build a single project</td>
+</tr>
+<tr>
+<td>HandleError</td>
+<td>Error handling placeholder</td>
+</tr>
+</tbody>
+</table>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../nbackup/" class="btn btn-neutral float-left" title="Nbackup (nbackup.exe)"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../ngit/" class="btn btn-neutral float-right" title="Ngit (ng.exe)">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/naz-hage/ntools" class="fa fa-code-fork" style="color: #fcfcfc"> ntools</a>
+        </span>
+    
+    
+      <span><a href="../nbackup/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../ngit/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

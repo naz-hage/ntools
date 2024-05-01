@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="naz-hage" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Setup your project - Ntools - Work in Progress</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Setup your project";
+        var mkdocs_page_input_path = "setup.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Ntools - Work in Progress
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../usage/">Practice</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Setup your project</a>
+    <ul class="current">
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">List of Tools</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/nbackup/">Nbackup (nbackup.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/nbuild/">Nbuild (nb.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/ngit/">Ngit (ng.exe)</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Custom Build Tasks</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/nbuildtasks/">NbuildTasks</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Revisions</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../changelog/">Changelog</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Ntools - Work in Progress</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Getting Started</li>
+      <li class="breadcrumb-item active">Setup your project</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/naz-hage/ntools/edit/main/docs/setup.md">Edit on ntools</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h3 id="devsetup"><a href="devsetup.md">DevSetup</a></h3>
+<p>DevSetup Folder contains the <code>apps.json</code> file and the <code>DevSetup.ps1</code> file. The <code>apps.json</code> file contains the list of development tools required for the project. The <code>DevSetup.ps1</code> file is a PowerShell script that installs the development tools and sets up the development environment for the project.</p>
+<ul>
+<li>After installing <code>ntools</code>, two environment variables, <code>DEVDRIVE</code> and <code>MAINDIR</code>, are created.</li>
+<li>When you create a new project, for example <code>MyProject</code>, clone the project into the <code>%DEVDRIVE%\%MAINDIR%</code> directory. </li>
+<li>In your project, create a <code>DevSetup</code> folder and add the <code>apps.json</code> file to it.</li>
+<li>In the <code>DevSetup</code>folder, create a <a href="../ntools/devsetup/">DevSetup.ps1</a> file.</li>
+</ul>
+<p>Your file structure should look like this:</p>
+<pre><code class="language-cmd">c:\source\MyProject
+c:\source\MyProject\DevSetup
+c:\source\MyProject\DevSetup\apps.json
+c:\source\MyProject\DevSetup\DevSetup.ps1
+c:\source\MyProject\... other project and test files
+</code></pre>
+<h3 id="add-nbuildtargets-file">Add nbuild.targets file</h3>
+<p>A file called <a href="../ntools/nbuild-targets/"><code>nbuild.targets</code></a> is required in the solution folder. This file imports the <code>common.targets</code> file located in the <code>$(ProgramFiles)\Nbuild</code> folder. The <code>ntools</code> repository includes multiple target files, which can be found in the <code>nbuild-targets.md</code> file.</p>
+<p>Your file structure should look like this:</p>
+<pre><code class="language-cmd">c:\source\MyProject
+c:\source\MyProject\nbuild.targets
+c:\source\MyProject\DevSetup
+c:\source\MyProject\DevSetup\apps.json
+c:\source\MyProject\DevSetup\DevSetup.ps1
+c:\source\MyProject\... other project test files
+</code></pre>
+<h3 id="nbuildtargets">nbuild.targets</h3>
+<ul>
+<li><code>nbuild.targets</code> is a MSBuild project file that imports <code>common.targets</code></li>
+<li><code>nbuild.targets</code> must include the <code>SolutionName</code> and <code>DeploymentFolder</code> <a href="#required-properties">property</a>. It should also define the <a href="#artifacts">ARTIFACTS</a> target. </li>
+<li><code>nbuild.targets</code> imports the <a href="../ntools/nbuild/#commontargets">common.targets</a> file located in the <code>$(ProgramFiles)\Nbuild</code> folder. The <code>ntools</code> repository includes multiple target files, which can be found in the <a href="../ntools/nbuild-targets/">targets</a> file.</li>
+<li><code>nbuild.targets</code> can include any additional properties and targets that are specific to the solution.  </li>
+<li><code>nbuild.targets</code> file is located in the solution folder.</li>
+</ul>
+<h3 id="required-properties">Required Properties</h3>
+<ul>
+<li>The following properties are required in <code>nbuild.targets</code>:<ul>
+<li>SolutionName: The name of the solution file.</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-xml">&lt;PropertyGroup&gt;
+  &lt;!--The GUID should be replaced with the solution name--&gt;
+  &lt;SolutionName&gt;$([System.IO.Path]::GetFileNameWithoutExtension('$(MSBuildProjectDirectory)'))&lt;/SolutionName&gt;
+  &lt;DeploymentFolder&gt;$(ProgramFiles)\Nbuild&lt;/DeploymentFolder&gt;
+&lt;/PropertyGroup&gt;
+</code></pre>
+<h3 id="artifacts">Artifacts</h3>
+<ul>
+<li>The following target is required in <code>nbuild.targets</code>:<ul>
+<li>ARTIFACTS: The folder where the artifacts are copied to.</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-xml">&lt;!--Setup the ARTIFACTS folders for binaries and test results - override --&gt;
+    &lt;Target Name=&quot;ARTIFACTS&quot; DependsOnTargets=&quot;TAG&quot;&gt;
+      &lt;PropertyGroup&gt;
+         &lt;ArtifactsSolutionFolder&gt;$(ArtifactsDir)\$(SolutionName)&lt;/ArtifactsSolutionFolder&gt;
+         &lt;SetupFolder&gt;$(ArtifactsSolutionFolder)\release&lt;/SetupFolder&gt;
+        &lt;ArtifactsFolder&gt;$(ArtifactsSolutionFolder)\$(TargetRelease)\$(ProductVersion)&lt;/ArtifactsFolder&gt;
+        &lt;ArtifactsTestResultsFolder&gt;$(ArtifactsSolutionFolder)\TestResults\$(ProductVersion)&lt;/ArtifactsTestResultsFolder&gt;
+      &lt;/PropertyGroup&gt;  
+      &lt;ItemGroup&gt;
+            &lt;BinaryFiles 
+                        Exclude=&quot;
+                         $(SolutionDir)\$(TargetRelease)\**\*.pdb;
+                         $(SolutionDir)\$(TargetRelease)\test.*;
+                         $(SolutionDir)\$(TargetRelease)\*test*;
+                         $(SolutionDir)\$(TargetRelease)\Nuget*;
+                         $(SolutionDir)\$(TargetRelease)\*CodeCoverage*&quot;
+
+                        Include=&quot;
+                        $(SolutionDir)\$(TargetRelease)\*.exe;
+                        $(SolutionDir)\$(TargetRelease)\*.exe.config;
+                        $(SolutionDir)\$(TargetRelease)\*.json;
+                        $(SolutionDir)\Nbuild\resources\*.targets;
+                        $(SolutionDir)\Nbuild\resources\*.ps1;
+                        $(SolutionDir)\Nbuild\resources\*.json;
+                        $(SolutionDir)\$(TargetRelease)\*.dll&quot;
+                        /&gt;
+
+            &lt;RunTimesNetStandard20 Include = &quot;
+                                   $(SolutionDir)\$(TargetRelease)\netstandard2.0\*.*&quot;
+                                    Exclude=&quot;
+                                    $(SolutionDir)\$(TargetRelease)\**\*.pdb&quot;
+                                    /&gt;
+        &lt;/ItemGroup&gt;
+
+        &lt;Message Text=&quot;==&gt; DONE&quot;/&gt;
+    &lt;/Target&gt;
+</code></pre>
+<h3 id="add-a-new-tool">Add a new tool</h3>
+<ul>
+<li>
+<p>When looking for new development tool for your project, your need the following:</p>
+<ul>
+<li>Web location to download the tool and the name of the downloaded file.  This file will be used to install the tool</li>
+<li>Command and arguments to install and uninstall the tool</li>
+<li>Location where the tool will be installed</li>
+<li>Location of the tool File name.  This file name will be used to check if the tool is already installed</li>
+<li>Version of the tool</li>
+<li>Name of the tool</li>
+</ul>
+</li>
+<li>
+<p>To add a new tool to your project which can be installed by <code>ntools</code>, you need to define json file.  Below is an example of the json file for 7-zip development tool</p>
+</li>
+</ul>
+<pre><code class="language-json">{
+  &quot;Version&quot;: &quot;1.2.0&quot;,
+  &quot;NbuildAppList&quot;: [
+    {
+      &quot;Name&quot;: &quot;7-zip&quot;,
+      &quot;Version&quot;: &quot;23.01&quot;,
+      &quot;AppFileName&quot;: &quot;$(InstallPath)\\7z.exe&quot;,
+      &quot;WebDownloadFile&quot;: &quot;https://www.7-zip.org/a/7z2301-x64.exe&quot;,
+      &quot;DownloadedFile&quot;: &quot;7zip.exe&quot;,
+      &quot;InstallCommand&quot;: &quot;$(DownloadedFile)&quot;,
+      &quot;InstallArgs&quot;: &quot;/S /D=\u0022$(ProgramFiles)\\7-Zip\u0022&quot;,
+      &quot;InstallPath&quot;: &quot;$(ProgramFiles)\\7-Zip&quot;,
+      &quot;UninstallCommand&quot;: &quot;$(InstallPath)\\Uninstall.exe&quot;,
+      &quot;UninstallArgs&quot;: &quot;/S&quot;
+    }
+  ]
+}
+</code></pre>
+<ul>
+<li>
+<p>By convention, the json file is named apps.json and is located in the DevSetup folder of your project</p>
+</li>
+<li>
+<p>Use Nb.exe to install the tool</p>
+</li>
+</ul>
+<pre><code class="language-cmd">cd DevSetup
+Nb.exe -c install -json apps.json
+</code></pre>
+<h2 id="list-of-environment-variables">List of Environment Variables</h2>
+<table>
+<thead>
+<tr>
+<th>Variable Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Name</td>
+<td>The name of the tool</td>
+</tr>
+<tr>
+<td>Version</td>
+<td>The version of the tool</td>
+</tr>
+<tr>
+<td>AppFileName</td>
+<td>The file name of the tool.  This file name will be used to check if the tool is already installed</td>
+</tr>
+<tr>
+<td>WebDownloadFile</td>
+<td>The web location to download the tool</td>
+</tr>
+<tr>
+<td>DownloadedFile</td>
+<td>The name of the downloaded file.  This file will be used to install the tool</td>
+</tr>
+<tr>
+<td>InstallCommand</td>
+<td>The command to install the tool</td>
+</tr>
+<tr>
+<td>InstallArgs</td>
+<td>The arguments to install the tool</td>
+</tr>
+<tr>
+<td>InstallPath</td>
+<td>The location where the tool will be installed</td>
+</tr>
+<tr>
+<td>UninstallCommand</td>
+<td>The command to uninstall the tool</td>
+</tr>
+<tr>
+<td>UninstallArgs</td>
+<td>The arguments to uninstall the tool</td>
+</tr>
+</tbody>
+</table>
+<h3 id="add-a-new-property">Add a new property</h3>
+<p>In MSBuild, a project file is an XML file that describes a software build process. It includes three important elements: Property, PropertyGroup, and Item.</p>
+<ul>
+<li><strong>Property</strong>: A property in MSBuild is a named value that you can refer to in the project file. Properties are key-value pairs and are defined inside PropertyGroup elements.  In the example below, the Configuration property is set to Debug.</li>
+</ul>
+<pre><code class="language-xml">&lt;PropertyGroup&gt;
+    &lt;Configuration&gt;Debug&lt;/Configuration&gt;
+&lt;/PropertyGroup&gt;
+</code></pre>
+<ul>
+<li><strong>PropertyGroup</strong>: A PropertyGroup is a container for properties. It can contain one or more Property elements. PropertyGroup elements can appear anywhere in the project file, and you can have multiple PropertyGroup elements in a project file.  In the example below, the Configuration and Platform properties are set to Debug and AnyCPU, respectively.</li>
+</ul>
+<pre><code class="language-xml">&lt;PropertyGroup&gt;
+    &lt;Configuration&gt;Debug&lt;/Configuration&gt;
+    &lt;Platform&gt;AnyCPU&lt;/Platform&gt;
+&lt;/PropertyGroup&gt;
+</code></pre>
+<ul>
+<li><strong>Item</strong>: An item in MSBuild is a piece of data that has a type and can be a file, a directory, or any other piece of data that you want to operate on. Items are grouped into ItemGroup elements.  In the example below, the Program.cs file is included in the project.</li>
+</ul>
+<pre><code class="language-xml">&lt;ItemGroup&gt;
+    &lt;Compile Include=&quot;Program.cs&quot; /&gt;
+&lt;/ItemGroup&gt;
+</code></pre>
+<p>For more detailed information, you can refer to the official MSBuild documentation: <a href="https://docs.microsoft.com/en-us/visualstudio/msbuild/msbuild-project-file-schema-reference?view=vs-2019">MSBuild Project File Schema Reference</a></p>
+<h3 id="add-a-new-target">Add a new target</h3>
+<p>A target is a named sequence of tasks that represents something to be built or done. For more information, see <a href="https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild-targets?view=vs-2022">Targets</a>.</p>
+<p><strong>Example of a target:</strong></p>
+<pre><code class="language-xml">&lt;Target Name=&quot;MyTarget&quot;&gt;
+  &lt;Message Text=&quot;Hello, world!&quot; /&gt;
+&lt;/Target&gt;
+</code></pre>
+<h3 id="add-a-new-task">Add a new task</h3>
+<p>A task is the smallest unit of work in a build. Tasks are independent executable components with inputs and outputs. You can add tasks to the project file in different sections. For more information, see <a href="https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild-tasks?view=vs-2022">Tasks</a>.</p>
+<p><strong>Example of a task:</strong></p>
+<pre><code class="language-xml">&lt;Target Name=&quot;MyTarget&quot;&gt;
+  &lt;Message Text=&quot;Hello, world!&quot; /&gt;
+&lt;/Target&gt;
+</code></pre>
+<p>See <a href="./ntools/nbuild-tasks.md">Nbuild Tasks</a> for more information on <code>ntools</code> built-in tasks.</p>
+<h3 id="add-a-new-condition">Add a new condition</h3>
+<p>Conditions in MSBuild allow you to specify whether a particular task, property, or target should be executed based on certain conditions. You can use conditions to control the flow of your build process and make it more flexible and dynamic. Conditions are expressed as Boolean expressions that evaluate to true or false. If the condition evaluates to true, the associated task, property, or target is executed; otherwise, it is skipped. You can use various operators and functions to create complex conditions. For more information on conditions in MSBuild, you can refer to the <a href="https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild-conditions?view=vs-2022">Conditions</a> documentation.</p>
+<p><strong>Example of a condition:</strong></p>
+<pre><code class="language-xml">&lt;PropertyGroup&gt;
+  &lt;IsAdmin Condition=&quot;'$(IsAdmin)' == ''&quot;&gt;false&lt;/IsAdmin&gt;
+&lt;/PropertyGroup&gt;
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../usage/" class="btn btn-neutral float-left" title="Practice"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../ntools/nbackup/" class="btn btn-neutral float-right" title="Nbackup (nbackup.exe)">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/naz-hage/ntools" class="fa fa-code-fork" style="color: #fcfcfc"> ntools</a>
+        </span>
+    
+    
+      <span><a href="../usage/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../ntools/nbackup/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

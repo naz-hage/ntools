@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="naz-hage" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Nbuild targets - Ntools - Work in Progress</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Nbuild targets";
+        var mkdocs_page_input_path = "ntools/nbuild-targets.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Ntools - Work in Progress
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../usage/">Practice</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../setup/">Setup your project</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">List of Tools</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../nbackup/">Nbackup (nbackup.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../nbuild/">Nbuild (nb.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ngit/">Ngit (ng.exe)</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Custom Build Tasks</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../nbuildtasks/">NbuildTasks</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Revisions</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../changelog/">Changelog</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Ntools - Work in Progress</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Nbuild targets</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/naz-hage/ntools/edit/main/docs/ntools/nbuild-targets.md">Edit on ntools</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>The table below lists all available targets for the Nbuild tool. </p>
+<ul>
+<li><strong>c:\source\ntools\nbuild.targets Targets</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th><strong>Target Name</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ARTIFACTS</td>
+<td>Setup the ARTIFACTS folders for binaries and test results - override</td>
+</tr>
+<tr>
+<td>CLEAN_ARTIFACTS</td>
+<td>Delete the ARTIFACTS folder after PACKAGE target is completed</td>
+</tr>
+<tr>
+<td>TEST_GIT</td>
+<td>Temporary Target to test the Git Task</td>
+</tr>
+<tr>
+<td>LOCAL</td>
+<td>Build local staging without incrementing the version</td>
+</tr>
+<tr>
+<td>FILE_VERSIONS</td>
+<td>Test for FileVersion task and powershell file-version.ps1</td>
+</tr>
+<tr>
+<td>NBUILD_DOWNLOAD</td>
+<td>Download Nbuild specified in the NbuildTargetVersion</td>
+</tr>
+<tr>
+<td>NBUILD_INSTALL</td>
+<td>Install Nbuild specified in the NbuildTargetVersion</td>
+</tr>
+<tr>
+<td>DEV_SETUP</td>
+<td>Setup Development Environment</td>
+</tr>
+<tr>
+<td>MKDOCS</td>
+<td>Build docs locally for testing</td>
+</tr>
+<tr>
+<td>NBUILD_DOWNLOAD</td>
+<td>Download Nbuild specified in the NbuildTargetVersion</td>
+</tr>
+<tr>
+<td></td>
+<td>Update the ntools-launcher nuget package in the local feed fot testing - not needed for normal builds</td>
+</tr>
+<tr>
+<td>NBUILD_INSTALL</td>
+<td>Install Nbuild specified in the NbuildTargetVersion</td>
+</tr>
+<tr>
+<td>UPDATE_APPS</td>
+<td>Update App metadata json files in nbuild\resources</td>
+</tr>
+<tr>
+<td>GET_PRODUCT_CODES</td>
+<td>Example to get the installation Product code used for uninstallation of product</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>C:\Program Files\Nbuild\common.targets Targets</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th><strong>Target Name</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PROPERTIES</td>
+<td>Common properties that will be used by all targets</td>
+</tr>
+<tr>
+<td>CLEAN</td>
+<td>Clean up the project and artifacts folder</td>
+</tr>
+<tr>
+<td>INSTALL_DEP</td>
+<td>Install dependencies</td>
+</tr>
+<tr>
+<td>TELEMETRY_OPT_OUT</td>
+<td>Opt out of the DOTNET_CLI_TELEMETRY_OPTOUT - move to common</td>
+</tr>
+<tr>
+<td>STAGING</td>
+<td>Create a staging package for testing</td>
+</tr>
+<tr>
+<td>PRODUCTION</td>
+<td>Create a production package for release</td>
+</tr>
+<tr>
+<td>STAGING_DEPLOY</td>
+<td>Create a staging package and deploy for testing</td>
+</tr>
+<tr>
+<td>PRODUCTION_DEPLOY</td>
+<td>Create a production package and deploy for release</td>
+</tr>
+<tr>
+<td>SOLUTION</td>
+<td>Build the solution Release configuration  using dotnet build</td>
+</tr>
+<tr>
+<td>SOLUTION_MSBUILD</td>
+<td>Build the solution Release configuration  using MSBuild</td>
+</tr>
+<tr>
+<td>PACKAGE</td>
+<td>Create a package for the solution default is a zip file of all artifacts</td>
+</tr>
+<tr>
+<td>COPY_ARTIFACTS</td>
+<td>Save the artifacts to the artifacts folder</td>
+</tr>
+<tr>
+<td>DEPLOY</td>
+<td>Deploy the package. default is to extract artifacts into DeploymentProperty folder</td>
+</tr>
+<tr>
+<td>TEST</td>
+<td>Run all tests using dotnet test in Release mode</td>
+</tr>
+<tr>
+<td>TEST_DEBUG</td>
+<td>Run all tests using dotnet test in Debug mode</td>
+</tr>
+<tr>
+<td>IS_ADMIN</td>
+<td>Check if current process is running in admin mode AdminCheckExitCode property is set</td>
+</tr>
+<tr>
+<td>SingleProject</td>
+<td>Example how to build a single project</td>
+</tr>
+<tr>
+<td>HandleError</td>
+<td>Error handling placeholder</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>C:\Program Files\nbuild\apps-versions.targets Targets</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th><strong>Target Name</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>APP_COMMON</td>
+<td>Defines the download location for the apps</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>C:\Program Files\nbuild\git.targets Targets</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th><strong>Target Name</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GIT_DOWNLOAD</td>
+<td>Download Git For Windows version specified in GitTargetVersion - Requires admin mode</td>
+</tr>
+<tr>
+<td>GIT_INSTALL</td>
+<td>Download Git For Windows version specified in GitTargetVersion property and install</td>
+</tr>
+<tr>
+<td>GIT_UPDATE</td>
+<td>Update the current Git for Windows</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>C:\Program Files\nbuild\dotnet.targets Targets</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th><strong>Target Name</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DOTNET_SDK_DOWNLOAD</td>
+<td>Download dotnet Core sdk</td>
+</tr>
+<tr>
+<td>DOTNET_SDK_INSTALL</td>
+<td>Download and install dotnet Core sdk</td>
+</tr>
+<tr>
+<td>DOTNET_DOWNLOAD</td>
+<td>Download DotNet Core</td>
+</tr>
+<tr>
+<td>DOTNET_INSTALL</td>
+<td>Download and install DotNet Core</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>C:\Program Files\nbuild\code.targets Targets</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th><strong>Target Name</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CODE_DOWNLOAD</td>
+<td>Download node version specified in CodeTargetVersion - Requires admin mode</td>
+</tr>
+<tr>
+<td>CODE_INSTALL</td>
+<td>Download node version specified in CodeTargetVersion property and install</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>C:\Program Files\nbuild\node.targets Targets</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th><strong>Target Name</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NODE_DOWNLOAD</td>
+<td>Download node version specified in NodeTargetVersion - Requires admin mode</td>
+</tr>
+<tr>
+<td>NODE_INSTALL</td>
+<td>Download node version specified in NodeTargetVersion property and install</td>
+</tr>
+<tr>
+<td>NODE_VERSION</td>
+<td>Display the installed note version</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>C:\Program Files\nbuild\mongodb.targets Targets</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th><strong>Target Name</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MONGODB_INSTALL</td>
+<td>Display mongodb version specified in TargetNodeVersion property and install</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>C:\Program Files\nbuild\nuget.targets Targets</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th><strong>Target Name</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NUGET_VERSION</td>
+<td>Display the installed nuget version</td>
+</tr>
+<tr>
+<td>NUGET_INSTALL</td>
+<td>Download latest nuget.exe and install</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>C:\Program Files\nbuild\ngit.targets Targets</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th><strong>Target Name</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GIT_STATUS</td>
+<td>Display the current git status</td>
+</tr>
+<tr>
+<td>AUTOTAG_STAGING</td>
+<td>Increment version for a staging build</td>
+</tr>
+<tr>
+<td>SET_TAG</td>
+<td>Set version for a staging build</td>
+</tr>
+<tr>
+<td>GIT_PULL</td>
+<td>Get the latest tag from git</td>
+</tr>
+<tr>
+<td>AUTOTAG_PRODUCTION</td>
+<td>Increment version for a production build</td>
+</tr>
+<tr>
+<td>TAG</td>
+<td>Get the tag from git</td>
+</tr>
+<tr>
+<td>PUSH_TAG</td>
+<td>Push the tag to the remote repo</td>
+</tr>
+<tr>
+<td>GIT_BRANCH</td>
+<td>Get the current git branch</td>
+</tr>
+</tbody>
+</table>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/naz-hage/ntools" class="fa fa-code-fork" style="color: #fcfcfc"> ntools</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

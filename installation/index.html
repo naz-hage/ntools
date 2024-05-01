@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="naz-hage" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Installation - Ntools - Work in Progress</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Installation";
+        var mkdocs_page_input_path = "installation.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Ntools - Work in Progress
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../usage/">Practice</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../setup/">Setup your project</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">List of Tools</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/nbackup/">Nbackup (nbackup.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/nbuild/">Nbuild (nb.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/ngit/">Ngit (ng.exe)</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Custom Build Tasks</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/nbuildtasks/">NbuildTasks</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Revisions</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../changelog/">Changelog</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Ntools - Work in Progress</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Getting Started</li>
+      <li class="breadcrumb-item active">Installation</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/naz-hage/ntools/edit/main/docs/installation.md">Edit on ntools</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>To get started with <code>ntools</code>, you need to install the latest version of <a href="https://git-scm.com/download/win">64-bit Git for Windows</a> on your machine, then follow these steps:</p>
+<ul>
+<li>Open a PowerShell in administrative mode.  By convention, two environment variables, <code>%DevDrive%='c:'</code> and <code>%MainDir%='source'</code> will be used through this document </li>
+<li>Clone this repository to your local machine from the <code>%MainDir%</code> folder.</li>
+</ul>
+<pre><code class="language-cmd">cd c:\source
+git clone https://github.com/naz-hage/ntools
+</code></pre>
+<ul>
+<li>Change the PowerShell execution policy to allow the installation script to run. Run the following command:</li>
+</ul>
+<pre><code class="language-cmd">Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope Process
+</code></pre>
+<p>This command will allow the installation script to run. Once the installation is complete, the execution policy will revert to its original state.</p>
+<ul>
+<li>Run the following command to install the Development tools:</li>
+</ul>
+<pre><code class="language-cmd">cd c:\source\ntools\DevSetup
+.\install.ps1
+</code></pre>
+<ul>
+<li>This command will install the Dotnet Core Desktop runtime and download the <code>ntools</code> from GitHub, installs the ntools package in the <code>%ProgramFiles%\Nbuild</code> folder, sets up the nTools development environment, adds the <code>%ProgramFiles%\Nbuild</code> will be added to the system path.  </li>
+<li>
+<p>The <code>Install.ps1</code> script also sets up the following environment variables:</p>
+<ul>
+<li><code>%DevDrive%</code> is a string parameter that represents the drive where the development environment will be set up. It is not mandatory , and if it is not provided when the script is run, it will default to <code>C:</code>.</li>
+<li><code>%MainDir%</code> is also a string parameter that represents the main directory where the development environment will be set up. It is not mandatory, and if it is not provided when the script is run, it will default to <code>source</code>.</li>
+</ul>
+</li>
+<li>
+<p>If you prefer to use a different drive or directory, you can specify the <code>%DevDrive%</code> and <code>%MainDir%</code> parameters when running the script. For example, to install the development tools on the <code>D:</code> drive in the <code>Development</code> directory, run the following command:</p>
+</li>
+</ul>
+<pre><code class="language-cmd">.\install.ps1 -DevDrive D: -MainDir Development
+</code></pre>
+<ul>
+<li>After the installation is complete, check out the <a href="../ntools/nbuild-targets/">nbuild.targets</a> for more all the available targets, and navigate to <a href="../usage/">Usage</a> to learn how to execute a build target.</li>
+</ul>
+<p>ntools is now installed on your machine, and you can start using it to learn how to build and run <a href="../usage/">additional targets</a>. If you have any questions or encounter any issues during the installation process, please don't hesitate to write an an <a href="https://github.com/naz-hage/NTools/issues">issue</a>. We're here to help!</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href=".." class="btn btn-neutral float-left" title="Overview"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../usage/" class="btn btn-neutral float-right" title="Practice">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/naz-hage/ntools" class="fa fa-code-fork" style="color: #fcfcfc"> ntools</a>
+        </span>
+    
+    
+      <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../usage/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
