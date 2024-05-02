@@ -5,15 +5,15 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="naz-hage" />
       <link rel="shortcut icon" href="../img/favicon.ico" />
-    <title>Practice - Ntools - Work in Progress</title>
+    <title>Build Types - Ntools - Work in Progress</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
     
       <script>
         // Current page data
-        var mkdocs_page_name = "Practice";
-        var mkdocs_page_input_path = "usage.md";
+        var mkdocs_page_name = "Build Types";
+        var mkdocs_page_input_path = "buildtypes.md";
         var mkdocs_page_url = null;
       </script>
     
@@ -45,11 +45,17 @@
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../installation/">Installation</a>
                   </li>
-                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Practice</a>
+                  <li class="toctree-l1"><a class="reference internal" href="../usage/">Practice</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../setup/">Setup your project</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../buildtypes/">Build Types</a>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Build Types</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#staging">Staging</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#production">Production</a>
+    </li>
+    </ul>
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">List of Tools</span></p>
@@ -86,9 +92,9 @@
   <ul class="wy-breadcrumbs">
     <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
           <li class="breadcrumb-item">Getting Started</li>
-      <li class="breadcrumb-item active">Practice</li>
+      <li class="breadcrumb-item active">Build Types</li>
     <li class="wy-breadcrumbs-aside">
-          <a href="https://github.com/naz-hage/ntools/edit/main/docs/usage.md">Edit on ntools</a>
+          <a href="https://github.com/naz-hage/ntools/edit/main/docs/buildtypes.md">Edit on ntools</a>
     </li>
   </ul>
   <hr/>
@@ -96,49 +102,38 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <p>Once Ntools is installed, Open a Developer Command prompt for Visual Studio 2022 and navigate to your solution folder (i.e. <code>c:\source\ntools</code>).  The <a href="../ntools/nbuild/"><code>Nb.exe</code></a> is the main executable for the Ntools.  The following are some examples of how to use the Ntools:</p>
-<ul>
-<li>Build a solution: Compiles the solution in the solution directory</li>
-</ul>
-<pre><code class="language-cmd">Nb.exe solution
+                <p><strong>ntools</strong> have two predefined build types: <code>staging</code> and <code>production</code>. The <code>staging</code> build type is deploy code to a staging environment used for debugging and testing, while the <code>production</code> build type is used for production deployment. The <code>staging</code> build type includes debugging symbols and is not optimized, while the <code>production</code> build type is optimized for performance and does not include debugging symbols.</p>
+<h2 id="_1"></h2>
+<h3 id="staging">Staging</h3>
+<p>The <code>staging</code> build type use the following command:</p>
+<pre><code class="language-powershell">nb staging
 </code></pre>
-<ul>
-<li>Clean a solution:  Deletes the release/Debug, bin and obj folders in the solution directory</li>
-</ul>
-<pre><code class="language-cmd">Nb.exe clean
+<p>It includes the following steps:
+- Clean the project
+- Restore the project
+- Build the project
+- Test the project
+- Publish the project to the staging environment
+- Run various tests on the staging environment</p>
+<h3 id="production">Production</h3>
+<p>The <code>production</code> build type use the following command:</p>
+<pre><code class="language-powershell">nb production
 </code></pre>
-<ul>
-<li>Test solution: runs all the tests in the solution</li>
-</ul>
-<pre><code class="language-cmd">Nb.exe test
-</code></pre>
-<ul>
-<li>Create a staging release: Creates a staging build which includes the following steps:<ul>
-<li>Clean the solution</li>
-<li>Build the solution</li>
-<li>Run tests</li>
-<li>Create a staging build</li>
-<li>Publish the staging build</li>
-<li>Create a zip file of the staging build file</li>
-</ul>
-</li>
-</ul>
-<pre><code class="language-cmd">Nb.exe staging
-</code></pre>
-<ul>
-<li>Display available targets:  Lists all the available targets in the targets file</li>
-</ul>
-<pre><code class="language-cmd">Nb.exe -c targets
-</code></pre>
-<ul>
-<li>See the list of available targets at <a href="../ntools/nbuild-targets/">Nbuild Targets</a></li>
-</ul>
+<p>It includes the following steps:
+- Clean the project
+- Restore the project
+- Build the project
+- Test the project
+- Publish the project to the production environment
+- Run smoke tests on the production environment
+- This build is available for download from the GitHub release page</p>
+<p>Your project can have additional build types which you can add to your <code>nbuild.targets</code> fille, </p>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../installation/" class="btn btn-neutral float-left" title="Installation"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../setup/" class="btn btn-neutral float-right" title="Setup your project">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../setup/" class="btn btn-neutral float-left" title="Setup your project"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../ntools/nbuild/" class="btn btn-neutral float-right" title="Nbuild (nb.exe)">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -165,10 +160,10 @@
         </span>
     
     
-      <span><a href="../installation/" style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../setup/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
-      <span><a href="../setup/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="../ntools/nbuild/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>
