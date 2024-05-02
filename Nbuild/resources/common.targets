@@ -14,7 +14,6 @@
 
 	<PropertyGroup>
 		<!--The SolutionName should be replaced in nbuild.targets-->
-		<SolutionName></SolutionName>
 		<SolutionName>$([System.IO.Path]::GetFileNameWithoutExtension('$(MSBuildProjectDirectory)'))</SolutionName>
 		<DevDriveRaw>$([System.IO.Path]::GetPathRoot('$(MSBuildProjectDirectory)'))</DevDriveRaw>
 		<MainDirRaw>$(MSBuildProjectDirectory.Replace('$(DevDriveRaw)', '').Replace('$(SolutionName)', ''))</MainDirRaw>
@@ -24,7 +23,7 @@
 		<MainDir>$(MainDirRaw.TrimEnd('\\'))</MainDir>
 		<SolutionDir>$(DevDrive)\$(SolutionName)</SolutionDir>
 		<!-- This is the location when the app deployed or installed -->
-		<DeploymentFolder>$(ProgramFiles)\Nbuild</DeploymentFolder>
+
 		<BuildTools>$(ProgramFiles)\nbuild</BuildTools>
 		<CommonTargetsVersion>6.2.0</CommonTargetsVersion>
 	</PropertyGroup>

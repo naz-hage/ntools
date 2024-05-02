@@ -6,7 +6,7 @@
 
 	<PropertyGroup>
         <!-- This is the folder where the *.sln resides-->
-		<SolutionName>$([System.IO.Path]::GetFileNameWithoutExtension('$(MSBuildProjectDirectory)'))</SolutionName>
+		<DeploymentFolder>$(ProgramFiles)\Nbuild</DeploymentFolder>
 	</PropertyGroup>
 
 	<!--Setup the ARTIFACTS folders for binaries and test results - override -->

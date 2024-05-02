@@ -1,36 +1,35 @@
 ### [DevSetup](devsetup.md)
-DevSetup Folder contains the `apps.json` file and the `DevSetup.ps1` file. The `apps.json` file contains the list of development tools required for the project. The `DevSetup.ps1` file is a PowerShell script that installs the development tools and sets up the development environment for the project.
+DevSetup Folder contains the `apps.json` file and the `DevSetup.ps1` file. The `apps.json` file contains the list of development tools required for your project. The `DevSetup.ps1` file is a PowerShell script that installs the development tools and sets up the development environment for the project.
 
-- After installing `ntools`, two environment variables, `DEVDRIVE` and `MAINDIR`, are created.
-- When you create a new project, for example `MyProject`, clone the project into the `%DEVDRIVE%\%MAINDIR%` directory. 
+- When you create a new project, for example `MyProject`, clone the project into the `%MainDirectory%` directory. 
 - In your project, create a `DevSetup` folder and add the `apps.json` file to it.
 - In the `DevSetup`folder, create a [DevSetup.ps1](./ntools/devsetup.md) file.
 
 Your file structure should look like this:
 ```cmd
-c:\source\MyProject
-c:\source\MyProject\DevSetup
-c:\source\MyProject\DevSetup\apps.json
-c:\source\MyProject\DevSetup\DevSetup.ps1
-c:\source\MyProject\... other project and test files
+%MainDirectory%\MyProject
+%MainDirectory%\MyProject\DevSetup
+%MainDirectory%\MyProject\DevSetup\apps.json
+%MainDirectory%\MyProject\DevSetup\DevSetup.ps1
+%MainDirectory%\MyProject\... other project and test files
 ```
 ### Add nbuild.targets file
 
-A file called [`nbuild.targets`](./ntools/nbuild-targets.md) is required in the solution folder. This file imports the `common.targets` file located in the `$(ProgramFiles)\Nbuild` folder. The `ntools` repository includes multiple target files, which can be found in the `nbuild-targets.md` file.
+A file called [`nbuild.targets`](ntools/nbuild-targets.md) is required in the solution folder. This file imports the `common.targets` file located in the `$(ProgramFiles)\Nbuild` folder. The `ntools` repository includes multiple target files, which can be found in the `nbuild-targets.md` file.
 
 Your file structure should look like this:
 ```cmd
-c:\source\MyProject
-c:\source\MyProject\nbuild.targets
-c:\source\MyProject\DevSetup
-c:\source\MyProject\DevSetup\apps.json
-c:\source\MyProject\DevSetup\DevSetup.ps1
-c:\source\MyProject\... other project test files
+%MainDirectory%\MyProject
+%MainDirectory%\MyProject\nbuild.targets
+%MainDirectory%\MyProject\DevSetup
+%MainDirectory%\MyProject\DevSetup\apps.json
+%MainDirectory%\MyProject\DevSetup\DevSetup.ps1
+%MainDirectory%\MyProject\... other project test files
 ```
 ### nbuild.targets
 - `nbuild.targets` is a MSBuild project file that imports `common.targets`
 - `nbuild.targets` must include the `SolutionName` and `DeploymentFolder` [property](#required-properties). It should also define the [ARTIFACTS](#artifacts) target. 
-- `nbuild.targets` imports the [common.targets](../ntools/nbuild/#commontargets) file located in the `$(ProgramFiles)\Nbuild` folder. The `ntools` repository includes multiple target files, which can be found in the [targets](../ntools/nbuild-targets/) file.
+- `nbuild.targets` imports the [common.targets](../ntools/nbuild/#commontargets) file located in the `$(ProgramFiles)\Nbuild` folder. The `ntools` repository includes multiple target files, which can be found in the [targets](ntools/nbuild-targets.md) file.
 - `nbuild.targets` can include any additional properties and targets that are specific to the solution.  
 - `nbuild.targets` file is located in the solution folder.
 
@@ -191,7 +190,7 @@ A task is the smallest unit of work in a build. Tasks are independent executable
 </Target>
 ```
 
-See [Nbuild Tasks](./ntools/nbuild-tasks.md) for more information on `ntools` built-in tasks.
+See [Nbuild Tasks](ntools/nbuild-targets.md) for more information on `ntools` built-in tasks.
 
 ### Add a new condition
 Conditions in MSBuild allow you to specify whether a particular task, property, or target should be executed based on certain conditions. You can use conditions to control the flow of your build process and make it more flexible and dynamic. Conditions are expressed as Boolean expressions that evaluate to true or false. If the condition evaluates to true, the associated task, property, or target is executed; otherwise, it is skipped. You can use various operators and functions to create complex conditions. For more information on conditions in MSBuild, you can refer to the [Conditions](https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild-conditions?view=vs-2022) documentation.

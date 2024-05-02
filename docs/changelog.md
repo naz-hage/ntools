@@ -1,3 +1,6 @@
+## Version 1.5.0 - 03-may-24
+- [issue #56](https://github.com/naz-hage/ntools/issues/56) - Feature: Remove the dependency on the $(DevDrive) and $(MainDir) environment variables
+
 ## Version 1.4.0 - 25-apr-24
 
 - Complete [issue #37](https://github.com/naz-hage/ntools/issues/37)
