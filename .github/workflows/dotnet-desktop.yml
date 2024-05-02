@@ -1,4 +1,4 @@
-name: dotnet-desktop
+name: .Net Core Desktop
 
 on:
   push:
@@ -16,10 +16,6 @@ jobs:
   build:
     name: Build and Test
     runs-on: windows-latest
-
-    env:
-      Solution_Name: ${{ env.Solution_Name }}
-      Test_Project_Path: ${{ env.Test_Project_Path }}
 
     steps:
     - name: Checkout
