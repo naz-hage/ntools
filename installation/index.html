@@ -96,42 +96,28 @@
               
                 <p>To get started with <code>ntools</code>, you need to install the latest version of <a href="https://git-scm.com/download/win">64-bit Git for Windows</a> on your machine, then follow these steps:</p>
 <ul>
-<li>Open a PowerShell in administrative mode.  By convention, two environment variables, <code>%DevDrive%='c:'</code> and <code>%MainDir%='source'</code> will be used through this document </li>
-<li>Clone this repository to your local machine from the <code>%MainDir%</code> folder.</li>
+<li>Open a PowerShell in administrative mode.  Assume c:\source as directory <code>%MainDirectory%</code> which will be used through this document.</li>
+<li>Clone this repository to your local machine from the <code>%MainDirectory%</code> folder.</li>
 </ul>
-<pre><code class="language-cmd">cd c:\source
+<pre><code class="language-powershell">cd c:\source
 git clone https://github.com/naz-hage/ntools
 </code></pre>
 <ul>
 <li>Change the PowerShell execution policy to allow the installation script to run. Run the following command:</li>
 </ul>
-<pre><code class="language-cmd">Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope Process
+<pre><code class="language-powershell">Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope Process
 </code></pre>
 <p>This command will allow the installation script to run. Once the installation is complete, the execution policy will revert to its original state.</p>
 <ul>
-<li>Run the following command to install the Development tools:</li>
+<li>Run the following command to install the ntools:</li>
 </ul>
-<pre><code class="language-cmd">cd c:\source\ntools\DevSetup
+<pre><code class="language-powershell">cd c:\source\ntools\DevSetup
 .\install.ps1
 </code></pre>
 <ul>
 <li>This command will install the Dotnet Core Desktop runtime and download the <code>ntools</code> from GitHub, installs the ntools package in the <code>%ProgramFiles%\Nbuild</code> folder, sets up the nTools development environment, adds the <code>%ProgramFiles%\Nbuild</code> will be added to the system path.  </li>
-<li>
-<p>The <code>Install.ps1</code> script also sets up the following environment variables:</p>
-<ul>
-<li><code>%DevDrive%</code> is a string parameter that represents the drive where the development environment will be set up. It is not mandatory , and if it is not provided when the script is run, it will default to <code>C:</code>.</li>
-<li><code>%MainDir%</code> is also a string parameter that represents the main directory where the development environment will be set up. It is not mandatory, and if it is not provided when the script is run, it will default to <code>source</code>.</li>
 </ul>
-</li>
-<li>
-<p>If you prefer to use a different drive or directory, you can specify the <code>%DevDrive%</code> and <code>%MainDir%</code> parameters when running the script. For example, to install the development tools on the <code>D:</code> drive in the <code>Development</code> directory, run the following command:</p>
-</li>
-</ul>
-<pre><code class="language-cmd">.\install.ps1 -DevDrive D: -MainDir Development
-</code></pre>
-<ul>
-<li>After the installation is complete, check out the <a href="../ntools/nbuild-targets/">nbuild.targets</a> for more all the available targets, and navigate to <a href="../usage/">Usage</a> to learn how to execute a build target.</li>
-</ul>
+<p>After the installation is complete, check out the <a href="../ntools/nbuild-targets/">nbuild.targets</a> for more all the available targets, and navigate to <a href="../usage/">Usage</a> to learn how to execute a build target.</p>
 <p>ntools is now installed on your machine, and you can start using it to learn how to build and run <a href="../usage/">additional targets</a>. If you have any questions or encounter any issues during the installation process, please don't hesitate to write an an <a href="https://github.com/naz-hage/NTools/issues">issue</a>. We're here to help!</p>
               
             </div>

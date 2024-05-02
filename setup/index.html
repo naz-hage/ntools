@@ -97,29 +97,28 @@
             <div class="section" itemprop="articleBody">
               
                 <h3 id="devsetup"><a href="devsetup.md">DevSetup</a></h3>
-<p>DevSetup Folder contains the <code>apps.json</code> file and the <code>DevSetup.ps1</code> file. The <code>apps.json</code> file contains the list of development tools required for the project. The <code>DevSetup.ps1</code> file is a PowerShell script that installs the development tools and sets up the development environment for the project.</p>
+<p>DevSetup Folder contains the <code>apps.json</code> file and the <code>DevSetup.ps1</code> file. The <code>apps.json</code> file contains the list of development tools required for your project. The <code>DevSetup.ps1</code> file is a PowerShell script that installs the development tools and sets up the development environment for the project.</p>
 <ul>
-<li>After installing <code>ntools</code>, two environment variables, <code>DEVDRIVE</code> and <code>MAINDIR</code>, are created.</li>
-<li>When you create a new project, for example <code>MyProject</code>, clone the project into the <code>%DEVDRIVE%\%MAINDIR%</code> directory. </li>
+<li>When you create a new project, for example <code>MyProject</code>, clone the project into the <code>%MainDirectory%</code> directory. </li>
 <li>In your project, create a <code>DevSetup</code> folder and add the <code>apps.json</code> file to it.</li>
 <li>In the <code>DevSetup</code>folder, create a <a href="../ntools/devsetup/">DevSetup.ps1</a> file.</li>
 </ul>
 <p>Your file structure should look like this:</p>
-<pre><code class="language-cmd">c:\source\MyProject
-c:\source\MyProject\DevSetup
-c:\source\MyProject\DevSetup\apps.json
-c:\source\MyProject\DevSetup\DevSetup.ps1
-c:\source\MyProject\... other project and test files
+<pre><code class="language-cmd">%MainDirectory%\MyProject
+%MainDirectory%\MyProject\DevSetup
+%MainDirectory%\MyProject\DevSetup\apps.json
+%MainDirectory%\MyProject\DevSetup\DevSetup.ps1
+%MainDirectory%\MyProject\... other project and test files
 </code></pre>
 <h3 id="add-nbuildtargets-file">Add nbuild.targets file</h3>
 <p>A file called <a href="../ntools/nbuild-targets/"><code>nbuild.targets</code></a> is required in the solution folder. This file imports the <code>common.targets</code> file located in the <code>$(ProgramFiles)\Nbuild</code> folder. The <code>ntools</code> repository includes multiple target files, which can be found in the <code>nbuild-targets.md</code> file.</p>
 <p>Your file structure should look like this:</p>
-<pre><code class="language-cmd">c:\source\MyProject
-c:\source\MyProject\nbuild.targets
-c:\source\MyProject\DevSetup
-c:\source\MyProject\DevSetup\apps.json
-c:\source\MyProject\DevSetup\DevSetup.ps1
-c:\source\MyProject\... other project test files
+<pre><code class="language-cmd">%MainDirectory%\MyProject
+%MainDirectory%\MyProject\nbuild.targets
+%MainDirectory%\MyProject\DevSetup
+%MainDirectory%\MyProject\DevSetup\apps.json
+%MainDirectory%\MyProject\DevSetup\DevSetup.ps1
+%MainDirectory%\MyProject\... other project test files
 </code></pre>
 <h3 id="nbuildtargets">nbuild.targets</h3>
 <ul>
@@ -322,7 +321,7 @@ Nb.exe -c install -json apps.json
   &lt;Message Text=&quot;Hello, world!&quot; /&gt;
 &lt;/Target&gt;
 </code></pre>
-<p>See <a href="./ntools/nbuild-tasks.md">Nbuild Tasks</a> for more information on <code>ntools</code> built-in tasks.</p>
+<p>See <a href="../ntools/nbuild-targets/">Nbuild Tasks</a> for more information on <code>ntools</code> built-in tasks.</p>
 <h3 id="add-a-new-condition">Add a new condition</h3>
 <p>Conditions in MSBuild allow you to specify whether a particular task, property, or target should be executed based on certain conditions. You can use conditions to control the flow of your build process and make it more flexible and dynamic. Conditions are expressed as Boolean expressions that evaluate to true or false. If the condition evaluates to true, the associated task, property, or target is executed; otherwise, it is skipped. You can use various operators and functions to create complex conditions. For more information on conditions in MSBuild, you can refer to the <a href="https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild-conditions?view=vs-2022">Conditions</a> documentation.</p>
 <p><strong>Example of a condition:</strong></p>
