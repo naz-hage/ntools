@@ -25,7 +25,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-        path: /d:/source
+        path: source
 
     # Install the .NET Core workload
     - name: Install .NET Core
@@ -99,7 +99,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          path: /d:/source
+          path: source
     
       - name: Set up Python
         uses: actions/setup-python@v5
