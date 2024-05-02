@@ -1,6 +1,12 @@
 To set up a new project and take advantage of ntools, you need to follow the steps below:
 
 - A new project should be created in the `%MainDirectory%` directory.
+- The project should be under source control using Git.  An tag should be created for the project and follow the [versioning](versioning.md) rules.
+  - To create a tag, use the following command from the root of the project directory:
+```cmd
+ng -c settag tag 0.0.1 
+```
+
 - The project should include a `DevSetup` folder with an `apps.json` file and a `DevSetup.ps1` file.
 - A `nbuild.targets` file should be added to the solution folder.
 - The `nbuild.targets` file should be located in the solution folder.

@@ -8,12 +8,14 @@ The `staging` build type use the following command:
 nb staging
 ```
 It includes the following steps:
+
 - Clean the project
 - Restore the project
 - Build the project
 - Test the project
 - Publish the project to the staging environment
 - Run various tests on the staging environment
+- The version is set according to the rules in [versioning](versioning.md)
 
 ### Production
 The `production` build type use the following command:
@@ -22,6 +24,7 @@ The `production` build type use the following command:
 nb production
 ```
 It includes the following steps:
+
 - Clean the project
 - Restore the project
 - Build the project
@@ -29,5 +32,6 @@ It includes the following steps:
 - Publish the project to the production environment
 - Run smoke tests on the production environment
 - This build is available for download from the GitHub release page
+- The version is set according to the rules in [versioning](versioning.md)
 
 Your project can have additional build types which you can add to your `nbuild.targets` fille, 

@@ -16,6 +16,7 @@ nav:
     - Practice: usage.md
     - Setup your project: setup.md
     - Build Types: buildtypes.md
+    - Versioning: versioning.md
   - List of Tools:
       - Nbuild (nb.exe): ntools/nbuild.md
       - Ngit (ng.exe): ntools/ngit.md
