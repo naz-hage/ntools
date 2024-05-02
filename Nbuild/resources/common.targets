@@ -55,7 +55,7 @@
 			<ZipExe>$(ProgramFiles)\7-Zip\7z.exe</ZipExe>
 			<TargetRelease>Release</TargetRelease>
 			<TargetDebug>Debug</TargetDebug>
-			<SolutionDir>$(DevDrive)\$(MainDir)\$(SolutionName)</SolutionDir>			
+			<SolutionDir>$(MSBuildProjectDirectory)</SolutionDir>			
 			<OutputPathRelease>$(SolutionDir)\$(TargetRelease)</OutputPathRelease>
 			<OutputPathDebug>$(SolutionDir)\$(TargetDebug)</OutputPathDebug>
 			<ArtifactsDir>$(DevDrive)\Artifacts</ArtifactsDir>
@@ -70,6 +70,7 @@
 		<Message Text="CommonTargets Version: $(CommonTargetsVersion)"/>
 		<Message Text="Solution Name: $(SolutionName)"/>
 		<Message Text="Solution Dir: $(SolutionDir)"/>
+		<Message Text="MSBuildProjectDirectory Dir: $(MSBuildProjectDirectory)"/>
 		<Message Text="Product Version: $(ProductVersion)"/>
 		<Exec Command="git remote -v" ContinueOnError="True"></Exec>
 		<Exec Command="git branch" ContinueOnError="True"></Exec>
