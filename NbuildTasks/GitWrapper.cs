@@ -167,7 +167,7 @@ namespace NbuildTasks
         /// given a valid tag m.n.p.b, staging tag is m.n.p.b+1
         /// </summary>
         /// <param name="tag"></param>
-        /// <returns>return valid stagging tag, otherwise null if failed</returns>
+        /// <returns>return valid staging tag, otherwise null if failed</returns>
         private string GetBranch()
         {
             var branch = string.Empty;

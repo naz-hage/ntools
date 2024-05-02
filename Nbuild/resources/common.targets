@@ -169,8 +169,6 @@
 
 	<!-- Create a package for the solution default is a zip file of all artifacts -->
 	<Target Name="PACKAGE" DependsOnTargets="ARTIFACTS;TAG">
-		<!-- <Exec Command='powershell -Command "Compress-Archive -Path $(ArtifactsFolder)\* -DestinationPath $(ArtifactsFolder).zip" -Force'/> -->
-		<!-- <Zip Path="$(ArtifactsFolder)" FileName="$(ArtifactsFolder).zip"/> -->
 		<Exec Command='"$(ZipExe)" a -r -tzip $(ArtifactsFolder).zip $(ArtifactsFolder)\*'/>
 		
 		<RemoveDir Directories="$(ArtifactsFolder);"/> 
@@ -240,9 +238,6 @@
 		<PropertyGroup>
 			<SetupDir>$(TEMP)\home</SetupDir>
 		</PropertyGroup>
-		
-		<!-- <Exec Command='powershell -Command &quot;Expand-Archive -Path c:\Artifacts\ntools\Release\1.1.11.zip -DestinationPath "C:\Program Files\Nbuild" -Force&quot;'/> -->
-		<!-- <Unzip FileName="$(ArtifactsFolder).zip" Destination="C:\Program Files\Nbuild" /> -->
 
 		<Exec Command='"$(ZipExe)" x $(ArtifactsFolder).zip -o"$(DeploymentFolder)" -y'/>
 		<RemoveDir Directories="$(SetupDir)"></RemoveDir>
