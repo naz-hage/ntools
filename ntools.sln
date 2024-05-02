@@ -60,6 +60,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DevSetup", "DevSetup", "{35
 		DevSetup\app-Visual_Studio_2022.json = DevSetup\app-Visual_Studio_2022.json
 		DevSetup\app-Visual_Studio_Build_Tools.json = DevSetup\app-Visual_Studio_Build_Tools.json
 		DevSetup\app-Visual_Studio_Code.json = DevSetup\app-Visual_Studio_Code.json
+		DevSetup\install-ntools.ps1 = DevSetup\install-ntools.ps1
 		DevSetup\install.log = DevSetup\install.log
 		DevSetup\install.ps1 = DevSetup\install.ps1
 		DevSetup\install.psm1 = DevSetup\install.psm1
