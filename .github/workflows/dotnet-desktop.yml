@@ -21,7 +21,7 @@ jobs:
       Test_Project_Path: LauncherTests                 # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
       DevDrive: 'D:'
       MainDir: 'source'
-      WorkingDir: 'D:\source\REPO_NAME'
+      WorkingDir: 'D:\source\ntools'
 
     steps:
     - name: Checkout
