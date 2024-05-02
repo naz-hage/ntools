@@ -49,6 +49,32 @@
                   </li>
                   <li class="toctree-l1 current"><a class="reference internal current" href="#">Setup your project</a>
     <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#devsetup-folder">DevSetup folder</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#add-a-new-tool">Add a new tool</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#list-of-environment-variables">List of Environment Variables</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#nbuildtargets-file">nbuild.targets file</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#nbuildtargets">nbuild.targets</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#required-properties">Required Properties</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#artifacts">Artifacts</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#add-a-new-property">Add a new property</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#add-a-new-target">Add a new target</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#add-a-new-task">Add a new task</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#add-a-new-condition">Add a new condition</a>
+    </li>
     </ul>
                   </li>
               </ul>
@@ -96,7 +122,21 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h3 id="devsetup"><a href="devsetup.md">DevSetup</a></h3>
+                <p>To set up a new project and take advantage of ntools, you need to follow the steps below:</p>
+<ul>
+<li>A new project should be created in the <code>%MainDirectory%</code> directory.</li>
+<li>The project should include a <code>DevSetup</code> folder with an <code>apps.json</code> file and a <code>DevSetup.ps1</code> file.</li>
+<li>A <code>nbuild.targets</code> file should be added to the solution folder.</li>
+<li>The <code>nbuild.targets</code> file should be located in the solution folder.</li>
+<li>The <code>nbuild.targets</code> file should include the <code>DeploymentFolder</code> property and define the <code>ARTIFACTS</code> target.</li>
+<li>The <code>nbuild.targets</code> file should include any additional properties and targets specific to the solution.</li>
+<li>The <code>nbuild.targets</code> file should import the <code>common.targets</code> file located in the <code>$(ProgramFiles)\Nbuild</code> folder.</li>
+<li>The <code>DevSetup/apps.json</code> file should include the list of development tools required for the project.</li>
+<li>The <code>DevSetup/DevSetup.ps1</code> file should install the development tools and set up the development environment for the project.</li>
+<li>The <code>DevSetup/DevSetup.ps1</code> file should be located in the <code>DevSetup</code> folder of the project.</li>
+</ul>
+<h2 id="_1"></h2>
+<h3 id="devsetup-folder">DevSetup folder</h3>
 <p>DevSetup Folder contains the <code>apps.json</code> file and the <code>DevSetup.ps1</code> file. The <code>apps.json</code> file contains the list of development tools required for your project. The <code>DevSetup.ps1</code> file is a PowerShell script that installs the development tools and sets up the development environment for the project.</p>
 <ul>
 <li>When you create a new project, for example <code>MyProject</code>, clone the project into the <code>%MainDirectory%</code> directory. </li>
@@ -110,82 +150,7 @@
 %MainDirectory%\MyProject\DevSetup\DevSetup.ps1
 %MainDirectory%\MyProject\... other project and test files
 </code></pre>
-<h3 id="add-nbuildtargets-file">Add nbuild.targets file</h3>
-<p>A file called <a href="../ntools/nbuild-targets/"><code>nbuild.targets</code></a> is required in the solution folder. This file imports the <code>common.targets</code> file located in the <code>$(ProgramFiles)\Nbuild</code> folder. The <code>ntools</code> repository includes multiple target files, which can be found in the <code>nbuild-targets.md</code> file.</p>
-<p>Your file structure should look like this:</p>
-<pre><code class="language-cmd">%MainDirectory%\MyProject
-%MainDirectory%\MyProject\nbuild.targets
-%MainDirectory%\MyProject\DevSetup
-%MainDirectory%\MyProject\DevSetup\apps.json
-%MainDirectory%\MyProject\DevSetup\DevSetup.ps1
-%MainDirectory%\MyProject\... other project test files
-</code></pre>
-<h3 id="nbuildtargets">nbuild.targets</h3>
-<ul>
-<li><code>nbuild.targets</code> is a MSBuild project file that imports <code>common.targets</code></li>
-<li><code>nbuild.targets</code> must include the <code>SolutionName</code> and <code>DeploymentFolder</code> <a href="#required-properties">property</a>. It should also define the <a href="#artifacts">ARTIFACTS</a> target. </li>
-<li><code>nbuild.targets</code> imports the <a href="../ntools/nbuild/#commontargets">common.targets</a> file located in the <code>$(ProgramFiles)\Nbuild</code> folder. The <code>ntools</code> repository includes multiple target files, which can be found in the <a href="../ntools/nbuild-targets/">targets</a> file.</li>
-<li><code>nbuild.targets</code> can include any additional properties and targets that are specific to the solution.  </li>
-<li><code>nbuild.targets</code> file is located in the solution folder.</li>
-</ul>
-<h3 id="required-properties">Required Properties</h3>
-<ul>
-<li>The following properties are required in <code>nbuild.targets</code>:<ul>
-<li>SolutionName: The name of the solution file.</li>
-</ul>
-</li>
-</ul>
-<pre><code class="language-xml">&lt;PropertyGroup&gt;
-  &lt;!--The GUID should be replaced with the solution name--&gt;
-  &lt;SolutionName&gt;$([System.IO.Path]::GetFileNameWithoutExtension('$(MSBuildProjectDirectory)'))&lt;/SolutionName&gt;
-  &lt;DeploymentFolder&gt;$(ProgramFiles)\Nbuild&lt;/DeploymentFolder&gt;
-&lt;/PropertyGroup&gt;
-</code></pre>
-<h3 id="artifacts">Artifacts</h3>
-<ul>
-<li>The following target is required in <code>nbuild.targets</code>:<ul>
-<li>ARTIFACTS: The folder where the artifacts are copied to.</li>
-</ul>
-</li>
-</ul>
-<pre><code class="language-xml">&lt;!--Setup the ARTIFACTS folders for binaries and test results - override --&gt;
-    &lt;Target Name=&quot;ARTIFACTS&quot; DependsOnTargets=&quot;TAG&quot;&gt;
-      &lt;PropertyGroup&gt;
-         &lt;ArtifactsSolutionFolder&gt;$(ArtifactsDir)\$(SolutionName)&lt;/ArtifactsSolutionFolder&gt;
-         &lt;SetupFolder&gt;$(ArtifactsSolutionFolder)\release&lt;/SetupFolder&gt;
-        &lt;ArtifactsFolder&gt;$(ArtifactsSolutionFolder)\$(TargetRelease)\$(ProductVersion)&lt;/ArtifactsFolder&gt;
-        &lt;ArtifactsTestResultsFolder&gt;$(ArtifactsSolutionFolder)\TestResults\$(ProductVersion)&lt;/ArtifactsTestResultsFolder&gt;
-      &lt;/PropertyGroup&gt;  
-      &lt;ItemGroup&gt;
-            &lt;BinaryFiles 
-                        Exclude=&quot;
-                         $(SolutionDir)\$(TargetRelease)\**\*.pdb;
-                         $(SolutionDir)\$(TargetRelease)\test.*;
-                         $(SolutionDir)\$(TargetRelease)\*test*;
-                         $(SolutionDir)\$(TargetRelease)\Nuget*;
-                         $(SolutionDir)\$(TargetRelease)\*CodeCoverage*&quot;
-
-                        Include=&quot;
-                        $(SolutionDir)\$(TargetRelease)\*.exe;
-                        $(SolutionDir)\$(TargetRelease)\*.exe.config;
-                        $(SolutionDir)\$(TargetRelease)\*.json;
-                        $(SolutionDir)\Nbuild\resources\*.targets;
-                        $(SolutionDir)\Nbuild\resources\*.ps1;
-                        $(SolutionDir)\Nbuild\resources\*.json;
-                        $(SolutionDir)\$(TargetRelease)\*.dll&quot;
-                        /&gt;
-
-            &lt;RunTimesNetStandard20 Include = &quot;
-                                   $(SolutionDir)\$(TargetRelease)\netstandard2.0\*.*&quot;
-                                    Exclude=&quot;
-                                    $(SolutionDir)\$(TargetRelease)\**\*.pdb&quot;
-                                    /&gt;
-        &lt;/ItemGroup&gt;
-
-        &lt;Message Text=&quot;==&gt; DONE&quot;/&gt;
-    &lt;/Target&gt;
-</code></pre>
-<h3 id="add-a-new-tool">Add a new tool</h3>
+<h4 id="add-a-new-tool">Add a new tool</h4>
 <ul>
 <li>
 <p>When looking for new development tool for your project, your need the following:</p>
@@ -231,7 +196,7 @@
 <pre><code class="language-cmd">cd DevSetup
 Nb.exe -c install -json apps.json
 </code></pre>
-<h2 id="list-of-environment-variables">List of Environment Variables</h2>
+<h4 id="list-of-environment-variables">List of Environment Variables</h4>
 <table>
 <thead>
 <tr>
@@ -282,6 +247,79 @@ Nb.exe -c install -json apps.json
 </tr>
 </tbody>
 </table>
+<h3 id="nbuildtargets-file">nbuild.targets file</h3>
+<p>A file called <a href="../ntools/nbuild-targets/"><code>nbuild.targets</code></a> is required in the solution folder. This file imports the <code>common.targets</code> file located in the <code>$(ProgramFiles)\Nbuild</code> folder. The <code>ntools</code> repository includes multiple target files, which can be found in the <code>nbuild-targets.md</code> file.</p>
+<p>Your file structure should look like this:</p>
+<pre><code class="language-cmd">%MainDirectory%\MyProject
+%MainDirectory%\MyProject\nbuild.targets
+%MainDirectory%\MyProject\DevSetup
+%MainDirectory%\MyProject\DevSetup\apps.json
+%MainDirectory%\MyProject\DevSetup\DevSetup.ps1
+%MainDirectory%\MyProject\... other project test files
+</code></pre>
+<h4 id="nbuildtargets">nbuild.targets</h4>
+<ul>
+<li><code>nbuild.targets</code> is a MSBuild project file that imports <code>common.targets</code></li>
+<li><code>nbuild.targets</code> must include the <code>SolutionName</code> and <code>DeploymentFolder</code> <a href="#required-properties">property</a>. It should also define the <a href="#artifacts">ARTIFACTS</a> target. </li>
+<li><code>nbuild.targets</code> imports the <a href="../ntools/nbuild/#commontargets">common.targets</a> file located in the <code>$(ProgramFiles)\Nbuild</code> folder. The <code>ntools</code> repository includes multiple target files, which can be found in the <a href="../ntools/nbuild-targets/">targets</a> file.</li>
+<li><code>nbuild.targets</code> can include any additional properties and targets that are specific to the solution.  </li>
+<li><code>nbuild.targets</code> file is located in the solution folder.</li>
+</ul>
+<h4 id="required-properties">Required Properties</h4>
+<ul>
+<li>The following properties are required in <code>nbuild.targets</code>:<ul>
+<li>SolutionName: The name of the solution file.</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-xml">&lt;PropertyGroup&gt;
+  &lt;DeploymentFolder&gt;$(ProgramFiles)\Nbuild&lt;/DeploymentFolder&gt;
+&lt;/PropertyGroup&gt;
+</code></pre>
+<h4 id="artifacts">Artifacts</h4>
+<ul>
+<li>The following target is required in <code>nbuild.targets</code>:<ul>
+<li>ARTIFACTS: The folder where the artifacts are copied to.</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-xml">&lt;!--Setup the ARTIFACTS folders for binaries and test results - override --&gt;
+    &lt;Target Name=&quot;ARTIFACTS&quot; DependsOnTargets=&quot;TAG&quot;&gt;
+      &lt;PropertyGroup&gt;
+         &lt;ArtifactsSolutionFolder&gt;$(ArtifactsDir)\$(SolutionName)&lt;/ArtifactsSolutionFolder&gt;
+         &lt;SetupFolder&gt;$(ArtifactsSolutionFolder)\release&lt;/SetupFolder&gt;
+        &lt;ArtifactsFolder&gt;$(ArtifactsSolutionFolder)\$(TargetRelease)\$(ProductVersion)&lt;/ArtifactsFolder&gt;
+        &lt;ArtifactsTestResultsFolder&gt;$(ArtifactsSolutionFolder)\TestResults\$(ProductVersion)&lt;/ArtifactsTestResultsFolder&gt;
+      &lt;/PropertyGroup&gt;  
+      &lt;ItemGroup&gt;
+            &lt;BinaryFiles 
+                        Exclude=&quot;
+                         $(SolutionDir)\$(TargetRelease)\**\*.pdb;
+                         $(SolutionDir)\$(TargetRelease)\test.*;
+                         $(SolutionDir)\$(TargetRelease)\*test*;
+                         $(SolutionDir)\$(TargetRelease)\Nuget*;
+                         $(SolutionDir)\$(TargetRelease)\*CodeCoverage*&quot;
+
+                        Include=&quot;
+                        $(SolutionDir)\$(TargetRelease)\*.exe;
+                        $(SolutionDir)\$(TargetRelease)\*.exe.config;
+                        $(SolutionDir)\$(TargetRelease)\*.json;
+                        $(SolutionDir)\Nbuild\resources\*.targets;
+                        $(SolutionDir)\Nbuild\resources\*.ps1;
+                        $(SolutionDir)\Nbuild\resources\*.json;
+                        $(SolutionDir)\$(TargetRelease)\*.dll&quot;
+                        /&gt;
+
+            &lt;RunTimesNetStandard20 Include = &quot;
+                                   $(SolutionDir)\$(TargetRelease)\netstandard2.0\*.*&quot;
+                                    Exclude=&quot;
+                                    $(SolutionDir)\$(TargetRelease)\**\*.pdb&quot;
+                                    /&gt;
+        &lt;/ItemGroup&gt;
+
+        &lt;Message Text=&quot;==&gt; DONE&quot;/&gt;
+    &lt;/Target&gt;
+</code></pre>
 <h3 id="add-a-new-property">Add a new property</h3>
 <p>In MSBuild, a project file is an XML file that describes a software build process. It includes three important elements: Property, PropertyGroup, and Item.</p>
 <ul>
