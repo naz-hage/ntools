@@ -101,56 +101,54 @@ function CheckIfAppInstalled {
      }
 }
 
-function  Install {
+function Install {
     param (
         [Parameter(Mandatory=$true)]
         [string]$json
     )
-     # Retrieve elements using dot notation
-     $appInfo = GetAppInfo $json
+    # Retrieve elements using dot notation
+    $appInfo = GetAppInfo $json
 
     # download the App
     $output = $downloadsDirectory + "\\" + $appInfo.DownloadedFile
-    
     # replace $(Version) with the version number
     $output = $output -replace '\$\(Version\)', $appInfo.Version
     $webUri = $appInfo.WebDownloadFile -replace '\$\(Version\)', $appInfo.Version
     Write-Host "Downloading $($webUri) to : $($output) ..."
     Invoke-WebRequest -Uri $webUri -OutFile $output
 
-    # install the App
+    #Install the App
     $installCommand = $appInfo.InstallCommand -replace '\$\(Version\)', $appInfo.Version
-    write-host "Installing $($appInfo.Name) version: $($appInfo.Version) ..."
-    write-host "Install command: $installCommand"
-    $installArgs=$appInfo.InstallArgs
-    write-host "Install arguments: $installArgs"
-    write-host "App file Nane: $($appInfo.AppFileName) ..."
+    Write-Host "Installing $($appInfo.Name) version: $($appInfo.Version) ..."
+    Write-Host "Install command: $installCommand"
+    $installArgs = $appInfo.InstallArgs
+    Write-Host "Install arguments: $installArgs"
+    Write-Host "App file Name: $($appInfo.AppFileName) ..."
 
     $timeout = New-TimeSpan -Minutes 10
     $sw = [Diagnostics.Stopwatch]::StartNew()
-    
+
     Start-Process -FilePath $installCommand -ArgumentList $installArgs -WorkingDirectory $downloadsDirectory -Wait
-    
+
     # Wait for App to be installed or timeout
-    while (!(Test-Path $appInfo.AppFileName) -and $sw.elapsed -lt $timeout) {
+    while (!(Test-Path $appInfo.AppFileName) -and $sw.Elapsed -lt $timeout) {
         Start-Sleep -Seconds 5
     }
-    
-    if ($sw.elapsed -ge $timeout) {
+
+    if ($sw.Elapsed -ge $timeout) {
         Write-Output "Installation timed out."
+        return $false
     } else {
         Write-Output "Installation completed."
     }
 
-    # check if App is installed
     $installed = CheckIfAppInstalled $json
     if ($installed) {
         Write-Host "App $($appInfo.Name) version: $($appInfo.Version) is installed successfully."
-        return
-    }
-    else
-    {
+        return $true
+    } else {
         Write-Host "App $($appInfo.Name) version: $($appInfo.Version) is not installed."
+        return $false
     }
 }
 
@@ -175,8 +173,6 @@ function MainInstallApp {
     }
     Write-OutputMessage $MyInvocation.MyCommand.Name "Installation of $($app.Name) completed successfully."
 }
-
-
 
 function CheckIfDotnetInstalled {
     param (
@@ -304,7 +300,6 @@ function GetFileVersion {
     # return the all file version parts joined by a dot
     return ($versionInfo.FileMajorPart, $versionInfo.FileMinorPart, $versionInfo.FileBuildPart, $versionInfo.FilePrivatePart) -join "."
 }
-
 
 function MainFileVersion {
     param (

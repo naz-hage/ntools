@@ -17,19 +17,24 @@ if (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
 
 # Install Dotnet_Runtime
 #########################
-MainInstallApp -command install -json .\app-Dotnet_Runtime.json
-if ($LASTEXITCODE -ne 0) {
+if (MainInstallApp -command install -json .\app-Dotnet_Runtime.json) {
+    Write-OutputMessage $fileName "Installation of app-Dotnet_Runtime succeeded."
+} else {
     Write-OutputMessage $fileName "Error: Installation of app-Dotnet_Runtime.json failed. Exiting script."
     exit 1
 }
 
 # install Ntools
 #########################
-MainInstallApp -command install -json .\app-Ntools.json
-if ($LASTEXITCODE -ne 0) {
+# install Ntools
+#########################
+if (MainInstallApp -command install -json .\app-Ntools.json) {
+    Write-OutputMessage $fileName "Installation of app-Ntools succeeded."
+} else {
     Write-OutputMessage $fileName "Error: Installation of app-Ntools.json failed. Exiting script."
     exit 1
 }
+
 #install Development tools for Ntools
 #########################
 MainInstallNtools 
