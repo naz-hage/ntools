@@ -32,6 +32,7 @@ jobs:
     - name: Copy repository
       run: |
         New-Item -ItemType Directory -Force -Path ${{ env.DevDrive }}\${{ env.MainDir }}
+        Remove-Item -Path ${{ env.WorkingDir }} -Recurse -Force -ErrorAction Ignore
         Copy-Item -Path ${{ github.workspace }}\* -Destination ${{ env.WorkingDir }} -Recurse -Force
       shell: pwsh
 
