@@ -5,10 +5,10 @@ This repository contains a collection of software tools specifically designed to
 With the `ntools`, you can effortlessly:
 
 - Set up your development environment quickly and lay the development foundation for all your projects
-- Backup your files and folders
 - Build your projects with ease
 - Perform Git operations seamlessly
 - Leverage powerful MSBuild tasks
+- Backup your files and folders
 
 The [installation](installation.md) process is straightforward, and the tools are highly reliable and efficient, ensuring the safety and integrity of your data.
 
