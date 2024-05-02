@@ -19,29 +19,28 @@ jobs:
     env:
       Solution_Name: ntools.sln                         # Replace with your solution name, i.e. MyWpfApp.sln.
       Test_Project_Path: LauncherTests                 # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
+      DevDrive: 'D:'
+      MainDir: 'source'
+      WorkingDir: 'D:\source\REPO_NAME'
 
     steps:
     - name: Checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-        path: source
+
+    - name: Move repository
+      run: |
+        New-Item -ItemType Directory -Force -Path ${{ env.DevDrive }}\${{ env.MainDir }}
+        Move-Item -Path ${{ github.workspace }} -Destination ${{ env.WorkingDir }} -Force
+      shell: pwsh
 
     # Install the .NET Core workload
     - name: Install .NET Core
       uses: actions/setup-dotnet@v4
-                
-   
       with:
         dotnet-version: 8.0
 
-    #  Upload a test output file
-    # - name: Upload test output
-    #   uses: actions/upload-artifact@v2
-    #   with:
-    #     name: Test Output
-    #     path: test_output.txt
-    
     # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v2
@@ -52,14 +51,16 @@ jobs:
         cd ./DevSetup
         ./install-ntools.ps1
       shell: pwsh
-      working-directory: ${{ github.workspace }}
+      working-directory: ${{ env.WorkingDir }}
 
     # Set ProgramFilesPath
     - name: Set ProgramFilesPath
       run: |
+        
         $programFilesPath = [System.Environment]::GetFolderPath('ProgramFiles')
         echo "ProgramFilesPath=$programFilesPath" | Out-File -FilePath $env:GITHUB_ENV -Append
       shell: pwsh
+      working-directory: ${{ env.WorkingDir }}
    
     # Configure Git
     - name: Configure Git
@@ -70,25 +71,9 @@ jobs:
     # Build Staging using ntools
     - name: Run nb.exe
       run: |
-        & dotnet build --configuration Debug --verbosity normal
-        & "Debug/nb.exe" solution -v true
+        & "$env:ProgramFilesPath/nbuild/nb.exe" staging
       shell: pwsh
-      working-directory: ${{ github.workspace }}
-
-    - name: Install dependencies
-      run: dotnet restore
-
-    # Execute all unit tests in the solution
-    - name: Build the solution
-      run: dotnet build --no-restore --verbosity normal
-
-    - name: Execute unit tests
-      #run: dotnet test --no-build --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
-      run: dotnet test --no-build --verbosity normal
-      env:
-        DOTNET_CLI_TELEMETRY_OPTOUT: 1
-
-
+      working-directory: ${{ env.WorkingDir }}
 
   docs:
     name: Publish docs  # More descriptive name for the docs job
@@ -99,7 +84,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          path: source
     
       - name: Set up Python
         uses: actions/setup-python@v5
