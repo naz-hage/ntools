@@ -5,15 +5,15 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="naz-hage" />
       <link rel="shortcut icon" href="../img/favicon.ico" />
-    <title>Installation - Ntools - Work in Progress</title>
+    <title>Versioning - Ntools - Work in Progress</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
     
       <script>
         // Current page data
-        var mkdocs_page_name = "Installation";
-        var mkdocs_page_input_path = "installation.md";
+        var mkdocs_page_name = "Versioning";
+        var mkdocs_page_input_path = "versioning.md";
         var mkdocs_page_url = null;
       </script>
     
@@ -43,7 +43,7 @@
               <ul class="current">
                   <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
                   </li>
-                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Installation</a>
+                  <li class="toctree-l1"><a class="reference internal" href="../installation/">Installation</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../usage/">Practice</a>
                   </li>
@@ -51,7 +51,9 @@
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../buildtypes/">Build Types</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../versioning/">Versioning</a>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Versioning</a>
+    <ul class="current">
+    </ul>
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">List of Tools</span></p>
@@ -88,9 +90,9 @@
   <ul class="wy-breadcrumbs">
     <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
           <li class="breadcrumb-item">Getting Started</li>
-      <li class="breadcrumb-item active">Installation</li>
+      <li class="breadcrumb-item active">Versioning</li>
     <li class="wy-breadcrumbs-aside">
-          <a href="https://github.com/naz-hage/ntools/edit/main/docs/installation.md">Edit on ntools</a>
+          <a href="https://github.com/naz-hage/ntools/edit/main/docs/versioning.md">Edit on ntools</a>
     </li>
   </ul>
   <hr/>
@@ -98,37 +100,30 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <p>To get started with <code>ntools</code>, you need to install the latest version of <a href="https://git-scm.com/download/win">64-bit Git for Windows</a> on your machine, then follow these steps:</p>
-<ul>
-<li>Open a PowerShell in administrative mode.  Assume c:\source as directory <code>%MainDirectory%</code> which will be used through this document.</li>
-<li>Clone this repository to your local machine from the <code>%MainDirectory%</code> folder.</li>
+                <h1 id="version-and-tag">Version and Tag</h1>
+<p>Throughout this document, the terms "version" and "tag" are used interchangeably. The version applies to binaries, product, or repo tagging. The rules for ntools versioning are as follows:</p>
+<ol>
+<li>The version is a string in the format of <code>X.Y.Z</code>, where <code>X</code>, <code>Y</code>, and <code>Z</code> are integers.</li>
+<li>The version is incremented as follows:<ul>
+<li><code>X</code> is the major number:</li>
+<li>Incremented for breaking changes.</li>
+<li><code>Y</code> is the minor number:</li>
+<li>Incremented for new features or bug fixes.</li>
+<li>Incremented when <a href="../buildtypes/#production">production</a> Build Type is deployed.</li>
+<li>Incrementing <code>Y</code> resets <code>Z</code> to 0.</li>
+<li><code>Z</code> is the build number:<ul>
+<li>Incremented when <a href="../buildtypes/#staging">staging</a> Build Type is deployed.</li>
 </ul>
-<pre><code class="language-powershell">cd c:\source
-git clone https://github.com/naz-hage/ntools
-</code></pre>
-<ul>
-<li>Change the PowerShell execution policy to allow the installation script to run. Run the following command:</li>
+</li>
 </ul>
-<pre><code class="language-powershell">Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope Process
-</code></pre>
-<p>This command will allow the installation script to run. Once the installation is complete, the execution policy will revert to its original state.</p>
-<ul>
-<li>Run the following command to install the ntools:</li>
-</ul>
-<pre><code class="language-powershell">cd c:\source\ntools\DevSetup
-.\install.ps1
-</code></pre>
-<ul>
-<li>This command will install the Dotnet Core Desktop runtime and download the <code>ntools</code> from GitHub, installs the ntools package in the <code>%ProgramFiles%\Nbuild</code> folder, sets up the nTools development environment, adds the <code>%ProgramFiles%\Nbuild</code> will be added to the system path.  </li>
-</ul>
-<p>After the installation is complete, check out the <a href="../ntools/nbuild-targets/">nbuild.targets</a> for more all the available targets, and navigate to <a href="../usage/">Usage</a> to learn how to execute a build target.</p>
-<p>ntools is now installed on your machine, and you can start using it to learn how to build and run <a href="../usage/">additional targets</a>. If you have any questions or encounter any issues during the installation process, please don't hesitate to write an an <a href="https://github.com/naz-hage/NTools/issues">issue</a>. We're here to help!</p>
+</li>
+</ol>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href=".." class="btn btn-neutral float-left" title="Overview"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../usage/" class="btn btn-neutral float-right" title="Practice">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../buildtypes/" class="btn btn-neutral float-left" title="Build Types"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../ntools/nbuild/" class="btn btn-neutral float-right" title="Nbuild (nb.exe)">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -155,10 +150,10 @@ git clone https://github.com/naz-hage/ntools
         </span>
     
     
-      <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../buildtypes/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
-      <span><a href="../usage/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="../ntools/nbuild/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>

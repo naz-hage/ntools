@@ -79,6 +79,8 @@
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../buildtypes/">Build Types</a>
                   </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../versioning/">Versioning</a>
+                  </li>
               </ul>
               <p class="caption"><span class="caption-text">List of Tools</span></p>
               <ul>
@@ -127,6 +129,12 @@
                 <p>To set up a new project and take advantage of ntools, you need to follow the steps below:</p>
 <ul>
 <li>A new project should be created in the <code>%MainDirectory%</code> directory.</li>
+<li>The project should be under source control using Git.  An tag should be created for the project and follow the <a href="../versioning/">versioning</a> rules.</li>
+<li>To create a tag, use the following command from the root of the project directory:</li>
+</ul>
+<pre><code class="language-cmd">ng -c settag tag 0.0.1 
+</code></pre>
+<ul>
 <li>The project should include a <code>DevSetup</code> folder with an <code>apps.json</code> file and a <code>DevSetup.ps1</code> file.</li>
 <li>A <code>nbuild.targets</code> file should be added to the solution folder.</li>
 <li>The <code>nbuild.targets</code> file should be located in the solution folder.</li>
