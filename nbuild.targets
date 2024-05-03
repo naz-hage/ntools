@@ -6,9 +6,7 @@
 
 	<PropertyGroup>
         <!-- This is the folder where the *.sln resides-->
-		<SolutionName>$([System.IO.Path]::GetFileNameWithoutExtension('$(MSBuildProjectDirectory)'))</SolutionName>
-        <!-- This is the location when the app deployed or installed -->
-        <DeploymentFolder>$(ProgramFiles)\Nbuild</DeploymentFolder>
+		<DeploymentFolder>$(ProgramFiles)\Nbuild</DeploymentFolder>
 	</PropertyGroup>
 
 	<!--Setup the ARTIFACTS folders for binaries and test results - override -->
@@ -218,6 +216,34 @@
 	<Target Name="PUSH_TAG" DependsOnTargets="TAG" AfterTargets="PRODUCTION" >
 		<Git Command="PushTag" TaskParameter="$(ProductVersion)" >
 		</Git>
+	</Target>
+	
+	<!-- Display core properties-->
+	<Target Name="CORE" >
+		<Message Text="DevDrive: $(DevDrive)"/>
+		<Message Text="MainDir: $(MainDir)"/>
+		<Message Text="SolutionName: $(SolutionName)"/>
+		<Message Text="SolutionDir: $(SolutionDir)"/>
+		<Message Text="DeploymentFolder: $(DeploymentFolder)"/>
+		<Message Text="ArtifactsSolutionFolder: $(ArtifactsSolutionFolder)"/>
+		<Message Text="SetupFolder: $(SetupFolder)"/>
+		<Message Text="ArtifactsFolder: $(ArtifactsFolder)"/>
+		<Message Text="ArtifactsTestResultsFolder: $(ArtifactsTestResultsFolder)"/>
+		<Message Text="==> DONE"/>
+	</Target>
+
+	<!-- Update ntools locally for testing -->
+	<Target Name="UPDATE_NTOOLS" >
+		<PropertyGroup>
+			<SRC>$(SolutionDir)\nbuild\resources</SRC>
+			<DST>$(DeploymentFolder)</DST>
+		</PropertyGroup>
+		<ItemGroup>
+			<SourceFiles Include="
+						 $(SRC)\ntools.json;
+						 $(SRC)\common.targets" />
+		</ItemGroup>
+		<Copy SourceFiles="@(SourceFiles)" DestinationFolder="$(DST)" />
 	</Target>
 
 </Project>

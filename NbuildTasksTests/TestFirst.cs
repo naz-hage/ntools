@@ -33,39 +33,54 @@ namespace NbuildTasks.Tests
             ProjectName = TestProject.Split('/').Last().Split('.').First();
             Assert.IsNotNull(ProjectName);
 
-            var gitWrapper = new GitWrapper(ProjectName);
+            var gitWrapper = new GitWrapper(ProjectName, verbose:true, testMode:true);
 
-            // change to project directory
-
-            var solutionDir = $@"{gitWrapper.DevDrive}\{gitWrapper.MainDir}\{ProjectName}";
-            if (!Directory.Exists(solutionDir))
+            try
             {
-                Assert.AreEqual(0, gitWrapper.CloneProject(TestProject).Code);
+                var solutionDir = $@"{gitWrapper.DevDrive}\{gitWrapper.MainDir}\{ProjectName}";
+                if (!Directory.Exists(solutionDir))
+                {
+                    Assert.AreEqual(0, gitWrapper.CloneProject(TestProject).Code);
+                }
+                Assert.IsTrue(Directory.Exists(solutionDir));
+
+                // change to project directory
+                Directory.SetCurrentDirectory(solutionDir);
+
+                Assert.IsTrue(File.Exists($"README.md"));
+
+                // create 'testRandom' branch if not exists
+                if (!gitWrapper.BranchExists(TestBranch))
+                {
+                    Assert.IsTrue(gitWrapper.CheckoutBranch(TestBranch, create: true));
+                }
+                Assert.IsTrue(gitWrapper.CheckoutBranch(TestBranch));
+
+                if (string.IsNullOrEmpty(gitWrapper.Tag))
+                {
+                    Assert.IsTrue(gitWrapper.SetTag("1.0.0"));
+                }
+
+                Assert.IsNotNull(gitWrapper.Tag);
+
+                Console.WriteLine($"TestFirst - AppDomain.CurrentDomain.BaseDirectory: {AppDomain.CurrentDomain.BaseDirectory}");
+                Console.WriteLine($"TestFirst - DevDrive: {gitWrapper.DevDrive}");
+                Console.WriteLine($"TestFirst - MainDir: {gitWrapper.MainDir}");
+                Console.WriteLine($"TestFirst - Current Directory: {Directory.GetCurrentDirectory()}");
+                Console.WriteLine($"TestFirst - Current Branch: {gitWrapper.Branch}");
+                Console.WriteLine($"TestFirst - Current Tag: {gitWrapper.Tag}");
             }
-            Assert.IsTrue(Directory.Exists(solutionDir));
-
-            // change to project directory
-            Directory.SetCurrentDirectory(solutionDir);
-
-            Assert.IsTrue(File.Exists($"README.md"));
-
-            // create 'testRandom' branch if not exists
-            if (!gitWrapper.BranchExists(TestBranch))
+            catch (Exception ex)
             {
-                Assert.IsTrue(gitWrapper.CheckoutBranch(TestBranch, create: true));
-            }
-            Assert.IsTrue(gitWrapper.CheckoutBranch(TestBranch));
+                
 
-            if (string.IsNullOrEmpty(gitWrapper.Tag))
+                Assert.Fail($"TestFirst exception {ex.Message}");
+            }
+            finally
             {
-                Assert.IsTrue(gitWrapper.SetTag("1.0.0"));
+                // change back to test directory
+                Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
             }
-
-            Assert.IsNotNull(gitWrapper.Tag);
-
-            Console.WriteLine($"TestFirst - Current Directory: {Directory.GetCurrentDirectory()}");
-            Console.WriteLine($"TestFirst - Current Branch: {gitWrapper.Branch}");
-            Console.WriteLine($"TestFirst - Current Tag: {gitWrapper.Tag}");
         }
     }
 }

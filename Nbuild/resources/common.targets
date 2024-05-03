@@ -14,13 +14,16 @@
 
 	<PropertyGroup>
 		<!--The SolutionName should be replaced in nbuild.targets-->
-		<SolutionName></SolutionName>
-		<DeploymentFolder></DeploymentFolder>
-		<DevDrive Condition=" '$(DevDrive)' == '' ">$(DevDrive)</DevDrive>
-		<DevDrive Condition=" '$(DevDrive)' == '' ">C:</DevDrive>
-		<MainDir Condition=" '$(MainDir)' == '' ">$(MainDir)</MainDir>
-		<MainDir Condition=" '$(MainDir)' == '' ">Source</MainDir>
-		<DevDir>$(DevDrive)\$(MainDir)</DevDir>
+		<SolutionName>$([System.IO.Path]::GetFileNameWithoutExtension('$(MSBuildProjectDirectory)'))</SolutionName>
+		<DevDriveRaw>$([System.IO.Path]::GetPathRoot('$(MSBuildProjectDirectory)'))</DevDriveRaw>
+		<MainDirRaw>$(MSBuildProjectDirectory.Replace('$(DevDriveRaw)', '').Replace('$(SolutionName)', ''))</MainDirRaw>
+
+		<!-- Trim the trailing backslash -->
+		<DevDrive>$(DevDriveRaw.TrimEnd('\\'))</DevDrive>
+		<MainDir>$(MainDirRaw.TrimEnd('\\'))</MainDir>
+		<SolutionDir>$(DevDrive)\$(SolutionName)</SolutionDir>
+		<!-- This is the location when the app deployed or installed -->
+
 		<BuildTools>$(ProgramFiles)\nbuild</BuildTools>
 		<CommonTargetsVersion>6.2.0</CommonTargetsVersion>
 	</PropertyGroup>
@@ -51,7 +54,7 @@
 			<ZipExe>$(ProgramFiles)\7-Zip\7z.exe</ZipExe>
 			<TargetRelease>Release</TargetRelease>
 			<TargetDebug>Debug</TargetDebug>
-			<SolutionDir>$(DevDir)\$(SolutionName)</SolutionDir>
+			<SolutionDir>$(MSBuildProjectDirectory)</SolutionDir>			
 			<OutputPathRelease>$(SolutionDir)\$(TargetRelease)</OutputPathRelease>
 			<OutputPathDebug>$(SolutionDir)\$(TargetDebug)</OutputPathDebug>
 			<ArtifactsDir>$(DevDrive)\Artifacts</ArtifactsDir>
@@ -66,6 +69,7 @@
 		<Message Text="CommonTargets Version: $(CommonTargetsVersion)"/>
 		<Message Text="Solution Name: $(SolutionName)"/>
 		<Message Text="Solution Dir: $(SolutionDir)"/>
+		<Message Text="MSBuildProjectDirectory Dir: $(MSBuildProjectDirectory)"/>
 		<Message Text="Product Version: $(ProductVersion)"/>
 		<Exec Command="git remote -v" ContinueOnError="True"></Exec>
 		<Exec Command="git branch" ContinueOnError="True"></Exec>
@@ -165,8 +169,6 @@
 
 	<!-- Create a package for the solution default is a zip file of all artifacts -->
 	<Target Name="PACKAGE" DependsOnTargets="ARTIFACTS;TAG">
-		<!-- <Exec Command='powershell -Command "Compress-Archive -Path $(ArtifactsFolder)\* -DestinationPath $(ArtifactsFolder).zip" -Force'/> -->
-		<!-- <Zip Path="$(ArtifactsFolder)" FileName="$(ArtifactsFolder).zip"/> -->
 		<Exec Command='"$(ZipExe)" a -r -tzip $(ArtifactsFolder).zip $(ArtifactsFolder)\*'/>
 		
 		<RemoveDir Directories="$(ArtifactsFolder);"/> 
@@ -236,9 +238,6 @@
 		<PropertyGroup>
 			<SetupDir>$(TEMP)\home</SetupDir>
 		</PropertyGroup>
-		
-		<!-- <Exec Command='powershell -Command &quot;Expand-Archive -Path c:\Artifacts\ntools\Release\1.1.11.zip -DestinationPath "C:\Program Files\Nbuild" -Force&quot;'/> -->
-		<!-- <Unzip FileName="$(ArtifactsFolder).zip" Destination="C:\Program Files\Nbuild" /> -->
 
 		<Exec Command='"$(ZipExe)" x $(ArtifactsFolder).zip -o"$(DeploymentFolder)" -y'/>
 		<RemoveDir Directories="$(SetupDir)"></RemoveDir>

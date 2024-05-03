@@ -1,3 +1,7 @@
+## Version 1.5.0 - 03-may-24
+- [issue #56](https://github.com/naz-hage/ntools/issues/56) - Feature: Remove the dependency on the $(DevDrive) and $(MainDir) environment variables
+- [issue #55](https://github.com/naz-hage/ntools/issues/55) - Feature: Add documentation of staging and production releases with ntools
+
 ## Version 1.4.0 - 25-apr-24
 
 - Complete [issue #37](https://github.com/naz-hage/ntools/issues/37)
@@ -9,8 +13,8 @@
 ## Version 1.3.0 - 15-feb-24
 - Fix [issue #29](https://github.com/naz-hage/ntools/issues/29)
 - Add default value for -json option
-- Fix specifiying the process start info for ntools-launcher.
-  - if StartInfo.FileName uses executable name only that is in the system path, then the StartInfo.FileName witll be replaced with the full pathName.
+- Fix specifying the process start info for ntools-launcher.
+  - if StartInfo.FileName uses executable name only that is in the system path, then the StartInfo.FileName will be replaced with the full pathName.
   - See FileMapping.cs file
   - Add install.ps1 which is equivalent to install.bat.
   - update to ntools-launcher 1.3.0
@@ -44,7 +48,7 @@
         
 ## Version 1.1.0 - 05-jan-24
 - Move Launcher project to its own public repo [ntools-launcher](https://github.com/naz-hage/ntools-launcher). Publish Launcher 1.1.0 to nuget.org and unlist 1.0.0.5
-  - Target .netstandard2.0 project to supprt MS build tasks.  MS Build tasks only support .netstandard2.0. 
+  - Target .netstandard2.0 project to support MS build tasks.  MS Build tasks only support .netstandard2.0. 
 - Add `Nbuild` project to streamline the building process of ntools and other projects, renaming it yo `Nb.exe` for convenience.
 - Refactor Launcher tests
 - Introduce `Nbuild` project to streamline the building process of ntools and other projects, renaming it yo `Nb.exe` for convenience.

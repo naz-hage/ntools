@@ -2,20 +2,7 @@ Content of DevSetup.ps1:
 This script sets up the development environment for your project, installs `ntools` and the necessary development tools, and sets the development environment variables.
 
 ```powershell
-# The [cmdletbinding()] attribute is used to make the script function like a cmdlet
-# it is a lightweight command used in the PowerShell environment. This attribute allows the script to use cmdlet 
-# features such as common parameters (like -Verbose, -Debug, etc.) and the ability to be used in pipelines.
-[cmdletbinding()]
-param(
-    [Parameter(Mandatory = $false)]
-    [String]
-    $DevDrive = "c:",
-
-    [Parameter(Mandatory = $false)]
-    [String]
-    $MainDir = "source"
-)
-
+# DevSetup.ps1
 $fileName = Split-Path -Leaf $PSCommandPath
 Write-OutputMessage $fileName "Started installation script."
 
@@ -51,9 +38,6 @@ if ($LASTEXITCODE -ne 0) {
     Write-OutputMessage $fileName "Error: Installation of ntools failed. Exiting script."
     exit 1
 }
-
-# Set the development environment variables
-SetDevEnvironmentVariables -devDrive $DevDrive -mainDir $MainDir
 
 Write-OutputMessage $fileName "Completed installation script."
 Write-OutputMessage $fileName "EmtpyLine"

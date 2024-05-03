@@ -12,8 +12,13 @@ namespace NgitTests
             Verbose = false
         };
 
-        private static GitWrapper Git { get; set; } = new GitWrapper();
+        private static GitWrapper GitWrapper { get; set; } = new GitWrapper();
 
+        public CommandTests()
+        {
+            Console.WriteLine($"Ctor: DevDrive: {GitWrapper.DevDrive}");
+            Console.WriteLine($"Ctor: MainDir: {GitWrapper.MainDir}");
+        }
         [TestMethod]
         public void DisplayTagTest()
         {
@@ -36,6 +41,19 @@ namespace NgitTests
 
             // Act
             var actual = Command.DisplayTag(Options);
+
+            // Assert
+            Assert.IsTrue(actual == Enums.RetCode.Success);
+        }
+
+        [TestMethod]
+        public void DisplayBranchTest()
+        {
+            // Arrange
+            Options.GitCommand = Command.GetBranchCommand;
+
+            // Act
+            var actual = Command.DisplayBranch();
 
             // Assert
             Assert.IsTrue(actual == Enums.RetCode.Success);
