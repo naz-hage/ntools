@@ -208,26 +208,39 @@ namespace Nbuild
             Colorizer.WriteLine($"[{ConsoleColor.Yellow}! |--------------------|--------------------------------|-----------------|]");
             Colorizer.WriteLine($"[{ConsoleColor.Yellow}! | App name           | Downloaded file                | (hh:mm:ss.ff)   |]");
             Colorizer.WriteLine($"[{ConsoleColor.Yellow}! |--------------------|--------------------------------|-----------------|]");
-            foreach (var app in apps)
+
+            string webDownloadedFile = string.Empty;
+            try
             {
-                var stopWatch = new Stopwatch();
-                stopWatch.Start();
-                // download app
-                var result = DownloadApp(app);
-
-                stopWatch.Stop();
-
-                if (result.IsSuccess())
+                foreach (var app in apps)
                 {
-                    Colorizer.WriteLine($"[{ConsoleColor.Green}! | {app.Name,-18} | {app.DownloadedFile,-30} | {stopWatch.Elapsed,-16:hh\\:mm\\:ss\\.ff}|]");
-                }
-                else
-                {
-                    Colorizer.WriteLine($"[{ConsoleColor.Red}! Failed to download {app.WebDownloadFile} to {app.DownloadedFile}]");
-                    Console.WriteLine($"Return: {result.GetFirstOutput()}");
-                    Colorizer.WriteLine($"[{ConsoleColor.Red}! | {app.Name,-18} | {app.DownloadedFile,-30} | {stopWatch.Elapsed,-16:hh\\:mm\\:ss\\.ff}|]");
-                }
+                    webDownloadedFile = app.WebDownloadFile!;
 
+                    var stopWatch = new Stopwatch();
+                    stopWatch.Start();
+                    // download app
+                    var result = DownloadApp(app);
+
+                    stopWatch.Stop();
+
+                    if (result.IsSuccess())
+                    {
+                        Colorizer.WriteLine($"[{ConsoleColor.Green}! | {app.Name,-18} | {app.DownloadedFile,-30} | {stopWatch.Elapsed,-16:hh\\:mm\\:ss\\.ff}|]");
+                    }
+                    else
+                    {
+                        Colorizer.WriteLine($"[{ConsoleColor.Red}! Failed to download {app.WebDownloadFile} to {app.DownloadedFile}]");
+                        Console.WriteLine($"Return: {result.GetFirstOutput()}");
+                        Colorizer.WriteLine($"[{ConsoleColor.Red}! | {app.Name,-18} | {app.DownloadedFile,-30} | {stopWatch.Elapsed,-16:hh\\:mm\\:ss\\.ff}|]");
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                var errorMessage = $"Failed to download {webDownloadedFile} to {DownloadsDirectory}. {ex.Message}";
+                Console.WriteLine(errorMessage);
+                return ResultHelper.Fail(-1, errorMessage);
             }
 
             Console.WriteLine();
