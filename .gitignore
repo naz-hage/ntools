@@ -402,3 +402,4 @@ FodyWeavers.xsd
 **/launchSettings.json
 /site
 /targets.md
+/nbuild.bat
