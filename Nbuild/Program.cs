@@ -3,8 +3,7 @@ using NbuildTasks;
 using Ntools;
 using OutputColorizer;
 using System.Diagnostics;
-using System.Linq.Expressions;
-using static NbuildTasks.Enums;
+using System.Reflection;
 
 namespace Nbuild;
 
@@ -139,7 +138,7 @@ public class Program
                 options.Verbose = verbose;
                 target = args[0];
                 return BuildStarter.Build(target, verbose);
-            
+
             default:
                 return ResultHelper.Fail(int.MaxValue, "Display Help");
         }
@@ -186,15 +185,18 @@ public class Program
     /// <param name="verbose">Flag indicating whether to display verbose output.</param>
     private static void DisplayGitInfo(bool verbose)
     {
-        GitWrapper gitWrapper = new();
+        GitWrapper gitWrapper = new(project:null,verbose:verbose);
         if (!gitWrapper.IsGitConfigured(silent:true) || !gitWrapper.IsGitRepository(Environment.CurrentDirectory)) return;
+
+        // Get the directory of the current process
+        var executableDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
         var process = new Process
         {
             StartInfo =
             {
                 WorkingDirectory = Environment.CurrentDirectory,
-                FileName = ShellUtility.GetFullPathOfFile(NgitAssemblyExe),
+                FileName = Path.Combine(executableDirectory!, NgitAssemblyExe),
                 Arguments = $"-c branch",
                 RedirectStandardOutput = false,
                 RedirectStandardError = false,
@@ -202,7 +204,7 @@ public class Program
             },
         };
 
-        var resultHelper = process.LockStart(false);
+        var resultHelper = process.LockStart(verbose);
         if (!resultHelper.IsSuccess())
         {
             if (verbose) Console.WriteLine($"==> Failed to display git info:{resultHelper.GetFirstOutput()}");
