@@ -303,6 +303,7 @@ public class BuildStarter
         var possibleDirectories = new[]
         {
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin"),
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Microsoft Visual Studio\\2022\\Professional\\MSBuild\\Current\\Bin"),
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Microsoft Visual Studio\\2022\\Enterprise\\MSBuild\\Current\\Bin"),
         };
 
