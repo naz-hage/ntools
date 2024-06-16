@@ -26,8 +26,6 @@ if (MainInstallApp -command install -json .\app-Dotnet_Runtime.json) {
 
 # install Ntools
 #########################
-# install Ntools
-#########################
 if (MainInstallApp -command install -json .\app-Ntools.json) {
     Write-OutputMessage $fileName "Installation of app-Ntools succeeded."
 } else {

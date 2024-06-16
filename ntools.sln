@@ -16,7 +16,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		install.bat = install.bat
 		install.ps1 = install.ps1
 		mkdocs.yml = mkdocs.yml
-		nbuild.bat = nbuild.bat
 		nbuild.log = nbuild.log
 		nbuild.targets = nbuild.targets
 		prebuild.bat = prebuild.bat
