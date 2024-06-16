@@ -49,31 +49,9 @@
                   </li>
                   <li class="toctree-l1 current"><a class="reference internal current" href="#">Setup your project</a>
     <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#devsetup-folder">DevSetup folder</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#add-a-new-tool">Add a new tool</a>
+    <li class="toctree-l2"><a class="reference internal" href="#add-a-new-tool">Add a new tool</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#list-of-environment-variables">List of Environment Variables</a>
-    </li>
-        </ul>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#nbuildtargets-file">nbuild.targets file</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#nbuildtargets">nbuild.targets</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#required-properties">Required Properties</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#artifacts">Artifacts</a>
-    </li>
-        </ul>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#add-a-new-property">Add a new property</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#add-a-new-target">Add a new target</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#add-a-new-task">Add a new task</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#add-a-new-condition">Add a new condition</a>
+    <li class="toctree-l2"><a class="reference internal" href="#list-of-environment-variables">List of Environment Variables</a>
     </li>
     </ul>
                   </li>
@@ -132,30 +110,45 @@
 <li>The project should be under source control using Git.  An tag should be created for the project and follow the <a href="../versioning/">versioning</a> rules.</li>
 <li>To create a tag, use the following command from the root of the project directory:</li>
 </ul>
-<pre><code class="language-cmd">ng -c settag tag 0.0.1 
+<pre><code class="language-cmd">ng -c settag -tag 0.0.1 
 </code></pre>
-<ul>
-<li>The project should include a <code>DevSetup</code> folder with an <code>apps.json</code> file and a <code>DevSetup.ps1</code> file.</li>
-<li>A <code>nbuild.targets</code> file should be added to the solution folder.</li>
-<li>The <code>nbuild.targets</code> file should be located in the solution folder.</li>
-<li>The <code>nbuild.targets</code> file should include the <code>DeploymentFolder</code> property and define the <code>ARTIFACTS</code> target.</li>
-<li>The <code>nbuild.targets</code> file should include any additional properties and targets specific to the solution.</li>
-<li>The <code>nbuild.targets</code> file should import the <code>common.targets</code> file located in the <code>$(ProgramFiles)\Nbuild</code> folder.</li>
-<li>The <code>DevSetup/apps.json</code> file should include the list of development tools required for the project.</li>
-<li>The <code>DevSetup/DevSetup.ps1</code> file should install the development tools and set up the development environment for the project.</li>
-<li>The <code>DevSetup/DevSetup.ps1</code> file should be located in the <code>DevSetup</code> folder of the project.</li>
-</ul>
-<h2 id="_1"></h2>
 <h3 id="devsetup-folder">DevSetup folder</h3>
 <p>DevSetup Folder contains the <code>apps.json</code> file and the <code>DevSetup.ps1</code> file. The <code>apps.json</code> file contains the list of development tools required for your project. The <code>DevSetup.ps1</code> file is a PowerShell script that installs the development tools and sets up the development environment for the project.</p>
 <ul>
 <li>When you create a new project, for example <code>MyProject</code>, clone the project into the <code>%MainDirectory%</code> directory. </li>
-<li>In your project, create a <code>DevSetup</code> folder and add the <code>apps.json</code> file to it.</li>
-<li>In the <code>DevSetup</code>folder, create a <a href="../ntools/devsetup/">DevSetup.ps1</a> file.</li>
+<li>In your project, create a <code>DevSetup</code> folder and add the following files:</li>
+<li>The <code>DevSetup/app-Ntools.json</code> file should include installation information for ntools. This is required so that other apps (<code>DevSetup/apps.json</code>) can be installed.</li>
+<li>The <code>DevSetup/apps.json</code> file should include the list of development tools required for the project. <code>ntools</code> must be installed first using <code>DevSetup/app-Ntools.json</code></li>
+<li>The <code>DevSetup/DevSetup.ps1</code> file should install the development tools and set up the development environment for the project.</li>
+<li>
+<p>Check this example for <a href="../ntools/devsetup/">DevSetup.ps1</a> file. You can modify this file to fit your development needs.</p>
+</li>
+<li>
+<p><code>DevSetup/app-Ntools.json</code> should like this:</p>
+</li>
 </ul>
+<pre><code class="language-json">{
+  &quot;Version&quot;: &quot;1.2.0&quot;,
+  &quot;NbuildAppList&quot;: [
+    {
+      &quot;Name&quot;: &quot;Ntools&quot;,
+      &quot;Version&quot;: &quot;1.5.0&quot;,
+      &quot;AppFileName&quot;: &quot;$(InstallPath)\\nb.exe&quot;,
+      &quot;WebDownloadFile&quot;: &quot;https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip&quot;,
+      &quot;DownloadedFile&quot;: &quot;$(Version).zip&quot;,
+      &quot;InstallCommand&quot;: &quot;powershell.exe&quot;,
+      &quot;InstallArgs&quot;: &quot;-Command Expand-Archive -Path $(Version).zip -DestinationPath \u0027$(InstallPath)\u0027 -Force&quot;,
+      &quot;InstallPath&quot;: &quot;$(ProgramFiles)\\Nbuild&quot;,
+      &quot;UninstallCommand&quot;: &quot;powershell.exe&quot;,
+      &quot;UninstallArgs&quot;: &quot;-Command Remove-Item -Path \u0027$(InstallPath)\u0027 -Recurse -Force&quot;
+    }
+  ]
+}
+</code></pre>
 <p>Your file structure should look like this:</p>
 <pre><code class="language-cmd">%MainDirectory%\MyProject
 %MainDirectory%\MyProject\DevSetup
+%MainDirectory%\MyProject\DevSetup\app-Ntools.json
 %MainDirectory%\MyProject\DevSetup\apps.json
 %MainDirectory%\MyProject\DevSetup\DevSetup.ps1
 %MainDirectory%\MyProject\... other project and test files
@@ -197,15 +190,15 @@
 </code></pre>
 <ul>
 <li>
-<p>By convention, the json file is named apps.json and is located in the DevSetup folder of your project</p>
+<p>By convention, the json file is named <code>apps.json</code> and is located in the <code>DevSetup</code> folder of your project</p>
 </li>
 <li>
-<p>Use Nb.exe to install the tool</p>
+<p>You can use Nb.exe to install the tools</p>
 </li>
 </ul>
-<pre><code class="language-cmd">cd DevSetup
-Nb.exe -c install -json apps.json
+<pre><code class="language-cmd">Nb.exe -c install -json apps.json
 </code></pre>
+<p>This command can be also added to <a href="../ntools/devsetup/">DevSetup.ps1</a>.</p>
 <h4 id="list-of-environment-variables">List of Environment Variables</h4>
 <table>
 <thead>
@@ -263,6 +256,7 @@ Nb.exe -c install -json apps.json
 <pre><code class="language-cmd">%MainDirectory%\MyProject
 %MainDirectory%\MyProject\nbuild.targets
 %MainDirectory%\MyProject\DevSetup
+%MainDirectory%\MyProject\DevSetup\app-Ntools.json
 %MainDirectory%\MyProject\DevSetup\apps.json
 %MainDirectory%\MyProject\DevSetup\DevSetup.ps1
 %MainDirectory%\MyProject\... other project test files
@@ -365,8 +359,10 @@ Nb.exe -c install -json apps.json
 <h3 id="add-a-new-task">Add a new task</h3>
 <p>A task is the smallest unit of work in a build. Tasks are independent executable components with inputs and outputs. You can add tasks to the project file in different sections. For more information, see <a href="https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild-tasks?view=vs-2022">Tasks</a>.</p>
 <p><strong>Example of a task:</strong></p>
+<p>We're adding a new task to <code>MyTarget</code>:</p>
 <pre><code class="language-xml">&lt;Target Name=&quot;MyTarget&quot;&gt;
   &lt;Message Text=&quot;Hello, world!&quot; /&gt;
+  &lt;Message Text=&quot;Done!&quot; /&gt;
 &lt;/Target&gt;
 </code></pre>
 <p>See <a href="../ntools/nbuild-targets/">Nbuild Tasks</a> for more information on <code>ntools</code> built-in tasks.</p>

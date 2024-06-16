@@ -100,19 +100,14 @@
                 <p>Content of DevSetup.ps1:
 This script sets up the development environment for your project, installs <code>ntools</code> and the necessary development tools, and sets the development environment variables.</p>
 <pre><code class="language-powershell"># DevSetup.ps1
-$fileName = Split-Path -Leaf $PSCommandPath
-Write-OutputMessage $fileName &quot;Started installation script.&quot;
-
-# Download and import the common Install module
-$url = &quot;https://raw.githubusercontent.com/naz-hage/ntools/main/install.psm1&quot;
+# Get the common Install module and import it
+$url = &quot;https://raw.githubusercontent.com/naz-hage/ntools/main/DevSetup/install.psm1&quot;
 $output = &quot;./install.psm1&quot;
 Invoke-WebRequest -Uri $url -OutFile $output
-
-if ($LASTEXITCODE -ne 0) {
-    Write-OutputMessage $fileName &quot;Error: downloading install.psm1 failed. Exiting script.&quot;
-    exit 1
-}
 Import-Module ./install.psm1 -Force
+
+$fileName = Split-Path -Leaf $PSCommandPath
+Write-OutputMessage $fileName &quot;Started installation script.&quot;
 
 # Check if the script is running with admin rights
 if (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] &quot;Administrator&quot;)) {
@@ -125,14 +120,14 @@ if (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
 # Install Ntools
 MainInstallApp -command install -json .\app-Ntools.json
 if ($LASTEXITCODE -ne 0) {
-    Write-OutputMessage $fileName &quot;Error: Installation of app-Ntools.json failed. Exiting script.&quot;
+    Write-OutputMessage $fileName &quot;Error: Installation of ntools (app-Ntools.json) failed. Exiting script.&quot;
     exit 1
 }
 
-# Install development tools for the MyProject project
+# Install development tools for the project
 &amp; $global:NbExePath -c install -json .\apps.json
 if ($LASTEXITCODE -ne 0) {
-    Write-OutputMessage $fileName &quot;Error: Installation of ntools failed. Exiting script.&quot;
+    Write-OutputMessage $fileName &quot;Error: Installation of other tools (apps.json)  failed. Exiting script.&quot;
     exit 1
 }
 
