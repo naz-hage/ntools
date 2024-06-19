@@ -4,31 +4,44 @@ To set up a new project and take advantage of ntools, you need to follow the ste
 - The project should be under source control using Git.  An tag should be created for the project and follow the [versioning](versioning.md) rules.
   - To create a tag, use the following command from the root of the project directory:
 ```cmd
-ng -c settag tag 0.0.1 
+ng -c settag -tag 0.0.1 
 ```
 
-- The project should include a `DevSetup` folder with an `apps.json` file and a `DevSetup.ps1` file.
-- A `nbuild.targets` file should be added to the solution folder.
-- The `nbuild.targets` file should be located in the solution folder.
-- The `nbuild.targets` file should include the `DeploymentFolder` property and define the `ARTIFACTS` target.
-- The `nbuild.targets` file should include any additional properties and targets specific to the solution.
-- The `nbuild.targets` file should import the `common.targets` file located in the `$(ProgramFiles)\Nbuild` folder.
-- The `DevSetup/apps.json` file should include the list of development tools required for the project.
-- The `DevSetup/DevSetup.ps1` file should install the development tools and set up the development environment for the project.
-- The `DevSetup/DevSetup.ps1` file should be located in the `DevSetup` folder of the project.
-
-## 
 ### DevSetup folder
 DevSetup Folder contains the `apps.json` file and the `DevSetup.ps1` file. The `apps.json` file contains the list of development tools required for your project. The `DevSetup.ps1` file is a PowerShell script that installs the development tools and sets up the development environment for the project.
 
 - When you create a new project, for example `MyProject`, clone the project into the `%MainDirectory%` directory. 
-- In your project, create a `DevSetup` folder and add the `apps.json` file to it.
-- In the `DevSetup`folder, create a [DevSetup.ps1](ntools/devsetup.md) file.
+- In your project, create a `DevSetup` folder and add the following files:
+  - The `DevSetup/app-Ntools.json` file should include installation information for ntools. This is required so that other apps (`DevSetup/apps.json`) can be installed.
+  - The `DevSetup/apps.json` file should include the list of development tools required for the project. `ntools` must be installed first using `DevSetup/app-Ntools.json`
+  - The `DevSetup/DevSetup.ps1` file should install the development tools and set up the development environment for the project.
+- Check this example for [DevSetup.ps1](ntools/devsetup.md) file. You can modify this file to fit your development needs.
 
+- `DevSetup/app-Ntools.json` should like this:
+```json
+{
+  "Version": "1.2.0",
+  "NbuildAppList": [
+    {
+      "Name": "Ntools",
+      "Version": "1.5.0",
+      "AppFileName": "$(InstallPath)\\nb.exe",
+      "WebDownloadFile": "https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip",
+      "DownloadedFile": "$(Version).zip",
+      "InstallCommand": "powershell.exe",
+      "InstallArgs": "-Command Expand-Archive -Path $(Version).zip -DestinationPath \u0027$(InstallPath)\u0027 -Force",
+      "InstallPath": "$(ProgramFiles)\\Nbuild",
+      "UninstallCommand": "powershell.exe",
+      "UninstallArgs": "-Command Remove-Item -Path \u0027$(InstallPath)\u0027 -Recurse -Force"
+    }
+  ]
+}
+```
 Your file structure should look like this:
 ```cmd
 %MainDirectory%\MyProject
 %MainDirectory%\MyProject\DevSetup
+%MainDirectory%\MyProject\DevSetup\app-Ntools.json
 %MainDirectory%\MyProject\DevSetup\apps.json
 %MainDirectory%\MyProject\DevSetup\DevSetup.ps1
 %MainDirectory%\MyProject\... other project and test files
@@ -62,13 +75,13 @@ Your file structure should look like this:
   ]
 }
 ```
-- By convention, the json file is named apps.json and is located in the DevSetup folder of your project
+- By convention, the json file is named `apps.json` and is located in the `DevSetup` folder of your project
 
-- Use Nb.exe to install the tool
+- You can use Nb.exe to install the tools
 ```cmd
-cd DevSetup
 Nb.exe -c install -json apps.json
 ```
+This command can be also added to [DevSetup.ps1](ntools/devsetup.md).
 
 #### List of Environment Variables
 | Variable Name | Description |
@@ -93,6 +106,7 @@ Your file structure should look like this:
 %MainDirectory%\MyProject
 %MainDirectory%\MyProject\nbuild.targets
 %MainDirectory%\MyProject\DevSetup
+%MainDirectory%\MyProject\DevSetup\app-Ntools.json
 %MainDirectory%\MyProject\DevSetup\apps.json
 %MainDirectory%\MyProject\DevSetup\DevSetup.ps1
 %MainDirectory%\MyProject\... other project test files
@@ -199,9 +213,12 @@ A target is a named sequence of tasks that represents something to be built or d
 A task is the smallest unit of work in a build. Tasks are independent executable components with inputs and outputs. You can add tasks to the project file in different sections. For more information, see [Tasks](https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild-tasks?view=vs-2022).
 
 **Example of a task:**
+
+We're adding a new task to `MyTarget`:
 ```xml
 <Target Name="MyTarget">
   <Message Text="Hello, world!" />
+  <Message Text="Done!" />
 </Target>
 ```
 
