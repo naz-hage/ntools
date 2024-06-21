@@ -15,7 +15,7 @@ public class Program
     private const string CmdList = "list";
     private const string CmdDownload = "download";
     private const string CmdHelp = "--help";
-    private const string NgitAssemblyExe = "ng.exe";
+    private const string NgitAssemblyExe = "ngit.exe";
     private static readonly int linesToDisplay = 10;
 
     static int Main(string[] args)

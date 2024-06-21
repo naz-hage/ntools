@@ -15,7 +15,7 @@ namespace NbuildTests
         private const string NbuildAssemblyName = "Nb.dll";
         private const string NbuildAppListJsonFile = "app-ntools.json";
         private const string LocalTest = "LOCAL_TEST";
-        private const string VersionToTest = "1.4.7";
+        private const string VersionToTest = "1.5.0";
         // Local test mode flag
         private bool? LocalTestMode;
 
@@ -97,7 +97,7 @@ namespace NbuildTests
                 ""NbuildAppList"": [
                 {
                 ""Name"": ""nbuild"",
-                ""Version"": ""1.4.7"",
+                ""Version"": ""1.5.0"",
                 ""AppFileName"": ""nb.exe"",
                 ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
                 ""DownloadedFile"": ""$(Version).zip"",

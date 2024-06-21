@@ -1,3 +1,6 @@
+## Version 1.6.0 - 21-jun-24
+- [issue #62](https://github.com/naz-hage/ntools/issues/62) - Feature: Rename ng.exe to ngit.exe
+- 
 ## Version 1.5.0 - 03-may-24
 - [issue #56](https://github.com/naz-hage/ntools/issues/56) - Feature: Remove the dependency on the $(DevDrive) and $(MainDir) environment variables
 - [issue #55](https://github.com/naz-hage/ntools/issues/55) - Feature: Add documentation of staging and production releases with ntools
@@ -59,7 +62,7 @@
     - Git.PushTag
     - Git.DeleteTag
     - Git.GetBranch
-- Introduce `Ngit` project to provide a simplified and automated interface for git operations, renaming it to `Ng.exe` for convenience.
+- Introduce `Ngit` project to provide a simplified and automated interface for git operations.
     - Depends on DevDrive and MainDir environment variables.  Default values are used if they don't exist. DevDrive defaults to `C:` and MainDir defaults to `C:\source`.
 
 - Use DevDrive and MainDir from environment variables if they exist.  Otherwise, use default values.
