@@ -1,8 +1,8 @@
-`Ngit` (`ng.exe`) is simple wrapper for `Git` tool that perform simple commands such as get tag and set tag.
+`Ngit` is simple wrapper for `Git` tool that perform simple commands such as get tag and set tag.
 
 ### Usage
 ```batch
-Ng.exe [-c value] [-url value] [-tag value] [-buildtype value] [-v value]
+Ngit.exe [-c value] [-url value] [-tag value] [-buildtype value] [-v value]
 - c         : git Command, value= [tag | settag| autotag| setautotag| deletetag | branch | clone]
     tag         -> Get the current tag
     autotag     -> Set next tag based on the build type: STAGING vs.PRODUCTION

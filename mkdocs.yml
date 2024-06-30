@@ -19,7 +19,7 @@ nav:
     - Versioning: versioning.md
   - List of Tools:
       - Nbuild (nb.exe): ntools/nbuild.md
-      - Ngit (ng.exe): ntools/ngit.md
+      - Ngit (ngit.exe): ntools/ngit.md
       - Nbackup (nbackup.exe): ntools/nbackup.md      
   - Custom Build Tasks:
       - Nbuild Tasks: ntools/nbuildtasks.md

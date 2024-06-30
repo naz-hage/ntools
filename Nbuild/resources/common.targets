@@ -49,7 +49,7 @@
 	<!-- Common properties that will be used by all targets -->
 	<Target Name="PROPERTIES" DependsOnTargets="TAG">
 		<PropertyGroup>
-			<NbuildExe>"$(BuildTools)\ng.exe"</NbuildExe>
+			<NbuildExe>"$(BuildTools)\nb.exe"</NbuildExe>
 			<NugetExe>$(BuildTools)\nuget.exe</NugetExe>
 			<ZipExe>$(ProgramFiles)\7-Zip\7z.exe</ZipExe>
 			<TargetRelease>Release</TargetRelease>
