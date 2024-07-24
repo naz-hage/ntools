@@ -7,9 +7,9 @@ The [Windows dev environment](https://learn.microsoft.com/en-us/windows/dev-envi
 | --- | --- | --- | --- | --- |
 | Windows Terminal | [Windows Terminal](https://www.microsoft.com/en-us/p/windows-terminal/9n0dx20hk701?activetab=pivot:overviewtab) | --- | 1.11.2382.0 | Oct 1, 2023 |
 | Visual Studio 2022 Community Edition | [Visual Studio 2022 Community Edition – Download Latest Free Version](https://visualstudio.microsoft.com/vs/community/) | https://aka.ms/vs/17/release/vs_Community.exe |  17.8.3 | 08-jan-24 |
-| Visual Studio Code | [Download Visual Studio Code - Mac, Linux, Windows](https://code.visualstudio.com/download) | https://aka.ms/win32-x64-system-stable |  1.92.1 | 22-jun-24 |
-| Git | [Git](https://git-scm.com/downloads) | [Web Download](https://github.com/git-for-windows/git/releases/download/v$(Version).windows.1/Git-$(Version)-64-bit.exe) |  2.45.0 | Oct 1, 2023 |
-| Node.js | [Node.js](https://nodejs.org/en/download/) | --- |  18.17.0 | Oct 1, 2023 |
+| Visual Studio Code | [Download Visual Studio Code - Mac, Linux, Windows](https://code.visualstudio.com/download) | https://aka.ms/win32-x64-system-stable |  1.91.1 | 24-jul-24 |
+| Git | [Git](https://git-scm.com/downloads) | [Web Download](https://github.com/git-for-windows/git/releases/download/v$(Version).windows.1/Git-$(Version)-64-bit.exe) |  2.45.2 | 24-jul-24 |
+| Node.js | [Node.js](https://nodejs.org/en/download/) | --- |  20.15.1 | 24-jul-24 |
 | Postman | [Download Postman Get Started for Free](https://www.postman.com/downloads/) | --- |  v10.18.7 | Oct 1, 2023 |
 | Docker Desktop | [Install Docker Desktop on Windows](https://docs.docker.com/docker-for-windows/install/) | --- | 4.23 | Oct 1, 2023 |
 | MongoDB | [Download MongoDB Community Server](https://www.mongodb.com/try/download/community) | --- | 7.0.2 | Oct 1, 2023 |
