@@ -3,7 +3,7 @@
   "NbuildAppList": [
     {
       "Name": "Git for Windows",
-      "Version": "2.44.0",
+      "Version": "2.45.2",
       "AppFileName": "$(InstallPath)\\bin\\git.exe",
       "WebDownloadFile": "https://github.com/git-for-windows/git/releases/download/v$(Version).windows.1/Git-$(Version)-64-bit.exe",
       "DownloadedFile": "Git-$(Version)-64-bit.exe",
