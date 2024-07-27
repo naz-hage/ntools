@@ -219,9 +219,10 @@
 	</Target>
 	
 	<!-- Display core properties-->
-	<Target Name="CORE" >
+	<Target Name="CORE" DependsOnTargets="ARTIFACTS" >
 		<Message Text="DevDrive: $(DevDrive)"/>
 		<Message Text="MainDir: $(MainDir)"/>
+		<Message Text="Product Version: $(ProductVersion)"/>
 		<Message Text="SolutionName: $(SolutionName)"/>
 		<Message Text="SolutionDir: $(SolutionDir)"/>
 		<Message Text="DeploymentFolder: $(DeploymentFolder)"/>
