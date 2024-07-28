@@ -311,7 +311,7 @@
 	</Target>
 
 	<!-- terraform apply -->
-	<Target Name="TF_APPLY" DependsOnTargets="TF_PLAN">
+	<Target Name="TF_APPLY" >
 		<Exec Command='terraform apply -auto-approve tfplan' WorkingDirectory="$(TerraformFolder)" />
 		<Message Text="==> DONE"/>
 	</Target>
