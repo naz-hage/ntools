@@ -44,7 +44,12 @@ namespace Nbuild.Tests
                 "TEST_DEBUG",
                 "IS_ADMIN",
                 "SingleProject",
-                "HandleError"
+                "HandleError",
+                "TF_WORKSPACE_DEV",
+                "TF_INIT",
+                "TF_PLAN",
+                "TF_APPLY",
+                "TF_DESTROY"
             ];
 
             // Act

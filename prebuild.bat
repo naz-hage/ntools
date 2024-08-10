@@ -6,7 +6,7 @@
 if "%1"=="" (
     rem deploy the latest version of ntools
     echo getting the latest version of ntools
-    ng -c tag | findstr /R "Tag [0-9]*\.[0-9]*\.[0-9]*" > temp.txt
+    ngit -c tag | findstr /R "Tag [0-9]*\.[0-9]*\.[0-9]*" > temp.txt
     rem the tag is in the 6th position
     for /f "tokens=6" %%A in (temp.txt) do set "tag=%%A"
     @REM echo latest_tag: %latest_tag%
