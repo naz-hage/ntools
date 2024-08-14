@@ -1,0 +1,17 @@
+{
+    "Version": "1.2.0",
+    "NbuildAppList": [
+      {
+        "Name": "AzureCLI",
+        "Version": "2.63.0",
+        "AppFileName": "$(InstallPath)\\az.exe",
+        "WebDownloadFile": "https://aka.ms/installazurecliwindows",
+        "DownloadedFile": "AzureCLI-$(Version)-win-x64.msi",
+        "InstallCommand": "msiexec.exe",
+        "InstallArgs": "/i AzureCLI-$(Version)-win-x64.msi /quiet",
+        "InstallPath": "$(ProgramFiles)\\AzureCLI",
+        "UninstallCommand": "msiexec.exe",
+        "UninstallArgs": "/x AzureCLI-$(Version)-win-x64.msi /quiet"
+      }
+    ]
+  }
