@@ -234,7 +234,7 @@
 	</Target>
 
 	<!-- Update ntools locally for testing -->
-	<Target Name="UPDATE_NTOOLS" >
+	<Target Name="UPDATE_NTOOLS" DependsOnTargets="IS_ADMIN" >
 		<PropertyGroup>
 			<SRC>$(SolutionDir)\nbuild\resources</SRC>
 			<DST>$(DeploymentFolder)</DST>
@@ -247,4 +247,35 @@
 		<Copy SourceFiles="@(SourceFiles)" DestinationFolder="$(DST)" />
 	</Target>
 
+	<!-- Standardize on dev, stage, and prod environments and phase out STAGING and PRODUCTION -->
+	<!-- Create a development package for testing -->
+	<Target Name="DEV" DependsOnTargets="
+				SOLUTION;
+                TEST">
+  	</Target>
+
+
+	<!-- Create a stage package for testing -->
+	<Target Name="STAGE" DependsOnTargets="
+                CLEAN;
+                TAG;
+                AUTOTAG_STAGING;
+				SOLUTION;
+                TEST;
+				COPY_ARTIFACTS;
+                PACKAGE">
+  	</Target>
+
+	<!-- Create a production package for release -->  	
+	<Target Name="PROD" DependsOnTargets="
+                CLEAN;
+                GIT_PULL;
+                TAG;
+                AUTOTAG_PRODUCTION;
+                SOLUTION;
+				TEST;
+                COPY_ARTIFACTS;
+                PACKAGE">
+   	</Target>
+	
 </Project>
