@@ -1,0 +1,17 @@
+{
+    "Version": "1.2.0",
+    "NbuildAppList": [
+      {
+        "Name": "AzurePowershell",
+        "Version": "10.0.0",
+        "AppFileName": "$(InstallPath)\\pwsh.exe",
+        "WebDownloadFile": "https://www.powershellgallery.com/packages/Az/10.0.0",
+        "DownloadedFile": "Az-10.0.0.zip",
+        "InstallCommand": "powershell.exe",
+        "InstallArgs": "-Command \"Install-Module -Name Az -AllowClobber -Force\"",
+        "InstallPath": "$(ProgramFiles)\\PowerShell",
+        "UninstallCommand": "powershell.exe",
+        "UninstallArgs": "-Command \"Uninstall-Module -Name Az -AllVersions -Force\""
+      }
+    ]
+  }

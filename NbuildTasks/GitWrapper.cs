@@ -123,14 +123,11 @@ namespace NbuildTasks
 
             if (!IsValidTag(newTag)) return false;
 
-            if (LocalTagExists(newTag)) DeleteTag(newTag);
+            if (LocalTagExists(newTag)) DeleteLocalTag(newTag);
 
             bool resultSetTag = true;
             for (int i = 0; i < 2; i++)
             {
-                // delete tag if exists
-                if (TagExist(newTag)) DeleteTag(newTag);
-
                 Process.StartInfo.Arguments = $"tag -a {newTag} HEAD -m \"Automated tag\"";
 
                 var result = Process.LockStart(Verbose);
@@ -155,11 +152,6 @@ namespace NbuildTasks
             }
 
             return resultSetTag;
-        }
-
-        private bool TagExist(string newTag)
-        {
-            return LocalTagExists(newTag) || RemoteTagExists(newTag);
         }
 
         /// <summary>
