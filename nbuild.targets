@@ -131,7 +131,7 @@
 
 	<!-- Setup Development Environment -->
 	<Target Name="DEV_SETUP" DependsOnTargets="IS_ADMIN">
-		<Exec Command='powershell -command ".\Install.ps1"' WorkingDirectory="$(SolutionDir)\DevSetup"/>
+		<Pwsh ScriptPath="$(SolutionDir)\DevSetup\install.ps1" Arguments="" WorkingDirectory ="$(SolutionDir)\DevSetup"/>
 
 	    <Message Text="==> DONE"/>
 	</Target>

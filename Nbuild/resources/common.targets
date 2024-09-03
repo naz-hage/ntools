@@ -42,6 +42,7 @@
 	<UsingTask TaskName="NbuildTasks.FileVersion" AssemblyFile="$(BuildTools)\NbuildTasks.dll" />
 	<UsingTask TaskName="NbuildTasks.UnZip" AssemblyFile="$(BuildTools)\NbuildTasks.dll" />
 	<UsingTask TaskName="NbuildTasks.Zip" AssemblyFile="$(BuildTools)\NbuildTasks.dll" />
+	<UsingTask TaskName="NbuildTasks.Pwsh" AssemblyFile="$(BuildTools)\NbuildTasks.dll" />
 	
 
 	<Import Project="$(BuildTools)\apps-versions.targets"/>
@@ -122,6 +123,7 @@
 		<Message Text="==> DONE"/>
 	</Target>
 
+	<!-- Standardize on dev, stage, and prod environments and phase out STAGING and PRODUCTION -->
 	<!-- Create a staging package for testing -->
 	<Target Name="STAGING" DependsOnTargets="
                 CLEAN;
