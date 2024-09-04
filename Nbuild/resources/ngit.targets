@@ -12,15 +12,15 @@
         <Message Text="==> COMMON_DONE"/>
     </Target>
 
-    <!-- Increment version for a staging build -->
-    <Target Name="AUTOTAG_STAGING" >
+    <!-- Increment version for a stage build -->
+    <Target Name="AUTOTAG_STAGE" >
         <!--
-        <Exec Command='$(NbuildExe) -c autotag  -buildtype staging' ConsoleToMSBuild="true">
+        <Exec Command='$(NbuildExe) -c autotag  -buildtype stage' ConsoleToMSBuild="true">
             <Output TaskParameter="ConsoleOutput" PropertyName="ProductVersion" />
         </Exec>
         -->
 
-        <Git Command="AutoTag" TaskParameter="Staging">
+        <Git Command="AutoTag" TaskParameter="Stage">
             <Output TaskParameter="Output" PropertyName="ProductVersion"/>
         </Git>
         <Message Text="Task - Git Next Tag:'$(ProductVersion)'"/>
@@ -31,8 +31,8 @@
     </Target>
 
 
-    <!-- Set version for a staging build -->
-    <Target Name="SET_TAG" AfterTargets="AUTOTAG_STAGING;AUTOTAG_PRODUCTION">
+    <!-- Set version for a stage build -->
+    <Target Name="SET_TAG" AfterTargets="AUTOTAG_STAGE;AUTOTAG_PROD">
         <Message Text="Git Next tag: $(ProductVersion)"/>
 
         <!-- <Exec Command='$(NbuildExe) -c settag  -tag $(ProductVersion)' ConsoleToMSBuild="true">
@@ -55,7 +55,7 @@
     </Target>
 
     <!-- Increment version for a production build -->
-    <Target Name="AUTOTAG_PRODUCTION" DependsOnTargets="GIT_BRANCH">
+    <Target Name="AUTOTAG_PROD" DependsOnTargets="GIT_BRANCH">
         <RedError Condition="'$(GitBranch)' != 'main'" Message="Error: Must be on main branch for a production release." />
 
         <!-- 
@@ -64,12 +64,12 @@
             </Exec> 
         -->
 
-        <Git Command="AutoTag" TaskParameter="Production">
+        <Git Command="AutoTag" TaskParameter="Prod">
             <Output TaskParameter="Output" PropertyName="ProductVersion"/>
         </Git>
         <Message Text="Task - Git Next Tag:'$(ProductVersion)'"/>
 
-        <RedError Condition="'$(ProductVersion)' == ''" Message="AutoTag Production Failed: Product Version property is not defined." />
+        <RedError Condition="'$(ProductVersion)' == ''" Message="AutoTag Prod Failed: Product Version property is not defined." />
         <Message Text="==> COMMON_DONE"/>
     </Target>
 

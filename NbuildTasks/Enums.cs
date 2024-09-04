@@ -4,8 +4,8 @@
     {
         public enum BuildType
         {
-            STAGING,
-            PRODUCTION
+            STAGE,
+            PROD
         }
 
         public enum RetCode : int
@@ -15,7 +15,7 @@
             FileNotFound = -3,
             CloneProjectFailed = -4,
             SetStagingTagFailed = -5,
-            SetProductionTagFailed = -6,
+            SetProdTagFailed = -6,
             DeleteTagFailed = -7,
             SetBranchFailed = -9,
             AutoTagFailed = -10,

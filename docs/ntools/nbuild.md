@@ -30,8 +30,8 @@ Below is a full list of options that can be used with `Nb.exe`:
           (string, default=$(ProgramFiles)\nbuild\NTools.json)
   - v    : Optional parameter which sets the console output verbose level
          ----
-         - if no command line options are specified with the -v option , i.e.: 'Nb.exe staging -v true`
-           `Nb` will run an MSbuild target `staging` defined in a `nbuild.targets` file which present in the solution folder.
+         - if no command line options are specified with the -v option , i.e.: 'Nb.exe stage -v true`
+           `Nb` will run an MSbuild target `stage` defined in a `nbuild.targets` file which present in the solution folder.
            Run `Nb.exe -t Targets` to list the available targets.
          -v Possible Values: (true or false, default=False)
 ```
@@ -52,10 +52,10 @@ Below is list of common targets that are defined in the `common.targets` file
 | CLEAN               | Clean up the project and artifacts folder |
 | INSTALL_DEP         | Install dependencies |
 | TELEMETRY_OPT_OUT   | Opt out of the DOTNET_CLI_TELEMETRY_OPTOUT - move to common |
-| STAGING             | Create a staging package for testing |
-| PRODUCTION          | Create a production package for release |
-| STAGING_DEPLOY      | Create a staging package and deploy for testing |
-| PRODUCTION_DEPLOY   | Create a production package and deploy for release |
+| STAGE             | Create a stage package for testing |
+| PROD          | Create a production package for release |
+| STAGE_DEPLOY      | Create a stage package and deploy for testing |
+| PROD_DEPLOY   | Create a production package and deploy for release |
 | SOLUTION            | Build the solution Release configuration  using dotnet build |
 | SOLUTION_MSBUILD    | Build the solution Release configuration  using MSBuild |
 | PACKAGE             | Create a package for the solution default is a zip file of all artifacts |

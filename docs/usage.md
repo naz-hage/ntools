@@ -17,16 +17,16 @@ Nb.exe clean
 ```cmd
 Nb.exe test
 ```
-- Create a staging release: Creates a staging build which includes the following steps:
+- Create a stage release: Creates a stage build which includes the following steps:
     - Clean the solution
     - Build the solution
     - Run tests
-    - Create a staging build
-    - Publish the staging build
-    - Create a zip file of the staging build file
+    - Create a stage build
+    - Publish the stage build
+    - Create a zip file of the stage build file
 
 ```cmd
-Nb.exe staging
+Nb.exe stage
 ```
 - Display available targets:  Lists all the available targets in the targets file
     

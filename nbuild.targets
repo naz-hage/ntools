@@ -54,7 +54,7 @@
 		<Message Text="==> DONE"/>
 	</Target>
 
-	<!--Build local staging without incrementing the version-->
+	<!--Build local stage without incrementing the version-->
 	<Target Name="LOCAL" DependsOnTargets="
                 SOLUTION;
                 COPY_ARTIFACTS;
@@ -213,7 +213,7 @@
 	</Target>
 
 	<!-- push production tag -->
-	<Target Name="PUSH_TAG" DependsOnTargets="TAG" AfterTargets="PRODUCTION" >
+	<Target Name="PUSH_TAG" DependsOnTargets="TAG" AfterTargets="PROD" >
 		<Git Command="PushTag" TaskParameter="$(ProductVersion)" >
 		</Git>
 	</Target>
@@ -242,40 +242,10 @@
 		<ItemGroup>
 			<SourceFiles Include="
 						 $(SRC)\ntools.json;
+						 $(SRC)\ngit.targets;
 						 $(SRC)\common.targets" />
 		</ItemGroup>
 		<Copy SourceFiles="@(SourceFiles)" DestinationFolder="$(DST)" />
 	</Target>
 
-	<!-- Standardize on dev, stage, and prod environments and phase out STAGING and PRODUCTION -->
-	<!-- Create a development package for testing -->
-	<Target Name="DEV" DependsOnTargets="
-				SOLUTION;
-                TEST">
-  	</Target>
-
-
-	<!-- Create a stage package for testing -->
-	<Target Name="STAGE" DependsOnTargets="
-                CLEAN;
-                TAG;
-                AUTOTAG_STAGING;
-				SOLUTION;
-                TEST;
-				COPY_ARTIFACTS;
-                PACKAGE">
-  	</Target>
-
-	<!-- Create a production package for release -->  	
-	<Target Name="PROD" DependsOnTargets="
-                CLEAN;
-                GIT_PULL;
-                TAG;
-                AUTOTAG_PRODUCTION;
-                SOLUTION;
-				TEST;
-                COPY_ARTIFACTS;
-                PACKAGE">
-   	</Target>
-	
 </Project>

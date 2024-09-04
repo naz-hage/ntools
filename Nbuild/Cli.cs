@@ -22,8 +22,8 @@ public class Cli
 
     [OptionalArgument(false, "v", "Optional parameter which sets the console output verbose level\n" +
         "\t ----\n" +
-        "\t - if no command line options are specified with the -v option , i.e.: 'Nb.exe staging -v true` \n" +
-        "\t   `Nb` will run an MSbuild target `staging` defined in a `nbuild.targets` file which present in the solution folder.\n" +
+        "\t - if no command line options are specified with the -v option , i.e.: 'Nb.exe stage -v true` \n" +
+        "\t   `Nb` will run an MSbuild target `stage` defined in a `nbuild.targets` file which present in the solution folder.\n" +
         "\t   Run `Nb.exe -t Targets` to list the available targets. \n" +
         "\t -v Possible Values:")]
     public bool Verbose { get; set; }
