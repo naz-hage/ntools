@@ -140,8 +140,8 @@
           (string, default=$(ProgramFiles)\nbuild\NTools.json)
   - v    : Optional parameter which sets the console output verbose level
          ----
-         - if no command line options are specified with the -v option , i.e.: 'Nb.exe staging -v true`
-           `Nb` will run an MSbuild target `staging` defined in a `nbuild.targets` file which present in the solution folder.
+         - if no command line options are specified with the -v option , i.e.: 'Nb.exe stage -v true`
+           `Nb` will run an MSbuild target `stage` defined in a `nbuild.targets` file which present in the solution folder.
            Run `Nb.exe -t Targets` to list the available targets.
          -v Possible Values: (true or false, default=False)
 </code></pre>
@@ -178,19 +178,19 @@
 <td>Opt out of the DOTNET_CLI_TELEMETRY_OPTOUT - move to common</td>
 </tr>
 <tr>
-<td>STAGING</td>
-<td>Create a staging package for testing</td>
+<td>STAGE</td>
+<td>Create a stage package for testing</td>
 </tr>
 <tr>
-<td>PRODUCTION</td>
+<td>PROD</td>
 <td>Create a production package for release</td>
 </tr>
 <tr>
-<td>STAGING_DEPLOY</td>
-<td>Create a staging package and deploy for testing</td>
+<td>STAGE_DEPLOY</td>
+<td>Create a stage package and deploy for testing</td>
 </tr>
 <tr>
-<td>PRODUCTION_DEPLOY</td>
+<td>PROD_DEPLOY</td>
 <td>Create a production package and deploy for release</td>
 </tr>
 <tr>
