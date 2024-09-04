@@ -42,6 +42,7 @@
 	<UsingTask TaskName="NbuildTasks.FileVersion" AssemblyFile="$(BuildTools)\NbuildTasks.dll" />
 	<UsingTask TaskName="NbuildTasks.UnZip" AssemblyFile="$(BuildTools)\NbuildTasks.dll" />
 	<UsingTask TaskName="NbuildTasks.Zip" AssemblyFile="$(BuildTools)\NbuildTasks.dll" />
+	<UsingTask TaskName="NbuildTasks.Pwsh" AssemblyFile="$(BuildTools)\NbuildTasks.dll" />
 	
 
 	<Import Project="$(BuildTools)\apps-versions.targets"/>
@@ -117,28 +118,35 @@
 	</Target>
 
 	<!-- Opt out of the DOTNET_CLI_TELEMETRY_OPTOUT - move to common -->
-	<Target Name="TELEMETRY_OPT_OUT" AfterTargets="AUTOTAG_PRODUCTION">
+	<Target Name="TELEMETRY_OPT_OUT" AfterTargets="AUTOTAG_PROD">
 		<Exec Command='setx DOTNET_CLI_TELEMETRY_OPTOUT 1'/>
 		<Message Text="==> DONE"/>
 	</Target>
 
-	<!-- Create a staging package for testing -->
-	<Target Name="STAGING" DependsOnTargets="
+	<!-- Standardize on dev, stage, and prod environments and phase out STAGE and PROD -->
+		<!-- Create a development package for testing -->
+	<Target Name="DEV" DependsOnTargets="
+				SOLUTION;
+                TEST">
+  	</Target>
+	
+	<!-- Create a stage package for testing -->
+	<Target Name="STAGE" DependsOnTargets="
                 CLEAN;
                 TAG;
-                AUTOTAG_STAGING;
+                AUTOTAG_STAGE;
 				SOLUTION;
                 TEST;
 				COPY_ARTIFACTS;
                 PACKAGE">
   </Target>
 
-  <!-- Create a production package for release -->
-  <Target Name="PRODUCTION" DependsOnTargets="
+  <!-- Create a PROD package for release -->
+  <Target Name="PROD" DependsOnTargets="
                 CLEAN;
                 GIT_PULL;
                 TAG;
-                AUTOTAG_PRODUCTION;
+                AUTOTAG_PROD;
                 SOLUTION;
 				TEST;
                 COPY_ARTIFACTS;
@@ -146,16 +154,16 @@
   
   </Target>
 
-	<!-- Create a staging package and deploy for testing -->
-	<Target Name="STAGING_DEPLOY" DependsOnTargets="
-                            STAGING;
+	<!-- Create a STAGE package and deploy for testing -->
+	<Target Name="STAGE_DEPLOY" DependsOnTargets="
+                            STAGE;
                             DEPLOY">
 		<Message Text="==> COMMON_DONE"/>
 	</Target>
 
-	<!-- Create a production package and deploy for release -->	
-	<Target Name="PRODUCTION_DEPLOY" DependsOnTargets="
-                            PRODUCTION;
+	<!-- Create a PROD package and deploy for release -->	
+	<Target Name="PROD_DEPLOY" DependsOnTargets="
+                            PROD;
                             DEPLOY">
 		<Message Text="==> COMMON_DONE"/>
 	</Target>

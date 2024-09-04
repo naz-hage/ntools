@@ -54,7 +54,7 @@
 		<Message Text="==> DONE"/>
 	</Target>
 
-	<!--Build local staging without incrementing the version-->
+	<!--Build local stage without incrementing the version-->
 	<Target Name="LOCAL" DependsOnTargets="
                 SOLUTION;
                 COPY_ARTIFACTS;
@@ -131,7 +131,7 @@
 
 	<!-- Setup Development Environment -->
 	<Target Name="DEV_SETUP" DependsOnTargets="IS_ADMIN">
-		<Exec Command='powershell -command ".\Install.ps1"' WorkingDirectory="$(SolutionDir)\DevSetup"/>
+		<Pwsh ScriptPath="$(SolutionDir)\DevSetup\install.ps1" Arguments="" WorkingDirectory ="$(SolutionDir)\DevSetup"/>
 
 	    <Message Text="==> DONE"/>
 	</Target>
@@ -213,7 +213,7 @@
 	</Target>
 
 	<!-- push production tag -->
-	<Target Name="PUSH_TAG" DependsOnTargets="TAG" AfterTargets="PRODUCTION" >
+	<Target Name="PUSH_TAG" DependsOnTargets="TAG" AfterTargets="PROD" >
 		<Git Command="PushTag" TaskParameter="$(ProductVersion)" >
 		</Git>
 	</Target>
@@ -234,7 +234,7 @@
 	</Target>
 
 	<!-- Update ntools locally for testing -->
-	<Target Name="UPDATE_NTOOLS" >
+	<Target Name="UPDATE_NTOOLS" DependsOnTargets="IS_ADMIN" >
 		<PropertyGroup>
 			<SRC>$(SolutionDir)\nbuild\resources</SRC>
 			<DST>$(DeploymentFolder)</DST>
@@ -242,6 +242,7 @@
 		<ItemGroup>
 			<SourceFiles Include="
 						 $(SRC)\ntools.json;
+						 $(SRC)\ngit.targets;
 						 $(SRC)\common.targets" />
 		</ItemGroup>
 		<Copy SourceFiles="@(SourceFiles)" DestinationFolder="$(DST)" />

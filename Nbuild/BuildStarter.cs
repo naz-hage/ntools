@@ -46,7 +46,7 @@ public class BuildStarter
         LogFile = Path.Combine(Environment.CurrentDirectory, LogFile);
         string cmd = string.IsNullOrEmpty(target)
             ? $"{nbuildPath} -fl -flp:logfile={LogFile};verbosity=normal"
-            : $"{nbuildPath} /t:{target} -fl -flp:logfile={LogFile};verbosity=normal";
+            : $"{nbuildPath} /t:{target} -p:TargetName={target} -fl -flp:logfile={LogFile};verbosity=normal";
 
         if (verbose)
         {

@@ -7,7 +7,7 @@ The table below lists all available targets for the Nbuild tool.
 | ARTIFACTS           | Setup the ARTIFACTS folders for binaries and test results - override |
 | CLEAN_ARTIFACTS     | Delete the ARTIFACTS folder after PACKAGE target is completed |
 | TEST_GIT            | Temporary Target to test the Git Task |
-| LOCAL               | Build local staging without incrementing the version |
+| LOCAL               | Build local stage without incrementing the version |
 | FILE_VERSIONS       | Test for FileVersion task and powershell file-version.ps1 |
 | NBUILD_DOWNLOAD     | Download Nbuild specified in the NbuildTargetVersion |
 | NBUILD_INSTALL      | Install Nbuild specified in the NbuildTargetVersion |
@@ -28,10 +28,11 @@ The table below lists all available targets for the Nbuild tool.
 | CLEAN               | Clean up the project and artifacts folder |
 | INSTALL_DEP         | Install dependencies |
 | TELEMETRY_OPT_OUT   | Opt out of the DOTNET_CLI_TELEMETRY_OPTOUT - move to common |
-| STAGING             | Create a staging package for testing |
-| PRODUCTION          | Create a production package for release |
-| STAGING_DEPLOY      | Create a staging package and deploy for testing |
-| PRODUCTION_DEPLOY   | Create a production package and deploy for release |
+| DEV                 | Create a development package for testing |
+| STAGE               | Create a stage package for testing |
+| PROD                | Create a production package for release |
+| STAGE_DEPLOY      | Create a stage package and deploy for testing |
+| PROD_DEPLOY   | Create a production package and deploy for release |
 | SOLUTION            | Build the solution Release configuration  using dotnet build |
 | SOLUTION_MSBUILD    | Build the solution Release configuration  using MSBuild |
 | PACKAGE             | Create a package for the solution default is a zip file of all artifacts |
@@ -107,10 +108,10 @@ The table below lists all available targets for the Nbuild tool.
 | **Target Name** | **Description** |
 | --- | --- |
 | GIT_STATUS          | Display the current git status |
-| AUTOTAG_STAGING     | Increment version for a staging build |
-| SET_TAG             | Set version for a staging build |
+| AUTOTAG_STAGE     | Increment version for a stage build |
+| SET_TAG             | Set version for a stage build |
 | GIT_PULL            | Get the latest tag from git |
-| AUTOTAG_PRODUCTION  | Increment version for a production build |
+| AUTOTAG_PROD  | Increment version for a production build |
 | TAG                 | Get the tag from git |
 | PUSH_TAG            | Push the tag to the remote repo |
 | GIT_BRANCH          | Get the current git branch |

@@ -51,7 +51,7 @@ namespace NbuildTasks.Tests
             // Arrange
             var buildTypes = new List<string>
             {
-                Enums.BuildType.STAGING.ToString(), Enums.BuildType.PRODUCTION.ToString()
+                Enums.BuildType.STAGE.ToString(), Enums.BuildType.PROD.ToString()
             };
 
             Console.WriteLine("Test for SetAutoTagTest");
@@ -104,7 +104,7 @@ namespace NbuildTasks.Tests
         }
 
         [TestMethod()]
-        public void StagingTagTest()
+        public void StageTagTest()
         {
             // Arrange Act and Assert.   Repeat for 1 time to speed up the test
             var times = 1;
@@ -119,7 +119,7 @@ namespace NbuildTasks.Tests
                 Console.WriteLine($"Tag - Current: {tag} Expected Tag: {expectedTag}");
 
                 // Act
-                var nextTag = GitWrapper.StagingTag();
+                var nextTag = GitWrapper.StageTag();
                 Assert.IsTrue(GitWrapper.IsValidTag(nextTag));
 
                 // Assert 
@@ -137,7 +137,7 @@ namespace NbuildTasks.Tests
         }
 
         [TestMethod()]
-        public void ProductionTagTest()
+        public void ProdTagTest()
         {
             // Arrange Act and Assert.   Repeat for 1 time to speed up the test
             var times = 1;
@@ -152,7 +152,7 @@ namespace NbuildTasks.Tests
                 Console.WriteLine($"Tag - Current: {tag} Expected Tag: {expectedTag}");
 
                 // Act
-                var nextTag = GitWrapper.ProductionTag();
+                var nextTag = GitWrapper.ProdTag();
                 Assert.IsTrue(GitWrapper.IsValidTag(nextTag));
 
                 // Assert 
@@ -220,7 +220,7 @@ namespace NbuildTasks.Tests
         public void ListRemoteTagsTest()
         {
             // Arrange add a tag
-            var tag = GitWrapper.SetAutoTag(Enums.BuildType.STAGING.ToString());
+            var tag = GitWrapper.SetAutoTag(Enums.BuildType.STAGE.ToString());
             Assert.IsTrue(GitWrapper.SetTag(tag));
             GitWrapper.PushTag(tag);
 
@@ -243,7 +243,7 @@ namespace NbuildTasks.Tests
         {
             // Arrange add a tag
             var localTags = GitWrapper.ListLocalTags();
-            var tag = GitWrapper.SetAutoTag(Enums.BuildType.STAGING.ToString());
+            var tag = GitWrapper.SetAutoTag(Enums.BuildType.STAGE.ToString());
             Assert.IsTrue(GitWrapper.SetTag(tag));
 
             var expectedCount = localTags.Count + 1;

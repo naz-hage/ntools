@@ -155,11 +155,11 @@ namespace NbuildTasks
         }
 
         /// <summary>
-        /// Given a valid tag, get staging tag
-        /// given a valid tag m.n.p.b, staging tag is m.n.p.b+1
+        /// Given a valid tag, get stage tag
+        /// given a valid tag m.n.p.b, stage tag is m.n.p.b+1
         /// </summary>
         /// <param name="tag"></param>
-        /// <returns>return valid staging tag, otherwise null if failed</returns>
+        /// <returns>return valid stage tag, otherwise null if failed</returns>
         private string GetBranch()
         {
             var branch = string.Empty;
@@ -572,9 +572,9 @@ namespace NbuildTasks
         /// <summary>
         /// Automatically generates a tag based on the build type.
         /// </summary>
-        /// <param name="buildType">The build type: `production` or `staging`.</param>
+        /// <param name="buildType">The build type: `production` or `stage`.</param>
         /// <param name="tag">The tag.</param>
-        /// <returns>The generated tag if the buildType is `production` or `staging`.  Otherwise throw a message</returns>
+        /// <returns>The generated tag if the buildType is `production` or `stage`.  Otherwise throw a message</returns>
         public string AutoTag(string buildType)
         {
             if (string.IsNullOrEmpty(buildType))
@@ -583,13 +583,13 @@ namespace NbuildTasks
                 return string.Empty;
             }
 
-            if (buildType.Equals(Enums.BuildType.STAGING.ToString(), StringComparison.OrdinalIgnoreCase))
+            if (buildType.Equals(Enums.BuildType.STAGE.ToString(), StringComparison.OrdinalIgnoreCase))
             {
-                return StagingTag();
+                return StageTag();
             }
-            else if (buildType.Equals(Enums.BuildType.PRODUCTION.ToString(), StringComparison.OrdinalIgnoreCase))
+            else if (buildType.Equals(Enums.BuildType.PROD.ToString(), StringComparison.OrdinalIgnoreCase))
             {
-                return ProductionTag();
+                return ProdTag();
             }
             else
             {
@@ -600,11 +600,11 @@ namespace NbuildTasks
 
 
         /// <summary>
-        /// Returns the staging tag based on the provided tag.
+        /// Returns the stage tag based on the provided tag.
         /// </summary>
-        /// <param name="tag">The tag to generate the staging tag from.</param>
-        /// <returns>The staging tag.</returns>
-        public string StagingTag()
+        /// <param name="tag">The tag to generate the stage tag from.</param>
+        /// <returns>The stage tag.</returns>
+        public string StageTag()
         {
             var tag = Tag;
             if (tag == null)
@@ -635,7 +635,7 @@ namespace NbuildTasks
         /// </summary>
         /// <param name="tag">The input tag.</param>
         /// <returns>The generated production tag, or null if the input tag is invalid.</returns>
-        public string ProductionTag()
+        public string ProdTag()
         {
             var tag = Tag;
             if (tag == null)
