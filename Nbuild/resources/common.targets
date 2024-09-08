@@ -26,13 +26,6 @@
 
 		<BuildTools>$(ProgramFiles)\nbuild</BuildTools>
 		<CommonTargetsVersion>6.2.0</CommonTargetsVersion>
-		<!-- Azure properties -->
-		<AzLocation>centralus</AzLocation>
-		<AzAcr>ShouldBeDefinedInNBuild.Targets</AzAcr>
-		
-		<!-- Terraform properties -->
-		<TerraformFolder>$(MSBuildProjectDirectory)\Terraform</TerraformFolder>
-
 	</PropertyGroup>
 	
 	<UsingTask TaskName="NbuildTasks.ColorMessage" AssemblyFile="$(BuildTools)\NbuildTasks.dll"/>
@@ -53,6 +46,8 @@
 	<Import Project="$(BuildTools)\mongodb.targets"/>
 	<Import Project="$(BuildTools)\nuget.targets"/>
 	<Import Project="$(BuildTools)\ngit.targets"/>
+	<Import Project="$(BuildTools)\docker.targets"/>
+	<Import Project="$(BuildTools)\terraform.targets"/>
 	
 	<!-- Common properties that will be used by all targets -->
 	<Target Name="PROPERTIES" DependsOnTargets="TAG">
@@ -298,36 +293,5 @@
 		<Message Text="An error occurred while reading the version file." Importance="high"/>
 	</Target>
 
-	<!-- Create a new terraform workspace `dev` and select it-->
-	<Target Name="TF_WORKSPACE_DEV">
-		<Exec Command="terraform workspace new dev" WorkingDirectory="$(SolutionDir)" IgnoreExitCode="true" />
-		<Exec Command="terraform workspace select dev" WorkingDirectory="$(SolutionDir)" />
-		<Message Text="==> DONE"/>
-	</Target>
 
-	<!-- Init terraform -->
-	<Target Name="TF_INIT" >
-		<Exec Command='powershell -ExecutionPolicy Bypass -File ".\.set-secrets.ps1"' WorkingDirectory="$(UserProfile)" />
-		<Exec Command="terraform init" WorkingDirectory="$(TerraformFolder)" />
-		<Message Text="==> DONE"/>
-	</Target>
-
-	<!-- terraform plan -->
-	<Target Name="TF_PLAN" DependsOnTargets="TF_INIT">
-		<Exec Command='terraform plan -out=tfplan' WorkingDirectory="$(TerraformFolder)" />
-		<Message Text="==> DONE"/>
-	</Target>
-
-	<!-- terraform apply -->
-	<Target Name="TF_APPLY" >
-		<Exec Command='terraform apply -auto-approve tfplan' WorkingDirectory="$(TerraformFolder)" />
-		<Message Text="==> DONE"/>
-	</Target>
-
-
-	<!-- terraform destroy-->
-	<Target Name="TF_DESTROY">
-		<Exec Command="terraform destroy -auto-approve" WorkingDirectory="$(SolutionDir)" />
-		<Message Text="==> DONE"/>
-	</Target>
 </Project>
