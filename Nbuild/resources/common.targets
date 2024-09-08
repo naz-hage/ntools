@@ -21,7 +21,6 @@
 		<!-- Trim the trailing backslash -->
 		<DevDrive>$(DevDriveRaw.TrimEnd('\\'))</DevDrive>
 		<MainDir>$(MainDirRaw.TrimEnd('\\'))</MainDir>
-		<SolutionDir>$(DevDrive)\$(SolutionName)</SolutionDir>
 		<!-- This is the location when the app deployed or installed -->
 
 		<BuildTools>$(ProgramFiles)\nbuild</BuildTools>
