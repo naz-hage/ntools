@@ -17,7 +17,7 @@ The [Windows dev environment](https://learn.microsoft.com/en-us/windows/dev-envi
 | [Burp Suite](https://portswigger.net/burp/communitydownload) |   2021.11.2 | Oct 1, 2023 |
 | [Draw.io](https://app.diagrams.net/) |   --- | Oct 1, 2023 |
 | [Dotnet Runtime](https://dotnet.microsoft.com/en-us/) | 8.0.6 | 22-jun-24 |
-| [PowerShell](https://docs.microsoft.com/en-us/powershell/) | 7.4.3 | 22-jun-24 |
+| [PowerShell](https://docs.microsoft.com/en-us/powershell/) | 7.4.5 | 15-sep-24 |
 | [Nuget]() |  6.9.1.3 | 22-jun-24 |
 | [SysInternals]() |  2.90.0 | 22-jun-24 |
 | [Python]() | 3.12.6 | 10-sep-24 |
