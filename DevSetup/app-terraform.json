@@ -1,0 +1,17 @@
+{
+  "Version": "1.2.0",
+  "NbuildAppList": [
+    {
+      "Name": "Terraform",
+      "Version": "1.9.5",
+      "AppFileName": "$(InstallPath)\\terraform.exe",
+      "WebDownloadFile": "https://releases.hashicorp.com/terraform/$(Version)/terraform_$(Version)_windows_amd64.zip",
+      "DownloadedFile": "terraform_$(Version)_windows_amd64.zip",
+      "InstallCommand": "powershell.exe",
+      "InstallArgs": "-Command \"Expand-Archive -Path '$(DownloadedFile)' -DestinationPath '$(InstallPath)'\" -Force",
+      "InstallPath": "$(ProgramFiles)\\Terraform\\",
+      "UninstallCommand": "powershell.exe",
+      "UninstallArgs": "-Command \"Remove-Item -Path '$(InstallPath)\\terraform.exe' -Force\""
+    }
+  ]
+}

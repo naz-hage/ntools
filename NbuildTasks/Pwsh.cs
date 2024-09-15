@@ -13,6 +13,9 @@ namespace NbuildTasks
         public string Arguments { get; set; }
 
         public string WorkingDirectory { get; set; }
+        
+        [Output]
+        public int ExitCode { get; set; }
 
         private readonly string PowerShellExe = "pwsh";
         public override bool Execute()
@@ -48,7 +51,7 @@ namespace NbuildTasks
 
                 var output = process.StandardOutput.ReadToEnd();
                 var error = process.StandardError.ReadToEnd();
-
+                ExitCode = process.ExitCode;
                 Log.LogMessage(MessageImportance.High, output);
                 if (process.ExitCode != 0)
                 {

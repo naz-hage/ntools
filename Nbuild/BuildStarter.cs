@@ -34,7 +34,7 @@ public class BuildStarter
         }
 
         // check if target is valid
-        if (!ValidTarget(target))
+        if (!ValidTarget(target, verbose))
         {
             return ResultHelper.Fail(-1, $"Target '{target}' not found");
         }
@@ -100,31 +100,45 @@ public class BuildStarter
     /// </summary>
     /// <param name="target">The target to check.</param>
     /// <returns>True if the target is valid, false otherwise.</returns>
-    public static bool ValidTarget(string? target)
+    public static bool ValidTarget(string? target, bool verbose)
     {
         // check if target is valid in the current directory
         string nbuildPath = Path.Combine(Environment.CurrentDirectory, BuildFileName);
         if (ValidTarget(nbuildPath, target)) return true;
 
-        // check if target is valid in the target files in $(ProgramFiles)\nbuild
+        List<string> KnownTargetFiles = new List<string>();
 
-        List<string> TargetFiles =
-        [
-            "common.targets",
-                "git.targets",
-                "dotnet.targets",
-                "code.targets",
-                "node.targets",
-                "nuget.targets",
-                "ngit.targets",
-                "mongodb.targets",
-            ];
+        // Find list of *.targets files in ntools deployment folder
+        string[] targetFiles = Directory.GetFiles($"{Environment.GetEnvironmentVariable("ProgramFiles")}\\nbuild", "*.targets");
+        if (targetFiles == null)
+        {
+            return false;
+        }
+
+     
+
+
+        // Add target files to TargetFiles list
+        KnownTargetFiles.AddRange(targetFiles);
+        
+        // Find list of *.targets files in current folder
+        targetFiles = Directory.GetFiles(Environment.CurrentDirectory, "*.targets");
+
+        // Add target files to TargetFiles list
+        KnownTargetFiles.AddRange(targetFiles);
+
+        if (verbose)
+        {
+            foreach (var file in KnownTargetFiles)
+            {
+                Console.WriteLine(file);
+            }
+        }
 
         bool found = false;
-        foreach (var targetFile in TargetFiles)
+        foreach (var targetFile in KnownTargetFiles)
         {
-            var path = Path.Combine($"{Environment.GetEnvironmentVariable("ProgramFiles")}\\nbuild", targetFile);
-            if (ValidTarget(path, target))
+            if (ValidTarget(targetFile, target))
             {
                 found = true;
                 break;

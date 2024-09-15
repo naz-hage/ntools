@@ -242,8 +242,7 @@
 		<ItemGroup>
 			<SourceFiles Include="
 						 $(SRC)\ntools.json;
-						 $(SRC)\ngit.targets;
-						 $(SRC)\common.targets" />
+						 $(SRC)\*.targets" />
 		</ItemGroup>
 		<Copy SourceFiles="@(SourceFiles)" DestinationFolder="$(DST)" />
 	</Target>
