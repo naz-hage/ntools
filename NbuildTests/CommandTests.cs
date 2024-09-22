@@ -15,7 +15,7 @@ namespace NbuildTests
         private const string NbuildAssemblyName = "Nb.dll";
         private const string NbuildAppListJsonFile = "app-ntools.json";
         private const string LocalTest = "LOCAL_TEST";
-        private const string VersionToTest = "1.5.0";
+        private const string VersionToTest = "1.6.0";
         // Local test mode flag
         private bool? LocalTestMode;
 
@@ -97,7 +97,7 @@ namespace NbuildTests
                 ""NbuildAppList"": [
                 {
                 ""Name"": ""nbuild"",
-                ""Version"": ""1.5.0"",
+                ""Version"": ""1.6.0"",
                 ""AppFileName"": ""nb.exe"",
                 ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
                 ""DownloadedFile"": ""$(Version).zip"",
@@ -219,16 +219,6 @@ namespace NbuildTests
         [TestMethod()]
         public void InstallTest()
         {
-            // Arrange "C:\Program Files\7-Zip\7z.exe" x C:\Artifacts\ntools\Release\%1.zip -o"C:\Program Files\Nbuild" -y
-            // var json = @"{
-            //     ""Name"": ""nbuild"",
-            //     ""Version"": ""1.2.0"",
-            //     ""Url"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
-            //     ""InstallFile"": ""$(Version).zip"",
-            //     ""InstallCommand"": ""c:\\program files\\7-Zip\\7z.exe"",
-            //     ""InstallArgs"": ""x $(Version).zip -o\""C:\\Temp\\nbuild2\"" -y""
-            // }";
-            // Use this json to test the install command in GitHub Actions because it doesn't have 7-Zip installed
             SetupTestModeFlag();
 
             var json = @"{

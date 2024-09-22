@@ -366,6 +366,12 @@ namespace Nbuild
 
         private static bool IsFileHashEqual(string? filePath, string? storedHash)
         {
+            // return false if file does not exist
+            if (!File.Exists(filePath))
+            {
+                return false;
+            }
+
             using var sha256 = SHA256.Create();
             using var stream = File.OpenRead(filePath!);
             var computedHash = sha256.ComputeHash(stream);
