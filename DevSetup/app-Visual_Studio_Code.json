@@ -11,7 +11,8 @@
       "InstallArgs": "/silent /mergetasks=!runcode,addcontextmenufiles,addcontextmenufolders",
       "InstallPath": "$(ProgramFiles)\\Microsoft VS Code",
       "UninstallCommand": "$(InstallPath)\\unins000.exe",
-      "UninstallArgs": "/SILENT"
+      "UninstallArgs": "/SILENT",
+      "StoredHash": null
     }
   ]
 }

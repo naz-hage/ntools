@@ -3,7 +3,7 @@
   "NbuildAppList": [
     {
       "Name": "Powershell",
-      "Version": "7.4.4",
+      "Version": "7.4.5",
       "AppFileName": "$(InstallPath)\\pwsh.exe",
       "WebDownloadFile": "https://github.com/PowerShell/PowerShell/releases/download/v$(Version)/PowerShell-$(Version)-win-x64.msi",
       "DownloadedFile": "PowerShell-$(Version)-win-x64.msi",
@@ -11,7 +11,8 @@
       "InstallArgs": "/i PowerShell-$(Version)-win-x64.msi /quiet",
       "InstallPath": "$(ProgramFiles)\\PowerShell\\7",
       "UninstallCommand": "msiexec.exe",
-      "UninstallArgs": "/x PowerShell-$(Version)-win-x64.msi /quiet"
+      "UninstallArgs": "/x PowerShell-$(Version)-win-x64.msi /quiet",
+      "StoredHash": null
     }
   ]
 }

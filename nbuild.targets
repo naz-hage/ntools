@@ -7,6 +7,7 @@
 	<PropertyGroup>
         <!-- This is the folder where the *.sln resides-->
 		<DeploymentFolder>$(ProgramFiles)\Nbuild</DeploymentFolder>
+		<GithubRelease>c:\source\learn\Release\GitHubRelease.exe</GithubRelease>
 	</PropertyGroup>
 
 	<!--Setup the ARTIFACTS folders for binaries and test results - override -->
@@ -213,7 +214,7 @@
 	</Target>
 
 	<!-- push production tag -->
-	<Target Name="PUSH_TAG" DependsOnTargets="TAG" AfterTargets="PROD" >
+	<Target Name="PUSH_TAG" DependsOnTargets="TAG" AfterTargets="PROD;STAGE_NEW" >
 		<Git Command="PushTag" TaskParameter="$(ProductVersion)" >
 		</Git>
 	</Target>
@@ -245,6 +246,20 @@
 						 $(SRC)\*.targets" />
 		</ItemGroup>
 		<Copy SourceFiles="@(SourceFiles)" DestinationFolder="$(DST)" />
+	</Target>
+
+	<!-- Create a stage since the last release -->
+	<Target Name="STAGE_NEW" DependsOnTargets="TAG;GIT_BRANCH;AUTOTAG_STAGE;SOLUTION;COPY_ARTIFACTS;PACKAGE" >
+		<Exec Command="$(GithubRelease) $(SolutionName) $(ProductVersion) $(GitBranch) $(ArtifactsFolder).zip" WorkingDirectory="$(SolutionDir)\Release" />
+		
+		<Message Text="==> DONE"/>
+	</Target>
+
+	<!-- Create a production since the last release -->
+	<Target Name="PROD_NEW" DependsOnTargets="TAG;GIT_BRANCH;AUTOTAG_PROD;SOLUTION;COPY_ARTIFACTS;PACKAGE" >
+		<Exec Command="$(GithubRelease) $(SolutionName) $(ProductVersion) $(GitBranch) $(ArtifactsFolder).zip" WorkingDirectory="$(SolutionDir)\Release" />
+
+		<Message Text="==> DONE"/>
 	</Target>
 
 </Project>
