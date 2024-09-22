@@ -11,6 +11,7 @@ namespace NbuildTests
     public class NtoolsJsonTests
     {
         private const string NbuildAssemblyName = "Nb.dll"; // "Nbuild.dll"
+        private const string SupportedVersion = "1.2.0";
 
         [TestMethod()]
         public void ValidateNtoolsJsonTest()
@@ -44,10 +45,10 @@ namespace NbuildTests
 
             var listAppData = JsonSerializer.Deserialize<NbuildApps>(json) ?? throw new ParserException("Failed to parse json to list of objects", null);
 
-            // make sure version matches 1.2.0
-            if (listAppData.Version != "1.2.0")
+            // make sure version matches SupportedVersion
+            if (listAppData.Version != SupportedVersion)
             {
-                throw new ParserException($"Version {listAppData.Version} is not supported. Please use version 1.2.0", null);
+                throw new ParserException($"Version {listAppData.Version} is not supported. Please use version {SupportedVersion}", null);
             }
 
             var appsFolder = @"c:\temp\apps";
@@ -56,7 +57,7 @@ namespace NbuildTests
             // create a new json file for each item in the json file and save it to the appsFolder directory
             foreach (var appData in listAppData.NbuildAppList)
             {
-                var appsOne = new NbuildApps("1.2.0", [appData]);
+                var appsOne = new NbuildApps(SupportedVersion, [appData]);
 
                 var jsonItem = JsonSerializer.Serialize(appsOne, new JsonSerializerOptions { WriteIndented = true });
                 var jsonFilename = $"app-{appData.Name}.json";
