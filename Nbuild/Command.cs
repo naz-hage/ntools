@@ -124,7 +124,7 @@ namespace Nbuild
 
             foreach (var app in apps)
             {
-                result = Install(app);
+                result = Install(app, verbose);
                 if (!result.IsSuccess())
                 {
                     break;
@@ -284,8 +284,9 @@ namespace Nbuild
             return result;
         }
 
-        private static ResultHelper Install(NbuildApp nbuildApp)
+        private static ResultHelper Install(NbuildApp nbuildApp, bool verbose=false)
         {
+            Verbose = verbose;
             if (!CanRunCommand()) return ResultHelper.Fail(-1, $"You must run this command as an administrator");
 
             if (string.IsNullOrEmpty(nbuildApp.DownloadedFile) ||
@@ -355,6 +356,11 @@ namespace Nbuild
                     //Colorizer.WriteLine($"[{ConsoleColor.Red}!X {appData.Name} {appData.Version} failed to install: {resultInstall.GetFirstOutput()}]");
                     Colorizer.WriteLine($"[{ConsoleColor.Red}!X {nbuildApp.Name} {nbuildApp.Version} failed to install: {process.ExitCode}]");
                     if (Verbose) DisplayCodeAndOutput(result);
+                    // print resultInstall.Output
+                    foreach (var item in resultInstall.Output)
+                    {
+                        Colorizer.WriteLine(item.ToString());
+                    }
                     return ResultHelper.Fail(process.ExitCode, $"Failed to install {nbuildApp.Name} {nbuildApp.Version}");
                 }
             }
