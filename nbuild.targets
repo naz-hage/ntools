@@ -221,7 +221,7 @@
 
 	<!-- Example of a target that displays a red color message -->
 	<Target Name="RED_MESSAGE">
-		<ColorMessage Message="This is a message displayed in Yellow" Color="Red" />
+		<ColorMessage Message="This is a message displayed in Red" Color="Red" />
 	</Target>
 
 </Project>
