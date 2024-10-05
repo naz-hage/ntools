@@ -11,7 +11,8 @@
       "InstallArgs": "-Command \"Expand-Archive -Path '$(DownloadedFile)' -DestinationPath '$(InstallPath)'\" -Force",
       "InstallPath": "$(ProgramFiles)\\Terraform\\",
       "UninstallCommand": "powershell.exe",
-      "UninstallArgs": "-Command \"Remove-Item -Path '$(InstallPath)\\terraform.exe' -Force\""
+      "UninstallArgs": "-Command \"Remove-Item -Path '$(InstallPath)\\terraform.exe' -Force\"",
+      "StoredHash": "9A9B81018E40DADBC1EDA63C95C601878A5CA0CD4EF52A87DE0DE940F88E93C9"
     }
   ]
 }

@@ -11,7 +11,8 @@
       "InstallArgs": "/quiet InstallAllUsers=1 PrependPath=1 TargetDir=\u0022$(InstallPath)\\\u0022",
       "InstallPath": "$(ProgramFiles)\\Python\\$(Version)\\",
       "UninstallCommand": "msiexec.exe",
-      "UninstallArgs": "/x {0001-0001-0001-0001-0001-0001} /qn"
+      "UninstallArgs": "/x {0001-0001-0001-0001-0001-0001} /qn",
+      "StoredHash": null
     }
   ]
 }

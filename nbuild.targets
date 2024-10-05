@@ -7,6 +7,7 @@
 	<PropertyGroup>
         <!-- This is the folder where the *.sln resides-->
 		<DeploymentFolder>$(ProgramFiles)\Nbuild</DeploymentFolder>
+		<GithubRelease>c:\source\learn\Release\GitHubRelease.exe</GithubRelease>
 	</PropertyGroup>
 
 	<!--Setup the ARTIFACTS folders for binaries and test results - override -->
@@ -45,21 +46,12 @@
 		
         <Message Text="==> DONE"/>
     </Target>
-
 	
 	<!--Delete the ARTIFACTS folder after PACKAGE target is completed-->
 	<Target Name="CLEAN_ARTIFACTS" AfterTargets="PACKAGE">
 		<Message Text="Removing $(ArtifactsFolder)"> </Message>
 		<RemoveDir Directories="$(ArtifactsFolder);"/>
 		<Message Text="==> DONE"/>
-	</Target>
-
-	<!--Build local stage without incrementing the version-->
-	<Target Name="LOCAL" DependsOnTargets="
-                SOLUTION;
-                COPY_ARTIFACTS;
-                PACKAGE"
-				>
 	</Target>
 
 	<!-- Test for FileVersion task and powershell file-version.ps1-->
@@ -143,56 +135,6 @@
 		<Exec Command='mkdocs serve' WorkingDirectory="$(SolutionDir)"/>
 	    <Message Text="==> DONE"/>
 	</Target>
-	<!-- Download Nbuild specified in the NbuildTargetVersion -->
-	<Target Name="NBUILD_DOWNLOAD" DependsOnTargets="IS_ADMIN">
-		<PropertyGroup>
-			<WebUri>https://github.com/naz-hage/ntools/releases/download/$(NbuildTargetVersion)/$(NbuildTargetVersion).zip</WebUri>
-			<FileName>$(DownloadsDirectory)\NBuildTools.zip</FileName>
-		</PropertyGroup>
-	</Target>
-
-	<!--Update the ntools-launcher nuget package in the local feed fot testing - not needed for normal builds-->
-	<Target Name ="NUGET_UPDATE">
-		<!--Nuget does not support updating a package in the local feed without version - so we need to remove it first-->
-		<Exec Command='dotnet remove package ntools-launcher"' WorkingDirectory='$(SolutionDir)\Nbackup'></Exec>
-		<Exec Command='dotnet remove package ntools-launcher"' WorkingDirectory='$(SolutionDir)\Ngit'></Exec>
-		<Exec Command='dotnet remove package ntools-launcher"' WorkingDirectory='$(SolutionDir)\NbuildTasks'></Exec>
-		<Exec Command='dotnet add package ntools-launcher  --source "C:\Artifacts\nupkgs"' WorkingDirectory='$(SolutionDir)\Nbackup'></Exec>
-		<Exec Command='dotnet add package ntools-launcher  --source "C:\Artifacts\nupkgs"' WorkingDirectory='$(SolutionDir)\Ngit'></Exec>
-		<Exec Command='dotnet add package ntools-launcher  --source "C:\Artifacts\nupkgs"' WorkingDirectory='$(SolutionDir)\NbuildTasks'></Exec>
-	</Target>
-
-	<!-- Install Nbuild specified in the NbuildTargetVersion -->
-	<Target Name="NBUILD_INSTALL" DependsOnTargets="IS_ADMIN">
-		<PropertyGroup>
-            <FileExe>$(ProgramFiles)\Nbuild\nb.exe</FileExe>
-        </PropertyGroup>
-        <Exec Command='"$(FileExe)" --version' Condition="Exists('$(FileExe)')" />
-        
-        <RedError Condition="'$(IsAdmin)' == false" Message="Must be an admin to install $(CodeAppName)" />
-        
-        <FileVersion Name="$(FileExe)" Condition="Exists('$(FileExe)')" >
-            <Output TaskParameter="Output" PropertyName="Version" />
-        </FileVersion>
-
-        <Message Text="$(CodeAppName) is not installed" Condition="'$(Version)' == ''" />
-        <!-- Display the file version -->
-        <Message Text="$(CodeAppName) Version is $(Version)" Condition="'$(Version)' != ''" />
-
-        <Message Text="Installing $(CodeAppName)" Condition="!Exists('$(FileExe)') or '$(Version)' == '' or '$(Version)' &lt; '$(CodeTargetVersion)'"/>
-        <Exec Command='"$(ZipExe)" x $(FileName) -o"C:\Program Files\Nbuild" ' Condition="'$(Verion)' == '' Or '$(Version)' &lt; '$(CodeTargetVersion)'" />
-
-        <Delete Files="$(FileName)" Condition="Exists('$(FileName)') == true" />
-
-        <Exec Command='"$(FileExe)" --version'  Condition="Exists('$(FileExe)')" />
-
-        <FileVersion Name="$(FileExe)" Condition="Exists('$(FileExe)')" >
-            <Output TaskParameter="Output" PropertyName="Version" />
-        </FileVersion>
-
-        <Message Text="$(CodeAppName) installed version: $(Version)" />
-        <Message Text="==> CODE_DONE"/>
-	</Target>
 
 	<!-- Update App metadata json files in nbuild\resources -->
 	<Target Name="UPDATE_APPS" AfterTargets="TEST">
@@ -213,7 +155,7 @@
 	</Target>
 
 	<!-- push production tag -->
-	<Target Name="PUSH_TAG" DependsOnTargets="TAG" AfterTargets="PROD" >
+	<Target Name="PUSH_TAG" DependsOnTargets="TAG" AfterTargets="PROD;STAGE_NEW" >
 		<Git Command="PushTag" TaskParameter="$(ProductVersion)" >
 		</Git>
 	</Target>
@@ -245,6 +187,41 @@
 						 $(SRC)\*.targets" />
 		</ItemGroup>
 		<Copy SourceFiles="@(SourceFiles)" DestinationFolder="$(DST)" />
+	</Target>
+
+	<!-- Update the ntools-launcher nuget package in the local feed for testing - not needed for normal builds -->
+	<Target Name="NUGET_UPDATE">
+		<!--Nuget does not support updating a package in the local feed without version - so we need to remove it first-->
+		<Exec Command='dotnet remove package ntools-launcher"' WorkingDirectory='$(SolutionDir)\Nbackup'></Exec>
+		<Exec Command='dotnet remove package ntools-launcher"' WorkingDirectory='$(SolutionDir)\Ngit'></Exec>
+		<Exec Command='dotnet remove package ntools-launcher"' WorkingDirectory='$(SolutionDir)\NbuildTasks'></Exec>
+		<Exec Command='dotnet add package ntools-launcher  --source "C:\Artifacts\nupkgs"' WorkingDirectory='$(SolutionDir)\Nbackup'></Exec>
+		<Exec Command='dotnet add package ntools-launcher  --source "C:\Artifacts\nupkgs"' WorkingDirectory='$(SolutionDir)\Ngit'></Exec>
+		<Exec Command='dotnet add package ntools-launcher  --source "C:\Artifacts\nupkgs"' WorkingDirectory='$(SolutionDir)\NbuildTasks'></Exec>
+	</Target>
+
+	<!-- Create a stage builld since the last release -->
+	<Target Name="STAGE_NEW" DependsOnTargets="TAG;GIT_BRANCH;AUTOTAG_STAGE;SOLUTION;COPY_ARTIFACTS;PACKAGE" >
+		<Exec Command="$(GithubRelease) $(SolutionName) $(ProductVersion) $(GitBranch) $(ArtifactsFolder).zip" WorkingDirectory="$(SolutionDir)\Release" />
+		
+		<Message Text="==> DONE"/>
+	</Target>
+
+	<!-- Create a production build since the last release -->
+	<Target Name="PROD_NEW" DependsOnTargets="TAG;GIT_BRANCH;AUTOTAG_PROD;SOLUTION;COPY_ARTIFACTS;PACKAGE" >
+		<Exec Command="$(GithubRelease) $(SolutionName) $(ProductVersion) $(GitBranch) $(ArtifactsFolder).zip" WorkingDirectory="$(SolutionDir)\Release" />
+
+		<Message Text="==> DONE"/>
+	</Target>
+
+	<!-- Example of a target that displays a yellow color message -->
+	<Target Name="YELLOW_MESSAGE">
+		<ColorMessage Message="This is a message displayed in Yellow" Color="Yellow" />
+	</Target>
+
+	<!-- Example of a target that displays a red color message -->
+	<Target Name="RED_MESSAGE">
+		<ColorMessage Message="This is a message displayed in Red" Color="Red" />
 	</Target>
 
 </Project>

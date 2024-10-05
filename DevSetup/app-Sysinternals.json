@@ -11,7 +11,8 @@
       "InstallArgs": "-Command Expand-Archive -Path \u0027\u0022$(DownloadedFile)\u0022\u0027 -DestinationPath \u0027\u0022$(ProgramFiles)\\SysInternalsSuite\u0022\u0027 -Force",
       "InstallPath": "$(ProgramFiles)\\SysInternalsSuite",
       "UninstallCommand": "powershell.exe",
-      "UninstallArgs": "-Command Remove-Item -Path \u0027$(InstallPath)\u0027 -Recurse -Force"
+      "UninstallArgs": "-Command Remove-Item -Path \u0027$(InstallPath)\u0027 -Recurse -Force",
+      "StoredHash": null
     }
   ]
 }

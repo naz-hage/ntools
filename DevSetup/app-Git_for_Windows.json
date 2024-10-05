@@ -11,7 +11,8 @@
       "InstallArgs": "/SILENT /NORESTART /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS /SP- /LOG",
       "InstallPath": "$(ProgramFiles)\\Git",
       "UninstallCommand": "$(InstallPath)\\unins000.exe",
-      "UninstallArgs": "/SILENT"
+      "UninstallArgs": "/SILENT",
+      "StoredHash": null
     }
   ]
 }

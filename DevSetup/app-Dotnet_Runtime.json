@@ -11,7 +11,8 @@
       "InstallArgs": "/quiet /norestart\u0022",
       "InstallPath": "$(ProgramFiles)\\dotnet",
       "UninstallCommand": "dotnet_installer.exe",
-      "UninstallArgs": "/uninstall /quiet /norestart"
+      "UninstallArgs": "/uninstall /quiet /norestart",
+      "StoredHash": null
     }
   ]
 }

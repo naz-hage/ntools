@@ -23,13 +23,13 @@ msbuild %CMD%
 if ERRORLEVEL 1 (
     echo %ERRORLEVEL%
     @REM Display the Git project information: branch and tag
-    ng -c branch
+    ngit -c branch
     echo %0 '%1' FAILED
     echo %0 '%1' FAILED >>%BUILD_LOG%
     EXIT /B1
 ) else (
     @REM Display the Git project information: branch and tag
-    ng -c branch
+    ngit -c branch
     echo %0 '%1' SUCCEEDED 
     echo %0 '%1' SUCCEEDED >>%BUILD_LOG%
 )

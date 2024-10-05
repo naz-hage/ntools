@@ -3,7 +3,7 @@
   "NbuildAppList": [
     {
       "Name": "Visual Studio 2022",
-      "Version": "17.0.0",
+      "Version": "17.11.3",
       "AppFileName": "$(InstallPath)\\Common7\\IDE\\devenv.exe",
       "WebDownloadFile": "https://aka.ms/vs/17/release/vs_Community.exe",
       "DownloadedFile": "vs_Community.exe",
@@ -11,7 +11,8 @@
       "InstallArgs": "--add Microsoft.VisualStudio.Workload.CoreEditor Microsoft.VisualStudio.Workload.Azure Microsoft.VisualStudio.Workload.ManagedDesktop Microsoft.VisualStudio.Workload.NativeDesktop Microsoft.VisualStudio.Workload.NetWeb Microsoft.VisualStudio.Workload.NetDesktop Microsoft.VisualStudio.Workload.Azure Microsoft.VisualStudio.Workload.Data --quiet --wait",
       "InstallPath": "$(ProgramFiles)\\Microsoft Visual Studio\\2022\\Community",
       "UninstallCommand": "$(ProgramFilesX86)\\Microsoft Visual Studio\\Installer\\vs_installer.exe",
-      "UninstallArgs": "uninstall --quiet --installPath $(InstallPath)"
+      "UninstallArgs": "uninstall --quiet --installPath $(InstallPath)",
+      "StoredHash": null
     }
   ]
 }

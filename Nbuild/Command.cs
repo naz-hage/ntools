@@ -5,6 +5,7 @@ using OutputColorizer;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
@@ -12,6 +13,7 @@ namespace Nbuild
 {
     public static class Command
     {
+        private const string SupportedVersion = "1.2.0";
         private const int MsiReturnCodeRestartRequired = 1603;
         private static readonly string DownloadsDirectory = $"{Environment.GetEnvironmentVariable("Temp")}\\nb"; // "C:\\NToolsDownloads" $"{Environment.GetEnvironmentVariable("Temp")}\\nb"
         private static bool Verbose = false;
@@ -122,7 +124,7 @@ namespace Nbuild
 
             foreach (var app in apps)
             {
-                result = Install(app);
+                result = Install(app, verbose);
                 if (!result.IsSuccess())
                 {
                     break;
@@ -282,8 +284,9 @@ namespace Nbuild
             return result;
         }
 
-        private static ResultHelper Install(NbuildApp nbuildApp)
+        private static ResultHelper Install(NbuildApp nbuildApp, bool verbose=false)
         {
+            Verbose = verbose;
             if (!CanRunCommand()) return ResultHelper.Fail(-1, $"You must run this command as an administrator");
 
             if (string.IsNullOrEmpty(nbuildApp.DownloadedFile) ||
@@ -353,6 +356,11 @@ namespace Nbuild
                     //Colorizer.WriteLine($"[{ConsoleColor.Red}!X {appData.Name} {appData.Version} failed to install: {resultInstall.GetFirstOutput()}]");
                     Colorizer.WriteLine($"[{ConsoleColor.Red}!X {nbuildApp.Name} {nbuildApp.Version} failed to install: {process.ExitCode}]");
                     if (Verbose) DisplayCodeAndOutput(result);
+                    // print resultInstall.Output
+                    foreach (var item in resultInstall.Output)
+                    {
+                        Colorizer.WriteLine(item.ToString());
+                    }
                     return ResultHelper.Fail(process.ExitCode, $"Failed to install {nbuildApp.Name} {nbuildApp.Version}");
                 }
             }
@@ -360,6 +368,21 @@ namespace Nbuild
             {
                 return ResultHelper.Fail(-1, $"Failed to download {nbuildApp.WebDownloadFile} to {nbuildApp.DownloadedFile}. {result.GetFirstOutput()}");
             }
+        }
+
+        private static bool IsFileHashEqual(string? filePath, string? storedHash)
+        {
+            // return false if file does not exist
+            if (!File.Exists(filePath))
+            {
+                return false;
+            }
+
+            using var sha256 = SHA256.Create();
+            using var stream = File.OpenRead(filePath!);
+            var computedHash = sha256.ComputeHash(stream);
+            var computedHashString = BitConverter.ToString(computedHash).Replace("-", "").ToLowerInvariant();
+            return computedHashString.Equals(storedHash, StringComparison.InvariantCultureIgnoreCase);
         }
 
         private static ResultHelper SuccessfullInstall(NbuildApp nbuildApp, ResultHelper result)
@@ -376,6 +399,12 @@ namespace Nbuild
                     Colorizer.WriteLine($"[{ConsoleColor.Yellow}!√ {nbuildApp.Name} {nbuildApp.Version} installed.  Restart Required]");
                     result.Code = 0;
                     return result;
+                }
+
+                if (IsFileHashEqual(nbuildApp.AppFileName, nbuildApp.StoredHash))
+                {
+                    Colorizer.WriteLine($"[{ConsoleColor.Green}!√ {nbuildApp.Name} {nbuildApp.Version} installed.]");
+                    return ResultHelper.Success();
                 }
 
                 Colorizer.WriteLine($"[{ConsoleColor.Red}!X {nbuildApp.Name} {nbuildApp.Version} failed to install]");
@@ -478,18 +507,26 @@ namespace Nbuild
         private static bool IsAppVersionGreaterOrEqual(NbuildApp nbuildApp, bool equal = false)
         {
             var currentVersion = GetAppFileVersion(nbuildApp);
+            var versionGreater = false;
+            var hashMatch = IsFileHashEqual(nbuildApp.AppFileName, nbuildApp.StoredHash);
+
+
             if (currentVersion == null)
             {
-                return false;
+                versionGreater = false;
+            }
+            else
+            {
+                if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{nbuildApp.Name} {nbuildApp.Version} current version: {currentVersion}]");
+
+                if (!Version.TryParse(currentVersion, out Version? currentVersionParsed)) return false;
+
+                if (!Version.TryParse(nbuildApp.Version, out Version? versionParsed)) return false;
+                versionGreater = currentVersionParsed >= versionParsed;
             }
 
-            if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{nbuildApp.Name} {nbuildApp.Version} current version: {currentVersion}]");
-
-            if (!Version.TryParse(currentVersion, out Version? currentVersionParsed)) return false;
-
-            if (!Version.TryParse(nbuildApp.Version, out Version? versionParsed)) return false;
-
-            return currentVersionParsed >= versionParsed;
+            return versionGreater || hashMatch;
+            //return currentVersionParsed >= versionParsed;
         }
 
         private static bool IsAppVersionEqual(NbuildApp nbuildApp)
@@ -529,10 +566,10 @@ namespace Nbuild
 
             var listAppData = JsonSerializer.Deserialize<NbuildApps>(json) ?? throw new ParserException("Failed to parse json to list of objects", null);
 
-            // make sure version matches 1.2.0
-            if (listAppData.Version != "1.2.0")
+            // make sure version matches supported version
+            if (listAppData.Version != SupportedVersion)
             {
-                throw new ParserException($"Version {listAppData.Version} is not supported. Please use version 1.2.0", null);
+                throw new ParserException($"Json Version {listAppData.Version} is not supported. Please use version {SupportedVersion}", null);
             }
 
             foreach (var appData in listAppData.NbuildAppList)
