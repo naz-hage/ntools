@@ -115,9 +115,6 @@ public class BuildStarter
             return false;
         }
 
-     
-
-
         // Add target files to TargetFiles list
         KnownTargetFiles.AddRange(targetFiles);
         
@@ -126,6 +123,13 @@ public class BuildStarter
 
         // Add target files to TargetFiles list
         KnownTargetFiles.AddRange(targetFiles);
+
+        foreach (var file in targetFiles)
+        {
+            var importTargets = BuildStarter.GetImportAttributes(file, "Project");
+
+            KnownTargetFiles.AddRange(importTargets);
+        }
 
         if (verbose)
         {
@@ -239,12 +243,14 @@ public class BuildStarter
             else if (trimmedLine.StartsWith("<Target "))
             {
                 string targetName = string.Empty;
-                string[] parts = line.Trim().Split(' ');
+                string[] parts = line.Trim().Trim('>').Trim('"').Split(' ');
                 if (parts.Length > 1)
                 {
                     string[] subParts = parts[1].Split('=');
                     if (subParts.Length > 1)
                     {
+                        targetName = subParts[1].Trim(' ');
+                        targetName = subParts[1].Trim('>');
                         targetName = subParts[1].Trim('"');
                         // Rest of your code that uses targetName...
                     }
@@ -279,30 +285,44 @@ public class BuildStarter
     }
 
     /// <summary>
-    /// Retrieves the values of the specified attribute from the Import elements in the XML document.
+    /// Reads the common.targets file and returns the specified attributes, with optional replacements for placeholders.
     /// </summary>
-    /// <param name="filePath">The path to the XML document.</param>
+    /// <param name="filePath">The path to the common.targets file.</param>
     /// <param name="attributeName">The name of the attribute to retrieve.</param>
-    /// <returns>An enumerable collection of attribute values.</returns>
+    /// <param name="replacements">A dictionary of placeholders and their replacements.</param>
+    /// <returns>An enumerable collection of modified attributes.</returns>
+    //public static IEnumerable<string> GetImportAttributes(string filePath, string attributeName, Dictionary<string, string>? replacements = null)
     public static IEnumerable<string> GetImportAttributes(string filePath, string attributeName)
     {
+        var ntoolsEnv = new NtoolsEnvironmentVariables();
+        var replacements = new Dictionary<string, string>
+                    {
+                        { "$(MainDir)", ntoolsEnv.MainDir },
+                        { "$(DevDrive)", ntoolsEnv.DevDrive },
+                        { "$(ProgramFiles)", Environment.GetEnvironmentVariable("ProgramFiles") ?? string.Empty },
+                        { "$(BuildTools)", $"{Environment.GetEnvironmentVariable("ProgramFiles")}\\nbuild" }
+                    };
+
         XmlDocument doc = new XmlDocument();
         doc.Load(filePath);
 
         XmlNodeList imports = doc.GetElementsByTagName("Import");
 
-        if (imports != null)
+        foreach (XmlNode import in imports)
         {
-            foreach (XmlNode import in imports)
+            if (import.Attributes != null && import.Attributes[attributeName] != null)
             {
-                if (import.Attributes != null && import.Attributes[attributeName] != null)
+                string attributeValue = import.Attributes[attributeName]?.Value ?? string.Empty;
+
+                if (replacements != null)
                 {
-                    var projectName = import?.Attributes?[attributeName]?.Value;
-                    if (projectName != null)
+                    foreach (var replacement in replacements)
                     {
-                        yield return projectName;
+                        attributeValue = attributeValue.Replace(replacement.Key, replacement.Value);
                     }
                 }
+
+                yield return attributeValue;
             }
         }
     }
@@ -389,10 +409,6 @@ public class BuildStarter
                 var importItems = GetImportAttributes(filePath, "Project");
                 foreach (var item in importItems)
                 {
-                    // replace $(ProgramFiles) with environment variable
-                    var importItem = item.Replace("$(ProgramFiles)", Environment.GetEnvironmentVariable("ProgramFiles"));
-                    importItem = importItem.Replace("$(BuildTools)", $"{Environment.GetEnvironmentVariable("ProgramFiles")}\\nbuild");
-
                     using (StreamWriter writer = new(TargetsMd, true))
                     {
                         Console.WriteLine($"Imported Targets:");
@@ -400,7 +416,7 @@ public class BuildStarter
                         Console.WriteLine($"----------------------");
                     }
                     // Recursive call for each imported target file
-                    DisplayTargetsInFile(importItem);
+                    DisplayTargetsInFile(item);
                 }
 
             }

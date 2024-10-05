@@ -117,8 +117,7 @@
 		<Message Text="==> DONE"/>
 	</Target>
 
-	<!-- Standardize on dev, stage, and prod environments and phase out STAGE and PROD -->
-		<!-- Create a development package for testing -->
+	<!-- Create a development package for testing without incrementing the version-->
 	<Target Name="DEV" DependsOnTargets="
 				SOLUTION;
                 TEST">
