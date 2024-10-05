@@ -1,3 +1,11 @@
+## Version 1.7.0 - oct-24
+- [issue #78](https://github.com/naz-hage/ntools/issues/78) - Feature: Add Hash Checks for File Integrity after app installation enhancement
+- [issue #76](https://github.com/naz-hage/ntools/issues/76) - Feature: Enhanced Build Process with Verbose Logging and Terraform Support enhancement
+- [issue #74](https://github.com/naz-hage/ntools/issues/74) - Feature: Add pwsh as MS Build task to execute PowerShell scripts with validation and logging. enhancement
+- [issue #69](https://github.com/naz-hage/ntools/issues/69) - Feature: Add common devops scripts enhancement
+- [issue #67](https://github.com/naz-hage/ntools/issues/67) - Feature: Add new msbuild tasks to common.targets that supports terraform enhancement
+- [issue #65](https://github.com/naz-hage/ntools/issues/65) - Feature: Update development tools to latest stable versions enhancement
+
 ## Version 1.6.0 - 21-jun-24
 - [issue #62](https://github.com/naz-hage/ntools/issues/62) - Feature: Rename ng.exe to ngit.exe
 - 

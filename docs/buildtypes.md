@@ -1,11 +1,11 @@
-**ntools** have two predefined build types: `staging` and `production`. The `staging` build type is deploy code to a staging environment used for debugging and testing, while the `production` build type is used for production deployment. The `staging` build type includes debugging symbols and is not optimized, while the `production` build type is optimized for performance and does not include debugging symbols.
+**ntools** have two predefined build types: `stage` and `prod`. The `stage` build type is deploy code to a stage environment used for debugging and testing, while the `prod` build type is used for prod deployment. The `stage` build type includes debugging symbols and is not optimized, while the `production` build type is optimized for performance and does not include debugging symbols.
 
 ##
-### Staging
-The `staging` build type use the following command:
+### stage
+The `stage` build type use the following command:
 
 ```powershell
-nb staging
+nb stage
 ```
 It includes the following steps:
 
@@ -13,15 +13,15 @@ It includes the following steps:
 - Restore the project
 - Build the project
 - Test the project
-- Publish the project to the staging environment
-- Run various tests on the staging environment
+- Publish the project to the stage environment
+- Run various tests on the stage environment
 - The version is set according to the rules in [versioning](versioning.md)
 
 ### Production
-The `production` build type use the following command:
+The `prod` build type use the following command:
 
 ```powershell
-nb production
+nb prod
 ```
 It includes the following steps:
 
