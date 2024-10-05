@@ -94,6 +94,15 @@ Here are examples of custom Tasks that can be used during builds:
 	<Message Text="==> ZIP_DONE"/>
 </Target>
 ```
+### Pwsh
+```xml
+<!-- This target uses the `Pwsh` custom NTools MS Build task to launch a PowerShell Core script -->
+<Target Name="INSTALL_NTOOLS">
+	<Pwsh ScriptPath="$(SolutionDir)\DevSetup\install.ps1" Arguments="" WorkingDirectory ="$(SolutionDir)\dev-setup"/>
+
+	<Message Text="==> INSTALL_NTOOLS_DONE"/>
+</Target>
+```
 You can also find the complete list of predefined [MSBuild properties in the Microsoft documentation](https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild-reserved-and-well-known-properties?view=vs-2022).
 
 - Here are few examples:
