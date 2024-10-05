@@ -51,7 +51,7 @@
                   </li>
                   <li class="toctree-l1 current"><a class="reference internal current" href="#">Build Types</a>
     <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#staging">Staging</a>
+    <li class="toctree-l2"><a class="reference internal" href="#stage">stage</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#production">Production</a>
     </li>
@@ -104,11 +104,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <p><strong>ntools</strong> have two predefined build types: <code>staging</code> and <code>production</code>. The <code>staging</code> build type is deploy code to a staging environment used for debugging and testing, while the <code>production</code> build type is used for production deployment. The <code>staging</code> build type includes debugging symbols and is not optimized, while the <code>production</code> build type is optimized for performance and does not include debugging symbols.</p>
+                <p><strong>ntools</strong> have two predefined build types: <code>stage</code> and <code>prod</code>. The <code>stage</code> build type is deploy code to a stage environment used for debugging and testing, while the <code>prod</code> build type is used for prod deployment. The <code>stage</code> build type includes debugging symbols and is not optimized, while the <code>production</code> build type is optimized for performance and does not include debugging symbols.</p>
 <h2 id="_1"></h2>
-<h3 id="staging">Staging</h3>
-<p>The <code>staging</code> build type use the following command:</p>
-<pre><code class="language-powershell">nb staging
+<h3 id="stage">stage</h3>
+<p>The <code>stage</code> build type use the following command:</p>
+<pre><code class="language-powershell">nb stage
 </code></pre>
 <p>It includes the following steps:</p>
 <ul>
@@ -116,13 +116,13 @@
 <li>Restore the project</li>
 <li>Build the project</li>
 <li>Test the project</li>
-<li>Publish the project to the staging environment</li>
-<li>Run various tests on the staging environment</li>
+<li>Publish the project to the stage environment</li>
+<li>Run various tests on the stage environment</li>
 <li>The version is set according to the rules in <a href="../versioning/">versioning</a></li>
 </ul>
 <h3 id="production">Production</h3>
-<p>The <code>production</code> build type use the following command:</p>
-<pre><code class="language-powershell">nb production
+<p>The <code>prod</code> build type use the following command:</p>
+<pre><code class="language-powershell">nb prod
 </code></pre>
 <p>It includes the following steps:</p>
 <ul>
