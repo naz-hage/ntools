@@ -222,20 +222,29 @@ function InstallDotNetCore {
     }   
 }
 
+    function AddDeploymentPathToEnvironment {
+        param (
+            [Parameter(Mandatory=$true)]
+            [string]$deploymentPath
+        )
+
+        $path = [Environment]::GetEnvironmentVariable("PATH", "Machine")
+        if ($path -notlike "*$deploymentPath*") {
+            Write-OutputMessage $MyInvocation.MyCommand.Name "Adding $deploymentPath to the PATH environment variable."
+            [Environment]::SetEnvironmentVariable("PATH", $path + ";$deploymentPath", "Machine")
+        }
+        else {
+            Write-OutputMessage $MyInvocation.MyCommand.Name "$deploymentPath already exists in the PATH environment variable."
+        }
+    }
+
+
 function MainInstallNtools {
     # prepare the downloads directory
     PrepareDownloadsDirectory $downloadsDirectory
 
     # add deployment path to the PATH environment variable if it doesn't already exist
-    $path = [Environment]::GetEnvironmentVariable("PATH", "Machine")
-    if ($path -notlike "*$deploymentPath*") {
-        Write-OutputMessage $MyInvocation.MyCommand.Name "Adding $deploymentPath to the PATH environment variable."
-        [Environment]::SetEnvironmentVariable("PATH", $path + ";$deploymentPath", "Machine")
-    }
-    else
-    {
-        Write-OutputMessage $MyInvocation.MyCommand.Name "$deploymentPath already exists in the PATH environment variable."
-    }
+    AddDeploymentPathToEnvironment $deploymentPath
 
     & $global:NbExePath -c install -json $nbToolsPath
 

@@ -1,0 +1,18 @@
+{
+    "Version": "1.2.0",
+    "NbuildAppList": [
+      {
+        "Name": "Go",
+        "Version": "1.23.2",
+        "AppFileName": "$(InstallPath)\\bin\\go.exe",
+        "WebDownloadFile": "https://go.dev/dl/go$(Version).windows-amd64.msi",
+        "DownloadedFile": "go.msi",
+        "InstallCommand": "msiexec.exe",
+        "InstallArgs": "/i $(DownloadedFile) /quiet /qn INSTALLDIR=\u0022$(ProgramFiles)\\Go\u0022",
+        "InstallPath": "$(ProgramFiles)\\Go",
+        "UninstallCommand": "msiexec.exe",
+        "UninstallArgs": "/x $(DownloadedFile) /quiet /qn",
+        "StoredHash": "CB582FD4CD2A768077B584D69344543138FA120CD38DE7CF4E42C70C96195768"
+      }
+    ]
+  }
