@@ -3,15 +3,16 @@
   "NbuildAppList": [
     {
       "Name": "Dotnet Runtime",
-      "Version": "8.0.1",
+      "Version": "9.0.0",
       "AppFileName": "$(InstallPath)\\dotnet.exe",
-      "WebDownloadFile": "https://download.visualstudio.microsoft.com/download/pr/f18288f6-1732-415b-b577-7fb46510479a/a98239f751a7aed31bc4aa12f348a9bf/windowsdesktop-runtime-$(Version)-win-x64.exe",
+      "WebDownloadFile": "https://download.visualstudio.microsoft.com/download/pr/685792b6-4827-4dca-a971-bce5d7905170/1bf61b02151bc56e763dc711e45f0e1e/windowsdesktop-runtime-$(Version)-win-x64.exe",
       "DownloadedFile": "dotnet_installer.exe",
       "InstallCommand": "dotnet_installer.exe",
       "InstallArgs": "/quiet /norestart\"",
       "InstallPath": "$(ProgramFiles)\\dotnet",
       "UninstallCommand": "dotnet_installer.exe",
-      "UninstallArgs": "/uninstall /quiet /norestart"
+      "UninstallArgs": "/uninstall /quiet /norestart",
+      "StoredHash": null
     },
     {
       "Name": "Visual Studio 2022",
