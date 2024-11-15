@@ -13,10 +13,10 @@ The [Windows dev environment](https://learn.microsoft.com/en-us/windows/dev-envi
 | [Download Postman Get Started for Free](https://www.postman.com/downloads/) |   v110.24.27 | 14-sep-24 |
 | [Install Docker Desktop on Windows](https://docs.docker.com/docker-for-windows/install/) |  4.34.2 | 14-sep-24 |
 | [Download MongoDB Community Server](https://www.mongodb.com/try/download/community) |  7.0.12 | 28-jul-24 |
-| [Download .NET SDKs for Visual Studio](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) |   8.0.7 | 28-jul-24 |
+| [Download .NET SDKs for Visual Studio](https://dotnet.microsoft.com/en-us/download/dotnet/9.0) |   9.0.100 | 15-nov-24 |
 | [Burp Suite](https://portswigger.net/burp/communitydownload) |   2021.11.2 | Oct 1, 2023 |
 | [Draw.io](https://app.diagrams.net/) |   --- | Oct 1, 2023 |
-| [Dotnet Runtime](https://dotnet.microsoft.com/en-us/) | 8.0.6 | 22-jun-24 |
+| [Dotnet Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/9.0)) | 9.0.0 | 15-nov-24 |
 | [PowerShell](https://docs.microsoft.com/en-us/powershell/) | 7.4.5 | 15-sep-24 |
 | [Nuget]() |  6.9.1.3 | 22-jun-24 |
 | [SysInternals]() |  2.90.0 | 22-jun-24 |

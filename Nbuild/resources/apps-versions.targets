@@ -20,10 +20,10 @@
 		<GitTargetVersion>2.43.0</GitTargetVersion>
 
 		<DotNetAppName>dotnet</DotNetAppName>
-		<DotNetTargetVersion>8.0.1</DotNetTargetVersion>
+		<DotNetTargetVersion>9.0.0</DotNetTargetVersion>
 
 		<DotnetSdkAppName>dotnet-sdk</DotnetSdkAppName>
-		<DotnetSdkTargetVersion>8.0.101</DotnetSdkTargetVersion>
+		<DotnetSdkTargetVersion>9.0.100</DotnetSdkTargetVersion>
 
  		<CodeAppName>Code</CodeAppName>
 		<CodeTargetVersion>1.85.1</CodeTargetVersion>
