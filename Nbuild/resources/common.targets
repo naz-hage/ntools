@@ -215,7 +215,7 @@
 			  SkipUnchangedFiles="true" />
 
 		<Copy SourceFiles="@(RunTimesLibNet)"
-			  DestinationFolder="$(ArtifactsFolder)\runtimes\win\lib\net8.0"
+			  DestinationFolder="$(ArtifactsFolder)\runtimes\win\lib\net9.0"
 			  Condition="'@(RunTimesLibNet, ' ')' != ''"
 			  SkipUnchangedFiles="true" />
 

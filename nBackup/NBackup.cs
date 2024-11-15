@@ -121,7 +121,7 @@ namespace Nbackup
             else
             {
                 result.Code = ResultHelper.FileNotFound;
-                Console.WriteLine($"Input file 'backup.json' not found");
+                Console.WriteLine($"Input file '{options.Input}' not found");
             }
 
             return result;
