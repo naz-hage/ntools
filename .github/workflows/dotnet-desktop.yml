@@ -71,6 +71,10 @@ jobs:
         & "$env:ProgramFilesPath/nbuild/nb.exe" ${{ env.Build_Type }} -v ${{ env.Enable_Logging }}
       shell: pwsh
       working-directory: ${{ github.workspace }}
+      env:
+        OWNER: ${{ secrets.OWNER }}
+        API_GITHUB_KEY: ${{ secrets.API_GITHUB_KEY }}
+        DOTNET_CLI_TELEMETRY_OPTOUT: 1
 
   docs:
     name: Publish Docs
