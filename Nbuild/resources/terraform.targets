@@ -49,7 +49,7 @@
 
 	<!-- terraform destroy-->
 	<Target Name="TF_DESTROY">
-		<Exec Command="terraform destroy -auto-approve" WorkingDirectory="$(SolutionDir)">
+		<Exec Command="terraform destroy -auto-approve" WorkingDirectory="$(TerraformFolder)">
 			<Output TaskParameter="ExitCode" PropertyName="DestroyExitCode" />
 		</Exec>
 		<Message Text="==> DONE" Condition="'$(DestroyExitCode)' == '0'" />
