@@ -7,7 +7,6 @@
 	<PropertyGroup>
         <!-- This is the folder where the *.sln resides-->
 		<DeploymentFolder>$(ProgramFiles)\Nbuild</DeploymentFolder>
-		<GithubRelease>c:\source\learn\Release\GitHubRelease.exe</GithubRelease>
 	</PropertyGroup>
 
 	<!--Setup the ARTIFACTS folders for binaries and test results - override -->
@@ -200,20 +199,6 @@
 		<Exec Command='dotnet add package ntools-launcher  --source "C:\Artifacts\nupkgs"' WorkingDirectory='$(SolutionDir)\NbuildTasks'></Exec>
 	</Target>
 
-	<!-- Create a stage builld since the last release -->
-	<Target Name="STAGE_NEW" DependsOnTargets="TAG;GIT_BRANCH;AUTOTAG_STAGE;SOLUTION;COPY_ARTIFACTS;PACKAGE" >
-		<Exec Command="$(GithubRelease) $(SolutionName) $(ProductVersion) $(GitBranch) $(ArtifactsFolder).zip" WorkingDirectory="$(SolutionDir)\Release" />
-		
-		<Message Text="==> DONE"/>
-	</Target>
-
-	<!-- Create a production build since the last release -->
-	<Target Name="PROD_NEW" DependsOnTargets="TAG;GIT_BRANCH;AUTOTAG_PROD;SOLUTION;COPY_ARTIFACTS;PACKAGE" >
-		<Exec Command="$(GithubRelease) $(SolutionName) $(ProductVersion) $(GitBranch) $(ArtifactsFolder).zip" WorkingDirectory="$(SolutionDir)\Release" />
-
-		<Message Text="==> DONE"/>
-	</Target>
-
 	<!-- Example of a target that displays a yellow color message -->
 	<Target Name="YELLOW_MESSAGE">
 		<ColorMessage Message="This is a message displayed in Yellow" Color="Yellow" />
@@ -256,12 +241,10 @@
 	<!-- Creates a production since the last release  (Experimental) -->
 	<Target Name="GITHUB_RELEASE" DependsOnTargets="ARTIFACTS;GIT_BRANCH" AfterTargets="STAGE_EXP;PROD_EXP" >
 		<PropertyGroup>
-			<!-- The GitHubRelease must be filled.  This is the location when the app deployed or installed -->
-			<GitHubReleaseDir>C:\source\GitHubRelease\Release</GitHubReleaseDir>
-			<GitHubReleaseExe>$(GitHubReleaseDir)\GitHubRelease.exe</GitHubReleaseExe>
+			<GitHubReleaseExe>$(OutputPathRelease)\GitHubRelease.exe</GitHubReleaseExe>
 		</PropertyGroup>
 		<Git Command="PushTag" TaskParameter="$(ProductVersion)" />
-		<Exec Command="$(GitHubReleaseExe) -c create -r $(SolutionName) -t $(ProductVersion) -b $(GitBranch) -p $(ArtifactsFolder).zip" WorkingDirectory="$(GitHubReleaseDir)" />
+		<Exec Command="$(GitHubReleaseExe) -c create -r $(SolutionName) -t $(ProductVersion) -b $(GitBranch) -p $(ArtifactsFolder).zip" WorkingDirectory="$(OutputPathRelease)" />
 
 		<Message Text="==> DONE"/>
 	</Target>
