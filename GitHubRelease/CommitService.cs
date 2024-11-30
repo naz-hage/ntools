@@ -29,16 +29,14 @@ namespace GitHubRelease
     {
         
         private readonly ApiService ApiService;
-        private readonly string Owner;
         private readonly string Repo;
 
-        public CommitService(ApiService apiService, string owner, string repo, string token)
+        public CommitService(ApiService apiService, string repo)
         {
             ApiService = apiService;
-            Owner = owner;
             Repo = repo;
             apiService.GetClient().DefaultRequestHeaders.Clear();
-            apiService.GetClient().DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+            apiService.GetClient().DefaultRequestHeaders.Add("Authorization", $"Bearer {Credentials.GetToken()}");
             apiService.GetClient().DefaultRequestHeaders.Add("User-Agent", "request");
             apiService.GetClient().DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3+json");
         }
@@ -50,7 +48,7 @@ namespace GitHubRelease
         /// <returns>The tag associated with the commit, or null if not found.</returns>
         private async Task<string?> GetTagFromCommitAsync(string commitSha)
         {
-            var uri = $"https://api.github.com/repos/{Owner}/{Repo}/tags";
+            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/tags";
             
             var response = await ApiService.GetAsync(uri);
             if (response.IsSuccessStatusCode)
@@ -143,7 +141,7 @@ namespace GitHubRelease
                 else
                 {
                     var prNumber = prCommits[0].GetProperty("number").GetInt32().ToString();
-                    releaseNotes.AppendLine($"* {message} by @{author} in https://github.com/{Owner}/{Repo}/pull/{prNumber}");
+                    releaseNotes.AppendLine($"* {message} by @{author} in https://github.com/{Credentials.GetOwner()}/{Repo}/pull/{prNumber}");
                 }
             }
 
@@ -158,7 +156,7 @@ namespace GitHubRelease
 
         public async Task<List<JsonElement>> GetCommits(string? branch = null, string? sinceLastPublished = null)
         {
-            var uri = $"https://api.github.com/repos/{Owner}/{Repo}/commits";
+            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/commits";
             var queryParams = new List<string>();
             if (branch != null)
             {
@@ -205,7 +203,7 @@ namespace GitHubRelease
 
         public async Task<List<string>> GetReleaseTags(string? branch = null)
         {
-            var uri = $"https://api.github.com/repos/{Owner}/{Repo}/tags";
+            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/tags";
             var response = await ApiService.GetAsync(uri);
             if (response.IsSuccessStatusCode)
             {
@@ -220,10 +218,10 @@ namespace GitHubRelease
 
         public async Task<List<JsonElement>> GetPullRequestCommits(string? sha = null)
         {
-            var uri = $"https://api.github.com/repos/{Owner}/{Repo}/commits/pulls";
+            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/commits/pulls";
             if (sha != null)
             {
-                uri = $"https://api.github.com/repos/{Owner}/{Repo}/commits/{sha}/pulls";
+                uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/commits/{sha}/pulls";
             }
 
             var response = await ApiService.GetAsync(uri);
@@ -238,7 +236,7 @@ namespace GitHubRelease
 
         private async Task<string> GetShaFromBranch(string branch)
         {
-            var branchUri = $"https://api.github.com/repos/{Owner}/{Repo}/branches/{branch}";
+            var branchUri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/branches/{branch}";
             var branchResponse = await ApiService.GetAsync(branchUri);
             if (branchResponse.IsSuccessStatusCode)
             {

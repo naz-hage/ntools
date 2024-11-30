@@ -85,23 +85,6 @@ namespace GitHubRelease
                 Console.WriteLine("Please provide valid repo, tag, branch and asset path.");
                 Environment.Exit(1);
             }
-            var owner = Environment.GetEnvironmentVariable("OWNER");
-            
-            if (string.IsNullOrEmpty(owner))
-            {
-                // read test token from file
-                using var reader = new StreamReader($"{Environment.GetEnvironmentVariable("USERPROFILE")}\\.owner");
-                owner = reader.ReadToEnd();
-            }
-
-            var token = Environment.GetEnvironmentVariable("API_GITHUB_KEY");
-
-            if (string.IsNullOrEmpty(token))
-            {
-                // read test token from file
-                using var reader = new StreamReader($"{Environment.GetEnvironmentVariable("USERPROFILE")}\\.git-credentials");
-                token = reader.ReadToEnd();
-            }
 
             // Print the command line values and and exit
             Console.WriteLine($"Repo: {repo}");
@@ -115,22 +98,22 @@ namespace GitHubRelease
                 {
                     // get release notes
                     case "notes":
-                        await GetReleaseRelease(owner, repo, tag, branch, assetPath, token);
+                        await GetReleaseRelease(repo, tag, branch, assetPath);
                         break;
 
                     // create a release
                     case "create":
-                        await CreateRelease(owner, repo, tag, branch, assetPath, token);
+                        await CreateRelease(repo, tag, branch, assetPath);
                         break;
 
                     // upload an asset
                     case "upload":
-                        await UploadAsset(owner, repo, tag, branch, assetPath, token);
+                        await UploadAsset(repo, tag, branch, assetPath);
                         break;
 
                     // update a release
                     case "update":
-                        await UpdateRelease(owner, repo, tag, branch, assetPath, token);
+                        await UpdateRelease(repo, tag, branch, assetPath);
                         break;
                     default:
                         Console.WriteLine($"Invalid command '{command}'. Please use ");
@@ -161,9 +144,10 @@ namespace GitHubRelease
             Console.WriteLine("Usage: GitHubRelease --command <command> --repo <repoName> --tag <repTag> --branch <repoBranch> --path <assetPath>");
         }
 
-        private static async Task CreateRelease(string owner, string repo, string tag, string branch, string assetPath, string token)
+        private static async Task CreateRelease(string repo, string tag, string branch, string assetPath)
         {
-            var releaseService = new ReleaseService(owner, repo);
+
+            var releaseService = new ReleaseService(repo);
 
             var release = new Release
             {
@@ -176,7 +160,7 @@ namespace GitHubRelease
             };
 
             // Create a release
-            await releaseService.CreateRelease (token, release, assetPath);
+            await releaseService.CreateRelease (release, assetPath);
             // In debug mode, the release will not be created
             //var responseMessage = await releaseService.CreateRelease(token, release, assetPath);
             var responseMessage = new HttpResponseMessage(System.Net.HttpStatusCode.OK); // for testing debugging
@@ -194,15 +178,16 @@ namespace GitHubRelease
             }
         }
 
-        private static async Task UploadAsset(string owner, string repo, string tag, string branch, string assetPath, string token)
+        private static async Task UploadAsset(string repo, string tag, string branch, string assetPath)
         {
             await Task.CompletedTask;
             throw new NotImplementedException();
         }
 
-        private static async Task GetReleaseRelease(string owner, string repo, string tag, string branch, string assetPath, string token)
+        private static async Task GetReleaseRelease(string repo, string tag, string branch, string assetPath)
         {
-            var releaseService = new ReleaseService(owner, repo);
+            var owner = Credentials.GetOwner();
+            var releaseService = new ReleaseService(repo);
 
             var release = new Release
             {
@@ -215,7 +200,8 @@ namespace GitHubRelease
             };
 
             // Create a release
-            await releaseService.UpdateReleaseNotes(token, release);
+            var token = Credentials.GetToken();
+            await releaseService.UpdateReleaseNotes(release);
             // In debug mode, the release will not be created
             //var responseMessage = await releaseService.CreateRelease(token, release, assetPath);
             var responseMessage = new HttpResponseMessage(System.Net.HttpStatusCode.OK); // for testing debugging
@@ -238,9 +224,9 @@ namespace GitHubRelease
 
         }
 
-        private static async Task UpdateRelease(string owner, string repo, string tag, string branch, string assetPath, string token)
+        private static async Task UpdateRelease(string repo, string tag, string branch, string assetPath)
         {
-            var releaseService = new ReleaseService(owner, repo);
+            var releaseService = new ReleaseService(repo);
 
             var release = new Release
             {
@@ -253,7 +239,7 @@ namespace GitHubRelease
             };
 
             // Create a release
-            await releaseService.UpdateReleaseNotes(token, release);
+            await releaseService.UpdateReleaseNotes(release);
             // In debug mode, the release will not be created
             //var responseMessage = await releaseService.CreateRelease(token, release, assetPath);
             var responseMessage = new HttpResponseMessage(System.Net.HttpStatusCode.OK); // for testing debugging

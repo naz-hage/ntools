@@ -12,7 +12,7 @@ namespace GitHubRelease.Tests
             string? lastPublished = null;
 
             var apiService = new ApiService();
-            var commitService = new CommitService(apiService, Owner, Repo, Token);
+            var commitService = new CommitService(apiService, Repo);
 
             // Act
             var commits = await commitService.GetCommits(DefaultBranch, lastPublished);
@@ -34,7 +34,7 @@ namespace GitHubRelease.Tests
         {
             // Arrange
             var apiService = new ApiService();
-            var commitService = new CommitService(apiService, Owner, Repo, Token);
+            var commitService = new CommitService(apiService, Repo);
 
             // Act  Get all commits from pull requests
             var result = await commitService.GetPullRequestCommits();
@@ -63,7 +63,7 @@ namespace GitHubRelease.Tests
             // Arrange
             var apiService = new ApiService();
 
-            var commitService = new CommitService(apiService, Owner, Repo, Token);
+            var commitService = new CommitService(apiService, Repo);
 
             // Act
             var commits = await commitService.GetCommits(DefaultBranch);
@@ -137,10 +137,10 @@ namespace GitHubRelease.Tests
         {
             // Arrange
             var apiService = new ApiService();
-            var commitService = new CommitService(apiService, Owner, Repo, Token);
-            var releaseService = new ReleaseService(Owner, Repo);   
+            var commitService = new CommitService(apiService,Repo);
+            var releaseService = new ReleaseService(Repo);   
 
-            var (sinceLastPublished, sinceTag) = await releaseService.GetLatestReleasePublishedAtAndTagAsync(Token, DefaultBranch);
+            var (sinceLastPublished, sinceTag) = await releaseService.GetLatestReleasePublishedAtAndTagAsync(DefaultBranch);
             // Act
             var commits = await commitService.GetCommits(DefaultBranch, sinceLastPublished);
 
@@ -158,7 +158,7 @@ namespace GitHubRelease.Tests
         {
             // Arrange
             var apiService = new ApiService();
-            var commitService = new CommitService(apiService, Owner, Repo, Token);
+            var commitService = new CommitService(apiService,Repo);
 
             // Act
             var tags = await commitService.GetReleaseTags();

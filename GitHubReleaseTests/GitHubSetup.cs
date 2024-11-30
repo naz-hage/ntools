@@ -1,12 +1,11 @@
-﻿using System.Text.Json;
+﻿using System.Net;
+using System.Text.Json;
 
 namespace GitHubRelease.Tests
 {
     public class GitHubSetup
     {
-        protected readonly string Owner = "naz-hage";
         protected readonly string Repo = "learn"; //"ntools";//"learn";
-        protected readonly string Token = System.IO.File.ReadAllText(System.Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\.git-credentials");
 
         protected readonly string MainBranch = "main";
         protected readonly string DefaultBranch = "main";//"58-issue";// "13-issue";
@@ -18,7 +17,7 @@ namespace GitHubRelease.Tests
         public GitHubSetup()
         {
             // private properties to console
-            Console.WriteLine($"Owner: {Owner}");
+            Console.WriteLine($"Owner: {Credentials.GetOwner()}");
             Console.WriteLine($"Repo: {Repo}");
             Console.WriteLine($"DefaultBranch: {DefaultBranch}");
 

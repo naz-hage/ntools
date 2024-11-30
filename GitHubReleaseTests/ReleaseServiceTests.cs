@@ -26,7 +26,7 @@ namespace GitHubRelease.Tests
         public async Task CreateGitHubReleaseAsyncTestAsync()
         {
             // Arrange
-            var releaseService = new ReleaseService(Owner, Repo);
+            var releaseService = new ReleaseService(Repo);
 
             var release = new Release
             {
@@ -41,7 +41,7 @@ namespace GitHubRelease.Tests
             string assetPath = CreateAsset(TagStagingRequested);
 
             // Act
-            var result = await releaseService.CreateRelease(Token, release, assetPath);
+            var result = await releaseService.CreateRelease(release, assetPath);
 
             // Assert
             Assert.IsNotNull(result, "Create release is null");
@@ -52,10 +52,10 @@ namespace GitHubRelease.Tests
         public async Task GetReleasesAsyncTest()
         {
             // Arrange
-            var releaseService = new ReleaseService(Owner, Repo);
+            var releaseService = new ReleaseService(Repo);
 
             // Act
-            var releases = await releaseService.GetReleasesAsync(Token, DefaultBranch);
+            var releases = await releaseService.GetReleasesAsync(DefaultBranch);
 
             // Assert
             Assert.IsNotNull(releases, "Latest release is null");
@@ -81,10 +81,10 @@ namespace GitHubRelease.Tests
         public async Task GetLatestReleaseRawAsyncTestAsync()
         {
             // Arrange
-            var releaseService = new ReleaseService(Owner, Repo);
+            var releaseService = new ReleaseService(Repo);
 
             // Act
-            var releases = await releaseService.GetReleasesAsync(Token, DefaultBranch);
+            var releases = await releaseService.GetReleasesAsync(DefaultBranch);
 
             // Assert
             Assert.IsNotNull(releases, "Latest release is null");
@@ -112,10 +112,10 @@ namespace GitHubRelease.Tests
         public async Task GetLastPublishedAndLastTagAsyncTest()
         {
             // Arrange
-            var releaseService = new ReleaseService(Owner, Repo);
+            var releaseService = new ReleaseService(Repo);
 
             // Act
-            var (sinceLastPublished, sinceTag) = await releaseService.GetLatestReleasePublishedAtAndTagAsync(Token, DefaultBranch);
+            var (sinceLastPublished, sinceTag) = await releaseService.GetLatestReleasePublishedAtAndTagAsync(DefaultBranch);
 
             // Assert
             Assert.AreNotEqual("", sinceTag, "Latest release tag is null");
@@ -129,10 +129,10 @@ namespace GitHubRelease.Tests
         public async Task GetReleaseIdsAsyncTestAsync()
         {
             // Arrange
-            var releaseService = new ReleaseService(Owner, Repo);
+            var releaseService = new ReleaseService(Repo);
 
             // Act
-            var releaseIds = await releaseService.GetReleaseIdsAsync(Token);
+            var releaseIds = await releaseService.GetReleaseIdsAsync();
 
             // Assert
             Assert.IsNotNull(releaseIds, "Release Ids is null");
@@ -141,7 +141,7 @@ namespace GitHubRelease.Tests
             Console.WriteLine($"Release Ids count: {releaseIds.Count}");
             foreach (var releaseId in releaseIds)
             {
-                var release = await releaseService.GetReleaseAsync(Token, releaseId);
+                var release = await releaseService.GetReleaseAsync(releaseId);
 
                 if (release == null)
                 {
@@ -160,10 +160,10 @@ namespace GitHubRelease.Tests
         public async Task GetReleaseTagsAsyncTestAsync()
         {
             // Arrange
-            var releaseService = new ReleaseService(Owner, Repo);
+            var releaseService = new ReleaseService(Repo);
 
             // Act
-            var tags = await releaseService.GetReleaseTagsAsync(Token);
+            var tags = await releaseService.GetReleaseTagsAsync();
 
             // Assert
             Assert.IsNotNull(tags, "Release tags is null");

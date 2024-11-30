@@ -17,7 +17,7 @@ namespace GitHubRelease.Tests
         {
             // Arrange
             var apiService = new ApiService();
-            var contributorService = new ContributorService(apiService,Owner, Repo);
+            var contributorService = new ContributorService(apiService, Repo);
             // Act
 
             //var result = contributorService.GetNewContributorsAsync(commits);

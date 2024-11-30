@@ -8,28 +8,27 @@ namespace GitHubRelease
     /// <summary>
     /// Service class for creating GitHub releases and uploading assets.
     /// </summary>
-    public class ReleaseService(string owner, string repo) : Constants
+    public class ReleaseService(string repo) : Constants
     {
         private readonly ApiService ApiService = new();
-        private readonly string Owner = owner;
         public readonly string Repo = repo;
         public readonly string FirstDate = "1970-01-01T00:00:00Z";
         private const string NoneFound = "N/A";
 
         /// <summary>
-        /// Creates a release with the specified token, release object, and asset path.
+        /// Creates a release with the specified release object, and asset path.
         /// </summary>
         /// <param name="token">The token for authentication.</param>
         /// <param name="release">The release object.</param>
         /// <param name="assetPath">The path to the asset.</param>
         /// <returns>The HTTP response message.</returns>
-        public async Task<HttpResponseMessage> CreateRelease(string token, Release release, string assetPath)
+        public async Task<HttpResponseMessage> CreateRelease(Release release, string assetPath)
         {
             ValidateAssetPath(assetPath);
-            await DeleteExistingRelease(token, release);
-            await DeleteStagingReleasesIfProduction(token, release);
-            await UpdateReleaseNotes(token, release);
-            return await CreateReleaseAndUploadAsset(token, release, assetPath);
+            await DeleteExistingRelease(release);
+            await DeleteStagingReleasesIfProduction(release);
+            await UpdateReleaseNotes(release);
+            return await CreateReleaseAndUploadAsset(release, assetPath);
         }
 
         /// <summary>
@@ -52,12 +51,12 @@ namespace GitHubRelease
         /// <param name="release">The release to be deleted.</param>
         /// <returns>A Task representing the asynchronous operation.</returns>
         /// <exception cref="InvalidOperationException">Thrown when the deletion of the release fails.</exception>
-        private async Task DeleteExistingRelease(string token, Release release)
+        private async Task DeleteExistingRelease(Release release)
         {
-            var releaseId = await GetReleaseByTagNameAsync(token, release.TagName!);
+            var releaseId = await GetReleaseByTagNameAsync(release.TagName!);
             if (releaseId.HasValue)
             {
-                var responseReleaseExist = await DeleteReleaseAsync(token, releaseId.Value);
+                var responseReleaseExist = await DeleteReleaseAsync(releaseId.Value);
                 if (!responseReleaseExist.IsSuccessStatusCode)
                 {
                     throw new InvalidOperationException($"Failed to delete release {release.TagName}. Status code: {responseReleaseExist.StatusCode}");
@@ -72,13 +71,13 @@ namespace GitHubRelease
         /// <param name="release">The release to be checked.</param>
         /// <returns>A Task representing the asynchronous operation.</returns>
         /// <exception cref="InvalidOperationException">Thrown when the deletion of staging releases fails.</exception>
-        private async Task DeleteStagingReleasesIfProduction(string token, Release release)
+        private async Task DeleteStagingReleasesIfProduction(Release release)
         {
             if (IsProductionTag(release.TagName!))
             {
                 Console.WriteLine("Production release");
-                var tags = await GetReleaseTagsAsync(token);
-                var responseMessage = await DeleteStagingReleases(token, tags);
+                var tags = await GetReleaseTagsAsync();
+                var responseMessage = await DeleteStagingReleases(tags);
                 if (!responseMessage.IsSuccessStatusCode)
                 {
                     throw new InvalidOperationException("Failed to delete staging releases");
@@ -97,16 +96,16 @@ namespace GitHubRelease
         /// <param name="tags">The list of tags to check for staging releases.</param>
         /// <returns>A Task representing the asynchronous operation, containing the HTTP response message of the last deletion operation.</returns>
         /// <exception cref="InvalidOperationException">Thrown when the deletion of a staging release fails.</exception>
-        public async Task<HttpResponseMessage> DeleteStagingReleases(string token, List<string> tags)
+        public async Task<HttpResponseMessage> DeleteStagingReleases(List<string> tags)
         {
             HttpResponseMessage response = new HttpResponseMessage();
 
             foreach (var tag in tags.Where(IsStagingTag))
                 {
-                    var releaseId = await GetReleaseByTagNameAsync(token, tag);
+                    var releaseId = await GetReleaseByTagNameAsync(tag);
                     if (releaseId.HasValue)
                     {
-                        response = await DeleteReleaseAsync(token, releaseId.Value);
+                        response = await DeleteReleaseAsync(releaseId.Value);
                         if (!response.IsSuccessStatusCode)
                         {
                             throw new InvalidOperationException($"Failed to delete staging release with tag {tag}. Status code: {response.StatusCode}");
@@ -124,14 +123,14 @@ namespace GitHubRelease
         /// <param name="release">The release whose notes are to be updated.</param>
         /// <returns>A Task representing the asynchronous operation.</returns>
         /// <exception cref="InvalidOperationException">Thrown when no commits are found since the last release.</exception>
-        public async Task UpdateReleaseNotes(string token, Release release)
+        public async Task UpdateReleaseNotes(Release release)
         {
             Console.WriteLine("Updating release notes...");
-            var (sinceLastPublished, sinceTag)  = await GetLatestReleasePublishedAtAndTagAsync(token, release.TargetCommitish!);
+            var (sinceLastPublished, sinceTag)  = await GetLatestReleasePublishedAtAndTagAsync(release.TargetCommitish!);
             Console.WriteLine($"sinceLastPublished: {sinceLastPublished}");
             Console.WriteLine($"sinceTag: {sinceTag}");
 
-            var commitService = new CommitService(ApiService, Owner, Repo, token);
+            var commitService = new CommitService(ApiService, Repo);
 
             Console.WriteLine("Getting commits since the last release...");
             var commits = await commitService.GetCommits(release.TargetCommitish!, sinceLastPublished);
@@ -141,7 +140,7 @@ namespace GitHubRelease
                 //throw new InvalidOperationException("No commits found since the last release.");
             }
 
-            var releaseFormatter = new ReleaseFormatter(ApiService, Owner, Repo, token);
+            var releaseFormatter = new ReleaseFormatter(ApiService, Repo);
             var releaseNotes = await releaseFormatter.FormatAsync(commits, sinceTag, sinceLastPublished, release.TagName!);
             release.Body = releaseNotes ?? "No release notes available.";
         }
@@ -154,7 +153,7 @@ namespace GitHubRelease
         /// <param name="assetPath">The path to the asset to be uploaded.</param>
         /// <returns>A Task representing the asynchronous operation, containing the HTTP response message.</returns>
         /// <exception cref="InvalidOperationException">Thrown when the creation of the release or the upload of the asset fails.</exception>
-        private async Task<HttpResponseMessage> CreateReleaseAndUploadAsset(string token, Release release, string assetPath)
+        private async Task<HttpResponseMessage> CreateReleaseAndUploadAsset(Release release, string assetPath)
         {
             var context = new JsonContext();
             string jsonBody = JsonSerializer.Serialize(release, context.Release);
@@ -165,7 +164,7 @@ namespace GitHubRelease
                 throw new InvalidOperationException($"Error: Could not create a release: {release.TagName}. Response: {responseContent}");
             }
             Console.WriteLine($"Successfully created a release {release.TagName}. uploading asset");
-            response = await UploadAsset(token, assetPath, response);
+            response = await UploadAsset(assetPath, response);
             if (!response.IsSuccessStatusCode)
             {
                 throw new InvalidOperationException($"Error: Could not upload the asset:{assetPath}.");
@@ -177,7 +176,7 @@ namespace GitHubRelease
         private async Task<HttpResponseMessage> UploadAsset(string jsonBody)
         {
             // Send a POST request to create a new release on GitHub
-            var uri = $"https://api.github.com/repos/{Owner}/{Repo}/releases";
+            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/releases";
 
             var response = await ApiService.PostAsync(uri, new StringContent(jsonBody, Encoding.UTF8, "application/json"));
             return response;
@@ -191,15 +190,15 @@ namespace GitHubRelease
         /// <returns>The latest release information as a <see cref="JsonDocument"/> object.
         /// null if no release is not found.
         /// </returns>
-        public async Task<JsonDocument?> GetReleasesAsync(string token, string branch)
+        public async Task<JsonDocument?> GetReleasesAsync(string branch)
         {
-            ApiService.SetupHeaders(token);
-            var releases = await GetLatestReleaseRawAsync(token, branch);
+            ApiService.SetupHeaders();
+            var releases = await GetLatestReleaseRawAsync(branch);
             if (releases == null)
             {
                 Console.WriteLine($"No releases found on {branch}");
                 // Get the latest release on the main branch
-                releases = await GetLatestReleaseRawAsync(token, "main");
+                releases = await GetLatestReleaseRawAsync("main");
             }
 
             if (releases != null)
@@ -215,10 +214,10 @@ namespace GitHubRelease
         /// </summary>
         /// <param name="token">The GitHub access token.</param>
         /// <returns>The list of release tags.</returns>
-        public async Task<List<string>> GetReleaseTagsAsync(string token)
+        public async Task<List<string>> GetReleaseTagsAsync()
         {
-            ApiService.SetupHeaders(token);
-            var uri = $"https://api.github.com/repos/{Owner}/{Repo}/releases";
+            ApiService.SetupHeaders();
+            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/releases";
             var response = await ApiService.GetAsync(uri);
 
             if (response.IsSuccessStatusCode)
@@ -246,10 +245,10 @@ namespace GitHubRelease
             }
         }
 
-        public async Task<List<int>> GetReleaseIdsAsync(string token)
+        public async Task<List<int>> GetReleaseIdsAsync()
         {
-            ApiService.SetupHeaders(token);
-            var uri = $"https://api.github.com/repos/{Owner}/{Repo}/releases";
+            ApiService.SetupHeaders();
+            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/releases";
             var response = await ApiService.GetAsync(uri);
 
             if (response.IsSuccessStatusCode)
@@ -275,10 +274,10 @@ namespace GitHubRelease
         /// <returns>The latest release information as a <see cref="JsonDocument"/> object.
         /// null if no release is not found.
         /// </returns>
-        private async Task<JsonDocument?> GetLatestReleaseRawAsync(string token, string? branch = null)
+        private async Task<JsonDocument?> GetLatestReleaseRawAsync(string? branch = null)
         {
-            ApiService.SetupHeaders(token);
-            var uri = $"https://api.github.com/repos/{Owner}/{Repo}/releases";
+            ApiService.SetupHeaders();
+            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/releases";
             var response = await ApiService.GetAsync(uri);
             if (response.IsSuccessStatusCode)
             {
@@ -321,9 +320,9 @@ namespace GitHubRelease
         /// <param name="token">The GitHub access token.</param>
         /// <param name="branch">The branch name. Set to null if requesting release on any branch.</param>
         /// <returns>The latest release publish date as a string.</returns>
-        //public async Task<string> GetLatestReleasePublishDateAsync(string token, string branch)
+        //public async Task<string> GetLatestReleasePublishDateAsync(string branch)
         //{
-        //    var latestRelease = await GetLatestReleaseAsync(token, branch);
+        //    var latestRelease = await GetLatestReleaseAsync(branch);
         //    if (latestRelease != null && latestRelease.RootElement.GetArrayLength() > 0)
         //    {
         //        // get count
@@ -348,9 +347,9 @@ namespace GitHubRelease
         /// <param name="token">The GitHub access token.</param>
         /// <param name="branch">The branch name. Set to null if requesting release on any branch.</param>
         /// <returns>A tuple containing the latest release published date and tag.</returns>
-        public async Task<(string, string)> GetLatestReleasePublishedAtAndTagAsync(string token, string branch)
+        public async Task<(string, string)> GetLatestReleasePublishedAtAndTagAsync(string branch)
         {
-            var releases = await GetReleasesAsync(token, branch);
+            var releases = await GetReleasesAsync(branch);
             if (releases == null)
             {
                 return (FirstDate, NoneFound);
@@ -374,9 +373,9 @@ namespace GitHubRelease
                 throw new InvalidOperationException($"Failed to get the latest release. Exception: {ex.Message}");
             }
         }
-        //public async Task<string> GetLatestReleaseTagAsync(string token, string branch)
+        //public async Task<string> GetLatestReleaseTagAsync(string branch)
         //{
-        //    var latestRelease = await GetLatestReleaseAsync(token, branch);
+        //    var latestRelease = await GetLatestReleaseAsync(branch);
         //    if (latestRelease != null)
         //    {
         //        // get count
@@ -424,10 +423,10 @@ namespace GitHubRelease
         /// <param name="token">The GitHub access token.</param>
         /// <param name="releaseId">The ID of the release to delete.</param>
         /// <returns>The response from deleting the release.</returns>
-        public async Task<HttpResponseMessage> DeleteReleaseAsync(string token, int releaseId)
+        public async Task<HttpResponseMessage> DeleteReleaseAsync(int releaseId)
         {
-            ApiService.SetupHeaders(token);
-            var uri = $"https://api.github.com/repos/{Owner}/{Repo}/releases/{releaseId}";
+            ApiService.SetupHeaders();
+            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/releases/{releaseId}";
             Console.WriteLine($"DELETE uri: {uri}");
             var response = await ApiService.DeleteAsync(uri);
 
@@ -449,11 +448,11 @@ namespace GitHubRelease
         /// <param name="token">The GitHub access token.</param>
         /// <param name="tagName">The tag name of the release.</param>
         /// <returns>The release ID if found, otherwise null.</returns>
-        public async Task<int?> GetReleaseByTagNameAsync(string token, string tagName)
+        public async Task<int?> GetReleaseByTagNameAsync(string tagName)
         {
-            ApiService.SetupHeaders(token);
+            ApiService.SetupHeaders();
 
-            var uri = $"https://api.github.com/repos/{Owner}/{Repo}/releases/tags/{tagName}";
+            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/releases/tags/{tagName}";
             Console.WriteLine($"GET uri: {uri}");
             var response = await ApiService.GetAsync(uri);
 
@@ -480,7 +479,7 @@ namespace GitHubRelease
         /// <param name="assetPath">The path to the asset file.</param>
         /// <param name="response">The response from creating the release.</param>
         /// <returns>The response from uploading the asset.</returns>
-        private async Task<HttpResponseMessage> UploadAsset(string token, string assetPath, HttpResponseMessage response)
+        private async Task<HttpResponseMessage> UploadAsset(string assetPath, HttpResponseMessage response)
         {
             if (!response.IsSuccessStatusCode)
             {
@@ -493,7 +492,7 @@ namespace GitHubRelease
                 return new(HttpStatusCode.NotFound);
             }
 
-            ApiService.SetupHeaders(token);
+            ApiService.SetupHeaders();
 
             var responseContent = await response.Content.ReadAsStringAsync();
             var responseObject = System.Text.Json.JsonDocument.Parse(responseContent);
@@ -529,10 +528,10 @@ namespace GitHubRelease
         /// <param name="token">The GitHub access token.</param>
         /// <param name="releaseId">The ID of the release.</param>
         /// <returns>The release information as a <see cref="Release"/> object.</returns>
-        public async Task<Release?> GetReleaseAsync(string token, int releaseId)
+        public async Task<Release?> GetReleaseAsync(int releaseId)
         {
-            ApiService.SetupHeaders(token);
-            var uri = $"https://api.github.com/repos/{Owner}/{Repo}/releases/{releaseId}";
+            ApiService.SetupHeaders();
+            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/releases/{releaseId}";
             Console.WriteLine($"GET uri: {uri}");
             var response = await ApiService.GetAsync(uri);
 

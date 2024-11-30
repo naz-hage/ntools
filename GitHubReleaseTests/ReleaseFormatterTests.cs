@@ -10,11 +10,11 @@ namespace GitHubRelease.Tests
             // Arrange
             var apiService = new ApiService();
 
-            var commitService = new CommitService(apiService, Owner, Repo, Token);
-            var releaseService = new ReleaseService(Owner, Repo);
-            var releaseFormatter = new ReleaseFormatter(apiService, Owner, Repo, Token);
+            var commitService = new CommitService(apiService, Repo);
+            var releaseService = new ReleaseService(Repo);
+            var releaseFormatter = new ReleaseFormatter(apiService, Repo);
 
-            var (sinceLastPublished, sinceTag) = await releaseService.GetLatestReleasePublishedAtAndTagAsync(Token, DefaultBranch);
+            var (sinceLastPublished, sinceTag) = await releaseService.GetLatestReleasePublishedAtAndTagAsync(DefaultBranch);
 
             // Get commits since last release on Default branch
             var commits = await commitService.GetCommits(DefaultBranch, sinceLastPublished);

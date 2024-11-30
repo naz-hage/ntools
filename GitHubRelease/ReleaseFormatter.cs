@@ -3,12 +3,11 @@ using System.Text.Json;
 
 namespace GitHubRelease
 {
-    public class ReleaseFormatter(ApiService apiService, string owner, string repo, string token) : Constants
+    public class ReleaseFormatter(ApiService apiService, string repo) : Constants
     {
-        private readonly CommitService CommitService = new(apiService, owner, repo, token);
-        private readonly ContributorService ContributorService = new(apiService, owner, repo);
-        private readonly string Owner = owner;
-        private readonly string Repo = repo;
+        private readonly CommitService CommitService = new(apiService, repo);
+        private readonly ContributorService ContributorService = new(apiService, repo);
+         private readonly string Repo = repo;
 
         /// <summary>
         /// Formats the release notes based on the commits.
@@ -55,11 +54,11 @@ namespace GitHubRelease
             StringBuilder releaseNotes = new();
             if (string.IsNullOrEmpty(sinceTag))
             {
-                releaseNotes.AppendLine($"\n\n**Full Changelog**: https://github.com/{Owner}/{Repo}/commits/{tag}");
+                releaseNotes.AppendLine($"\n\n**Full Changelog**: https://github.com/{Credentials.GetOwner()}/{Repo}/commits/{tag}");
             }
             else
             {
-                releaseNotes.AppendLine($"\n\n**Full Changelog**: https://github.com/{Owner}/{Repo}/compare/{sinceTag}...{tag}");
+                releaseNotes.AppendLine($"\n\n**Full Changelog**: https://github.com/{Credentials.GetOwner()}/{Repo}/compare/{sinceTag}...{tag}");
             }
 
             return releaseNotes;

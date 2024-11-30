@@ -30,10 +30,10 @@
         /// Sets up the headers for making API requests.
         /// </summary>
         /// <param name="token">The access token for authentication.</param>
-        public void SetupHeaders(string token)
+        public void SetupHeaders()
         {
             Client.DefaultRequestHeaders.Clear();
-            Client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+            Client.DefaultRequestHeaders.Add("Authorization", $"Bearer {Credentials.GetToken()}");
             Client.DefaultRequestHeaders.Add("User-Agent", "request");
             Client.DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3+json");
         }

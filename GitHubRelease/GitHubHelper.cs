@@ -12,10 +12,9 @@ namespace GitHubRelease
     /// </remarks>
     /// <param name="owner">The owner of the GitHub repository.</param>
     /// <param name="repo">The name of the GitHub repository.</param>
-    public class GitHubHelper(string owner, string repo)
+    public class GitHubHelper(string repo) : Constants
     {
         private readonly HttpClient Client = new();
-        private readonly string Owner = owner;
         private readonly string Repo = repo;
 
         /// <summary>
@@ -32,7 +31,7 @@ namespace GitHubRelease
             Client.DefaultRequestHeaders.Add("User-Agent", "request");
             //_client.DefaultRequestHeaders.Add("Authorization", $"token {token}");
             Client.DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3+json");
-            var uri = $"https://api.github.com/repos/{Owner}/{Repo}/releases/latest";
+            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/releases/latest";
             Console.WriteLine($"GET uri: {uri}");
             var response = await Client.GetAsync(uri);
             if (response.IsSuccessStatusCode)
@@ -70,12 +69,12 @@ namespace GitHubRelease
             DateTime date = DateTime.Parse(sinceLastPublished!);
             string iso8601DateSinceLastPublished = date.ToString("s") + "Z";
 
-            var uri = $"https://api.github.com/repos/{Owner}/{Repo}/commits?since={iso8601DateSinceLastPublished}";
+            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/commits?since={iso8601DateSinceLastPublished}";
 
             // If there are no releases, get all commits
             if (latest == null)
             {
-                uri = $"https://api.github.com/repos/{Owner}/{Repo}/commits";
+                uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/commits";
             }
 
             Console.WriteLine($"GET uri: {uri}");
@@ -143,11 +142,11 @@ namespace GitHubRelease
             StringBuilder releaseNotes = new();
             if (string.IsNullOrEmpty(sinceTag))
             {
-                releaseNotes.AppendLine($"\n\n**Full Changelog**: https://github.com/{Owner}/{Repo}/commits/{tag}");
+                releaseNotes.AppendLine($"\n\n**Full Changelog**: https://github.com/{Credentials.GetOwner()}/{Repo}/commits/{tag}");
             }
             else
             {
-                releaseNotes.AppendLine($"\n\n**Full Changelog**: https://github.com/{Owner}/{Repo}/compare/{sinceTag}...{tag}");
+                releaseNotes.AppendLine($"\n\n**Full Changelog**: https://github.com/{Credentials.GetOwner()}/{Repo}/compare/{sinceTag}...{tag}");
             }
 
             return releaseNotes;
@@ -157,7 +156,7 @@ namespace GitHubRelease
         {
             var contributors = new List<string>();
 
-            var uri = $"https://api.github.com/repos/{Owner}/{Repo}/contributors";
+            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/contributors";
             Console.WriteLine($"GET uri: {uri}");
             var response = await Client.GetAsync(uri);
             if (response.IsSuccessStatusCode)
@@ -187,7 +186,7 @@ namespace GitHubRelease
                 var author = commit.GetProperty("author").GetProperty("login").GetString();
                 if (author != null && !contributors.Contains(author))
                 {
-                    var prUri = $"https://api.github.com/repos/{Owner}/{Repo}/commits/{commit.GetProperty("sha").GetString()}/pulls";
+                    var prUri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/commits/{commit.GetProperty("sha").GetString()}/pulls";
                     Console.WriteLine($"GET uri: {prUri}");
                     var prResponse = await Client.GetAsync(prUri);
                     if (prResponse.IsSuccessStatusCode)
@@ -197,7 +196,7 @@ namespace GitHubRelease
                         if (pulls.Count() > 0)
                         {
                             var prNumber = pulls.ElementAt(0).GetProperty("number").GetString();
-                            releaseNotes.AppendLine($"* @{author} made their first contribution in https://github.com/{Owner}/{Repo}/pull/{prNumber}");
+                            releaseNotes.AppendLine($"* @{author} made their first contribution in https://github.com/{Credentials.GetOwner()}/{Repo}/pull/{prNumber}");
                         }
                     }
                 }
@@ -233,7 +232,7 @@ namespace GitHubRelease
                     continue;
                 }
 
-                var prUri = $"https://api.github.com/repos/{Owner}/{Repo}/commits/{sha}/pulls";
+                var prUri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/commits/{sha}/pulls";
                 Console.WriteLine($"GET uri: {prUri}");
                 var prResponse = await Client.GetAsync(prUri);
                 if (prResponse.IsSuccessStatusCode)
@@ -245,7 +244,7 @@ namespace GitHubRelease
                         try
                         {
                             var prNumber = pulls.ElementAt(0).GetProperty("number").GetInt32().ToString();
-                            releaseNotes.AppendLine($"* {message} by @{author} in https://github.com/{Owner}/{Repo}/pull/{prNumber}");
+                            releaseNotes.AppendLine($"* {message} by @{author} in https://github.com/{Credentials.GetOwner()}/{Repo}/pull/{prNumber}");
                         }
                         catch (Exception ex)
                         {
@@ -270,7 +269,7 @@ namespace GitHubRelease
 
         private async Task<string?> GetTagFromCommitAsync(string commitSha)
         {
-            var uri = $"https://api.github.com/repos/{Owner}/{Repo}/tags";
+            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/tags";
             Console.WriteLine($"GET uri: {uri}");
             var response = await Client.GetAsync(uri);
             if (response.IsSuccessStatusCode)
@@ -379,7 +378,7 @@ namespace GitHubRelease
             // replace TargetCommitish with the bra
 
             // Send a POST request to create a new release on GitHub
-            var uri = $"https://api.github.com/repos/{Owner}/{Repo}/releases";
+            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/releases";
             Console.WriteLine($"POST uri: {uri}");
             var response = await Client.PostAsync(uri, new StringContent(jsonBody, Encoding.UTF8, "application/json"));
 
@@ -465,7 +464,7 @@ namespace GitHubRelease
             Client.DefaultRequestHeaders.Add("User-Agent", "request");
             Client.DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3+json");
 
-            var uri = $"https://api.github.com/repos/{Owner}/{Repo}/releases/tags/{tagName}";
+            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/releases/tags/{tagName}";
             Console.WriteLine($"GET uri: {uri}");
             var response = await Client.GetAsync(uri);
 
@@ -491,7 +490,7 @@ namespace GitHubRelease
             Client.DefaultRequestHeaders.Add("User-Agent", "request");
             Client.DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3+json");
 
-            var uri = $"https://api.github.com/repos/{Owner}/{Repo}/releases/{releaseId}";
+            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/releases/{releaseId}";
             Console.WriteLine($"DELETE uri: {uri}");
             var response = await Client.DeleteAsync(uri);
 
@@ -514,7 +513,7 @@ namespace GitHubRelease
             Client.DefaultRequestHeaders.Add("User-Agent", "request");
             Client.DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3+json");
 
-            var uri = $"https://api.github.com/repos/{Owner}/{Repo}/git/refs/tags/{tagName}";
+            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/git/refs/tags/{tagName}";
             Console.WriteLine($"DELETE uri: {uri}");
             var response = await Client.DeleteAsync(uri);
 
@@ -539,7 +538,7 @@ namespace GitHubRelease
             Client.DefaultRequestHeaders.Add("User-Agent", "request");
             Client.DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3+json");
 
-            var uri = $"https://api.github.com/repos/{Owner}/{Repo}/git/refs/tags/{tagName}";
+            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/git/refs/tags/{tagName}";
             Console.WriteLine($"GET uri: {uri}");
             var response = await Client.GetAsync(uri);
 
@@ -553,7 +552,7 @@ namespace GitHubRelease
             Client.DefaultRequestHeaders.Add("User-Agent", "request");
             Client.DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3+json");
 
-            var uri = $"https://api.github.com/repos/{Owner}/{Repo}/tags";
+            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/tags";
             Console.WriteLine($"GET uri: {uri}");
             var response = await Client.GetAsync(uri);
 
@@ -597,7 +596,7 @@ namespace GitHubRelease
             Client.DefaultRequestHeaders.Add("User-Agent", "request");
             Client.DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3+json");
 
-            var uri = $"https://api.github.com/repos/{Owner}/{Repo}/releases";
+            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/releases";
             Console.WriteLine($"GET uri: {uri}");
             var response = await Client.GetAsync(uri);
 
