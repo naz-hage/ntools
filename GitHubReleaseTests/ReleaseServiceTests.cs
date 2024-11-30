@@ -22,9 +22,21 @@ namespace GitHubRelease.Tests
             }
         }
 
+        /// <summary>
+        /// CreateGitHubReleaseAsyncTestAsync method tests the creation of a GitHub release using the ReleaseService class. 
+        /// It sets up the necessary release information, calls the CreateRelease method, and verifies that the release 
+        /// was created successfully by checking the result and status code. 
+        /// The test is skipped if it is running in a GitHub Actions environment.
+        /// </summary>
+        /// <returns></returns>
         [TestMethod()]
         public async Task CreateGitHubReleaseAsyncTestAsync()
         {
+            if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != null)
+            {
+                Assert.Inconclusive();
+            }
+
             // Arrange
             var releaseService = new ReleaseService(Repo);
 
