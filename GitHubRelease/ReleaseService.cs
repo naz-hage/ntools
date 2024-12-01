@@ -1,7 +1,7 @@
+using System.Diagnostics;
 using System.Net;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace GitHubRelease
 {
@@ -346,7 +346,7 @@ namespace GitHubRelease
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"Releases JSON Content: {content}");
+                Debug.WriteLine($"Releases JSON Content: {content}");
 
                 // return all releases on all branches
                 if (branch == null)
