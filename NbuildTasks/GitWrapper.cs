@@ -99,22 +99,57 @@ namespace NbuildTasks
         /// <returns>True if command is successful, otherwise False</returns>
         public bool PushTag(string newTag)
         {
-            Process.StartInfo.Arguments = $"push origin {Branch} {newTag}";
-
-            var result = Process.LockStart(Verbose);
-            if ((result.Code == 0) && (result.Output.Count >= 0))
+            if (string.IsNullOrEmpty(newTag))
             {
-                foreach (var line in result.Output)
+                throw new ArgumentException("Tag cannot be null or empty", nameof(newTag));
+            }
+
+            if (string.IsNullOrEmpty(Branch))
+            {
+                throw new InvalidOperationException("Branch cannot be null or empty");
+            }
+
+            // Pull the latest changes from the remote branch
+            Process.StartInfo.Arguments = $"pull origin {Branch}";
+            var pullResult = Process.LockStart(Verbose);
+            if (pullResult.Code != 0)
+            {
+                Console.WriteLine("Failed to pull the latest changes from the remote branch.");
+                foreach (var line in pullResult.Output)
                 {
                     if (Verbose) Console.WriteLine(line);
-                    if (line.Contains("fatal"))
+                }
+                return false;
+            }
+
+            // Push the new tag to the remote repository
+            Process.StartInfo.Arguments = $"push origin {Branch} {newTag}";
+            var pushResult = Process.LockStart(Verbose);
+            if (pushResult.Code == 0 && pushResult.Output.Count > 0)
+            {
+                foreach (var line in pushResult.Output)
+                {
+                    if (Verbose) Console.WriteLine(line);
+                    if (line.Contains("fatal") || line.Contains("error"))
                     {
+                        Console.WriteLine($"Error pushing tag: {line}");
                         return false;
                     }
                 }
                 return true;
             }
-            return false;
+            else
+            {
+                foreach (var line in pushResult.Output)
+                {
+                    if (Verbose) Console.WriteLine(line);
+                    if (line.Contains("fatal") || line.Contains("error"))
+                    {
+                        Console.WriteLine($"Error pushing tag: {line}");
+                    }
+                }
+                return false;
+            }
         }
 
         public bool SetTag(string newTag)
