@@ -154,7 +154,7 @@
 	</Target>
 
 	<!-- push production tag -->
-	<Target Name="PUSH_TAG" DependsOnTargets="TAG" AfterTargets="PROD;STAGE_NEW" >
+	<Target Name="PUSH_TAG" DependsOnTargets="TAG" AfterTargets="PROD" >
 		<Git Command="PushTag" TaskParameter="$(ProductVersion)" >
 		</Git>
 	</Target>
@@ -210,7 +210,7 @@
 	</Target>
 
 	<!-- Creates a staging since the last release  (Experimental) -->
-	<Target Name="STAGE_EXP" DependsOnTargets="
+	<Target Name="STAGE" DependsOnTargets="
 			CLEAN;
             TAG;
             AUTOTAG_STAGE;
@@ -224,7 +224,7 @@
 	</Target>
 
 	<!-- Creates a production since the last release (Experimental) -->
-	<Target Name="PROD_EXP" DependsOnTargets="
+	<Target Name="PROD" DependsOnTargets="
 			CLEAN;
             GIT_PULL;
             TAG;
@@ -239,7 +239,7 @@
 	</Target>
 
 	<!-- Creates a production since the last release  (Experimental) -->
-	<Target Name="GITHUB_RELEASE" DependsOnTargets="ARTIFACTS;GIT_BRANCH" AfterTargets="STAGE_EXP;PROD_EXP" >
+	<Target Name="GITHUB_RELEASE" DependsOnTargets="ARTIFACTS;GIT_BRANCH" AfterTargets="STAGE;PROD" >
 		<PropertyGroup>
 			<GitHubReleaseExe>$(OutputPathRelease)\GitHubRelease.exe</GitHubReleaseExe>
 		</PropertyGroup>
