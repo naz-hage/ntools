@@ -39,7 +39,7 @@ namespace GitHubRelease
             }
 
             // Handle detached HEAD in GitHub Actions
-            if (release.TargetCommitish == "HEAD")
+            if (release.TargetCommitish.Contains("HEAD"))
             {
                 var branch = await GetBranchNameFromGitHubActions();
                 if (!string.IsNullOrEmpty(branch))
@@ -68,10 +68,10 @@ namespace GitHubRelease
                     var commitSha = await GetCurrentCommitSha();
                     if (branch.GetProperty("commit").GetProperty("sha").GetString() == commitSha)
                     {
-                        var branchInGitHubActons = branch.GetProperty("name").GetString();
-                        Console.WriteLine($"branch In GitHubActions:{branchInGitHubActons}");
-                        Console.WriteLine($"CommitSha In GitHubActions:{commitSha}");
-                        return branchInGitHubActons;
+                        var branchInGitHubActions = branch.GetProperty("name").GetString();
+                        Console.WriteLine($"branch In GitHubActions: {branchInGitHubActions}");
+                        Console.WriteLine($"CommitSha In GitHubActions: {commitSha}");
+                        return branchInGitHubActions;
                     }
                 }
             }
