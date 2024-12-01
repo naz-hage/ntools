@@ -28,8 +28,68 @@ namespace GitHubRelease
             await DeleteExistingRelease(release);
             await DeleteStagingReleasesIfProduction(release);
             await UpdateReleaseNotes(release);
+
+            // Log the release object for debugging
+            Console.WriteLine($"Creating release with tag: {release.TagName}, target commitish: {release.TargetCommitish}");
+
+            // Validate tag_name and target_commitish
+            if (string.IsNullOrEmpty(release.TagName) || string.IsNullOrEmpty(release.TargetCommitish))
+            {
+                throw new InvalidOperationException("Tag name and target commitish must be provided and valid.");
+            }
+
+            // Handle detached HEAD in GitHub Actions
+            if (release.TargetCommitish == "HEAD")
+            {
+                var branch = await GetBranchNameFromGitHubActions();
+                if (!string.IsNullOrEmpty(branch))
+                {
+                    release.TargetCommitish = branch;
+                }
+                else
+                {
+                    throw new InvalidOperationException("Could not determine the branch name from GitHub Actions.");
+                }
+            }
+
             return await CreateReleaseAndUploadAsset(release, assetPath);
         }
+
+        private async Task<string?> GetBranchNameFromGitHubActions()
+        {
+            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/branches";
+            var response = await ApiService.GetAsync(uri);
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                var branches = JsonDocument.Parse(content).RootElement.EnumerateArray();
+                foreach (var branch in branches)
+                {
+                    var commitSha = await GetCurrentCommitSha();
+                    if (branch.GetProperty("commit").GetProperty("sha").GetString() == commitSha)
+                    {
+                        var branchInGitHubActons = branch.GetProperty("name").GetString();
+                        Console.WriteLine($"branch In GitHubActions:{branchInGitHubActons}");
+                        Console.WriteLine($"CommitSha In GitHubActions:{commitSha}");
+                        return branchInGitHubActons;
+                    }
+                }
+            }
+            return null;
+        }
+
+        private async Task<string> GetCurrentCommitSha()
+        {
+            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/commits/HEAD";
+            var response = await ApiService.GetAsync(uri);
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                return JsonDocument.Parse(content).RootElement.GetProperty("sha").GetString() ?? string.Empty;
+            }
+            return string.Empty;
+        }
+
 
         /// <summary>
         /// Validates the asset path.
@@ -157,6 +217,10 @@ namespace GitHubRelease
         {
             var context = new JsonContext();
             string jsonBody = JsonSerializer.Serialize(release, context.Release);
+
+            // Log the JSON body for debugging
+            Console.WriteLine($"Release JSON Body: {jsonBody}");
+
             HttpResponseMessage response = await UploadAsset(jsonBody);
             if (!response.IsSuccessStatusCode)
             {
