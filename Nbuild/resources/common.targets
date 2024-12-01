@@ -257,7 +257,7 @@
 	<Target Name="TEST" DependsOnTargets="ARTIFACTS;TAG">
 		<RemoveDir Directories="$(ArtifactsTestResultsFolder)"></RemoveDir>
 		<!--To colllect code coverage, add the following option to the test command: collect:"XPlat Code Coverage"-->
-		<Exec Command='dotnet test --no-build --configuration $(TargetRelease) --logger "console;verbosity=normal" %(DotNetTestFiles.Identity) --logger trx --results-directory:$(ArtifactsTestResultsFolder) --verbosity normal'/>
+		<Exec Command='dotnet test $(SolutionName).sln --no-build --configuration $(TargetRelease) --logger "console;verbosity=normal" %(DotNetTestFiles.Identity) --logger trx --results-directory:$(ArtifactsTestResultsFolder) --verbosity normal'/>
 		<Message Text="==> COMMON_DONE"/>
 	</Target>
 
