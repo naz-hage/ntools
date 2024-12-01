@@ -154,7 +154,7 @@
 	</Target>
 
 	<!-- push production tag -->
-	<Target Name="PUSH_TAG" DependsOnTargets="TAG" AfterTargets="PROD" >
+	<Target Name="PUSH_TAG" DependsOnTargets="TAG" AfterTargets="STAGE;PROD" >
 		<Git Command="PushTag" TaskParameter="$(ProductVersion)" >
 		</Git>
 	</Target>
