@@ -244,7 +244,7 @@
 			<GitHubReleaseExe>$(OutputPathRelease)\GitHubRelease.exe</GitHubReleaseExe>
 		</PropertyGroup>
 		<Git Command="PushTag" TaskParameter="$(ProductVersion)" />
-		<Exec Command="$(GitHubReleaseExe) -c create -r $(SolutionName) -t $(ProductVersion) -b $(GitBranch) -p $(ArtifactsFolder).zip" WorkingDirectory="$(OutputPathRelease)" />
+		<Exec Command="$(GitHubReleaseExe) -c create -r $(SolutionName) -t $(ProductVersion) -b 80-issue -p $(ArtifactsFolder).zip" WorkingDirectory="$(OutputPathRelease)" />
 
 		<Message Text="==> DONE"/>
 	</Target>
