@@ -215,6 +215,21 @@ namespace NbuildTasks.Tests
             Assert.IsTrue(result);
         }
 
+        [TestMethod, TestCategory("Manual")]
+        public void PushTagTest()
+        {
+            // Arrange
+            // Arrange add a tag
+            var tag = GitWrapper.SetAutoTag(Enums.BuildType.STAGE.ToString());
+            Assert.IsTrue(GitWrapper.SetTag(tag));
+            Assert.IsNotNull(tag);
+            // Act
+            var result = GitWrapper.PushTag(tag);
+            // Assert
+            Assert.IsTrue(result);
+        }
+
+
         // This test is time consuming and should be run manually
         [TestMethod, TestCategory("Manual")]
         public void ListRemoteTagsTest()
