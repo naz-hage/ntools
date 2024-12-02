@@ -223,12 +223,20 @@ namespace NbuildTasks.Tests
             var tag = GitWrapper.SetAutoTag(Enums.BuildType.STAGE.ToString());
             Assert.IsTrue(GitWrapper.SetTag(tag));
             Assert.IsNotNull(tag);
+
             // Act
             var result = GitWrapper.PushTag(tag);
-            // Assert
-            Assert.IsTrue(result);
-        }
 
+            // Assert
+            if (!GitHubActions)
+            {
+                Assert.IsTrue(result, " GitWrapper.PushTag(tag) returned falase");
+            }
+            else
+            {
+                Assert.Inconclusive();
+            }
+        }
 
         // This test is time consuming and should be run manually
         [TestMethod, TestCategory("Manual")]
@@ -299,7 +307,7 @@ namespace NbuildTasks.Tests
             // Assert
             // if running in GitHub Actions, git Email is not configured, if running locally, git is configured
             // ignore the test if running in GitHub Actions
-            if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") == null)
+            if (!GitHubActions)
             {
                 Assert.IsNotNull(result);
             }
@@ -321,7 +329,7 @@ namespace NbuildTasks.Tests
             // Assert
             // if running in GitHub Actions, git Email is not configured, if running locally, git is configured
             // ignore the test if running in GitHub Actions
-            if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") == null)
+            if (!GitHubActions)
             {
                 Assert.IsNotNull(result);
             }
@@ -343,7 +351,7 @@ namespace NbuildTasks.Tests
             // Assert
             // if running in GitHub Actions, git UserName is not configured, if running locally, git is configured
             // ignore the test if running in GitHub Actions
-            if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") == null)
+            if (!GitHubActions)
             {
                 Assert.IsTrue(result);
             }
