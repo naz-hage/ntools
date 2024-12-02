@@ -228,13 +228,13 @@ namespace NbuildTasks.Tests
             var result = GitWrapper.PushTag(tag);
 
             // Assert
-            if (!GitHubActions)
+            if (GitHubActions)
             {
-                Assert.IsTrue(result, " GitWrapper.PushTag(tag) returned falase");
+                Assert.Inconclusive();
             }
             else
             {
-                Assert.Inconclusive();
+                Assert.IsTrue(result, " GitWrapper.PushTag(tag) returned falase");
             }
         }
 
@@ -307,13 +307,13 @@ namespace NbuildTasks.Tests
             // Assert
             // if running in GitHub Actions, git Email is not configured, if running locally, git is configured
             // ignore the test if running in GitHub Actions
-            if (!GitHubActions)
+            if (GitHubActions)
             {
-                Assert.IsNotNull(result);
+                Assert.Inconclusive();
             }
             else
             {
-                Assert.Inconclusive();
+                Assert.IsNotNull(result);
             }
         }
 
@@ -329,13 +329,13 @@ namespace NbuildTasks.Tests
             // Assert
             // if running in GitHub Actions, git Email is not configured, if running locally, git is configured
             // ignore the test if running in GitHub Actions
-            if (!GitHubActions)
+            if (GitHubActions)
             {
-                Assert.IsNotNull(result);
+                Assert.Inconclusive();
             }
             else
             {
-                Assert.Inconclusive();
+                Assert.IsNotNull(result);
             }
         }
 
@@ -351,13 +351,13 @@ namespace NbuildTasks.Tests
             // Assert
             // if running in GitHub Actions, git UserName is not configured, if running locally, git is configured
             // ignore the test if running in GitHub Actions
-            if (!GitHubActions)
+            if (GitHubActions)
             {
-                Assert.IsTrue(result);
+                Assert.Inconclusive();
             }
             else
             {
-                Assert.Inconclusive();
+                Assert.IsTrue(result);
             }
         }
     }

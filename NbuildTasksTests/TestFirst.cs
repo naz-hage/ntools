@@ -16,7 +16,9 @@ namespace NbuildTasks.Tests
 
         public TestFirst()
         {
-            GitHubActions = (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") == null);
+            var githubActionsEnvironment = Environment.GetEnvironmentVariable("GITHUB_ACTIONS");
+            GitHubActions = githubActionsEnvironment != null;
+            Console.WriteLine($"GitHubActions: {GitHubActions}");
             ProjectName = TestProject.Split('/').Last().Split('.').First();
         }
 
