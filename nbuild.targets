@@ -198,12 +198,12 @@
 	</Target>
 
 	<!-- Creates a stage or prod release -->
-	<Target Name="GITHUB_RELEASE" DependsOnTargets="ARTIFACTS;GIT_BRANCH" AfterTargets="STAGE;PROD" Condition="'$(GITHUB_ACTIONS)' != ''" >
+	<Target Name="GITHUB_RELEASE" DependsOnTargets="ARTIFACTS;GIT_BRANCH" AfterTargets="STAGE;PROD" >
 		<PropertyGroup>
 			<GitHubReleaseExe>$(OutputPathRelease)\GitHubRelease.exe</GitHubReleaseExe>
 		</PropertyGroup>
 		<Git Command="PushTag" TaskParameter="$(ProductVersion)" />
-		<Exec Command='"$(OutputPathRelease)\GitHubRelease.exe -c create -r $(SolutionName) -t $(ProductVersion) -b $(GitBranch) -p $(ArtifactsFolder).zip' WorkingDirectory="$(OutputPathRelease)" />
+		<Exec Command='"$(OutputPathRelease)\GitHubRelease.exe" -c create -r $(SolutionName) -t $(ProductVersion) -b $(GitBranch) -p $(ArtifactsFolder).zip' WorkingDirectory="$(OutputPathRelease)" />
 
 		<Message Text="==> DONE"/>
 	</Target>
