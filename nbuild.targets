@@ -7,6 +7,7 @@
 	<PropertyGroup>
         <!-- This is the folder where the *.sln resides-->
 		<DeploymentFolder>$(ProgramFiles)\Nbuild</DeploymentFolder>
+		
 	</PropertyGroup>
 
 	<!--Setup the ARTIFACTS folders for binaries and test results - override -->
@@ -158,6 +159,7 @@
 		<Message Text="SetupFolder: $(SetupFolder)"/>
 		<Message Text="ArtifactsFolder: $(ArtifactsFolder)"/>
 		<Message Text="ArtifactsTestResultsFolder: $(ArtifactsTestResultsFolder)"/>
+		<Message Text="GitHub Action: $(GITHUB_ACTION)" />
 		<Message Text="==> DONE"/>
 	</Target>
 
