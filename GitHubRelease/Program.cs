@@ -1,4 +1,5 @@
-﻿using System.Xml.Linq;
+﻿using NbuildTasks;
+using System.Xml.Linq;
 
 namespace GitHubRelease
 {
@@ -14,7 +15,7 @@ namespace GitHubRelease
         /// </param>
         static async Task Main(string[] args)
         {
-            Console.WriteLine($"GitHub Release demo!  args.Length: {args.Length}");
+            Console.WriteLine($"[{ConsoleColor.Yellow}!{Nversion.Get()}]\n");
 
             if (args.Length < 10)
             {

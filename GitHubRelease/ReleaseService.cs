@@ -194,6 +194,7 @@ namespace GitHubRelease
 
             Console.WriteLine("Getting commits since the last release...");
             var commits = await commitService.GetCommits(release.TargetCommitish!, sinceLastPublished);
+            Console.WriteLine($"commits: {commits.Count}");
 
             if (commits.Count <= 0)
             {
