@@ -72,8 +72,9 @@ jobs:
 
     - name: Build using ntools
       run: |
-        & "$env:ProgramFilesPath/nbuild/nb.exe" CORE  
+        & "$env:ProgramFilesPath/nbuild/nb.exe" CORE
         & "$env:ProgramFilesPath/nbuild/nb.exe" ${{ env.Build_Type }} -v ${{ env.Enable_Logging }}
+        & "$env:ProgramFilesPath/nbuild/nb.exe" GITHUB_RELEASE -v ${{ env.Enable_Logging }}
       shell: pwsh
       working-directory: ${{ github.workspace }}
       env:
