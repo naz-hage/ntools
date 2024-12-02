@@ -12,8 +12,13 @@ namespace NbuildTasks.Tests
         public const string TestBranch = "testRandom";
         public static string ProjectName { get; set; }
 
+        public static bool GitHubActions { get; set; } = false;
+
         public TestFirst()
         {
+            var githubActionsEnvironment = Environment.GetEnvironmentVariable("GITHUB_ACTIONS");
+            GitHubActions = githubActionsEnvironment != null;
+            Console.WriteLine($"GitHubActions: {GitHubActions}");
             ProjectName = TestProject.Split('/').Last().Split('.').First();
         }
 

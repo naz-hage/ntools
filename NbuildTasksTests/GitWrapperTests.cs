@@ -215,6 +215,29 @@ namespace NbuildTasks.Tests
             Assert.IsTrue(result);
         }
 
+        [TestMethod, TestCategory("Manual")]
+        public void PushTagTest()
+        {
+            // Arrange
+            // Arrange add a tag
+            var tag = GitWrapper.SetAutoTag(Enums.BuildType.STAGE.ToString());
+            Assert.IsTrue(GitWrapper.SetTag(tag));
+            Assert.IsNotNull(tag);
+
+            // Act
+            var result = GitWrapper.PushTag(tag);
+
+            // Assert
+            if (GitHubActions)
+            {
+                Assert.Inconclusive();
+            }
+            else
+            {
+                Assert.IsTrue(result, " GitWrapper.PushTag(tag) returned falase");
+            }
+        }
+
         // This test is time consuming and should be run manually
         [TestMethod, TestCategory("Manual")]
         public void ListRemoteTagsTest()
@@ -284,13 +307,13 @@ namespace NbuildTasks.Tests
             // Assert
             // if running in GitHub Actions, git Email is not configured, if running locally, git is configured
             // ignore the test if running in GitHub Actions
-            if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") == null)
+            if (GitHubActions)
             {
-                Assert.IsNotNull(result);
+                Assert.Inconclusive();
             }
             else
             {
-                Assert.Inconclusive();
+                Assert.IsNotNull(result);
             }
         }
 
@@ -306,13 +329,13 @@ namespace NbuildTasks.Tests
             // Assert
             // if running in GitHub Actions, git Email is not configured, if running locally, git is configured
             // ignore the test if running in GitHub Actions
-            if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") == null)
+            if (GitHubActions)
             {
-                Assert.IsNotNull(result);
+                Assert.Inconclusive();
             }
             else
             {
-                Assert.Inconclusive();
+                Assert.IsNotNull(result);
             }
         }
 
@@ -328,13 +351,13 @@ namespace NbuildTasks.Tests
             // Assert
             // if running in GitHub Actions, git UserName is not configured, if running locally, git is configured
             // ignore the test if running in GitHub Actions
-            if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") == null)
+            if (GitHubActions)
             {
-                Assert.IsTrue(result);
+                Assert.Inconclusive();
             }
             else
             {
-                Assert.Inconclusive();
+                Assert.IsTrue(result);
             }
         }
     }

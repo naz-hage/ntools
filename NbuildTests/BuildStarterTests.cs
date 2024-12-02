@@ -12,17 +12,6 @@ namespace Nbuild.Tests
         [TestMethod()]
         public void GetTargetsTest()
         {
-            List<string> expectedNgitTargets =
-            [
-                "GIT_STATUS",
-                "AUTOTAG_STAGE",
-                "SET_TAG",
-                "GIT_PULL",
-                "AUTOTAG_PROD",
-                "TAG",
-                "PUSH_TAG",
-                "GIT_BRANCH"
-            ];
 
             // Arrange
             List<string> expectedCommonTargets =
@@ -34,6 +23,7 @@ namespace Nbuild.Tests
                 "DEV",
                 "STAGE",
                 "PROD",
+                "GITHUB_RELEASE",
                 "STAGE_DEPLOY",
                 "PROD_DEPLOY",
                 "SOLUTION",
