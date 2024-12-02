@@ -198,21 +198,11 @@ namespace NbuildTasks
         private string GetBranch()
         {
             var branch = string.Empty;
-            Process.StartInfo.Arguments = $"branch";
+            Process.StartInfo.Arguments = $"rev-parse --abbrev-ref HEAD";
             var result = Process.LockStart(Verbose);
-            if ((result.Code == 0) && (result.Output.Count > 0))
+            if ((result.Code == 0) && (result.Output.Count == 1))
             {
-
-                foreach (var line in result.Output)
-                {
-                    if (Verbose) Console.WriteLine(line);
-
-                    if (line.StartsWith("*"))
-                    {
-                        branch = line.Substring(2); // //branch = line[2..]
-                        break;
-                    }
-                }
+                branch = result.GetFirstOutput();
             }
 
             return branch;
