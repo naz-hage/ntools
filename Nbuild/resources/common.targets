@@ -148,7 +148,7 @@
   </Target>
 
 	<!-- Creates a stage or prod release -->
-	<Target Name="GITHUB_RELEASE" DependsOnTargets="ARTIFACTS;GIT_BRANCH" AfterTargets="STAGE;PROD" Condition="'$(GITHUB_ACTIONS)' == 'true'" >
+	<Target Name="GITHUB_RELEASE" DependsOnTargets="ARTIFACTS;GIT_BRANCH" AfterTargets="STAGE;PROD" Condition="'$(GITHUB_ACTIONS)' != ''" >
 		<PropertyGroup>
 			<GitHubReleaseExe>$(OutputPathRelease)\GitHubRelease.exe</GitHubReleaseExe>
 		</PropertyGroup>
