@@ -267,7 +267,7 @@ namespace GitHubRelease
 
             if (releases != null)
             {
-                Console.WriteLine($"Releases JSON: {releases.RootElement}");
+                Debug.WriteLine($"Releases JSON: {releases.RootElement}");
             }
 
             return releases;
