@@ -5,17 +5,9 @@ namespace GitHubRelease
 {
     static class Program
     {
-        /// <summary>
-        /// The entry point of the application.
-        /// </summary>
-        /// <param name="args">The command-line arguments.
-        /// first argument is the repo name
-        /// second argument is the tag name
-        /// third argument is the branch name
-        /// </param>
         static async Task Main(string[] args)
         {
-            Console.WriteLine($"[{ConsoleColor.Yellow}!{Nversion.Get()}]\n");
+            Console.WriteLine($"{Nversion.Get()}\n");
 
             if (args.Length < 10)
             {

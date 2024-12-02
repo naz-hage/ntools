@@ -34,6 +34,7 @@ namespace Nbuild.Tests
                 "DEV",
                 "STAGE",
                 "PROD",
+                "GITHUB_RELEASE",
                 "STAGE_DEPLOY",
                 "PROD_DEPLOY",
                 "SOLUTION",
