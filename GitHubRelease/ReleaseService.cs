@@ -268,7 +268,7 @@ namespace GitHubRelease
 
             if (releases != null)
             {
-                Debug.WriteLine($"Releases JSON: {releases.RootElement}");
+                Console.WriteLine($"Releases JSON: {releases.RootElement}");
             }
 
             return releases;
@@ -347,7 +347,7 @@ namespace GitHubRelease
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
-                Debug.WriteLine($"Releases JSON Content: {content}");
+                Console.WriteLine($"Releases JSON Content: {content}");
 
                 // return all releases on all branches
                 if (branch == null)
