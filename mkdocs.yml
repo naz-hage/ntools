@@ -20,7 +20,8 @@ nav:
   - List of Tools:
       - Nbuild (nb.exe): ntools/nbuild.md
       - Ngit (ngit.exe): ntools/ngit.md
-      - Nbackup (nbackup.exe): ntools/nbackup.md      
+      - Nbackup (nbackup.exe): ntools/nbackup.md
+      - Github Release (githubrelease.exe): ntools/github-release.md
   - Custom Build Tasks:
       - Nbuild Tasks: ntools/nbuildtasks.md
   - Revisions: 

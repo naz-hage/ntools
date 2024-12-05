@@ -78,7 +78,7 @@ jobs:
       shell: pwsh
       working-directory: ${{ github.workspace }}
       env:
-        OWNER: ${{ secrets.OWNER }}
+        OWNER: ${{ github.repository_owner }}
         API_GITHUB_KEY: ${{ secrets.API_GITHUB_KEY }}
         DOTNET_CLI_TELEMETRY_OPTOUT: 1
         Build_Type: ${{ github.event.inputs.build_type || 'stage' }}
