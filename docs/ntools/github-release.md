@@ -37,8 +37,16 @@
 
 - Follow the How to create a GitHub token [link](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token)
 - The access token must have the following permissions:
-  - `TBD`  : TBD
-
+     - Under **Repository permissions**, set the following:
+        - **Contents**: `Read and write`
+        - **Metadata**: `Read-only`
+        - **Actions**: `Read and write` (if needed)
+        - **Packages**: `Read and write` (if needed)
+      - Under **Workflow permissions**, set the following:
+        - **Workflows**: `Read and write` (if needed)
+      - Under **Release permissions**, set the following:
+        - **Releases**: `Read and write`
+  
 # GitHubRelease.exe command line options:
  ```-c create -r <repo name> -t <tag Version> -b $(GitBranch) -p <Release Package>```
  
