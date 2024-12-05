@@ -5,14 +5,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="naz-hage" />
       <link rel="shortcut icon" href="../../img/favicon.ico" />
-    <title>Github release - Ntools - Work in Progress</title>
+    <title>Github Release (githubrelease.exe) - Ntools - Work in Progress</title>
     <link rel="stylesheet" href="../../css/theme.css" />
     <link rel="stylesheet" href="../../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
     
       <script>
         // Current page data
-        var mkdocs_page_name = "Github release";
+        var mkdocs_page_name = "Github Release (githubrelease.exe)";
         var mkdocs_page_input_path = "ntools/github-release.md";
         var mkdocs_page_url = null;
       </script>
@@ -55,12 +55,16 @@
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">List of Tools</span></p>
-              <ul>
+              <ul class="current">
                   <li class="toctree-l1"><a class="reference internal" href="../nbuild/">Nbuild (nb.exe)</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../ngit/">Ngit (ngit.exe)</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../nbackup/">Nbackup (nbackup.exe)</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Github Release (githubrelease.exe)</a>
+    <ul class="current">
+    </ul>
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Custom Build Tasks</span></p>
@@ -87,7 +91,8 @@
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
-      <li class="breadcrumb-item active">Github release</li>
+          <li class="breadcrumb-item">List of Tools</li>
+      <li class="breadcrumb-item active">Github Release (githubrelease.exe)</li>
     <li class="wy-breadcrumbs-aside">
           <a href="https://github.com/naz-hage/ntools/edit/main/docs/ntools/github-release.md">Edit on ntools</a>
     </li>
@@ -98,28 +103,68 @@
             <div class="section" itemprop="articleBody">
               
                 <ul>
-<li>GitHubRelease is a tool that allows you to create and manage GitHub releases from the command line. It simplifies the process of creating and managing releases, making it easier to publish your software updates on GitHub.<ul>
-<li>Must add a Repository secret token named <code>API_GITHUB_KEY</code> to the GitHub repository Secrets and variables</li>
-<li>Must add a Repository secret owner named <code>OWNER</code> to the GitHub repository Secrets and variables</li>
-<li>must add env in the GitHub actions workflow file
-```yml</li>
-<li>name: Build using ntools
+<li>GitHubRelease is a tool that allows you to create and manage GitHub releases from the command line. It simplifies the process of creating and managing releases, making it easier to publish your software updates on GitHub.</li>
+<li>The repository must have a .net solution file and one .net project to build the project.</li>
+<li>The repository must have<ul>
+<li>GitHub token to create releases.</li>
+<li>GitHub owner to create releases.</li>
+<li>a git branch to create releases.</li>
+<li>a git at least one tag prior to create releases.</li>
+</ul>
+</li>
+<li>A Repository secret <a href="#create-a-github-token">token</a> named <code>API_GITHUB_KEY</code> must be added to the GitHub repository Secrets and variables</li>
+<li>Here an example how to add env in the GitHub actions workflow file </li>
+</ul>
+<pre><code class="language-yml">- name: Build using ntools
   run: |
-    &amp; "$env:ProgramFilesPath/nbuild/nb.exe" ${{ env.Build_Type }} -v ${{ env.Enable_Logging }}
+    &amp; &quot;$env:ProgramFilesPath/nbuild/nb.exe&quot; ${{ env.Build_Type }} -v ${{ env.Enable_Logging }}
   shell: pwsh
   working-directory: ${{ github.workspace }}
   env:
-    OWNER: ${{ secrets.OWNER }}
+    OWNER: ${{ github.repository_owner }}
     API_GITHUB_KEY: ${{ secrets.API_GITHUB_KEY }}
-```</li>
+</code></pre>
+<ul>
+<li>The checkout a branch must be specified before running the the tool. Here an example how to checkout a branch in the GitHub actions workflow file</li>
 </ul>
+<pre><code class="language-yml">- name: Checkout Repository
+  uses: actions/checkout@v4
+  with:
+    token: ${{ secrets.API_GITHUB_KEY }}
+    fetch-depth: 0
+    ref: ${{ github.event.pull_request.head.ref }}
+    repository: ${{ github.event.pull_request.head.repo.full_name }}
+</code></pre>
+<ul>
+<li>
+<p>When <code>nb stage</code> runs successfully, the tool creates a stage release. This release is tagged with the next tag release number, and the release notes include the commits since the last stage or prod tag. The API token from the repository secrets is used to create this release.  The release package is uploaded to the release. The release is also tagged with the next stage release number.</p>
+</li>
+<li>
+<p>When <code>nb prod</code> runs successfully, the tool creates a production release. This release is also tagged with the next prod release, and the release notes include the commits since the last production tag. All previous stage releases are deleted. The API token from the repository secrets is used to create this release. The release package is uploaded to the release. The release is also tagged with the next prod release number. All previous stage releases are deleted.</p>
 </li>
 </ul>
-<p>When <code>nb stage</code> runs successfully, the tool creates a stage release. This release is tagged with the next tag release number, and the release notes include the commits since the last stage or prod tag. The API token from the repository secrets is used to create this release.  The release package is uploaded to the release. The release is also tagged with the next stage release number.</p>
-<p>When <code>nb prod</code> runs successfully, the tool creates a production release. This release is also tagged with the next prod release, and the release notes include the commits since the last production tag. All previous stage releases are deleted. The API token from the repository secrets is used to create this release. The release package is uploaded to the release. The release is also tagged with the next prod release number. All previous stage releases are deleted.</p>
+<h1 id="create-a-github-token">Create a GitHub token</h1>
+<ul>
+<li>Follow the How to create a GitHub token <a href="https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token">link</a></li>
+<li>The access token must have the following permissions:</li>
+<li><code>TBD</code>  : TBD</li>
+</ul>
+<h1 id="githubreleaseexe-command-line-options">GitHubRelease.exe command line options:</h1>
+<p><code>-c create -r &lt;repo name&gt; -t &lt;tag Version&gt; -b $(GitBranch) -p &lt;Release Package&gt;</code></p>
+<ul>
+<li><code>-c</code> create : create a release</li>
+<li><code>-r</code> <repo name> : repository name</li>
+<li><code>-t</code> <tag Version> : tag version</li>
+<li><code>-b</code> <git Branch> : git branch</li>
+<li><code>-p</code> <Release Package> : release package</li>
+</ul>
               
             </div>
           </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../nbackup/" class="btn btn-neutral float-left" title="Nbackup (nbackup.exe)"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../nbuildtasks/" class="btn btn-neutral float-right" title="Nbuild Tasks">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
 
   <hr/>
 
@@ -145,6 +190,10 @@
         </span>
     
     
+      <span><a href="../nbackup/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../nbuildtasks/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>
