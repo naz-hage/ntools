@@ -146,8 +146,24 @@
 <h1 id="create-a-github-token">Create a GitHub token</h1>
 <ul>
 <li>Follow the How to create a GitHub token <a href="https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token">link</a></li>
-<li>The access token must have the following permissions:</li>
-<li><code>TBD</code>  : TBD</li>
+<li>The access token must have the following permissions:<ul>
+<li>Under <strong>Repository permissions</strong>, set the following:<ul>
+<li><strong>Contents</strong>: <code>Read and write</code></li>
+<li><strong>Metadata</strong>: <code>Read-only</code></li>
+<li><strong>Actions</strong>: <code>Read and write</code> (if needed)</li>
+<li><strong>Packages</strong>: <code>Read and write</code> (if needed)</li>
+</ul>
+</li>
+<li>Under <strong>Workflow permissions</strong>, set the following:<ul>
+<li><strong>Workflows</strong>: <code>Read and write</code> (if needed)</li>
+</ul>
+</li>
+<li>Under <strong>Release permissions</strong>, set the following:<ul>
+<li><strong>Releases</strong>: <code>Read and write</code></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 <h1 id="githubreleaseexe-command-line-options">GitHubRelease.exe command line options:</h1>
 <p><code>-c create -r &lt;repo name&gt; -t &lt;tag Version&gt; -b $(GitBranch) -p &lt;Release Package&gt;</code></p>
