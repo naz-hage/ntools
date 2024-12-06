@@ -83,6 +83,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ntools", "ntools", "{DBDD07
 		docs\ntools\ngit.md = docs\ntools\ngit.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHubRelease", "GitHubRelease\GitHubRelease.csproj", "{DE08895C-1D65-4A68-B9CC-144B5FADEB5A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHubReleaseTests", "GitHubReleaseTests\GitHubReleaseTests.csproj", "{CF5DF473-3089-4B66-A483-9CDA206CC083}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -121,6 +125,14 @@ Global
 		{F98C96D6-AF6D-40EB-BFA2-73600DE146B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F98C96D6-AF6D-40EB-BFA2-73600DE146B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F98C96D6-AF6D-40EB-BFA2-73600DE146B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE08895C-1D65-4A68-B9CC-144B5FADEB5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE08895C-1D65-4A68-B9CC-144B5FADEB5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE08895C-1D65-4A68-B9CC-144B5FADEB5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE08895C-1D65-4A68-B9CC-144B5FADEB5A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF5DF473-3089-4B66-A483-9CDA206CC083}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF5DF473-3089-4B66-A483-9CDA206CC083}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF5DF473-3089-4B66-A483-9CDA206CC083}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF5DF473-3089-4B66-A483-9CDA206CC083}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

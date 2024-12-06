@@ -24,7 +24,7 @@ DevSetup Folder contains the `apps.json` file and the `DevSetup.ps1` file. The `
   "NbuildAppList": [
     {
       "Name": "Ntools",
-      "Version": "1.6.0",
+      "Version": "1.8.0",
       "AppFileName": "$(InstallPath)\\nb.exe",
       "WebDownloadFile": "https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip",
       "DownloadedFile": "$(Version).zip",

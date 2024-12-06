@@ -16,7 +16,6 @@ on:
 env:
   Solution_Name: ntools.sln
   Test_Project_Path: LauncherTests
-  Build_Type: ${{ github.event.inputs.build_type || 'stage' }}
   Enable_Logging: true # Enable additional logging
 
 jobs:
@@ -33,11 +32,16 @@ jobs:
           exit 1
         }
       shell: pwsh
+      env:
+        Build_Type: ${{ github.event.inputs.build_type || 'stage' }}
 
     - name: Checkout Repository
       uses: actions/checkout@v4
       with:
+        token: ${{ secrets.API_GITHUB_KEY }}
         fetch-depth: 0
+        ref: ${{ github.event.pull_request.head.ref }}
+        repository: ${{ github.event.pull_request.head.repo.full_name }}
     
     - name: Install .NET Core
       uses: actions/setup-dotnet@v4
@@ -68,9 +72,15 @@ jobs:
 
     - name: Build using ntools
       run: |
+        & "$env:ProgramFilesPath/nbuild/nb.exe" CORE
         & "$env:ProgramFilesPath/nbuild/nb.exe" ${{ env.Build_Type }} -v ${{ env.Enable_Logging }}
       shell: pwsh
       working-directory: ${{ github.workspace }}
+      env:
+        OWNER: ${{ github.repository_owner }}
+        API_GITHUB_KEY: ${{ secrets.API_GITHUB_KEY }}
+        DOTNET_CLI_TELEMETRY_OPTOUT: 1
+        Build_Type: ${{ github.event.inputs.build_type || 'stage' }}
 
   docs:
     name: Publish Docs
@@ -81,6 +91,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
     
       - name: Set up Python
         uses: actions/setup-python@v5
