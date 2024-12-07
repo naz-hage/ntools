@@ -1,14 +1,14 @@
 ### Windows Dev Environment
 The [Windows dev environment](https://learn.microsoft.com/en-us/windows/dev-environment/) has good information on how to setup a Windows dev environment.
 
-- This table below list the latest dev tools that I use. I will try to keep this list up to date.
+- The table below list the latest dev tools used in Ntoots.
 
 | Tool| Version | Last Checked on |
 | --- | --- | --- |
 | [Windows Terminal](https://www.microsoft.com/en-us/p/windows-terminal/9n0dx20hk701?activetab=pivot:overviewtab) |  1.20.11781.0 | 28-jul-24 |
-| [Visual Studio 2022 Community Edition – Download Latest Free Version](https://visualstudio.microsoft.com/vs/community/) |  17.11.3 | 14-sep-24 |
-| [Visual Studio Code](https://code.visualstudio.com/download) |  1.93.1 | 14-sep-24 |
-| [Git](https://git-scm.com/downloads) |   2.46.0 | 10-sep-24 |
+| [Visual Studio 2022 Community Edition](https://visualstudio.microsoft.com/vs/community/) |  17.11.3 | 14-sep-24 |
+| [Visual Studio Code](https://code.visualstudio.com/download) |  1.95.3 | 07-dec-24 |
+| [Git](https://git-scm.com/downloads) |   2.47.1 | 07-dec-24 |
 | [Node.js](https://nodejs.org/en/download/) |   20.17.0 | 10-sep-24 |
 | [Download Postman Get Started for Free](https://www.postman.com/downloads/) |   v110.24.27 | 14-sep-24 |
 | [Install Docker Desktop on Windows](https://docs.docker.com/docker-for-windows/install/) |  4.34.2 | 14-sep-24 |
@@ -17,9 +17,7 @@ The [Windows dev environment](https://learn.microsoft.com/en-us/windows/dev-envi
 | [Burp Suite](https://portswigger.net/burp/communitydownload) |   2021.11.2 | Oct 1, 2023 |
 | [Draw.io](https://app.diagrams.net/) |   --- | Oct 1, 2023 |
 | [Dotnet Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/9.0)) | 9.0.0 | 15-nov-24 |
-| [PowerShell](https://docs.microsoft.com/en-us/powershell/) | 7.4.5 | 15-sep-24 |
-| [Nuget]() |  6.9.1.3 | 22-jun-24 |
+| [PowerShell](https://github.com/PowerShell/PowerShell/releases) | 7.4.6 | 07-dec-24 |
+| [Nuget](https://www.nuget.org/downloads) |  6.12.1 | 07-dec-24 |
 | [SysInternals]() |  2.90.0 | 22-jun-24 |
 | [Python]() | 3.12.6 | 10-sep-24 |
-| [Install .NET SDK on Ubuntu 22.04](https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-2204#install-net) |   From Ubuntu 22.04 <br> `sudo apt-get update && \ sudo apt-get install -y dotnet-sdk-7.0` <br> # Add .NET Core SDK tools <br> export PATH="$PATH:/home/naz/.dotnet/tools"| Oct 3, 2023 |
-| [Install WSL](https://learn.microsoft.com/en-us/windows/wsl/install#install-wsl-command) |   From Admin Powershell <br> `wsl --install -d Ubuntu-22.04` <br> [Activate the WSL integration in Docker Desktop settings](https://docs.docker.com/desktop/wsl/#turn-on-docker-desktop-wsl-2)| Oct 1, 2023 |
