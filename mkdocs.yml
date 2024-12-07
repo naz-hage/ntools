@@ -24,5 +24,7 @@ nav:
       - Github Release (githubrelease.exe): ntools/github-release.md
   - Custom Build Tasks:
       - Nbuild Tasks: ntools/nbuildtasks.md
+  - Update:
+      - Development Tools: ntools/ntools.md
   - Revisions: 
       - changelog.md

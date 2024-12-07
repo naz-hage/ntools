@@ -1,3 +1,6 @@
+
+## [Latest Release](https://github.com/naz-hage/ntools/releases)
+
 ## Version 1.7.0 - oct-24
 - [issue #78](https://github.com/naz-hage/ntools/issues/78) - Feature: Add Hash Checks for File Integrity after app installation enhancement
 - [issue #76](https://github.com/naz-hage/ntools/issues/76) - Feature: Enhanced Build Process with Verbose Logging and Terraform Support enhancement
