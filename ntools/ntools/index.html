@@ -5,15 +5,15 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="naz-hage" />
       <link rel="shortcut icon" href="../../img/favicon.ico" />
-    <title>Github Release (githubrelease.exe) - Ntools - Work in Progress</title>
+    <title>Development Tools - Ntools - Work in Progress</title>
     <link rel="stylesheet" href="../../css/theme.css" />
     <link rel="stylesheet" href="../../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
     
       <script>
         // Current page data
-        var mkdocs_page_name = "Github Release (githubrelease.exe)";
-        var mkdocs_page_input_path = "ntools/github-release.md";
+        var mkdocs_page_name = "Development Tools";
+        var mkdocs_page_input_path = "ntools/ntools.md";
         var mkdocs_page_url = null;
       </script>
     
@@ -55,16 +55,14 @@
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">List of Tools</span></p>
-              <ul class="current">
+              <ul>
                   <li class="toctree-l1"><a class="reference internal" href="../nbuild/">Nbuild (nb.exe)</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../ngit/">Ngit (ngit.exe)</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../nbackup/">Nbackup (nbackup.exe)</a>
                   </li>
-                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Github Release (githubrelease.exe)</a>
-    <ul class="current">
-    </ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../github-release/">Github Release (githubrelease.exe)</a>
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Custom Build Tasks</span></p>
@@ -73,8 +71,10 @@
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Update</span></p>
-              <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="../ntools/">Development Tools</a>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Development Tools</a>
+    <ul class="current">
+    </ul>
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Revisions</span></p>
@@ -96,10 +96,10 @@
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
-          <li class="breadcrumb-item">List of Tools</li>
-      <li class="breadcrumb-item active">Github Release (githubrelease.exe)</li>
+          <li class="breadcrumb-item">Update</li>
+      <li class="breadcrumb-item active">Development Tools</li>
     <li class="wy-breadcrumbs-aside">
-          <a href="https://github.com/naz-hage/ntools/edit/main/docs/ntools/github-release.md">Edit on ntools</a>
+          <a href="https://github.com/naz-hage/ntools/edit/main/docs/ntools/ntools.md">Edit on ntools</a>
     </li>
   </ul>
   <hr/>
@@ -107,84 +107,108 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <ul>
-<li>GitHubRelease is a tool that allows you to create and manage GitHub releases from the command line. It simplifies the process of creating and managing releases, making it easier to publish your software updates on GitHub.</li>
-<li>The repository must have a .net solution file and one .net project to build the project.</li>
-<li>The repository must have<ul>
-<li>GitHub token to create releases.</li>
-<li>GitHub owner to create releases.</li>
-<li>a git branch to create releases.</li>
-<li>a git at least one tag prior to create releases.</li>
-</ul>
-</li>
-<li>A Repository secret <a href="#create-a-github-token">token</a> named <code>API_GITHUB_KEY</code> must be added to the GitHub repository Secrets and variables</li>
-<li>Here an example how to add env in the GitHub actions workflow file </li>
-</ul>
-<pre><code class="language-yml">- name: Build using ntools
-  run: |
-    &amp; &quot;$env:ProgramFilesPath/nbuild/nb.exe&quot; ${{ env.Build_Type }} -v ${{ env.Enable_Logging }}
-  shell: pwsh
-  working-directory: ${{ github.workspace }}
-  env:
-    OWNER: ${{ github.repository_owner }}
-    API_GITHUB_KEY: ${{ secrets.API_GITHUB_KEY }}
-</code></pre>
+                <h3 id="windows-dev-environment">Windows Dev Environment</h3>
+<p>The <a href="https://learn.microsoft.com/en-us/windows/dev-environment/">Windows dev environment</a> has good information on how to setup a Windows dev environment.</p>
 <ul>
-<li>The checkout a branch must be specified before running the the tool. Here an example how to checkout a branch in the GitHub actions workflow file</li>
+<li>The table below list the latest dev tools used in Ntoots.</li>
 </ul>
-<pre><code class="language-yml">- name: Checkout Repository
-  uses: actions/checkout@v4
-  with:
-    token: ${{ secrets.API_GITHUB_KEY }}
-    fetch-depth: 0
-    ref: ${{ github.event.pull_request.head.ref }}
-    repository: ${{ github.event.pull_request.head.repo.full_name }}
-</code></pre>
-<ul>
-<li>
-<p>When <code>nb stage</code> runs successfully, the tool creates a stage release. This release is tagged with the next tag release number, and the release notes include the commits since the last stage or prod tag. The API token from the repository secrets is used to create this release.  The release package is uploaded to the release. The release is also tagged with the next stage release number.</p>
-</li>
-<li>
-<p>When <code>nb prod</code> runs successfully, the tool creates a production release. This release is also tagged with the next prod release, and the release notes include the commits since the last production tag. All previous stage releases are deleted. The API token from the repository secrets is used to create this release. The release package is uploaded to the release. The release is also tagged with the next prod release number. All previous stage releases are deleted.</p>
-</li>
-</ul>
-<h1 id="create-a-github-token">Create a GitHub token</h1>
-<ul>
-<li>Follow the How to create a GitHub token <a href="https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token">link</a></li>
-<li>The access token must have the following permissions:<ul>
-<li>Under <strong>Repository permissions</strong>, set the following:<ul>
-<li><strong>Contents</strong>: <code>Read and write</code></li>
-<li><strong>Metadata</strong>: <code>Read-only</code></li>
-<li><strong>Actions</strong>: <code>Read and write</code> (if needed)</li>
-<li><strong>Packages</strong>: <code>Read and write</code> (if needed)</li>
-</ul>
-</li>
-<li>Under <strong>Workflow permissions</strong>, set the following:<ul>
-<li><strong>Workflows</strong>: <code>Read and write</code> (if needed)</li>
-</ul>
-</li>
-<li>Under <strong>Release permissions</strong>, set the following:<ul>
-<li><strong>Releases</strong>: <code>Read and write</code></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h1 id="githubreleaseexe-command-line-options">GitHubRelease.exe command line options:</h1>
-<p><code>-c create -r &lt;repo name&gt; -t &lt;tag Version&gt; -b $(GitBranch) -p &lt;Release Package&gt;</code></p>
-<ul>
-<li><code>-c</code> create : create a release</li>
-<li><code>-r</code> <repo name> : repository name</li>
-<li><code>-t</code> <tag Version> : tag version</li>
-<li><code>-b</code> <git Branch> : git branch</li>
-<li><code>-p</code> <Release Package> : release package</li>
-</ul>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Version</th>
+<th>Last Checked on</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://www.microsoft.com/en-us/p/windows-terminal/9n0dx20hk701?activetab=pivot:overviewtab">Windows Terminal</a></td>
+<td>1.20.11781.0</td>
+<td>28-jul-24</td>
+</tr>
+<tr>
+<td><a href="https://visualstudio.microsoft.com/vs/community/">Visual Studio 2022 Community Edition</a></td>
+<td>17.11.3</td>
+<td>14-sep-24</td>
+</tr>
+<tr>
+<td><a href="https://code.visualstudio.com/download">Visual Studio Code</a></td>
+<td>1.95.3</td>
+<td>07-dec-24</td>
+</tr>
+<tr>
+<td><a href="https://git-scm.com/downloads">Git</a></td>
+<td>2.47.1</td>
+<td>07-dec-24</td>
+</tr>
+<tr>
+<td><a href="https://nodejs.org/en/download/">Node.js</a></td>
+<td>20.17.0</td>
+<td>10-sep-24</td>
+</tr>
+<tr>
+<td><a href="https://www.postman.com/downloads/">Download Postman Get Started for Free</a></td>
+<td>v110.24.27</td>
+<td>14-sep-24</td>
+</tr>
+<tr>
+<td><a href="https://docs.docker.com/docker-for-windows/install/">Install Docker Desktop on Windows</a></td>
+<td>4.34.2</td>
+<td>14-sep-24</td>
+</tr>
+<tr>
+<td><a href="https://www.mongodb.com/try/download/community">Download MongoDB Community Server</a></td>
+<td>7.0.12</td>
+<td>28-jul-24</td>
+</tr>
+<tr>
+<td><a href="https://dotnet.microsoft.com/en-us/download/dotnet/9.0">Download .NET SDKs for Visual Studio</a></td>
+<td>9.0.100</td>
+<td>15-nov-24</td>
+</tr>
+<tr>
+<td><a href="https://portswigger.net/burp/communitydownload">Burp Suite</a></td>
+<td>2021.11.2</td>
+<td>Oct 1, 2023</td>
+</tr>
+<tr>
+<td><a href="https://app.diagrams.net/">Draw.io</a></td>
+<td>---</td>
+<td>Oct 1, 2023</td>
+</tr>
+<tr>
+<td><a href="https://dotnet.microsoft.com/en-us/download/dotnet/9.0">Dotnet Runtime</a>)</td>
+<td>9.0.0</td>
+<td>15-nov-24</td>
+</tr>
+<tr>
+<td><a href="https://github.com/PowerShell/PowerShell/releases">PowerShell</a></td>
+<td>7.4.6</td>
+<td>07-dec-24</td>
+</tr>
+<tr>
+<td><a href="https://www.nuget.org/downloads">Nuget</a></td>
+<td>6.12.1</td>
+<td>07-dec-24</td>
+</tr>
+<tr>
+<td><a href="">SysInternals</a></td>
+<td>2.90.0</td>
+<td>22-jun-24</td>
+</tr>
+<tr>
+<td><a href="">Python</a></td>
+<td>3.12.6</td>
+<td>10-sep-24</td>
+</tr>
+</tbody>
+</table>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../nbackup/" class="btn btn-neutral float-left" title="Nbackup (nbackup.exe)"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../nbuildtasks/" class="btn btn-neutral float-right" title="Nbuild Tasks">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../nbuildtasks/" class="btn btn-neutral float-left" title="Nbuild Tasks"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../changelog/" class="btn btn-neutral float-right" title="Changelog">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -211,10 +235,10 @@
         </span>
     
     
-      <span><a href="../nbackup/" style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../nbuildtasks/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
-      <span><a href="../nbuildtasks/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="../../changelog/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>
