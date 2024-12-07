@@ -204,4 +204,25 @@
 
 		<Message Text="==> DONE"/>
 	</Target>
+
+	<!-- Install dotnet-outdated-tool globally -->
+	<Target Name="INSTALL_DOTNET_OUTDATED_TOOL">
+		<Exec Command="dotnet tool install --global dotnet-outdated-tool" />
+		<Message Text="dotnet-outdated-tool installed globally." />
+		<Message Text="==> DONE"/>
+	</Target>
+
+	<!-- Update all NuGet packages to the latest version -->
+	<Target Name="UPDATE_NUGET_PACKAGES">
+		<Exec Command="dotnet outdated --upgrade" WorkingDirectory="$(SolutionDir)" />
+		<Message Text="NuGet packages updated to the latest version." />
+		<Message Text="==> DONE"/>
+	</Target>
+
+	<!-- List all NuGet sources -->
+	<Target Name="LIST_NUGET_SOURCES">
+		<Exec Command="dotnet nuget list source" />
+		<Message Text="Listed all NuGet sources." />
+		<Message Text="==> DONE"/>
+	</Target>
 </Project>
