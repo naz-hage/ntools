@@ -3,7 +3,7 @@
   "NbuildAppList": [
     {
       "Name": "Powershell",
-      "Version": "7.4.6",
+      "Version": "7.5.0",
       "AppFileName": "$(InstallPath)\\pwsh.exe",
       "WebDownloadFile": "https://github.com/PowerShell/PowerShell/releases/download/v$(Version)/PowerShell-$(Version)-win-x64.msi",
       "DownloadedFile": "PowerShell-$(Version)-win-x64.msi",
