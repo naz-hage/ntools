@@ -40,7 +40,7 @@
     },
     {
       "Name": "Git for Windows",
-      "Version": "2.45.2",
+      "Version": "2.47.1",
       "AppFileName": "$(InstallPath)\\bin\\git.exe",
       "WebDownloadFile": "https://github.com/git-for-windows/git/releases/download/v$(Version).windows.1/Git-$(Version)-64-bit.exe",
       "DownloadedFile": "Git-$(Version)-64-bit.exe",
@@ -64,7 +64,7 @@
     },
     {
       "Name": "Visual Studio Code",
-      "Version": "1.93.1",
+      "Version": "1.96.4",
       "AppFileName": "$(InstallPath)\\Code.exe",
       "WebDownloadFile": "https://aka.ms/win32-x64-system-stable",
       "DownloadedFile": "VSCodeSetup-x64-$(Version).exe",

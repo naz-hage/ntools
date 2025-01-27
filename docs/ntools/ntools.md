@@ -7,7 +7,7 @@ The [Windows dev environment](https://learn.microsoft.com/en-us/windows/dev-envi
 | --- | --- | --- |
 | [Windows Terminal](https://www.microsoft.com/en-us/p/windows-terminal/9n0dx20hk701?activetab=pivot:overviewtab) |  1.20.11781.0 | 28-jul-24 |
 | [Visual Studio 2022 Community Edition](https://visualstudio.microsoft.com/vs/community/) |  17.11.3 | 14-sep-24 |
-| [Visual Studio Code](https://code.visualstudio.com/download) |  1.95.3 | 07-dec-24 |
+| [Visual Studio Code](https://code.visualstudio.com/download) |  1.96.4 | 26-jan-25 |
 | [Git](https://git-scm.com/downloads) |   2.47.1 | 07-dec-24 |
 | [Node.js](https://nodejs.org/en/download/) |   20.17.0 | 10-sep-24 |
 | [Download Postman Get Started for Free](https://www.postman.com/downloads/) |   v110.24.27 | 14-sep-24 |
