@@ -75,6 +75,11 @@ func main() {
         StoredHash      string `json:"StoredHash,omitempty"`
     }
 
+    type FileContent struct {
+        Version       string `json:"Version"`
+        NbuildAppList []App  `json:"NbuildAppList"`
+    }
+
     type CombinedJSON struct {
         Version       string `json:"Version"`
         NbuildAppList []App  `json:"NbuildAppList"`
@@ -95,23 +100,17 @@ func main() {
 
         fmt.Printf("Content of file %s:\n%s\n", file, string(content))
 
-        // Try to parse the content as a JSON array of App elements
-        var apps []App
-        if err := json.Unmarshal(content, &apps); err != nil {
-            // If it fails, try to parse the content as a single App object
-            var app App
-            if err := json.Unmarshal(content, &app); err != nil {
-                fmt.Printf("Error parsing JSON file %s: %v\n", file, err)
-                continue
-            }
-            fmt.Printf("Parsed single app from file %s: %+v\n", file, app)
-            apps = append(apps, app)
-        } else {
-            fmt.Printf("Parsed apps array from file %s: %+v\n", file, apps)
+        // Parse the content as FileContent
+        var fileContent FileContent
+        if err := json.Unmarshal(content, &fileContent); err != nil {
+            fmt.Printf("Error parsing JSON file %s: %v\n", file, err)
+            continue
         }
 
+        fmt.Printf("Parsed content from file %s: %+v\n", file, fileContent)
+
         // Append the apps to the combined list
-        combined.NbuildAppList = append(combined.NbuildAppList, apps...)
+        combined.NbuildAppList = append(combined.NbuildAppList, fileContent.NbuildAppList...)
     }
 
     // Write the combined content to apps.json
