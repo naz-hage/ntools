@@ -1,0 +1,18 @@
+{
+    "Version": "1.2.0",
+    "NbuildAppList": [
+      {
+        "Name": "Argo CD",
+        "Version": "2.9.3",
+        "AppFileName": "$(InstallPath)\\argocd.exe",
+        "WebDownloadFile": "https://github.com/argoproj/argo-cd/releases/download/v$(Version)/argocd-windows-amd64.exe",
+        "DownloadedFile": "argocd.exe",
+        "InstallCommand": "xcopy.exe",
+        "InstallArgs": "$(DownloadedFile) \"$(InstallPath)\\\" /d /y",      
+        "InstallPath": "$(ProgramFiles)\\ArgoCD\\",
+        "UninstallCommand": "powershell.exe",
+        "UninstallArgs": "-Command \"Remove-Item -Path '$(InstallPath)\\argocd.exe' -Force; if ((Get-ChildItem -Path '$(InstallPath)' -Force).Count -eq 0) { Remove-Item -Path '$(InstallPath)' -Force }; Write-Output 'ArgoCD CLI uninstalled.'\"",
+        "StoredHash": null
+      }
+    ]
+  }
