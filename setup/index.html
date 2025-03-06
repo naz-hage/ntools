@@ -119,19 +119,19 @@
 </ul>
 <pre><code class="language-cmd">ng -c settag -tag 0.0.1 
 </code></pre>
-<h3 id="devsetup-folder">DevSetup folder</h3>
-<p>DevSetup Folder contains the <code>apps.json</code> file and the <code>DevSetup.ps1</code> file. The <code>apps.json</code> file contains the list of development tools required for your project. The <code>DevSetup.ps1</code> file is a PowerShell script that installs the development tools and sets up the development environment for the project.</p>
+<h3 id="dev-setup-folder">dev-setup folder</h3>
+<p>dev-setup Folder contains the <code>apps.json</code> file and the <code>dev-setup.ps1</code> file. The <code>apps.json</code> file contains the list of development tools required for your project. The <code>dev-setup.ps1</code> file is a PowerShell script that installs the development tools and sets up the development environment for the project.</p>
 <ul>
 <li>When you create a new project, for example <code>MyProject</code>, clone the project into the <code>%MainDirectory%</code> directory. </li>
-<li>In your project, create a <code>DevSetup</code> folder and add the following files:</li>
-<li>The <code>DevSetup/app-Ntools.json</code> file should include installation information for ntools. This is required so that other apps (<code>DevSetup/apps.json</code>) can be installed.</li>
-<li>The <code>DevSetup/apps.json</code> file should include the list of development tools required for the project. <code>ntools</code> must be installed first using <code>DevSetup/app-Ntools.json</code></li>
-<li>The <code>DevSetup/DevSetup.ps1</code> file should install the development tools and set up the development environment for the project.</li>
+<li>In your project, create a <code>dev-setup</code> folder and add the following files:</li>
+<li>The <code>dev-setup/app-Ntools.json</code> file should include installation information for ntools. This is required so that other apps (<code>dev-setup/apps.json</code>) can be installed.</li>
+<li>The <code>dev-setup/apps.json</code> file should include the list of development tools required for the project. <code>ntools</code> must be installed first using <code>dev-setup/app-Ntools.json</code></li>
+<li>The <code>dev-setup/dev-setup.ps1</code> file should install the development tools and set up the development environment for the project.</li>
 <li>
-<p>Check this example for <a href="../ntools/devsetup/">DevSetup.ps1</a> file. You can modify this file to fit your development needs.</p>
+<p>Check this example for <a href="ntools/dev-setup.md">dev-setup.ps1</a> file. You can modify this file to fit your development needs.</p>
 </li>
 <li>
-<p><code>DevSetup/app-Ntools.json</code> should like this:</p>
+<p><code>dev-setup/app-Ntools.json</code> should like this:</p>
 </li>
 </ul>
 <pre><code class="language-json">{
@@ -154,10 +154,10 @@
 </code></pre>
 <p>Your file structure should look like this:</p>
 <pre><code class="language-cmd">%MainDirectory%\MyProject
-%MainDirectory%\MyProject\DevSetup
-%MainDirectory%\MyProject\DevSetup\app-Ntools.json
-%MainDirectory%\MyProject\DevSetup\apps.json
-%MainDirectory%\MyProject\DevSetup\DevSetup.ps1
+%MainDirectory%\MyProject\dev-setup
+%MainDirectory%\MyProject\dev-setup\app-Ntools.json
+%MainDirectory%\MyProject\dev-setup\apps.json
+%MainDirectory%\MyProject\dev-setup\dev-setup.ps1
 %MainDirectory%\MyProject\... other project and test files
 </code></pre>
 <h4 id="add-a-new-tool">Add a new tool</h4>
@@ -197,7 +197,7 @@
 </code></pre>
 <ul>
 <li>
-<p>By convention, the json file is named <code>apps.json</code> and is located in the <code>DevSetup</code> folder of your project</p>
+<p>By convention, the json file is named <code>apps.json</code> and is located in the <code>dev-setup</code> folder of your project</p>
 </li>
 <li>
 <p>You can use Nb.exe to install the tools</p>
@@ -205,7 +205,7 @@
 </ul>
 <pre><code class="language-cmd">Nb.exe -c install -json apps.json
 </code></pre>
-<p>This command can be also added to <a href="../ntools/devsetup/">DevSetup.ps1</a>.</p>
+<p>This command can be also added to <a href="ntools/dev-setup.md">dev-setup.ps1</a>.</p>
 <h4 id="list-of-environment-variables">List of Environment Variables</h4>
 <table>
 <thead>
@@ -262,10 +262,10 @@
 <p>Your file structure should look like this:</p>
 <pre><code class="language-cmd">%MainDirectory%\MyProject
 %MainDirectory%\MyProject\nbuild.targets
-%MainDirectory%\MyProject\DevSetup
-%MainDirectory%\MyProject\DevSetup\app-Ntools.json
-%MainDirectory%\MyProject\DevSetup\apps.json
-%MainDirectory%\MyProject\DevSetup\DevSetup.ps1
+%MainDirectory%\MyProject\dev-setup
+%MainDirectory%\MyProject\dev-setup\app-Ntools.json
+%MainDirectory%\MyProject\dev-setup\apps.json
+%MainDirectory%\MyProject\dev-setup\dev-setup.ps1
 %MainDirectory%\MyProject\... other project test files
 </code></pre>
 <h4 id="nbuildtargets">nbuild.targets</h4>
