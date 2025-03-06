@@ -1,3 +1,5 @@
+// Package main provides a utility to scan a directory for JSON files,
+// parse them, and combine their contents into a single JSON file.
 package main
 
 import (
@@ -8,7 +10,11 @@ import (
 )
 
 // GetJSONFiles returns a slice of all .json files in the specified directory,
-// excluding any files named "apps.json"
+// excluding any files named "apps.json".
+//
+// folderPath: The path to the directory to scan for JSON files.
+//
+// Returns a slice of file paths to .json files and an error if any.
 func GetJSONFiles(folderPath string) ([]string, error) {
     var result []string
 
@@ -47,7 +53,8 @@ func GetJSONFiles(folderPath string) ([]string, error) {
     return result, nil
 }
 
-// Example usage:
+// main is the entry point for the application. It scans the current directory
+// for JSON files, parses them, and combines their contents into a single JSON file.
 func main() {
     files, err := GetJSONFiles(".")
     if err != nil {
@@ -55,7 +62,8 @@ func main() {
         return
     }
 
-    fmt.Println("JSON files found (excluding apps.json):")
+    count := len(files)
+    fmt.Printf("%d JSON files found (excluding apps.json)\n", count)
     for _, file := range files {
         fmt.Println(file)
     }
@@ -98,16 +106,12 @@ func main() {
             continue
         }
 
-        fmt.Printf("Content of file %s:\n%s\n", file, string(content))
-
         // Parse the content as FileContent
         var fileContent FileContent
         if err := json.Unmarshal(content, &fileContent); err != nil {
             fmt.Printf("Error parsing JSON file %s: %v\n", file, err)
             continue
         }
-
-        fmt.Printf("Parsed content from file %s: %+v\n", file, fileContent)
 
         // Append the apps to the combined list
         combined.NbuildAppList = append(combined.NbuildAppList, fileContent.NbuildAppList...)
