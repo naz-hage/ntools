@@ -39,7 +39,7 @@
 		<EmbeddedResource Include="resources\nuget.targets">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</EmbeddedResource>
-		<EmbeddedResource Include="..\DevSetup\app-ntools.json" />
+		<EmbeddedResource Include="..\dev-setup\app-ntools.json" />
 	    <EmbeddedResource Include="resources\ntools.json" />
 	</ItemGroup>
 	

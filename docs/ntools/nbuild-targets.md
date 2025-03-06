@@ -16,7 +16,6 @@ The table below lists all available targets for the Nbuild tool.
 | NBUILD_DOWNLOAD     | Download Nbuild specified in the NbuildTargetVersion |
 |                     | Update the ntools-launcher nuget package in the local feed fot testing - not needed for normal builds |
 | NBUILD_INSTALL      | Install Nbuild specified in the NbuildTargetVersion |
-| UPDATE_APPS         | Update App metadata json files in nbuild\resources |
 | GET_PRODUCT_CODES   | Example to get the installation Product code used for uninstallation of product |
 
 

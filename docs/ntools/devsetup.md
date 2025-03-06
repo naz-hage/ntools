@@ -1,10 +1,10 @@
-Content of DevSetup.ps1:
+Content of dev-setup.ps1:
 This script sets up the development environment for your project, installs `ntools` and the necessary development tools, and sets the development environment variables.
 
 ```powershell
-# DevSetup.ps1
+# dev-setup.ps1
 # Get the common Install module and import it
-$url = "https://raw.githubusercontent.com/naz-hage/ntools/main/DevSetup/install.psm1"
+$url = "https://raw.githubusercontent.com/naz-hage/ntools/main/dev-setup/install.psm1"
 $output = "./install.psm1"
 Invoke-WebRequest -Uri $url -OutFile $output
 Import-Module ./install.psm1 -Force
