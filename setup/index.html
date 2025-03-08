@@ -124,14 +124,14 @@
 <ul>
 <li>When you create a new project, for example <code>MyProject</code>, clone the project into the <code>%MainDirectory%</code> directory. </li>
 <li>In your project, create a <code>dev-setup</code> folder and add the following files:</li>
-<li>The <code>dev-setup/app-Ntools.json</code> file should include installation information for ntools. This is required so that other apps (<code>dev-setup/apps.json</code>) can be installed.</li>
-<li>The <code>dev-setup/apps.json</code> file should include the list of development tools required for the project. <code>ntools</code> must be installed first using <code>dev-setup/app-Ntools.json</code></li>
+<li>The <code>dev-setup/ntools.json</code> file should include installation information for ntools. This is required so that other apps (<code>dev-setup/apps.json</code>) can be installed.</li>
+<li>The <code>dev-setup/apps.json</code> file should include the list of development tools required for the project. <code>ntools</code> must be installed first using <code>dev-setup/ntools.json</code></li>
 <li>The <code>dev-setup/dev-setup.ps1</code> file should install the development tools and set up the development environment for the project.</li>
 <li>
 <p>Check this example for <a href="ntools/dev-setup.md">dev-setup.ps1</a> file. You can modify this file to fit your development needs.</p>
 </li>
 <li>
-<p><code>dev-setup/app-Ntools.json</code> should like this:</p>
+<p><code>dev-setup/ntools.json</code> should like this:</p>
 </li>
 </ul>
 <pre><code class="language-json">{
@@ -155,7 +155,7 @@
 <p>Your file structure should look like this:</p>
 <pre><code class="language-cmd">%MainDirectory%\MyProject
 %MainDirectory%\MyProject\dev-setup
-%MainDirectory%\MyProject\dev-setup\app-Ntools.json
+%MainDirectory%\MyProject\dev-setup\ntools.json
 %MainDirectory%\MyProject\dev-setup\apps.json
 %MainDirectory%\MyProject\dev-setup\dev-setup.ps1
 %MainDirectory%\MyProject\... other project and test files
@@ -263,7 +263,7 @@
 <pre><code class="language-cmd">%MainDirectory%\MyProject
 %MainDirectory%\MyProject\nbuild.targets
 %MainDirectory%\MyProject\dev-setup
-%MainDirectory%\MyProject\dev-setup\app-Ntools.json
+%MainDirectory%\MyProject\dev-setup\ntools.json
 %MainDirectory%\MyProject\dev-setup\apps.json
 %MainDirectory%\MyProject\dev-setup\dev-setup.ps1
 %MainDirectory%\MyProject\... other project test files
