@@ -43,24 +43,24 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ngitTests", "NgitTests\ngit
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NbuildTasksTests", "NbuildTasksTests\NbuildTasksTests.csproj", "{F98C96D6-AF6D-40EB-BFA2-73600DE146B2}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DevSetup", "DevSetup", "{35A35C8A-7DA2-4316-A8BE-00066BD1C003}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dev-setup", "dev-setup", "{35A35C8A-7DA2-4316-A8BE-00066BD1C003}"
 	ProjectSection(SolutionItems) = preProject
-		DevSetup\app-7-zip.json = DevSetup\app-7-zip.json
-		DevSetup\app-docker.json = DevSetup\app-docker.json
-		DevSetup\app-Dotnet_Runtime.json = DevSetup\app-Dotnet_Runtime.json
-		DevSetup\app-Git_for_Windows.json = DevSetup\app-Git_for_Windows.json
-		DevSetup\app-Ntools.json = DevSetup\app-Ntools.json
-		DevSetup\app-nuget.json = DevSetup\app-nuget.json
-		DevSetup\app-Powershell.json = DevSetup\app-Powershell.json
-		DevSetup\app-python.json = DevSetup\app-python.json
-		DevSetup\app-Sysinternals.json = DevSetup\app-Sysinternals.json
-		DevSetup\app-Visual_Studio_2022.json = DevSetup\app-Visual_Studio_2022.json
-		DevSetup\app-Visual_Studio_Build_Tools.json = DevSetup\app-Visual_Studio_Build_Tools.json
-		DevSetup\app-Visual_Studio_Code.json = DevSetup\app-Visual_Studio_Code.json
-		DevSetup\install-ntools.ps1 = DevSetup\install-ntools.ps1
-		DevSetup\install.log = DevSetup\install.log
-		DevSetup\install.ps1 = DevSetup\install.ps1
-		DevSetup\install.psm1 = DevSetup\install.psm1
+		dev-setup\app-7-zip.json = dev-setup\app-7-zip.json
+		dev-setup\app-docker.json = dev-setup\app-docker.json
+		dev-setup\app-Dotnet_Runtime.json = dev-setup\app-Dotnet_Runtime.json
+		dev-setup\app-Git_for_Windows.json = dev-setup\app-Git_for_Windows.json
+		dev-setup\app-Ntools.json = dev-setup\app-Ntools.json
+		dev-setup\app-nuget.json = dev-setup\app-nuget.json
+		dev-setup\app-Powershell.json = dev-setup\app-Powershell.json
+		dev-setup\app-python.json = dev-setup\app-python.json
+		dev-setup\app-Sysinternals.json = dev-setup\app-Sysinternals.json
+		dev-setup\app-Visual_Studio_2022.json = dev-setup\app-Visual_Studio_2022.json
+		dev-setup\app-Visual_Studio_Build_Tools.json = dev-setup\app-Visual_Studio_Build_Tools.json
+		dev-setup\app-Visual_Studio_Code.json = dev-setup\app-Visual_Studio_Code.json
+		dev-setup\install-ntools.ps1 = dev-setup\install-ntools.ps1
+		dev-setup\install.log = dev-setup\install.log
+		dev-setup\install.ps1 = dev-setup\install.ps1
+		dev-setup\install.psm1 = dev-setup\install.psm1
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{B79CBB23-CB3B-4934-921E-59BF51B96B93}"
@@ -68,14 +68,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{B79CBB23-C
 		docs\changelog.md = docs\changelog.md
 		docs\index.md = docs\index.md
 		docs\installation.md = docs\installation.md
-		DevSetup\Ntools.md = DevSetup\Ntools.md
+		dev-setup\Ntools.md = dev-setup\Ntools.md
 		docs\setup.md = docs\setup.md
 		docs\usage.md = docs\usage.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ntools", "ntools", "{DBDD07F6-003B-4E2D-8BBA-651A29E54445}"
 	ProjectSection(SolutionItems) = preProject
-		docs\ntools\devsetup.md = docs\ntools\devsetup.md
+		docs\ntools\dev-setup.md = docs\ntools\dev-setup.md
 		docs\ntools\nbackup.md = docs\ntools\nbackup.md
 		docs\ntools\nbuild-targets.md = docs\ntools\nbuild-targets.md
 		docs\ntools\nbuild.md = docs\ntools\nbuild.md

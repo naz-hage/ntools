@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using NbuildTasks;
+using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
@@ -209,7 +210,7 @@ namespace GitHubRelease
             {
                 var content = await response.Content.ReadAsStringAsync();
                 var tags = JsonDocument.Parse(content).RootElement.EnumerateArray();
-                return tags.Select(tag => tag.GetProperty("name").GetString()!).ToList();
+                return tags.Select(tag => tag.GetProperty(Constants.NamePropertyName).GetString()!).ToList();
             }
 
             // Return an empty enumerator if the request fails
@@ -277,5 +278,42 @@ namespace GitHubRelease
 
             throw new InvalidOperationException("Invalid JSON structure");
         }
+
+
+        public async Task<string[]> GetTagsAsArrayAsync()
+        {
+            var tagsList = await GetReleaseTags();
+            return tagsList.ToArray();
+        }
+
+        private bool IsStageTag(string tag)
+        {
+            GitWrapper git = new();
+
+            // Use the git wrapper to determine if the tag is valid
+            if (!git.IsValidTag(tag))
+            {
+                return false;
+            }
+
+            // A stage tag is a tag with a build number that is not zero
+            string[] items = tag.Split('.');
+            return items.Length == 3 && int.TryParse(items[2], out int buildNumber) && buildNumber != 0;
+        }
+
+        private bool IsReleaseProd(string tag)
+        {
+            // Use the git wrapper to determine if the tag is valid
+            GitWrapper git = new();
+            if (!git.IsValidTag(tag))
+            {
+                return false;
+            }
+
+            // A Prod tag is a tag with a build number that is zero
+            string[] items = tag.Split('.');
+            return items.Length == 3 && int.TryParse(items[2], out int buildNumber) && buildNumber == 0;
+        }
+
     }
 }

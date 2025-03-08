@@ -7,17 +7,17 @@ To set up a new project and take advantage of ntools, you need to follow the ste
 ng -c settag -tag 0.0.1 
 ```
 
-### DevSetup folder
-DevSetup Folder contains the `apps.json` file and the `DevSetup.ps1` file. The `apps.json` file contains the list of development tools required for your project. The `DevSetup.ps1` file is a PowerShell script that installs the development tools and sets up the development environment for the project.
+### dev-setup folder
+dev-setup Folder contains the `apps.json` file and the `dev-setup.ps1` file. The `apps.json` file contains the list of development tools required for your project. The `dev-setup.ps1` file is a PowerShell script that installs the development tools and sets up the development environment for the project.
 
 - When you create a new project, for example `MyProject`, clone the project into the `%MainDirectory%` directory. 
-- In your project, create a `DevSetup` folder and add the following files:
-  - The `DevSetup/app-Ntools.json` file should include installation information for ntools. This is required so that other apps (`DevSetup/apps.json`) can be installed.
-  - The `DevSetup/apps.json` file should include the list of development tools required for the project. `ntools` must be installed first using `DevSetup/app-Ntools.json`
-  - The `DevSetup/DevSetup.ps1` file should install the development tools and set up the development environment for the project.
-- Check this example for [DevSetup.ps1](ntools/devsetup.md) file. You can modify this file to fit your development needs.
+- In your project, create a `dev-setup` folder and add the following files:
+  - The `dev-setup/app-Ntools.json` file should include installation information for ntools. This is required so that other apps (`dev-setup/apps.json`) can be installed.
+  - The `dev-setup/apps.json` file should include the list of development tools required for the project. `ntools` must be installed first using `dev-setup/app-Ntools.json`
+  - The `dev-setup/dev-setup.ps1` file should install the development tools and set up the development environment for the project.
+- Check this example for [dev-setup.ps1](ntools/dev-setup.md) file. You can modify this file to fit your development needs.
 
-- `DevSetup/app-Ntools.json` should like this:
+- `dev-setup/app-Ntools.json` should like this:
 ```json
 {
   "Version": "1.2.0",
@@ -40,10 +40,10 @@ DevSetup Folder contains the `apps.json` file and the `DevSetup.ps1` file. The `
 Your file structure should look like this:
 ```cmd
 %MainDirectory%\MyProject
-%MainDirectory%\MyProject\DevSetup
-%MainDirectory%\MyProject\DevSetup\app-Ntools.json
-%MainDirectory%\MyProject\DevSetup\apps.json
-%MainDirectory%\MyProject\DevSetup\DevSetup.ps1
+%MainDirectory%\MyProject\dev-setup
+%MainDirectory%\MyProject\dev-setup\app-Ntools.json
+%MainDirectory%\MyProject\dev-setup\apps.json
+%MainDirectory%\MyProject\dev-setup\dev-setup.ps1
 %MainDirectory%\MyProject\... other project and test files
 ```
 #### Add a new tool
@@ -75,13 +75,13 @@ Your file structure should look like this:
   ]
 }
 ```
-- By convention, the json file is named `apps.json` and is located in the `DevSetup` folder of your project
+- By convention, the json file is named `apps.json` and is located in the `dev-setup` folder of your project
 
 - You can use Nb.exe to install the tools
 ```cmd
 Nb.exe -c install -json apps.json
 ```
-This command can be also added to [DevSetup.ps1](ntools/devsetup.md).
+This command can be also added to [dev-setup.ps1](ntools/dev-setup.md).
 
 #### List of Environment Variables
 | Variable Name | Description |
@@ -105,10 +105,10 @@ Your file structure should look like this:
 ```cmd
 %MainDirectory%\MyProject
 %MainDirectory%\MyProject\nbuild.targets
-%MainDirectory%\MyProject\DevSetup
-%MainDirectory%\MyProject\DevSetup\app-Ntools.json
-%MainDirectory%\MyProject\DevSetup\apps.json
-%MainDirectory%\MyProject\DevSetup\DevSetup.ps1
+%MainDirectory%\MyProject\dev-setup
+%MainDirectory%\MyProject\dev-setup\app-Ntools.json
+%MainDirectory%\MyProject\dev-setup\apps.json
+%MainDirectory%\MyProject\dev-setup\dev-setup.ps1
 %MainDirectory%\MyProject\... other project test files
 ```
 #### nbuild.targets

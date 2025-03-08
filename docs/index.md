@@ -19,7 +19,7 @@ Delivering a high-quality software product requires the use of the right develop
 - [How to install ntools](installation.md)
 - [Practice using ntools](usage.md)
 - [How to setup your project](setup.md)
-    - [Dev Setup](setup.md#devsetup)
+    - [Dev Setup](setup.md#dev-setup)
     - [Add a new tool](setup.md#add-a-new-tool)
     - [Add a new property](setup.md#add-a-new-property)
     - [Add a new target](setup.md#add-a-new-target)

@@ -129,6 +129,12 @@ namespace Nbuild
                 {
                     break;
                 }
+
+                // Print the stored hash of the app file name
+                if (!string.IsNullOrEmpty(app.StoredHash))
+                {
+                    Colorizer.WriteLine($"[{ConsoleColor.Yellow}!Stored hash for {app.AppFileName}: {app.StoredHash}]");
+                }
             }
 
             return result;

@@ -58,7 +58,7 @@ try {
 
 # Step 4: Sign the PowerShell script
 try {
-    Set-AuthenticodeSignature -FilePath "C:\source\ntools\DevSetup\ff.ps1" -Certificate $cert
+    Set-AuthenticodeSignature -FilePath "C:\source\ntools\dev-setup\ff.ps1" -Certificate $cert
 } catch {
     Write-Error "Failed to sign the script: $_"
     exit
@@ -66,7 +66,7 @@ try {
 
 # Step 5: Verify the signature
 try {
-    $signature = Get-AuthenticodeSignature -FilePath "C:\source\ntools\DevSetup\ff.ps1"
+    $signature = Get-AuthenticodeSignature -FilePath "C:\source\ntools\dev-setup\ff.ps1"
     Write-Output $signature
 } catch {
     Write-Error "Failed to verify the script signature: $_"
@@ -88,11 +88,11 @@ try {
 
 # # Step 4: Sign the PowerShell script
 # # - The script is signed using the certificate, which includes the private key stored in the `CurrentUser\My` certificate store.
-# Set-AuthenticodeSignature -FilePath "C:\source\ntools\DevSetup\ff.ps1" -Certificate $cert
+# Set-AuthenticodeSignature -FilePath "C:\source\ntools\dev-setup\ff.ps1" -Certificate $cert
 
 # # Step 5: Verify the signature
 # # - The signature of the script is verified to ensure that it was signed by the certificate.
-# Get-AuthenticodeSignature -FilePath "C:\source\ntools\DevSetup\ff.ps1"
+# Get-AuthenticodeSignature -FilePath "C:\source\ntools\dev-setup\ff.ps1"
 
 # ### Summary
 # - **Initial Creation**: The private key is initially stored in the `CurrentUser\My` certificate store when the self-signed certificate is created.

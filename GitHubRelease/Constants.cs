@@ -7,6 +7,8 @@
         protected const string ShaPropertyName = "sha";
         protected const string AuthorPropertyName = "author";
 
+        protected const string NamePropertyName = "name";
+
         protected const string GitHubApiPrefix = "https://api.github.com/repos";
     }
 }

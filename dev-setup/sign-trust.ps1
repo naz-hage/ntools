@@ -2,7 +2,7 @@
 # The script creates a self-signed certificate, exports it to a .pfx file, exports it to a .cer file, 
 # imports it to Trusted Root Certification Authorities, imports it back to CurrentUser store, 
 # signs the script, and verifies the signature.
-# Usage: .\sign-trust.ps1 -dnsName "ntools" -location "C:\source\ntools\DevSetup" -certSubject "CN=ntools"
+# Usage: .\sign-trust.ps1 -dnsName "ntools" -location "C:\source\ntools\dev-setup" -certSubject "CN=ntools"
 param (
     [Parameter(Mandatory=$true)]
     [string]$dnsName,
@@ -184,7 +184,7 @@ Import-CertificateToRoot -filePath "$location\certificate.cer"
 $cert = Import-CertificateToCurrentUser -filePath "$location\certificate.pfx" -password $certPassword
 
 # Step 6: Sign the PowerShell script
-Sign-Script -scriptPath "C:\source\ntools\DevSetup\ff.ps1" -certificate $cert
+Sign-Script -scriptPath "C:\source\ntools\dev-setup\ff.ps1" -certificate $cert
 
 # Step 7: Verify the signature
-Verify-Signature -scriptPath "C:\source\ntools\DevSetup\ff.ps1"
+Verify-Signature -scriptPath "C:\source\ntools\dev-setup\ff.ps1"

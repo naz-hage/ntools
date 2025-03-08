@@ -26,7 +26,7 @@ Below is a full list of options that can be used with `Nb.exe`:
          - By default, the -json option points to the `ntools` deployment folder: $(ProgramFiles)\build\ntools.json.
          - The install, uninstall, and download commands require admin privileges to run. (string, default=)
   - json : Specifies the JSON file that holds the list of apps. Only valid for the install, download, and list commands.
-         Sample JSON file: https://github.com/naz-hage/ntools/blob/main/DevSetup/app-Ntools.json
+         Sample JSON file: https://github.com/naz-hage/ntools/blob/main/dev-setup/app-Ntools.json
           (string, default=$(ProgramFiles)\nbuild\NTools.json)
   - v    : Optional parameter which sets the console output verbose level
          ----

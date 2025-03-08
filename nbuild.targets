@@ -115,7 +115,7 @@
 
 	<!-- Setup Development Environment -->
 	<Target Name="DEV_SETUP" DependsOnTargets="IS_ADMIN">
-		<Pwsh ScriptPath="$(SolutionDir)\DevSetup\install.ps1" Arguments="" WorkingDirectory ="$(SolutionDir)\DevSetup"/>
+		<Pwsh ScriptPath="$(SolutionDir)\dev-setup\install.ps1" Arguments="" WorkingDirectory ="$(SolutionDir)\dev-setup"/>
 
 	    <Message Text="==> DONE"/>
 	</Target>
@@ -126,12 +126,6 @@
 		<Exec Command='mkdocs build -d %userprofile%\ntools' WorkingDirectory="$(SolutionDir)"/>
 		<Exec Command='mkdocs serve' WorkingDirectory="$(SolutionDir)"/>
 	    <Message Text="==> DONE"/>
-	</Target>
-
-	<!-- Update App metadata json files in nbuild\resources -->
-	<Target Name="UPDATE_APPS" AfterTargets="TEST">
-	    <Exec Command='xcopy c:\temp\apps\*.* .\DevSetup /d /y' WorkingDirectory="$(SolutionDir)"/>
-		<Message Text="==> DONE"/>
 	</Target>
 
 	<!-- Example to get the installation 
