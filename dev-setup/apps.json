@@ -14,100 +14,16 @@
       "UninstallArgs": "/S"
     },
     {
-      "Name": "Dotnet Runtime",
-      "Version": "9.0.0",
-      "AppFileName": "$(InstallPath)\\dotnet.exe",
-      "WebDownloadFile": "https://download.visualstudio.microsoft.com/download/pr/685792b6-4827-4dca-a971-bce5d7905170/1bf61b02151bc56e763dc711e45f0e1e/windowsdesktop-runtime-$(Version)-win-x64.exe",
-      "DownloadedFile": "dotnet_installer.exe",
-      "InstallCommand": "dotnet_installer.exe",
-      "InstallArgs": "/quiet /norestart\"",
-      "InstallPath": "$(ProgramFiles)\\dotnet",
-      "UninstallCommand": "dotnet_installer.exe",
-      "UninstallArgs": "/uninstall /quiet /norestart"
-    },
-    {
-      "Name": "Git for Windows",
-      "Version": "2.47.1",
-      "AppFileName": "$(InstallPath)\\bin\\git.exe",
-      "WebDownloadFile": "https://github.com/git-for-windows/git/releases/download/v$(Version).windows.1/Git-$(Version)-64-bit.exe",
-      "DownloadedFile": "Git-$(Version)-64-bit.exe",
-      "InstallCommand": "$(DownloadedFile)",
-      "InstallArgs": "/SILENT /NORESTART /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS /SP- /LOG",
-      "InstallPath": "$(ProgramFiles)\\Git",
-      "UninstallCommand": "$(InstallPath)\\unins000.exe",
-      "UninstallArgs": "/SILENT"
-    },
-    {
-      "Name": "Ntools",
-      "Version": "1.9.0",
-      "AppFileName": "$(InstallPath)\\nb.exe",
-      "WebDownloadFile": "https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip",
-      "DownloadedFile": "$(Version).zip",
-      "InstallCommand": "powershell.exe",
-      "InstallArgs": "-Command Expand-Archive -Path $(Version).zip -DestinationPath '$(InstallPath)' -Force",
-      "InstallPath": "$(ProgramFiles)\\Nbuild",
+      "Name": "Argo CD",
+      "Version": "2.9.3",
+      "AppFileName": "$(InstallPath)\\argocd.exe",
+      "WebDownloadFile": "https://github.com/argoproj/argo-cd/releases/download/v$(Version)/argocd-windows-amd64.exe",
+      "DownloadedFile": "argocd.exe",
+      "InstallCommand": "xcopy.exe",
+      "InstallArgs": "$(DownloadedFile) \"$(InstallPath)\\\" /d /y",
+      "InstallPath": "$(ProgramFiles)\\ArgoCD\\",
       "UninstallCommand": "powershell.exe",
-      "UninstallArgs": "-Command Remove-Item -Path '$(InstallPath)' -Recurse -Force"
-    },
-    {
-      "Name": "Powershell",
-      "Version": "7.5.0",
-      "AppFileName": "$(InstallPath)\\pwsh.exe",
-      "WebDownloadFile": "https://github.com/PowerShell/PowerShell/releases/download/v$(Version)/PowerShell-$(Version)-win-x64.msi",
-      "DownloadedFile": "PowerShell-$(Version)-win-x64.msi",
-      "InstallCommand": "msiexec.exe",
-      "InstallArgs": "/i PowerShell-$(Version)-win-x64.msi /quiet",
-      "InstallPath": "$(ProgramFiles)\\PowerShell\\7",
-      "UninstallCommand": "msiexec.exe",
-      "UninstallArgs": "/x PowerShell-$(Version)-win-x64.msi /quiet"
-    },
-    {
-      "Name": "SysInternals",
-      "Version": "2.90.0.0",
-      "AppFileName": "$(InstallPath)\\sigcheck64.exe",
-      "WebDownloadFile": "https://download.sysinternals.com/files/SysinternalsSuite.zip",
-      "DownloadedFile": "SysinternalsSuite.zip",
-      "InstallCommand": "powershell.exe",
-      "InstallArgs": "-Command Expand-Archive -Path '\"$(DownloadedFile)\"' -DestinationPath '\"$(ProgramFiles)\\SysInternalsSuite\"' -Force",
-      "InstallPath": "$(ProgramFiles)\\SysInternalsSuite",
-      "UninstallCommand": "powershell.exe",
-      "UninstallArgs": "-Command Remove-Item -Path '$(InstallPath)' -Recurse -Force"
-    },
-    {
-      "Name": "Visual Studio 2022",
-      "Version": "17.11.3",
-      "AppFileName": "$(InstallPath)\\Common7\\IDE\\devenv.exe",
-      "WebDownloadFile": "https://aka.ms/vs/17/release/vs_Community.exe",
-      "DownloadedFile": "vs_Community.exe",
-      "InstallCommand": "$(DownloadedFile)",
-      "InstallArgs": "--add Microsoft.VisualStudio.Workload.CoreEditor Microsoft.VisualStudio.Workload.Azure Microsoft.VisualStudio.Workload.ManagedDesktop Microsoft.VisualStudio.Workload.NativeDesktop Microsoft.VisualStudio.Workload.NetWeb Microsoft.VisualStudio.Workload.NetDesktop Microsoft.VisualStudio.Workload.Azure Microsoft.VisualStudio.Workload.Data --quiet --wait",
-      "InstallPath": "$(ProgramFiles)\\Microsoft Visual Studio\\2022\\Community",
-      "UninstallCommand": "$(ProgramFilesX86)\\Microsoft Visual Studio\\Installer\\vs_installer.exe",
-      "UninstallArgs": "uninstall --quiet --installPath $(InstallPath)"
-    },
-    {
-      "Name": "Visual Studio Build Tools",
-      "Version": "17.8.5.5502",
-      "AppFileName": "msbuild.exe",
-      "WebDownloadFile": "https://aka.ms/vs/17/release/vs_BuildTools.exe",
-      "DownloadedFile": "vs_BuildTools.exe",
-      "InstallCommand": "vs_BuildTools.exe",
-      "InstallArgs": "--add Microsoft.VisualStudio.Workload.MSBuildTools Microsoft.NetCore.Component.SDK Microsoft.VisualStudio.Workload.ManagedDesktop Microsoft.VisualStudio.Workload.NetWeb --quiet --wait",
-      "InstallPath": "$(ProgramFilesX86)\\Microsoft Visual Studio\\2022\\BuildTools\\MSBuild\\Current\\Bin\\amd64",
-      "UninstallCommand": "vs_installer.exe",
-      "UninstallArgs": "--uninstall --force --quiet"
-    },
-    {
-      "Name": "Visual Studio Code",
-      "Version": "1.98.0",
-      "AppFileName": "$(InstallPath)\\Code.exe",
-      "WebDownloadFile": "https://aka.ms/win32-x64-system-stable",
-      "DownloadedFile": "VSCodeSetup-x64-$(Version).exe",
-      "InstallCommand": "$(DownloadedFile)",
-      "InstallArgs": "/silent /mergetasks=!runcode,addcontextmenufiles,addcontextmenufolders",
-      "InstallPath": "$(ProgramFiles)\\Microsoft VS Code",
-      "UninstallCommand": "$(InstallPath)\\unins000.exe",
-      "UninstallArgs": "/SILENT"
+      "UninstallArgs": "-Command \"Remove-Item -Path '$(InstallPath)\\argocd.exe' -Force; if ((Get-ChildItem -Path '$(InstallPath)' -Force).Count -eq 0) { Remove-Item -Path '$(InstallPath)' -Force }; Write-Output 'ArgoCD CLI uninstalled.'\""
     },
     {
       "Name": "AzureCLI",
@@ -146,6 +62,30 @@
       "UninstallArgs": "-Command \"\u0026 {Start-Process -FilePath '$(InstallPath)\\Docker Desktop Installer.exe' -ArgumentList 'uninstall --quiet' -NoNewWindow -Wait; while ((Get-Process 'Docker Desktop Installer' -ErrorAction SilentlyContinue) -or (Get-Process 'Docker' -ErrorAction SilentlyContinue)) { Start-Sleep -Seconds 5 }}\""
     },
     {
+      "Name": "Dotnet Runtime",
+      "Version": "8.0.1",
+      "AppFileName": "$(InstallPath)\\dotnet.exe",
+      "WebDownloadFile": "https://download.visualstudio.microsoft.com/download/pr/f18288f6-1732-415b-b577-7fb46510479a/a98239f751a7aed31bc4aa12f348a9bf/windowsdesktop-runtime-$(Version)-win-x64.exe",
+      "DownloadedFile": "dotnet_installer.exe",
+      "InstallCommand": "dotnet_installer.exe",
+      "InstallArgs": "/quiet /norestart\"",
+      "InstallPath": "$(ProgramFiles)\\dotnet",
+      "UninstallCommand": "dotnet_installer.exe",
+      "UninstallArgs": "/uninstall /quiet /norestart"
+    },
+    {
+      "Name": "Git for Windows",
+      "Version": "2.47.1",
+      "AppFileName": "$(InstallPath)\\bin\\git.exe",
+      "WebDownloadFile": "https://github.com/git-for-windows/git/releases/download/v$(Version).windows.1/Git-$(Version)-64-bit.exe",
+      "DownloadedFile": "Git-$(Version)-64-bit.exe",
+      "InstallCommand": "$(DownloadedFile)",
+      "InstallArgs": "/SILENT /NORESTART /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS /SP- /LOG",
+      "InstallPath": "$(ProgramFiles)\\Git",
+      "UninstallCommand": "$(InstallPath)\\unins000.exe",
+      "UninstallArgs": "/SILENT"
+    },
+    {
       "Name": "Go Lang",
       "Version": "1.24.0",
       "AppFileName": "$(InstallPath)\\bin\\go.exe",
@@ -157,6 +97,56 @@
       "UninstallCommand": "msiexec.exe",
       "UninstallArgs": "/x $(DownloadedFile) /quiet /qn",
       "StoredHash": "CB582FD4CD2A768077B584D69344543138FA120CD38DE7CF4E42C70C96195768"
+    },
+    {
+      "Name": "kubectl",
+      "Version": "1.32.2",
+      "AppFileName": "$(InstallPath)\\kubectl.exe",
+      "WebDownloadFile": "https://dl.k8s.io/release/v$(Version)/bin/windows/amd64/kubectl.exe",
+      "DownloadedFile": "kubectl.exe",
+      "InstallCommand": "xcopy.exe",
+      "InstallArgs": "$(DownloadedFile) \"$(InstallPath)\\\" /d /y",
+      "InstallPath": "$(ProgramFiles)\\kubectl\\",
+      "UninstallCommand": "powershell.exe",
+      "UninstallArgs": "-Command \"Remove-Item -Path '$(ProgramFiles)\\kubectl\\kubectl.exe' -Force; [Environment]::SetEnvironmentVariable('Path', $env:Path -replace ';$(ProgramFiles)\\kubectl', '', [EnvironmentVariableTarget]::Machine); Write-Output 'kubectl uninstalled.'\"",
+      "StoredHash": "CF51A1C6BF3B6BA6A5B549D1DEBF8AA6AFB00C4C5A3D5D4BB1072F54CBE4390F"
+    },
+    {
+      "Name": "minikube",
+      "Version": "1.35.0",
+      "AppFileName": "$(InstallPath)\\minikube.exe",
+      "WebDownloadFile": "https://github.com/kubernetes/minikube/releases/latest/download/minikube-installer.exe",
+      "DownloadedFile": "minikube-installer.exe",
+      "InstallCommand": "powershell.exe",
+      "InstallArgs": "-Command \"Start-Process -FilePath '$(DownloadedFile)' -ArgumentList '/S' -Wait; ",
+      "InstallPath": "$(ProgramFiles)\\Kubernetes\\Minikube\\",
+      "UninstallCommand": "powershell.exe",
+      "UninstallArgs": "-Command \"$uninstaller = '$(InstallPath)\\Uninstall Minikube.exe'; if (Test-Path $uninstaller) { Start-Process -FilePath $uninstaller -ArgumentList '/S' -Wait; Write-Output 'Minikube uninstalled.' } else { Write-Output 'Minikube uninstaller not found.' }\"",
+      "StoredHash": "7B7D2DCB130DC066D6F2D01DD1A54B92A35F8F7B0F849283A8BF4455DFF8DAEA"
+    },
+    {
+      "Name": "MongoDB",
+      "Version": "8.0.5",
+      "AppFileName": "$(InstallPath)\\bin\\mongod.exe",
+      "WebDownloadFile": "https://fastdl.mongodb.org/windows/mongodb-windows-x86_64-$(Version)-signed.msi",
+      "DownloadedFile": "mongodb-windows-x86_64-$(Version)-signed.msi",
+      "InstallCommand": "msiexec.exe",
+      "InstallArgs": "/q /i $(DownloadedFile) INSTALLLOCATION=\"$(InstallPath)\" ADDLOCAL=\"all\"",
+      "InstallPath": "$(ProgramFiles)\\MongoDB\\Server",
+      "UninstallCommand": "msiexec.exe",
+      "UninstallArgs": "/x {CDE275B4-7DCB-4D35-AD3E-AB7A4EB36CBB} /qn"
+    },
+    {
+      "Name": "Ntools",
+      "Version": "1.9.0",
+      "AppFileName": "$(InstallPath)\\nb.exe",
+      "WebDownloadFile": "https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip",
+      "DownloadedFile": "$(Version).zip",
+      "InstallCommand": "powershell.exe",
+      "InstallArgs": "-Command Expand-Archive -Path $(Version).zip -DestinationPath '$(InstallPath)' -Force",
+      "InstallPath": "$(ProgramFiles)\\Nbuild",
+      "UninstallCommand": "powershell.exe",
+      "UninstallArgs": "-Command Remove-Item -Path '$(InstallPath)' -Recurse -Force"
     },
     {
       "Name": "Nuget",
@@ -171,6 +161,18 @@
       "UninstallArgs": "-Command Remove-Item -Path '$(AppFileName)' -Force"
     },
     {
+      "Name": "Powershell",
+      "Version": "7.5.0",
+      "AppFileName": "$(InstallPath)\\pwsh.exe",
+      "WebDownloadFile": "https://github.com/PowerShell/PowerShell/releases/download/v$(Version)/PowerShell-$(Version)-win-x64.msi",
+      "DownloadedFile": "PowerShell-$(Version)-win-x64.msi",
+      "InstallCommand": "msiexec.exe",
+      "InstallArgs": "/i PowerShell-$(Version)-win-x64.msi /quiet",
+      "InstallPath": "$(ProgramFiles)\\PowerShell\\7",
+      "UninstallCommand": "msiexec.exe",
+      "UninstallArgs": "/x PowerShell-$(Version)-win-x64.msi /quiet"
+    },
+    {
       "Name": "Python",
       "Version": "3.12.2",
       "AppFileName": "$(InstallPath)\\python.exe",
@@ -181,6 +183,18 @@
       "InstallPath": "$(ProgramFiles)\\Python\\$(Version)\\",
       "UninstallCommand": "msiexec.exe",
       "UninstallArgs": "/x {0001-0001-0001-0001-0001-0001} /qn"
+    },
+    {
+      "Name": "SysInternals",
+      "Version": "2.90.0.0",
+      "AppFileName": "$(InstallPath)\\sigcheck64.exe",
+      "WebDownloadFile": "https://download.sysinternals.com/files/SysinternalsSuite.zip",
+      "DownloadedFile": "SysinternalsSuite.zip",
+      "InstallCommand": "powershell.exe",
+      "InstallArgs": "-Command Expand-Archive -Path '\"$(DownloadedFile)\"' -DestinationPath '\"$(ProgramFiles)\\SysInternalsSuite\"' -Force",
+      "InstallPath": "$(ProgramFiles)\\SysInternalsSuite",
+      "UninstallCommand": "powershell.exe",
+      "UninstallArgs": "-Command Remove-Item -Path '$(InstallPath)' -Recurse -Force"
     },
     {
       "Name": "Terraform",
@@ -207,6 +221,30 @@
       "UninstallCommand": "powershell.exe",
       "UninstallArgs": "-Command Remove-Item -Path '$(InstallPath)' -Recurse -Force",
       "StoredHash": "34A3CF6F9FBA5DD5DC102EA474A3B9B218FDDDD39B09EF4928822F2A03803DA5"
+    },
+    {
+      "Name": "Visual Studio 2022",
+      "Version": "17.11.3",
+      "AppFileName": "$(InstallPath)\\Common7\\IDE\\devenv.exe",
+      "WebDownloadFile": "https://aka.ms/vs/17/release/vs_Community.exe",
+      "DownloadedFile": "vs_Community.exe",
+      "InstallCommand": "$(DownloadedFile)",
+      "InstallArgs": "--add Microsoft.VisualStudio.Workload.CoreEditor Microsoft.VisualStudio.Workload.Azure Microsoft.VisualStudio.Workload.ManagedDesktop Microsoft.VisualStudio.Workload.NativeDesktop Microsoft.VisualStudio.Workload.NetWeb Microsoft.VisualStudio.Workload.NetDesktop Microsoft.VisualStudio.Workload.Azure Microsoft.VisualStudio.Workload.Data --quiet --wait",
+      "InstallPath": "$(ProgramFiles)\\Microsoft Visual Studio\\2022\\Community",
+      "UninstallCommand": "$(ProgramFilesX86)\\Microsoft Visual Studio\\Installer\\vs_installer.exe",
+      "UninstallArgs": "uninstall --quiet --installPath $(InstallPath)"
+    },
+    {
+      "Name": "Visual Studio Code",
+      "Version": "1.98.0",
+      "AppFileName": "$(InstallPath)\\Code.exe",
+      "WebDownloadFile": "https://aka.ms/win32-x64-system-stable",
+      "DownloadedFile": "VSCodeSetup-x64-$(Version).exe",
+      "InstallCommand": "$(DownloadedFile)",
+      "InstallArgs": "/silent /mergetasks=!runcode,addcontextmenufiles,addcontextmenufolders",
+      "InstallPath": "$(ProgramFiles)\\Microsoft VS Code",
+      "UninstallCommand": "$(InstallPath)\\unins000.exe",
+      "UninstallArgs": "/SILENT"
     }
   ]
 }
