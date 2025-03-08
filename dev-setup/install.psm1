@@ -28,13 +28,13 @@
 .EXAMPLE
     Import-Module ./install.psm1
     PrepareDownloadsDirectory -directory "C:\NToolsDownloads"
-    $appInfo = GetAppInfo -json "C:\NToolsDownloads\app-Ntools.json"
-    $isInstalled = CheckIfAppInstalled -json "C:\NToolsDownloads\app-Ntools.json"
-    Install -json "C:\NToolsDownloads\app-Ntools.json"
+    $appInfo = GetAppInfo -json "C:\NToolsDownloads\ntools.json"
+    $isInstalled = CheckIfAppInstalled -json "C:\NToolsDownloads\ntools.json"
+    Install -json "C:\NToolsDownloads\ntools.json"
     SetDevEnvironmentVariables -devDrive "D:" -mainDir "C:\MainDir"
     InstallDotNetCore -dotnetVersion "3.1.0"
 
-    MainInstallApp -command install -json "C:\NToolsDownloads\app-Ntools.json"
+    MainInstallApp -command install -json "C:\NToolsDownloads\ntools.json"
     MainInstallNtools
     SetDevEnvironmentVariables -devDrive "D:" -mainDir "C:\MainDir"
     Write-OutputMessage -Prefix "Info" -Message "Installation completed successfully."

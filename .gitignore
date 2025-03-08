@@ -405,3 +405,4 @@ FodyWeavers.xsd
 /nbuild.bat
 /.temp
 /dev-setup/build-apps.exe
+/go/build-apps.exe
