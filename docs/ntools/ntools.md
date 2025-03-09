@@ -21,3 +21,5 @@ The [Windows dev environment](https://learn.microsoft.com/en-us/windows/dev-envi
 | [Nuget](https://www.nuget.org/downloads) |  6.12.1 | 07-dec-24 |
 | [SysInternals]() |  2.90.0 | 22-jun-24 |
 | [Python]() | 3.12.6 | 10-sep-24 |
+| [Terraform](https://releases.hashicorp.com/terraform) | 1.11.1 | 09-mar-24 |
+| [Terraform Lint](https://github.com/terraform-linters/tflint/releases) | 0.55.1 | 09-mar-24 |
