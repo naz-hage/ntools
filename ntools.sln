@@ -7,7 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{80B7
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{E9FCB2FE-4245-44DF-A7DE-189496E1431F}"
 	ProjectSection(SolutionItems) = preProject
-		.github\workflows\dotnet-desktop.yml = .github\workflows\dotnet-desktop.yml
+		.github\workflows\ntools.yml = .github\workflows\ntools.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{35AAB912-8196-4DE2-B5DA-98E9F4340A8D}"
@@ -45,22 +45,37 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NbuildTasksTests", "NbuildT
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dev-setup", "dev-setup", "{35A35C8A-7DA2-4316-A8BE-00066BD1C003}"
 	ProjectSection(SolutionItems) = preProject
-		dev-setup\app-7-zip.json = dev-setup\app-7-zip.json
-		dev-setup\app-docker.json = dev-setup\app-docker.json
-		dev-setup\app-Dotnet_Runtime.json = dev-setup\app-Dotnet_Runtime.json
-		dev-setup\app-Git_for_Windows.json = dev-setup\app-Git_for_Windows.json
-		dev-setup\app-Ntools.json = dev-setup\app-Ntools.json
-		dev-setup\app-nuget.json = dev-setup\app-nuget.json
-		dev-setup\app-Powershell.json = dev-setup\app-Powershell.json
-		dev-setup\app-python.json = dev-setup\app-python.json
-		dev-setup\app-Sysinternals.json = dev-setup\app-Sysinternals.json
-		dev-setup\app-Visual_Studio_2022.json = dev-setup\app-Visual_Studio_2022.json
-		dev-setup\app-Visual_Studio_Build_Tools.json = dev-setup\app-Visual_Studio_Build_Tools.json
-		dev-setup\app-Visual_Studio_Code.json = dev-setup\app-Visual_Studio_Code.json
+		dev-setup\7-zip.json = dev-setup\7-zip.json
+		dev-setup\apps.json = dev-setup\apps.json
+		dev-setup\argo-cd.json = dev-setup\argo-cd.json
+		dev-setup\azure-cli.json = dev-setup\azure-cli.json
+		dev-setup\azure-powershell.json = dev-setup\azure-powershell.json
+		dev-setup\calc-file-hash.ps1 = dev-setup\calc-file-hash.ps1
+		dev-setup\docker.json = dev-setup\docker.json
+		dev-setup\dotnet_runtime.json = dev-setup\dotnet_runtime.json
+		dev-setup\ff.ps1 = dev-setup\ff.ps1
+		dev-setup\git_for_windows.json = dev-setup\git_for_windows.json
+		dev-setup\go.json = dev-setup\go.json
 		dev-setup\install-ntools.ps1 = dev-setup\install-ntools.ps1
 		dev-setup\install.log = dev-setup\install.log
 		dev-setup\install.ps1 = dev-setup\install.ps1
 		dev-setup\install.psm1 = dev-setup\install.psm1
+		dev-setup\k8s.json = dev-setup\k8s.json
+		dev-setup\list-file-version.ps1 = dev-setup\list-file-version.ps1
+		dev-setup\minikube.json = dev-setup\minikube.json
+		dev-setup\mongo-db.json = dev-setup\mongo-db.json
+		dev-setup\ntools.json = dev-setup\ntools.json
+		dev-setup\nuget.json = dev-setup\nuget.json
+		dev-setup\powershell.json = dev-setup\powershell.json
+		dev-setup\python.json = dev-setup\python.json
+		dev-setup\setenv.ps1 = dev-setup\setenv.ps1
+		dev-setup\sign-trust.ps1 = dev-setup\sign-trust.ps1
+		dev-setup\sign.ps1 = dev-setup\sign.ps1
+		dev-setup\sysinternals.json = dev-setup\sysinternals.json
+		dev-setup\terraform.json = dev-setup\terraform.json
+		dev-setup\tflint.json = dev-setup\tflint.json
+		dev-setup\visual-studio-22.json = dev-setup\visual-studio-22.json
+		dev-setup\vs-code.json = dev-setup\vs-code.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{B79CBB23-CB3B-4934-921E-59BF51B96B93}"
@@ -86,6 +101,13 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHubRelease", "GitHubRelease\GitHubRelease.csproj", "{DE08895C-1D65-4A68-B9CC-144B5FADEB5A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHubReleaseTests", "GitHubReleaseTests\GitHubReleaseTests.csproj", "{CF5DF473-3089-4B66-A483-9CDA206CC083}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "go", "go", "{72A31A3D-5909-486D-AB92-BF76A06BDAAA}"
+	ProjectSection(SolutionItems) = preProject
+		go\apps.json = go\apps.json
+		go\build-apps.exe = go\build-apps.exe
+		go\build-apps.go = go\build-apps.go
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

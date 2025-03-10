@@ -1,3 +1,59 @@
+<#
+.SYNOPSIS
+    This module contains functions to install and manage development tools.
+.DESCRIPTION
+    This module provides functions to prepare the downloads directory, get application information,
+    check if an application is installed, install applications, and manage environment variables.
+    It also includes functions to handle .NET Core installation and version checking.
+    The module is designed to be used in a PowerShell environment and requires administrative privileges
+    for certain operations.
+    The module also includes functions to write output messages to the console and log files.
+    The module is intended to be used as part of a larger script or automation process.
+
+.FUNCTIONS
+    | Function Name               | Description                                                   |
+    |-----------------------------|---------------------------------------------------------------|
+    | PrepareDownloadsDirectory   | Prepares the downloads directory for storing installation files. |
+    | GetAppInfo                  | Retrieves application information from a JSON file.           |
+    | CheckIfAppInstalled         | Checks if an application is installed and its version.        |
+    | Install                     | Installs an application using the provided JSON configuration.|
+    | MainInstallApp              | Main function to install an application.                      |
+    | CheckIfDotnetInstalled      | Checks if .NET Core is installed and its version.             |
+    | InstallDotNetCore           | Installs .NET Core if not already installed.                  |
+    | MainInstallNtools           | Main function to install NTools.                              |
+    | SetDevEnvironmentVariables  | Sets development environment variables.                       |
+    | Write-OutputMessage         | Writes output messages to the console and log files.          |
+    | GetFileVersion              | Retrieves the file version of a specified file.               |
+    | MainFileVersion             | Main function to get the file version.                        |
+.EXAMPLE
+    Import-Module ./install.psm1
+    PrepareDownloadsDirectory -directory "C:\NToolsDownloads"
+    $appInfo = GetAppInfo -json "C:\NToolsDownloads\ntools.json"
+    $isInstalled = CheckIfAppInstalled -json "C:\NToolsDownloads\ntools.json"
+    Install -json "C:\NToolsDownloads\ntools.json"
+    SetDevEnvironmentVariables -devDrive "D:" -mainDir "C:\MainDir"
+    InstallDotNetCore -dotnetVersion "3.1.0"
+
+    MainInstallApp -command install -json "C:\NToolsDownloads\ntools.json"
+    MainInstallNtools
+    SetDevEnvironmentVariables -devDrive "D:" -mainDir "C:\MainDir"
+    Write-OutputMessage -Prefix "Info" -Message "Installation completed successfully."
+    GetFileVersion -FilePath "C:\Program Files\NBuild\nb.exe"
+    MainFileVersion -FilePath "C:\Program Files\NBuild\nb.exe"
+
+.NOTES
+
+    adding the deployment path to the PATH environment variable
+    $path = [Environment]::GetEnvironmentVariable("PATH", "Machine")
+    if ($path -notlike "*$deploymentPath*") {
+        Write-OutputMessage $MyInvocation.MyCommand.Name "Adding $deploymentPath to the PATH environment variable."
+        [Environment]::SetEnvironmentVariable("PATH", $path + ";$deploymentPath", "Machine")
+    }
+    else {
+        Write-OutputMessage $MyInvocation.MyCommand.Name "$deploymentPath already exists in the PATH environment variable."
+    }
+
+#>
 # local variables
 $downloadsDirectory = "c:\NToolsDownloads"
 $deploymentPath = $env:ProgramFiles + "\NBuild"

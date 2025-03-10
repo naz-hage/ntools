@@ -12,12 +12,12 @@ dev-setup Folder contains the `apps.json` file and the `dev-setup.ps1` file. The
 
 - When you create a new project, for example `MyProject`, clone the project into the `%MainDirectory%` directory. 
 - In your project, create a `dev-setup` folder and add the following files:
-  - The `dev-setup/app-Ntools.json` file should include installation information for ntools. This is required so that other apps (`dev-setup/apps.json`) can be installed.
-  - The `dev-setup/apps.json` file should include the list of development tools required for the project. `ntools` must be installed first using `dev-setup/app-Ntools.json`
+  - The `dev-setup/ntools.json` file should include installation information for ntools. This is required so that other apps (`dev-setup/apps.json`) can be installed.
+  - The `dev-setup/apps.json` file should include the list of development tools required for the project. `ntools` must be installed first using `dev-setup/ntools.json`
   - The `dev-setup/dev-setup.ps1` file should install the development tools and set up the development environment for the project.
 - Check this example for [dev-setup.ps1](ntools/dev-setup.md) file. You can modify this file to fit your development needs.
 
-- `dev-setup/app-Ntools.json` should like this:
+- `dev-setup/ntools.json` should like this:
 ```json
 {
   "Version": "1.2.0",
@@ -41,7 +41,7 @@ Your file structure should look like this:
 ```cmd
 %MainDirectory%\MyProject
 %MainDirectory%\MyProject\dev-setup
-%MainDirectory%\MyProject\dev-setup\app-Ntools.json
+%MainDirectory%\MyProject\dev-setup\ntools.json
 %MainDirectory%\MyProject\dev-setup\apps.json
 %MainDirectory%\MyProject\dev-setup\dev-setup.ps1
 %MainDirectory%\MyProject\... other project and test files
@@ -106,7 +106,7 @@ Your file structure should look like this:
 %MainDirectory%\MyProject
 %MainDirectory%\MyProject\nbuild.targets
 %MainDirectory%\MyProject\dev-setup
-%MainDirectory%\MyProject\dev-setup\app-Ntools.json
+%MainDirectory%\MyProject\dev-setup\ntools.json
 %MainDirectory%\MyProject\dev-setup\apps.json
 %MainDirectory%\MyProject\dev-setup\dev-setup.ps1
 %MainDirectory%\MyProject\... other project test files

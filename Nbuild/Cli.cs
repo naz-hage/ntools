@@ -16,7 +16,7 @@ public class Cli
     public string? Command { get; set; }
 
     [OptionalArgument("$(ProgramFiles)\\nbuild\\ntools.json", "json", "Specifies the JSON file that holds the list of apps. Only valid for the install, download, and list commands.\n" +
-        "\t Sample JSON file: https://github.com/naz-hage/ntools/blob/main/dev-setup/app-Ntools.json\n" +
+        "\t Sample JSON file: https://github.com/naz-hage/ntools/blob/main/dev-setup/ntools.json\n" +
         "\t ")]
     public string? Json { get; set; }
 

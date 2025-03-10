@@ -13,14 +13,14 @@ namespace NbuildTests
     {
         // Constants for test setup
         private const string NbuildAssemblyName = "Nb.dll";
-        private const string NbuildAppListJsonFile = "app-ntools.json";
+        private const string NbuildAppListJsonFile = "ntools.json";
         private const string LocalTest = "LOCAL_TEST";
-        private const string VersionToTest = "1.9.0";
+        private const string VersionToTest = "1.10.0";
         // Local test mode flag
         private bool? LocalTestMode;
 
         // Resource location for test setup
-        private readonly string ResourceLocation = "Nbuild.app-ntools.json"; //"Nbuild.resources.app-ntools.json";
+        private readonly string ResourceLocation = "Nbuild.ntools.json"; //"Nbuild.resources.ntools.json";
 
         // Method to teardown test mode flag
         private void TeardownTestModeFlag()

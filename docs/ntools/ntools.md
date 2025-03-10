@@ -16,8 +16,10 @@ The [Windows dev environment](https://learn.microsoft.com/en-us/windows/dev-envi
 | [Download .NET SDKs for Visual Studio](https://dotnet.microsoft.com/en-us/download/dotnet/9.0) |   9.0.100 | 15-nov-24 |
 | [Burp Suite](https://portswigger.net/burp/communitydownload) |   2021.11.2 | Oct 1, 2023 |
 | [Draw.io](https://app.diagrams.net/) |   --- | Oct 1, 2023 |
-| [Dotnet Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/9.0)) | 9.0.0 | 15-nov-24 |
+| [Dotnet Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/9.0.2)) | 9.0.0 | 03-mar-25 |
 | [PowerShell](https://github.com/PowerShell/PowerShell/releases) | 7.5.0 | 25-jan-25 |
 | [Nuget](https://www.nuget.org/downloads) |  6.12.1 | 07-dec-24 |
 | [SysInternals]() |  2.90.0 | 22-jun-24 |
 | [Python]() | 3.12.6 | 10-sep-24 |
+| [Terraform](https://releases.hashicorp.com/terraform) | 1.11.1 | 09-mar-24 |
+| [Terraform Lint](https://github.com/terraform-linters/tflint/releases) | 0.55.1 | 09-mar-24 |

@@ -53,10 +53,33 @@ func GetJSONFiles(folderPath string) ([]string, error) {
     return result, nil
 }
 
-// main is the entry point for the application. It scans the current directory
+// main is the entry point for the application. It scans the a directory
 // for JSON files, parses them, and combines their contents into a single JSON file.
 func main() {
-    files, err := GetJSONFiles(".")
+    if len(os.Args) < 3 {
+        fmt.Println("Usage: build-apps --filePath <directory> or build-apps -f <directory>")
+        return
+    }
+
+    var folderPath string
+    for i := 1; i < len(os.Args); i++ {
+        if os.Args[i] == "--filePath" || os.Args[i] == "-f" {
+            if i+1 < len(os.Args) {
+                folderPath = os.Args[i+1]
+                break
+            } else {
+                fmt.Println("Error: Missing directory path after", os.Args[i])
+                return
+            }
+        }
+    }
+
+    if folderPath == "" {
+        fmt.Println("Error: No directory path provided")
+        return
+    }
+
+    files, err := GetJSONFiles(folderPath)
     if err != nil {
         fmt.Printf("Error: %v\n", err)
         return

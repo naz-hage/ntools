@@ -3,7 +3,7 @@
     "NbuildAppList": [
       {
         "Name": "terraform lint",
-        "Version": "0.53.0",
+        "Version": "0.55.1",
         "AppFileName": "$(InstallPath)\\tflint.exe",
         "WebDownloadFile": "https://github.com/terraform-linters/tflint/releases/download/v$(Version)/tflint_windows_amd64.zip",
         "DownloadedFile": "tflint.zip",
@@ -12,7 +12,7 @@
         "InstallPath": "$(ProgramFiles)\\TFLint",
         "UninstallCommand": "powershell.exe",
         "UninstallArgs": "-Command Remove-Item -Path '$(InstallPath)' -Recurse -Force",
-        "StoredHash": "34A3CF6F9FBA5DD5DC102EA474A3B9B218FDDDD39B09EF4928822F2A03803DA5"
+        "StoredHash": "2F4D6E4D96F817938DA43E786E4F2E97791CA15962DAE4EF8EF97D0A0CD49A14"
       }
     ]
   }
