@@ -9,10 +9,11 @@
       "DownloadedFile": "terraform_$(Version)_windows_amd64.zip",
       "InstallCommand": "powershell.exe",
       "InstallArgs": "-Command \"Expand-Archive -Path '$(DownloadedFile)' -DestinationPath '$(InstallPath)'\" -Force",
-      "InstallPath": "$(ProgramFiles)\\Terraform\\",
+      "InstallPath": "$(ProgramFiles)\\Terraform",
       "UninstallCommand": "powershell.exe",
       "UninstallArgs": "-Command \"Remove-Item -Path '$(InstallPath)\\terraform.exe' -Force\"",
-      "StoredHash": "990EA1F1665D1B4E0C827AB39D6835E949928DEC28D5458B3C429778041FF72C"
+      "StoredHash": "990EA1F1665D1B4E0C827AB39D6835E949928DEC28D5458B3C429778041FF72C",
+      "AddToPath": true
     }
   ]
 }

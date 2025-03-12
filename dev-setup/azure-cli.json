@@ -3,15 +3,16 @@
     "NbuildAppList": [
       {
         "Name": "AzureCLI",
-        "Version": "2.63.0",
-        "AppFileName": "$(InstallPath)\\az.exe",
-        "WebDownloadFile": "https://aka.ms/installazurecliwindows",
+        "Version": "2.70.0",
+        "AppFileName": "$(InstallPath)\\az.cmd",
+        "WebDownloadFile": "https://azcliprod.blob.core.windows.net/msi/azure-cli-$(Version)-x64.msi",
         "DownloadedFile": "AzureCLI-$(Version)-win-x64.msi",
         "InstallCommand": "msiexec.exe",
-        "InstallArgs": "/i AzureCLI-$(Version)-win-x64.msi /quiet",
-        "InstallPath": "$(ProgramFiles)\\AzureCLI",
+        "InstallArgs": "/i AzureCLI-$(Version)-win-x64.msi /quiet" ,
+        "InstallPath": "$(ProgramFiles)\\Microsoft SDKs\\Azure\\CLI2\\wbin",
         "UninstallCommand": "msiexec.exe",
-        "UninstallArgs": "/x AzureCLI-$(Version)-win-x64.msi /quiet"
+        "UninstallArgs": "/x AzureCLI-$(Version)-win-x64.msi /quiet",
+        "StoredHash" : "F24C501B242614AFA989ACF22719C816BE87E7AC1FF8FF84C5FA200751F30FE2"
       }
     ]
   }

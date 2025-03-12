@@ -10,6 +10,7 @@ public class Cli
         "\t uninstall \t -> Uninstalls apps specified in the -json option.\n" +
         "\t download \t -> Downloads apps specified in the -json option.\n" +
         "\t list \t\t -> Lists apps specified in the -json option.\n" +
+        "\t path \t\t -> Displays environment path in local machine.\n" +
         "\t ----\n" +
         "\t - By default, the -json option points to the ntools deployment folder: $(ProgramFiles)\\build\\ntools.json.\n" +
         "\t - The install, uninstall, and download commands require admin privileges to run.")]
