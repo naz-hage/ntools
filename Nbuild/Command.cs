@@ -428,12 +428,16 @@ namespace Nbuild
             {
                 return false;
             }
+            var computedHashString = FileHashString(filePath);
+            return computedHashString.Equals(storedHash, StringComparison.InvariantCultureIgnoreCase);
+        }
 
+        private static string FileHashString(string? filePath)
+        {
             using var sha256 = SHA256.Create();
             using var stream = File.OpenRead(filePath!);
             var computedHash = sha256.ComputeHash(stream);
-            var computedHashString = BitConverter.ToString(computedHash).Replace("-", "").ToLowerInvariant();
-            return computedHashString.Equals(storedHash, StringComparison.InvariantCultureIgnoreCase);
+            return Convert.ToHexStringLower(computedHash);
         }
 
         private static ResultHelper SuccessfullInstall(NbuildApp nbuildApp, ResultHelper result)
@@ -451,6 +455,13 @@ namespace Nbuild
                     result.Code = 0;
                     return result;
                 }
+
+                // Print the stored hash of the app file name
+                if (!string.IsNullOrEmpty(nbuildApp.StoredHash))
+                {
+                    Colorizer.WriteLine($"[{ConsoleColor.Yellow}!Stored hash for {nbuildApp.AppFileName}: {FileHashString(nbuildApp.AppFileName)}]");
+                }
+
 
                 if (IsFileHashEqual(nbuildApp.AppFileName, nbuildApp.StoredHash))
                 {

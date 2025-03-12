@@ -25,3 +25,6 @@ The [Windows dev environment](https://learn.microsoft.com/en-us/windows/dev-envi
 | [NuGet](https://www.nuget.org/downloads)                                                                 | 6.13.2      | 10-mar-25       |
 | [SysInternals](https://learn.microsoft.com/en-us/sysinternals/)                                          | 2.90.0      | 22-Jun-24       |
 | [Python](https://www.python.org/downloads/)                                                               | 3.13.2      | 10-mar-25       |
+| [Argo CD](https://github.com/argoproj/argo-cd/releases/)                                          | 2.14.5      | 12-mar-25       |
+| [minikube](https://github.com/kubernetes/minikube/releases/)                                          | 2.14.5      | 12-mar-25       |
+| [kubernetes](https://github.com/kubernetes/kubernetes/releases)                                          | 1.32.2      | 12-mar-25       |

@@ -11,7 +11,8 @@
       "InstallArgs": "-Command Expand-Archive -Path $(Version).zip -DestinationPath \u0027$(InstallPath)\u0027 -Force",
       "InstallPath": "$(ProgramFiles)\\Nbuild",
       "UninstallCommand": "powershell.exe",
-      "UninstallArgs": "-Command Remove-Item -Path \u0027$(InstallPath)\u0027 -Recurse -Force"
+      "UninstallArgs": "-Command Remove-Item -Path \u0027$(InstallPath)\u0027 -Recurse -Force",
+      "AddToPath": true
     }
   ]
 }

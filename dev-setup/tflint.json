@@ -12,7 +12,8 @@
         "InstallPath": "$(ProgramFiles)\\TFLint",
         "UninstallCommand": "powershell.exe",
         "UninstallArgs": "-Command Remove-Item -Path '$(InstallPath)' -Recurse -Force",
-        "StoredHash": "2F4D6E4D96F817938DA43E786E4F2E97791CA15962DAE4EF8EF97D0A0CD49A14"
+        "StoredHash": "2F4D6E4D96F817938DA43E786E4F2E97791CA15962DAE4EF8EF97D0A0CD49A14",
+        "AddToPath": true
       }
     ]
   }
