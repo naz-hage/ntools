@@ -12,7 +12,8 @@
       "InstallPath": "$(ProgramFiles)\\kubectl\\",
       "UninstallCommand": "powershell.exe",
       "UninstallArgs": "-Command \"Remove-Item -Path '$(ProgramFiles)\\kubectl\\kubectl.exe' -Force; [Environment]::SetEnvironmentVariable('Path', $env:Path -replace ';$(ProgramFiles)\\kubectl', '', [EnvironmentVariableTarget]::Machine); Write-Output 'kubectl uninstalled.'\"",
-      "StoredHash": "CF51A1C6BF3B6BA6A5B549D1DEBF8AA6AFB00C4C5A3D5D4BB1072F54CBE4390F"
+      "StoredHash": "CF51A1C6BF3B6BA6A5B549D1DEBF8AA6AFB00C4C5A3D5D4BB1072F54CBE4390F",
+      "AddToPath": true
     }
   ]
 }

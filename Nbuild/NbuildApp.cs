@@ -27,5 +27,6 @@ namespace Nbuild
         [Required(ErrorMessage = "UninstallArgs is required")]
         public string? UninstallArgs { get; set; }     // the arguments to pass to the uninstall command. can use $(Version) and $(InstallPath) to substitute the version number
         public string? StoredHash { get; set; }
+        public bool? AddToPath { get; set; } = false; // add the install path to the system path
     }
 }
