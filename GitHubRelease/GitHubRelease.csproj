@@ -7,6 +7,12 @@
     <Nullable>enable</Nullable>
     <PublishAot>true</PublishAot>
     <InvariantGlobalization>true</InvariantGlobalization>
+	<Version></Version>
+	<AssemblyVersion></AssemblyVersion>
+	<Authors>naz-hage</Authors>
+	<Company>naz-hage</Company>
+	<Product>Backup automation</Product>
+	<Copyright>2020-2025</Copyright>
   </PropertyGroup>
 	
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

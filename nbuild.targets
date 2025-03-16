@@ -51,7 +51,7 @@
 		<PropertyGroup>
 			<FileName>$(SolutionDir)\$(TargetRelease)\nb.exe</FileName>
 		</PropertyGroup>
-		<Exec Command='powershell -File "$(BuildTools)\file-version.ps1" "$(FileName)"' ConsoleToMSBuild="true">
+		<Exec Command='powershell -File "$(SolutionDir)\dev-setup\list-file-version.ps1" "$(FileName)"' ConsoleToMSBuild="true">
 			<Output TaskParameter="ConsoleOutput" PropertyName="Version" />
 		</Exec>
 		<Message Text="Powershell File version: $(Version)" />
