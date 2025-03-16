@@ -29,7 +29,7 @@ env:
   Test_Project_Path: LauncherTests
   build_type: ${{ github.event.inputs.build_type || 'stage' }}
   enable_logging: ${{ github.event.inputs.enable_logging || 'false' }}
-  dotnet_version: '9.0.2'
+  dotnet_version: '9.0.3'
 
 jobs:
   build:
