@@ -6,7 +6,7 @@ The [Windows dev environment](https://learn.microsoft.com/en-us/windows/dev-envi
 
 | Tool                                                                                                       | Version     | Last Checked on |
 | :--------------------------------------------------------------------------------------------------------- | :---------- | :-------------- |
-| [Git for Windows](https://git-scm.com/downloads)                                                          | 2.48.1      | 10-Mar-25       |
+| [Git for Windows](https://git-scm.com/downloads)                                                          | 2.49.0      | 18-Mar-25       |
 | [Windows Terminal](https://www.microsoft.com/en-us/p/windows-terminal/9n0dx20hk701)                       | 1.21.10351.0| 10-Mar-25       |
 | [Download MongoDB Community Server](https://www.mongodb.com/try/download/community)                       | 8.0.5       | 10-Mar-25       |
 | [Terraform](https://releases.hashicorp.com/terraform)                                                    | 1.11.1      | 09-Mar-25       |

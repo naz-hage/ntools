@@ -89,7 +89,7 @@
     },
     {
       "Name": "Git for Windows",
-      "Version": "2.48.1",
+      "Version": "2.49.0",
       "AppFileName": "$(InstallPath)\\bin\\git.exe",
       "WebDownloadFile": "https://github.com/git-for-windows/git/releases/download/v$(Version).windows.1/Git-$(Version)-64-bit.exe",
       "DownloadedFile": "Git-$(Version)-64-bit.exe",
