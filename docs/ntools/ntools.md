@@ -13,7 +13,7 @@ The [Windows dev environment](https://learn.microsoft.com/en-us/windows/dev-envi
 | [Terraform Lint](https://github.com/terraform-linters/tflint/releases)                                  | 0.55.1      | 09-Mar-25       |
 | [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli-windows?pivots=msi)            | 2.70.0      | 10-Mar-25       |
 | [Visual Studio 2022 Community Edition](https://visualstudio.microsoft.com/vs/community/)                | 17.11.3     | 14-Sep-24       |
-| [Visual Studio Code](https://code.visualstudio.com/download)                                             | 1.98.0      | 06-Mar-25       |
+| [Visual Studio Code](https://code.visualstudio.com/download)                                             | 1.98.2      | 06-Mar-25       |
 | [Node.js](https://nodejs.org/en/download/)                                                               | 22.14.1     | 10-mar-25       |
 | [Download Postman Get Started for Free](https://www.postman.com/downloads/)                               | v11.36.0  | 10-mar-25       |
 | [Install Docker Desktop on Windows](https://docs.docker.com/docker-for-windows/install/)                 | 4.38.0.0    | 03-Mar-25       |
