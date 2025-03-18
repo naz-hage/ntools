@@ -3,16 +3,17 @@
   "NbuildAppList": [
     {
       "Name": "kubectl",
-      "Version": "1.32.2",
+      "Version": "1.32.3",
       "AppFileName": "$(InstallPath)\\kubectl.exe",
       "WebDownloadFile": "https://dl.k8s.io/release/v$(Version)/bin/windows/amd64/kubectl.exe",
       "DownloadedFile": "kubectl.exe",
       "InstallCommand": "xcopy.exe",
-      "InstallArgs": "$(DownloadedFile) \"$(InstallPath)\\\" /d /y",      
-      "InstallPath": "$(ProgramFiles)\\kubectl\\",
+      "InstallArgs": "$(DownloadedFile) \"$(InstallPath)\\\" /d /y",
+      "InstallPath": "$(ProgramFiles)\\kubectl",
       "UninstallCommand": "powershell.exe",
-      "UninstallArgs": "-Command \"Remove-Item -Path '$(ProgramFiles)\\kubectl\\kubectl.exe' -Force; [Environment]::SetEnvironmentVariable('Path', $env:Path -replace ';$(ProgramFiles)\\kubectl', '', [EnvironmentVariableTarget]::Machine); Write-Output 'kubectl uninstalled.'\"",
-      "StoredHash": "CF51A1C6BF3B6BA6A5B549D1DEBF8AA6AFB00C4C5A3D5D4BB1072F54CBE4390F"
+      "UninstallArgs": "-Command \"Remove-Item -Path '$(InstallPath)\\' -Recurse -Force\"",
+      "StoredHash": "3fd1576a902ecf713f7d6390ae01799e370883e0341177ee09dbdc362db953e3",
+      "AddToPath": true
     }
   ]
 }

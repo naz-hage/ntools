@@ -9,12 +9,13 @@
         "DownloadedFile": "minikube-installer.exe",
         "InstallCommand": "powershell.exe",
         "InstallArgs": "-Command \"Start-Process -FilePath '$(DownloadedFile)' -ArgumentList '/S' -Wait; ",
-        "InstallPath": "$(ProgramFiles)\\Kubernetes\\Minikube\\",
+        "InstallPath": "$(ProgramFiles)\\Kubernetes\\Minikube",
         "UninstallCommand": "powershell.exe",
-        "UninstallArgs": "-Command \"$uninstaller = '$(InstallPath)\\Uninstall Minikube.exe'; if (Test-Path $uninstaller) { Start-Process -FilePath $uninstaller -ArgumentList '/S' -Wait; Write-Output 'Minikube uninstalled.' } else { Write-Output 'Minikube uninstaller not found.' }\"",
+        "UninstallArgs": "-Command \"Start-Process -FilePath '$(InstallPath)\\Uninstall.exe' -ArgumentList '/S' -Wait;\"",
         "PostInstallCommand": "powershell.exe",
         "PostInstallArgs": "-Command \"minikube start --driver=docker\"",
-        "StoredHash": "7B7D2DCB130DC066D6F2D01DD1A54B92A35F8F7B0F849283A8BF4455DFF8DAEA"
+        "StoredHash": "7B7D2DCB130DC066D6F2D01DD1A54B92A35F8F7B0F849283A8BF4455DFF8DAEA",
+        "AddToPath": true
       }
     ]
   }
