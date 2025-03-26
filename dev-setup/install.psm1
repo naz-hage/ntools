@@ -366,11 +366,6 @@ function GetFileVersion {
     return ($versionInfo.FileMajorPart, $versionInfo.FileMinorPart, $versionInfo.FileBuildPart, $versionInfo.FilePrivatePart) -join "."
 }
 
-    # Call GetFileVersion function with the specified path
-    return GetFileVersion -FilePath $FilePath
-}
-
-
 <#
     Function: EnsureMinikubeRunning
     Description: Checks if Minikube is running and starts it if not.
