@@ -19,6 +19,7 @@ namespace NbuildTests
         // Local test mode flag
         private bool? LocalTestMode;
 
+
         // Resource location for test setup
         private readonly string ResourceLocation = "Nbuild.ntools.json"; //"Nbuild.resources.ntools.json";
 
@@ -85,6 +86,7 @@ namespace NbuildTests
             LocalTestMode = true;
         }
 
+        private string TestPath => "C:\\Temp\\nbuild2";
         // Test method for download functionality
         [TestMethod()]
         public void DownloadTest()
@@ -579,5 +581,199 @@ namespace NbuildTests
 
             Assert.AreEqual(result.GetFirstOutput(), "Invalid json input: InstallPath is required");
         }
+
+        [TestMethod]
+        public void AddAppInstallPathToEnvironmentPath_AddsPath_WhenNotPresent()
+        {
+            // Arrange
+            var nbuildApp = new NbuildApp
+            {
+                InstallPath = TestPath
+            };
+            var originalPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine);
+            Environment.SetEnvironmentVariable("PATH", string.Empty, EnvironmentVariableTarget.Machine);
+
+            // Act
+            Command.AddAppInstallPathToEnvironmentPath(nbuildApp);
+            var updatedPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine);
+
+            // Assert
+            Assert.IsTrue(updatedPath!.Contains(nbuildApp.InstallPath));
+
+            // Cleanup
+            Environment.SetEnvironmentVariable("PATH", originalPath, EnvironmentVariableTarget.Machine);
+        }
+
+        [TestMethod]
+        public void AddAppInstallPathToEnvironmentPath_DoesNotAddPath_WhenAlreadyPresent()
+        {
+            // Arrange
+            var nbuildApp = new NbuildApp
+            {
+                InstallPath = TestPath
+            };
+            var originalPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine);
+            var originalPathCount = originalPath!.Split(';').Length;
+            if (!Command.IsAppInstallPathInEnvironmentPath(nbuildApp))
+            {
+                Environment.SetEnvironmentVariable("PATH", $"{nbuildApp.InstallPath};{originalPath}", EnvironmentVariableTarget.Machine);
+            }
+
+            var updatedPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine);
+
+            // Act
+            Command.AddAppInstallPathToEnvironmentPath(nbuildApp);
+            updatedPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine);
+
+            // Assert
+            var pathCount = updatedPath!.Split(';').Length;
+            Assert.AreEqual(pathCount, originalPath!.Split(';').Length + 1);
+
+            // Cleanup
+            Environment.SetEnvironmentVariable("PATH", originalPath, EnvironmentVariableTarget.Machine);
+
+            Command.RemoveAppInstallPathFromEnvironmentPath(nbuildApp);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void AddAppInstallPathToEnvironmentPath_ThrowsException_WhenInstallPathIsNull()
+        {
+            // Arrange
+            var nbuildApp = new NbuildApp
+            {
+                InstallPath = null
+            };
+
+            // Act
+            Command.AddAppInstallPathToEnvironmentPath(nbuildApp);
+
+            // Assert is handled by ExpectedException
+        }
+
+        [TestMethod]
+        public void RemoveAppInstallPathFromEnvironmentPath_RemovesPath_WhenPresent()
+        {
+            // Arrange
+            var nbuildApp = new NbuildApp
+            {
+                InstallPath = TestPath
+            };
+            var originalPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine);
+            Environment.SetEnvironmentVariable("PATH", $"{TestPath};{originalPath}", EnvironmentVariableTarget.Machine);
+
+            // Act
+            Command.RemoveAppInstallPathFromEnvironmentPath(nbuildApp);
+            var updatedPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine);
+
+            // Assert
+            Assert.IsFalse(updatedPath!.Contains(nbuildApp.InstallPath));
+
+            // Cleanup
+            Environment.SetEnvironmentVariable("PATH", originalPath, EnvironmentVariableTarget.Machine);
+        }
+
+        [TestMethod]
+        public void RemoveAppInstallPathFromEnvironmentPath_DoesNotRemovePath_WhenNotPresent()
+        {
+            // Arrange
+            var nbuildApp = new NbuildApp
+            {
+                InstallPath = TestPath
+            };
+
+            if (Command.IsAppInstallPathInEnvironmentPath(nbuildApp))
+            {
+                Command.RemoveAppInstallPathFromEnvironmentPath(nbuildApp);
+            }
+
+            var originalPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine);
+            Environment.SetEnvironmentVariable("PATH", originalPath, EnvironmentVariableTarget.Machine);
+
+            // Act
+            Command.RemoveAppInstallPathFromEnvironmentPath(nbuildApp);
+            var updatedPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine);
+
+            // Assert
+            Assert.AreEqual(originalPath, updatedPath);
+
+            // Cleanup
+            Environment.SetEnvironmentVariable("PATH", originalPath, EnvironmentVariableTarget.Machine);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void RemoveAppInstallPathFromEnvironmentPath_ThrowsException_WhenInstallPathIsNull()
+        {
+            // Arrange
+            var nbuildApp = new NbuildApp
+            {
+                InstallPath = null
+            };
+
+            // Act
+            Command.RemoveAppInstallPathFromEnvironmentPath(nbuildApp);
+
+            // Assert is handled by ExpectedException
+        }
+
+        [TestMethod]
+        public void IsAppInstallPathInEnvironmentPath_ReturnsTrue_WhenPathIsPresent()
+        {
+            // Arrange
+            var nbuildApp = new NbuildApp
+            {
+                InstallPath = "C:\\TestPath"
+            };
+            var originalPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine);
+            Environment.SetEnvironmentVariable("PATH", $"C:\\TestPath;{originalPath}", EnvironmentVariableTarget.Machine);
+
+            // Act
+            var result = Command.IsAppInstallPathInEnvironmentPath(nbuildApp);
+
+            // Assert
+            Assert.IsTrue(result);
+
+            // Cleanup
+            Environment.SetEnvironmentVariable("PATH", originalPath, EnvironmentVariableTarget.Machine);
+        }
+
+        [TestMethod]
+        public void IsAppInstallPathInEnvironmentPath_ReturnsFalse_WhenPathIsNotPresent()
+        {
+            // Arrange
+            var nbuildApp = new NbuildApp
+            {
+                InstallPath = "C:\\TestPath"
+            };
+            var originalPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine);
+            Environment.SetEnvironmentVariable("PATH", originalPath, EnvironmentVariableTarget.Machine);
+
+            // Act
+            var result = Command.IsAppInstallPathInEnvironmentPath(nbuildApp);
+
+            // Assert
+            Assert.IsFalse(result);
+
+            // Cleanup
+            Environment.SetEnvironmentVariable("PATH", originalPath, EnvironmentVariableTarget.Machine);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void IsAppInstallPathInEnvironmentPath_ThrowsException_WhenInstallPathIsNull()
+        {
+            // Arrange
+            var nbuildApp = new NbuildApp
+            {
+                InstallPath = null
+            };
+
+            // Act
+            Command.IsAppInstallPathInEnvironmentPath(nbuildApp);
+
+            // Assert is handled by ExpectedException
+        }
     }
 }
+

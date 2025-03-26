@@ -24,7 +24,8 @@
     | SetDevEnvironmentVariables  | Sets development environment variables.                       |
     | Write-OutputMessage         | Writes output messages to the console and log files.          |
     | GetFileVersion              | Retrieves the file version of a specified file.               |
-    | MainFileVersion             | Main function to get the file version.                        |
+    | EnsureMinikubeRunning       | Checks if Minikube is running and starts it if not.           |
+
 .EXAMPLE
     Import-Module ./install.psm1
     PrepareDownloadsDirectory -directory "C:\NToolsDownloads"
@@ -39,7 +40,6 @@
     SetDevEnvironmentVariables -devDrive "D:" -mainDir "C:\MainDir"
     Write-OutputMessage -Prefix "Info" -Message "Installation completed successfully."
     GetFileVersion -FilePath "C:\Program Files\NBuild\nb.exe"
-    MainFileVersion -FilePath "C:\Program Files\NBuild\nb.exe"
 
 .NOTES
 
@@ -142,7 +142,7 @@ function CheckIfAppInstalled {
      {
         # check if the version is correct
         #$installedVersion = & .\file-version.ps1 $appInfo.AppFileName
-        $installedVersion = MainFileVersion -FilePath $appInfo.AppFileName
+        $installedVersion = GetFileVersion -FilePath $appInfo.AppFileName
         $targetVersion = $appInfo.Version
         Write-Host "$($appInfo.Name)  version: $($appInfo.Version) is found."
 
@@ -366,13 +366,21 @@ function GetFileVersion {
     return ($versionInfo.FileMajorPart, $versionInfo.FileMinorPart, $versionInfo.FileBuildPart, $versionInfo.FilePrivatePart) -join "."
 }
 
-function MainFileVersion {
-    param (
-        [string]$FilePath
-    )
+<#
+    Function: EnsureMinikubeRunning
+    Description: Checks if Minikube is running and starts it if not.
+#>
 
-    # Call GetFileVersion function with the specified path
-    return GetFileVersion -FilePath $FilePath
+function EnsureMinikubeRunning {
+    # Check if Minikube is running
+    $minikubeStatus = sudo minikube status | Select-String "host: Running"
+
+    if ($minikubeStatus) {
+        Write-Host "Minikube is already running."
+    } else {
+        Write-Host "Starting Minikube..."
+        sudo minikube start --driver=hyperv --cpus=2 --memory=6144 --disk-size=20g
+    }
 }
 
-Export-ModuleMember -Function PrepareDownloadsDirectory, GetAppInfo, CheckIfAppInstalled, Install, MainInstallApp, CheckIfDotnetInstalled, InstallDotNetCore, MainInstallNtools, SetDevEnvironmentVariables, Write-OutputMessage, GetFileVersion, MainFileVersion, nbExePath
+Export-ModuleMember -Function *

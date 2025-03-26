@@ -14,6 +14,7 @@ public class Program
     private const string CmdUninstall = "uninstall";
     private const string CmdList = "list";
     private const string CmdDownload = "download";
+    private const string CmdPath = "path";
     private const string CmdHelp = "--help";
     private const string NgitAssemblyExe = "ngit.exe";
     private static readonly int linesToDisplay = 10;
@@ -65,6 +66,7 @@ public class Program
                         var d when d == CmdUninstall => Command.Uninstall(options.Json, options.Verbose),
                         var d when d == CmdList => Command.List(options.Json, options.Verbose),
                         var d when d == CmdDownload => Command.Download(options.Json, options.Verbose),
+                        var d when d == CmdPath => Command.DisplayPathSegments(),
                         _ => ResultHelper.Fail(-1, $"Invalid Command: '{options.Command}'"),
                     };
                 }

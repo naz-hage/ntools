@@ -15,27 +15,30 @@
     },
     {
       "Name": "Argo CD",
-      "Version": "2.9.3",
+      "Version": "2.14.5",
       "AppFileName": "$(InstallPath)\\argocd.exe",
       "WebDownloadFile": "https://github.com/argoproj/argo-cd/releases/download/v$(Version)/argocd-windows-amd64.exe",
       "DownloadedFile": "argocd.exe",
       "InstallCommand": "xcopy.exe",
       "InstallArgs": "$(DownloadedFile) \"$(InstallPath)\\\" /d /y",
-      "InstallPath": "$(ProgramFiles)\\ArgoCD\\",
+      "InstallPath": "$(ProgramFiles)\\ArgoCD",
       "UninstallCommand": "powershell.exe",
-      "UninstallArgs": "-Command \"Remove-Item -Path '$(InstallPath)\\argocd.exe' -Force; if ((Get-ChildItem -Path '$(InstallPath)' -Force).Count -eq 0) { Remove-Item -Path '$(InstallPath)' -Force }; Write-Output 'ArgoCD CLI uninstalled.'\""
+      "UninstallArgs": "-Command \"Remove-Item -Path '$(InstallPath)\\' -Recurse -Force\"",
+      "StoredHash": "D93E14EEBE6FD0B8F6677D95617982B7C9D73617D3F714C36D19C087C0E7A9FB",
+      "AddToPath": true
     },
     {
       "Name": "AzureCLI",
-      "Version": "2.63.0",
-      "AppFileName": "$(InstallPath)\\az.exe",
-      "WebDownloadFile": "https://aka.ms/installazurecliwindows",
+      "Version": "2.70.0",
+      "AppFileName": "$(InstallPath)\\az.cmd",
+      "WebDownloadFile": "https://azcliprod.blob.core.windows.net/msi/azure-cli-$(Version)-x64.msi",
       "DownloadedFile": "AzureCLI-$(Version)-win-x64.msi",
       "InstallCommand": "msiexec.exe",
       "InstallArgs": "/i AzureCLI-$(Version)-win-x64.msi /quiet",
-      "InstallPath": "$(ProgramFiles)\\AzureCLI",
+      "InstallPath": "$(ProgramFiles)\\Microsoft SDKs\\Azure\\CLI2\\wbin",
       "UninstallCommand": "msiexec.exe",
-      "UninstallArgs": "/x AzureCLI-$(Version)-win-x64.msi /quiet"
+      "UninstallArgs": "/x AzureCLI-$(Version)-win-x64.msi /quiet",
+      "StoredHash": "F24C501B242614AFA989ACF22719C816BE87E7AC1FF8FF84C5FA200751F30FE2"
     },
     {
       "Name": "AzurePowershell",
@@ -62,10 +65,22 @@
       "UninstallArgs": "-Command \"\u0026 {Start-Process -FilePath '$(InstallPath)\\Docker Desktop Installer.exe' -ArgumentList 'uninstall --quiet' -NoNewWindow -Wait; while ((Get-Process 'Docker Desktop Installer' -ErrorAction SilentlyContinue) -or (Get-Process 'Docker' -ErrorAction SilentlyContinue)) { Start-Sleep -Seconds 5 }}\""
     },
     {
-      "Name": "Dotnet Runtime",
-      "Version": "8.0.1",
+      "Name": "Dotnet Desktop Runtime",
+      "Version": "9.0.2",
       "AppFileName": "$(InstallPath)\\dotnet.exe",
-      "WebDownloadFile": "https://download.visualstudio.microsoft.com/download/pr/f18288f6-1732-415b-b577-7fb46510479a/a98239f751a7aed31bc4aa12f348a9bf/windowsdesktop-runtime-$(Version)-win-x64.exe",
+      "WebDownloadFile": "https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/$(Version)/windowsdesktop-runtime-$(Version)-win-x64.exe",
+      "DownloadedFile": "dotnet_installer.exe",
+      "InstallCommand": "dotnet_installer.exe",
+      "InstallArgs": "/quiet /norestart\"",
+      "InstallPath": "$(ProgramFiles)\\dotnet",
+      "UninstallCommand": "dotnet_installer.exe",
+      "UninstallArgs": "/uninstall /quiet /norestart"
+    },
+    {
+      "Name": "Dotnet Runtime",
+      "Version": "9.0.2",
+      "AppFileName": "$(InstallPath)\\dotnet.exe",
+      "WebDownloadFile": "https://builds.dotnet.microsoft.com/dotnet/Runtime/$(Version)/dotnet-runtime-$(Version)-win-x64.exe",
       "DownloadedFile": "dotnet_installer.exe",
       "InstallCommand": "dotnet_installer.exe",
       "InstallArgs": "/quiet /norestart\"",
@@ -75,7 +90,7 @@
     },
     {
       "Name": "Git for Windows",
-      "Version": "2.47.1",
+      "Version": "2.49.0",
       "AppFileName": "$(InstallPath)\\bin\\git.exe",
       "WebDownloadFile": "https://github.com/git-for-windows/git/releases/download/v$(Version).windows.1/Git-$(Version)-64-bit.exe",
       "DownloadedFile": "Git-$(Version)-64-bit.exe",
@@ -100,16 +115,17 @@
     },
     {
       "Name": "kubectl",
-      "Version": "1.32.2",
+      "Version": "1.32.3",
       "AppFileName": "$(InstallPath)\\kubectl.exe",
       "WebDownloadFile": "https://dl.k8s.io/release/v$(Version)/bin/windows/amd64/kubectl.exe",
       "DownloadedFile": "kubectl.exe",
       "InstallCommand": "xcopy.exe",
       "InstallArgs": "$(DownloadedFile) \"$(InstallPath)\\\" /d /y",
-      "InstallPath": "$(ProgramFiles)\\kubectl\\",
+      "InstallPath": "$(ProgramFiles)\\kubectl",
       "UninstallCommand": "powershell.exe",
-      "UninstallArgs": "-Command \"Remove-Item -Path '$(ProgramFiles)\\kubectl\\kubectl.exe' -Force; [Environment]::SetEnvironmentVariable('Path', $env:Path -replace ';$(ProgramFiles)\\kubectl', '', [EnvironmentVariableTarget]::Machine); Write-Output 'kubectl uninstalled.'\"",
-      "StoredHash": "CF51A1C6BF3B6BA6A5B549D1DEBF8AA6AFB00C4C5A3D5D4BB1072F54CBE4390F"
+      "UninstallArgs": "-Command \"Remove-Item -Path '$(InstallPath)\\' -Recurse -Force\"",
+      "StoredHash": "3fd1576a902ecf713f7d6390ae01799e370883e0341177ee09dbdc362db953e3",
+      "AddToPath": true
     },
     {
       "Name": "minikube",
@@ -119,10 +135,11 @@
       "DownloadedFile": "minikube-installer.exe",
       "InstallCommand": "powershell.exe",
       "InstallArgs": "-Command \"Start-Process -FilePath '$(DownloadedFile)' -ArgumentList '/S' -Wait; ",
-      "InstallPath": "$(ProgramFiles)\\Kubernetes\\Minikube\\",
+      "InstallPath": "$(ProgramFiles)\\Kubernetes\\Minikube",
       "UninstallCommand": "powershell.exe",
-      "UninstallArgs": "-Command \"$uninstaller = '$(InstallPath)\\Uninstall Minikube.exe'; if (Test-Path $uninstaller) { Start-Process -FilePath $uninstaller -ArgumentList '/S' -Wait; Write-Output 'Minikube uninstalled.' } else { Write-Output 'Minikube uninstaller not found.' }\"",
-      "StoredHash": "7B7D2DCB130DC066D6F2D01DD1A54B92A35F8F7B0F849283A8BF4455DFF8DAEA"
+      "UninstallArgs": "-Command \"Start-Process -FilePath '$(InstallPath)\\Uninstall.exe' -ArgumentList '/S' -Wait;\"",
+      "StoredHash": "7B7D2DCB130DC066D6F2D01DD1A54B92A35F8F7B0F849283A8BF4455DFF8DAEA",
+      "AddToPath": true
     },
     {
       "Name": "MongoDB",
@@ -138,7 +155,7 @@
     },
     {
       "Name": "Ntools",
-      "Version": "1.9.0",
+      "Version": "1.10.1",
       "AppFileName": "$(InstallPath)\\nb.exe",
       "WebDownloadFile": "https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip",
       "DownloadedFile": "$(Version).zip",
@@ -146,7 +163,8 @@
       "InstallArgs": "-Command Expand-Archive -Path $(Version).zip -DestinationPath '$(InstallPath)' -Force",
       "InstallPath": "$(ProgramFiles)\\Nbuild",
       "UninstallCommand": "powershell.exe",
-      "UninstallArgs": "-Command Remove-Item -Path '$(InstallPath)' -Recurse -Force"
+      "UninstallArgs": "-Command Remove-Item -Path '$(InstallPath)' -Recurse -Force",
+      "AddToPath": true
     },
     {
       "Name": "Nuget",
@@ -198,20 +216,21 @@
     },
     {
       "Name": "Terraform",
-      "Version": "1.9.5",
+      "Version": "1.11.1",
       "AppFileName": "$(InstallPath)\\terraform.exe",
       "WebDownloadFile": "https://releases.hashicorp.com/terraform/$(Version)/terraform_$(Version)_windows_amd64.zip",
       "DownloadedFile": "terraform_$(Version)_windows_amd64.zip",
       "InstallCommand": "powershell.exe",
       "InstallArgs": "-Command \"Expand-Archive -Path '$(DownloadedFile)' -DestinationPath '$(InstallPath)'\" -Force",
-      "InstallPath": "$(ProgramFiles)\\Terraform\\",
+      "InstallPath": "$(ProgramFiles)\\Terraform",
       "UninstallCommand": "powershell.exe",
       "UninstallArgs": "-Command \"Remove-Item -Path '$(InstallPath)\\terraform.exe' -Force\"",
-      "StoredHash": "9A9B81018E40DADBC1EDA63C95C601878A5CA0CD4EF52A87DE0DE940F88E93C9"
+      "StoredHash": "990EA1F1665D1B4E0C827AB39D6835E949928DEC28D5458B3C429778041FF72C",
+      "AddToPath": true
     },
     {
       "Name": "terraform lint",
-      "Version": "0.53.0",
+      "Version": "0.55.1",
       "AppFileName": "$(InstallPath)\\tflint.exe",
       "WebDownloadFile": "https://github.com/terraform-linters/tflint/releases/download/v$(Version)/tflint_windows_amd64.zip",
       "DownloadedFile": "tflint.zip",
@@ -220,7 +239,8 @@
       "InstallPath": "$(ProgramFiles)\\TFLint",
       "UninstallCommand": "powershell.exe",
       "UninstallArgs": "-Command Remove-Item -Path '$(InstallPath)' -Recurse -Force",
-      "StoredHash": "34A3CF6F9FBA5DD5DC102EA474A3B9B218FDDDD39B09EF4928822F2A03803DA5"
+      "StoredHash": "2F4D6E4D96F817938DA43E786E4F2E97791CA15962DAE4EF8EF97D0A0CD49A14",
+      "AddToPath": true
     },
     {
       "Name": "Visual Studio 2022",
@@ -236,7 +256,7 @@
     },
     {
       "Name": "Visual Studio Code",
-      "Version": "1.98.0",
+      "Version": "1.98.2",
       "AppFileName": "$(InstallPath)\\Code.exe",
       "WebDownloadFile": "https://aka.ms/win32-x64-system-stable",
       "DownloadedFile": "VSCodeSetup-x64-$(Version).exe",
