@@ -24,7 +24,8 @@
       "InstallPath": "$(ProgramFiles)\\ArgoCD",
       "UninstallCommand": "powershell.exe",
       "UninstallArgs": "-Command \"Remove-Item -Path '$(InstallPath)\\' -Recurse -Force\"",
-      "StoredHash": "D93E14EEBE6FD0B8F6677D95617982B7C9D73617D3F714C36D19C087C0E7A9FB"
+      "StoredHash": "D93E14EEBE6FD0B8F6677D95617982B7C9D73617D3F714C36D19C087C0E7A9FB",
+      "AddToPath": true
     },
     {
       "Name": "AzureCLI",
@@ -123,7 +124,8 @@
       "InstallPath": "$(ProgramFiles)\\kubectl",
       "UninstallCommand": "powershell.exe",
       "UninstallArgs": "-Command \"Remove-Item -Path '$(InstallPath)\\' -Recurse -Force\"",
-      "StoredHash": "3fd1576a902ecf713f7d6390ae01799e370883e0341177ee09dbdc362db953e3"
+      "StoredHash": "3fd1576a902ecf713f7d6390ae01799e370883e0341177ee09dbdc362db953e3",
+      "AddToPath": true
     },
     {
       "Name": "minikube",
@@ -136,7 +138,8 @@
       "InstallPath": "$(ProgramFiles)\\Kubernetes\\Minikube",
       "UninstallCommand": "powershell.exe",
       "UninstallArgs": "-Command \"Start-Process -FilePath '$(InstallPath)\\Uninstall.exe' -ArgumentList '/S' -Wait;\"",
-      "StoredHash": "7B7D2DCB130DC066D6F2D01DD1A54B92A35F8F7B0F849283A8BF4455DFF8DAEA"
+      "StoredHash": "7B7D2DCB130DC066D6F2D01DD1A54B92A35F8F7B0F849283A8BF4455DFF8DAEA",
+      "AddToPath": true
     },
     {
       "Name": "MongoDB",
@@ -152,7 +155,7 @@
     },
     {
       "Name": "Ntools",
-      "Version": "1.9.0",
+      "Version": "1.10.1",
       "AppFileName": "$(InstallPath)\\nb.exe",
       "WebDownloadFile": "https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip",
       "DownloadedFile": "$(Version).zip",
@@ -160,7 +163,8 @@
       "InstallArgs": "-Command Expand-Archive -Path $(Version).zip -DestinationPath '$(InstallPath)' -Force",
       "InstallPath": "$(ProgramFiles)\\Nbuild",
       "UninstallCommand": "powershell.exe",
-      "UninstallArgs": "-Command Remove-Item -Path '$(InstallPath)' -Recurse -Force"
+      "UninstallArgs": "-Command Remove-Item -Path '$(InstallPath)' -Recurse -Force",
+      "AddToPath": true
     },
     {
       "Name": "Nuget",
@@ -221,7 +225,8 @@
       "InstallPath": "$(ProgramFiles)\\Terraform",
       "UninstallCommand": "powershell.exe",
       "UninstallArgs": "-Command \"Remove-Item -Path '$(InstallPath)\\terraform.exe' -Force\"",
-      "StoredHash": "990EA1F1665D1B4E0C827AB39D6835E949928DEC28D5458B3C429778041FF72C"
+      "StoredHash": "990EA1F1665D1B4E0C827AB39D6835E949928DEC28D5458B3C429778041FF72C",
+      "AddToPath": true
     },
     {
       "Name": "terraform lint",
@@ -234,7 +239,8 @@
       "InstallPath": "$(ProgramFiles)\\TFLint",
       "UninstallCommand": "powershell.exe",
       "UninstallArgs": "-Command Remove-Item -Path '$(InstallPath)' -Recurse -Force",
-      "StoredHash": "2F4D6E4D96F817938DA43E786E4F2E97791CA15962DAE4EF8EF97D0A0CD49A14"
+      "StoredHash": "2F4D6E4D96F817938DA43E786E4F2E97791CA15962DAE4EF8EF97D0A0CD49A14",
+      "AddToPath": true
     },
     {
       "Name": "Visual Studio 2022",

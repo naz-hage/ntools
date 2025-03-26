@@ -104,6 +104,7 @@ func main() {
         UninstallCommand string `json:"UninstallCommand"`
         UninstallArgs   string `json:"UninstallArgs"`
         StoredHash      string `json:"StoredHash,omitempty"`
+        AddToPath       bool `json:"AddToPath,omitempty"`
     }
 
     type FileContent struct {
