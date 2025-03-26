@@ -25,7 +25,7 @@
     | Write-OutputMessage         | Writes output messages to the console and log files.          |
     | GetFileVersion              | Retrieves the file version of a specified file.               |
     | EnsureMinikubeRunning       | Checks if Minikube is running and starts it if not.           |
-    | MainFileVersion             | Main function to get the file version.                        |
+
 .EXAMPLE
     Import-Module ./install.psm1
     PrepareDownloadsDirectory -directory "C:\NToolsDownloads"
@@ -40,7 +40,6 @@
     SetDevEnvironmentVariables -devDrive "D:" -mainDir "C:\MainDir"
     Write-OutputMessage -Prefix "Info" -Message "Installation completed successfully."
     GetFileVersion -FilePath "C:\Program Files\NBuild\nb.exe"
-    MainFileVersion -FilePath "C:\Program Files\NBuild\nb.exe"
 
 .NOTES
 
@@ -143,7 +142,7 @@ function CheckIfAppInstalled {
      {
         # check if the version is correct
         #$installedVersion = & .\file-version.ps1 $appInfo.AppFileName
-        $installedVersion = MainFileVersion -FilePath $appInfo.AppFileName
+        $installedVersion = GetFileVersion -FilePath $appInfo.AppFileName
         $targetVersion = $appInfo.Version
         Write-Host "$($appInfo.Name)  version: $($appInfo.Version) is found."
 
@@ -366,11 +365,6 @@ function GetFileVersion {
     # return the all file version parts joined by a dot
     return ($versionInfo.FileMajorPart, $versionInfo.FileMinorPart, $versionInfo.FileBuildPart, $versionInfo.FilePrivatePart) -join "."
 }
-
-function MainFileVersion {
-    param (
-        [string]$FilePath
-    )
 
     # Call GetFileVersion function with the specified path
     return GetFileVersion -FilePath $FilePath
