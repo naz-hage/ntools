@@ -27,7 +27,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.13.9" />	  
-    <PackageReference Include="ntools-launcher" Version="1.6.0" />
+    <PackageReference Include="ntools-launcher" Version="1.7.0" />
   </ItemGroup>
 
 </Project>

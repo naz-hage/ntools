@@ -297,12 +297,26 @@ function InstallDotNetCore {
 
 function MainInstallNtools {
     # prepare the downloads directory
+    Write-OutputMessage "This `MainInstallNtools` function is deprecated, please use `InstallNTools` instead."
     PrepareDownloadsDirectory $downloadsDirectory
 
     # add deployment path to the PATH environment variable if it doesn't already exist
     AddDeploymentPathToEnvironment $deploymentPath
 
-    & $global:NbExePath -c install -json $nbToolsPath
+    & $global:NbExePath install -json $nbToolsPath
+
+    Write-OutputMessage $MyInvocation.MyCommand.Name "Completed successfully."
+    Write-OutputMessage "This `MainInstallNtools` function is deprecated, please use `InstallNTools` instead."
+}
+
+function InstallNtools {
+    # prepare the downloads directory
+    PrepareDownloadsDirectory $downloadsDirectory
+
+    # add deployment path to the PATH environment variable if it doesn't already exist
+    AddDeploymentPathToEnvironment $deploymentPath
+
+    & $global:NbExePath install -json $nbToolsPath
 
     Write-OutputMessage $MyInvocation.MyCommand.Name "Completed successfully."
 }
