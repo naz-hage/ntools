@@ -2,30 +2,121 @@
 
 namespace Ngit;
 
+/// <summary>
+/// Represents the command-line interface (CLI) options for the Ngit application.
+/// </summary>
 public class Cli
 {
-    [OptionalArgument("", "c", "git Command, value= [tag | settag| autotag| setautotag| deletetag | branch | clone]\n" +
-                            "     tag\t -> Get the current tag\n" +
-                            "     autotag\t -> Set next tag based on the build type: STAGE vs.PROD\n" +
-                            "     pushtag\t -> push specified tag in -tag option to remote repo\n" +
-                            "     settag\t -> Set specified tag in -tag option \n" +
-                            "     deletetag\t -> Delete specified tag in -tag option\n" +
-                            "     branch\t -> Get the current branch\n" +
-                            "     clone \t -> Clone specified Git repo in the -url option")]
-    public string? GitCommand { get; set; }
+    /// <summary>
+    /// Enum representing the possible command types.
+    /// </summary>
+    public enum CommandType
+    {
+        tag,
+        setTag,
+        autoTag,
+        setAutoTag,
+        deleteTag,
+        branch,
+        clone,
+        pushTag
+    }
 
-    [OptionalArgument("", "url", "Git repo path")]
+    /// <summary>
+    /// Gets or sets the git command to execute.
+    /// Possible values: tag, settag, autotag, setautotag, deletetag, branch, clone.
+    /// </summary>
+    [RequiredArgument(0, "command", "Specifies the git command to execute.\n" +
+        "\t tag \t\t -> Get the current tag\n" +
+        "\t settag \t -> Set specified tag in -tag option\n" +
+        "\t autotag \t -> Set next tag based on the build type: STAGE vs. PROD\n" +
+        "\t setautotag \t -> Set next tag based on the build type: STAGE vs. PROD\n" +
+        "\t deletetag \t -> Delete specified tag in -tag option\n" +
+        "\t branch \t -> Get the current branch\n" +
+        "\t clone \t\t -> Clone specified Git repo in the -url option\n" +
+        "\t ----\n")]
+    public CommandType Command { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Git repository URL.
+    /// </summary>
+    [OptionalArgument("", "url", "Specifies the Git repository URL.")]
     public string? Url { get; set; }
 
-    //[OptionalArgument("", "branch", "Branch Name")]
-    //public string? Branch { get; set; }
-
-    [OptionalArgument("", "tag", "Tag used for -c settag and -c deletetag")]
+    /// <summary>
+    /// Gets or sets the tag used for settag and deletetag commands.
+    /// </summary>
+    [OptionalArgument("", "tag", "Specifies the tag used for settag and deletetag commands.")]
     public string? Tag { get; set; }
 
-    [OptionalArgument("", "buildtype", "Build type used for -c autotag and -c setautotag Values: STAGE | PROD")]
+    /// <summary>
+    /// Gets or sets the build type used for autotag and setautotag commands.
+    /// Possible values: STAGE, PROD.
+    /// </summary>
+    [OptionalArgument("", "buildtype", "Specifies the build type used for autotag and setautotag commands. Possible values: STAGE, PROD.")]
     public string? BuildType { get; internal set; }
 
-    [OptionalArgument(false, "v", "verbose. value = [true | false]")]
+    /// <summary>
+    /// Gets or sets a value indicating whether to set the console output verbose level.
+    /// </summary>
+    [OptionalArgument(false, "v", "Specifies whether to print additional information.")]
     public bool Verbose { get; set; }
+
+    private static readonly Dictionary<string, CommandType> CommandMap = new()
+    {
+        { "tag", CommandType.tag },
+        { "settag", CommandType.setTag },
+        { "autotag", CommandType.autoTag },
+        { "setautotag", CommandType.setAutoTag },
+        { "deletetag", CommandType.deleteTag },
+        { "branch", CommandType.branch },
+        { "clone", CommandType.clone }
+    };
+
+    /// <summary>
+    /// Gets the command type from the command string.
+    /// </summary>
+    /// <returns>The command type.</returns>
+    /// <exception cref="ArgumentException">Thrown when the command is invalid.</exception>
+    public CommandType GetCommandType()
+    {
+        if (CommandMap.TryGetValue(Command.ToString().ToLower(), out var commandType))
+        {
+            return commandType;
+        }
+        throw new ArgumentException($"Invalid command: {Command}");
+    }
+
+    /// <summary>
+    /// Validates the CLI arguments to ensure required options are provided for specific commands.
+    /// </summary>
+    public void Validate()
+    {
+        switch (Command)
+        {
+            case CommandType.setTag:
+            case CommandType.deleteTag:
+                if (string.IsNullOrEmpty(Tag))
+                {
+                    throw new ArgumentException("The 'tag' option is required for the 'settag' and 'deletetag' commands.");
+                }
+                break;
+            case CommandType.clone:
+                if (string.IsNullOrEmpty(Url))
+                {
+                    throw new ArgumentException("The 'url' option is required for the 'clone' command.");
+                }
+                break;
+            case CommandType.autoTag:
+            case CommandType.setAutoTag:
+                if (string.IsNullOrEmpty(BuildType))
+                {
+                    throw new ArgumentException("The 'buildtype' option is required for the 'autotag' and 'setautotag' commands.");
+                }
+                break;
+            default:
+                // For all other commands, no additional validation is required.
+                break;
+        }
+    }
 }

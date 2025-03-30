@@ -17,7 +17,7 @@ if (!Parser.TryParse(args, out Cli options))
     return 0;
 }
 
-if (!string.IsNullOrEmpty(options.GitCommand))
+if (!Enum.IsDefined(options.Command))
 {
     if (options.Verbose)
     {

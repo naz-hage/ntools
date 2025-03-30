@@ -14,12 +14,6 @@
 
     <!-- Increment version for a stage build -->
     <Target Name="AUTOTAG_STAGE" >
-        <!--
-        <Exec Command='$(NbuildExe) -c autotag  -buildtype stage' ConsoleToMSBuild="true">
-            <Output TaskParameter="ConsoleOutput" PropertyName="ProductVersion" />
-        </Exec>
-        -->
-
         <Git Command="AutoTag" TaskParameter="Stage">
             <Output TaskParameter="Output" PropertyName="ProductVersion"/>
         </Git>
@@ -34,10 +28,6 @@
     <!-- Set version for a stage build -->
     <Target Name="SET_TAG" AfterTargets="AUTOTAG_STAGE;AUTOTAG_PROD">
         <Message Text="Git Next tag: $(ProductVersion)"/>
-
-        <!-- <Exec Command='$(NbuildExe) -c settag  -tag $(ProductVersion)' ConsoleToMSBuild="true">
-        <Output TaskParameter="ConsoleOutput" PropertyName="Result" />
-    </Exec> -->
 
         <Git Command="SetTag" TaskParameter="$(ProductVersion)">
             <Output TaskParameter="Output" PropertyName="ProductVersion"/>
@@ -58,13 +48,7 @@
     <Target Name="AUTOTAG_PROD" DependsOnTargets="GIT_BRANCH">
         <RedError Condition="'$(GitBranch)' != 'main'" Message="Error: Must be on main branch for a production release." />
 
-        <!-- 
-            <Exec Command='$(NbuildExe) -c autotag  -buildtype production' ConsoleToMSBuild="true">
-                <Output TaskParameter="ConsoleOutput" PropertyName="ProductVersion" />
-            </Exec> 
-        -->
-
-        <Git Command="AutoTag" TaskParameter="Prod">
+          <Git Command="AutoTag" TaskParameter="Prod">
             <Output TaskParameter="Output" PropertyName="ProductVersion"/>
         </Git>
         <Message Text="Task - Git Next Tag:'$(ProductVersion)'"/>
@@ -75,13 +59,6 @@
 
     <!-- Get the tag from git -->
     <Target Name="TAG" >
-        <!-- 
-            <Exec Command='$(NbuildExe) -c gettag ' ConsoleToMSBuild="true">
-                <Output TaskParameter="ConsoleOutput" PropertyName="ProductVersion" />
-            </Exec>
-            <Message Text="Git tag: $(ProductVersion)"/> 
-        -->
-
         <Git Command="GetTag" >
             <Output TaskParameter="Output" PropertyName="ProductVersion"/>
         </Git>
@@ -107,12 +84,6 @@
 
     <!-- Get the current git branch -->
     <Target Name="GIT_BRANCH" >
-        <!-- <Exec Command='$(NbuildExe) -c getbranch' ConsoleToMSBuild="true">
-        <Output TaskParameter="ConsoleOutput" PropertyName="GitBranch" />
-    </Exec>
-
-    <Message Text="Git Branch: $(GitBranch)"/> -->
-
         <Git Command="GetBranch">
             <Output TaskParameter="Output" PropertyName="GitBranch"/>
         </Git>

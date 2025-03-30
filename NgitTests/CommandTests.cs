@@ -23,7 +23,7 @@ namespace NgitTests
         public void DisplayTagTest()
         {
             // Arrange
-            Options.GitCommand = Command.GetTagCommand;
+            Options.Command = Cli.CommandType.tag;
 
             // Act
             var actual = Command.DisplayTag(Options);
@@ -36,7 +36,7 @@ namespace NgitTests
         public void DisplayTagVerboseTest()
         {
             // Arrange
-            Options.GitCommand = Command.GetTagCommand;
+            Options.Command = Cli.CommandType.tag;
             Options.Verbose = true;
 
             // Act
@@ -50,7 +50,7 @@ namespace NgitTests
         public void DisplayBranchTest()
         {
             // Arrange
-            Options.GitCommand = Command.GetBranchCommand;
+            Options.Command = Cli.CommandType.branch;
 
             // Act
             var actual = Command.DisplayBranch();

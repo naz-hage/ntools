@@ -8,7 +8,7 @@ set PROJECT=nbuild.targets
 
 if "%1"=="/?" (
     @REM Display the available targets
-    Nb -c targets
+    Nb targets
     EXIT /B0
 ) else if "%1"=="" (
     @REM Set the CMD variable to the project name
@@ -23,13 +23,13 @@ msbuild %CMD%
 if ERRORLEVEL 1 (
     echo %ERRORLEVEL%
     @REM Display the Git project information: branch and tag
-    ngit -c branch
+    ngit branch
     echo %0 '%1' FAILED
     echo %0 '%1' FAILED >>%BUILD_LOG%
     EXIT /B1
 ) else (
     @REM Display the Git project information: branch and tag
-    ngit -c branch
+    ngit branch
     echo %0 '%1' SUCCEEDED 
     echo %0 '%1' SUCCEEDED >>%BUILD_LOG%
 )

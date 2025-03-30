@@ -6,7 +6,11 @@
 
 	<PropertyGroup>
         <!-- This is the folder where the *.sln resides-->
-		<DeploymentFolder>$(ProgramFiles)\Nbuild</DeploymentFolder>	
+		<DeploymentFolder>$(ProgramFiles)\Nbuild</DeploymentFolder>
+		<!--  Modify these paths to match your Python installation -->
+		<PythonPath>$(ProgramFiles)\Python\3.12.2</PythonPath>
+		<PipPath>$(PythonPath)\Scripts\pip.exe</PipPath>
+		<MkDocsExe>$(USERPROFILE)\AppData\Roaming\Python\Python312\Scripts\mkdocs.exe</MkDocsExe>
 	</PropertyGroup>
 
 	<!--Setup the ARTIFACTS folders for binaries and test results - override -->
@@ -122,10 +126,30 @@
 
 	<!-- Build docs locally for testing -->
 	<Target Name="MKDOCS" >
-		<Exec Command='pip install mkdocs' WorkingDirectory="$(SolutionDir)"/>
-		<Exec Command='mkdocs build -d %userprofile%\ntools' WorkingDirectory="$(SolutionDir)"/>
-		<Exec Command='mkdocs serve' WorkingDirectory="$(SolutionDir)"/>
-	    <Message Text="==> DONE"/>
+		<!-- Check if Python is installed -->
+		<Error Condition="!Exists('$(PythonPath)\python.exe')" Text="Python is not installed at $(PythonPath)" />
+
+		<!-- Upgrade pip -->
+		<Exec Command="&quot;$(PipPath)&quot; install --upgrade pip" WorkingDirectory="$(SolutionDir)">
+			<Output TaskParameter="ExitCode" PropertyName="PipUpgradeExitCode" />
+		</Exec>
+		<Error Condition="'$(PipUpgradeExitCode)' != '0'" Text="Failed to upgrade pip. Exit code: $(PipUpgradeExitCode)" />
+
+		<!-- Install mkdocs -->
+		<Exec Command="&quot;$(PipPath)&quot; install mkdocs" WorkingDirectory="$(SolutionDir)">
+			<Output TaskParameter="ExitCode" PropertyName="MkDocsInstallExitCode" />
+		</Exec>
+		<Error Condition="'$(MkDocsInstallExitCode)' != '0'" Text="Failed to install mkdocs. Exit code: $(MkDocsInstallExitCode)" />
+
+		<!-- Build the documentation -->
+		<Exec Command='"$(MkDocsExe)" build -d $(ArtifactsDir)\$(SolutionName)\docs"' WorkingDirectory="$(SolutionDir)" />
+		<Message Text="==> DONE" />
+	</Target>
+
+	<!-- mkdocs deploy locally -->
+	<Target Name="MKDOCS_DEPLOY" AfterTargets="MKDOCS">
+		<Exec Command='"$(MkDocsExe)" serve' WorkingDirectory="$(SolutionDir)"/>
+		<Message Text="==> DONE" />
 	</Target>
 
 	<!-- Example to get the installation 
@@ -194,7 +218,7 @@
 	<!-- Creates a stage or prod release -->
 	<Target Name="GITHUB_RELEASE" DependsOnTargets="ARTIFACTS;GIT_BRANCH" AfterTargets="STAGE;PROD" >
 		<Git Command="PushTag" TaskParameter="$(ProductVersion)" />
-		<Exec Command='"$(OutputPathRelease)\GitHubRelease.exe" -c create -r $(SolutionName) -t $(ProductVersion) -b $(GitBranch) -p $(ArtifactsFolder).zip' WorkingDirectory="$(OutputPathRelease)" />
+		<Exec Command='"$(OutputPathRelease)\GitHubRelease.exe" create -r $(SolutionName) -t $(ProductVersion) -b $(GitBranch) -p $(ArtifactsFolder).zip' WorkingDirectory="$(OutputPathRelease)" />
 
 		<Message Text="==> DONE"/>
 	</Target>
