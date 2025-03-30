@@ -44,6 +44,7 @@ try
 
 catch (Exception ex)
 {
+    ReturnCode = RetCode.Exception;
     Colorizer.WriteLine($"Exception: {ex.Message} [{ConsoleColor.Red}!'{ReturnCode}']\n");
 }
 

@@ -26,6 +26,7 @@
             SetTagFailed = -15,
             NotAGitRepository = -16,
             GitNotConfigured = -17,
+            Exception = -18,
         }
     }
 }
