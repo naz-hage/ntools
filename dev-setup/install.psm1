@@ -378,6 +378,12 @@ function DownloadNtools {
     Write-Host "Downloading NTools version $version ..."
     Write-Host "Downloads directory: $downloadsDirectory"
 
+    # Create the Downloads directory if it doesn't exist
+    if (!(Test-Path -Path $downloadsDirectory)) {
+        Write-Host "Creating downloads directory: $downloadsDirectory ..."
+        New-Item -ItemType Directory -Path $downloadsDirectory | Out-Null
+    }
+
     $url = "https://github.com/naz-hage/ntools/releases/download/$version/$version.zip"
     $fileName = "$downloadsDirectory\$version.zip"
     Invoke-WebRequest -Uri $url -OutFile $fileName
