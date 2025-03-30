@@ -70,7 +70,8 @@ public class Cli
         { "setautotag", CommandType.setAutoTag },
         { "deletetag", CommandType.deleteTag },
         { "branch", CommandType.branch },
-        { "clone", CommandType.clone }
+        { "clone", CommandType.clone },
+        { "pushtag", CommandType.pushTag }
     };
 
     /// <summary>
