@@ -311,11 +311,34 @@ function MainInstallNtools {
 
 function InstallNtools {
     param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false, HelpMessage = "The version of NTools to install. If not specified, the version is read from ntools.json.")]
         [string]$version,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$false, HelpMessage = "The directory to download the NTools zip file to. Defaults to 'c:\\NToolsDownloads'.")]
         [string]$downloadsDirectory = "c:\NToolsDownloads"
     )
+
+    # If Version is not specified, read it from ntools.json
+    if (-not $Version) {
+        $NtoolsJsonPath = "$PSScriptRoot\ntools.json"
+
+        Write-Host "Reading version from $NtoolsJsonPath ..."
+        # 
+        if (Test-Path -Path $NtoolsJsonPath) {
+            try {
+                $NtoolsJson = Get-Content -Path $NtoolsJsonPath -Raw | ConvertFrom-Json
+                $Version = $NtoolsJson.NbuildAppList[0].Version
+                Write-Host "Version read from ntools.json: $Version"
+            }
+            catch {
+                Write-Warning "Failed to read version from ntools.json. Please specify the version manually."
+                return
+            }
+        }
+        else {
+            Write-Warning "ntools.json not found in the script directory. Please specify the version manually."
+            return
+        }
+    }
 
     # Download the specified version of NTools
     DownloadNtools -version $version -downloadsDirectory $downloadsDirectory
@@ -327,10 +350,8 @@ function InstallNtools {
         Write-Host "Downloaded file not found: $downloadedFile"
         return
     }
-    Write-Host "Downloaded NTools version $version to $downloadedFile"
-
-    # Unzip the downloaded file to the deployment path
     
+    # Unzip the downloaded file to the deployment path
     Expand-Archive -Path $downloadedFile -DestinationPath $deploymentPath -Force
     Write-Host "Unzipped NTools version $version to $deploymentPath"
 

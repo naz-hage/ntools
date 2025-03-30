@@ -31,36 +31,6 @@ Write-Host "PSScriptRoot: $PSScriptRoot"
 # Import the install module
 Import-Module "$PSScriptRoot\install.psm1" -Force
 
-# If Version is not specified, read it from ntools.json
-if (-not $Version) {
-    $NtoolsJsonPath = "$PSScriptRoot\ntools.json"
-
-    if (Test-Path -Path $NtoolsJsonPath) {
-        try {
-            $NtoolsJson = Get-Content -Path $NtoolsJsonPath -Raw | ConvertFrom-Json
-            $Version = $NtoolsJson.NbuildAppList[0].Version
-            Write-Host "Version read from ntools.json: $Version"
-        }
-        catch {
-            Write-Warning "Failed to read version from ntools.json. Please specify the version manually."
-            return
-        }
-    }
-    else {
-        Write-Warning "ntools.json not found in the script directory. Please specify the version manually."
-        return
-    }
-}
-
-# Check if the version is empty after attempting to read from ntools.json
-if (-not $Version) {
-    Write-Warning "No version specified and failed to read from ntools.json. Exiting."
-    return
-}
-
-# Set the deployment path
-$DeploymentPath = Join-Path -Path $env:ProgramFiles -ChildPath "Nbuild"
-
 # Call the InstallNtools function from the install module
 InstallNtools -version $Version -downloadsDirectory $DownloadsDirectory
 
