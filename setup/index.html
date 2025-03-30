@@ -117,7 +117,7 @@
 <li>The project should be under source control using Git.  An tag should be created for the project and follow the <a href="../versioning/">versioning</a> rules.</li>
 <li>To create a tag, use the following command from the root of the project directory:</li>
 </ul>
-<pre><code class="language-cmd">ng -c settag -tag 0.0.1 
+<pre><code class="language-cmd">ng settag -tag 0.0.1 
 </code></pre>
 <h3 id="dev-setup-folder">dev-setup folder</h3>
 <p>dev-setup Folder contains the <code>apps.json</code> file and the <code>dev-setup.ps1</code> file. The <code>apps.json</code> file contains the list of development tools required for your project. The <code>dev-setup.ps1</code> file is a PowerShell script that installs the development tools and sets up the development environment for the project.</p>
@@ -203,7 +203,7 @@
 <p>You can use Nb.exe to install the tools</p>
 </li>
 </ul>
-<pre><code class="language-cmd">Nb.exe -c install -json apps.json
+<pre><code class="language-cmd">Nb.exe install -json apps.json
 </code></pre>
 <p>This command can be also added to <a href="ntools/dev-setup.md">dev-setup.ps1</a>.</p>
 <h4 id="list-of-environment-variables">List of Environment Variables</h4>

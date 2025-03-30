@@ -132,7 +132,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 # Install development tools for the project
-&amp; $global:NbExePath -c install -json .\apps.json
+&amp; $global:NbExePath install -json .\apps.json
 if ($LASTEXITCODE -ne 0) {
     Write-OutputMessage $fileName &quot;Error: Installation of other tools (apps.json)  failed. Exiting script.&quot;
     exit 1
