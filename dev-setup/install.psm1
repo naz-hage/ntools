@@ -317,6 +317,11 @@ function InstallNtools {
         [string]$downloadsDirectory = "c:\NToolsDownloads"
     )
 
+    # display parameters
+    Write-Host "InstallNtools - Parameters:"
+    Write-Host "Version: $version"
+    Write-Host "Downloads directory: $downloadsDirectory"
+
     # If Version is not specified, read it from ntools.json
     if (-not $Version) {
         $NtoolsJsonPath = "$PSScriptRoot\ntools.json"
@@ -368,6 +373,10 @@ function DownloadNtools {
         [Parameter(Mandatory=$false)]
         [string]$downloadsDirectory = "c:\NToolsDownloads"
     )
+    # display parameters
+    Write-Host "DownloadNtools - Parameters:"
+    Write-Host "Downloading NTools version $version ..."
+    Write-Host "Downloads directory: $downloadsDirectory"
 
     $url = "https://github.com/naz-hage/ntools/releases/download/$version/$version.zip"
     $fileName = "$downloadsDirectory\$version.zip"
