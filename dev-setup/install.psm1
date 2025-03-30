@@ -310,15 +310,52 @@ function MainInstallNtools {
 }
 
 function InstallNtools {
-    # prepare the downloads directory
-    PrepareDownloadsDirectory $downloadsDirectory
+    param (
+        [Parameter(Mandatory=$true)]
+        [string]$version,
+        [Parameter(Mandatory=$false)]
+        [string]$downloadsDirectory = "c:\NToolsDownloads"
+    )
+
+    # Download the specified version of NTools
+    DownloadNtools -version $version -downloadsDirectory $downloadsDirectory
+
+    # Check if the downloaded file exists
+    $downloadedFile = Join-Path -Path $downloadsDirectory -ChildPath "$version.zip"
+
+    if (!(Test-Path -Path $downloadedFile)) {
+        Write-Host "Downloaded file not found: $downloadedFile"
+        return
+    }
+    Write-Host "Downloaded NTools version $version to $downloadedFile"
+
+    # Unzip the downloaded file to the deployment path
+    
+    Expand-Archive -Path $downloadedFile -DestinationPath $deploymentPath -Force
+    Write-Host "Unzipped NTools version $version to $deploymentPath"
 
     # add deployment path to the PATH environment variable if it doesn't already exist
     AddDeploymentPathToEnvironment $deploymentPath
 
-    & $global:NbExePath install -json $nbToolsPath
-
     Write-OutputMessage $MyInvocation.MyCommand.Name "Completed successfully."
+}
+
+function DownloadNtools {
+    param (
+        [Parameter(Mandatory=$true)]
+        [string]$version,
+        [Parameter(Mandatory=$false)]
+        [string]$downloadsDirectory = "c:\NToolsDownloads"
+    )
+
+    $url = "https://github.com/naz-hage/ntools/releases/download/$version/$version.zip"
+    $fileName = "$downloadsDirectory\$version.zip"
+    Invoke-WebRequest -Uri $url -OutFile $fileName
+    if (Test-Path $fileName) {
+        Write-Host "Downloaded NTools version $version to $fileName"
+    } else {
+        Write-Host "Failed to download NTools version $version from $url"
+    }
 }
 
 function SetDevEnvironmentVariables {

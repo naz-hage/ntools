@@ -1,27 +1,35 @@
+<#
+.SYNOPSIS
+    Installs NTools.
+.DESCRIPTION
+    This script downloads, unzips, and installs NTools to the specified deployment path.
+    It also adds the deployment path to the PATH environment variable.
+.PARAMETER Version
+    The version of NTools to install.
+.PARAMETER DownloadsDirectory
+    The directory to download the NTools zip file to. Defaults to "c:\NToolsDownloads".
+.EXAMPLE
+    .\install-ntools.ps1 -Version "1.2.3" -DownloadsDirectory "C:\Downloads"
+.NOTES
+    Requires administrative privileges.
+#>
 
-# Import the common Install module
-#########################
-Import-Module ./install.psm1 -Force
+[CmdletBinding()]
+param (
+    [Parameter(Mandatory = $true, HelpMessage = "The version of NTools to install.")]
+    [string]$Version,
 
-$fileName = Split-Path -Leaf $PSCommandPath
-Write-OutputMessage $fileName "Started installation script."
+    [Parameter(Mandatory = $false, HelpMessage = "The directory to download the NTools zip file to. Defaults to 'c:\\NToolsDownloads'.")]
+    [string]$DownloadsDirectory = "c:\NToolsDownloads"
+)
 
-# Check if admin
-#########################
-if (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-    Write-OutputMessage $fileName "Error: Please run this script as an administrator."
-    exit 1
-} else {
-    Write-OutputMessage $fileName "Admin rights detected"
-}
+# Import the install module
+Import-Module .\install.psm1
 
-# install Ntools
-#########################
-MainInstallApp -command install -json .\ntools.json
-if ($LASTEXITCODE -ne 0) {
-    Write-OutputMessage $fileName "Error: Installation of ntools.json failed. Exiting script."
-    exit 1
-}
+# Set the deployment path
+$DeploymentPath = Join-Path -Path $env:ProgramFiles -ChildPath "NBuild"
 
-Write-OutputMessage $fileName "Completed installation script."
-Write-OutputMessage $fileName "EmtpyLine"
+# Call the InstallNtools function from the install module
+InstallNtools -version $Version -downloadsDirectory $DownloadsDirectory
+
+Write-Host "NTools version $Version installed to $DeploymentPath"
