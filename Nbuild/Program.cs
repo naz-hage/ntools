@@ -199,7 +199,7 @@ public class Program
             {
                 WorkingDirectory = Environment.CurrentDirectory,
                 FileName = Path.Combine(executableDirectory!, NgitAssemblyExe),
-                Arguments = $"-c branch",
+                Arguments = $"branch",
                 RedirectStandardOutput = false,
                 RedirectStandardError = false,
                 UseShellExecute = false,
