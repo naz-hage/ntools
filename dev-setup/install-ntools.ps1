@@ -32,6 +32,8 @@ Write-Host "PSScriptRoot: $PSScriptRoot"
 Import-Module "$PSScriptRoot\install.psm1" -Force
 
 # Call the InstallNtools function from the install module
-InstallNtools -version $Version -downloadsDirectory $DownloadsDirectory
-
-Write-Host "NTools version $Version installed to $DeploymentPath"
+$result = InstallNtools -version $Version -downloadsDirectory $DownloadsDirectory
+if (-not $result) {
+    Write-Host "Failed to install NTools. Please check the logs for more details." -ForegroundColor Red
+    exit 1
+}

@@ -20,7 +20,9 @@
     | MainInstallApp              | Main function to install an application.                      |
     | CheckIfDotnetInstalled      | Checks if .NET Core is installed and its version.             |
     | InstallDotNetCore           | Installs .NET Core if not already installed.                  |
-    | MainInstallNtools           | Main function to install NTools.                              |
+    | MainInstallNtools           | Main function to install NTools (Deprecated).
+    | InstallNtools               | Installs NTools by downloading and unzipping the specified version. |
+    | DownloadNtools              | Downloads the specified version of NTools from GitHub.        |
     | SetDevEnvironmentVariables  | Sets development environment variables.                       |
     | Write-OutputMessage         | Writes output messages to the console and log files.          |
     | GetFileVersion              | Retrieves the file version of a specified file.               |
@@ -36,23 +38,13 @@
     InstallDotNetCore -dotnetVersion "3.1.0"
 
     MainInstallApp -command install -json "C:\NToolsDownloads\ntools.json"
-    MainInstallNtools
+    
     SetDevEnvironmentVariables -devDrive "D:" -mainDir "C:\MainDir"
     Write-OutputMessage -Prefix "Info" -Message "Installation completed successfully."
     GetFileVersion -FilePath "C:\Program Files\NBuild\nb.exe"
 
 .NOTES
-
-    adding the deployment path to the PATH environment variable
-    $path = [Environment]::GetEnvironmentVariable("PATH", "Machine")
-    if ($path -notlike "*$deploymentPath*") {
-        Write-OutputMessage $MyInvocation.MyCommand.Name "Adding $deploymentPath to the PATH environment variable."
-        [Environment]::SetEnvironmentVariable("PATH", $path + ";$deploymentPath", "Machine")
-    }
-    else {
-        Write-OutputMessage $MyInvocation.MyCommand.Name "$deploymentPath already exists in the PATH environment variable."
-    }
-
+    
 #>
 # local variables
 $downloadsDirectory = "c:\NToolsDownloads"
@@ -358,12 +350,10 @@ function InstallNtools {
     
     # Unzip the downloaded file to the deployment path
     Expand-Archive -Path $downloadedFile -DestinationPath $deploymentPath -Force
-    Write-Host "Unzipped NTools version $version to $deploymentPath"
-
     # add deployment path to the PATH environment variable if it doesn't already exist
     AddDeploymentPathToEnvironment $deploymentPath
 
-    Write-OutputMessage $MyInvocation.MyCommand.Name "Completed successfully."
+    Write-Host "NTools version $Version installed to $deploymentPath"
 }
 
 function DownloadNtools {
@@ -373,6 +363,7 @@ function DownloadNtools {
         [Parameter(Mandatory=$false)]
         [string]$downloadsDirectory = "c:\NToolsDownloads"
     )
+    
     # display parameters
     Write-Host "DownloadNtools - Parameters:"
     Write-Host "Downloading NTools version $version ..."
@@ -386,7 +377,15 @@ function DownloadNtools {
 
     $url = "https://github.com/naz-hage/ntools/releases/download/$version/$version.zip"
     $fileName = "$downloadsDirectory\$version.zip"
-    Invoke-WebRequest -Uri $url -OutFile $fileName
+    
+    try {
+        Invoke-WebRequest -Uri $url -OutFile $fileName -ErrorAction Stop
+    } catch {
+        Write-Host "Failed to download NTools version $version from $url"
+        Write-Host "Error: $($_.Exception.Message)"
+        return
+    }
+
     if (Test-Path $fileName) {
         Write-Host "Downloaded NTools version $version to $fileName"
     } else {
