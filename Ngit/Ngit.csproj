@@ -10,7 +10,7 @@
 	  <Authors>naz-hage</Authors>
 	  <Company>blue-man</Company>
 	  <Product>Git Wrapper</Product>
-	  <Copyright>2020-2025</Copyright>
+	  <Copyright>2020-XXXX</Copyright>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
