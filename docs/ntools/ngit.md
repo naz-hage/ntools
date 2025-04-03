@@ -6,8 +6,8 @@
   - command   : Specifies the git command to execute.
          tag             -> Get the current tag
          settag          -> Set specified tag in -tag option
-         autotag         -> Set next tag based on the build type: STAGE vs. PROD
-         setautotag      -> Set next tag based on the build type: STAGE vs. PROD
+         autotag         -> Set next tag based on the build type: STAGE | PROD
+         setautotag      -> Set next tag based on the build type and push to remote repo
          deletetag       -> Delete specified tag in -tag option
          branch          -> Get the current branch
          clone           -> Clone specified Git repo in the -url option
