@@ -25,6 +25,7 @@ namespace Ngit
                 CommandType.branch => DisplayBranch(),
                 CommandType.tag => DisplayTag(options),
                 CommandType.autoTag => SetAutoTag(options),
+                CommandType.setAutoTag => SetAutoTag(options, push:true),
                 CommandType.setTag => SetTag(options),
                 CommandType.pushTag => PushTag(options),
                 CommandType.deleteTag => DeleteTag(options),
@@ -111,8 +112,16 @@ namespace Ngit
             if (!string.IsNullOrEmpty(options.Tag))
             {
                 var nextTag = GitWrapper.PushTag(options.Tag);
-                //Colorizer.WriteLine($"[{ConsoleColor.Green}!{nextTag}]");
-                ReturnCode = RetCode.Success;
+                Colorizer.WriteLine($"[{ConsoleColor.Green}! PushTag: {nextTag}]");
+                
+                if (!nextTag)
+                {
+                    ReturnCode = RetCode.AutoTagFailed;
+                }
+                else
+                {
+                    ReturnCode = RetCode.Success;
+                }
             }
             else
             {
@@ -181,7 +190,13 @@ namespace Ngit
 
         }
 
-        public static RetCode SetAutoTag(Cli options)
+        /// <summary>
+        /// Sets the auto tag based on the provided build type and optionally pushes the tag.
+        /// </summary>
+        /// <param name="options">The CLI options containing the build type and other parameters.</param>
+        /// <param name="push">A boolean flag indicating whether to push the tag after setting it. Default is false.</param>
+        /// <returns>Returns a RetCode indicating the result of the operation.</returns>
+        public static RetCode SetAutoTag(Cli options, bool push = false)
         {
             var retCode = RetCode.InvalidParameter;
 
@@ -193,11 +208,16 @@ namespace Ngit
                     options.Tag = nextTag;
                     options.Command = CommandType.setAutoTag;
                     retCode = SetTag(options);
+
+                    if (retCode == RetCode.Success && push)
+                    {
+                        Colorizer.WriteLine($"[{ConsoleColor.Green}!new tag: {GitWrapper.Tag}]");
+                        retCode = PushTag(options);
+                    }
                 }
                 else
                     retCode = RetCode.SetAutoTagFailed;
             }
-
             else
             {
                 Colorizer.WriteLine($"[{ConsoleColor.Red}!Error: valid build type is required]");

@@ -29,8 +29,8 @@ public class Cli
     [RequiredArgument(0, "command", "Specifies the git command to execute.\n" +
         "\t tag \t\t -> Get the current tag\n" +
         "\t settag \t -> Set specified tag in -tag option\n" +
-        "\t autotag \t -> Set next tag based on the build type: STAGE vs. PROD\n" +
-        "\t setautotag \t -> Set next tag based on the build type: STAGE vs. PROD\n" +
+        "\t autotag \t -> Set next tag based on the build type: STAGE | PROD\n" +
+        "\t setautotag \t -> Set next tag based on the build type and push to remote rep\n" +
         "\t deletetag \t -> Delete specified tag in -tag option\n" +
         "\t branch \t -> Get the current branch\n" +
         "\t clone \t\t -> Clone specified Git repo in the -url option\n" +
