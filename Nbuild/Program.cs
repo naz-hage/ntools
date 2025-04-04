@@ -55,18 +55,18 @@ public class Program
 
             try
             {
-                if (options != null && !string.IsNullOrEmpty(options.Command))
+                if (options != null && Enum.IsDefined(options.Command))
                 {
                     options.Json = UpdateJsonOption(options);
 
                     result = options.Command switch
                     {
-                        var d when d == CmdTargets => BuildStarter.DisplayTargets(Environment.CurrentDirectory),
-                        var d when d == CmdInstall => Command.Install(options.Json, options.Verbose),
-                        var d when d == CmdUninstall => Command.Uninstall(options.Json, options.Verbose),
-                        var d when d == CmdList => Command.List(options.Json, options.Verbose),
-                        var d when d == CmdDownload => Command.Download(options.Json, options.Verbose),
-                        var d when d == CmdPath => Command.DisplayPathSegments(),
+                        Cli.CommandType.targets => BuildStarter.DisplayTargets(Environment.CurrentDirectory),
+                        Cli.CommandType.install => Command.Install(options.Json, options.Verbose),
+                        Cli.CommandType.uninstall => Command.Uninstall(options.Json, options.Verbose),
+                        Cli.CommandType.list => Command.List(options.Json, options.Verbose),
+                        Cli.CommandType.download => Command.Download(options.Json, options.Verbose),
+                        Cli.CommandType.path => Command.DisplayPathSegments(),
                         _ => ResultHelper.Fail(-1, $"Invalid Command: '{options.Command}'"),
                     };
                 }
@@ -159,11 +159,11 @@ public class Program
     /// <exception cref="FileNotFoundException">Thrown when no file exists at the path specified by the Json property.</exception>
     private static string? UpdateJsonOption(Cli options)
     {
-        if ((string.IsNullOrEmpty(options.Json) && !string.IsNullOrEmpty(options.Command)) &&
-                    (options.Command.Equals(CmdInstall, StringComparison.InvariantCultureIgnoreCase) ||
-                    options.Command.Equals(CmdUninstall, StringComparison.InvariantCultureIgnoreCase) ||
-                    options.Command.Equals(CmdList, StringComparison.InvariantCultureIgnoreCase) ||
-                    options.Command.Equals(CmdDownload, StringComparison.InvariantCultureIgnoreCase)))
+        if ((string.IsNullOrEmpty(options.Json) && !string.IsNullOrEmpty(options.Command.ToString())) &&
+                (options.Command.Equals(Cli.CommandType.install) ||
+                options.Command.Equals(Cli.CommandType.uninstall) ||
+                options.Command.Equals(Cli.CommandType.list) ||
+                options.Command.Equals(Cli.CommandType.download)))
         {
             options.Json = $"{Environment.GetEnvironmentVariable("ProgramFiles")}\\Nbuild\\ntools.json";
         }
@@ -199,7 +199,7 @@ public class Program
             {
                 WorkingDirectory = Environment.CurrentDirectory,
                 FileName = Path.Combine(executableDirectory!, NgitAssemblyExe),
-                Arguments = $"-c branch",
+                Arguments = $"branch",
                 RedirectStandardOutput = false,
                 RedirectStandardError = false,
                 UseShellExecute = false,

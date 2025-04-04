@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace NbuildTasks
@@ -28,11 +29,16 @@ namespace NbuildTasks
 
             }
 
+            string updatedCopyright = fileVersionInfo
+                            .LegalCopyright
+                            .Replace("XXXX", DateTime.Now.Year.ToString());
+
             return $" *** {fileVersionInfo.FileDescription}, " +
                             $"{fileVersionInfo.ProductName}, " +
                             $"{fileVersionInfo.CompanyName}, " +
-                            $"{fileVersionInfo.LegalCopyright} -" +
-                            $" version: {fileVersionInfo.FileVersion}";
+                            $"{updatedCopyright} - " +
+                            $" Version: {fileVersionInfo.FileVersion}";
+
         }
     }
 }

@@ -1,27 +1,39 @@
+<#
+.SYNOPSIS
+    Installs NTools.
+.DESCRIPTION
+    This script downloads, unzips, and installs NTools to the specified deployment path.
+    It also adds the deployment path to the PATH environment variable.
+    If the version is not specified, it reads the version from ntools.json file in the same directory as this script.
+.PARAMETER Version
+    The version of NTools to install. If not specified, the version is read from ntools.json.
+.PARAMETER DownloadsDirectory
+    The directory to download the NTools zip file to. Defaults to "c:\NToolsDownloads".
+.EXAMPLE
+    .\install-ntools.ps1 -Version "1.2.3" -DownloadsDirectory "C:\Downloads"
+    .\install-ntools.ps1 -DownloadsDirectory "C:\Downloads" # Reads version from ntools.json
+.NOTES
+    Requires administrative privileges.
+#>
 
-# Import the common Install module
-#########################
-Import-Module ./install.psm1 -Force
+[CmdletBinding()]
+param (
+    [Parameter(Mandatory = $false, HelpMessage = "The version of NTools to install. If not specified, the version is read from ntools.json.")]
+    [string]$Version,
 
-$fileName = Split-Path -Leaf $PSCommandPath
-Write-OutputMessage $fileName "Started installation script."
+    [Parameter(Mandatory = $false, HelpMessage = "The directory to download the NTools zip file to. Defaults to 'c:\\NToolsDownloads'.")]
+    [string]$DownloadsDirectory = "c:\NToolsDownloads"
+)
 
-# Check if admin
-#########################
-if (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-    Write-OutputMessage $fileName "Error: Please run this script as an administrator."
+# display $PSScriptRoot
+Write-Host "PSScriptRoot: $PSScriptRoot"
+
+# Import the install module
+Import-Module "$PSScriptRoot\install.psm1" -Force
+
+# Call the InstallNtools function from the install module
+$result = InstallNtools -version $Version -downloadsDirectory $DownloadsDirectory
+if (-not $result) {
+    Write-Host "Failed to install NTools. Please check the logs for more details." -ForegroundColor Red
     exit 1
-} else {
-    Write-OutputMessage $fileName "Admin rights detected"
 }
-
-# install Ntools
-#########################
-MainInstallApp -command install -json .\ntools.json
-if ($LASTEXITCODE -ne 0) {
-    Write-OutputMessage $fileName "Error: Installation of ntools.json failed. Exiting script."
-    exit 1
-}
-
-Write-OutputMessage $fileName "Completed installation script."
-Write-OutputMessage $fileName "EmtpyLine"

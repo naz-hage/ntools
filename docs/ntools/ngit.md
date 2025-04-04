@@ -2,17 +2,19 @@
 
 ### Usage
 ```batch
-Ngit.exe [-c value] [-url value] [-tag value] [-buildtype value] [-v value]
-- c         : git Command, value= [tag | settag| autotag| setautotag| deletetag | branch | clone]
-    tag         -> Get the current tag
-    autotag     -> Set next tag based on the build type: STAGE vs.PROD
-    pushtag     -> push specified tag in -tag option to remote repo
-    settag      -> Set specified tag in -tag option
-    deletetag   -> Delete specified tag in -tag option
-    branch      -> Get the current branch
-    clone       -> Clone specified Git repo in the -url option (string, default=)
-- url       : Git repo path (string, default=)
-- tag       : Tag used for -c settag and -c deletetag (string, default=)
-- buildtype : Build type used for -c autotag and -c setautotag Values: STAGE | PROD (string, default=)
-- v         : verbose. value = [true | false] (true or false, default=False)
+ Ngit.exe command [-url value] [-tag value] [-buildtype value] [-v value]
+  - command   : Specifies the git command to execute.
+         tag             -> Get the current tag
+         settag          -> Set specified tag in -tag option
+         autotag         -> Set next tag based on the build type: STAGE | PROD
+         setautotag      -> Set next tag based on the build type and push to remote repo
+         deletetag       -> Delete specified tag in -tag option
+         branch          -> Get the current branch
+         clone           -> Clone specified Git repo in the -url option
+         ----
+ (one of tag,setTag,autoTag,setAutoTag,deleteTag,branch,clone,pushTag, required)
+  - url       : Specifies the Git repository URL. (string, default=)
+  - tag       : Specifies the tag used for settag and deletetag commands. (string, default=)
+  - buildtype : Specifies the build type used for autotag and setautotag commands. Possible values: STAGE, PROD. (string, default=)
+  - v         : Specifies whether to print additional information. (true or false, default=False)
 ```

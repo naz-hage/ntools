@@ -183,7 +183,7 @@ namespace GitHubRelease
         /// <param name="release">The release whose notes are to be updated.</param>
         /// <returns>A Task representing the asynchronous operation.</returns>
         /// <exception cref="InvalidOperationException">Thrown when no commits are found since the last release.</exception>
-        public async Task UpdateReleaseNotes(Release release)
+        public async Task  UpdateReleaseNotes(Release release)
         {
             Console.WriteLine("Updating release notes...");
             var (sinceLastPublished, sinceTag)  = await GetLatestReleasePublishedAtAndTagAsync(release.TargetCommitish!);
@@ -222,28 +222,39 @@ namespace GitHubRelease
             // Log the JSON body for debugging
             Console.WriteLine($"Release JSON Body: {jsonBody}");
 
-            HttpResponseMessage response = await UploadAsset(jsonBody);
-            if (!response.IsSuccessStatusCode)
-            {
-                var responseContent = await response.Content.ReadAsStringAsync();
-                throw new InvalidOperationException($"Error: Could not create a release: {release.TagName}. Response: {responseContent}");
-            }
-            Console.WriteLine($"Successfully created a release {release.TagName}. uploading asset");
-            response = await UploadAsset(assetPath, response);
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new InvalidOperationException($"Error: Could not upload the asset:{assetPath}.");
-            }
-            Console.WriteLine($"Successfully uploaded the asset: {assetPath}.");
-            return response;
-        }
-
-        private async Task<HttpResponseMessage> UploadAsset(string jsonBody)
-        {
             // Send a POST request to create a new release on GitHub
             var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/releases";
-
             var response = await ApiService.PostAsync(uri, new StringContent(jsonBody, Encoding.UTF8, "application/json"));
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var responseContentError = await response.Content.ReadAsStringAsync();
+                throw new InvalidOperationException($"Error: Could not create a release: {release.TagName}. Response: {responseContentError}");
+            }
+
+            Console.WriteLine($"Successfully created a release {release.TagName}. uploading asset");
+
+            // Extract the upload URL from the response
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var responseObject = JsonDocument.Parse(responseContent);
+            var uploadUrlDynamic = responseObject.RootElement.GetProperty("upload_url").GetString();
+            if (uploadUrlDynamic is string uploadUrl)
+            {
+                uploadUrl = uploadUrl.Replace("{?name,label}", $"?name={Path.GetFileName(assetPath)}");
+            }
+            else
+            {
+                throw new InvalidOperationException("Failed to extract upload URL from the response.");
+            }
+
+            // Upload the asset
+            response = await UploadAsset(assetPath, uploadUrl);
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new InvalidOperationException($"Error: Could not upload the asset: {assetPath}.");
+            }
+
+            Console.WriteLine($"Successfully uploaded the asset: {assetPath}.");
             return response;
         }
 
@@ -379,32 +390,6 @@ namespace GitHubRelease
             return null;
         }
 
-        /// <summary>
-        /// Gets the latest release publish date from GitHub API.
-        /// </summary>
-        /// <param name="token">The GitHub access token.</param>
-        /// <param name="branch">The branch name. Set to null if requesting release on any branch.</param>
-        /// <returns>The latest release publish date as a string.</returns>
-        //public async Task<string> GetLatestReleasePublishDateAsync(string branch)
-        //{
-        //    var latestRelease = await GetLatestReleaseAsync(branch);
-        //    if (latestRelease != null && latestRelease.RootElement.GetArrayLength() > 0)
-        //    {
-        //        // get count
-        //        Console.WriteLine($"Count: {latestRelease.RootElement.GetArrayLength()}");
-        //        // Get the tag name of the latest release and print to console
-        //        foreach (var release in latestRelease.RootElement.EnumerateArray())
-        //        {
-        //            // Get the tag name of the latest release and print to console
-        //            Console.WriteLine($"tag: {release.GetProperty(PropertyNameTagName).GetString()}");
-        //            // get the published date of the latest release and print to console
-        //            Console.WriteLine($"published_at: {release.GetProperty("published_at").GetString()}");
-        //        }
-        //        Console.WriteLine($"published_at: {latestRelease.RootElement[0].GetProperty("published_at").GetString()}");
-        //        return latestRelease.RootElement[0].GetProperty("published_at").GetString() ?? FirstDate;
-        //    }
-        //    return FirstDate;
-        //}
 
         /// <summary>
         /// Gets the latest release published date and tag from GitHub API.
@@ -438,23 +423,6 @@ namespace GitHubRelease
                 throw new InvalidOperationException($"Failed to get the latest release. Exception: {ex.Message}");
             }
         }
-        //public async Task<string> GetLatestReleaseTagAsync(string branch)
-        //{
-        //    var latestRelease = await GetLatestReleaseAsync(branch);
-        //    if (latestRelease != null)
-        //    {
-        //        // get count
-        //        Console.WriteLine($"Count: {latestRelease.RootElement.GetArrayLength()}");
-        //        // Get the tag name of the latest release and print to console
-        //        foreach (var release in latestRelease.RootElement.EnumerateArray())
-        //        {
-        //            // Get the tag name of the latest release and print to console
-        //            Console.WriteLine($"tag: {release.GetProperty(PropertyNameTagName).GetString()}");
-        //        }
-        //        return latestRelease.RootElement[0].GetProperty(PropertyNameTagName).GetString() ?? "";
-        //    }
-        //    return "";
-        //}
         /// <summary>
         /// Gets the latest release information from GitHub API.
         /// </summary>
@@ -536,6 +504,7 @@ namespace GitHubRelease
             }
         }
 
+        #region Upload Release
         /// <summary>
         /// Uploads an asset to the GitHub release.
         /// </summary>
@@ -544,36 +513,18 @@ namespace GitHubRelease
         /// <param name="assetPath">The path to the asset file.</param>
         /// <param name="response">The response from creating the release.</param>
         /// <returns>The response from uploading the asset.</returns>
-        private async Task<HttpResponseMessage> UploadAsset(string assetPath, HttpResponseMessage response)
+        private async Task<HttpResponseMessage> UploadAsset(string assetPath, string uploadUrl)
         {
-            if (!response.IsSuccessStatusCode)
-            {
-                return response;
-            }
-
             if (!File.Exists(assetPath))
             {
                 Console.WriteLine($"File {assetPath} does not exist");
-                return new(HttpStatusCode.NotFound);
+                return new HttpResponseMessage(HttpStatusCode.NotFound);
             }
 
             ApiService.SetupHeaders();
 
-            var responseContent = await response.Content.ReadAsStringAsync();
-            var responseObject = System.Text.Json.JsonDocument.Parse(responseContent);
-            var uploadUrlDynamic = responseObject.RootElement.GetProperty("upload_url").GetString();
-            if (uploadUrlDynamic is string uploadUrl)
-            {
-                uploadUrl = uploadUrl.Replace("{?name,label}", $"?name={Path.GetFileName(assetPath)}");
-            }
-            else
-            {
-                // Handle the case where uploadUrlDynamic is not a string.
-                return new(HttpStatusCode.BadRequest);
-            }
-
             var assetMimeType = "application/octet-stream";
-            var assetContent = System.IO.File.ReadAllBytes(assetPath);
+            var assetContent = File.ReadAllBytes(assetPath);
 
             // Create a ByteArrayContent object with the asset content
             var byteArrayContent = new ByteArrayContent(assetContent);
@@ -586,6 +537,10 @@ namespace GitHubRelease
 
             return uploadResponse;
         }
+
+
+        #endregion
+
 
         /// <summary>
         /// Gets the release information from GitHub API.
@@ -660,5 +615,102 @@ namespace GitHubRelease
             var parts = tag.Split('.');
             return parts.Length == 3 && parts[2] == "0";
         }
+
+
+        #region Download Release
+        public async Task<HttpResponseMessage> DownloadAssetByName(string tagName, string assetName, string downloadPath)
+        {
+            var releaseId = await GetReleaseByTagNameAsync(tagName);
+            if (!releaseId.HasValue)
+            {
+                Console.WriteLine($"Release with tag {tagName} not found.");
+                return new HttpResponseMessage(HttpStatusCode.NotFound);
+            }
+
+            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/releases/{releaseId}/assets";
+            Console.WriteLine($"GET uri: {uri}");
+            var response = await ApiService.GetAsync(uri);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                var assets = JsonDocument.Parse(content).RootElement.EnumerateArray();
+                var asset = assets.FirstOrDefault(a => a.GetProperty("name").GetString() == assetName);
+
+                if (asset.ValueKind != JsonValueKind.Undefined)
+                {
+                    var assetId = asset.GetProperty("id").GetInt32();
+                    // build full filename with path
+                    var assetFileName = Path.Combine(downloadPath, assetName);
+                    return await DownloadAsset(assetId, assetFileName);
+                }
+                else
+                {
+                    Console.WriteLine($"Asset with name {assetName} not found in release {tagName}.");
+                    return new HttpResponseMessage(HttpStatusCode.NotFound);
+                }
+            }
+            else
+            {
+                Console.WriteLine($"Failed to get assets for release {tagName}. Status code: {response.StatusCode}");
+                return response;
+            }
+        }
+
+        public async Task<HttpResponseMessage> DownloadAsset(int assetId, string assetFileName)
+        {
+            ApiService.SetupHeaders();
+            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/releases/assets/{assetId}";
+            Console.WriteLine($"GET uri: {uri}");
+            var response = await ApiService.GetAsync(uri);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var assetContent = await response.Content.ReadAsByteArrayAsync();
+                await File.WriteAllBytesAsync(assetFileName, assetContent);
+                Console.WriteLine($"Successfully downloaded the asset to: {assetFileName}");
+            }
+            else
+            {
+                Console.WriteLine($"Error: Could not download the asset. Status code: {response.StatusCode}");
+                Console.WriteLine(await response.Content.ReadAsStringAsync());
+            }
+
+            return response;
+        }
+
+        public async Task<bool> VerifyAssetId(string tagName, int assetId)
+        {
+            var releaseId = await GetReleaseByTagNameAsync(tagName);
+            if (!releaseId.HasValue)
+            {
+                Console.WriteLine($"Release with tag {tagName} not found.");
+                return false;
+            }
+
+            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/releases/{releaseId}/assets";
+            Console.WriteLine($"GET uri: {uri}");
+            var response = await ApiService.GetAsync(uri);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                var assets = JsonDocument.Parse(content).RootElement.EnumerateArray();
+                foreach (var asset in assets)
+                {
+                    if (asset.GetProperty("id").GetInt32() == assetId)
+                    {
+                        return true;
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine($"Failed to get assets for release {tagName}. Status code: {response.StatusCode}");
+            }
+
+            return false;
+        }
+        #endregion
     }
 }

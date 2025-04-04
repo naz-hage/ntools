@@ -84,7 +84,7 @@ namespace GitHubRelease
             Console.WriteLine($"Tag: {tag}");
             Console.WriteLine($"Branch: {branch}");
             Console.WriteLine($"Asset Path: {assetPath}");
-            
+
             try
             {
                 switch (command)
@@ -104,14 +104,19 @@ namespace GitHubRelease
                         await UploadAsset(repo, tag, branch, assetPath);
                         break;
 
+                    // download an asset
+                    case "download":
+                        await DownloadAsset(repo, tag, branch, assetPath);
+                        break;
+
                     // update a release
                     case "update":
                         await UpdateRelease(repo, tag, branch, assetPath);
                         break;
                     default:
                         Console.WriteLine($"Invalid command '{command}'. Please use ");
-                        Console.WriteLine("     'notes' get release notes since tag" );
-                        Console.WriteLine("     'upload' upload an asset" );
+                        Console.WriteLine("     'notes' get release notes since tag");
+                        Console.WriteLine("     'upload' upload an asset");
                         Console.WriteLine("     'create' create a release");
                         Console.WriteLine("     'update' update a release");
 
@@ -128,7 +133,7 @@ namespace GitHubRelease
                 Console.WriteLine($"Exception {ex.Message}");
                 Environment.Exit(1);
             }
-            
+
             Environment.Exit(0);
         }
 
@@ -137,9 +142,42 @@ namespace GitHubRelease
             Console.WriteLine("Usage: GitHubRelease --command <command> --repo <repoName> --tag <repTag> --branch <repoBranch> --path <assetPath>");
         }
 
+        private static async Task DownloadAsset(string repo, string tag, string branch, string assetPath)
+        {
+            var releaseService = new ReleaseService(repo);
+
+            // Ensure the assetPath includes a file name
+            if (string.IsNullOrEmpty(Path.GetFileName(assetPath)))
+            {
+                assetPath = Path.Combine(assetPath, $"{tag}.zip");
+            }
+
+            // Ensure the download directory exists
+            var directoryPath = Path.GetDirectoryName(assetPath);
+            if (directoryPath != null)
+            {
+                Directory.CreateDirectory(directoryPath);
+            }
+
+            // Act
+            var response = await releaseService.DownloadAssetByName(tag, $"{tag}.zip", assetPath);
+
+            // Check the response
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"Successfully downloaded the asset to: {assetPath}");
+            }
+            else
+            {
+                Console.WriteLine($"Failed to download the asset. Status code: {response.StatusCode}");
+                var content = await response.Content.ReadAsStringAsync();
+                Console.WriteLine(content);
+                Environment.Exit(1);
+            }
+        }
+
         private static async Task CreateRelease(string repo, string tag, string branch, string assetPath)
         {
-
             var releaseService = new ReleaseService(repo);
 
             var release = new Release
@@ -153,7 +191,7 @@ namespace GitHubRelease
             };
 
             // Create a release
-            await releaseService.CreateRelease (release, assetPath);
+            await releaseService.CreateRelease(release, assetPath);
             // In debug mode, the release will not be created
             //var responseMessage = await releaseService.CreateRelease(token, release, assetPath);
             var responseMessage = new HttpResponseMessage(System.Net.HttpStatusCode.OK); // for testing debugging

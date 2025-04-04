@@ -20,7 +20,9 @@
     | MainInstallApp              | Main function to install an application.                      |
     | CheckIfDotnetInstalled      | Checks if .NET Core is installed and its version.             |
     | InstallDotNetCore           | Installs .NET Core if not already installed.                  |
-    | MainInstallNtools           | Main function to install NTools.                              |
+    | MainInstallNtools           | Main function to install NTools (Deprecated).
+    | InstallNtools               | Installs NTools by downloading and unzipping the specified version. |
+    | DownloadNtools              | Downloads the specified version of NTools from GitHub.        |
     | SetDevEnvironmentVariables  | Sets development environment variables.                       |
     | Write-OutputMessage         | Writes output messages to the console and log files.          |
     | GetFileVersion              | Retrieves the file version of a specified file.               |
@@ -36,23 +38,13 @@
     InstallDotNetCore -dotnetVersion "3.1.0"
 
     MainInstallApp -command install -json "C:\NToolsDownloads\ntools.json"
-    MainInstallNtools
+    
     SetDevEnvironmentVariables -devDrive "D:" -mainDir "C:\MainDir"
     Write-OutputMessage -Prefix "Info" -Message "Installation completed successfully."
     GetFileVersion -FilePath "C:\Program Files\NBuild\nb.exe"
 
 .NOTES
-
-    adding the deployment path to the PATH environment variable
-    $path = [Environment]::GetEnvironmentVariable("PATH", "Machine")
-    if ($path -notlike "*$deploymentPath*") {
-        Write-OutputMessage $MyInvocation.MyCommand.Name "Adding $deploymentPath to the PATH environment variable."
-        [Environment]::SetEnvironmentVariable("PATH", $path + ";$deploymentPath", "Machine")
-    }
-    else {
-        Write-OutputMessage $MyInvocation.MyCommand.Name "$deploymentPath already exists in the PATH environment variable."
-    }
-
+    
 #>
 # local variables
 $downloadsDirectory = "c:\NToolsDownloads"
@@ -297,14 +289,108 @@ function InstallDotNetCore {
 
 function MainInstallNtools {
     # prepare the downloads directory
+    Write-OutputMessage "This `MainInstallNtools` function is deprecated, please use `InstallNTools` instead."
     PrepareDownloadsDirectory $downloadsDirectory
 
     # add deployment path to the PATH environment variable if it doesn't already exist
     AddDeploymentPathToEnvironment $deploymentPath
 
-    & $global:NbExePath -c install -json $nbToolsPath
+    & $global:NbExePath install -json $nbToolsPath
 
     Write-OutputMessage $MyInvocation.MyCommand.Name "Completed successfully."
+    Write-OutputMessage "This `MainInstallNtools` function is deprecated, please use `InstallNTools` instead."
+}
+
+function InstallNtools {
+    param (
+        [Parameter(Mandatory=$false, HelpMessage = "The version of NTools to install. If not specified, the version is read from ntools.json.")]
+        [string]$version,
+        [Parameter(Mandatory=$false, HelpMessage = "The directory to download the NTools zip file to. Defaults to 'c:\\NToolsDownloads'.")]
+        [string]$downloadsDirectory = "c:\NToolsDownloads"
+    )
+
+    # display parameters
+    Write-Host "InstallNtools - Parameters:"
+    Write-Host "Version: $version"
+    Write-Host "Downloads directory: $downloadsDirectory"
+
+    # If Version is not specified, read it from ntools.json
+    if (-not $Version) {
+        $NtoolsJsonPath = "$PSScriptRoot\ntools.json"
+
+        Write-Host "Reading version from $NtoolsJsonPath ..."
+        # 
+        if (Test-Path -Path $NtoolsJsonPath) {
+            try {
+                $NtoolsJson = Get-Content -Path $NtoolsJsonPath -Raw | ConvertFrom-Json
+                $Version = $NtoolsJson.NbuildAppList[0].Version
+                Write-Host "Version read from ntools.json: $Version"
+            }
+            catch {
+                Write-Warning "Failed to read version from ntools.json. Please specify the version manually."
+                return
+            }
+        }
+        else {
+            Write-Warning "ntools.json not found in the script directory. Please specify the version manually."
+            return
+        }
+    }
+
+    # Download the specified version of NTools
+    DownloadNtools -version $version -downloadsDirectory $downloadsDirectory
+
+    # Check if the downloaded file exists
+    $downloadedFile = Join-Path -Path $downloadsDirectory -ChildPath "$version.zip"
+
+    if (!(Test-Path -Path $downloadedFile)) {
+        Write-Host "Downloaded file not found: $downloadedFile"
+        return
+    }
+    
+    # Unzip the downloaded file to the deployment path
+    Expand-Archive -Path $downloadedFile -DestinationPath $deploymentPath -Force
+    # add deployment path to the PATH environment variable if it doesn't already exist
+    AddDeploymentPathToEnvironment $deploymentPath
+
+    Write-Host "NTools version $Version installed to $deploymentPath"
+}
+
+function DownloadNtools {
+    param (
+        [Parameter(Mandatory=$true)]
+        [string]$version,
+        [Parameter(Mandatory=$false)]
+        [string]$downloadsDirectory = "c:\NToolsDownloads"
+    )
+    
+    # display parameters
+    Write-Host "DownloadNtools - Parameters:"
+    Write-Host "Downloading NTools version $version ..."
+    Write-Host "Downloads directory: $downloadsDirectory"
+
+    # Create the Downloads directory if it doesn't exist
+    if (!(Test-Path -Path $downloadsDirectory)) {
+        Write-Host "Creating downloads directory: $downloadsDirectory ..."
+        New-Item -ItemType Directory -Path $downloadsDirectory | Out-Null
+    }
+
+    $url = "https://github.com/naz-hage/ntools/releases/download/$version/$version.zip"
+    $fileName = "$downloadsDirectory\$version.zip"
+    
+    try {
+        Invoke-WebRequest -Uri $url -OutFile $fileName -ErrorAction Stop
+    } catch {
+        Write-Host "Failed to download NTools version $version from $url"
+        Write-Host "Error: $($_.Exception.Message)"
+        return
+    }
+
+    if (Test-Path $fileName) {
+        Write-Host "Downloaded NTools version $version to $fileName"
+    } else {
+        Write-Host "Failed to download NTools version $version from $url"
+    }
 }
 
 function SetDevEnvironmentVariables {

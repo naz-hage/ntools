@@ -17,26 +17,35 @@ if (!Parser.TryParse(args, out Cli options))
     return 0;
 }
 
-if (!string.IsNullOrEmpty(options.GitCommand))
+try
 {
+    options.Validate();
+
     if (options.Verbose)
     {
         Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{Nversion.Get()}]\n");
     }
+
+    // Process the command line options
     ReturnCode = Command.Process(options);
+    if (ReturnCode != RetCode.Success)
+    {
+        if (ReturnCode == RetCode.NotAGitRepository)
+        {
+           if (options.Verbose) Colorizer.WriteLine($"Current directory is not git repo [{ConsoleColor.Cyan}!'{RetCode.NotAGitRepository}']\n");
+           ReturnCode = RetCode.Success;
+        }
+        else
+        {
+            Colorizer.WriteLine($"{NgitAssemblyExe} Completed with [{ConsoleColor.Red}!'{ReturnCode}']\n");
+        }
+    }
 }
 
-if (ReturnCode != RetCode.Success)
+catch (Exception ex)
 {
-    if (ReturnCode == RetCode.NotAGitRepository)
-    {
-       if (options.Verbose) Colorizer.WriteLine($"Current directory is not git repo [{ConsoleColor.Cyan}!'{RetCode.NotAGitRepository}']\n");
-       ReturnCode = RetCode.Success;
-    }
-    else
-    {
-        Colorizer.WriteLine($"{NgitAssemblyExe} Completed with [{ConsoleColor.Red}!'{ReturnCode}']\n");
-    }
+    ReturnCode = RetCode.Exception;
+    Colorizer.WriteLine($"Exception: {ex.Message} [{ConsoleColor.Red}!'{ReturnCode}']\n");
 }
 
 return Convert.ToInt32(ReturnCode);

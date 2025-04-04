@@ -4,7 +4,7 @@ To set up a new project and take advantage of ntools, you need to follow the ste
 - The project should be under source control using Git.  An tag should be created for the project and follow the [versioning](versioning.md) rules.
   - To create a tag, use the following command from the root of the project directory:
 ```cmd
-ng -c settag -tag 0.0.1 
+ng settag -tag 0.0.1 
 ```
 
 ### dev-setup folder
@@ -79,7 +79,7 @@ Your file structure should look like this:
 
 - You can use Nb.exe to install the tools
 ```cmd
-Nb.exe -c install -json apps.json
+Nb.exe install -json apps.json
 ```
 This command can be also added to [dev-setup.ps1](ntools/dev-setup.md).
 

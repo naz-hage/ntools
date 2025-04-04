@@ -9,7 +9,7 @@
     <Authors>naz-hage</Authors>
     <Company>naz-hage</Company>
     <Product>Backup automation</Product>
-    <Copyright>2020-2025</Copyright>
+    <Copyright>2020-XXXX</Copyright>
   </PropertyGroup>
 
 
@@ -28,7 +28,7 @@
 
   <ItemGroup>
     <PackageReference Include="CommandLine.Net" Version="2.3.0" />
-	<PackageReference Include="ntools-launcher" Version="1.6.0" />
+	<PackageReference Include="ntools-launcher" Version="1.7.0" />
   </ItemGroup>
 
   <ItemGroup>

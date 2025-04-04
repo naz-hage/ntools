@@ -92,7 +92,7 @@ function Main {
     }
 
     $nbExePath = "$env:ProgramFiles\Nbuild\nb.exe"
-    & $nbExePath -c install -json ntools.json 
+    & $nbExePath install -json ntools.json 
 }
 
 # Call the Main function with the provided or default values

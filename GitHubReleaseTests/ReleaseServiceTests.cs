@@ -2,6 +2,7 @@
 using GitHubRelease;
 using System.Text.Json;
 using Newtonsoft.Json.Linq;
+using System.Net;
 
 namespace GitHubRelease.Tests
 {
@@ -187,5 +188,63 @@ namespace GitHubRelease.Tests
                 Console.WriteLine($"Tag: {tag}");
             }
         }
+
+        [TestMethod]
+        public async Task DownloadAssetByName_ShouldDownloadAsset()
+        {
+            // Arrange
+            string tagName = "1.11.0";
+            string assetName = "1.11.0.zip";
+            string DownloadPath = @"c:\temp";
+            var assetFileName = Path.Combine(DownloadPath, assetName);
+
+            // Delete the file if it exists
+            if (File.Exists(assetFileName))
+            {
+                File.Delete(assetFileName);
+            }
+
+            var releaseService = new ReleaseService(Repo);
+
+            // Act
+            var response = await releaseService.DownloadAssetByName(tagName, assetName, DownloadPath);
+
+            // Assert
+            Assert.IsTrue(response.IsSuccessStatusCode, "Failed to download the asset.");
+            
+            Assert.IsTrue(File.Exists(assetFileName), "The asset file was not downloaded.");
+
+            // Clean up
+            if (File.Exists(assetFileName))
+            {
+                File.Delete(assetFileName);
+            }
+        }
+
+        [TestMethod]
+        public async Task DownloadAssetByName_ShouldFailForNonExistentAsset()
+        {
+            // Arrange
+            string tagName = "9.9.9";
+            string assetName = "nonexistent.zip";
+            string downloadPath = @"c:\temp";
+            var assetFileName = Path.Combine(downloadPath, assetName);
+
+            // Delete the file if it exists
+            if (File.Exists(assetFileName))
+            {
+                File.Delete(assetFileName);
+            }
+
+            var releaseService = new ReleaseService(Repo);
+
+            // Act
+            var response = await releaseService.DownloadAssetByName(tagName, assetName, downloadPath);
+
+            // Assert
+            Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode, "Expected NotFound status code.");
+            Assert.IsFalse(File.Exists(assetFileName), "The asset file should not be created.");
+        }
+
     }
 }

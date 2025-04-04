@@ -64,7 +64,7 @@
 			
 		</PropertyGroup>
 
-		<RedError Condition="'$(ProductVersion)' == ''" Message="Error: Version property is not defined. Type Ngit.exe -c settag -tag 0.0.1" />
+		<RedError Condition="'$(ProductVersion)' == ''" Message="Error: Version property is not defined. Type Ngit.exe settag -tag 0.0.1" />
 		<RedError Condition="'$(SolutionName)' == ''" Message="Error: SolutionName property is not defined." />
 		<RedError Condition="'$(DeploymentFolder)' == ''" Message="Error: DeploymentFolder property is not defined." />
 

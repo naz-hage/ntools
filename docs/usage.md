@@ -31,7 +31,7 @@ Nb.exe stage
 - Display available targets:  Lists all the available targets in the targets file
     
 ```cmd
-Nb.exe -c targets
+Nb.exe targets
 ```
 - See the list of available targets at [Nbuild Targets](./ntools/nbuild-targets.md)
 
