@@ -65,15 +65,11 @@
                 Directory.CreateDirectory(directoryPath);
             }
 
-            // Act
+            // download the asset
             var response = await releaseService.DownloadAssetByName(tag, $"{tag}.zip", assetPath);
 
             // Check the response
-            if (response.IsSuccessStatusCode)
-            {
-                Console.WriteLine($"Successfully downloaded the asset to: {assetPath}");
-            }
-            else
+            if (!response.IsSuccessStatusCode)
             {
                 Console.WriteLine($"Failed to download the asset. Status code: {response.StatusCode}");
                 var content = await response.Content.ReadAsStringAsync();
