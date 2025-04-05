@@ -49,7 +49,6 @@
   
 # GitHubRelease.exe command line options:
 ### Usage
-### Usage
 ```batch
  GitHubRelease.exe command [-repo value] [-tag value] [-branch value] [-path value] [-v value]
   - command : Specifies the command to execute.

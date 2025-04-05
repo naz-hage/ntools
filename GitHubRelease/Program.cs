@@ -1,22 +1,19 @@
 ﻿using CommandLine;
 using NbuildTasks;
+using OutputColorizer;
 using System.Xml.Linq;
 
 namespace GitHubRelease
 {
     static class Program
     {
-        static string GitHubReleaseAssemblyExe = "GitHubRelease";
         static async Task Main(string[] args)
         {
             Console.WriteLine($"{Nversion.Get()}\n");
 
             if (!Parser.TryParse(args, out Cli options))
             {
-                if (!args[0].Equals("--help", StringComparison.CurrentCultureIgnoreCase))
-                    Console.WriteLine($"{GitHubReleaseAssemblyExe} Completed with '-1'");
-
-                Environment.Exit(0);
+                Environment.Exit(-1);
             }
 
             // Validate the CLI arguments
@@ -26,7 +23,8 @@ namespace GitHubRelease
             }
             catch (ArgumentException ex)
             {
-                Console.WriteLine(ex.Message);
+                Colorizer.WriteLine($"[{ConsoleColor.Red}!Invalid arguments: {ex.Message}]");
+                Parser.DisplayHelp<Cli>();
                 Environment.Exit(1);
             }
 
@@ -40,19 +38,9 @@ namespace GitHubRelease
             {
                 switch (options.Command)
                 {
-                    // get release notes
-                    case Cli.CommandType.notes:
-                        await Command.GetReleaseNotes(options.Repo!, options.Tag!, options.Branch!, options.AssetPath!);
-                        break;
-
                     // create a release
                     case Cli.CommandType.create:
                         await Command.CreateRelease(options.Repo!, options.Tag!, options.Branch!, options.AssetPath!);
-                        break;
-
-                    // upload an asset
-                    case Cli.CommandType.upload:
-                        await Command.UploadAsset(options.Repo!, options.Tag!, options.Branch!, options.AssetPath!);
                         break;
 
                     // download an asset
@@ -60,10 +48,6 @@ namespace GitHubRelease
                         await Command.DownloadAsset(options.Repo!, options.Tag!, options.AssetPath!);
                         break;
 
-                    // update a release
-                    case Cli.CommandType.update:
-                        await Command.UpdateRelease(options.Repo!, options.Tag!, options.Branch!, options.AssetPath!);
-                        break;
                     default:
                         Console.WriteLine($"Invalid command '{options.Command}'. Please use ");
                         Console.WriteLine("     'notes' get release notes since tag");
@@ -90,7 +74,7 @@ namespace GitHubRelease
 
         private static void DisplayHelp()
         {
-            Console.WriteLine("Usage: GitHubRelease --command <command> --repo <repoName> --tag <repTag> --branch <repoBranch> --path <assetPath>");
+            Parser.DisplayHelp<Cli>();
         }
     }
 }
