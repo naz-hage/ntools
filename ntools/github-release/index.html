@@ -171,14 +171,23 @@
 </li>
 </ul>
 <h1 id="githubreleaseexe-command-line-options">GitHubRelease.exe command line options:</h1>
-<p><code>-c create -r &lt;repo name&gt; -t &lt;tag Version&gt; -b $(GitBranch) -p &lt;Release Package&gt;</code></p>
-<ul>
-<li><code>-c</code> create : create a release</li>
-<li><code>-r</code> <repo name> : repository name</li>
-<li><code>-t</code> <tag Version> : tag version</li>
-<li><code>-b</code> <git Branch> : git branch</li>
-<li><code>-p</code> <Release Package> : release package</li>
-</ul>
+<h3 id="usage">Usage</h3>
+<h3 id="usage_1">Usage</h3>
+<pre><code class="language-batch"> GitHubRelease.exe command [-repo value] [-tag value] [-branch value] [-path value] [-v value]
+  - command : Specifies the command to execute.
+         notes           -&gt; Get release notes since tag.
+         create          -&gt; Create a release.
+         upload          -&gt; Upload an asset.
+         download        -&gt; Download an asset.
+         update          -&gt; Update a release.
+         ----
+ (one of notes,create,upload,download,update, required)
+  - repo    : Specifies the repository name. (string, default=)
+  - tag     : Specifies the tag name. (string, default=)
+  - branch  : Specifies the branch name. (string, default=main)
+  - path    : Specifies the asset path. (string, default=)
+  - v       : Optional parameter which sets the console output verbose level. (true or false, default=False)
+</code></pre>
               
             </div>
           </div><footer>
