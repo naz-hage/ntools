@@ -48,10 +48,21 @@
         - **Releases**: `Read and write`
   
 # GitHubRelease.exe command line options:
- ```-c create -r <repo name> -t <tag Version> -b $(GitBranch) -p <Release Package>```
- 
-   - `-c` create : create a release
-  - `-r` <repo name> : repository name
-  - `-t` <tag Version> : tag version
-  - `-b` <git Branch> : git branch
-  - `-p` <Release Package> : release package
+### Usage
+### Usage
+```batch
+ GitHubRelease.exe command [-repo value] [-tag value] [-branch value] [-path value] [-v value]
+  - command : Specifies the command to execute.
+         notes           -> Get release notes since tag.
+         create          -> Create a release.
+         upload          -> Upload an asset.
+         download        -> Download an asset.
+         update          -> Update a release.
+         ----
+ (one of notes,create,upload,download,update, required)
+  - repo    : Specifies the repository name. (string, default=)
+  - tag     : Specifies the tag name. (string, default=)
+  - branch  : Specifies the branch name. (string, default=main)
+  - path    : Specifies the asset path. (string, default=)
+  - v       : Optional parameter which sets the console output verbose level. (true or false, default=False)
+```
