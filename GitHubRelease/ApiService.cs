@@ -37,11 +37,15 @@ namespace GitHubRelease
             Client.DefaultRequestHeaders.Clear();
             Client.DefaultRequestHeaders.Add("Authorization", $"Bearer {Credentials.GetToken()}");
             Client.DefaultRequestHeaders.Add("User-Agent", "request");
-            Client.DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3+json");
+            
             if (download)
             {
                 Client.DefaultRequestHeaders.Add("Accept", "application/octet-stream");
                 Client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (compatible; GitHubRelease/1.0)");
+            }
+            else
+            {
+                Client.DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3+json");
             }
         }
 

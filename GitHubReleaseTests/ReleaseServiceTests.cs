@@ -222,6 +222,38 @@ namespace GitHubRelease.Tests
         }
 
         [TestMethod]
+        public async Task DownloadPublicAssetByName_ShouldDownloadAsset()
+        {
+            // Arrange
+            string tagName = "1.12.6";
+            string assetName = $"{tagName}.zip";
+            string DownloadPath = @"c:\temp";
+            var assetFileName = Path.Combine(DownloadPath, assetName);
+
+            // Delete the file if it exists
+            if (File.Exists(assetFileName))
+            {
+                File.Delete(assetFileName);
+            }
+
+            var releaseService = new ReleaseService("ntools");
+
+            // Act
+            var response = await releaseService.DownloadAssetByName(tagName, assetName, DownloadPath);
+
+            // Assert
+            Assert.IsTrue(response.IsSuccessStatusCode, $"Failed to download the asset.  status: {response.StatusCode}.");
+
+            Assert.IsTrue(File.Exists(assetFileName), "The asset file was not downloaded.");
+
+            // Clean up
+            if (File.Exists(assetFileName))
+            {
+                File.Delete(assetFileName);
+            }
+        }
+
+        [TestMethod]
         public async Task DownloadAssetByName_ShouldFailForNonExistentAsset()
         {
             // Arrange

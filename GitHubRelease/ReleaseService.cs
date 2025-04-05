@@ -846,6 +846,8 @@ namespace GitHubRelease
                 Console.WriteLine("Authorization header is not set.");
             }
 
+            ApiService.SetupHeaders(download: true);
+
             // Log the headers
             foreach (var header in ApiService.GetClient().DefaultRequestHeaders)
             {
