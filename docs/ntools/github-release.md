@@ -50,18 +50,15 @@
 # GitHubRelease.exe command line options:
 ### Usage
 ```batch
- GitHubRelease.exe command [-repo value] [-tag value] [-branch value] [-path value] [-v value]
+GitHubRelease.exe command [-repo value] [-tag value] [-branch value] [-path value] [-v value]
   - command : Specifies the command to execute.
-         notes           -> Get release notes since tag.
-         create          -> Create a release.
-         upload          -> Upload an asset.
-         download        -> Download an asset.
-         update          -> Update a release.
+         create          -> Create a release. Requires repo, tag, branch and path.
+         download        -> Download an asset.  Requires repo, tag, and path
          ----
- (one of notes,create,upload,download,update, required)
-  - repo    : Specifies the repository name. (string, default=)
-  - tag     : Specifies the tag name. (string, default=)
-  - branch  : Specifies the branch name. (string, default=main)
-  - path    : Specifies the asset path. (string, default=)
+ (one of create,download, required)
+  - repo    : repository name. (string, default=)
+  - tag     : tag name. (string, default=)
+  - branch  : branch name. (string, default=main)
+  - path    : asset path. Must be absolute path. (string, default=)
   - v       : Optional parameter which sets the console output verbose level. (true or false, default=False)
 ```
