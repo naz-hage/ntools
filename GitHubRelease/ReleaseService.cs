@@ -619,44 +619,6 @@ namespace GitHubRelease
         }
 
         #region Download Release
-        public async Task<HttpResponseMessage> DownloadAssetByNameObsolete(string tagName, string assetName, string downloadPath)
-        {
-            var releaseId = await GetReleaseByTagNameAsync(tagName);
-            if (!releaseId.HasValue)
-            {
-                Console.WriteLine($"Release with tag {tagName} not found.");
-                return new HttpResponseMessage(HttpStatusCode.NotFound);
-            }
-
-            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/releases/{releaseId}/assets";
-            Console.WriteLine($"GET uri: {uri}");
-            var response = await ApiService.GetAsync(uri);
-
-            if (response.IsSuccessStatusCode)
-            {
-                var content = await response.Content.ReadAsStringAsync();
-                var assets = JsonDocument.Parse(content).RootElement.EnumerateArray();
-                var asset = assets.FirstOrDefault(a => a.GetProperty("name").GetString() == assetName);
-
-                if (asset.ValueKind != JsonValueKind.Undefined)
-                {
-                    var assetId = asset.GetProperty("id").GetInt32();
-                    // build full filename with path
-                    var assetFileName = Path.Combine(downloadPath, assetName);
-                    return await DownloadAsset(assetId, assetFileName);
-                }
-                else
-                {
-                    Console.WriteLine($"Asset with name {assetName} not found in release {tagName}.");
-                    return new HttpResponseMessage(HttpStatusCode.NotFound);
-                }
-            }
-            else
-            {
-                Console.WriteLine($"Failed to get assets for release {tagName}. Status code: {response.StatusCode}");
-                return response;
-            }
-        }
 
         public async Task<HttpResponseMessage> DownloadAsset(int assetId, string assetFileName)
         {
@@ -727,29 +689,7 @@ namespace GitHubRelease
             }
         }
 
-        public async Task<HttpResponseMessage> DownloadAssetFromUrlObsolete(string downloadUrl, string assetFileName)
-        {
-            ApiService.SetupHeaders(download:true);
-
-            Console.WriteLine($"GET uri: {downloadUrl}");
-            var response = await ApiService.GetAsync(downloadUrl);
-
-            if (response.IsSuccessStatusCode)
-            {
-                var assetContent = await response.Content.ReadAsByteArrayAsync();
-                await File.WriteAllBytesAsync(assetFileName, assetContent);
-                Console.WriteLine($"Successfully downloaded the asset to: {assetFileName}");
-            }
-            else
-            {
-                Console.WriteLine($"Error: Could not download the asset. Status code: {response.StatusCode}");
-                var responseContent = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"Response content: {responseContent}");
-            }
-
-            return response;
-        }
-
+        
         public async Task CheckTokenPermissions()
         {
             // Setup headers with Authorization
