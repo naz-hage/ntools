@@ -1,4 +1,6 @@
-﻿namespace GitHubRelease
+﻿using System.Net.Http;
+
+namespace GitHubRelease
 {
     /// <summary>
     /// Represents an API service for interacting with GitHub.
@@ -30,12 +32,17 @@
         /// Sets up the headers for making API requests.
         /// </summary>
         /// <param name="token">The access token for authentication.</param>
-        public void SetupHeaders()
+        public void SetupHeaders(bool download = false)
         {
             Client.DefaultRequestHeaders.Clear();
             Client.DefaultRequestHeaders.Add("Authorization", $"Bearer {Credentials.GetToken()}");
             Client.DefaultRequestHeaders.Add("User-Agent", "request");
             Client.DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3+json");
+            if (download)
+            {
+                Client.DefaultRequestHeaders.Add("Accept", "application/octet-stream");
+                Client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (compatible; GitHubRelease/1.0)");
+            }
         }
 
         /// <summary>

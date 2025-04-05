@@ -1,5 +1,7 @@
+using System;
 using System.Diagnostics;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 
@@ -616,9 +618,8 @@ namespace GitHubRelease
             return parts.Length == 3 && parts[2] == "0";
         }
 
-
         #region Download Release
-        public async Task<HttpResponseMessage> DownloadAssetByName(string tagName, string assetName, string downloadPath)
+        public async Task<HttpResponseMessage> DownloadAssetByNameObsolete(string tagName, string assetName, string downloadPath)
         {
             var releaseId = await GetReleaseByTagNameAsync(tagName);
             if (!releaseId.HasValue)
@@ -678,6 +679,198 @@ namespace GitHubRelease
 
             return response;
         }
+
+        public async Task<HttpResponseMessage> DownloadAssetByName(string tagName, string assetName, string downloadPath)
+        {
+            var releaseId = await GetReleaseByTagNameAsync(tagName);
+            if (!releaseId.HasValue)
+            {
+                Console.WriteLine($"Release with tag {tagName} not found.");
+                return new HttpResponseMessage(HttpStatusCode.NotFound);
+            }
+
+            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/releases/{releaseId}/assets";
+            Console.WriteLine($"GET uri: {uri}");
+            var response = await ApiService.GetAsync(uri);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                var assets = JsonDocument.Parse(content).RootElement.EnumerateArray();
+                var asset = assets.FirstOrDefault(a => a.GetProperty("name").GetString() == assetName);
+
+                if (asset.ValueKind != JsonValueKind.Undefined)
+                {
+                    var downloadUrl = asset.GetProperty("browser_download_url").GetString();
+                    if (!string.IsNullOrEmpty(downloadUrl))
+                    {
+                        // build full filename with path
+                        var assetFileName = Path.Combine(downloadPath, assetName);
+                        return await DownloadAssetFromUrl(downloadUrl, assetFileName);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Download URL for asset {assetName} not found.");
+                        return new HttpResponseMessage(HttpStatusCode.NotFound);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"Asset with name {assetName} not found in release {tagName}.");
+                    return new HttpResponseMessage(HttpStatusCode.NotFound);
+                }
+            }
+            else
+            {
+                Console.WriteLine($"Failed to get assets for release {tagName}. Status code: {response.StatusCode}");
+                return response;
+            }
+        }
+
+        public async Task<HttpResponseMessage> DownloadAssetFromUrlObsolete(string downloadUrl, string assetFileName)
+        {
+            ApiService.SetupHeaders(download:true);
+
+            Console.WriteLine($"GET uri: {downloadUrl}");
+            var response = await ApiService.GetAsync(downloadUrl);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var assetContent = await response.Content.ReadAsByteArrayAsync();
+                await File.WriteAllBytesAsync(assetFileName, assetContent);
+                Console.WriteLine($"Successfully downloaded the asset to: {assetFileName}");
+            }
+            else
+            {
+                Console.WriteLine($"Error: Could not download the asset. Status code: {response.StatusCode}");
+                var responseContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Response content: {responseContent}");
+            }
+
+            return response;
+        }
+
+        public async Task CheckTokenPermissions()
+        {
+            // Setup headers with Authorization
+            ApiService.SetupHeaders();
+
+            // Log the Authorization header
+            var authorizationHeader = ApiService.GetClient().DefaultRequestHeaders.Authorization;
+            if (authorizationHeader != null)
+            {
+                Console.WriteLine($"Authorization: {authorizationHeader.Scheme} {authorizationHeader.Parameter}");
+            }
+            else
+            {
+                Console.WriteLine("Authorization header is not set.");
+            }
+
+            // Make a request to the GitHub API to check token permissions
+            var uri = "https://api.github.com/user";
+            var response = await ApiService.GetAsync(uri);
+
+            // Log the response headers
+            foreach (var header in response.Headers)
+            {
+                Console.WriteLine($"{header.Key}: {string.Join(", ", header.Value)}");
+            }
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Log the scopes
+                if (response.Headers.TryGetValues("X-OAuth-Scopes", out var scopes))
+                {
+                    Console.WriteLine($"Token scopes: {string.Join(", ", scopes)}");
+                }
+                else
+                {
+                    Console.WriteLine("Token scopes not found in the response headers.");
+                }
+            }
+            else
+            {
+                Console.WriteLine($"Error: Could not retrieve token permissions. Status code: {response.StatusCode}");
+                var responseContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Response content: {responseContent}");
+            }
+        }
+
+
+        public async Task CheckTokenPermissionsObsolsete()
+        {
+            // Setup headers with Authorization
+            ApiService.SetupHeaders();
+
+            // Make a request to the GitHub API to check token permissions
+            var uri = "https://api.github.com/user";
+            var response = await ApiService.GetAsync(uri);
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Log the scopes
+                if (response.Headers.TryGetValues("X-OAuth-Scopes", out var scopes))
+                {
+                    Console.WriteLine($"Token scopes: {string.Join(", ", scopes)}");
+                }
+                else
+                
+                {
+                    Console.WriteLine("Token scopes not found in the response headers.");
+                }
+            }
+            else
+            {
+                Console.WriteLine($"Error: Could not retrieve token permissions. Status code: {response.StatusCode}");
+                var responseContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Response content: {responseContent}");
+            }
+        }
+
+
+
+        public async Task<HttpResponseMessage> DownloadAssetFromUrl(string downloadUrl, string assetFileName)
+        {
+            ApiService.SetupHeaders(download: true);
+
+            // Log the Authorization header
+            var authorizationHeader = ApiService.GetClient().DefaultRequestHeaders.Authorization;
+            if (authorizationHeader != null)
+            {
+                Console.WriteLine($"Authorization: {authorizationHeader.Scheme} {authorizationHeader.Parameter}");
+
+                await CheckTokenPermissions();
+            }
+            else
+            {
+                Console.WriteLine("Authorization header is not set.");
+            }
+
+            // Log the headers
+            foreach (var header in ApiService.GetClient().DefaultRequestHeaders)
+            {
+                Console.WriteLine($"{header.Key}: {string.Join(", ", header.Value)}");
+            }
+
+            Console.WriteLine($"GET uri: {downloadUrl}");
+            var response = await ApiService.GetAsync(downloadUrl);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var assetContent = await response.Content.ReadAsByteArrayAsync();
+                await File.WriteAllBytesAsync(assetFileName, assetContent);
+                Console.WriteLine($"Successfully downloaded the asset to: {assetFileName}");
+            }
+            else
+            {
+                Console.WriteLine($"Error: Could not download the asset. Status code: {response.StatusCode}");
+                var responseContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Response content: {responseContent}");
+            }
+
+            return response;
+        }
+
 
         public async Task<bool> VerifyAssetId(string tagName, int assetId)
         {

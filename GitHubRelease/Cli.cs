@@ -18,36 +18,36 @@ namespace GitHubRelease
 
         /// <summary>
         /// Gets or sets the command to execute.
-        /// Possible values: notes, create, upload, download, update.
+        /// Possible values: create, download.
         /// </summary>
         [RequiredArgument(0, "command", "Specifies the command to execute.\n" +
-            "\t create \t -> Create a release. Requires repo, tag, branch, and path.\n" +
-            "\t download \t -> Download an asset.  Requires repo, tag, and path\n" +
+            "\t create \t -> Create a release. Requires repo, tag, branch and path.\n" +
+            "\t download \t -> Download an asset. Requires repo, tag, and path\n" +
             "\t ----\n")]
         public CommandType Command { get; set; }
 
         /// <summary>
         /// Gets or sets the repository name.
         /// </summary>
-        [OptionalArgument("", "repo", "repository name.")]
+        [OptionalArgument("", "repo", "Specifies the repository name.")]
         public string? Repo { get; set; }
 
         /// <summary>
         /// Gets or sets the tag name.
         /// </summary>
-        [OptionalArgument("", "tag", "tag name.")]
+        [OptionalArgument("", "tag", "Specifies the tag name.")]
         public string? Tag { get; set; }
 
         /// <summary>
         /// Gets or sets the branch name.
         /// </summary>
-        [OptionalArgument("main", "branch", "branch name.")]
+        [OptionalArgument("main", "branch", "Specifies the branch name.")]
         public string? Branch { get; set; }
 
         /// <summary>
         /// Gets or sets the asset path.
         /// </summary>
-        [OptionalArgument("", "path", "asset path. Must be absolute path.")]
+        [OptionalArgument("", "path", "Specifies the asset path. Must be an absolute path.")]
         public string? AssetPath { get; set; }
 
         /// <summary>
@@ -57,10 +57,10 @@ namespace GitHubRelease
         public bool Verbose { get; set; }
 
         private static readonly Dictionary<string, CommandType> CommandMap = new()
-                {
-                    { "create", CommandType.create },
-                    { "download", CommandType.download },
-                };
+            {
+                { "create", CommandType.create },
+                { "download", CommandType.download },
+            };
 
         /// <summary>
         /// Gets the command type from the command string.
@@ -81,7 +81,6 @@ namespace GitHubRelease
         /// </summary>
         public void Validate()
         {
-
             if (string.IsNullOrEmpty(Repo))
             {
                 throw new ArgumentException("The 'repo' option is required for all commands.");
