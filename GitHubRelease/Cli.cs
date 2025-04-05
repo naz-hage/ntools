@@ -21,7 +21,7 @@ namespace GitHubRelease
         /// Possible values: notes, create, upload, download, update.
         /// </summary>
         [RequiredArgument(0, "command", "Specifies the command to execute.\n" +
-            "\t create \t -> Create a release. Requires repo, tag, branch and path.\n" +
+            "\t create \t -> Create a release. Requires repo, tag, branch, and path.\n" +
             "\t download \t -> Download an asset.  Requires repo, tag, and path\n" +
             "\t ----\n")]
         public CommandType Command { get; set; }

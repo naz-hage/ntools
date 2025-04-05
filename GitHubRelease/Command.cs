@@ -27,13 +27,10 @@
             };
 
             // Create a release
-            await releaseService.CreateRelease(release, assetPath);
-            // In debug mode, the release will not be created
-            //var responseMessage = await releaseService.CreateRelease(token, release, assetPath);
-            var responseMessage = new HttpResponseMessage(System.Net.HttpStatusCode.OK); // for testing debugging
+            var responseMessage = await releaseService.CreateRelease(release, assetPath);
             if (responseMessage.IsSuccessStatusCode)
             {
-                Console.WriteLine(responseMessage);
+                Console.WriteLine("Release created successfully.");
             }
             else
             {
