@@ -31,9 +31,20 @@ Write-Host "PSScriptRoot: $PSScriptRoot"
 # Import the install module
 Import-Module "$PSScriptRoot\install.psm1" -Force
 
+$fileName = Split-Path -Leaf $PSCommandPath
+
+# Check if admin
+#########################
+if (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+    Write-OutputMessage $fileName "Error: Please run this script as an administrator."
+    exit 1
+} else {
+    Write-OutputMessage $fileName "Admin rights detected"
+}
+
 # Call the InstallNtools function from the install module
 $result = InstallNtools -version $Version -downloadsDirectory $DownloadsDirectory
 if (-not $result) {
-    Write-Host "Failed to install NTools. Please check the logs for more details." -ForegroundColor Red
+    Write-OutputMessage $fileName "Failed to install NTools. Please check the logs for more details." -ForegroundColor Red
     exit 1
 }

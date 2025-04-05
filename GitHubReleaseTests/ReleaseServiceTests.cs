@@ -210,7 +210,7 @@ namespace GitHubRelease.Tests
             var response = await releaseService.DownloadAssetByName(tagName, assetName, DownloadPath);
 
             // Assert
-            Assert.IsTrue(response.IsSuccessStatusCode, "Failed to download the asset.");
+            Assert.IsTrue(response.IsSuccessStatusCode, $"Failed to download the asset.  status: {response.StatusCode}.");
             
             Assert.IsTrue(File.Exists(assetFileName), "The asset file was not downloaded.");
 

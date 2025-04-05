@@ -35,6 +35,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CommandLine.Net" Version="2.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\NbuildTasks\NbuildTasks.csproj" />
   </ItemGroup>
 
