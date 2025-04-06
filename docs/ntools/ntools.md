@@ -1,5 +1,3 @@
-### Windows Dev Environment
-
 The [Windows dev environment](https://learn.microsoft.com/en-us/windows/dev-environment/) has good information on how to setup a Windows dev environment.
 
 - The table below list the latest dev tools used in Ntools.
