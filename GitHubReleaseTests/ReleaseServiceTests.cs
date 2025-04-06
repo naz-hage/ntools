@@ -186,11 +186,11 @@ namespace GitHubRelease.Tests
         }
 
         [TestMethod]
-        public async Task DownloadAssetByName_ShouldDownloadAsset()
+        public async Task DownloadPrivateAssetByName_ShouldDownloadAsset()
         {
             // Arrange
             
-            string tagName = "1.11.0";
+            string tagName = "1.2.1";
             string assetName = $"{tagName}.zip";
             string DownloadPath = @"c:\temp";
             var assetFileName = Path.Combine(DownloadPath, assetName);

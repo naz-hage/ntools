@@ -534,9 +534,19 @@ namespace GitHubRelease
             // Set the Content-Type header to the specified assetMimeType
             byteArrayContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(assetMimeType);
 
+            // Log the request details
+            Console.WriteLine($"Uploading asset to URL: {uploadUrl}");
+            Console.WriteLine($"Asset Path: {assetPath}");
+            Console.WriteLine($"Asset MIME Type: {assetMimeType}");
+            Console.WriteLine($"Asset Content Length: {assetContent.Length} bytes");
+
             // Make the POST request with the specified assetMimeType to upload the asset
             var uploadResponse = await ApiService.PostAsync(uploadUrl, byteArrayContent);
 
+            // Log the response details
+            Console.WriteLine($"Response Status Code: {uploadResponse.StatusCode}");
+            var responseContent = await uploadResponse.Content.ReadAsStringAsync();
+            Console.WriteLine($"Response Content: {responseContent}");
             return uploadResponse;
         }
 
@@ -668,7 +678,19 @@ namespace GitHubRelease
                     {
                         // Build full filename with path
                         var assetFileName = Path.Combine(downloadPath, assetName);
-                        return await DownloadAssetFromUrl(downloadUrl, assetFileName);
+                        response = await DownloadAssetFromUrl(downloadUrl, assetFileName);
+                        if (response.IsSuccessStatusCode)
+                        {
+                            Console.WriteLine($"Successfully downloaded the asset to: {assetFileName}");
+                            return response;
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Error: Could not download the asset. Status code: {response.StatusCode}");
+                            var contentError = await response.Content.ReadAsStringAsync();
+                            Console.WriteLine(contentError);
+                            return response;
+                        }
                     }
                     else
                     {
@@ -685,6 +707,7 @@ namespace GitHubRelease
             else
             {
                 Console.WriteLine($"Failed to get assets for release {tagName}. Status code: {response.StatusCode}");
+                Console.WriteLine(await response.Content.ReadAsStringAsync());
                 return response;
             }
         }
@@ -772,6 +795,13 @@ namespace GitHubRelease
         public async Task<HttpResponseMessage> DownloadAssetFromUrl(string downloadUrl, string assetFileName)
         {
             ApiService.SetupHeaders(download: true);
+
+            // Log the headers
+            //Console.WriteLine("Request Headers:");
+            //foreach (var header in ApiService.GetClient().DefaultRequestHeaders)
+            //{
+            //    Console.WriteLine($"{header.Key}: {string.Join(", ", header.Value)}");
+            //}
 
             Console.WriteLine($"GET uri: {downloadUrl}");
             var response = await ApiService.GetAsync(downloadUrl);
