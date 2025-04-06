@@ -66,8 +66,8 @@ namespace GitHubRelease
             }
 
             Colorizer.WriteLine(result
-                ? $"[{ConsoleColor.Green}!√ 'gitbubrelease.exe': {options.Command} completed successfully]"
-                : $"[{ConsoleColor.Red}!× 'gitbubrelease.exe': {options.Command} failed]");
+                ? $"[{ConsoleColor.Green}!√ '{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}': {options.Command} completed successfully]"
+                : $"[{ConsoleColor.Red}!× '{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}': {options.Command} failed]");
             Environment.Exit(result ? 0 : -1);
         }
     }
