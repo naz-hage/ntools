@@ -39,14 +39,16 @@ dev-setup Folder contains the `apps.json` file and the `dev-setup.ps1` file. The
 ```
 Your file structure should look like this:
 ```cmd
-%MainDirectory%\MyProject
-%MainDirectory%\MyProject\dev-setup
-%MainDirectory%\MyProject\dev-setup\ntools.json
-%MainDirectory%\MyProject\dev-setup\apps.json
-%MainDirectory%\MyProject\dev-setup\dev-setup.ps1
-%MainDirectory%\MyProject\... other project and test files
+%MainDirectory%\
+├── MyProject\
+│   ├── dev-setup\
+│   │   ├── ntools.json
+│   │   ├── apps.json
+│   │   ├── dev-setup.ps1
+│   ├── ... other project and test files
+|   └── nbuild.targets  (this file is required in the solution folder)
 ```
-#### Add a new tool
+#### Add a new developement tool
 - When looking for new development tool for your project, your need the following:
     - Web location to download the tool and the name of the downloaded file.  This file will be used to install the tool
     - Command and arguments to install and uninstall the tool
