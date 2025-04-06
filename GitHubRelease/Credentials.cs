@@ -33,21 +33,17 @@ namespace GitHubRelease
                 throw new ArgumentException("The OWNER environment variable cannot be empty");
             }
 
-            SecureString secureToken;
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            SecureString secureToken = GetTokenFromEnvironmentVariable();
+
+            // If the token is not found in the environment variable and the OS is Windows, try to get it from the Credential Manager
+            if ((secureToken == null || secureToken.Length == 0) && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 secureToken = GetToken("GitHubRelease", "API_GITHUB_KEY");
-
-                // If the token is not found in the Credential Manager, try to get it from the environment variable
-                if (secureToken == null || secureToken.Length == 0)
-                {
-                    secureToken = GetTokenFromEnvironmentVariable();
-                }
             }
-            else
+
+            if (secureToken == null || secureToken.Length == 0)
             {
-                // Used in GitHub Actions Runner
-                secureToken = GetTokenFromEnvironmentVariable();
+                throw new InvalidOperationException("The API token could not be retrieved from the environment variable or the Credential Manager.");
             }
 
             return (secureOwner, secureToken);

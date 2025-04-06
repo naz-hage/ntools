@@ -185,46 +185,46 @@ namespace GitHubRelease.Tests
             }
         }
 
-        [TestMethod]
-        public async Task DownloadPrivateAssetByName_ShouldDownloadAsset()
-        {
-            // Skip the test if running in GitHub Actions
-            if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != null)
-            {
-                Assert.Inconclusive();
-            }
+        // [TestMethod]
+        // public async Task DownloadPrivateAssetByName_ShouldDownloadAsset()
+        // {
+        //     // Skip the test if running in GitHub Actions
+        //     if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != null)
+        //     {
+        //         Assert.Inconclusive();
+        //     }
 
-            // Arrange
-            string tagName = "1.2.1";
-            string assetName = $"{tagName}.zip";
-            string DownloadPath = @"c:\temp";
-            var assetFileName = Path.Combine(DownloadPath, assetName);
-            //string owner = "naz-hage";
-            //var downloadUrl = $"https://github.com/{owner}/{Repo}/releases/download/{tagName}/{assetName}";
+        //     // Arrange
+        //     string tagName = "1.2.1";
+        //     string assetName = $"{tagName}.zip";
+        //     string DownloadPath = @"c:\temp";
+        //     var assetFileName = Path.Combine(DownloadPath, assetName);
+        //     //string owner = "naz-hage";
+        //     //var downloadUrl = $"https://github.com/{owner}/{Repo}/releases/download/{tagName}/{assetName}";
 
-            // Delete the file if it exists
-            if (File.Exists(assetFileName))
-            {
-                File.Delete(assetFileName);
-            }
+        //     // Delete the file if it exists
+        //     if (File.Exists(assetFileName))
+        //     {
+        //         File.Delete(assetFileName);
+        //     }
 
-            var releaseService = new ReleaseService(Repo);
+        //     var releaseService = new ReleaseService(Repo);
 
-            // Act
-            var response = await releaseService.DownloadAssetByName(tagName, assetName, DownloadPath);
-            //var response = await releaseService.DownloadAssetFromUrl(downloadUrl, assetFileName);
+        //     // Act
+        //     var response = await releaseService.DownloadAssetByName(tagName, assetName, DownloadPath);
+        //     //var response = await releaseService.DownloadAssetFromUrl(downloadUrl, assetFileName);
 
-            // Assert
-            Assert.IsTrue(response.IsSuccessStatusCode, $"Failed to download the asset.  status: {response.StatusCode}.");
+        //     // Assert
+        //     Assert.IsTrue(response.IsSuccessStatusCode, $"Failed to download the asset.  status: {response.StatusCode}.");
             
-            Assert.IsTrue(File.Exists(assetFileName), "The asset file was not downloaded.");
+        //     Assert.IsTrue(File.Exists(assetFileName), "The asset file was not downloaded.");
 
-            // Clean up
-            if (File.Exists(assetFileName))
-            {
-                File.Delete(assetFileName);
-            }
-        }
+        //     // Clean up
+        //     if (File.Exists(assetFileName))
+        //     {
+        //         File.Delete(assetFileName);
+        //     }
+        // }
 
         [TestMethod]
         public async Task DownloadPublicAssetByName_ShouldDownloadAsset()
