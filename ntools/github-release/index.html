@@ -205,16 +205,48 @@
 <h2 id="create-a-github-token">Create a GitHub Token</h2>
 <p>Follow the <a href="https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token">GitHub documentation</a> to create a GitHub token.</p>
 <h3 id="required-permissions">Required Permissions</h3>
-<p>The access token must have the following permissions:
-- <strong>Repository Permissions:</strong>
-  - <strong>Contents:</strong> <code>Read and write</code>
-  - <strong>Metadata:</strong> <code>Read-only</code>
-  - <strong>Actions:</strong> <code>Read and write</code> (if needed)
-  - <strong>Packages:</strong> <code>Read and write</code> (if needed)
-- <strong>Workflow Permissions:</strong>
-  - <strong>Workflows:</strong> <code>Read and write</code> (if needed)
-- <strong>Release Permissions:</strong>
-  - <strong>Releases:</strong> <code>Read and write</code></p>
+<p>The access token must have the following permissions:</p>
+<table>
+<thead>
+<tr>
+<th><strong>Permission Type</strong></th>
+<th><strong>Scope</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Repository</td>
+<td>Contents: <code>Read/Write</code></td>
+<td>Access repository contents.</td>
+</tr>
+<tr>
+<td></td>
+<td>Metadata: <code>Read-only</code></td>
+<td>Access repository metadata.</td>
+</tr>
+<tr>
+<td></td>
+<td>Actions: <code>Read/Write</code></td>
+<td>Manage GitHub Actions (if needed).</td>
+</tr>
+<tr>
+<td></td>
+<td>Packages: <code>Read/Write</code></td>
+<td>Manage GitHub Packages (if needed).</td>
+</tr>
+<tr>
+<td>Workflow</td>
+<td>Workflows: <code>Read/Write</code></td>
+<td>Manage workflows (if needed).</td>
+</tr>
+<tr>
+<td>Release</td>
+<td>Releases: <code>Read/Write</code></td>
+<td>Manage GitHub releases.</td>
+</tr>
+</tbody>
+</table>
 <h2 id="githubrelease-command-line-options">GitHubRelease Command Line Options</h2>
 <h3 id="usage">Usage</h3>
 <pre><code class="language-batch">GitHubRelease.exe command [-repo value] [-tag value] [-branch value] [-path value] [-v value]
