@@ -6,7 +6,6 @@ GitHubRelease is a tool that allows you to create and manage GitHub releases fro
 
 ### Repository Requirements
 - The repository must have:
-  - A `.NET` solution file and at least one `.NET` project to build the project.
   - A GitHub token to create releases.
   - A GitHub owner to create releases.
   - A Git branch to create releases.

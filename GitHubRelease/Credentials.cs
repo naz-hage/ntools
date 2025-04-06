@@ -24,7 +24,7 @@ namespace GitHubRelease
             string? owner = Environment.GetEnvironmentVariable("OWNER");
             if (owner == null)
             {
-                throw new ArgumentNullException("OWNER", "Environment variable 'OWNER' is required");
+                throw new InvalidOperationException("Environment variable 'OWNER' is required");
             }
 
             SecureString secureOwner = CreateSecureString(owner);
