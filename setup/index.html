@@ -260,23 +260,11 @@
 </tbody>
 </table>
 <h3 id="nbuildtargets-file">nbuild.targets file</h3>
-<p>A file called <a href="../ntools/nbuild-targets/"><code>nbuild.targets</code></a> is required in the solution folder. This file imports the <code>common.targets</code> file located in the <code>$(ProgramFiles)\Nbuild</code> folder. The <code>ntools</code> repository includes multiple target files, which can be found in the <code>nbuild-targets.md</code> file.</p>
-<p>Your file structure should look like this:</p>
-<pre><code class="language-cmd">%MainDirectory%\MyProject
-%MainDirectory%\MyProject\nbuild.targets
-%MainDirectory%\MyProject\dev-setup
-%MainDirectory%\MyProject\dev-setup\ntools.json
-%MainDirectory%\MyProject\dev-setup\apps.json
-%MainDirectory%\MyProject\dev-setup\dev-setup.ps1
-%MainDirectory%\MyProject\... other project test files
-</code></pre>
-<h4 id="nbuildtargets">nbuild.targets</h4>
+<p>The file is an MSBuild project file required in the solution folder. It imports the <code>common.targets</code> file located in the <code>$(ProgramFiles)\Nbuild</code> folder. The <code>ntools</code> repository includes multiple target files, which are documented in the [nbuild-targets.md] file.</p>
 <ul>
-<li><code>nbuild.targets</code> is a MSBuild project file that imports <code>common.targets</code></li>
-<li><code>nbuild.targets</code> must include the <code>SolutionName</code> and <code>DeploymentFolder</code> <a href="#required-properties">property</a>. It should also define the <a href="#artifacts">ARTIFACTS</a> target. </li>
-<li><code>nbuild.targets</code> imports the <a href="../ntools/nbuild/#commontargets">common.targets</a> file located in the <code>$(ProgramFiles)\Nbuild</code> folder. The <code>ntools</code> repository includes multiple target files, which can be found in the <a href="../ntools/nbuild-targets/">targets</a> file.</li>
-<li><code>nbuild.targets</code> can include any additional properties and targets that are specific to the solution.  </li>
-<li><code>nbuild.targets</code> file is located in the solution folder.</li>
+<li>Must include the <code>SolutionName</code> and <code>DeploymentFolder</code> <a href="#required-properties">properties</a>.</li>
+<li>Should define the <a href="#artifacts">ARTIFACTS</a> target.</li>
+<li>Can include additional properties and targets specific to the solution.</li>
 </ul>
 <h4 id="required-properties">Required Properties</h4>
 <ul>
