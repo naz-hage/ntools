@@ -47,13 +47,13 @@ namespace GitHubRelease.Tests
             Assert.IsNotNull(result, "Create release is null");
             Assert.AreEqual(result.StatusCode.ToString(), "Created");
 
-            // Download the asset
-            var assetName = $"{TagStagingRequested}.zip";
-            string DownloadPath = @"c:\temp";
-            var response = await releaseService.DownloadAssetByName(release.TagName, assetName, DownloadPath);
+            // Skip Private repo Download the asset
+            //var assetName = $"{TagStagingRequested}.zip";
+            //string DownloadPath = @"c:\temp";
+            //var response = await releaseService.DownloadAssetByName(release.TagName, assetName, DownloadPath);
 
-            // Assert
-            Assert.IsTrue(response.IsSuccessStatusCode, $"Failed to download the asset.  status: {response.StatusCode}.");
+            //// Assert
+            //Assert.IsTrue(response.IsSuccessStatusCode, $"Failed to download the asset.  status: {response.StatusCode}.");
 
         }
 
