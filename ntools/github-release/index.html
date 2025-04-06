@@ -64,6 +64,38 @@
                   </li>
                   <li class="toctree-l1 current"><a class="reference internal current" href="#">Github Release (githubrelease.exe)</a>
     <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#repository-requirements">Repository Requirements</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#environment-requirements">Environment Requirements</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#github-actions-workflow-example">GitHub Actions Workflow Example</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#branch-checkout-example">Branch Checkout Example</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#release-process">Release Process</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#stage-release">Stage Release</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#production-release">Production Release</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#create-a-github-token">Create a GitHub Token</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#required-permissions">Required Permissions</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#githubrelease-command-line-options">GitHubRelease Command Line Options</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a>
+    </li>
+        </ul>
+    </li>
     </ul>
                   </li>
               </ul>
@@ -107,19 +139,35 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <ul>
-<li>GitHubRelease is a tool that allows you to create and manage GitHub releases from the command line. It simplifies the process of creating and managing releases, making it easier to publish your software updates on GitHub.</li>
-<li>The repository must have a .net solution file and one .net project to build the project.</li>
-<li>The repository must have<ul>
-<li>GitHub token to create releases.</li>
-<li>GitHub owner to create releases.</li>
-<li>a git branch to create releases.</li>
-<li>a git at least one tag prior to create releases.</li>
+                <h1 id="githubrelease-documentation">GitHubRelease Documentation</h1>
+<p>GitHubRelease is a tool that allows you to create and manage GitHub releases from the command line. It simplifies the process of creating and managing releases, making it easier to publish your software updates on GitHub.</p>
+<h2 id="requirements">Requirements</h2>
+<h3 id="repository-requirements">Repository Requirements</h3>
+<ul>
+<li>The repository must have:</li>
+<li>A <code>.NET</code> solution file and at least one <code>.NET</code> project to build the project.</li>
+<li>A GitHub token to create releases.</li>
+<li>A GitHub owner to create releases.</li>
+<li>A Git branch to create releases.</li>
+<li>At least one Git tag prior to creating releases.</li>
+</ul>
+<h3 id="environment-requirements">Environment Requirements</h3>
+<ul>
+<li><strong>Windows Platforms:</strong></li>
+<li>The GitHub API token must be stored in the Windows Credential Manager with:<ul>
+<li><strong>Target Name:</strong> <code>GitHubRelease</code></li>
+<li><strong>Credential Name:</strong> <code>API_GITHUB_KEY</code></li>
 </ul>
 </li>
-<li>A Repository secret <a href="#create-a-github-token">token</a> named <code>API_GITHUB_KEY</code> must be added to the GitHub repository Secrets and variables</li>
-<li>Here an example how to add env in the GitHub actions workflow file </li>
+<li><strong>Non-Windows Platforms:</strong></li>
+<li>The following environment variables must be set:<ul>
+<li><strong><code>OWNER</code>:</strong> The GitHub repository owner's username.</li>
+<li><strong><code>API_GITHUB_KEY</code>:</strong> The GitHub API token (personal access token).</li>
 </ul>
+</li>
+</ul>
+<h3 id="github-actions-workflow-example">GitHub Actions Workflow Example</h3>
+<p>Here is an example of how to set up the required environment variables in a GitHub Actions workflow file:</p>
 <pre><code class="language-yml">- name: Build using ntools
   run: |
     &amp; &quot;$env:ProgramFilesPath/nbuild/nb.exe&quot; ${{ env.Build_Type }} -v ${{ env.Enable_Logging }}
@@ -129,9 +177,8 @@
     OWNER: ${{ github.repository_owner }}
     API_GITHUB_KEY: ${{ secrets.API_GITHUB_KEY }}
 </code></pre>
-<ul>
-<li>The checkout a branch must be specified before running the the tool. Here an example how to checkout a branch in the GitHub actions workflow file</li>
-</ul>
+<h3 id="branch-checkout-example">Branch Checkout Example</h3>
+<p>Before running the tool, you must checkout a branch. Here is an example of how to checkout a branch in a GitHub Actions workflow file:</p>
 <pre><code class="language-yml">- name: Checkout Repository
   uses: actions/checkout@v4
   with:
@@ -140,48 +187,49 @@
     ref: ${{ github.event.pull_request.head.ref }}
     repository: ${{ github.event.pull_request.head.repo.full_name }}
 </code></pre>
+<h2 id="release-process">Release Process</h2>
+<h3 id="stage-release">Stage Release</h3>
 <ul>
-<li>
-<p>When <code>nb stage</code> runs successfully, the tool creates a stage release. This release is tagged with the next tag release number, and the release notes include the commits since the last stage or prod tag. The API token from the repository secrets is used to create this release.  The release package is uploaded to the release. The release is also tagged with the next stage release number.</p>
-</li>
-<li>
-<p>When <code>nb prod</code> runs successfully, the tool creates a production release. This release is also tagged with the next prod release, and the release notes include the commits since the last production tag. All previous stage releases are deleted. The API token from the repository secrets is used to create this release. The release package is uploaded to the release. The release is also tagged with the next prod release number. All previous stage releases are deleted.</p>
-</li>
+<li>When <code>nb stage</code> runs successfully:</li>
+<li>The tool creates a stage release tagged with the next stage release number.</li>
+<li>The release notes include the commits since the last stage or production tag.</li>
+<li>The API token from the repository secrets is used to create this release.</li>
+<li>The release package is uploaded to the release.</li>
 </ul>
-<h1 id="create-a-github-token">Create a GitHub token</h1>
+<h3 id="production-release">Production Release</h3>
 <ul>
-<li>Follow the How to create a GitHub token <a href="https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token">link</a></li>
-<li>The access token must have the following permissions:<ul>
-<li>Under <strong>Repository permissions</strong>, set the following:<ul>
-<li><strong>Contents</strong>: <code>Read and write</code></li>
-<li><strong>Metadata</strong>: <code>Read-only</code></li>
-<li><strong>Actions</strong>: <code>Read and write</code> (if needed)</li>
-<li><strong>Packages</strong>: <code>Read and write</code> (if needed)</li>
+<li>When <code>nb prod</code> runs successfully:</li>
+<li>The tool creates a production release tagged with the next production release number.</li>
+<li>The release notes include the commits since the last production tag.</li>
+<li>All previous stage releases are deleted.</li>
+<li>The API token from the repository secrets is used to create this release.</li>
+<li>The release package is uploaded to the release.</li>
 </ul>
-</li>
-<li>Under <strong>Workflow permissions</strong>, set the following:<ul>
-<li><strong>Workflows</strong>: <code>Read and write</code> (if needed)</li>
-</ul>
-</li>
-<li>Under <strong>Release permissions</strong>, set the following:<ul>
-<li><strong>Releases</strong>: <code>Read and write</code></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h1 id="githubreleaseexe-command-line-options">GitHubRelease.exe command line options:</h1>
+<h2 id="create-a-github-token">Create a GitHub Token</h2>
+<p>Follow the <a href="https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token">GitHub documentation</a> to create a GitHub token.</p>
+<h3 id="required-permissions">Required Permissions</h3>
+<p>The access token must have the following permissions:
+- <strong>Repository Permissions:</strong>
+  - <strong>Contents:</strong> <code>Read and write</code>
+  - <strong>Metadata:</strong> <code>Read-only</code>
+  - <strong>Actions:</strong> <code>Read and write</code> (if needed)
+  - <strong>Packages:</strong> <code>Read and write</code> (if needed)
+- <strong>Workflow Permissions:</strong>
+  - <strong>Workflows:</strong> <code>Read and write</code> (if needed)
+- <strong>Release Permissions:</strong>
+  - <strong>Releases:</strong> <code>Read and write</code></p>
+<h2 id="githubrelease-command-line-options">GitHubRelease Command Line Options</h2>
 <h3 id="usage">Usage</h3>
 <pre><code class="language-batch">GitHubRelease.exe command [-repo value] [-tag value] [-branch value] [-path value] [-v value]
   - command : Specifies the command to execute.
-         create          -&gt; Create a release. Requires repo, tag, branch and path.
-         download        -&gt; Download an asset.  Requires repo, tag, and path
+         create          -&gt; Create a release. Requires repo, tag, branch, and path.
+         download        -&gt; Download an asset. Requires repo, tag, and path.
          ----
- (one of create,download, required)
-  - repo    : repository name. (string, default=)
-  - tag     : tag name. (string, default=)
-  - branch  : branch name. (string, default=main)
-  - path    : asset path. Must be absolute path. (string, default=)
+ (one of create, download, required)
+  - repo    : Repository name. (string, default=)
+  - tag     : Tag name. (string, default=)
+  - branch  : Branch name. (string, default=main)
+  - path    : Asset path. Must be an absolute path. (string, default=)
   - v       : Optional parameter which sets the console output verbose level. (true or false, default=False)
 </code></pre>
               
