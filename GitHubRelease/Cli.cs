@@ -96,6 +96,12 @@ namespace GitHubRelease
                 throw new ArgumentException("The 'branch' option is required for commands other than 'download'.");
             }
 
+            if (Command != CommandType.download && string.IsNullOrEmpty(AssetPath))
+            {
+                // Default to the current directory if AssetPath is not provided
+                AssetPath = Directory.GetCurrentDirectory();
+            }
+
             if (string.IsNullOrEmpty(AssetPath) || !Path.IsPathRooted(AssetPath))
             {
                 throw new ArgumentException("The 'path' option is required for all commands and must be an absolute path.");
