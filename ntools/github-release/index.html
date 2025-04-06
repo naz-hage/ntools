@@ -266,13 +266,14 @@
   - v       : Optional parameter which sets the console output verbose level. (true or false, default=False)
 </code></pre>
 <h3 id="example-creating-a-release">Example: Creating a Release</h3>
-<p>To create a release for the repository <code>my-repo</code> with the tag <code>v1.0.0</code>, branch <code>main</code>, and an asset located at <code>C:\Releases\my-release.zip</code>:</p>
-<pre><code class="language-batch">GitHubRelease.exe create -repo my-repo -tag v1.0.0 -branch main -path C:\Releases\my-release.zip -v true
+<p>To create a release for the repository <code>my-repo</code> with the tag <code>1.0.0</code>, branch <code>main</code>, and an asset located at <code>C:\Releases\1.0.0.zip</code>, you would use the following command:</p>
+<pre><code class="language-batch">GitHubRelease.exe create -repo my-repo -tag 1.0.0 -branch main -path C:\Releases\1.1.0.zip -v true
 </code></pre>
 <h3 id="example-downloading-an-asset">Example: Downloading an Asset</h3>
-<p>To download an asset from the release with the tag <code>v1.0.0</code> in the repository <code>my-repo</code> to the path <code>C:\Downloads\asset.zip</code>:</p>
-<pre><code class="language-batch">GitHubRelease.exe download -repo my-repo -tag v1.0.0 -path C:\Downloads\asset.zip -v true
+<p>To download an asset from the release with the tag <code>1.0.0</code> in the repository <code>my-repo</code> to the path <code>C:\Downloads</code>:</p>
+<pre><code class="language-batch">GitHubRelease.exe download -repo my-repo -tag 1.0.0 -path C:\Downloads -v true
 </code></pre>
+<p>An asset named 1.0.0.zip will be downloaded to the specified path if it exists in the release.</p>
               
             </div>
           </div><footer>
