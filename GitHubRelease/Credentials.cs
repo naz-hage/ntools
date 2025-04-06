@@ -37,6 +37,12 @@ namespace GitHubRelease
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 secureToken = GetToken("GitHubRelease", "API_GITHUB_KEY");
+
+                // If the token is not found in the Credential Manager, try to get it from the environment variable
+                if (secureToken == null || secureToken.Length == 0)
+                {
+                    secureToken = GetTokenFromEnvironmentVariable();
+                }
             }
             else
             {
