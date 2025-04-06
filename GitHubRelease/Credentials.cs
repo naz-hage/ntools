@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Security;
@@ -5,8 +6,19 @@ using System.Text;
 
 namespace GitHubRelease
 {
+    /// <summary>
+    /// Provides methods for securely retrieving and storing credentials, such as the GitHub repository owner and API token.
+    /// </summary>
     static public class Credentials
     {
+        /// <summary>
+        /// Retrieves the GitHub repository owner and API token.
+        /// </summary>
+        /// <returns>A tuple containing the owner and token as SecureString objects.</returns>
+        /// <remarks>
+        /// The owner is retrieved from the OWNER environment variable.
+        /// The token is retrieved from the Windows Credential Manager if running on Windows, otherwise from the API_GITHUB_KEY environment variable.
+        /// </remarks>
         private static (SecureString owner, SecureString token) GetOwnerAndToken()
         {
             string? owner = Environment.GetEnvironmentVariable("OWNER");
@@ -35,48 +47,16 @@ namespace GitHubRelease
             return (secureOwner, secureToken);
         }
 
-        [SupportedOSPlatform("windows")]
-        public static SecureString GetToken(string target, string credentialName)
-        {
-            SecureString secureToken = new SecureString();
-            bool success = NativeMethods.CredRead(credentialName, NativeMethods.CRED_TYPE_GENERIC, 0, out var credPtr);
-
-            if (success)
-            {
-                try
-                {
-                    var cred = Marshal.PtrToStructure<NativeMethods.CREDENTIAL>(credPtr);
-                    if (cred.CredentialBlobSize > 0 && cred.CredentialBlob != IntPtr.Zero)
-                    {
-                        byte[] credentialBytes = new byte[cred.CredentialBlobSize];
-                        Marshal.Copy(cred.CredentialBlob, credentialBytes, 0, cred.CredentialBlobSize);
-                        string token = Encoding.UTF8.GetString(credentialBytes);
-
-                        secureToken = CreateSecureString(token);
-                    }
-                }
-                finally
-                {
-                    NativeMethods.CredFree(credPtr);
-                }
-            }
-            else
-            {
-                Console.WriteLine($"Failed to read credential '{credentialName}' from Credential Manager. Error code: {Marshal.GetLastWin32Error()}");
-                // Optionally, throw an exception or return an empty SecureString
-            }
-
-            return secureToken;
-        }
-
+        
         /// <summary>
-        /// Retrieves a token from the Windows Credential Manager.
+        /// Saves a token to the Windows Credential Manager.
         /// </summary>
         /// <param name="target">The target application name.</param>
-        /// <param name="credentialName">The name of the credential to retrieve.</param>
-        /// <returns>A SecureString containing the token.</returns>
+        /// <param name="credentialName">The name of the credential to save.</param>
+        /// <param name="token">A SecureString containing the token to save.</param>
+        /// <returns>True if the token was saved successfully, false otherwise.</returns>
         /// <remarks>
-        /// This method is only supported on Windows platforms. It uses the CredRead function from Advapi32.dll to read the credential.
+        /// This method is only supported on Windows platforms. It uses the CredWrite function from Advapi32.dll to write the credential.
         /// </remarks>
         [SupportedOSPlatform("windows")]
         public static bool SaveTokenToCredentialManager(string target, string credentialName, SecureString token)
@@ -115,6 +95,12 @@ namespace GitHubRelease
             return success;
         }
 
+        /// <summary>
+        /// Retrieves a token from the API_GITHUB_KEY environment variable.
+        /// </summary>
+        /// <returns>A SecureString containing the token.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if the API_GITHUB_KEY environment variable is not set.</exception>
+        /// <exception cref="ArgumentException">Thrown if the API_GITHUB_KEY environment variable is empty.</exception>
         private static SecureString GetTokenFromEnvironmentVariable()
         {
             string? token = Environment.GetEnvironmentVariable("API_GITHUB_KEY");
@@ -132,16 +118,75 @@ namespace GitHubRelease
             return secureToken;
         }
 
+        /// <summary>
+        /// Gets the GitHub repository owner.
+        /// </summary>
+        /// <returns>The GitHub repository owner.</returns>
         public static string GetOwner()
         {
             return ConvertToUnsecureString(GetOwnerAndToken().owner);
         }
 
+        /// <summary>
+        /// Gets the GitHub API token.
+        /// </summary>
+        /// <returns>The GitHub API token.</returns>
         public static string GetToken()
         {
             return ConvertToUnsecureString(GetOwnerAndToken().token);
         }
 
+/// <summary>
+        /// Retrieves a token from the Windows Credential Manager.
+        /// </summary>
+        /// <param name="target">The target application name.</param>
+        /// <param name="credentialName">The name of the credential to retrieve.</param>
+        /// <returns>A SecureString containing the token.</returns>
+        /// <remarks>
+        /// This method is only supported on Windows platforms. It uses the CredRead function from Advapi32.dll to read the credential.
+        /// </remarks>
+        [SupportedOSPlatform("windows")]
+        public static SecureString GetToken(string target, string credentialName)
+        {
+            SecureString secureToken = new SecureString();
+            bool success = NativeMethods.CredRead(credentialName, NativeMethods.CRED_TYPE_GENERIC, 0, out var credPtr);
+
+            if (success)
+            {
+                try
+                {
+                    var cred = Marshal.PtrToStructure<NativeMethods.CREDENTIAL>(credPtr);
+                    if (cred.CredentialBlobSize > 0 && cred.CredentialBlob != IntPtr.Zero)
+                    {
+                        byte[] credentialBytes = new byte[cred.CredentialBlobSize];
+                        Marshal.Copy(cred.CredentialBlob, credentialBytes, 0, cred.CredentialBlobSize);
+                        string token = Encoding.UTF8.GetString(credentialBytes);
+
+                        secureToken = CreateSecureString(token);
+                    }
+                }
+                finally
+                {
+                    NativeMethods.CredFree(credPtr);
+                }
+            }
+            else
+            {
+                Console.WriteLine($"Failed to read credential '{credentialName}' from Credential Manager. Error code: {Marshal.GetLastWin32Error()}");
+                // Optionally, throw an exception or return an empty SecureString
+            }
+
+            return secureToken;
+        }
+
+        /// <summary>
+        /// Converts a SecureString to an unsecure string.
+        /// </summary>
+        /// <param name="secureString">The SecureString to convert.</param>
+        /// <returns>The unsecure string.</returns>
+        /// <remarks>
+        /// This method should be used with caution, as it exposes the contents of the SecureString in memory.
+        /// </remarks>
         private static string ConvertToUnsecureString(SecureString secureString)
         {
             IntPtr unmanagedString = IntPtr.Zero;
@@ -157,6 +202,11 @@ namespace GitHubRelease
             }
         }
 
+        /// <summary>
+        /// Creates a SecureString from a string.
+        /// </summary>
+        /// <param name="input">The string to convert.</param>
+        /// <returns>The SecureString.</returns>
         private static SecureString CreateSecureString(string input)
         {
             SecureString secureString = new SecureString();
@@ -167,11 +217,14 @@ namespace GitHubRelease
             return secureString;
         }
 
+        /// <summary>
+        /// Provides access to native Windows API methods.
+        /// </summary>
         private static class NativeMethods
         {
             public const int CRED_TYPE_GENERIC = 1;
             public const int CRED_PERSIST_LOCAL_MACHINE = 2;
-            public const int CRED_PERSIST_USER = 1;
+            // public const int CRED_PERSIST_USER = 1;
 
             [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
             public struct CREDENTIAL
