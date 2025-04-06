@@ -34,26 +34,22 @@ namespace GitHubRelease
             Console.WriteLine($"Branch: {options.Branch}");
             Console.WriteLine($"Asset Path: {options.AssetPath}");
 
+            bool result = false;
             try
             {
                 switch (options.Command)
                 {
                     // create a release
                     case Cli.CommandType.create:
-                        await Command.CreateRelease(options.Repo!, options.Tag!, options.Branch!, options.AssetPath!);
+                        result = await Command.CreateRelease(options.Repo!, options.Tag!, options.Branch!, options.AssetPath!);
                         break;
 
                     // download an asset
                     case Cli.CommandType.download:
-                        await Command.DownloadAsset(options.Repo!, options.Tag!, options.AssetPath!);
+                        result = await Command.DownloadAsset(options.Repo!, options.Tag!, options.AssetPath!);
                         break;
 
                     default:
-                        Console.WriteLine($"Invalid command '{options.Command}'. Please use ");
-                        Console.WriteLine("     'notes' get release notes since tag");
-                        Console.WriteLine("     'upload' upload an asset");
-                        Console.WriteLine("     'create' create a release");
-                        Console.WriteLine("     'update' update a release");
 
                         Environment.Exit(1);
                         break;
@@ -69,7 +65,10 @@ namespace GitHubRelease
                 Environment.Exit(1);
             }
 
-            Environment.Exit(0);
+            Colorizer.WriteLine(result
+                ? $"[{ConsoleColor.Green}!√ {options.Command} completed successfully]"
+                : $"[{ConsoleColor.Red}!× {options.Command} failed]");
+            Environment.Exit(result ? 0 : -1);
         }
     }
 }

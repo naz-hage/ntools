@@ -1,4 +1,6 @@
-﻿namespace GitHubRelease
+﻿using OutputColorizer;
+
+namespace GitHubRelease
 {
     /// <summary>
     /// Provides methods to interact with GitHub releases.
@@ -12,7 +14,13 @@
         /// <param name="tag">The tag name for the release.</param>
         /// <param name="branch">The branch name for the release.</param>
         /// <param name="assetPath">The path to the asset to be included in the release.</param>
-        public static async Task CreateRelease(string repo, string tag, string branch, string assetPath)
+        /// <returns>True if the release was created successfully, otherwise false.</returns>
+        // <remarks>
+        /// This method creates a new release in the specified repository using the provided tag, branch, and asset path.
+        /// It utilizes the ReleaseService to interact with the GitHub API.
+        /// If the release creation is successful, it returns true; otherwise, it logs the error and returns false.
+        /// </remarks>
+        public static async Task<bool> CreateRelease(string repo, string tag, string branch, string assetPath)
         {
             var releaseService = new ReleaseService(repo);
 
@@ -30,7 +38,7 @@
             var responseMessage = await releaseService.CreateRelease(release, assetPath);
             if (responseMessage.IsSuccessStatusCode)
             {
-                Console.WriteLine("Release created successfully.");
+                return true;
             }
             else
             {
@@ -38,7 +46,7 @@
                 Console.WriteLine($"Failed to create release: {responseMessage.StatusCode}");
                 var content = await responseMessage.Content.ReadAsStringAsync();
                 Console.WriteLine(content);
-                Environment.Exit(1);
+                return false; // This line will never be reached, but is required for compilation
             }
         }
 
@@ -48,7 +56,11 @@
         /// <param name="repo">The repository name.</param>
         /// <param name="tag">The tag name for the release.</param>
         /// <param name="assetPath">The path where the asset will be downloaded.</param>
-        public static async Task DownloadAsset(string repo, string tag, string assetPath)
+        /// <returns>True if the download was successful, otherwise false.</returns>
+        /// <remarks>
+        /// This method ensures that the assetPath includes a file name and that the download directory exists before attempting to download the asset.
+        /// </remarks>/// 
+        public static async Task<bool> DownloadAsset(string repo, string tag, string assetPath)
         {
             var releaseService = new ReleaseService(repo);
 
@@ -69,12 +81,16 @@
             var response = await releaseService.DownloadAssetByName(tag, $"{tag}.zip", assetPath);
 
             // Check the response
-            if (!response.IsSuccessStatusCode)
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            else
             {
                 Console.WriteLine($"Failed to download the asset. Status code: {response.StatusCode}");
                 var content = await response.Content.ReadAsStringAsync();
                 Console.WriteLine(content);
-                Environment.Exit(1);
+                return false;
             }
         }
 
