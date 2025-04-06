@@ -71,10 +71,5 @@ namespace GitHubRelease
 
             Environment.Exit(0);
         }
-
-        private static void DisplayHelp()
-        {
-            Parser.DisplayHelp<Cli>();
-        }
     }
 }
