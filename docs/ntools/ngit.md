@@ -1,8 +1,8 @@
-`Ngit` is simple wrapper for `Git` tool that perform simple commands such as get tag and set tag.
+`Ngit` is a simple wrapper for the `Git` tool that performs basic commands such as getting and setting tags.
 
 ### Usage
 ```batch
- Ngit.exe command [-url value] [-tag value] [-buildtype value] [-v value]
+Ngit.exe command [-url value] [-tag value] [-buildtype value] [-v value]
   - command   : Specifies the git command to execute.
          tag             -> Get the current tag
          settag          -> Set specified tag in -tag option
@@ -18,3 +18,37 @@
   - buildtype : Specifies the build type used for autotag and setautotag commands. Possible values: STAGE, PROD. (string, default=)
   - v         : Specifies whether to print additional information. (true or false, default=False)
 ```
+
+### Examples
+
+#### Example 1: Get the Current Tag
+To retrieve the current Git tag:
+```batch
+Ngit.exe tag -v true
+```
+
+#### Example 2: Set a Specific Tag
+To set a specific tag (e.g., `1.0.0`):
+```batch
+Ngit.exe settag -tag 1.0.0 -v true
+```
+
+#### Example 3: Auto-Tag Based on Build Type
+To set the next tag based on the build type `STAGE`:
+```batch
+Ngit.exe autotag -buildtype STAGE -v true
+```
+
+#### Example 4: Clone a Repository
+To clone a Git repository from a specific URL:
+```batch
+Ngit.exe clone -url https://github.com/example/repo.git -v true
+```
+
+#### Example 5: Delete a Tag
+To delete a specific tag (e.g., `1.0.0`):
+```batch
+Ngit.exe deletetag -tag 1.0.0 -v true
+```
+
+These examples demonstrate how to use `Ngit` for common Git operations such as managing tags, branches, and repositories.
