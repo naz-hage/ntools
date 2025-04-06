@@ -49,9 +49,23 @@
                   </li>
                   <li class="toctree-l1 current"><a class="reference internal current" href="#">Setup your project</a>
     <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#add-a-new-developement-tool">Add a new developement tool</a>
+    <li class="toctree-l2"><a class="reference internal" href="#overview-of-dev-setup-folder">Overview of dev-setup Folder</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#list-of-environment-variables">List of Environment Variables</a>
+    <li class="toctree-l2"><a class="reference internal" href="#file-details">File Details</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#1-ntoolsjson">1. ntools.json</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-appsjson">2. apps.json</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#3-dev-setupps1">3. dev-setup.ps1</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#folder-structure">Folder Structure</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#adding-a-new-development-tool">Adding a New Development Tool</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#notes">Notes</a>
     </li>
     </ul>
                   </li>
@@ -111,29 +125,29 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <p>To set up a new project and take advantage of ntools, you need to follow the steps below:</p>
+                <h1 id="setting-up-your-project-with-dev-setup">Setting Up Your Project with dev-setup</h1>
+<p>The dev-setup folder is a critical part of your project setup. It contains scripts and configuration files to automate the installation of development tools and the setup of your development environment.</p>
+<h2 id="overview-of-dev-setup-folder">Overview of dev-setup Folder</h2>
+<p>The dev-setup folder typically includes the following files:</p>
 <ul>
-<li>A new project should be created in the <code>%MainDirectory%</code> directory.</li>
-<li>The project should be under source control using Git.  An tag should be created for the project and follow the <a href="../versioning/">versioning</a> rules.</li>
-<li>To create a tag, use the following command from the root of the project directory:</li>
+<li><strong><code>ntools.json</code></strong>  <ul>
+<li>Contains installation information for ntools. This file is required to install ntools before other deveopment tools.</li>
 </ul>
-<pre><code class="language-cmd">ng settag -tag 0.0.1 
-</code></pre>
-<h3 id="dev-setup-folder">dev-setup folder</h3>
-<p>dev-setup Folder contains the <code>apps.json</code> file and the <code>dev-setup.ps1</code> file. The <code>apps.json</code> file contains the list of development tools required for your project. The <code>dev-setup.ps1</code> file is a PowerShell script that installs the development tools and sets up the development environment for the project.</p>
-<ul>
-<li>When you create a new project, for example <code>MyProject</code>, clone the project into the <code>%MainDirectory%</code> directory. </li>
-<li>In your project, create a <code>dev-setup</code> folder and add the following files:</li>
-<li>The <code>dev-setup/ntools.json</code> file should include installation information for ntools. This is required so that other apps (<code>dev-setup/apps.json</code>) can be installed.</li>
-<li>The <code>dev-setup/apps.json</code> file should include the list of development tools required for the project. <code>ntools</code> must be installed first using <code>dev-setup/ntools.json</code></li>
-<li>The <code>dev-setup/dev-setup.ps1</code> file should install the development tools and set up the development environment for the project.</li>
-<li>
-<p>Check this example for <a href="ntools/dev-setup.md">dev-setup.ps1</a> file. You can modify this file to fit your development needs.</p>
 </li>
-<li>
-<p><code>dev-setup/ntools.json</code> should like this:</p>
+<li><strong><code>apps.json</code></strong>  <ul>
+<li>Lists the development tools required for your project, including their installation and uninstallation details.</li>
+</ul>
+</li>
+<li><strong><code>dev-setup.ps1</code></strong>  <ul>
+<li>A PowerShell script that installs the tools listed in apps.json and sets up the development environment.</li>
+</ul>
 </li>
 </ul>
+<hr />
+<h2 id="file-details">File Details</h2>
+<h3 id="1-ntoolsjson">1. ntools.json</h3>
+<p>This file provides the installation details for ntools, which is required to manage other tools in the project.</p>
+<p><strong>Example:</strong></p>
 <pre><code class="language-json">{
   &quot;Version&quot;: &quot;1.2.0&quot;,
   &quot;NbuildAppList&quot;: [
@@ -144,41 +158,20 @@
       &quot;WebDownloadFile&quot;: &quot;https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip&quot;,
       &quot;DownloadedFile&quot;: &quot;$(Version).zip&quot;,
       &quot;InstallCommand&quot;: &quot;powershell.exe&quot;,
-      &quot;InstallArgs&quot;: &quot;-Command Expand-Archive -Path $(Version).zip -DestinationPath \u0027$(InstallPath)\u0027 -Force&quot;,
+      &quot;InstallArgs&quot;: &quot;-Command Expand-Archive -Path $(Version).zip -DestinationPath '$(InstallPath)' -Force&quot;,
       &quot;InstallPath&quot;: &quot;$(ProgramFiles)\\Nbuild&quot;,
       &quot;UninstallCommand&quot;: &quot;powershell.exe&quot;,
-      &quot;UninstallArgs&quot;: &quot;-Command Remove-Item -Path \u0027$(InstallPath)\u0027 -Recurse -Force&quot;
+      &quot;UninstallArgs&quot;: &quot;-Command Remove-Item -Path '$(InstallPath)' -Recurse -Force&quot;,
+      &quot;StoredHash&quot;: &quot;XXX&quot;,
+      &quot;AddToPath&quot;: true
     }
   ]
 }
 </code></pre>
-<p>Your file structure should look like this:</p>
-<pre><code class="language-cmd">%MainDirectory%\
-├── MyProject\
-│   ├── dev-setup\
-│   │   ├── ntools.json
-│   │   ├── apps.json
-│   │   ├── dev-setup.ps1
-│   ├── ... other project and test files
-|   └── nbuild.targets  (this file is required in the solution folder)
-</code></pre>
-<h4 id="add-a-new-developement-tool">Add a new developement tool</h4>
-<ul>
-<li>
-<p>When looking for new development tool for your project, your need the following:</p>
-<ul>
-<li>Web location to download the tool and the name of the downloaded file.  This file will be used to install the tool</li>
-<li>Command and arguments to install and uninstall the tool</li>
-<li>Location where the tool will be installed</li>
-<li>Location of the tool File name.  This file name will be used to check if the tool is already installed</li>
-<li>Version of the tool</li>
-<li>Name of the tool</li>
-</ul>
-</li>
-<li>
-<p>To add a new tool to your project which can be installed by <code>ntools</code>, you need to define json file.  Below is an example of the json file for 7-zip development tool</p>
-</li>
-</ul>
+<hr />
+<h3 id="2-appsjson">2. apps.json</h3>
+<p>This file lists all the development tools required for the project. Each tool is defined with its name, version, installation details, and uninstallation details.</p>
+<p><strong>Example:</strong></p>
 <pre><code class="language-json">{
   &quot;Version&quot;: &quot;1.2.0&quot;,
   &quot;NbuildAppList&quot;: [
@@ -189,7 +182,7 @@
       &quot;WebDownloadFile&quot;: &quot;https://www.7-zip.org/a/7z2301-x64.exe&quot;,
       &quot;DownloadedFile&quot;: &quot;7zip.exe&quot;,
       &quot;InstallCommand&quot;: &quot;$(DownloadedFile)&quot;,
-      &quot;InstallArgs&quot;: &quot;/S /D=\u0022$(ProgramFiles)\\7-Zip\u0022&quot;,
+      &quot;InstallArgs&quot;: &quot;/S /D=\&quot;$(ProgramFiles)\\7-Zip\&quot;&quot;,
       &quot;InstallPath&quot;: &quot;$(ProgramFiles)\\7-Zip&quot;,
       &quot;UninstallCommand&quot;: &quot;$(InstallPath)\\Uninstall.exe&quot;,
       &quot;UninstallArgs&quot;: &quot;/S&quot;
@@ -197,179 +190,151 @@
   ]
 }
 </code></pre>
-<ul>
-<li>
-<p>By convention, the json file is named <code>apps.json</code> and is located in the <code>dev-setup</code> folder of your project</p>
-</li>
-<li>
-<p>You can use Nb.exe to install the tools</p>
-</li>
-</ul>
-<pre><code class="language-cmd">Nb.exe install -json apps.json
-</code></pre>
-<p>This command can be also added to <a href="ntools/dev-setup.md">dev-setup.ps1</a>.</p>
-<h4 id="list-of-environment-variables">List of Environment Variables</h4>
+<p><strong>Key Elements in apps.json:</strong></p>
 <table>
 <thead>
 <tr>
-<th>Variable Name</th>
+<th>Element Name</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Name</td>
-<td>The name of the tool</td>
+<td><code>Name</code></td>
+<td>The name of the tool.</td>
 </tr>
 <tr>
-<td>Version</td>
-<td>The version of the tool</td>
+<td><code>Version</code></td>
+<td>The version of the tool.</td>
 </tr>
 <tr>
-<td>AppFileName</td>
-<td>The file name of the tool.  This file name will be used to check if the tool is already installed</td>
+<td><code>AppFileName</code></td>
+<td>The file name of the tool, used to check if it is already installed.</td>
 </tr>
 <tr>
-<td>WebDownloadFile</td>
-<td>The web location to download the tool</td>
+<td><code>WebDownloadFile</code></td>
+<td>The URL to download the tool.</td>
 </tr>
 <tr>
-<td>DownloadedFile</td>
-<td>The name of the downloaded file.  This file will be used to install the tool</td>
+<td><code>DownloadedFile</code></td>
+<td>The name of the downloaded file, used for installation.</td>
 </tr>
 <tr>
-<td>InstallCommand</td>
-<td>The command to install the tool</td>
+<td><code>InstallCommand</code></td>
+<td>The command to install the tool.</td>
 </tr>
 <tr>
-<td>InstallArgs</td>
-<td>The arguments to install the tool</td>
+<td><code>InstallArgs</code></td>
+<td>The arguments for the installation command.</td>
 </tr>
 <tr>
-<td>InstallPath</td>
-<td>The location where the tool will be installed</td>
+<td><code>InstallPath</code></td>
+<td>The location where the tool will be installed.</td>
 </tr>
 <tr>
-<td>UninstallCommand</td>
-<td>The command to uninstall the tool</td>
+<td><code>UninstallCommand</code></td>
+<td>The command to uninstall the tool.</td>
 </tr>
 <tr>
-<td>UninstallArgs</td>
-<td>The arguments to uninstall the tool</td>
+<td><code>UninstallArgs</code></td>
+<td>The arguments for the uninstallation command.</td>
+</tr>
+<tr>
+<td><code>StoredHash</code></td>
+<td>(Optional) SHA256 hash of the file for verification.</td>
+</tr>
+<tr>
+<td><code>AddToPath</code></td>
+<td>(Optional) Whether to add the tool's path to the system PATH environment variable.</td>
 </tr>
 </tbody>
 </table>
-<h3 id="nbuildtargets-file">nbuild.targets file</h3>
-<p>The file is an MSBuild project file required in the solution folder. It imports the <code>common.targets</code> file located in the <code>$(ProgramFiles)\Nbuild</code> folder. The <code>ntools</code> repository includes multiple target files, which are documented in the [nbuild-targets.md] file.</p>
-<ul>
-<li>Must include the <code>SolutionName</code> and <code>DeploymentFolder</code> <a href="#required-properties">properties</a>.</li>
-<li>Should define the <a href="#artifacts">ARTIFACTS</a> target.</li>
-<li>Can include additional properties and targets specific to the solution.</li>
-</ul>
-<h4 id="required-properties">Required Properties</h4>
-<ul>
-<li>The following properties are required in <code>nbuild.targets</code>:<ul>
-<li>SolutionName: The name of the solution file.</li>
+<hr />
+<h3 id="3-dev-setupps1">3. <code>dev-setup.ps1</code></h3>
+<p>This PowerShell script automates the installation of tools and sets up the development environment.</p>
+<p><strong>Key Responsibilities:</strong>
+- Installs ntools using ntools.json.
+- Installs other tools listed in apps.json.
+- Verifies administrative privileges before proceeding.</p>
+<p><strong>Example:</strong></p>
+<pre><code class="language-powershell"># Import the install module
+$url = &quot;https://raw.githubusercontent.com/naz-hage/ntools/main/dev-setup/install.psm1&quot;
+$output = &quot;./install.psm1&quot;
+Invoke-WebRequest -Uri $url -OutFile $output
+Import-Module ./install.psm1 -Force
+
+# Install Ntools
+MainInstallApp -command install -json .\ntools.json
+if ($LASTEXITCODE -ne 0) {
+    Write-OutputMessage &quot;Error: Installation of ntools failed. Exiting script.&quot;
+    exit 1
+}
+
+# Install other tools
+&amp; $global:NbExePath install -json .\apps.json
+if ($LASTEXITCODE -ne 0) {
+    Write-OutputMessage &quot;Error: Installation of other tools failed. Exiting script.&quot;
+    exit 1
+}
+
+Write-OutputMessage &quot;Completed installation script.&quot;
+</code></pre>
+<hr />
+<h2 id="folder-structure">Folder Structure</h2>
+<p>Your project folder should look like this:</p>
+<pre><code class="language-plaintext">%MainDirectory%\
+├── MyProject\
+│   ├── dev-setup\
+│   │   ├── ntools.json
+│   │   ├── apps.json
+│   │   ├── dev-setup.ps1
+│   ├── ... other project and test files
+│   └── nbuild.targets  (this file is required in the solution folder)
+</code></pre>
+<hr />
+<h2 id="adding-a-new-development-tool">Adding a New Development Tool</h2>
+<p>To add a new tool to your project:
+1. Identify the tool's:
+   - Download URL and file name.
+   - Installation and uninstallation commands and arguments.
+   - Installation path.
+   - File name for version checks.
+   - Version and name.
+2. Add the tool's details to apps.json.</p>
+<p><strong>Example for a new tool:</strong></p>
+<pre><code class="language-json">{
+  &quot;Name&quot;: &quot;Docker&quot;,
+  &quot;Version&quot;: &quot;4.38.0.0&quot;,
+  &quot;AppFileName&quot;: &quot;$(InstallPath)\\Docker Desktop.exe&quot;,
+  &quot;WebDownloadFile&quot;: &quot;https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe&quot;,
+  &quot;DownloadedFile&quot;: &quot;Docker Desktop Installer.exe&quot;,
+  &quot;InstallCommand&quot;: &quot;$(DownloadedFile)&quot;,
+  &quot;InstallArgs&quot;: &quot;install --quiet&quot;,
+  &quot;InstallPath&quot;: &quot;$(ProgramFiles)\\Docker\\Docker&quot;,
+  &quot;UninstallCommand&quot;: &quot;powershell.exe&quot;,
+  &quot;UninstallArgs&quot;: &quot;-Command \&quot;Remove-Item -Path '$(InstallPath)' -Recurse -Force\&quot;&quot;,
+  &quot;AddToPath&quot;: true
+}
+</code></pre>
+<h2 id="notes">Notes</h2>
+<ol>
+<li><strong>Error Handling in <code>dev-setup.ps1</code>:</strong><ul>
+<li>What happens if a tool fails to install? Are there retries or logs generated?</li>
 </ul>
 </li>
-</ul>
-<pre><code class="language-xml">&lt;PropertyGroup&gt;
-  &lt;DeploymentFolder&gt;$(ProgramFiles)\Nbuild&lt;/DeploymentFolder&gt;
-&lt;/PropertyGroup&gt;
-</code></pre>
-<h4 id="artifacts">Artifacts</h4>
-<ul>
-<li>The following target is required in <code>nbuild.targets</code>:<ul>
-<li>ARTIFACTS: The folder where the artifacts are copied to.</li>
+<li><strong>Environment Variables:</strong><ul>
+<li>Are there any required environment variables for <code>dev-setup.ps1</code> to work?</li>
 </ul>
 </li>
+<li><strong>Dependencies:</strong><ul>
+<li>Are there any dependencies for the tools listed in apps.json (e.g., PowerShell version)?</li>
 </ul>
-<pre><code class="language-xml">&lt;!--Setup the ARTIFACTS folders for binaries and test results - override --&gt;
-    &lt;Target Name=&quot;ARTIFACTS&quot; DependsOnTargets=&quot;TAG&quot;&gt;
-      &lt;PropertyGroup&gt;
-         &lt;ArtifactsSolutionFolder&gt;$(ArtifactsDir)\$(SolutionName)&lt;/ArtifactsSolutionFolder&gt;
-         &lt;SetupFolder&gt;$(ArtifactsSolutionFolder)\release&lt;/SetupFolder&gt;
-        &lt;ArtifactsFolder&gt;$(ArtifactsSolutionFolder)\$(TargetRelease)\$(ProductVersion)&lt;/ArtifactsFolder&gt;
-        &lt;ArtifactsTestResultsFolder&gt;$(ArtifactsSolutionFolder)\TestResults\$(ProductVersion)&lt;/ArtifactsTestResultsFolder&gt;
-      &lt;/PropertyGroup&gt;  
-      &lt;ItemGroup&gt;
-            &lt;BinaryFiles 
-                        Exclude=&quot;
-                         $(SolutionDir)\$(TargetRelease)\**\*.pdb;
-                         $(SolutionDir)\$(TargetRelease)\test.*;
-                         $(SolutionDir)\$(TargetRelease)\*test*;
-                         $(SolutionDir)\$(TargetRelease)\Nuget*;
-                         $(SolutionDir)\$(TargetRelease)\*CodeCoverage*&quot;
-
-                        Include=&quot;
-                        $(SolutionDir)\$(TargetRelease)\*.exe;
-                        $(SolutionDir)\$(TargetRelease)\*.exe.config;
-                        $(SolutionDir)\$(TargetRelease)\*.json;
-                        $(SolutionDir)\Nbuild\resources\*.targets;
-                        $(SolutionDir)\Nbuild\resources\*.ps1;
-                        $(SolutionDir)\Nbuild\resources\*.json;
-                        $(SolutionDir)\$(TargetRelease)\*.dll&quot;
-                        /&gt;
-
-            &lt;RunTimesNetStandard20 Include = &quot;
-                                   $(SolutionDir)\$(TargetRelease)\netstandard2.0\*.*&quot;
-                                    Exclude=&quot;
-                                    $(SolutionDir)\$(TargetRelease)\**\*.pdb&quot;
-                                    /&gt;
-        &lt;/ItemGroup&gt;
-
-        &lt;Message Text=&quot;==&gt; DONE&quot;/&gt;
-    &lt;/Target&gt;
-</code></pre>
-<h3 id="add-a-new-property">Add a new property</h3>
-<p>In MSBuild, a project file is an XML file that describes a software build process. It includes three important elements: Property, PropertyGroup, and Item.</p>
-<ul>
-<li><strong>Property</strong>: A property in MSBuild is a named value that you can refer to in the project file. Properties are key-value pairs and are defined inside PropertyGroup elements.  In the example below, the Configuration property is set to Debug.</li>
+</li>
+<li><strong>Testing the Setup:</strong><ul>
+<li>How can users verify that the setup was successful?</li>
 </ul>
-<pre><code class="language-xml">&lt;PropertyGroup&gt;
-    &lt;Configuration&gt;Debug&lt;/Configuration&gt;
-&lt;/PropertyGroup&gt;
-</code></pre>
-<ul>
-<li><strong>PropertyGroup</strong>: A PropertyGroup is a container for properties. It can contain one or more Property elements. PropertyGroup elements can appear anywhere in the project file, and you can have multiple PropertyGroup elements in a project file.  In the example below, the Configuration and Platform properties are set to Debug and AnyCPU, respectively.</li>
-</ul>
-<pre><code class="language-xml">&lt;PropertyGroup&gt;
-    &lt;Configuration&gt;Debug&lt;/Configuration&gt;
-    &lt;Platform&gt;AnyCPU&lt;/Platform&gt;
-&lt;/PropertyGroup&gt;
-</code></pre>
-<ul>
-<li><strong>Item</strong>: An item in MSBuild is a piece of data that has a type and can be a file, a directory, or any other piece of data that you want to operate on. Items are grouped into ItemGroup elements.  In the example below, the Program.cs file is included in the project.</li>
-</ul>
-<pre><code class="language-xml">&lt;ItemGroup&gt;
-    &lt;Compile Include=&quot;Program.cs&quot; /&gt;
-&lt;/ItemGroup&gt;
-</code></pre>
-<p>For more detailed information, you can refer to the official MSBuild documentation: <a href="https://docs.microsoft.com/en-us/visualstudio/msbuild/msbuild-project-file-schema-reference?view=vs-2019">MSBuild Project File Schema Reference</a></p>
-<h3 id="add-a-new-target">Add a new target</h3>
-<p>A target is a named sequence of tasks that represents something to be built or done. For more information, see <a href="https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild-targets?view=vs-2022">Targets</a>.</p>
-<p><strong>Example of a target:</strong></p>
-<pre><code class="language-xml">&lt;Target Name=&quot;MyTarget&quot;&gt;
-  &lt;Message Text=&quot;Hello, world!&quot; /&gt;
-&lt;/Target&gt;
-</code></pre>
-<h3 id="add-a-new-task">Add a new task</h3>
-<p>A task is the smallest unit of work in a build. Tasks are independent executable components with inputs and outputs. You can add tasks to the project file in different sections. For more information, see <a href="https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild-tasks?view=vs-2022">Tasks</a>.</p>
-<p><strong>Example of a task:</strong></p>
-<p>We're adding a new task to <code>MyTarget</code>:</p>
-<pre><code class="language-xml">&lt;Target Name=&quot;MyTarget&quot;&gt;
-  &lt;Message Text=&quot;Hello, world!&quot; /&gt;
-  &lt;Message Text=&quot;Done!&quot; /&gt;
-&lt;/Target&gt;
-</code></pre>
-<p>See <a href="../ntools/nbuild-targets/">Nbuild Tasks</a> for more information on <code>ntools</code> built-in tasks.</p>
-<h3 id="add-a-new-condition">Add a new condition</h3>
-<p>Conditions in MSBuild allow you to specify whether a particular task, property, or target should be executed based on certain conditions. You can use conditions to control the flow of your build process and make it more flexible and dynamic. Conditions are expressed as Boolean expressions that evaluate to true or false. If the condition evaluates to true, the associated task, property, or target is executed; otherwise, it is skipped. You can use various operators and functions to create complex conditions. For more information on conditions in MSBuild, you can refer to the <a href="https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild-conditions?view=vs-2022">Conditions</a> documentation.</p>
-<p><strong>Example of a condition:</strong></p>
-<pre><code class="language-xml">&lt;PropertyGroup&gt;
-  &lt;IsAdmin Condition=&quot;'$(IsAdmin)' == ''&quot;&gt;false&lt;/IsAdmin&gt;
-&lt;/PropertyGroup&gt;
-</code></pre>
+</li>
+</ol>
               
             </div>
           </div><footer>
