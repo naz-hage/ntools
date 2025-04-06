@@ -94,6 +94,10 @@
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#example-creating-a-release">Example: Creating a Release</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#example-downloading-an-asset">Example: Downloading an Asset</a>
+    </li>
         </ul>
     </li>
     </ul>
@@ -260,6 +264,14 @@
   - branch  : Branch name. (string, default=main)
   - path    : Asset path. Must be an absolute path. (string, default=)
   - v       : Optional parameter which sets the console output verbose level. (true or false, default=False)
+</code></pre>
+<h3 id="example-creating-a-release">Example: Creating a Release</h3>
+<p>To create a release for the repository <code>my-repo</code> with the tag <code>v1.0.0</code>, branch <code>main</code>, and an asset located at <code>C:\Releases\my-release.zip</code>:</p>
+<pre><code class="language-batch">GitHubRelease.exe create -repo my-repo -tag v1.0.0 -branch main -path C:\Releases\my-release.zip -v true
+</code></pre>
+<h3 id="example-downloading-an-asset">Example: Downloading an Asset</h3>
+<p>To download an asset from the release with the tag <code>v1.0.0</code> in the repository <code>my-repo</code> to the path <code>C:\Downloads\asset.zip</code>:</p>
+<pre><code class="language-batch">GitHubRelease.exe download -repo my-repo -tag v1.0.0 -path C:\Downloads\asset.zip -v true
 </code></pre>
               
             </div>

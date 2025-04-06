@@ -107,9 +107,9 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <p><code>Ngit</code> is simple wrapper for <code>Git</code> tool that perform simple commands such as get tag and set tag.</p>
+                <p><code>Ngit</code> is a simple wrapper for the <code>Git</code> tool that performs basic commands such as getting and setting tags.</p>
 <h3 id="usage">Usage</h3>
-<pre><code class="language-batch"> Ngit.exe command [-url value] [-tag value] [-buildtype value] [-v value]
+<pre><code class="language-batch">Ngit.exe command [-url value] [-tag value] [-buildtype value] [-v value]
   - command   : Specifies the git command to execute.
          tag             -&gt; Get the current tag
          settag          -&gt; Set specified tag in -tag option
@@ -125,6 +125,28 @@
   - buildtype : Specifies the build type used for autotag and setautotag commands. Possible values: STAGE, PROD. (string, default=)
   - v         : Specifies whether to print additional information. (true or false, default=False)
 </code></pre>
+<h3 id="examples">Examples</h3>
+<h4 id="example-1-get-the-current-tag">Example 1: Get the Current Tag</h4>
+<p>To retrieve the current Git tag:</p>
+<pre><code class="language-batch">Ngit.exe tag -v true
+</code></pre>
+<h4 id="example-2-set-a-specific-tag">Example 2: Set a Specific Tag</h4>
+<p>To set a specific tag (e.g., <code>1.0.0</code>):</p>
+<pre><code class="language-batch">Ngit.exe settag -tag 1.0.0 -v true
+</code></pre>
+<h4 id="example-3-auto-tag-based-on-build-type">Example 3: Auto-Tag Based on Build Type</h4>
+<p>To set the next tag based on the build type <code>STAGE</code>:</p>
+<pre><code class="language-batch">Ngit.exe autotag -buildtype STAGE -v true
+</code></pre>
+<h4 id="example-4-clone-a-repository">Example 4: Clone a Repository</h4>
+<p>To clone a Git repository from a specific URL:</p>
+<pre><code class="language-batch">Ngit.exe clone -url https://github.com/example/repo.git -v true
+</code></pre>
+<h4 id="example-5-delete-a-tag">Example 5: Delete a Tag</h4>
+<p>To delete a specific tag (e.g., <code>1.0.0</code>):</p>
+<pre><code class="language-batch">Ngit.exe deletetag -tag 1.0.0 -v true
+</code></pre>
+<p>These examples demonstrate how to use <code>Ngit</code> for common Git operations such as managing tags, branches, and repositories.</p>
               
             </div>
           </div><footer>
