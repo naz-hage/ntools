@@ -97,15 +97,16 @@ GitHubRelease.exe command [-repo value] [-tag value] [-branch value] [-path valu
   - v       : Optional parameter which sets the console output verbose level. (true or false, default=False)
 ```
 ### Example: Creating a Release
-To create a release for the repository `my-repo` with the tag `v1.0.0`, branch `main`, and an asset located at `C:\Releases\my-release.zip`:
+To create a release for the repository `my-repo` with the tag `1.0.0`, branch `main`, and an asset located at `C:\Releases\1.0.0.zip`, you would use the following command:
 
 ```batch
-GitHubRelease.exe create -repo my-repo -tag v1.0.0 -branch main -path C:\Releases\my-release.zip -v true
+GitHubRelease.exe create -repo my-repo -tag 1.0.0 -branch main -path C:\Releases\1.1.0.zip -v true
 ```
 
 ### Example: Downloading an Asset
-To download an asset from the release with the tag `v1.0.0` in the repository `my-repo` to the path `C:\Downloads\asset.zip`:
+To download an asset from the release with the tag `1.0.0` in the repository `my-repo` to the path `C:\Downloads`:
 
 ```batch
-GitHubRelease.exe download -repo my-repo -tag v1.0.0 -path C:\Downloads\asset.zip -v true
+GitHubRelease.exe download -repo my-repo -tag 1.0.0 -path C:\Downloads -v true
 ```
+An asset named 1.0.0.zip will be downloaded to the specified path if it exists in the release.
