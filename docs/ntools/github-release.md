@@ -12,15 +12,14 @@ GitHubRelease is a tool that allows you to create and manage GitHub releases fro
   - At least one Git tag prior to creating releases.
 
 ### Environment Requirements
-- **Windows Platforms:**
-  - The GitHub API token must be stored in the Windows Credential Manager with:
+- The GitHub API token and repository owner are obtained from environment variables:
+  - **`OWNER`:** The GitHub repository owner's username.
+  - **`API_GITHUB_KEY`:** The GitHub API token (personal access token).
+- **Local development with Windows Platforms:**
+  - For additional security, the GitHub API token should be saved in the Windows Credential Manager with:
     - **Target Name:** `GitHubRelease`
     - **Credential Name:** `API_GITHUB_KEY`
-- **Non-Windows Platforms:**
-  - The following environment variables must be set:
-    - **`OWNER`:** The GitHub repository owner's username.
-    - **`API_GITHUB_KEY`:** The GitHub API token (personal access token).
-
+- 
 ### GitHub Actions Workflow Example
 Here is an example of how to set up the required environment variables in a GitHub Actions workflow file:
 
