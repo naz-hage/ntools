@@ -101,24 +101,11 @@ This command can be also added to [dev-setup.ps1](ntools/dev-setup.md).
 
 ### nbuild.targets file
 
-A file called [`nbuild.targets`](ntools/nbuild-targets.md) is required in the solution folder. This file imports the `common.targets` file located in the `$(ProgramFiles)\Nbuild` folder. The `ntools` repository includes multiple target files, which can be found in the `nbuild-targets.md` file.
+The file is an MSBuild project file required in the solution folder. It imports the `common.targets` file located in the `$(ProgramFiles)\Nbuild` folder. The `ntools` repository includes multiple target files, which are documented in the [nbuild-targets.md] file.
 
-Your file structure should look like this:
-```cmd
-%MainDirectory%\MyProject
-%MainDirectory%\MyProject\nbuild.targets
-%MainDirectory%\MyProject\dev-setup
-%MainDirectory%\MyProject\dev-setup\ntools.json
-%MainDirectory%\MyProject\dev-setup\apps.json
-%MainDirectory%\MyProject\dev-setup\dev-setup.ps1
-%MainDirectory%\MyProject\... other project test files
-```
-#### nbuild.targets
-- `nbuild.targets` is a MSBuild project file that imports `common.targets`
-- `nbuild.targets` must include the `SolutionName` and `DeploymentFolder` [property](#required-properties). It should also define the [ARTIFACTS](#artifacts) target. 
-- `nbuild.targets` imports the [common.targets](../ntools/nbuild/#commontargets) file located in the `$(ProgramFiles)\Nbuild` folder. The `ntools` repository includes multiple target files, which can be found in the [targets](ntools/nbuild-targets.md) file.
-- `nbuild.targets` can include any additional properties and targets that are specific to the solution.  
-- `nbuild.targets` file is located in the solution folder.
+- Must include the `SolutionName` and `DeploymentFolder` [properties](#required-properties).
+- Should define the [ARTIFACTS](#artifacts) target.
+- Can include additional properties and targets specific to the solution.
 
 #### Required Properties
 - The following properties are required in `nbuild.targets`:
