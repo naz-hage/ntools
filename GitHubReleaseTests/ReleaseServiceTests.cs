@@ -9,19 +9,6 @@ namespace GitHubRelease.Tests
     [TestClass()]
     public class ReleaseServiceTests : GitHubSetup
     {
-        private static string CreateAsset(string repo, string tag)
-        {
-            var assetPath = $"C:\\Artifacts\\{repo}\\release\\{tag}.zip";
-            if (File.Exists(assetPath))
-            {
-                return assetPath;
-            }
-            else
-            {
-                File.Copy($"C:\\Artifacts\\{repo}\\release\\0.0.1.zip", assetPath);
-                return assetPath;
-            }
-        }
 
         /// <summary>
         /// CreateGitHubReleaseAsyncTestAsync method tests the creation of a GitHub release using the ReleaseService class. 
@@ -193,10 +180,13 @@ namespace GitHubRelease.Tests
         public async Task DownloadAssetByName_ShouldDownloadAsset()
         {
             // Arrange
+            
             string tagName = "1.11.0";
-            string assetName = "1.11.0.zip";
+            string assetName = $"{tagName}.zip";
             string DownloadPath = @"c:\temp";
             var assetFileName = Path.Combine(DownloadPath, assetName);
+            //string owner = "naz-hage";
+            //var downloadUrl = $"https://github.com/{owner}/{Repo}/releases/download/{tagName}/{assetName}";
 
             // Delete the file if it exists
             if (File.Exists(assetFileName))
@@ -208,6 +198,7 @@ namespace GitHubRelease.Tests
 
             // Act
             var response = await releaseService.DownloadAssetByName(tagName, assetName, DownloadPath);
+            //var response = await releaseService.DownloadAssetFromUrl(downloadUrl, assetFileName);
 
             // Assert
             Assert.IsTrue(response.IsSuccessStatusCode, $"Failed to download the asset.  status: {response.StatusCode}.");

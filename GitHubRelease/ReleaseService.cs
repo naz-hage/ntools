@@ -697,14 +697,15 @@ namespace GitHubRelease
 
             // Log the Authorization header
             var authorizationHeader = ApiService.GetClient().DefaultRequestHeaders.Authorization;
-            if (authorizationHeader != null)
-            {
-                Console.WriteLine($"Authorization: {authorizationHeader.Scheme} {authorizationHeader.Parameter}");
-            }
-            else
+            if (authorizationHeader == null)
             {
                 Console.WriteLine("Authorization header is not set.");
+                throw new InvalidOperationException("Authorization header is not set.");
             }
+            //else
+            //{
+            //    Console.WriteLine($"Authorization: {authorizationHeader.Scheme} {authorizationHeader.Parameter}");
+            //}
 
             // Make a request to the GitHub API to check token permissions
             var uri = "https://api.github.com/user";
@@ -768,31 +769,9 @@ namespace GitHubRelease
         }
 
 
-
         public async Task<HttpResponseMessage> DownloadAssetFromUrl(string downloadUrl, string assetFileName)
         {
             ApiService.SetupHeaders(download: true);
-
-            // Log the Authorization header
-            var authorizationHeader = ApiService.GetClient().DefaultRequestHeaders.Authorization;
-            if (authorizationHeader != null)
-            {
-                Console.WriteLine($"Authorization: {authorizationHeader.Scheme} {authorizationHeader.Parameter}");
-
-                await CheckTokenPermissions();
-            }
-            else
-            {
-                Console.WriteLine("Authorization header is not set.");
-            }
-
-            ApiService.SetupHeaders(download: true);
-
-            // Log the headers
-            foreach (var header in ApiService.GetClient().DefaultRequestHeaders)
-            {
-                Console.WriteLine($"{header.Key}: {string.Join(", ", header.Value)}");
-            }
 
             Console.WriteLine($"GET uri: {downloadUrl}");
             var response = await ApiService.GetAsync(downloadUrl);
@@ -800,6 +779,10 @@ namespace GitHubRelease
             if (response.IsSuccessStatusCode)
             {
                 var assetContent = await response.Content.ReadAsByteArrayAsync();
+
+                // Write size of content to console
+                Console.WriteLine($"Size of downloaded content: {assetContent.Length} bytes");
+
                 await File.WriteAllBytesAsync(assetFileName, assetContent);
                 Console.WriteLine($"Successfully downloaded the asset to: {assetFileName}");
             }
@@ -812,6 +795,56 @@ namespace GitHubRelease
 
             return response;
         }
+
+
+        //public async Task<HttpResponseMessage> DownloadAssetFromUrl(string downloadUrl, string assetFileName)
+        //{
+        //    ApiService.SetupHeaders(download: true);
+
+        //    // Log the Authorization header
+        //    //var authorizationHeader = ApiService.GetClient().DefaultRequestHeaders.Authorization;
+        //    //if (authorizationHeader == null)
+        //    //{
+        //    //    Console.WriteLine("Authorization header is not set.");
+        //    //    throw new InvalidOperationException("Authorization header is not set.");
+        //    //}
+        //    //else
+        //    //{
+        //    //    Console.WriteLine($"Authorization: {authorizationHeader.Scheme} {authorizationHeader.Parameter}");
+
+        //    //    await CheckTokenPermissions();
+        //    //}
+
+        //    //ApiService.SetupHeaders(download: true);
+
+        //    // Log the headers
+        //    //foreach (var header in ApiService.GetClient().DefaultRequestHeaders)
+        //    //{
+        //    //    Console.WriteLine($"{header.Key}: {string.Join(", ", header.Value)}");
+        //    //}
+
+        //    Console.WriteLine($"GET uri: {downloadUrl}");
+        //    var response = await ApiService.GetAsync(downloadUrl);
+
+        //    if (response.IsSuccessStatusCode)
+        //    {
+        //        var assetContent = await response.Content.ReadAsByteArrayAsync();
+
+        //        // Write size of content to console
+        //        Console.WriteLine($"Size of downloaded content: {assetContent.Length} bytes");
+
+        //        await File.WriteAllBytesAsync(assetFileName, assetContent);
+        //        Console.WriteLine($"Successfully downloaded the asset to: {assetFileName}");
+        //    }
+        //    else
+        //    {
+        //        Console.WriteLine($"Error: Could not download the asset. Status code: {response.StatusCode}");
+        //        var responseContent = await response.Content.ReadAsStringAsync();
+        //        Console.WriteLine($"Response content: {responseContent}");
+        //    }
+
+        //    return response;
+        //}
 
 
         public async Task<bool> VerifyAssetId(string tagName, int assetId)

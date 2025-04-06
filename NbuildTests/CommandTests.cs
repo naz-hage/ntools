@@ -326,6 +326,12 @@ namespace NbuildTests
         [TestMethod()]
         public void InstallExceptionNameTest()
         {
+            // Skip test if not running in admin mode
+            if (!CurrentProcess.IsElevated())
+            {
+                Assert.Inconclusive("Test skipped because it requires admin privileges.");
+            }
+
             // Arrange with json and no name define ""Name"": ""nbuild"",
             var json = @"{
                 ""Version"": ""1.2.0"",
@@ -362,6 +368,12 @@ namespace NbuildTests
         [TestMethod()]
         public void InstallExceptionAppFileNameTest()
         {
+            // Skip test if not running in admin mode
+            if (!CurrentProcess.IsElevated())
+            {
+                Assert.Inconclusive("Test skipped because it requires admin privileges.");
+            }
+
             // Arrange with json and no AppFileName defined
             var json = @"{
                 ""Version"": ""1.2.0"",
@@ -438,6 +450,12 @@ namespace NbuildTests
         [TestMethod()]
         public void InstallExceptionDownloadedFileTest()
         {
+            // Skip test if not running in admin mode
+            if (!CurrentProcess.IsElevated())
+            {
+                Assert.Inconclusive("Test skipped because it requires admin privileges.");
+            }
+
             // Arrange with json and no DownloadedFile defined
             var json = @"{
                 ""Version"": ""1.2.0"",
@@ -475,6 +493,12 @@ namespace NbuildTests
         [TestMethod()]
         public void InstallExceptionInstallCommandTest()
         {
+            // Skip test if not running in admin mode
+            if (!CurrentProcess.IsElevated())
+            {
+                Assert.Inconclusive("Test skipped because it requires admin privileges.");
+            }
+
             // Arrange with json and no InstallCommand defined
             var json = @"{
                 ""Version"": ""1.2.0"",
@@ -512,6 +536,12 @@ namespace NbuildTests
         [TestMethod()]
         public void InstallExceptionInstallArgsTest()
         {
+            // Skip test if not running in admin mode
+            if (!CurrentProcess.IsElevated())
+            {
+                Assert.Inconclusive("Test skipped because it requires admin privileges.");
+            }
+
             // Arrange with json and no InstallArgs defined
             var json = @"{
                 ""Version"": ""1.2.0"",
@@ -549,6 +579,12 @@ namespace NbuildTests
         [TestMethod()]
         public void InstallExceptionInstallPathTest()
         {
+            // Skip test if not running in admin mode
+            if (!CurrentProcess.IsElevated())
+            {
+                Assert.Inconclusive("Test skipped because it requires admin privileges.");
+            }
+
             // Arrange with json and no InstallPath defined
             var json = @"{
                 ""Version"": ""1.2.0"",
@@ -585,6 +621,12 @@ namespace NbuildTests
         [TestMethod]
         public void AddAppInstallPathToEnvironmentPath_AddsPath_WhenNotPresent()
         {
+            // Skip test if not running in admin mode
+            if (!CurrentProcess.IsElevated())
+            {
+                Assert.Inconclusive("Test skipped because it requires admin privileges.");
+            }
+
             // Arrange
             var nbuildApp = new NbuildApp
             {
@@ -607,6 +649,12 @@ namespace NbuildTests
         [TestMethod]
         public void AddAppInstallPathToEnvironmentPath_DoesNotAddPath_WhenAlreadyPresent()
         {
+            // Skip test if not running in admin mode
+            if (!CurrentProcess.IsElevated())
+            {
+                Assert.Inconclusive("Test skipped because it requires admin privileges.");
+            }
+
             // Arrange
             var nbuildApp = new NbuildApp
             {
@@ -654,6 +702,12 @@ namespace NbuildTests
         [TestMethod]
         public void RemoveAppInstallPathFromEnvironmentPath_RemovesPath_WhenPresent()
         {
+            // Skip test if not running in admin mode
+            if (!CurrentProcess.IsElevated())
+            {
+                Assert.Inconclusive("Test skipped because it requires admin privileges.");
+            }
+
             // Arrange
             var nbuildApp = new NbuildApp
             {
@@ -676,6 +730,12 @@ namespace NbuildTests
         [TestMethod]
         public void RemoveAppInstallPathFromEnvironmentPath_DoesNotRemovePath_WhenNotPresent()
         {
+            // Skip test if not running in admin mode
+            if (!CurrentProcess.IsElevated())
+            {
+                Assert.Inconclusive("Test skipped because it requires admin privileges.");
+            }
+
             // Arrange
             var nbuildApp = new NbuildApp
             {
@@ -720,6 +780,12 @@ namespace NbuildTests
         [TestMethod]
         public void IsAppInstallPathInEnvironmentPath_ReturnsTrue_WhenPathIsPresent()
         {
+            // Skip test if not running in admin mode
+            if (!CurrentProcess.IsElevated())
+            {
+                Assert.Inconclusive("Test skipped because it requires admin privileges.");
+            }
+
             // Arrange
             var nbuildApp = new NbuildApp
             {
@@ -741,6 +807,12 @@ namespace NbuildTests
         [TestMethod]
         public void IsAppInstallPathInEnvironmentPath_ReturnsFalse_WhenPathIsNotPresent()
         {
+            // Skip test if not running in admin mode
+            if (!CurrentProcess.IsElevated())
+            {
+                Assert.Inconclusive("Test skipped because it requires admin privileges.");
+            }
+
             // Arrange
             var nbuildApp = new NbuildApp
             {
