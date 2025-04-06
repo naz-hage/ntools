@@ -70,15 +70,15 @@ Follow the [GitHub documentation](https://docs.github.com/en/github/authenticati
 
 ### Required Permissions
 The access token must have the following permissions:
-- **Repository Permissions:**
-  - **Contents:** `Read and write`
-  - **Metadata:** `Read-only`
-  - **Actions:** `Read and write` (if needed)
-  - **Packages:** `Read and write` (if needed)
-- **Workflow Permissions:**
-  - **Workflows:** `Read and write` (if needed)
-- **Release Permissions:**
-  - **Releases:** `Read and write`
+
+| **Permission Type** | **Scope**              | **Description**                          |
+|----------------------|------------------------|------------------------------------------|
+| Repository           | Contents: `Read/Write`| Access repository contents.              |
+|                      | Metadata: `Read-only` | Access repository metadata.              |
+|                      | Actions: `Read/Write` | Manage GitHub Actions (if needed).       |
+|                      | Packages: `Read/Write`| Manage GitHub Packages (if needed).      |
+| Workflow             | Workflows: `Read/Write`| Manage workflows (if needed).           |
+| Release              | Releases: `Read/Write`| Manage GitHub releases.                  |
 
 ## GitHubRelease Command Line Options
 
@@ -96,3 +96,5 @@ GitHubRelease.exe command [-repo value] [-tag value] [-branch value] [-path valu
   - path    : Asset path. Must be an absolute path. (string, default=)
   - v       : Optional parameter which sets the console output verbose level. (true or false, default=False)
 ```
+
+
