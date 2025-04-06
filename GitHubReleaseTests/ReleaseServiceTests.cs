@@ -46,6 +46,15 @@ namespace GitHubRelease.Tests
             // Assert
             Assert.IsNotNull(result, "Create release is null");
             Assert.AreEqual(result.StatusCode.ToString(), "Created");
+
+            // Download the asset
+            var assetName = $"{TagStagingRequested}.zip";
+            string DownloadPath = @"c:\temp";
+            var response = await releaseService.DownloadAssetByName(release.TagName, assetName, DownloadPath);
+
+            // Assert
+            Assert.IsTrue(response.IsSuccessStatusCode, $"Failed to download the asset.  status: {response.StatusCode}.");
+
         }
 
         [TestMethod()]
@@ -269,5 +278,44 @@ namespace GitHubRelease.Tests
             Assert.IsFalse(File.Exists(assetFileName), "The asset file should not be created.");
         }
 
+        //[TestMethod]
+        //public async Task UploadAsset_ShouldUploadAssetSuccessfully()
+        //{
+        //    // Arrange
+        //    var releaseService = new ReleaseService(Repo);
+        //    string assetPath = "test-asset.zip";
+        //    string uploadUrl = "https://uploads.github.com/repos/naz-hage/learn/releases/assets{?name,label}";
+        //    var expectedResponse = new HttpResponseMessage(HttpStatusCode.Created);
+
+        //    // Create a dummy file to upload
+        //    File.WriteAllText(assetPath, "dummy content");
+
+        //    // Act
+        //    var response = await releaseService.UploadAsset(assetPath!, uploadUrl!);
+
+        //    // Assert
+        //    Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
+
+        //    // Clean up
+        //    if (File.Exists(assetPath))
+        //    {
+        //        File.Delete(assetPath);
+        //    }
+        //}
+
+        //[TestMethod]
+        //public async Task UploadAsset_ShouldReturnNotFoundIfFileDoesNotExist()
+        //{
+        //    // Arrange
+        //    var releaseService = new ReleaseService(Repo);
+        //    string assetPath = "nonexistent-asset.zip";
+        //    string uploadUrl = "https://uploads.github.com/repos/naz-hage/learn/releases/assets{?name,label}";
+
+        //    // Act
+        //    var response = await releaseService.UploadAsset(assetPath, uploadUrl);
+
+        //    // Assert
+        //    Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
+        //}
     }
 }

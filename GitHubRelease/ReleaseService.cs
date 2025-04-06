@@ -666,7 +666,7 @@ namespace GitHubRelease
                     var downloadUrl = asset.GetProperty("browser_download_url").GetString();
                     if (!string.IsNullOrEmpty(downloadUrl))
                     {
-                        // build full filename with path
+                        // Build full filename with path
                         var assetFileName = Path.Combine(downloadPath, assetName);
                         return await DownloadAssetFromUrl(downloadUrl, assetFileName);
                     }
