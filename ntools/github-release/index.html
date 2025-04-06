@@ -152,18 +152,16 @@
 </ul>
 <h3 id="environment-requirements">Environment Requirements</h3>
 <ul>
-<li><strong>Windows Platforms:</strong></li>
-<li>The GitHub API token must be stored in the Windows Credential Manager with:<ul>
+<li>The GitHub API token and repository owner are obtained from environment variables:</li>
+<li><strong><code>OWNER</code>:</strong> The GitHub repository owner's username.</li>
+<li><strong><code>API_GITHUB_KEY</code>:</strong> The GitHub API token (personal access token).</li>
+<li><strong>Local development with Windows Platforms:</strong></li>
+<li>For additional security, the GitHub API token should be saved in the Windows Credential Manager with:<ul>
 <li><strong>Target Name:</strong> <code>GitHubRelease</code></li>
 <li><strong>Credential Name:</strong> <code>API_GITHUB_KEY</code></li>
 </ul>
 </li>
-<li><strong>Non-Windows Platforms:</strong></li>
-<li>The following environment variables must be set:<ul>
-<li><strong><code>OWNER</code>:</strong> The GitHub repository owner's username.</li>
-<li><strong><code>API_GITHUB_KEY</code>:</strong> The GitHub API token (personal access token).</li>
-</ul>
-</li>
+<li></li>
 </ul>
 <h3 id="github-actions-workflow-example">GitHub Actions Workflow Example</h3>
 <p>Here is an example of how to set up the required environment variables in a GitHub Actions workflow file:</p>
