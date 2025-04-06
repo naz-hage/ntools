@@ -178,7 +178,7 @@ namespace GitHubRelease
             }
             else
             {
-                Console.WriteLine($"Failed to read credential '{credentialName}' from Credential Manager. Error code: {Marshal.GetLastWin32Error()}");
+                Console.WriteLine($"Warning: unable to read credential from Credential Manager. Error code: {Marshal.GetLastWin32Error()}");
                 // Optionally, throw an exception or return an empty SecureString
             }
 

@@ -188,8 +188,13 @@ namespace GitHubRelease.Tests
         [TestMethod]
         public async Task DownloadPrivateAssetByName_ShouldDownloadAsset()
         {
+            // Skip the test if running in GitHub Actions
+            if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != null)
+            {
+                Assert.Inconclusive();
+            }
+
             // Arrange
-            
             string tagName = "1.2.1";
             string assetName = $"{tagName}.zip";
             string DownloadPath = @"c:\temp";
