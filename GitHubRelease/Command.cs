@@ -65,6 +65,11 @@ namespace GitHubRelease
             // Check if we have write access to the assetPath
             try
             {
+                // remove '\' from end of path if present
+                if (assetPath.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                {
+                    assetPath = assetPath.TrimEnd(Path.DirectorySeparatorChar);
+                }
                 using FileStream fs = File.Create(assetPath, 1, FileOptions.DeleteOnClose);
             }
             catch (UnauthorizedAccessException)
