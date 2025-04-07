@@ -253,21 +253,22 @@
 </table>
 <h2 id="githubrelease-command-line-options">GitHubRelease Command Line Options</h2>
 <h3 id="usage">Usage</h3>
-<pre><code class="language-batch">GitHubRelease.exe command [-repo value] [-tag value] [-branch value] [-path value] [-v value]
+<pre><code class="language-batch">GitHubRelease.exe command [-repo value] [-tag value] [-branch value] [-file value] [-path value] [-v value]
   - command : Specifies the command to execute.
-         create          -&gt; Create a release. Requires repo, tag, branch, and path.
-         download        -&gt; Download an asset. Requires repo, tag, and path.
+         create          -&gt; Create a release. Requires repo, tag, branch and file.
+         download        -&gt; Download an asset. Requires repo, tag, and path (optional)
          ----
- (one of create, download, required)
-  - repo    : Repository name. (string, default=)
-  - tag     : Tag name. (string, default=)
-  - branch  : Branch name. (string, default=main)
-  - path    : Asset path. Must be an absolute path. (string, default=)
+ (one of create,download, required)
+  - repo    : Specifies the repository name. Applicable to all commands. (string, default=)
+  - tag     : Specifies the tag name. Aplicable for all commands (string, default=)
+  - branch  : Specifies the branch name. Applicable for create command (string, default=main)
+  - file    : Specifies the asset file name. Must include full path. Applicable for create command (string, default=)
+  - path    : Specifies the asset path. Must be an absolute path. (string, default=)
   - v       : Optional parameter which sets the console output verbose level. (true or false, default=False)
 </code></pre>
 <h3 id="example-creating-a-release">Example: Creating a Release</h3>
 <p>To create a release for the repository <code>my-repo</code> with the tag <code>1.0.0</code>, branch <code>main</code>, and an asset located at <code>C:\Releases\1.0.0.zip</code>, you would use the following command:</p>
-<pre><code class="language-batch">GitHubRelease.exe create -repo my-repo -tag 1.0.0 -branch main -path C:\Releases\1.1.0.zip -v true
+<pre><code class="language-batch">GitHubRelease.exe create -repo my-repo -tag 1.0.0 -branch main -file C:\Releases\1.1.0.zip -v true
 </code></pre>
 <h3 id="example-downloading-an-asset">Example: Downloading an Asset</h3>
 <p>To download an asset from the release with the tag <code>1.0.0</code> in the repository <code>my-repo</code> to the path <code>C:\Downloads</code>:</p>
