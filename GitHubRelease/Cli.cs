@@ -21,29 +21,34 @@ namespace GitHubRelease
         /// Possible values: create, download.
         /// </summary>
         [RequiredArgument(0, "command", "Specifies the command to execute.\n" +
-            "\t create \t -> Create a release. Requires repo, tag, branch and path.\n" +
-            "\t download \t -> Download an asset. Requires repo, tag, and path\n" +
+            "\t create \t -> Create a release. Requires repo, tag, branch and file.\n" +
+            "\t download \t -> Download an asset. Requires repo, tag, and path (optional)\n" +
             "\t ----\n")]
         public CommandType Command { get; set; }
 
         /// <summary>
         /// Gets or sets the repository name.
         /// </summary>
-        [OptionalArgument("", "repo", "Specifies the repository name.")]
+        [OptionalArgument("", "repo", "Specifies the repository name. Applicable to all commands.")]
         public string? Repo { get; set; }
 
         /// <summary>
         /// Gets or sets the tag name.
         /// </summary>
-        [OptionalArgument("", "tag", "Specifies the tag name.")]
+        [OptionalArgument("", "tag", "Specifies the tag name. Aplicable for all commands")]
         public string? Tag { get; set; }
 
         /// <summary>
         /// Gets or sets the branch name.
         /// </summary>
-        [OptionalArgument("main", "branch", "Specifies the branch name.")]
+        [OptionalArgument("main", "branch", "Specifies the branch name. Applicable for create command")]
         public string? Branch { get; set; }
 
+        /// <summary>
+        /// Gets or sets the asset file name for `create` command.
+        /// </summary>
+        [OptionalArgument("", "file", "Specifies the asset file name. Must include full path. Applicable for create command")]
+        public string? AssetFileName { get; set; }
         /// <summary>
         /// Gets or sets the asset path.
         /// </summary>
@@ -91,20 +96,26 @@ namespace GitHubRelease
                 throw new ArgumentException("The 'tag' option is required for all commands.");
             }
 
+            if (Command == CommandType.create && string.IsNullOrEmpty(AssetFileName))
+            {
+                throw new ArgumentException("The 'file' option is required for the 'create' command.");
+
+            }
+
             if (Command != CommandType.download && string.IsNullOrEmpty(Branch))
             {
                 throw new ArgumentException("The 'branch' option is required for commands other than 'download'.");
             }
 
-            if (Command != CommandType.download && string.IsNullOrEmpty(AssetPath))
+            if (Command == CommandType.download && string.IsNullOrEmpty(AssetPath))
             {
                 // Default to the current directory if AssetPath is not provided
                 AssetPath = Directory.GetCurrentDirectory();
             }
 
-            if (string.IsNullOrEmpty(AssetPath) || !Path.IsPathRooted(AssetPath))
+            if (Command == CommandType.download && !Path.IsPathRooted(AssetPath))
             {
-                throw new ArgumentException("The 'path' option is required for all commands and must be an absolute path.");
+                throw new ArgumentException("The 'path' option is required for the downloab commands and must be an absolute path.");
             }
         }
     }

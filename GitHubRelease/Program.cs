@@ -41,7 +41,7 @@ namespace GitHubRelease
                 {
                     // create a release
                     case Cli.CommandType.create:
-                        result = await Command.CreateRelease(options.Repo!, options.Tag!, options.Branch!, options.AssetPath!);
+                        result = await Command.CreateRelease(options.Repo!, options.Tag!, options.Branch!, options.AssetFileName!);
                         break;
 
                     // download an asset
