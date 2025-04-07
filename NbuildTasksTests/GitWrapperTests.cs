@@ -219,9 +219,11 @@ namespace NbuildTasks.Tests
         public void PushTagTest()
         {
             // Arrange
-            // Arrange add a tag
-            var tag = GitWrapper.SetAutoTag(Enums.BuildType.STAGE.ToString());
+            var tag = GitWrapper.Tag;
             Assert.IsTrue(GitWrapper.SetTag(tag));
+            // Arrange add a tag
+            tag = GitWrapper.SetAutoTag(Enums.BuildType.STAGE.ToString());
+            
             Assert.IsNotNull(tag);
 
             // Act
@@ -234,7 +236,7 @@ namespace NbuildTasks.Tests
             }
             else
             {
-                Assert.IsTrue(result, " GitWrapper.PushTag(tag) returned falase");
+                Assert.IsTrue(result, " GitWrapper.PushTag(tag) returned false");
             }
         }
 

@@ -91,11 +91,14 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ntools", "ntools", "{DBDD07F6-003B-4E2D-8BBA-651A29E54445}"
 	ProjectSection(SolutionItems) = preProject
 		docs\ntools\dev-setup.md = docs\ntools\dev-setup.md
+		docs\ntools\devsetup.md = docs\ntools\devsetup.md
+		docs\ntools\github-release.md = docs\ntools\github-release.md
 		docs\ntools\nbackup.md = docs\ntools\nbackup.md
 		docs\ntools\nbuild-targets.md = docs\ntools\nbuild-targets.md
 		docs\ntools\nbuild.md = docs\ntools\nbuild.md
 		docs\ntools\nbuildtasks.md = docs\ntools\nbuildtasks.md
 		docs\ntools\ngit.md = docs\ntools\ngit.md
+		docs\ntools\ntools.md = docs\ntools\ntools.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHubRelease", "GitHubRelease\GitHubRelease.csproj", "{DE08895C-1D65-4A68-B9CC-144B5FADEB5A}"

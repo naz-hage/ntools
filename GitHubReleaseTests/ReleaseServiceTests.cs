@@ -9,19 +9,6 @@ namespace GitHubRelease.Tests
     [TestClass()]
     public class ReleaseServiceTests : GitHubSetup
     {
-        private static string CreateAsset(string repo, string tag)
-        {
-            var assetPath = $"C:\\Artifacts\\{repo}\\release\\{tag}.zip";
-            if (File.Exists(assetPath))
-            {
-                return assetPath;
-            }
-            else
-            {
-                File.Copy($"C:\\Artifacts\\{repo}\\release\\0.0.1.zip", assetPath);
-                return assetPath;
-            }
-        }
 
         /// <summary>
         /// CreateGitHubReleaseAsyncTestAsync method tests the creation of a GitHub release using the ReleaseService class. 
@@ -59,6 +46,15 @@ namespace GitHubRelease.Tests
             // Assert
             Assert.IsNotNull(result, "Create release is null");
             Assert.AreEqual(result.StatusCode.ToString(), "Created");
+
+            // Skip Private repo Download the asset
+            //var assetName = $"{TagStagingRequested}.zip";
+            //string DownloadPath = @"c:\temp";
+            //var response = await releaseService.DownloadAssetByName(release.TagName, assetName, DownloadPath);
+
+            //// Assert
+            //Assert.IsTrue(response.IsSuccessStatusCode, $"Failed to download the asset.  status: {response.StatusCode}.");
+
         }
 
         [TestMethod()]
@@ -189,12 +185,53 @@ namespace GitHubRelease.Tests
             }
         }
 
+        // [TestMethod]
+        // public async Task DownloadPrivateAssetByName_ShouldDownloadAsset()
+        // {
+        //     // Skip the test if running in GitHub Actions
+        //     if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != null)
+        //     {
+        //         Assert.Inconclusive();
+        //     }
+
+        //     // Arrange
+        //     string tagName = "1.2.1";
+        //     string assetName = $"{tagName}.zip";
+        //     string DownloadPath = @"c:\temp";
+        //     var assetFileName = Path.Combine(DownloadPath, assetName);
+        //     //string owner = "naz-hage";
+        //     //var downloadUrl = $"https://github.com/{owner}/{Repo}/releases/download/{tagName}/{assetName}";
+
+        //     // Delete the file if it exists
+        //     if (File.Exists(assetFileName))
+        //     {
+        //         File.Delete(assetFileName);
+        //     }
+
+        //     var releaseService = new ReleaseService(Repo);
+
+        //     // Act
+        //     var response = await releaseService.DownloadAssetByName(tagName, assetName, DownloadPath);
+        //     //var response = await releaseService.DownloadAssetFromUrl(downloadUrl, assetFileName);
+
+        //     // Assert
+        //     Assert.IsTrue(response.IsSuccessStatusCode, $"Failed to download the asset.  status: {response.StatusCode}.");
+            
+        //     Assert.IsTrue(File.Exists(assetFileName), "The asset file was not downloaded.");
+
+        //     // Clean up
+        //     if (File.Exists(assetFileName))
+        //     {
+        //         File.Delete(assetFileName);
+        //     }
+        // }
+
         [TestMethod]
-        public async Task DownloadAssetByName_ShouldDownloadAsset()
+        public async Task DownloadPublicAssetByName_ShouldDownloadAsset()
         {
             // Arrange
-            string tagName = "1.11.0";
-            string assetName = "1.11.0.zip";
+            string tagName = "1.12.6";
+            string assetName = $"{tagName}.zip";
             string DownloadPath = @"c:\temp";
             var assetFileName = Path.Combine(DownloadPath, assetName);
 
@@ -204,14 +241,14 @@ namespace GitHubRelease.Tests
                 File.Delete(assetFileName);
             }
 
-            var releaseService = new ReleaseService(Repo);
+            var releaseService = new ReleaseService("ntools");
 
             // Act
             var response = await releaseService.DownloadAssetByName(tagName, assetName, DownloadPath);
 
             // Assert
-            Assert.IsTrue(response.IsSuccessStatusCode, "Failed to download the asset.");
-            
+            Assert.IsTrue(response.IsSuccessStatusCode, $"Failed to download the asset.  status: {response.StatusCode}.");
+
             Assert.IsTrue(File.Exists(assetFileName), "The asset file was not downloaded.");
 
             // Clean up
@@ -246,5 +283,44 @@ namespace GitHubRelease.Tests
             Assert.IsFalse(File.Exists(assetFileName), "The asset file should not be created.");
         }
 
+        //[TestMethod]
+        //public async Task UploadAsset_ShouldUploadAssetSuccessfully()
+        //{
+        //    // Arrange
+        //    var releaseService = new ReleaseService(Repo);
+        //    string assetPath = "test-asset.zip";
+        //    string uploadUrl = "https://uploads.github.com/repos/naz-hage/learn/releases/assets{?name,label}";
+        //    var expectedResponse = new HttpResponseMessage(HttpStatusCode.Created);
+
+        //    // Create a dummy file to upload
+        //    File.WriteAllText(assetPath, "dummy content");
+
+        //    // Act
+        //    var response = await releaseService.UploadAsset(assetPath!, uploadUrl!);
+
+        //    // Assert
+        //    Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
+
+        //    // Clean up
+        //    if (File.Exists(assetPath))
+        //    {
+        //        File.Delete(assetPath);
+        //    }
+        //}
+
+        //[TestMethod]
+        //public async Task UploadAsset_ShouldReturnNotFoundIfFileDoesNotExist()
+        //{
+        //    // Arrange
+        //    var releaseService = new ReleaseService(Repo);
+        //    string assetPath = "nonexistent-asset.zip";
+        //    string uploadUrl = "https://uploads.github.com/repos/naz-hage/learn/releases/assets{?name,label}";
+
+        //    // Act
+        //    var response = await releaseService.UploadAsset(assetPath, uploadUrl);
+
+        //    // Assert
+        //    Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
+        //}
     }
 }

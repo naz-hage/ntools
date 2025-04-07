@@ -1,12 +1,28 @@
-- GitHubRelease is a tool that allows you to create and manage GitHub releases from the command line. It simplifies the process of creating and managing releases, making it easier to publish your software updates on GitHub.
-  - The repository must have a .net solution file and one .net project to build the project.
-  - The repository must have
-    - GitHub token to create releases.
-    - GitHub owner to create releases.
-    - a git branch to create releases.
-    - a git at least one tag prior to create releases.
-  - A Repository secret [token](#create-a-github-token) named `API_GITHUB_KEY` must be added to the GitHub repository Secrets and variables
-  - Here an example how to add env in the GitHub actions workflow file 
+# GitHubRelease Documentation
+
+GitHubRelease is a tool that allows you to create and manage GitHub releases from the command line. It simplifies the process of creating and managing releases, making it easier to publish your software updates on GitHub.
+
+## Requirements
+
+### Repository Requirements
+- The repository must have:
+  - A GitHub token to create releases.
+  - A GitHub owner to create releases.
+  - A Git branch to create releases.
+  - At least one Git tag prior to creating releases.
+
+### Environment Requirements
+- The GitHub API token and repository owner are obtained from environment variables:
+  - **`OWNER`:** The GitHub repository owner's username.
+  - **`API_GITHUB_KEY`:** The GitHub API token (personal access token).
+- **Local development with Windows Platforms:**
+  - For additional security, the GitHub API token should be saved in the Windows Credential Manager with:
+    - **Target Name:** `GitHubRelease`
+    - **Credential Name:** `API_GITHUB_KEY`
+- 
+### GitHub Actions Workflow Example
+Here is an example of how to set up the required environment variables in a GitHub Actions workflow file:
+
 ```yml
 - name: Build using ntools
   run: |
@@ -17,7 +33,9 @@
     OWNER: ${{ github.repository_owner }}
     API_GITHUB_KEY: ${{ secrets.API_GITHUB_KEY }}
 ```
-  - The checkout a branch must be specified before running the the tool. Here an example how to checkout a branch in the GitHub actions workflow file
+
+### Branch Checkout Example
+Before running the tool, you must checkout a branch. Here is an example of how to checkout a branch in a GitHub Actions workflow file:
 
 ```yml
 - name: Checkout Repository
@@ -29,29 +47,67 @@
     repository: ${{ github.event.pull_request.head.repo.full_name }}
 ```
 
-- When `nb stage` runs successfully, the tool creates a stage release. This release is tagged with the next tag release number, and the release notes include the commits since the last stage or prod tag. The API token from the repository secrets is used to create this release.  The release package is uploaded to the release. The release is also tagged with the next stage release number.
+## Release Process
 
-- When `nb prod` runs successfully, the tool creates a production release. This release is also tagged with the next prod release, and the release notes include the commits since the last production tag. All previous stage releases are deleted. The API token from the repository secrets is used to create this release. The release package is uploaded to the release. The release is also tagged with the next prod release number. All previous stage releases are deleted.
+### Stage Release
+- When `nb stage` runs successfully:
+  - The tool creates a stage release tagged with the next stage release number.
+  - The release notes include the commits since the last stage or production tag.
+  - The API token from the repository secrets is used to create this release.
+  - The release package is uploaded to the release.
 
-# Create a GitHub token
+### Production Release
+- When `nb prod` runs successfully:
+  - The tool creates a production release tagged with the next production release number.
+  - The release notes include the commits since the last production tag.
+  - All previous stage releases are deleted.
+  - The API token from the repository secrets is used to create this release.
+  - The release package is uploaded to the release.
 
-- Follow the How to create a GitHub token [link](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token)
-- The access token must have the following permissions:
-     - Under **Repository permissions**, set the following:
-        - **Contents**: `Read and write`
-        - **Metadata**: `Read-only`
-        - **Actions**: `Read and write` (if needed)
-        - **Packages**: `Read and write` (if needed)
-      - Under **Workflow permissions**, set the following:
-        - **Workflows**: `Read and write` (if needed)
-      - Under **Release permissions**, set the following:
-        - **Releases**: `Read and write`
-  
-# GitHubRelease.exe command line options:
- ```-c create -r <repo name> -t <tag Version> -b $(GitBranch) -p <Release Package>```
- 
-   - `-c` create : create a release
-  - `-r` <repo name> : repository name
-  - `-t` <tag Version> : tag version
-  - `-b` <git Branch> : git branch
-  - `-p` <Release Package> : release package
+## Create a GitHub Token
+
+Follow the [GitHub documentation](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) to create a GitHub token.
+
+### Required Permissions
+The access token must have the following permissions:
+
+| **Permission Type** | **Scope**              | **Description**                          |
+|----------------------|------------------------|------------------------------------------|
+| Repository           | Contents: `Read/Write`| Access repository contents.              |
+|                      | Metadata: `Read-only` | Access repository metadata.              |
+|                      | Actions: `Read/Write` | Manage GitHub Actions (if needed).       |
+|                      | Packages: `Read/Write`| Manage GitHub Packages (if needed).      |
+| Workflow             | Workflows: `Read/Write`| Manage workflows (if needed).           |
+| Release              | Releases: `Read/Write`| Manage GitHub releases.                  |
+
+## GitHubRelease Command Line Options
+
+### Usage
+```batch
+GitHubRelease.exe command [-repo value] [-tag value] [-branch value] [-file value] [-path value] [-v value]
+  - command : Specifies the command to execute.
+         create          -> Create a release. Requires repo, tag, branch and file.
+         download        -> Download an asset. Requires repo, tag, and path (optional)
+         ----
+ (one of create,download, required)
+  - repo    : Specifies the repository name. Applicable to all commands. (string, default=)
+  - tag     : Specifies the tag name. Aplicable for all commands (string, default=)
+  - branch  : Specifies the branch name. Applicable for create command (string, default=main)
+  - file    : Specifies the asset file name. Must include full path. Applicable for create command (string, default=)
+  - path    : Specifies the asset path. Must be an absolute path. (string, default=)
+  - v       : Optional parameter which sets the console output verbose level. (true or false, default=False)
+```
+### Example: Creating a Release
+To create a release for the repository `my-repo` with the tag `1.0.0`, branch `main`, and an asset located at `C:\Releases\1.0.0.zip`, you would use the following command:
+
+```batch
+GitHubRelease.exe create -repo my-repo -tag 1.0.0 -branch main -file C:\Releases\1.1.0.zip -v true
+```
+
+### Example: Downloading an Asset
+To download an asset from the release with the tag `1.0.0` in the repository `my-repo` to the path `C:\Downloads`:
+
+```batch
+GitHubRelease.exe download -repo my-repo -tag 1.0.0 -path C:\Downloads -v true
+```
+An asset named 1.0.0.zip will be downloaded to the specified path if it exists in the release.
