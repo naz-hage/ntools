@@ -84,23 +84,24 @@ The access token must have the following permissions:
 
 ### Usage
 ```batch
-GitHubRelease.exe command [-repo value] [-tag value] [-branch value] [-path value] [-v value]
+GitHubRelease.exe command [-repo value] [-tag value] [-branch value] [-file value] [-path value] [-v value]
   - command : Specifies the command to execute.
-         create          -> Create a release. Requires repo, tag, branch, and path.
-         download        -> Download an asset. Requires repo, tag, and path.
+         create          -> Create a release. Requires repo, tag, branch and file.
+         download        -> Download an asset. Requires repo, tag, and path (optional)
          ----
- (one of create, download, required)
-  - repo    : Repository name. (string, default=)
-  - tag     : Tag name. (string, default=)
-  - branch  : Branch name. (string, default=main)
-  - path    : Asset path. Must be an absolute path. (string, default=)
+ (one of create,download, required)
+  - repo    : Specifies the repository name. Applicable to all commands. (string, default=)
+  - tag     : Specifies the tag name. Aplicable for all commands (string, default=)
+  - branch  : Specifies the branch name. Applicable for create command (string, default=main)
+  - file    : Specifies the asset file name. Must include full path. Applicable for create command (string, default=)
+  - path    : Specifies the asset path. Must be an absolute path. (string, default=)
   - v       : Optional parameter which sets the console output verbose level. (true or false, default=False)
 ```
 ### Example: Creating a Release
 To create a release for the repository `my-repo` with the tag `1.0.0`, branch `main`, and an asset located at `C:\Releases\1.0.0.zip`, you would use the following command:
 
 ```batch
-GitHubRelease.exe create -repo my-repo -tag 1.0.0 -branch main -path C:\Releases\1.1.0.zip -v true
+GitHubRelease.exe create -repo my-repo -tag 1.0.0 -branch main -file C:\Releases\1.1.0.zip -v true
 ```
 
 ### Example: Downloading an Asset
