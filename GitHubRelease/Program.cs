@@ -37,32 +37,19 @@ namespace GitHubRelease
             bool result = false;
             try
             {
-                switch (options.Command)
+                result = options.Command switch
                 {
-                    // create a release
-                    case Cli.CommandType.create:
-                        result = await Command.CreateRelease(options.Repo!, options.Tag!, options.Branch!, options.AssetFileName!);
-                        break;
-
-                    // download an asset
-                    case Cli.CommandType.download:
-                        result = await Command.DownloadAsset(options.Repo!, options.Tag!, options.AssetPath!);
-                        break;
-
-                    default:
-
-                        Environment.Exit(1);
-                        break;
-                }
+                    Cli.CommandType.create => await Command.CreateRelease(options.Repo!, options.Tag!, options.Branch!, options.AssetFileName!),
+                    Cli.CommandType.download => await Command.DownloadAsset(options.Repo!, options.Tag!, options.AssetPath!),
+                    _ => throw new InvalidOperationException("Invalid command")
+                };
             }
             catch (Exception ex)
             {
-                // log the type of exception Is it a NullReferenceException, ArgumentException, etc.
-                Console.WriteLine(ex.ToString());
-
                 // log exception
-                Console.WriteLine($"Exception {ex.Message}");
-                Environment.Exit(1);
+                Colorizer.WriteLine($"[{ConsoleColor.Red}!× " +
+                    $"'{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}': Exception: {ex.Message}]");
+                Environment.Exit(-1);
             }
 
             Colorizer.WriteLine(result

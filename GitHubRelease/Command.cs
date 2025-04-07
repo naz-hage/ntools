@@ -13,14 +13,14 @@ namespace GitHubRelease
         /// <param name="repo">The repository name.</param>
         /// <param name="tag">The tag name for the release.</param>
         /// <param name="branch">The branch name for the release.</param>
-        /// <param name="assetPath">The path to the asset to be included in the release.</param>
+        /// <param name="assetFileName">The path to the asset to be included in the release.</param>
         /// <returns>True if the release was created successfully, otherwise false.</returns>
         // <remarks>
         /// This method creates a new release in the specified repository using the provided tag, branch, and asset path.
         /// It utilizes the ReleaseService to interact with the GitHub API.
         /// If the release creation is successful, it returns true; otherwise, it logs the error and returns false.
         /// </remarks>
-        public static async Task<bool> CreateRelease(string repo, string tag, string branch, string assetPath)
+        public static async Task<bool> CreateRelease(string repo, string tag, string branch, string assetFileName)
         {
             var releaseService = new ReleaseService(repo);
 
@@ -35,7 +35,7 @@ namespace GitHubRelease
             };
 
             // Create a release
-            var responseMessage = await releaseService.CreateRelease(release, assetPath);
+            var responseMessage = await releaseService.CreateRelease(release, assetFileName);
             if (responseMessage.IsSuccessStatusCode)
             {
                 return true;
@@ -62,6 +62,20 @@ namespace GitHubRelease
         /// </remarks>/// 
         public static async Task<bool> DownloadAsset(string repo, string tag, string assetPath)
         {
+            // Check if we have write access to the assetPath
+            try
+            {
+                using FileStream fs = File.Create(assetPath, 1, FileOptions.DeleteOnClose);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                throw new UnauthorizedAccessException($"No write access to the path: {assetPath}");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"An error occurred while checking write access to the path: {assetPath}", ex);
+            }
+
             var releaseService = new ReleaseService(repo);
 
             // Ensure the assetPath includes a file name
