@@ -57,6 +57,31 @@ namespace GitHubRelease
             return await CreateReleaseAndUploadAsset(release, assetPath);
         }
 
+        /// <summary>
+        /// Retrieves the branch name from GitHub Actions based on the current commit SHA.
+        /// </summary>
+        /// <remarks>
+        /// This method queries the GitHub API to fetch all branches of the repository and compares their commit SHAs
+        /// with the current commit SHA to determine the branch name. It is particularly useful in scenarios where
+        /// the repository is in a detached HEAD state, such as during GitHub Actions workflows.
+        /// 
+        /// - If a matching branch is found, its name is returned.
+        /// - If no matching branch is found, the method returns <c>null</c>.
+        /// 
+        /// Example usage:
+        /// <code>
+        /// var branchName = await GetBranchNameFromGitHubActions();
+        /// if (branchName != null)
+        /// {
+        ///     Console.WriteLine($"Branch name: {branchName}");
+        /// }
+        /// else
+        /// {
+        ///     Console.WriteLine("Branch name could not be determined.");
+        /// }
+        /// </code>
+        /// </remarks>
+        /// <returns>The branch name if found; otherwise, <c>null</c>.</returns>
         private async Task<string?> GetBranchNameFromGitHubActions()
         {
             var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/branches";
@@ -80,6 +105,28 @@ namespace GitHubRelease
             return null;
         }
 
+        /// <summary>
+        /// Retrieves the current commit SHA from the GitHub API.
+        /// </summary>
+        /// <remarks>
+        /// This method sends a GET request to the GitHub API to fetch the commit SHA of the HEAD reference.
+        /// - If the request is successful, the SHA is extracted from the response JSON and returned.
+        /// - If the request fails or the SHA is not found, an empty string is returned.
+        /// 
+        /// Example usage:
+        /// <code>
+        /// var commitSha = await GetCurrentCommitSha();
+        /// if (!string.IsNullOrEmpty(commitSha))
+        /// {
+        ///     Console.WriteLine($"Current Commit SHA: {commitSha}");
+        /// }
+        /// else
+        /// {
+        ///     Console.WriteLine("Failed to retrieve the commit SHA.");
+        /// }
+        /// </code>
+        /// </remarks>
+        /// <returns>The current commit SHA as a string, or an empty string if not found.</returns>
         private async Task<string> GetCurrentCommitSha()
         {
             var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/commits/HEAD";
@@ -323,6 +370,28 @@ namespace GitHubRelease
             }
         }
 
+        /// <summary>
+        /// Retrieves the IDs of all releases from the GitHub API.
+        /// </summary>
+        /// <remarks>
+        /// This method sends a GET request to the GitHub API to fetch all releases for the specified repository.
+        /// - If the request is successful, it parses the response JSON to extract the release IDs and returns them as a list.
+        /// - If the request fails, it logs the error details and returns an empty list.
+        /// 
+        /// Example usage:
+        /// <code>
+        /// var releaseIds = await GetReleaseIdsAsync();
+        /// if (releaseIds.Any())
+        /// {
+        ///     Console.WriteLine($"Found {releaseIds.Count} releases.");
+        /// }
+        /// else
+        /// {
+        ///     Console.WriteLine("No releases found.");
+        /// }
+        /// </code>
+        /// </remarks>
+        /// <returns>A list of release IDs.</returns>
         public async Task<List<int>> GetReleaseIdsAsync()
         {
             ApiService.SetupHeaders();
@@ -488,7 +557,6 @@ namespace GitHubRelease
             ApiService.SetupHeaders();
 
             var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/releases/tags/{tagName}";
-            Console.WriteLine($"GET uri: {uri}");
             var response = await ApiService.GetAsync(uri);
 
             if (response.IsSuccessStatusCode)
@@ -564,7 +632,6 @@ namespace GitHubRelease
         {
             ApiService.SetupHeaders();
             var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/releases/{releaseId}";
-            Console.WriteLine($"GET uri: {uri}");
             var response = await ApiService.GetAsync(uri);
 
             if (response.IsSuccessStatusCode)
@@ -634,7 +701,6 @@ namespace GitHubRelease
         {
             ApiService.SetupHeaders();
             var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/releases/assets/{assetId}";
-            Console.WriteLine($"GET uri: {uri}");
             var response = await ApiService.GetAsync(uri);
 
             if (response.IsSuccessStatusCode)
@@ -652,6 +718,20 @@ namespace GitHubRelease
             return response;
         }
 
+
+        /// <summary>
+        /// Downloads an asset by its name from a specific release tag.
+        /// </summary>
+        /// <param name="tagName">The tag name of the release.</param>
+        /// <param name="assetName">The name of the asset to download.</param>
+        /// <param name="downloadPath">The path where the asset will be downloaded.</param>
+        /// <returns>The HTTP response message from the download operation.</returns>
+        /// <remarks>
+        /// This method retrieves the release ID associated with the specified tag name and fetches the list of assets for that release.
+        /// It then searches for the asset by its name and downloads it to the specified path.
+        /// If the release or asset is not found, an appropriate HTTP response with a status code of <see cref="HttpStatusCode.NotFound"/> is returned.
+
+        ////// </remarks>
         public async Task<HttpResponseMessage> DownloadAssetByName(string tagName, string assetName, string downloadPath)
         {
             var releaseId = await GetReleaseByTagNameAsync(tagName);
@@ -662,7 +742,6 @@ namespace GitHubRelease
             }
 
             var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/releases/{releaseId}/assets";
-            Console.WriteLine($"GET uri: {uri}");
             var response = await ApiService.GetAsync(uri);
 
             if (response.IsSuccessStatusCode)
@@ -673,7 +752,8 @@ namespace GitHubRelease
 
                 if (asset.ValueKind != JsonValueKind.Undefined)
                 {
-                    var downloadUrl = asset.GetProperty("browser_download_url").GetString();
+                    // Use "url" property to get the download URL.  This allows download of private a
+                    var downloadUrl = asset.GetProperty("url").GetString();
                     if (!string.IsNullOrEmpty(downloadUrl))
                     {
                         // Build full filename with path
@@ -792,89 +872,48 @@ namespace GitHubRelease
         }
 
 
+        /// <summary>
+        /// Downloads an asset from a specified URL and saves it to a file.
+        /// </summary>
+        /// <param name="downloadUrl">The URL of the asset to download.</param>
+        /// <param name="assetFileName">The full path where the asset will be saved.</param>
+        /// <returns>The HTTP response message from the download operation.</returns>
+        /// <remarks>
+        /// This method uses the <see cref="ApiService"/> to set up headers and perform the download operation.
+        /// If the download is successful, the asset is saved to the specified file path.
+        /// For larger files, consider using a streaming approach to avoid memory issues.
+        /// for larger than 10 mb files, use the following code:
+        /// using (var contentStream = await response.Content.ReadAsStreamAsync())
+        /// using (var fileStream = System.IO.File.Create(assetFileName))
+        /// {
+        ///     await contentStream.CopyToAsync(fileStream);
+        /// }
+        /// </remarks>
         public async Task<HttpResponseMessage> DownloadAssetFromUrl(string downloadUrl, string assetFileName)
         {
             ApiService.SetupHeaders(download: true);
-
-            // Log the headers
-            //Console.WriteLine("Request Headers:");
-            //foreach (var header in ApiService.GetClient().DefaultRequestHeaders)
-            //{
-            //    Console.WriteLine($"{header.Key}: {string.Join(", ", header.Value)}");
-            //}
-
-            Console.WriteLine($"GET uri: {downloadUrl}");
-            var response = await ApiService.GetAsync(downloadUrl);
+            
+            var response = await ApiService.GetClient().GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead);
 
             if (response.IsSuccessStatusCode)
             {
-                var assetContent = await response.Content.ReadAsByteArrayAsync();
-
-                // Write size of content to console
-                Console.WriteLine($"Size of downloaded content: {assetContent.Length} bytes");
-
-                await File.WriteAllBytesAsync(assetFileName, assetContent);
-                Console.WriteLine($"Successfully downloaded the asset to: {assetFileName}");
+                try
+                {
+                    var assetContent = await response.Content.ReadAsByteArrayAsync();
+                    await File.WriteAllBytesAsync(assetFileName, assetContent);
+                }
+                catch (Exception ex)
+                {
+                    throw new InvalidOperationException($"An error occurred while downloading the asset from URL: {downloadUrl}. Exception: {ex.Message}", ex);
+                }
             }
             else
             {
                 Console.WriteLine($"Error: Could not download the asset. Status code: {response.StatusCode}");
-                var responseContent = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"Response content: {responseContent}");
             }
 
             return response;
         }
-
-
-        //public async Task<HttpResponseMessage> DownloadAssetFromUrl(string downloadUrl, string assetFileName)
-        //{
-        //    ApiService.SetupHeaders(download: true);
-
-        //    // Log the Authorization header
-        //    //var authorizationHeader = ApiService.GetClient().DefaultRequestHeaders.Authorization;
-        //    //if (authorizationHeader == null)
-        //    //{
-        //    //    Console.WriteLine("Authorization header is not set.");
-        //    //    throw new InvalidOperationException("Authorization header is not set.");
-        //    //}
-        //    //else
-        //    //{
-        //    //    Console.WriteLine($"Authorization: {authorizationHeader.Scheme} {authorizationHeader.Parameter}");
-
-        //    //    await CheckTokenPermissions();
-        //    //}
-
-        //    //ApiService.SetupHeaders(download: true);
-
-        //    // Log the headers
-        //    //foreach (var header in ApiService.GetClient().DefaultRequestHeaders)
-        //    //{
-        //    //    Console.WriteLine($"{header.Key}: {string.Join(", ", header.Value)}");
-        //    //}
-
-        //    Console.WriteLine($"GET uri: {downloadUrl}");
-        //    var response = await ApiService.GetAsync(downloadUrl);
-
-        //    if (response.IsSuccessStatusCode)
-        //    {
-        //        var assetContent = await response.Content.ReadAsByteArrayAsync();
-
-        //        // Write size of content to console
-        //        Console.WriteLine($"Size of downloaded content: {assetContent.Length} bytes");
-
-        //        await File.WriteAllBytesAsync(assetFileName, assetContent);
-        //        Console.WriteLine($"Successfully downloaded the asset to: {assetFileName}");
-        //    }
-        //    else
-        //    {
-        //        Console.WriteLine($"Error: Could not download the asset. Status code: {response.StatusCode}");
-        //        var responseContent = await response.Content.ReadAsStringAsync();
-        //        Console.WriteLine($"Response content: {responseContent}");
-        //    }
-
-        //    return response;
-        //}
 
 
         public async Task<bool> VerifyAssetId(string tagName, int assetId)
@@ -887,7 +926,6 @@ namespace GitHubRelease
             }
 
             var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/releases/{releaseId}/assets";
-            Console.WriteLine($"GET uri: {uri}");
             var response = await ApiService.GetAsync(uri);
 
             if (response.IsSuccessStatusCode)

@@ -1,4 +1,4 @@
-﻿using System.Net.Http;
+﻿using System.Net.Http.Headers;
 
 namespace GitHubRelease
 {
@@ -31,13 +31,18 @@ namespace GitHubRelease
         /// <summary>
         /// Sets up the headers for making API requests.
         /// </summary>
-        /// <param name="token">The access token for authentication.</param>
+        /// <param name="download">Indicates whether the request is for downloading content.</param>
+        /// <remarks>
+        /// - If <paramref name="download"/> is true, the headers are configured for downloading files.
+        /// - If <paramref name="download"/> is false, the headers are configured for standard API requests.
+        /// - The method uses the access token from <see cref="Credentials.GetToken()"/> for authentication.
+        /// </remarks>
         public void SetupHeaders(bool download = false)
         {
             Client.DefaultRequestHeaders.Clear();
             Client.DefaultRequestHeaders.Add("Authorization", $"Bearer {Credentials.GetToken()}");
             Client.DefaultRequestHeaders.Add("User-Agent", "request");
-            
+
             if (download)
             {
                 Client.DefaultRequestHeaders.Add("Accept", "application/octet-stream");
@@ -45,7 +50,7 @@ namespace GitHubRelease
             }
             else
             {
-                Client.DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3+json");
+                Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github+json")); // Accept JSON for metadata
             }
         }
 

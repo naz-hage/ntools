@@ -13,7 +13,6 @@ namespace GitHubRelease
             var contributors = new List<string>();
 
             var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/contributors";
-            Console.WriteLine($"GET uri: {uri}");
             var response = await apiService.GetAsync(uri);
             if (response.IsSuccessStatusCode)
             {
@@ -45,7 +44,6 @@ namespace GitHubRelease
                     if (author != null && !contributors.Contains(author))
                     {
                         var prUri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/commits/{commit.GetProperty("sha").GetString()}/pulls";
-                        Console.WriteLine($"GET uri: {prUri}");
                         var prResponse = await apiService.GetAsync(prUri);
                         if (prResponse.IsSuccessStatusCode)
                         {

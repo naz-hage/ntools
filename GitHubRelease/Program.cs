@@ -28,12 +28,6 @@ namespace GitHubRelease
                 Environment.Exit(1);
             }
 
-            // Print the command line values and exit
-            Console.WriteLine($"Repo: {options.Repo}");
-            Console.WriteLine($"Tag: {options.Tag}");
-            Console.WriteLine($"Branch: {options.Branch}");
-            Console.WriteLine($"Asset Path: {options.AssetPath}");
-
             bool result = false;
             try
             {

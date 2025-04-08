@@ -62,6 +62,13 @@ namespace GitHubRelease
         /// </remarks>/// 
         public static async Task<bool> DownloadAsset(string repo, string tag, string assetPath)
         {
+
+            // Ensure the assetPath is a directory
+            if (!Directory.Exists(assetPath))
+            {
+                throw new DirectoryNotFoundException($"The specified path is not a valid directory or does not exist: {assetPath}");
+            }
+
             // Check if we have write access to the assetPath
             try
             {
@@ -70,7 +77,9 @@ namespace GitHubRelease
                 {
                     assetPath = assetPath.TrimEnd(Path.DirectorySeparatorChar);
                 }
-                using FileStream fs = File.Create(assetPath, 1, FileOptions.DeleteOnClose);
+                // Attempt to create a temporary file in the directory
+                string tempFilePath = Path.Combine(assetPath, Path.GetRandomFileName());
+                using FileStream fs = File.Create(tempFilePath, 1, FileOptions.DeleteOnClose);
             }
             catch (UnauthorizedAccessException)
             {
@@ -83,23 +92,10 @@ namespace GitHubRelease
 
             var releaseService = new ReleaseService(repo);
 
-            // Ensure the assetPath includes a file name
-            if (string.IsNullOrEmpty(Path.GetFileName(assetPath)))
-            {
-                assetPath = Path.Combine(assetPath, $"{tag}.zip");
-            }
-
-            // Ensure the download directory exists
-            var directoryPath = Path.GetDirectoryName(assetPath);
-            if (directoryPath != null)
-            {
-                Directory.CreateDirectory(directoryPath);
-            }
 
             // download the asset
             var response = await releaseService.DownloadAssetByName(tag, $"{tag}.zip", assetPath);
 
-            // Check the response
             if (response.IsSuccessStatusCode)
             {
                 return true;
@@ -107,8 +103,6 @@ namespace GitHubRelease
             else
             {
                 Console.WriteLine($"Failed to download the asset. Status code: {response.StatusCode}");
-                var content = await response.Content.ReadAsStringAsync();
-                Console.WriteLine(content);
                 return false;
             }
         }
