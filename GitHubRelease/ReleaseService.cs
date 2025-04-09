@@ -84,7 +84,7 @@ namespace GitHubRelease
         /// <returns>The branch name if found; otherwise, <c>null</c>.</returns>
         private async Task<string?> GetBranchNameFromGitHubActions()
         {
-            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/branches";
+            var uri = $"{Constants.GitHubApiPrefix}/{Repo}/branches";
             var response = await ApiService.GetAsync(uri);
             if (response.IsSuccessStatusCode)
             {
@@ -129,7 +129,7 @@ namespace GitHubRelease
         /// <returns>The current commit SHA as a string, or an empty string if not found.</returns>
         private async Task<string> GetCurrentCommitSha()
         {
-            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/commits/HEAD";
+            var uri = $"{Constants.GitHubApiPrefix}/{Repo}/commits/HEAD";
             var response = await ApiService.GetAsync(uri);
             if (response.IsSuccessStatusCode)
             {
@@ -272,7 +272,7 @@ namespace GitHubRelease
             Console.WriteLine($"Release JSON Body: {jsonBody}");
 
             // Send a POST request to create a new release on GitHub
-            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/releases";
+            var uri = $"{Constants.GitHubApiPrefix}/{Repo}/releases";
             var response = await ApiService.PostAsync(uri, new StringContent(jsonBody, Encoding.UTF8, "application/json"));
 
             if (!response.IsSuccessStatusCode)
@@ -342,7 +342,7 @@ namespace GitHubRelease
         public async Task<List<string>> GetReleaseTagsAsync()
         {
             ApiService.SetupHeaders();
-            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/releases";
+            var uri = $"{Constants.GitHubApiPrefix}/{Repo}/releases";
             var response = await ApiService.GetAsync(uri);
 
             if (response.IsSuccessStatusCode)
@@ -395,7 +395,7 @@ namespace GitHubRelease
         public async Task<List<int>> GetReleaseIdsAsync()
         {
             ApiService.SetupHeaders();
-            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/releases";
+            var uri = $"{Constants.GitHubApiPrefix}/{Repo}/releases";
             var response = await ApiService.GetAsync(uri);
 
             if (response.IsSuccessStatusCode)
@@ -424,7 +424,7 @@ namespace GitHubRelease
         private async Task<JsonDocument?> GetLatestReleaseRawAsync(string? branch = null)
         {
             ApiService.SetupHeaders();
-            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/releases";
+            var uri = $"{Constants.GitHubApiPrefix}/{Repo}/releases";
             var response = await ApiService.GetAsync(uri);
             if (response.IsSuccessStatusCode)
             {
@@ -530,7 +530,7 @@ namespace GitHubRelease
         public async Task<HttpResponseMessage> DeleteReleaseAsync(int releaseId)
         {
             ApiService.SetupHeaders();
-            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/releases/{releaseId}";
+            var uri = $"{Constants.GitHubApiPrefix}/{Repo}/releases/{releaseId}";
             Console.WriteLine($"DELETE uri: {uri}");
             var response = await ApiService.DeleteAsync(uri);
 
@@ -556,7 +556,7 @@ namespace GitHubRelease
         {
             ApiService.SetupHeaders();
 
-            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/releases/tags/{tagName}";
+            var uri = $"{Constants.GitHubApiPrefix}/{Repo}/releases/tags/{tagName}";
             var response = await ApiService.GetAsync(uri);
 
             if (response.IsSuccessStatusCode)
@@ -631,7 +631,7 @@ namespace GitHubRelease
         public async Task<Release?> GetReleaseAsync(int releaseId)
         {
             ApiService.SetupHeaders();
-            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/releases/{releaseId}";
+            var uri = $"{Constants.GitHubApiPrefix}/{Repo}/releases/{releaseId}";
             var response = await ApiService.GetAsync(uri);
 
             if (response.IsSuccessStatusCode)
@@ -700,7 +700,7 @@ namespace GitHubRelease
         public async Task<HttpResponseMessage> DownloadAsset(int assetId, string assetFileName)
         {
             ApiService.SetupHeaders();
-            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/releases/assets/{assetId}";
+            var uri = $"{Constants.GitHubApiPrefix}/{Repo}/releases/assets/{assetId}";
             var response = await ApiService.GetAsync(uri);
 
             if (response.IsSuccessStatusCode)
@@ -741,7 +741,7 @@ namespace GitHubRelease
                 return new HttpResponseMessage(HttpStatusCode.NotFound);
             }
 
-            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/releases/{releaseId}/assets";
+            var uri = $"{Constants.GitHubApiPrefix}/{Repo}/releases/{releaseId}/assets";
             var response = await ApiService.GetAsync(uri);
 
             if (response.IsSuccessStatusCode)
@@ -925,7 +925,7 @@ namespace GitHubRelease
                 return false;
             }
 
-            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/releases/{releaseId}/assets";
+            var uri = $"{Constants.GitHubApiPrefix}/{Repo}/releases/{releaseId}/assets";
             var response = await ApiService.GetAsync(uri);
 
             if (response.IsSuccessStatusCode)

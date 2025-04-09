@@ -20,6 +20,9 @@ namespace GitHubRelease
             try
             {
                 options.Validate();
+
+                //Console.WriteLine("Debug: Validated CLI arguments successfully.");
+                //Environment.Exit(0);
             }
             catch (ArgumentException ex)
             {

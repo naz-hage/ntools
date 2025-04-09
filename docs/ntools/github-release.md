@@ -111,3 +111,8 @@ To download an asset from the release with the tag `1.0.0` in the repository `my
 GitHubRelease.exe download -repo my-repo -tag 1.0.0 -path C:\Downloads -v true
 ```
 An asset named 1.0.0.zip will be downloaded to the specified path if it exists in the release.
+
+
+-- Current expections:
+- The download assets expects to download an asset as a zip file name ${tag}.zip
+- tag must be a valid tag in the repository created by the tool. (X.Y.Z)
