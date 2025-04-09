@@ -230,7 +230,7 @@ namespace GitHubRelease.Tests
         public async Task DownloadPublicAssetByName_ShouldDownloadAsset()
         {
             // Arrange
-            string tagName = "1.12.6";
+            string tagName = "1.13.0";
             string assetName = $"{tagName}.zip";
             string DownloadPath = @"c:\temp";
             var assetFileName = Path.Combine(DownloadPath, assetName);
