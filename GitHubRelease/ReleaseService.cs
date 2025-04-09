@@ -731,7 +731,7 @@ namespace GitHubRelease
         /// It then searches for the asset by its name and downloads it to the specified path.
         /// If the release or asset is not found, an appropriate HTTP response with a status code of <see cref="HttpStatusCode.NotFound"/> is returned.
 
-        ////// </remarks>
+        /// </remarks>
         public async Task<HttpResponseMessage> DownloadAssetByName(string tagName, string assetName, string downloadPath)
         {
             var releaseId = await GetReleaseByTagNameAsync(tagName);
@@ -752,7 +752,7 @@ namespace GitHubRelease
 
                 if (asset.ValueKind != JsonValueKind.Undefined)
                 {
-                    // Use "url" property to get the download URL.  This allows download of private a
+                    // Use the "url" property to get the download URL. This is essential for downloading assets, including those from private repositories, as it provides the authenticated endpoint for the asset.
                     var downloadUrl = asset.GetProperty("url").GetString();
                     if (!string.IsNullOrEmpty(downloadUrl))
                     {
