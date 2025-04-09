@@ -234,6 +234,16 @@ namespace GitHubRelease.Tests
             string assetName = $"{tagName}.zip";
             string DownloadPath = @"c:\temp";
             var assetFileName = Path.Combine(DownloadPath, assetName);
+            var repo = "naz-hage/ntools";
+
+            // write parameters to console
+            Console.WriteLine($"repo: {repo}");
+            Console.WriteLine($"tagName: {tagName}");
+            Console.WriteLine($"assetName: {assetName}");
+            Console.WriteLine($"DownloadPath: {{DownloadPath}}");
+            Console.WriteLine($"assetFileName: {{assetFileName}}");
+
+
 
             // Delete the file if it exists
             if (File.Exists(assetFileName))
@@ -241,7 +251,7 @@ namespace GitHubRelease.Tests
                 File.Delete(assetFileName);
             }
 
-            var releaseService = new ReleaseService("ntools");
+            var releaseService = new ReleaseService(repo);
 
             // Act
             var response = await releaseService.DownloadAssetByName(tagName, assetName, DownloadPath);
