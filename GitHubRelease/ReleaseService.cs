@@ -752,7 +752,7 @@ namespace GitHubRelease
 
                 if (asset.ValueKind != JsonValueKind.Undefined)
                 {
-                    // Use "url" property to get the download URL.  This allows download of private a
+                    // Use the "url" property to get the download URL. This is essential for downloading assets, including those from private repositories, as it provides the authenticated endpoint for the asset.
                     var downloadUrl = asset.GetProperty("url").GetString();
                     if (!string.IsNullOrEmpty(downloadUrl))
                     {
