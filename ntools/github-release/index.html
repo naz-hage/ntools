@@ -100,6 +100,8 @@
     </li>
         </ul>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#current-expectations">Current expectations:</a>
+    </li>
     </ul>
                   </li>
               </ul>
@@ -156,8 +158,11 @@
 </ul>
 <h3 id="environment-requirements">Environment Requirements</h3>
 <ul>
-<li>The GitHub API token and repository owner are obtained from environment variables:</li>
-<li><strong><code>OWNER</code>:</strong> The GitHub repository owner's username.</li>
+<li>The GitHub API token (Required) and repository owner (Optional) are obtained from environment variables:</li>
+<li><strong><code>OWNER</code>:</strong> The GitHub repository owner's username.<ul>
+<li>The owner is optional and can be specified in the command line with <code>-repo</code> option. Checkout usage below.</li>
+</ul>
+</li>
 <li><strong><code>API_GITHUB_KEY</code>:</strong> The GitHub API token (personal access token).</li>
 <li><strong>Local development with Windows Platforms:</strong></li>
 <li>For additional security, the GitHub API token should be saved in the Windows Credential Manager with:<ul>
@@ -259,8 +264,8 @@
          download        -&gt; Download an asset. Requires repo, tag, and path (optional)
          ----
  (one of create,download, required)
-  - repo    : Specifies the repository name. Applicable to all commands. (string, default=)
-  - tag     : Specifies the tag name. Aplicable for all commands (string, default=)
+  - repo    : Specifies the Git repository in the format userName/repoName. Applicable to all commands. (string, default=)
+  - tag     : Specifies the tag name. Applicable for all commands (string, default=)
   - branch  : Specifies the branch name. Applicable for create command (string, default=main)
   - file    : Specifies the asset file name. Must include full path. Applicable for create command (string, default=)
   - path    : Specifies the asset path. Must be an absolute path. (string, default=)
@@ -268,13 +273,18 @@
 </code></pre>
 <h3 id="example-creating-a-release">Example: Creating a Release</h3>
 <p>To create a release for the repository <code>my-repo</code> with the tag <code>1.0.0</code>, branch <code>main</code>, and an asset located at <code>C:\Releases\1.0.0.zip</code>, you would use the following command:</p>
-<pre><code class="language-batch">GitHubRelease.exe create -repo my-repo -tag 1.0.0 -branch main -file C:\Releases\1.1.0.zip -v true
+<pre><code class="language-batch">GitHubRelease.exe create -repo userName/my-repo -tag 1.0.0 -branch main -file C:\Releases\1.1.0.zip -v true
 </code></pre>
 <h3 id="example-downloading-an-asset">Example: Downloading an Asset</h3>
 <p>To download an asset from the release with the tag <code>1.0.0</code> in the repository <code>my-repo</code> to the path <code>C:\Downloads</code>:</p>
-<pre><code class="language-batch">GitHubRelease.exe download -repo my-repo -tag 1.0.0 -path C:\Downloads -v true
+<pre><code class="language-batch">GitHubRelease.exe download -repo userName/my-repo -tag 1.0.0 -path C:\Downloads -v true
 </code></pre>
 <p>An asset named 1.0.0.zip will be downloaded to the specified path if it exists in the release.</p>
+<h2 id="current-expectations">Current expectations:</h2>
+<ul>
+<li>The download assets expects to download an asset as a zip file name ${tag}.zip</li>
+<li><code>tag</code> must be a valid tag in the repository created by the tool. (X.Y.Z)</li>
+</ul>
               
             </div>
           </div><footer>
