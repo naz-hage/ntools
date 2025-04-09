@@ -93,10 +93,6 @@ namespace GitHubRelease
                 throw new ArgumentException("The 'repo' option is required for all commands and must be in the format userName/repoName.");
             }
 
-            if (string.IsNullOrEmpty(Repo))
-            {
-                throw new ArgumentException("The 'repo' option is required for all commands and must be in the format userName/repoName.");
-            }
 
             // Use the new ValidateRepo method
             ValidateRepo().GetAwaiter().GetResult();
