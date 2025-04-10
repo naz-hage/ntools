@@ -30,7 +30,10 @@ namespace GitHubRelease
         /// <summary>
         /// Gets or sets the repository name in the format userName/repoName.
         /// </summary>
-        [OptionalArgument("", "repo", "Specifies the Git repository in the format userName/repoName. Applicable to all commands.")]
+        [OptionalArgument("", "repo", "Specifies the Git repository in the format any of the following fortmats: \n" +
+            "\t repoName  (UserName is declared the `OWNER` environment variable) \n"+
+            "\t userName/repoName\n" +
+            "\t https://github.com/userName/repoName (Full URL to the repository on GitHub). This is applicable to all commands.")]
         public string? Repo { get; set; }
 
         /// <summary>
@@ -93,7 +96,6 @@ namespace GitHubRelease
                 throw new ArgumentException("The 'repo' option is required for all commands and must be in the format userName/repoName.");
             }
 
-
             // Use the new ValidateRepo method
             ValidateRepo().GetAwaiter().GetResult();
 
@@ -153,6 +155,19 @@ namespace GitHubRelease
             // If the repo contains a slash, it must be in the format userName/repoName
             // otherwise, it is expected to be a repoName, in which case
             // the UserName is derived from the OWNER environment variable
+
+            // Check if the input is a full URL
+            if (Repo!.StartsWith("https://github.com/", StringComparison.OrdinalIgnoreCase))
+            {
+                // Extract the userName/repoName portion
+                var uri = new Uri(Repo);
+                if (uri.Host != "github.com")
+                {
+                    throw new ArgumentException("Only repositories hosted on github.com are supported.");
+                }
+
+                Repo = uri.AbsolutePath.Trim('/'); // Extracts "userName/repoName"
+            }
 
             var repoParts = Repo!.Split('/');
             if (repoParts.Length == 1)

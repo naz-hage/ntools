@@ -1,13 +1,113 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.IO;
-using System.Threading.Tasks;
-
 namespace GitHubRelease.Tests
 {
     [TestClass]
     public class CliTests
     {
+        [TestMethod]
+        public async Task ValidateRepo_ShouldExtractUserNameAndRepoName_FromFullUrl()
+        {
+            // Arrange
+            var cli = new Cli
+            {
+                Repo = "https://github.com/naz-hage/ntools"
+            };
+
+            // Act
+            await cli.ValidateRepo();
+
+            // Assert
+            Assert.AreEqual("naz-hage/ntools", cli.Repo, "The Repo property should correctly extract userName/repoName from the full URL.");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public async Task ValidateRepo_ShouldThrowException_ForNonGitHubDomain()
+        {
+            // Arrange
+            var cli = new GitHubRelease.Cli
+            {
+                Repo = "https://gitlab.com/userName/repoName"
+            };
+
+            // Act
+            await cli.ValidateRepo();
+
+            // Assert
+            // Exception is expected
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public async Task ValidateRepo_ShouldThrowException_ForInvalidRepoFormat()
+        {
+            // Arrange
+            var cli = new GitHubRelease.Cli
+            {
+                Repo = "invalid/repo/format"
+            };
+
+            // Act
+            await cli.ValidateRepo();
+
+            // Assert
+            // Exception is expected
+        }
+
+        [TestMethod]
+        public async Task ValidateRepo_ShouldHandleRepoNameOnly_WithOwnerEnvironmentVariable()
+        {
+            // Save current "OWNER" environment Variable
+            var owner = Environment.GetEnvironmentVariable("OWNER");
+
+            // Arrange
+            Environment.SetEnvironmentVariable("OWNER", "naz-hage");
+            var cli = new GitHubRelease.Cli
+            {
+                Repo = "ntools"
+            };
+
+            // Act
+            await cli.ValidateRepo();
+
+            // Assert
+            Assert.AreEqual("naz-hage/ntools", cli.Repo, "The Repo property should correctly combine OWNER and repoName.");
+
+            // restore current "OWNER" env. variable
+            Environment.SetEnvironmentVariable("OWNER", owner);
+
+            // Assert
+            Assert.AreEqual(owner, Environment.GetEnvironmentVariable("OWNER"));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public async Task ValidateRepo_ShouldThrowException_WhenOwnerEnvironmentVariableIsMissing()
+        {
+            // Save current "OWNER" environment Variable
+            var owner = Environment.GetEnvironmentVariable("OWNER");
+
+            // Arrange
+            Environment.SetEnvironmentVariable("OWNER", null);
+            var cli = new GitHubRelease.Cli
+            {
+                Repo = "ntools"
+            };
+
+            // Act
+            await cli.ValidateRepo();
+
+            // Expect exception
+
+            // Assert
+            Assert.AreEqual("naz-hage/ntools", cli.Repo, "The Repo property should correctly combine OWNER and repoName.");
+
+            // restore current "OWNER" env. variable
+            Environment.SetEnvironmentVariable("OWNER", owner);
+
+            // Assert
+            Assert.AreEqual(owner, Environment.GetEnvironmentVariable("OWNER"));
+        }
+
         [TestMethod]
         public void GetCommandType_ValidCommand_ShouldReturnCorrectCommandType()
         {
