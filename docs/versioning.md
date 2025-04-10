@@ -12,3 +12,9 @@ Throughout this document, the terms "version" and "tag" are used interchangeably
       - Incrementing `Y` resets `Z` to 0.
     - `Z` is the build number:
         - Incremented when [staging](buildtypes.md#staging) Build Type is deployed.
+
+Tags in the [GitHubRelease](./ntools/github-release.md) are used to:
+
+- Identify specific versions of the repository.
+- Associate release assets with a particular version.
+- Generate release notes based on commits since the last tag.

@@ -1,6 +1,4 @@
-# GitHubRelease Documentation
-
-GitHubRelease is a tool that allows you to create and manage GitHub releases from the command line. It simplifies the process of creating and managing releases, making it easier to publish your software updates on GitHub.
+GitHubRelease is a command-line tool designed to help you create and manage GitHub releases. It also enables you to download release assets, such as files named in the format x.y.z.zip. The tool expects downloaded assets to be in a zip file named ${tag}.zip, where tag must be a valid tag in the repository created by the tool (e.g., ``x.y.z``).  checkout the [tagging](../versioning.md) section for more details.
 
 ## Requirements
 
@@ -34,6 +32,7 @@ Here is an example of how to set up the required environment variables in a GitH
     OWNER: ${{ github.repository_owner }}
     API_GITHUB_KEY: ${{ secrets.API_GITHUB_KEY }}
 ```
+The above action builds, test, and creates a release using the GitHubRelease tool and upload to GitHub.
 
 ### Branch Checkout Example
 Before running the tool, you must checkout a branch. Here is an example of how to checkout a branch in a GitHub Actions workflow file:
@@ -91,7 +90,10 @@ GitHubRelease.exe command [-repo value] [-tag value] [-branch value] [-file valu
          download        -> Download an asset. Requires repo, tag, and path (optional)
          ----
  (one of create,download, required)
-  - repo    : Specifies the Git repository in the format userName/repoName. Applicable to all commands. (string, default=)
+  - repo    : Specifies the Git repository in the format any of the following fortmats:
+         repoName  (UserName is declared the `OWNER` environment variable)
+         userName/repoName
+         https://github.com/userName/repoName (Full URL to the repository on GitHub). This is applicable to all commands. (string, default=)
   - tag     : Specifies the tag name. Applicable for all commands (string, default=)
   - branch  : Specifies the branch name. Applicable for create command (string, default=main)
   - file    : Specifies the asset file name. Must include full path. Applicable for create command (string, default=)
@@ -102,18 +104,30 @@ GitHubRelease.exe command [-repo value] [-tag value] [-branch value] [-file valu
 To create a release for the repository `my-repo` with the tag `1.0.0`, branch `main`, and an asset located at `C:\Releases\1.0.0.zip`, you would use the following command:
 
 ```batch
-GitHubRelease.exe create -repo userName/my-repo -tag 1.0.0 -branch main -file C:\Releases\1.1.0.zip -v true
+GitHubRelease.exe create -repo userName/my-repo -tag 1.0.0 -branch main -file C:\Releases\1.1.0.zip
 ```
 
 ### Example: Downloading an Asset
 To download an asset from the release with the tag `1.0.0` in the repository `my-repo` to the path `C:\Downloads`:
 
 ```batch
-GitHubRelease.exe download -repo userName/my-repo -tag 1.0.0 -path C:\Downloads -v true
+GitHubRelease.exe download -repo userName/my-repo -tag 1.0.0 -path C:\Downloads
 ```
 An asset named 1.0.0.zip will be downloaded to the specified path if it exists in the release.
 
+Here is the updated section in github-release.md with an example using the `-repo` option with a full GitHub URL:
 
-## Current expectations:
-- The download assets expects to download an asset as a zip file name ${tag}.zip
-- `tag` must be a valid tag in the repository created by the tool. (X.Y.Z)
+### Example: Creating a Release with Full GitHub URL
+To create a release for the repository `my-repo` with the tag `1.0.0`, branch `main`, and an asset located at `C:\Releases\1.0.0.zip`, using the full GitHub URL:
+
+```batch
+GitHubRelease.exe create -repo https://github.com/userName/my-repo -tag 1.0.0 -branch main -file C:\Releases\1.0.0.zip
+```
+
+### Example: Downloading an Asset with Full GitHub URL
+To download an asset from the release with the tag `1.0.0` in the repository `my-repo` to the path `C:\Downloads`, using the full GitHub URL:
+
+```batch
+GitHubRelease.exe download -repo https://github.com/userName/my-repo -tag 1.0.0 -path C:\Downloads
+```
+An asset named `1.0.0.zip` will be downloaded to the specified path if it exists in the release.
