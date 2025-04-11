@@ -19,20 +19,8 @@ namespace GitHubRelease
         /// The owner is retrieved from the OWNER environment variable.
         /// The token is retrieved from the Windows Credential Manager if running on Windows, otherwise from the API_GITHUB_KEY environment variable.
         /// </remarks>
-        private static (SecureString owner, SecureString token) GetOwnerAndToken()
+        private static SecureString GetSecureToken()
         {
-            string? owner = Environment.GetEnvironmentVariable("OWNER");
-            if (owner == null)
-            {
-                throw new InvalidOperationException("Environment variable 'OWNER' is required");
-            }
-
-            SecureString secureOwner = CreateSecureString(owner);
-            if (secureOwner == null || secureOwner.Length == 0)
-            {
-                throw new ArgumentException("The OWNER environment variable cannot be empty");
-            }
-
             SecureString secureToken = GetTokenFromEnvironmentVariable();
 
             // If the token is not found in the environment variable and the OS is Windows, try to get it from the Credential Manager
@@ -46,10 +34,9 @@ namespace GitHubRelease
                 throw new InvalidOperationException("The API token could not be retrieved from the environment variable or the Credential Manager.");
             }
 
-            return (secureOwner, secureToken);
+            return secureToken;
         }
 
-        
         /// <summary>
         /// Saves a token to the Windows Credential Manager.
         /// </summary>
@@ -126,7 +113,8 @@ namespace GitHubRelease
         /// <returns>The GitHub repository owner.</returns>
         public static string GetOwner()
         {
-            return ConvertToUnsecureString(GetOwnerAndToken().owner);
+            string? owner = Environment.GetEnvironmentVariable("OWNER");
+            return owner ?? throw new InvalidOperationException("Environment variable 'OWNER' is required");
         }
 
         /// <summary>
@@ -135,7 +123,8 @@ namespace GitHubRelease
         /// <returns>The GitHub API token.</returns>
         public static string GetToken()
         {
-            return ConvertToUnsecureString(GetOwnerAndToken().token);
+
+            return ConvertToUnsecureString(GetSecureToken());
         }
 
 /// <summary>

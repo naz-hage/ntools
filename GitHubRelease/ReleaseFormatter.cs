@@ -54,11 +54,11 @@ namespace GitHubRelease
             StringBuilder releaseNotes = new();
             if (string.IsNullOrEmpty(sinceTag))
             {
-                releaseNotes.AppendLine($"\n\n**Full Changelog**: https://github.com/{Credentials.GetOwner()}/{Repo}/commits/{tag}");
+                releaseNotes.AppendLine($"\n\n**Full Changelog**: https://github.com/{Repo}/commits/{tag}");
             }
             else
             {
-                releaseNotes.AppendLine($"\n\n**Full Changelog**: https://github.com/{Credentials.GetOwner()}/{Repo}/compare/{sinceTag}...{tag}");
+                releaseNotes.AppendLine($"\n\n**Full Changelog**: https://github.com/{Repo}/compare/{sinceTag}...{tag}");
             }
 
             return releaseNotes;
