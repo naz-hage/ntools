@@ -90,7 +90,7 @@ GitHubRelease.exe command [-repo value] [-tag value] [-branch value] [-file valu
          download        -> Download an asset. Requires repo, tag, and path (optional)
          ----
  (one of create,download, required)
-  - repo    : Specifies the Git repository in the format any of the following fortmats:
+  - repo    : Specifies the Git repository in the format any of the following formats:
          repoName  (UserName is declared the `OWNER` environment variable)
          userName/repoName
          https://github.com/userName/repoName (Full URL to the repository on GitHub). This is applicable to all commands. (string, default=)

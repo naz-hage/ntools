@@ -30,7 +30,7 @@ namespace GitHubRelease
         /// <summary>
         /// Gets or sets the repository name in the format userName/repoName.
         /// </summary>
-        [OptionalArgument("", "repo", "Specifies the Git repository in the format any of the following fortmats: \n" +
+        [OptionalArgument("", "repo", "Specifies the Git repository in the format any of the following formats: \n" +
             "\t repoName  (UserName is declared the `OWNER` environment variable) \n"+
             "\t userName/repoName\n" +
             "\t https://github.com/userName/repoName (Full URL to the repository on GitHub). This is applicable to all commands.")]
@@ -129,7 +129,7 @@ namespace GitHubRelease
 
             if (Command == CommandType.download && !Path.IsPathRooted(AssetPath))
             {
-                throw new ArgumentException("The 'path' option is required for the downloab commands and must be an absolute path.");
+                throw new ArgumentException("The 'path' option is required for the download commands and must be an absolute path.");
             }
 
 
