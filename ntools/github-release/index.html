@@ -64,43 +64,13 @@
                   </li>
                   <li class="toctree-l1 current"><a class="reference internal current" href="#">Github Release (githubrelease.exe)</a>
     <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#repository-requirements">Repository Requirements</a>
+    <li class="toctree-l2"><a class="reference internal" href="#repository-requirements">Repository Requirements</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#environment-requirements">Environment Requirements</a>
+    <li class="toctree-l2"><a class="reference internal" href="#environment-requirements">Environment Requirements</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#github-actions-workflow-example">GitHub Actions Workflow Example</a>
+    <li class="toctree-l2"><a class="reference internal" href="#github-actions-workflow-example">GitHub Actions Workflow Example</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#branch-checkout-example">Branch Checkout Example</a>
-    </li>
-        </ul>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#release-process">Release Process</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#stage-release">Stage Release</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#production-release">Production Release</a>
-    </li>
-        </ul>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#create-a-github-token">Create a GitHub Token</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#required-permissions">Required Permissions</a>
-    </li>
-        </ul>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#githubrelease-command-line-options">GitHubRelease Command Line Options</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#example-creating-a-release">Example: Creating a Release</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#example-downloading-an-asset">Example: Downloading an Asset</a>
-    </li>
-        </ul>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#current-expectations">Current expectations:</a>
+    <li class="toctree-l2"><a class="reference internal" href="#branch-checkout-example">Branch Checkout Example</a>
     </li>
     </ul>
                   </li>
@@ -145,8 +115,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="githubrelease-documentation">GitHubRelease Documentation</h1>
-<p>GitHubRelease is a tool that allows you to create and manage GitHub releases from the command line. It simplifies the process of creating and managing releases, making it easier to publish your software updates on GitHub.</p>
+                <p>GitHubRelease is a command-line tool designed to help you create and manage GitHub releases. It also enables you to download release assets, such as files named in the format x.y.z.zip. The tool expects downloaded assets to be in a zip file named ${tag}.zip, where tag must be a valid tag in the repository created by the tool (e.g., <code>x.y.z</code>).  checkout the <a href="../../versioning/">tagging</a> section for more details.</p>
 <h2 id="requirements">Requirements</h2>
 <h3 id="repository-requirements">Repository Requirements</h3>
 <ul>
@@ -183,6 +152,7 @@
     OWNER: ${{ github.repository_owner }}
     API_GITHUB_KEY: ${{ secrets.API_GITHUB_KEY }}
 </code></pre>
+<p>The above action builds, test, and creates a release using the GitHubRelease tool and upload to GitHub.</p>
 <h3 id="branch-checkout-example">Branch Checkout Example</h3>
 <p>Before running the tool, you must checkout a branch. Here is an example of how to checkout a branch in a GitHub Actions workflow file:</p>
 <pre><code class="language-yml">- name: Checkout Repository
@@ -264,7 +234,10 @@
          download        -&gt; Download an asset. Requires repo, tag, and path (optional)
          ----
  (one of create,download, required)
-  - repo    : Specifies the Git repository in the format userName/repoName. Applicable to all commands. (string, default=)
+  - repo    : Specifies the Git repository in the format any of the following formats:
+         repoName  (UserName is declared the `OWNER` environment variable)
+         userName/repoName
+         https://github.com/userName/repoName (Full URL to the repository on GitHub). This is applicable to all commands. (string, default=)
   - tag     : Specifies the tag name. Applicable for all commands (string, default=)
   - branch  : Specifies the branch name. Applicable for create command (string, default=main)
   - file    : Specifies the asset file name. Must include full path. Applicable for create command (string, default=)
@@ -273,18 +246,23 @@
 </code></pre>
 <h3 id="example-creating-a-release">Example: Creating a Release</h3>
 <p>To create a release for the repository <code>my-repo</code> with the tag <code>1.0.0</code>, branch <code>main</code>, and an asset located at <code>C:\Releases\1.0.0.zip</code>, you would use the following command:</p>
-<pre><code class="language-batch">GitHubRelease.exe create -repo userName/my-repo -tag 1.0.0 -branch main -file C:\Releases\1.1.0.zip -v true
+<pre><code class="language-batch">GitHubRelease.exe create -repo userName/my-repo -tag 1.0.0 -branch main -file C:\Releases\1.1.0.zip
 </code></pre>
 <h3 id="example-downloading-an-asset">Example: Downloading an Asset</h3>
 <p>To download an asset from the release with the tag <code>1.0.0</code> in the repository <code>my-repo</code> to the path <code>C:\Downloads</code>:</p>
-<pre><code class="language-batch">GitHubRelease.exe download -repo userName/my-repo -tag 1.0.0 -path C:\Downloads -v true
+<pre><code class="language-batch">GitHubRelease.exe download -repo userName/my-repo -tag 1.0.0 -path C:\Downloads
 </code></pre>
 <p>An asset named 1.0.0.zip will be downloaded to the specified path if it exists in the release.</p>
-<h2 id="current-expectations">Current expectations:</h2>
-<ul>
-<li>The download assets expects to download an asset as a zip file name ${tag}.zip</li>
-<li><code>tag</code> must be a valid tag in the repository created by the tool. (X.Y.Z)</li>
-</ul>
+<p>Here is the updated section in github-release.md with an example using the <code>-repo</code> option with a full GitHub URL:</p>
+<h3 id="example-creating-a-release-with-full-github-url">Example: Creating a Release with Full GitHub URL</h3>
+<p>To create a release for the repository <code>my-repo</code> with the tag <code>1.0.0</code>, branch <code>main</code>, and an asset located at <code>C:\Releases\1.0.0.zip</code>, using the full GitHub URL:</p>
+<pre><code class="language-batch">GitHubRelease.exe create -repo https://github.com/userName/my-repo -tag 1.0.0 -branch main -file C:\Releases\1.0.0.zip
+</code></pre>
+<h3 id="example-downloading-an-asset-with-full-github-url">Example: Downloading an Asset with Full GitHub URL</h3>
+<p>To download an asset from the release with the tag <code>1.0.0</code> in the repository <code>my-repo</code> to the path <code>C:\Downloads</code>, using the full GitHub URL:</p>
+<pre><code class="language-batch">GitHubRelease.exe download -repo https://github.com/userName/my-repo -tag 1.0.0 -path C:\Downloads
+</code></pre>
+<p>An asset named <code>1.0.0.zip</code> will be downloaded to the specified path if it exists in the release.</p>
               
             </div>
           </div><footer>
