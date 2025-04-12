@@ -240,8 +240,8 @@ namespace GitHubRelease.Tests
             Console.WriteLine($"repo: {repo}");
             Console.WriteLine($"tagName: {tagName}");
             Console.WriteLine($"assetName: {assetName}");
-            Console.WriteLine($"DownloadPath: {{DownloadPath}}");
-            Console.WriteLine($"assetFileName: {{assetFileName}}");
+            Console.WriteLine($"DownloadPath: {DownloadPath}");
+            Console.WriteLine($"assetFileName: {assetFileName}");
 
 
 
