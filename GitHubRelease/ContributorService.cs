@@ -12,8 +12,7 @@ namespace GitHubRelease
         {
             var contributors = new List<string>();
 
-            var uri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/contributors";
-            Console.WriteLine($"GET uri: {uri}");
+            var uri = $"{Constants.GitHubApiPrefix}/{Repo}/contributors";
             var response = await apiService.GetAsync(uri);
             if (response.IsSuccessStatusCode)
             {
@@ -44,8 +43,7 @@ namespace GitHubRelease
                     var author = commit.GetProperty("commit").GetProperty(AuthorPropertyName).GetProperty("name").GetString();
                     if (author != null && !contributors.Contains(author))
                     {
-                        var prUri = $"{Constants.GitHubApiPrefix}/{Credentials.GetOwner()}/{Repo}/commits/{commit.GetProperty("sha").GetString()}/pulls";
-                        Console.WriteLine($"GET uri: {prUri}");
+                        var prUri = $"{Constants.GitHubApiPrefix}/{Repo}/commits/{commit.GetProperty("sha").GetString()}/pulls";
                         var prResponse = await apiService.GetAsync(prUri);
                         if (prResponse.IsSuccessStatusCode)
                         {
@@ -54,7 +52,7 @@ namespace GitHubRelease
                             if (pulls.Any())
                             {
                                 var prNumber = pulls.ElementAt(0).GetProperty("number").GetString();
-                                releaseNotes.AppendLine($"* @{author} made their first contribution in https://github.com/{Credentials.GetOwner()}/{Repo}/pull/{prNumber}");
+                                releaseNotes.AppendLine($"* @{author} made their first contribution in https://github.com/{Repo}/pull/{prNumber}");
                             }
                         }
                     }

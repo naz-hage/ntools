@@ -5,7 +5,7 @@ namespace GitHubRelease.Tests
 {
     public class GitHubSetup
     {
-        protected readonly string Repo = "learn"; //"ntools";//"learn";
+        protected readonly string Repo = "naz-hage/learn";
 
         protected readonly string MainBranch = "main";
         protected readonly string DefaultBranch = "main";//"58-issue";// "13-issue";
