@@ -1,58 +1,27 @@
-﻿using CommandLine;
-using NbuildTasks;
-using OutputColorizer;
-using System.Xml.Linq;
+﻿using System.Diagnostics;
 
-namespace GitHubRelease
+namespace GitHubRelease;
+
+class Program
 {
-    static class Program
+    static int Main(string[] args)
     {
-        static async Task Main(string[] args)
+        // Redirect to nb.exe with the "release" subcommand
+        var process = new Process
         {
-            Console.WriteLine($"{Nversion.Get()}\n");
-
-            if (!Parser.TryParse(args, out Cli options))
+            StartInfo = new ProcessStartInfo
             {
-                Environment.Exit(-1);
+                FileName = "nb",
+                Arguments = "release " + string.Join(" ", args),
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false
             }
+        };
 
-            // Validate the CLI arguments
-            try
-            {
-                options.Validate();
+        process.Start();
+        process.WaitForExit();
 
-                //Console.WriteLine("Debug: Validated CLI arguments successfully.");
-                //Environment.Exit(0);
-            }
-            catch (ArgumentException ex)
-            {
-                Colorizer.WriteLine($"[{ConsoleColor.Red}!Invalid arguments: {ex.Message}]");
-                Parser.DisplayHelp<Cli>();
-                Environment.Exit(1);
-            }
-
-            bool result = false;
-            try
-            {
-                result = options.Command switch
-                {
-                    Cli.CommandType.create => await Command.CreateRelease(options.Repo!, options.Tag!, options.Branch!, options.AssetFileName!),
-                    Cli.CommandType.download => await Command.DownloadAsset(options.Repo!, options.Tag!, options.AssetPath!),
-                    _ => throw new InvalidOperationException("Invalid command")
-                };
-            }
-            catch (Exception ex)
-            {
-                // log exception
-                Colorizer.WriteLine($"[{ConsoleColor.Red}!× " +
-                    $"'{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}': Exception: {ex.Message}]");
-                Environment.Exit(-1);
-            }
-
-            Colorizer.WriteLine(result
-                ? $"[{ConsoleColor.Green}!√ '{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}': {options.Command} completed successfully]"
-                : $"[{ConsoleColor.Red}!× '{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}': {options.Command} failed]");
-            Environment.Exit(result ? 0 : -1);
-        }
+        return process.ExitCode;
     }
 }

@@ -281,4 +281,19 @@ namespace GitHubRelease.Tests
             await cli.ValidateRepositoryExists();
         }
     }
+
+    [TestClass]
+    public class UnifiedReleaseCommandTests
+    {
+        [TestMethod]
+        public void TestReleaseCommands()
+        {
+            // Simulate invoking release commands
+            var result = Program.Main(new[] { "release", "list", "--repo", "userName/my-repo" });
+            Assert.AreEqual(0, result);
+
+            result = Program.Main(new[] { "release", "create", "--repo", "userName/my-repo", "--tag", "1.0.0", "--branch", "main", "--file", "C:\\Releases\\1.0.0.zip" });
+            Assert.AreEqual(0, result);
+        }
+    }
 }

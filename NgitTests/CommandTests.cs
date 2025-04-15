@@ -59,4 +59,19 @@ namespace NgitTests
             Assert.IsTrue(actual == Enums.RetCode.Success);
         }
     }
+
+    [TestClass]
+    public class UnifiedGitCommandTests
+    {
+        [TestMethod]
+        public void TestGitCommands()
+        {
+            // Simulate invoking git commands
+            var result = Program.Main(new[] { "git", "tag" });
+            Assert.AreEqual(0, result);
+
+            result = Program.Main(new[] { "git", "branch" });
+            Assert.AreEqual(0, result);
+        }
+    }
 }

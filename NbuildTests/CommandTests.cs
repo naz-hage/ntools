@@ -847,5 +847,20 @@ namespace NbuildTests
             // Assert is handled by ExpectedException
         }
     }
+
+    [TestClass]
+    public class UnifiedCommandTests
+    {
+        [TestMethod]
+        public void TestBuildCommands()
+        {
+            // Simulate invoking build commands
+            var result = Program.Main(new[] { "list", "-json", "tools.json" });
+            Assert.AreEqual(0, result);
+
+            result = Program.Main(new[] { "install", "-json", "tools.json" });
+            Assert.AreEqual(0, result);
+        }
+    }
 }
 

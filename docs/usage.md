@@ -1,5 +1,3 @@
-
-
 Once Ntools is installed, Open a Developer Command prompt for Visual Studio 2022 and navigate to your solution folder (i.e. `c:\source\ntools`).  The [`Nb.exe`](./ntools/nbuild.md) is the main executable for the Ntools.  The following are some examples of how to use the Ntools:
 
 -   Build a solution: Compiles the solution in the solution directory
@@ -34,4 +32,36 @@ Nb.exe stage
 Nb.exe targets
 ```
 - See the list of available targets at [Nbuild Targets](./ntools/nbuild-targets.md)
+
+## Unified Tool Usage
+
+The `nb.exe` tool now combines functionalities for build automation, Git enhancements, and GitHub release management. Below are examples of how to use the unified tool:
+
+### Build Commands
+```plaintext
+nb list -json tools.json
+nb install -json tools.json
+nb download -json tools.json
+nb targets
+nb path
+```
+
+### Git Commands
+```plaintext
+nb git tag
+nb git settag --tag 1.0.0
+nb git autotag --buildtype STAGE
+nb git branch
+nb git clone --url https://github.com/example/repo.git
+nb git deletetag --tag 1.0.0
+```
+
+### Release Commands
+```plaintext
+nb release create --repo userName/my-repo --tag 1.0.0 --branch main --file C:\Releases\1.0.0.zip
+nb release download --repo userName/my-repo --tag 1.0.0 --path C:\Downloads
+nb release list --repo userName/my-repo
+```
+
+For more details, use the `--help` option with any command or subcommand (e.g., `nb git --help`, `nb release --help`).
 

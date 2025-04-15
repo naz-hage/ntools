@@ -1,0 +1,8 @@
+GitHubRelease/Program.cs
+GitHubReleaseTests/CliTests.cs
+Nbuild/Program.cs
+NbuildTests/CommandTests.cs
+Ngit/Program.cs
+NgitTests/CommandTests.cs
+docs/ntools/nbuild.md
+docs/usage.md
