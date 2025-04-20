@@ -32,7 +32,7 @@ public class Cli
         "\t download \t -> Downloads apps specified in the -json option (require admin privileges to run).\n" +
         "\t targets \t -> Lists available targets and saves them in the targets.md file.\n" +
         "\t path \t\t -> Displays environment path in local machine.\n" +
-        "\t git_info\t -> Displays the current git inforamation in the local repository.\n" +
+        "\t git_info\t -> Displays the current git information in the local repository.\n" +
         "\t ----\n")]
     public CommandType Command { get; set; }
 
