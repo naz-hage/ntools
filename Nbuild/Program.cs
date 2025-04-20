@@ -21,8 +21,6 @@ public class Program
 
     static int Main(string[] args)
     {
-        Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{Nversion.Get()}]\n");
-
         var result = ResultHelper.New();
         var ParserOptions = new ParserOptions
         {
@@ -43,6 +41,11 @@ public class Program
         }
         else
         {
+            if (options!.Verbose)
+            {
+                Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{Nversion.Get()}]\n");
+            }
+
             ParserOptions.LogParseErrorToConsole = true;
             if (!Parser.TryParse(args, out options))
             {
@@ -59,6 +62,7 @@ public class Program
                 {
                     options.Json = UpdateJsonOption(options);
 
+
                     result = options.Command switch
                     {
                         Cli.CommandType.targets => BuildStarter.DisplayTargets(Environment.CurrentDirectory),
@@ -67,6 +71,7 @@ public class Program
                         Cli.CommandType.list => Command.List(options.Json, options.Verbose),
                         Cli.CommandType.download => Command.Download(options.Json, options.Verbose),
                         Cli.CommandType.path => Command.DisplayPathSegments(),
+                        Cli.CommandType.git_tag => DisplayGitInfo(options!.Verbose),
                         _ => ResultHelper.Fail(-1, $"Invalid Command: '{options.Command}'"),
                     };
                 }
@@ -80,31 +85,33 @@ public class Program
             Environment.CurrentDirectory = currentDirectory;
         }
 
-        if (result.IsSuccess())
+        if (options == null || !Enum.IsDefined(typeof(Cli.CommandType), options.Command))
         {
-            Colorizer.WriteLine($"[{ConsoleColor.Green}!√ Build completed.]");
-        }
-        else
-        {
-            if (result.Code == int.MaxValue)
+            if (result.IsSuccess())
             {
-                // Display Help
-                Parser.DisplayHelp<Cli>(HelpFormat.Full);
+                Colorizer.WriteLine($"[{ConsoleColor.Green}!√ Build completed.]");
             }
             else
             {
-                foreach (var item in result.Output.TakeLast(linesToDisplay))
+                if (result.Code == int.MaxValue)
                 {
-                    Colorizer.WriteLine($"[{ConsoleColor.Red}! {item}]");
+                    // Display Help
+                    Parser.DisplayHelp<Cli>(HelpFormat.Full);
                 }
+                else
+                {
+                    foreach (var item in result.Output.TakeLast(linesToDisplay))
+                    {
+                        Colorizer.WriteLine($"[{ConsoleColor.Red}! {item}]");
+                    }
 
-                Colorizer.WriteLine($"[{ConsoleColor.Red}!X Build failed!]");
-            
+                    Colorizer.WriteLine($"[{ConsoleColor.Red}!X Build failed!]");
+
+                }
             }
+
+            DisplayGitInfo(options!.Verbose);
         }
-
-        DisplayGitInfo(options!.Verbose);
-
         return (int)result.Code;
     }
 
@@ -185,10 +192,11 @@ public class Program
     /// Displays git information if git is configured and folder is git repository.
     /// </summary>
     /// <param name="verbose">Flag indicating whether to display verbose output.</param>
-    private static void DisplayGitInfo(bool verbose)
+    private static ResultHelper DisplayGitInfo(bool verbose)
     {
         GitWrapper gitWrapper = new(project:null,verbose:verbose);
-        if (!gitWrapper.IsGitConfigured(silent:true) || !gitWrapper.IsGitRepository(Environment.CurrentDirectory)) return;
+        if (!gitWrapper.IsGitConfigured(silent: true) || !gitWrapper.IsGitRepository(Environment.CurrentDirectory)) return ResultHelper.Fail(-1, "folde is not git repo");
+
 
         // Get the directory of the current process
         var executableDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -211,5 +219,7 @@ public class Program
         {
             if (verbose) Console.WriteLine($"==> Failed to display git info:{resultHelper.GetFirstOutput()}");
         }
-    }
+
+        return resultHelper;
+    }  
 }
