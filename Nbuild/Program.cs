@@ -195,7 +195,7 @@ public class Program
     private static ResultHelper DisplayGitInfo(bool verbose)
     {
         GitWrapper gitWrapper = new(project:null,verbose:verbose);
-        if (!gitWrapper.IsGitConfigured(silent: true) || !gitWrapper.IsGitRepository(Environment.CurrentDirectory)) return ResultHelper.Fail(-1, "folde is not git repo");
+        if (!gitWrapper.IsGitConfigured(silent: true) || !gitWrapper.IsGitRepository(Environment.CurrentDirectory)) return ResultHelper.Fail(-1, "folder is not git repo");
 
 
         // Get the directory of the current process
