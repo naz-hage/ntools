@@ -80,8 +80,9 @@ public class Program
             Environment.CurrentDirectory = currentDirectory;
         }
 
-        if (options == null || !Enum.IsDefined(typeof(Cli.CommandType), options.Command))
+        if (options == null || !Enum.IsDefined(options.Command))
         {
+            // Don't use the options object here, as it may not be initialized correctly
             if (result.IsSuccess())
             {
                 Colorizer.WriteLine($"[{ConsoleColor.Green}!√ Build completed.]");
@@ -105,7 +106,7 @@ public class Program
                 }
             }
 
-            Command.DisplayGitInfo(options!.Verbose);
+            Command.DisplayGitInfo();
         }
         return (int)result.Code;
     }

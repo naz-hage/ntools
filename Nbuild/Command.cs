@@ -865,7 +865,7 @@ namespace Nbuild
         /// Displays git information if git is configured and folder is git repository.
         /// </summary>
         /// <param name="verbose">Flag indicating whether to display verbose output.</param>
-        public static ResultHelper DisplayGitInfo(bool verbose)
+        public static ResultHelper DisplayGitInfo(bool verbose = false)
         {
             const string NgitAssemblyExe = "ngit.exe";
     
