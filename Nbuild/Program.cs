@@ -20,11 +20,11 @@ public class Program
     static int Main(string[] args)
     {
         var result = ResultHelper.New();
-        var ParserOptions = new ParserOptions
+        var parserOptions = new ParserOptions
         {
             LogParseErrorToConsole = false,
         };
-        var optionsParsed = Parser.TryParse(args, out Cli? options, ParserOptions);
+        var optionsParsed = Parser.TryParse(args, out Cli? options, parserOptions);
         if (!optionsParsed)
         {
             GitWrapper gitWrapper = new();
@@ -44,7 +44,7 @@ public class Program
                 Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{Nversion.Get()}]\n");
             }
 
-            ParserOptions.LogParseErrorToConsole = true;
+            parserOptions.LogParseErrorToConsole = true;
             if (!Parser.TryParse(args, out options))
             {
                 if (!args[0].Equals("--help", StringComparison.CurrentCultureIgnoreCase))

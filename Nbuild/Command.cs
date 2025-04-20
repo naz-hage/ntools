@@ -892,7 +892,7 @@ namespace Nbuild
             var resultHelper = process.LockStart(verbose);
             if (!resultHelper.IsSuccess())
             {
-                if (verbose) Console.WriteLine($"==> Failed to display git info:{resultHelper.GetFirstOutput()}");
+                if (verbose) Console.WriteLine($"==> Failed to display git info: {resultHelper.GetFirstOutput()}");
             }
 
             return resultHelper;
