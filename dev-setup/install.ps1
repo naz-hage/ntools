@@ -24,23 +24,22 @@ if (MainInstallApp -command install -json .\dotnet-runtime.json) {
     exit 1
 }
 
-# install Ntools
+# Call the InstallNtools function from the install module
+$result = InstallNtools
+if (-not $result) {
+    Write-OutputMessage $fileName "Failed to install NTools. Please check the logs for more details." -ForegroundColor Red
+    exit 1
+}
+
+# install apps
 #########################
-if (MainInstallApp -command install -json .\ntools.json) {
+if (MainInstallApp -command install -json .\apps.json) {
     Write-OutputMessage $fileName "Installation of ntools succeeded."
 } else {
     Write-OutputMessage $fileName "Error: Installation of ntools.json failed. Exiting script."
     exit 1
 }
 
-#install Development tools for Ntools
-#########################
-MainInstallNtools 
-#.\install-ntools.ps1 $DevDrive $MainDir
-if ($LASTEXITCODE -ne 0) {
-    Write-OutputMessage $fileName "Error: Installation of ntools failed. Exiting script."
-    exit 1
-}
 
 Write-OutputMessage $fileName "Completed installation script."
 Write-OutputMessage $fileName "EmtpyLine"
