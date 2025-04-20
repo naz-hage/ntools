@@ -2,8 +2,6 @@
 using NbuildTasks;
 using Ntools;
 using OutputColorizer;
-using System.Diagnostics;
-using System.Reflection;
 
 namespace Nbuild;
 
@@ -16,7 +14,7 @@ public class Program
     private const string CmdDownload = "download";
     private const string CmdPath = "path";
     private const string CmdHelp = "--help";
-    private const string NgitAssemblyExe = "ngit.exe";
+    
     private static readonly int linesToDisplay = 10;
 
     static int Main(string[] args)
@@ -71,7 +69,7 @@ public class Program
                         Cli.CommandType.list => Command.List(options.Json, options.Verbose),
                         Cli.CommandType.download => Command.Download(options.Json, options.Verbose),
                         Cli.CommandType.path => Command.DisplayPathSegments(),
-                        Cli.CommandType.git_tag => DisplayGitInfo(options!.Verbose),
+                        Cli.CommandType.git_tag => Command.DisplayGitInfo(options!.Verbose),
                         _ => ResultHelper.Fail(-1, $"Invalid Command: '{options.Command}'"),
                     };
                 }
@@ -110,7 +108,7 @@ public class Program
                 }
             }
 
-            DisplayGitInfo(options!.Verbose);
+            Command.DisplayGitInfo(options!.Verbose);
         }
         return (int)result.Code;
     }
@@ -188,38 +186,5 @@ public class Program
         return options.Json;
     }
 
-    /// <summary>
-    /// Displays git information if git is configured and folder is git repository.
-    /// </summary>
-    /// <param name="verbose">Flag indicating whether to display verbose output.</param>
-    private static ResultHelper DisplayGitInfo(bool verbose)
-    {
-        GitWrapper gitWrapper = new(project:null,verbose:verbose);
-        if (!gitWrapper.IsGitConfigured(silent: true) || !gitWrapper.IsGitRepository(Environment.CurrentDirectory)) return ResultHelper.Fail(-1, "folder is not git repo");
 
-
-        // Get the directory of the current process
-        var executableDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-
-        var process = new Process
-        {
-            StartInfo =
-            {
-                WorkingDirectory = Environment.CurrentDirectory,
-                FileName = Path.Combine(executableDirectory!, NgitAssemblyExe),
-                Arguments = $"branch",
-                RedirectStandardOutput = false,
-                RedirectStandardError = false,
-                UseShellExecute = false,
-            },
-        };
-
-        var resultHelper = process.LockStart(verbose);
-        if (!resultHelper.IsSuccess())
-        {
-            if (verbose) Console.WriteLine($"==> Failed to display git info:{resultHelper.GetFirstOutput()}");
-        }
-
-        return resultHelper;
-    }  
 }

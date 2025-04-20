@@ -4,11 +4,11 @@ using Ntools;
 using OutputColorizer;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using static NbuildTasks.Enums;
 
 namespace Nbuild
 {
@@ -859,6 +859,43 @@ namespace Nbuild
             var renewedPath = string.Join(';', uniqueSegments);
             Environment.SetEnvironmentVariable("PATH", renewedPath, EnvironmentVariableTarget.Machine);
             return uniqueSegments;
+        }
+
+        /// <summary>
+        /// Displays git information if git is configured and folder is git repository.
+        /// </summary>
+        /// <param name="verbose">Flag indicating whether to display verbose output.</param>
+        public static ResultHelper DisplayGitInfo(bool verbose)
+        {
+            const string NgitAssemblyExe = "ngit.exe";
+    
+            GitWrapper gitWrapper = new(project: null, verbose: verbose);
+            if (!gitWrapper.IsGitConfigured(silent: true) || !gitWrapper.IsGitRepository(Environment.CurrentDirectory)) return ResultHelper.Fail(-1, "folder is not git repo");
+
+
+            // Get the directory of the current process
+            var executableDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+            var process = new Process
+            {
+                StartInfo =
+            {
+                WorkingDirectory = Environment.CurrentDirectory,
+                FileName = Path.Combine(executableDirectory!, NgitAssemblyExe),
+                Arguments = $"branch",
+                RedirectStandardOutput = false,
+                RedirectStandardError = false,
+                UseShellExecute = false,
+            },
+            };
+
+            var resultHelper = process.LockStart(verbose);
+            if (!resultHelper.IsSuccess())
+            {
+                if (verbose) Console.WriteLine($"==> Failed to display git info:{resultHelper.GetFirstOutput()}");
+            }
+
+            return resultHelper;
         }
     }
 }
