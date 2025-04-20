@@ -15,12 +15,12 @@ if (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
     Write-OutputMessage $fileName "Admin rights detected"
 }
 
-# Install Dotnet_Runtime
+# Install dotnet-runtime
 #########################
-if (MainInstallApp -command install -json .\app-Dotnet_Runtime.json) {
-    Write-OutputMessage $fileName "Installation of app-Dotnet_Runtime succeeded."
+if (MainInstallApp -command install -json .\dotnet-runtime.json) {
+    Write-OutputMessage $fileName "Installation of dotnet-runtime succeeded."
 } else {
-    Write-OutputMessage $fileName "Error: Installation of app-Dotnet_Runtime.json failed. Exiting script."
+    Write-OutputMessage $fileName "Error: Installation of dotnet-runtime.json failed. Exiting script."
     exit 1
 }
 
