@@ -23,6 +23,7 @@ Below is a full list of options that can be used with `Nb.exe`:
          download        -> Downloads apps specified in the -json option (require admin privileges to run).
          targets         -> Lists available targets and saves them in the targets.md file.
          path            -> Displays environment path in local machine.
+         git_info        -> Displays the current git information in the local repository.
          ----
  (one of list,install,uninstall,download,targets,path, required)
   - json    : Specifies the JSON file that holds the list of apps. Only valid for the install, download, and list commands.

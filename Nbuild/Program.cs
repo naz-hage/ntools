@@ -19,6 +19,8 @@ public class Program
 
     static int Main(string[] args)
     {
+        Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{Nversion.Get()}]\n");
+
         var result = ResultHelper.New();
         var parserOptions = new ParserOptions
         {
@@ -39,11 +41,6 @@ public class Program
         }
         else
         {
-            if (options!.Verbose)
-            {
-                Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{Nversion.Get()}]\n");
-            }
-
             parserOptions.LogParseErrorToConsole = true;
             if (!Parser.TryParse(args, out options))
             {
@@ -69,7 +66,7 @@ public class Program
                         Cli.CommandType.list => Command.List(options.Json, options.Verbose),
                         Cli.CommandType.download => Command.Download(options.Json, options.Verbose),
                         Cli.CommandType.path => Command.DisplayPathSegments(),
-                        Cli.CommandType.git_tag => Command.DisplayGitInfo(options!.Verbose),
+                        Cli.CommandType.git_info => Command.DisplayGitInfo(options!.Verbose),
                         _ => ResultHelper.Fail(-1, $"Invalid Command: '{options.Command}'"),
                     };
                 }
