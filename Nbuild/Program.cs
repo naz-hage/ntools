@@ -66,7 +66,7 @@ public class Program
                         Cli.CommandType.list => Command.List(options.Json, options.Verbose),
                         Cli.CommandType.download => Command.Download(options.Json, options.Verbose),
                         Cli.CommandType.path => Command.DisplayPathSegments(),
-                        Cli.CommandType.git_info => Command.DisplayGitInfo(options!.Verbose),
+                        Cli.CommandType.git_info => Command.DisplayGitInfo(),
                         _ => ResultHelper.Fail(-1, $"Invalid Command: '{options.Command}'"),
                     };
                 }

@@ -864,38 +864,20 @@ namespace Nbuild
         /// <summary>
         /// Displays git information if git is configured and folder is git repository.
         /// </summary>
-        /// <param name="verbose">Flag indicating whether to display verbose output.</param>
-        public static ResultHelper DisplayGitInfo(bool verbose = false)
+        public static ResultHelper DisplayGitInfo()
         {
-            const string NgitAssemblyExe = "ngit.exe";
-    
-            GitWrapper gitWrapper = new(project: null, verbose: verbose);
-            if (!gitWrapper.IsGitConfigured(silent: true) || !gitWrapper.IsGitRepository(Environment.CurrentDirectory)) return ResultHelper.Fail(-1, "folder is not git repo");
-
-
-            // Get the directory of the current process
-            var executableDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-
-            var process = new Process
+            var project = Path.GetFileName(Directory.GetCurrentDirectory());
+            var gitWrapper= new GitWrapper();
+            if (string.IsNullOrEmpty(gitWrapper.Branch))
             {
-                StartInfo =
-            {
-                WorkingDirectory = Environment.CurrentDirectory,
-                FileName = Path.Combine(executableDirectory!, NgitAssemblyExe),
-                Arguments = $"branch",
-                RedirectStandardOutput = false,
-                RedirectStandardError = false,
-                UseShellExecute = false,
-            },
-            };
-
-            var resultHelper = process.LockStart(verbose);
-            if (!resultHelper.IsSuccess())
-            {
-                if (verbose) Console.WriteLine($"==> Failed to display git info: {resultHelper.GetFirstOutput()}");
+                Colorizer.WriteLine($"[{ConsoleColor.Red}!Error: [{ConsoleColor.Yellow}!{project}] directory is not a git repository]");
+                Parser.DisplayHelp<Cli>(HelpFormat.Full);
+                return ResultHelper.Fail(-1, "Not a git repository");
             }
-
-            return resultHelper;
+            Colorizer.WriteLine($"[{ConsoleColor.DarkMagenta}!Project [{ConsoleColor.Yellow}!{project}] " +
+                                                    $"Branch [{ConsoleColor.Yellow}!{gitWrapper.Branch}] " +
+                                                    $"Tag [{ConsoleColor.Yellow}!{gitWrapper.Tag}]]");
+            return ResultHelper.Success();
         }
     }
 }
