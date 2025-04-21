@@ -4,6 +4,7 @@ using Ntools;
 using OutputColorizer;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
@@ -858,6 +859,25 @@ namespace Nbuild
             var renewedPath = string.Join(';', uniqueSegments);
             Environment.SetEnvironmentVariable("PATH", renewedPath, EnvironmentVariableTarget.Machine);
             return uniqueSegments;
+        }
+
+        /// <summary>
+        /// Displays git information if git is configured and folder is git repository.
+        /// </summary>
+        public static ResultHelper DisplayGitInfo()
+        {
+            var project = Path.GetFileName(Directory.GetCurrentDirectory());
+            var gitWrapper= new GitWrapper();
+            if (string.IsNullOrEmpty(gitWrapper.Branch))
+            {
+                Colorizer.WriteLine($"[{ConsoleColor.Red}!Error: [{ConsoleColor.Yellow}!{project}] directory is not a git repository]");
+                Parser.DisplayHelp<Cli>(HelpFormat.Full);
+                return ResultHelper.Fail(-1, "Not a git repository");
+            }
+            Colorizer.WriteLine($"[{ConsoleColor.DarkMagenta}!Project [{ConsoleColor.Yellow}!{project}] " +
+                                                    $"Branch [{ConsoleColor.Yellow}!{gitWrapper.Branch}] " +
+                                                    $"Tag [{ConsoleColor.Yellow}!{gitWrapper.Tag}]]");
+            return ResultHelper.Success();
         }
     }
 }

@@ -2,8 +2,6 @@
 using NbuildTasks;
 using Ntools;
 using OutputColorizer;
-using System.Diagnostics;
-using System.Reflection;
 
 namespace Nbuild;
 
@@ -16,7 +14,7 @@ public class Program
     private const string CmdDownload = "download";
     private const string CmdPath = "path";
     private const string CmdHelp = "--help";
-    private const string NgitAssemblyExe = "ngit.exe";
+    
     private static readonly int linesToDisplay = 10;
 
     static int Main(string[] args)
@@ -24,11 +22,11 @@ public class Program
         Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{Nversion.Get()}]\n");
 
         var result = ResultHelper.New();
-        var ParserOptions = new ParserOptions
+        var parserOptions = new ParserOptions
         {
             LogParseErrorToConsole = false,
         };
-        var optionsParsed = Parser.TryParse(args, out Cli? options, ParserOptions);
+        var optionsParsed = Parser.TryParse(args, out Cli? options, parserOptions);
         if (!optionsParsed)
         {
             GitWrapper gitWrapper = new();
@@ -43,7 +41,7 @@ public class Program
         }
         else
         {
-            ParserOptions.LogParseErrorToConsole = true;
+            parserOptions.LogParseErrorToConsole = true;
             if (!Parser.TryParse(args, out options))
             {
                 if (!args[0].Equals("--help", StringComparison.CurrentCultureIgnoreCase))
@@ -59,6 +57,7 @@ public class Program
                 {
                     options.Json = UpdateJsonOption(options);
 
+
                     result = options.Command switch
                     {
                         Cli.CommandType.targets => BuildStarter.DisplayTargets(Environment.CurrentDirectory),
@@ -67,6 +66,7 @@ public class Program
                         Cli.CommandType.list => Command.List(options.Json, options.Verbose),
                         Cli.CommandType.download => Command.Download(options.Json, options.Verbose),
                         Cli.CommandType.path => Command.DisplayPathSegments(),
+                        Cli.CommandType.git_info => Command.DisplayGitInfo(),
                         _ => ResultHelper.Fail(-1, $"Invalid Command: '{options.Command}'"),
                     };
                 }
@@ -80,31 +80,34 @@ public class Program
             Environment.CurrentDirectory = currentDirectory;
         }
 
-        if (result.IsSuccess())
+        if (options == null || !Enum.IsDefined(options.Command))
         {
-            Colorizer.WriteLine($"[{ConsoleColor.Green}!√ Build completed.]");
-        }
-        else
-        {
-            if (result.Code == int.MaxValue)
+            // Don't use the options object here, as it may not be initialized correctly
+            if (result.IsSuccess())
             {
-                // Display Help
-                Parser.DisplayHelp<Cli>(HelpFormat.Full);
+                Colorizer.WriteLine($"[{ConsoleColor.Green}!√ Build completed.]");
             }
             else
             {
-                foreach (var item in result.Output.TakeLast(linesToDisplay))
+                if (result.Code == int.MaxValue)
                 {
-                    Colorizer.WriteLine($"[{ConsoleColor.Red}! {item}]");
+                    // Display Help
+                    Parser.DisplayHelp<Cli>(HelpFormat.Full);
                 }
+                else
+                {
+                    foreach (var item in result.Output.TakeLast(linesToDisplay))
+                    {
+                        Colorizer.WriteLine($"[{ConsoleColor.Red}! {item}]");
+                    }
 
-                Colorizer.WriteLine($"[{ConsoleColor.Red}!X Build failed!]");
-            
+                    Colorizer.WriteLine($"[{ConsoleColor.Red}!X Build failed!]");
+
+                }
             }
+
+            Command.DisplayGitInfo();
         }
-
-        DisplayGitInfo(options!.Verbose);
-
         return (int)result.Code;
     }
 
@@ -181,35 +184,5 @@ public class Program
         return options.Json;
     }
 
-    /// <summary>
-    /// Displays git information if git is configured and folder is git repository.
-    /// </summary>
-    /// <param name="verbose">Flag indicating whether to display verbose output.</param>
-    private static void DisplayGitInfo(bool verbose)
-    {
-        GitWrapper gitWrapper = new(project:null,verbose:verbose);
-        if (!gitWrapper.IsGitConfigured(silent:true) || !gitWrapper.IsGitRepository(Environment.CurrentDirectory)) return;
 
-        // Get the directory of the current process
-        var executableDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-
-        var process = new Process
-        {
-            StartInfo =
-            {
-                WorkingDirectory = Environment.CurrentDirectory,
-                FileName = Path.Combine(executableDirectory!, NgitAssemblyExe),
-                Arguments = $"branch",
-                RedirectStandardOutput = false,
-                RedirectStandardError = false,
-                UseShellExecute = false,
-            },
-        };
-
-        var resultHelper = process.LockStart(verbose);
-        if (!resultHelper.IsSuccess())
-        {
-            if (verbose) Console.WriteLine($"==> Failed to display git info:{resultHelper.GetFirstOutput()}");
-        }
-    }
 }

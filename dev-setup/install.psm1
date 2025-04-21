@@ -20,7 +20,6 @@
     | MainInstallApp              | Main function to install an application.                      |
     | CheckIfDotnetInstalled      | Checks if .NET Core is installed and its version.             |
     | InstallDotNetCore           | Installs .NET Core if not already installed.                  |
-    | MainInstallNtools           | Main function to install NTools (Deprecated).
     | InstallNtools               | Installs NTools by downloading and unzipping the specified version. |
     | DownloadNtools              | Downloads the specified version of NTools from GitHub.        |
     | SetDevEnvironmentVariables  | Sets development environment variables.                       |
@@ -285,21 +284,6 @@ function InstallDotNetCore {
             Write-OutputMessage $MyInvocation.MyCommand.Name "$deploymentPath already exists in the PATH environment variable."
         }
     }
-
-
-function MainInstallNtools {
-    # prepare the downloads directory
-    Write-OutputMessage "This `MainInstallNtools` function is deprecated, please use `InstallNTools` instead."
-    PrepareDownloadsDirectory $downloadsDirectory
-
-    # add deployment path to the PATH environment variable if it doesn't already exist
-    AddDeploymentPathToEnvironment $deploymentPath
-
-    & $global:NbExePath install -json $nbToolsPath
-
-    Write-OutputMessage $MyInvocation.MyCommand.Name "Completed successfully."
-    Write-OutputMessage "This `MainInstallNtools` function is deprecated, please use `InstallNTools` instead."
-}
 
 function InstallNtools {
     param (
