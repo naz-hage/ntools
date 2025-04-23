@@ -24,8 +24,9 @@ Below is a full list of options that can be used with `Nb.exe`:
          targets         -> Lists available targets and saves them in the targets.md file.
          path            -> Displays environment path in local machine.
          git_info        -> Displays the current git information in the local repository.
+         git_settag      -> Set specified tag with -tag option
          ----
- (one of list,install,uninstall,download,targets,path, required)
+ (one of list,install,uninstall,download,targets,path,git_info,git_settag, required)
   - json    : Specifies the JSON file that holds the list of apps. Only valid for the install, download, and list commands.
          - By default, the -json option points to the ntools deployment folder: $(ProgramFiles)\build\ntools.json.
          Sample JSON file: https://github.com/naz-hage/ntools/blob/main/dev-setup/ntools.json
@@ -36,6 +37,7 @@ Below is a full list of options that can be used with `Nb.exe`:
            `Nb` will run an MSbuild target `stage` defined in a `nbuild.targets` file which present in the solution folder.
            Run `Nb.exe Targets` to list the available targets.
          -v Possible Values: (true or false, default=False)
+  - tag     : Specifies the tag used for git_settag and git_deletetag commands. (string, default=)
 ```
 
 **If the -json option is not specified, the default json file `$(ProgramFiles)\Nbuild\NTools.json` is used**. 

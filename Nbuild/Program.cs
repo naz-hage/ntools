@@ -67,6 +67,7 @@ public class Program
                         Cli.CommandType.download => Command.Download(options.Json, options.Verbose),
                         Cli.CommandType.path => Command.DisplayPathSegments(),
                         Cli.CommandType.git_info => Command.DisplayGitInfo(),
+                        Cli.CommandType.git_settag => Command.SetTag(options.Tag),
                         _ => ResultHelper.Fail(-1, $"Invalid Command: '{options.Command}'"),
                     };
                 }
@@ -162,7 +163,7 @@ public class Program
     /// <exception cref="FileNotFoundException">Thrown when no file exists at the path specified by the Json property.</exception>
     private static string? UpdateJsonOption(Cli options)
     {
-        if ((string.IsNullOrEmpty(options.Json) && !string.IsNullOrEmpty(options.Command.ToString())) &&
+        if (string.IsNullOrEmpty(options.Json) && !string.IsNullOrEmpty(options.Command.ToString()) &&
                 (options.Command.Equals(Cli.CommandType.install) ||
                 options.Command.Equals(Cli.CommandType.uninstall) ||
                 options.Command.Equals(Cli.CommandType.list) ||

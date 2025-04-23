@@ -879,5 +879,23 @@ namespace Nbuild
                                                     $"Tag [{ConsoleColor.Yellow}!{gitWrapper.Tag}]]");
             return ResultHelper.Success();
         }
+
+        /// <summary>
+        /// Sets a tag in the current git repository.
+        /// </summary>
+        /// <param name="options">The CLI options containing the tag to set.</param>    
+        public static ResultHelper SetTag(string? tag)
+        {
+            var gitWrapper= new GitWrapper();
+            // Project and branch required
+            if (string.IsNullOrEmpty(tag))
+            {
+                Colorizer.WriteLine($"[{ConsoleColor.Red}!Error: valid tag is required]");
+                Parser.DisplayHelp<Cli>(HelpFormat.Full);
+                ResultHelper.Fail(-1, "Tag is reqiured");
+            }
+
+            return gitWrapper.SetTag(tag) == true ? ResultHelper.Success() : ResultHelper.Fail(-1, "Set tag failed");
+        }
     }
 }
