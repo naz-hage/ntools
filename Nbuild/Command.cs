@@ -867,7 +867,7 @@ namespace Nbuild
         public static ResultHelper DisplayGitInfo()
         {
             var project = Path.GetFileName(Directory.GetCurrentDirectory());
-            var gitWrapper= new GitWrapper();
+            var gitWrapper = new GitWrapper();
             if (string.IsNullOrEmpty(gitWrapper.Branch))
             {
                 Colorizer.WriteLine($"[{ConsoleColor.Red}!Error: [{ConsoleColor.Yellow}!{project}] directory is not a git repository]");
@@ -886,16 +886,21 @@ namespace Nbuild
         /// <param name="tag">The string representing the tag to set.</param>    
         public static ResultHelper SetTag(string? tag)
         {
-            var gitWrapper= new GitWrapper();
+            var gitWrapper = new GitWrapper();
             // Project and branch required
             if (string.IsNullOrEmpty(tag))
             {
                 Colorizer.WriteLine($"[{ConsoleColor.Red}!Error: valid tag is required]");
                 Parser.DisplayHelp<Cli>(HelpFormat.Full);
-                ResultHelper.Fail(-1, "Tag is required");
+                return ResultHelper.Fail(-1, "Tag is required");
             }
 
-            return gitWrapper.SetTag(tag) == true ? ResultHelper.Success() : ResultHelper.Fail(-1, "Set tag failed");
+            var result = gitWrapper.SetTag(tag) == true ? ResultHelper.Success() : ResultHelper.Fail(-1, "Set tag failed");
+            if (result.IsSuccess())
+            {
+                DisplayGitInfo();
+            }
+            return result;
         }
     }
 }
