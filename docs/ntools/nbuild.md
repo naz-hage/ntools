@@ -37,7 +37,7 @@ Below is a full list of options that can be used with `Nb.exe`:
            `Nb` will run an MSbuild target `stage` defined in a `nbuild.targets` file which present in the solution folder.
            Run `Nb.exe Targets` to list the available targets.
          -v Possible Values: (true or false, default=False)
-  - tag     : Specifies the tag used for git_settag and git_deletetag commands. (string, default=)
+  - tag     : Specifies the tag used for the git_settag command. (string, default=)
 ```
 
 **If the -json option is not specified, the default json file `$(ProgramFiles)\Nbuild\NTools.json` is used**. 
