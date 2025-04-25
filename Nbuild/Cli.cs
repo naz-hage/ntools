@@ -18,8 +18,9 @@ public class Cli
         download,
         targets,
         path,
-        git_info
-    }
+        git_info,
+        git_settag,
+}
 
     /// <summary>
     /// Gets or sets the command to execute.
@@ -33,6 +34,7 @@ public class Cli
         "\t targets \t -> Lists available targets and saves them in the targets.md file.\n" +
         "\t path \t\t -> Displays environment path in local machine.\n" +
         "\t git_info\t -> Displays the current git information in the local repository.\n" +
+        "\t git_settag\t -> Set specified tag with -tag option\n" +
         "\t ----\n")]
     public CommandType Command { get; set; }
 
@@ -56,6 +58,9 @@ public class Cli
         "\t   Run `Nb.exe Targets` to list the available targets. \n" +
         "\t -v Possible Values:")]
     public bool Verbose { get; set; }
+
+    [OptionalArgument("", "tag", "Specifies the tag used for git_settag and git_deletetag commands.")]
+    public string? Tag { get; set; }
 
     private static readonly Dictionary<string, CommandType> CommandMap = new()
         {
@@ -95,6 +100,12 @@ public class Cli
                 if (string.IsNullOrEmpty(Json))
                 {
                     throw new ArgumentException("The 'json' option is required for the 'install', 'uninstall', 'download', and 'list' commands.");
+                }
+                break;
+            case CommandType.git_settag:
+                if (string.IsNullOrEmpty(Tag))
+                {
+                    throw new ArgumentException("The 'tag' option is required for the 'git_settag' command.");
                 }
                 break;
             default:
