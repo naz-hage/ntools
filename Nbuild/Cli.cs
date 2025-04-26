@@ -20,21 +20,25 @@ public class Cli
         path,
         git_info,
         git_settag,
-}
+        git_autotag,
+        git_push_autotag,
+    }
 
     /// <summary>
     /// Gets or sets the command to execute.
     /// Possible values: targets, install, uninstall, download, list, path.
     /// </summary>
     [RequiredArgument(0, "command", "Specifies the command to execute.\n" +
-        "\t list \t\t -> Lists apps specified in the -json option.\n" +
-        "\t install \t -> Downloads and installs apps specified in the -json option (require admin privileges to run).\n" +
-        "\t uninstall \t -> Uninstalls apps specified in the -json option (require admin privileges to run).\n" +
-        "\t download \t -> Downloads apps specified in the -json option (require admin privileges to run).\n" +
-        "\t targets \t -> Lists available targets and saves them in the targets.md file.\n" +
-        "\t path \t\t -> Displays environment path in local machine.\n" +
-        "\t git_info\t -> Displays the current git information in the local repository.\n" +
-        "\t git_settag\t -> Set specified tag with -tag option\n" +
+        "\t list \t\t\t -> Lists apps specified in the -json option.\n" +
+        "\t install \t\t -> Downloads and installs apps specified in the -json option (require admin privileges to run).\n" +
+        "\t uninstall \t\t -> Uninstalls apps specified in the -json option (require admin privileges to run).\n" +
+        "\t download \t\t -> Downloads apps specified in the -json option (require admin privileges to run).\n" +
+        "\t targets \t\t -> Lists available targets and saves them in the targets.md file.\n" +
+        "\t path \t\t\t -> Displays environment path in local machine.\n" +
+        "\t git_info \t\t -> Displays the current git information in the local repository.\n" +
+        "\t git_settag \t\t -> Set specified tag with -tag option\n" +
+        "\t git_autotag \t\t -> Set next tag based on the build type: STAGE | PROD\n" +
+        "\t git_push_autotag \t -> Set next tag based on the build type and push to remote repo\n" +
         "\t ----\n")]
     public CommandType Command { get; set; }
 
@@ -59,8 +63,15 @@ public class Cli
         "\t -v Possible Values:")]
     public bool Verbose { get; set; }
 
-    [OptionalArgument("", "tag", "Specifies the tag used for git_settag and git_deletetag commands.")]
+    [OptionalArgument("", "tag", "Specifies the tag used for git_settag command.")]
     public string? Tag { get; set; }
+
+    /// <summary>
+    /// Gets or sets the build type used for git_autotag and git_push_autotag commands.
+    /// Possible values: STAGE, PROD.
+    /// </summary>
+    [OptionalArgument("", "buildtype", "Specifies the build type used for git_autotag and git_push_autotag commands. Possible values: STAGE, PROD.")]
+    public string? BuildType { get; internal set; }
 
     private static readonly Dictionary<string, CommandType> CommandMap = new()
         {
@@ -69,7 +80,11 @@ public class Cli
             { "uninstall", CommandType.uninstall },
             { "download", CommandType.download },
             { "list", CommandType.list },
-            { "path", CommandType.path }
+            { "path", CommandType.path },
+            { "git_info", CommandType.git_info },
+            { "git_settag", CommandType.git_settag },
+            { "git_autotag", CommandType.git_autotag },
+            { "git_push_autotag", CommandType.git_push_autotag },
         };
 
     /// <summary>
@@ -106,6 +121,13 @@ public class Cli
                 if (string.IsNullOrEmpty(Tag))
                 {
                     throw new ArgumentException("The 'tag' option is required for the 'git_settag' command.");
+                }
+                break;
+            case CommandType.git_autotag:
+            case CommandType.git_push_autotag:
+                if (string.IsNullOrEmpty(BuildType))
+                {
+                    throw new ArgumentException("The 'buildtype' option is required for the 'git_autotag' and 'git_push_autotag' commands.");
                 }
                 break;
             default:

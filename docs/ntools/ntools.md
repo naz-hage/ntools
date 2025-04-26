@@ -19,7 +19,7 @@ The [Windows dev environment](https://learn.microsoft.com/en-us/windows/dev-envi
 | [Burp Suite](https://portswigger.net/burp/communitydownload)                                             | 2021.11.2   | 01-Oct-23       |
 | [Draw.io](https://app.diagrams.net/)                                                                     | N/A         | 01-Oct-23       |
 | [Dotnet Runtime](https://dotnet.microsoft.com/en-us/download/dotnet)                               | 9.0.2       | 10-Mar-25       |
-| [PowerShell](https://github.com/PowerShell/PowerShell/releases)                                          | 7.5.0       | 25-Jan-25       |
+| [PowerShell](https://github.com/PowerShell/PowerShell/releases)                                          | 7.5.1       | 26-May-25       |
 | [NuGet](https://www.nuget.org/downloads)                                                                 | 6.13.2      | 10-mar-25       |
 | [SysInternals](https://learn.microsoft.com/en-us/sysinternals/)                                          | 2.90.0      | 22-Jun-24       |
 | [Python](https://www.python.org/downloads/)                                                               | 3.13.2      | 10-mar-25       |
