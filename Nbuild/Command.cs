@@ -49,7 +49,7 @@ namespace Nbuild
                 return true; // Running in GitHub Actions, in test mode
             }
 
-            // defaut is not in test mode
+            // default is not in test mode
             return false;
         }
 
@@ -897,6 +897,42 @@ namespace Nbuild
 
             var result = gitWrapper.SetTag(tag) == true ? ResultHelper.Success() : ResultHelper.Fail(-1, "Set tag failed");
             if (result.IsSuccess())
+            {
+                DisplayGitInfo();
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Sets the auto tag based on the provided build type and optionally pushes the tag.
+        /// </summary>
+        /// <param name="buildType">The build type (string): STAGE | PROD.</param>
+        /// <param name="push">A boolean flag indicating whether to push the tag after setting it. Default is false.</param>
+        /// <returns>Returns a RetCode indicating the result of the operation.</returns>
+        public static ResultHelper SetAutoTag(string? buildType, bool push = false)
+        {
+            var gitWrapper = new GitWrapper();
+
+            if (string.IsNullOrEmpty(buildType))
+            {
+                Colorizer.WriteLine($"[{ConsoleColor.Red}!Error: valid build type is required]");
+                Parser.DisplayHelp<Cli>(HelpFormat.Full);
+                return ResultHelper.Fail(-1, "Build type is required");
+            }
+            string? nextTag = gitWrapper.AutoTag(buildType);
+            if (string.IsNullOrEmpty(nextTag))
+            {
+                return ResultHelper.Fail(-1, "Autotag failed");
+            }
+
+            var result = gitWrapper.SetTag(nextTag) == true ? ResultHelper.Success() : ResultHelper.Fail(-1, "Autotag failed");
+            if (result.IsSuccess() && push)
+            {
+                Colorizer.WriteLine($"[{ConsoleColor.Green}!new tag: {gitWrapper.Tag}]");
+                gitWrapper.PushTag(nextTag);
+                DisplayGitInfo();
+            }
+            else if (result.IsSuccess())
             {
                 DisplayGitInfo();
             }
