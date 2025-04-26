@@ -922,10 +922,10 @@ namespace Nbuild
             string? nextTag = gitWrapper.AutoTag(buildType);
             if (string.IsNullOrEmpty(nextTag))
             {
-                return ResultHelper.Fail(-1, "Autotag failed");
+                return ResultHelper.Fail(-1, "AutoTag failed");
             }
 
-            var result = gitWrapper.SetTag(nextTag) == true ? ResultHelper.Success() : ResultHelper.Fail(-1, "Autotag failed");
+            var result = gitWrapper.SetTag(nextTag) == true ? ResultHelper.Success() : ResultHelper.Fail(-1, "SetTag failed");
             if (result.IsSuccess() && push)
             {
                 Colorizer.WriteLine($"[{ConsoleColor.Green}!new tag: {gitWrapper.Tag}]");
