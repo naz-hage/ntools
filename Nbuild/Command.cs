@@ -938,5 +938,21 @@ namespace Nbuild
             }
             return result;
         }
+
+        /// <summary>
+        /// Displays the current git branch in the local repository.
+        /// </summary>
+        public static ResultHelper DisplayGitBranch()
+        {
+            var gitWrapper = new GitWrapper();
+            if (string.IsNullOrEmpty(gitWrapper.Branch))
+            {
+                Colorizer.WriteLine($"[{ConsoleColor.Red}!Error: Not a git repository]");
+                return ResultHelper.Fail(-1, "Not a git repository");
+            }
+            Colorizer.WriteLine($"[{ConsoleColor.Green}!Current branch: {gitWrapper.Branch}]");
+            DisplayGitInfo();
+            return ResultHelper.Success();
+        }
     }
 }
