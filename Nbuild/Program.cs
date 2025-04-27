@@ -70,6 +70,7 @@ public class Program
                         Cli.CommandType.git_settag => Command.SetTag(options.Tag),
                         Cli.CommandType.git_autotag => Command.SetAutoTag(options.BuildType),
                         Cli.CommandType.git_push_autotag => Command.SetAutoTag(options.BuildType, push: true),
+                        Cli.CommandType.git_branch => Command.DisplayGitBranch(),
                         _ => ResultHelper.Fail(-1, $"Invalid Command: '{options.Command}'"),
                     };
                 }

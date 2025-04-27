@@ -22,6 +22,7 @@ public class Cli
         git_settag,
         git_autotag,
         git_push_autotag,
+        git_branch,
     }
 
     /// <summary>
@@ -39,6 +40,7 @@ public class Cli
         "\t git_settag \t\t -> Set specified tag with -tag option\n" +
         "\t git_autotag \t\t -> Set next tag based on the build type: STAGE | PROD\n" +
         "\t git_push_autotag \t -> Set next tag based on the build type and push to remote repo\n" +
+        "\t git_branch \t\t -> Displays the current git branch in the local repository\n" +
         "\t ----\n")]
     public CommandType Command { get; set; }
 
@@ -85,6 +87,7 @@ public class Cli
             { "git_settag", CommandType.git_settag },
             { "git_autotag", CommandType.git_autotag },
             { "git_push_autotag", CommandType.git_push_autotag },
+            { "git_branch", CommandType.git_branch },
         };
 
     /// <summary>
