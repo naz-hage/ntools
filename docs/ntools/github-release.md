@@ -87,16 +87,17 @@ The access token must have the following permissions:
 GitHubRelease.exe command [-repo value] [-tag value] [-branch value] [-file value] [-path value] [-v value]
   - command : Specifies the command to execute.
          create          -> Create a release. Requires repo, tag, branch and file.
+         pre_release     -> Create a pre_release. Requires repo, tag, branch and file.
          download        -> Download an asset. Requires repo, tag, and path (optional)
          ----
- (one of create,download, required)
+ (one of create,pre_release,download, required)
   - repo    : Specifies the Git repository in the format any of the following formats:
          repoName  (UserName is declared the `OWNER` environment variable)
          userName/repoName
          https://github.com/userName/repoName (Full URL to the repository on GitHub). This is applicable to all commands. (string, default=)
   - tag     : Specifies the tag name. Applicable for all commands (string, default=)
-  - branch  : Specifies the branch name. Applicable for create command (string, default=main)
-  - file    : Specifies the asset file name. Must include full path. Applicable for create command (string, default=)
+  - branch  : Specifies the branch name. Applicable for create, pre_release commands (string, default=main)
+  - file    : Specifies the asset file name. Must include full path. Applicable for create, pre_release commands (string, default=)
   - path    : Specifies the asset path. Must be an absolute path. (string, default=)
   - v       : Optional parameter which sets the console output verbose level. (true or false, default=False)
 ```
@@ -105,6 +106,13 @@ To create a release for the repository `my-repo` with the tag `1.0.0`, branch `m
 
 ```batch
 GitHubRelease.exe create -repo userName/my-repo -tag 1.0.0 -branch main -file C:\Releases\1.1.0.zip
+```
+
+### Example: Creating a Pre-Release
+To create a pre-release for the repository `my-repo` with the tag `1.0.0`, branch `main`, and an asset located at `C:\Releases\1.0.0.zip`, you would use the following command:
+
+```batch
+GitHubRelease.exe pre_release -repo userName/my-repo -tag 1.0.0 -branch main -file C:\Releases\1.1.0.zip
 ```
 
 ### Example: Downloading an Asset

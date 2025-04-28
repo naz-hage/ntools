@@ -148,9 +148,17 @@
   </Target>
 
 	<!-- Creates a stage or prod release -->
-	<Target Name="GITHUB_RELEASE" DependsOnTargets="ARTIFACTS;GIT_BRANCH" AfterTargets="STAGE;PROD" Condition="'$(GITHUB_ACTIONS)' != ''" >
+	<Target Name="GITHUB_RELEASE" DependsOnTargets="ARTIFACTS;GIT_BRANCH" AfterTargets="PROD" Condition="'$(GITHUB_ACTIONS)' != ''" >
 		<Git Command="PushTag" TaskParameter="$(ProductVersion)" />
 		<Exec Command='"$(BuildTools)\GitHubRelease.exe" create -repo $(SolutionName) -tag $(ProductVersion) -branch $(GitBranch) -file $(ArtifactsFolder).zip' WorkingDirectory="$(BuildTools)" />
+
+		<Message Text="==> DONE"/>
+	</Target>
+
+	<!-- Creates a stage or prod pre-release -->
+	<Target Name="GITHUB_PRE_RELEASE" DependsOnTargets="ARTIFACTS;GIT_BRANCH" AfterTargets="STAGE" Condition="'$(GITHUB_ACTIONS)' != ''" >
+		<Git Command="PushTag" TaskParameter="$(ProductVersion)" />
+		<Exec Command='"$(BuildTools)\GitHubRelease.exe" pre_release -repo $(SolutionName) -tag $(ProductVersion) -branch $(GitBranch) -file $(ArtifactsFolder).zip' WorkingDirectory="$(BuildTools)" />
 
 		<Message Text="==> DONE"/>
 	</Target>

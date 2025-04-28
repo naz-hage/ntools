@@ -20,7 +20,7 @@ namespace GitHubRelease
         /// It utilizes the ReleaseService to interact with the GitHub API.
         /// If the release creation is successful, it returns true; otherwise, it logs the error and returns false.
         /// </remarks>
-        public static async Task<bool> CreateRelease(string repo, string tag, string branch, string assetFileName)
+        public static async Task<bool> CreateRelease(string repo, string tag, string branch, string assetFileName, bool preRelease = false)
         {
             var releaseService = new ReleaseService(repo);
 
@@ -31,7 +31,7 @@ namespace GitHubRelease
                 Name = tag,
                 Body = "Description of the release",  // should be pulled from GetLatestReleaseAsync
                 Draft = false,
-                Prerelease = false
+                Prerelease = preRelease,
             };
 
             // Create a release

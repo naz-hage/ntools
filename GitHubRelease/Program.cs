@@ -37,6 +37,7 @@ namespace GitHubRelease
                 result = options.Command switch
                 {
                     Cli.CommandType.create => await Command.CreateRelease(options.Repo!, options.Tag!, options.Branch!, options.AssetFileName!),
+                    Cli.CommandType.pre_release => await Command.CreateRelease(options.Repo!, options.Tag!, options.Branch!, options.AssetFileName!, true),
                     Cli.CommandType.download => await Command.DownloadAsset(options.Repo!, options.Tag!, options.AssetPath!),
                     _ => throw new InvalidOperationException("Invalid command")
                 };
