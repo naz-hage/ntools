@@ -23,11 +23,12 @@ public class Cli
         git_autotag,
         git_push_autotag,
         git_branch,
+        git_clone,
     }
 
     /// <summary>
     /// Gets or sets the command to execute.
-    /// Possible values: targets, install, uninstall, download, list, path.
+    /// Possible values: targets, install, uninstall, download, list, path, git_info, git_settag, git_autotag, git_push_autotag, git_branch, git_clone.
     /// </summary>
     [RequiredArgument(0, "command", "Specifies the command to execute.\n" +
         "\t list \t\t\t -> Lists apps specified in the -json option.\n" +
@@ -41,6 +42,7 @@ public class Cli
         "\t git_autotag \t\t -> Set next tag based on the build type: STAGE | PROD\n" +
         "\t git_push_autotag \t -> Set next tag based on the build type and push to remote repo\n" +
         "\t git_branch \t\t -> Displays the current git branch in the local repository\n" +
+        "\t git_clone \t\t -> Clone specified Git repo in the -url option\n" +
         "\t ----\n")]
     public CommandType Command { get; set; }
 
@@ -65,6 +67,12 @@ public class Cli
         "\t -v Possible Values:")]
     public bool Verbose { get; set; }
 
+    /// <summary>
+    /// Gets or sets the Git repository URL.
+    /// </summary>
+    [OptionalArgument("", "url", "Specifies the Git repository URL.")]
+    public string? Url { get; set; }
+
     [OptionalArgument("", "tag", "Specifies the tag used for git_settag command.")]
     public string? Tag { get; set; }
 
@@ -88,6 +96,7 @@ public class Cli
             { "git_autotag", CommandType.git_autotag },
             { "git_push_autotag", CommandType.git_push_autotag },
             { "git_branch", CommandType.git_branch },
+            { "git_clone", CommandType.git_clone },
         };
 
     /// <summary>
@@ -131,6 +140,12 @@ public class Cli
                 if (string.IsNullOrEmpty(BuildType))
                 {
                     throw new ArgumentException("The 'buildtype' option is required for the 'git_autotag' and 'git_push_autotag' commands.");
+                }
+                break;
+            case CommandType.git_clone:
+                if (string.IsNullOrEmpty(Url))
+                {
+                    throw new ArgumentException("The 'url' option is required for the 'clone' command.");
                 }
                 break;
             default:

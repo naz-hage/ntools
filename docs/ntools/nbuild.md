@@ -28,8 +28,9 @@ Below is a full list of options that can be used with `Nb.exe`:
          git_autotag             -> Set next tag based on the build type: STAGE | PROD
          git_push_autotag        -> Set next tag based on the build type and push to remote repo
          git_branch              -> Displays the current git branch in the local repository
+         git_clone               -> Clone specified Git repo in the -url option
          ----
- (one of list,install,uninstall,download,targets,path,git_info,git_settag,git_autotag,git_push_autotag,git_branch, required)
+ (one of list,install,uninstall,download,targets,path,git_info,git_settag,git_autotag,git_push_autotag,git_branch,git_clone, required)
   - json      : Specifies the JSON file that holds the list of apps. Only valid for the install, download, and list commands.
          - By default, the -json option points to the ntools deployment folder: $(ProgramFiles)\build\ntools.json.
          Sample JSON file: https://github.com/naz-hage/ntools/blob/main/dev-setup/ntools.json
@@ -42,6 +43,7 @@ Below is a full list of options that can be used with `Nb.exe`:
          -v Possible Values: (true or false, default=False)
   - tag       : Specifies the tag used for git_settag command. (string, default=)
   - buildtype : Specifies the build type used for git_autotag and git_push_autotag commands. Possible values: STAGE, PROD. (string, default=)
+  - url       : Specifies the Git repository URL used for git_clone command. (string, default=)
 ```
 
 **If the -json option is not specified, the default json file `$(ProgramFiles)\Nbuild\NTools.json` is used**. 

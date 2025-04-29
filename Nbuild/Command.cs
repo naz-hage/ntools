@@ -908,7 +908,6 @@ namespace Nbuild
         /// </summary>
         /// <param name="buildType">The build type (string): STAGE | PROD.</param>
         /// <param name="push">A boolean flag indicating whether to push the tag after setting it. Default is false.</param>
-        /// <returns>Returns a RetCode indicating the result of the operation.</returns>
         public static ResultHelper SetAutoTag(string? buildType, bool push = false)
         {
             var gitWrapper = new GitWrapper();
@@ -953,6 +952,35 @@ namespace Nbuild
             Colorizer.WriteLine($"[{ConsoleColor.Green}!Current branch: {gitWrapper.Branch}]");
             DisplayGitInfo();
             return ResultHelper.Success();
+        }
+        /// <summary>
+        /// Clone specified Git repo in the -url option
+        /// </summary>
+        /// <param name="url">Specifies the Git repository URL used for git_clone command.</param>
+        public static ResultHelper Clone(string? url)
+        {
+            var gitWrapper = new GitWrapper();
+            if (string.IsNullOrEmpty(url))
+            {
+                Colorizer.WriteLine($"[{ConsoleColor.Red}!Error: valid url is required]");
+                Parser.DisplayHelp<Cli>(HelpFormat.Full);
+                return ResultHelper.Fail(-1, "Valid url is required");
+            }
+
+            var result = gitWrapper.CloneProject(options.Url); ;
+            if (result.IsSuccess())
+            {
+                // reset Process.StartInfo.WorkingDirectory
+                var solutionDir = gitWrapper.WorkingDirectory;
+                gitWrapper.WorkingDirectory = solutionDir;
+
+                Colorizer.WriteLine($"[{ConsoleColor.Green}!√ Project cloned to `{solutionDir}`.]");
+                DisplayGitInfo();
+                return ResultHelper.Success();
+
+            }
+            Colorizer.WriteLine($"[{ConsoleColor.Red}!X {result.GetFirstOutput()}]");
+            return ResultHelper.Fail(-1, "Clone failed");
         }
     }
 }
