@@ -1,7 +1,6 @@
 ﻿using CommandLine;
 using NbuildTasks;
 using OutputColorizer;
-using System.Xml.Linq;
 
 namespace GitHubRelease
 {
@@ -16,43 +15,51 @@ namespace GitHubRelease
                 Environment.Exit(-1);
             }
 
-            // Validate the CLI arguments
             try
             {
                 options.Validate();
-
-                //Console.WriteLine("Debug: Validated CLI arguments successfully.");
-                //Environment.Exit(0);
             }
             catch (ArgumentException ex)
             {
-                Colorizer.WriteLine($"[{ConsoleColor.Red}!Invalid arguments: {ex.Message}]");
-                Parser.DisplayHelp<Cli>();
-                Environment.Exit(1);
+                HandleError($"Invalid arguments: {ex.Message}", 1);
             }
 
             bool result = false;
             try
             {
-                result = options.Command switch
-                {
-                    Cli.CommandType.create => await Command.CreateRelease(options.Repo!, options.Tag!, options.Branch!, options.AssetFileName!),
-                    Cli.CommandType.download => await Command.DownloadAsset(options.Repo!, options.Tag!, options.AssetPath!),
-                    _ => throw new InvalidOperationException("Invalid command")
-                };
+                result = await ExecuteCommand(options);
             }
             catch (Exception ex)
             {
-                // log exception
-                Colorizer.WriteLine($"[{ConsoleColor.Red}!× " +
-                    $"'{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}': Exception: {ex.Message}]");
-                Environment.Exit(-1);
+                HandleError($"Exception: {ex.Message}", -1);
             }
 
-            Colorizer.WriteLine(result
-                ? $"[{ConsoleColor.Green}!√ '{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}': {options.Command} completed successfully]"
-                : $"[{ConsoleColor.Red}!× '{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}': {options.Command} failed]");
+            DisplayResult(result, options.Command);
             Environment.Exit(result ? 0 : -1);
+        }
+
+        private static async Task<bool> ExecuteCommand(Cli options)
+        {
+            return options.Command switch
+            {
+                Cli.CommandType.create => await Command.CreateRelease(options.Repo!, options.Tag!, options.Branch!, options.AssetFileName!),
+                Cli.CommandType.pre_release => await Command.CreateRelease(options.Repo!, options.Tag!, options.Branch!, options.AssetFileName!, true),
+                Cli.CommandType.download => await Command.DownloadAsset(options.Repo!, options.Tag!, options.AssetPath!),
+                _ => throw new InvalidOperationException("Invalid command")
+            };
+        }
+
+        private static void HandleError(string message, int exitCode)
+        {
+            Colorizer.WriteLine($"[{ConsoleColor.Red}!× '{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}': {message}]");
+            Environment.Exit(exitCode);
+        }
+
+        private static void DisplayResult(bool result, Cli.CommandType command)
+        {
+            Colorizer.WriteLine(result
+                ? $"[{ConsoleColor.Green}!√ '{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}': {command} completed successfully]"
+                : $"[{ConsoleColor.Red}!× '{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}': {command} failed]");
         }
     }
 }

@@ -14,6 +14,7 @@ namespace GitHubRelease
         public enum CommandType
         {
             create,
+            pre_release,
             download,
         }
 
@@ -23,6 +24,7 @@ namespace GitHubRelease
         /// </summary>
         [RequiredArgument(0, "command", "Specifies the command to execute.\n" +
             "\t create \t -> Create a release. Requires repo, tag, branch and file.\n" +
+            "\t pre_release \t -> Create a pre-release. Requires repo, tag, branch and file.\n" +
             "\t download \t -> Download an asset. Requires repo, tag, and path (optional)\n" +
             "\t ----\n")]
         public CommandType Command { get; set; }
@@ -45,13 +47,13 @@ namespace GitHubRelease
         /// <summary>
         /// Gets or sets the branch name.
         /// </summary>
-        [OptionalArgument("main", "branch", "Specifies the branch name. Applicable for create command")]
+        [OptionalArgument("main", "branch", "Specifies the branch name. Applicable for create, pre_release commands")]
         public string? Branch { get; set; }
 
         /// <summary>
         /// Gets or sets the asset file name for `create` command.
         /// </summary>
-        [OptionalArgument("", "file", "Specifies the asset file name. Must include full path. Applicable for create command")]
+        [OptionalArgument("", "file", "Specifies the asset file name. Must include full path. Applicable for create, pre_release commands")]
         public string? AssetFileName { get; set; }
 
         /// <summary>
@@ -69,6 +71,7 @@ namespace GitHubRelease
         private static readonly Dictionary<string, CommandType> CommandMap = new()
                 {
                     { "create", CommandType.create },
+                    { "pre_release", CommandType.pre_release },
                     { "download", CommandType.download },
                 };
 
@@ -113,6 +116,12 @@ namespace GitHubRelease
             if (Command == CommandType.create && string.IsNullOrEmpty(AssetFileName))
             {
                 throw new ArgumentException("The 'file' option is required for the 'create' command.");
+
+            }
+
+            if (Command == CommandType.pre_release && string.IsNullOrEmpty(AssetFileName))
+            {
+                throw new ArgumentException("The 'file' option is required for the 'pre_release' command.");
 
             }
 

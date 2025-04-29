@@ -192,7 +192,7 @@
     },
     {
       "Name": "Python",
-      "Version": "3.12.2",
+      "Version": "3.13.3",
       "AppFileName": "$(InstallPath)\\python.exe",
       "WebDownloadFile": "https://www.python.org/ftp/python/$(Version)/python-$(Version)-amd64.exe",
       "DownloadedFile": "python-$(Version)-amd64.exe",

@@ -24,6 +24,7 @@ namespace Nbuild.Tests
                 "STAGE",
                 "PROD",
                 "GITHUB_RELEASE",
+                "GITHUB_PRE_RELEASE",
                 "STAGE_DEPLOY",
                 "PROD_DEPLOY",
                 "SOLUTION",
@@ -35,7 +36,7 @@ namespace Nbuild.Tests
                 "TEST_DEBUG",
                 "IS_ADMIN",
                 "SingleProject",
-                "HandleError",
+                "HandleError"
             ];
 
             // Act
