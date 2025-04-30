@@ -64,6 +64,8 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#commontargets">common.targets</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a>
+    </li>
     </ul>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../ngit/">Ngit (ngit.exe)</a>
@@ -117,7 +119,7 @@
 <li><a href="#usage">Usage</a></li>
 <li><a href="#nbuildtargets">nbuild.targets</a></li>
 <li><a href="#commontargets">common.targets</a></li>
-<li><a href="../../usage/">Examples</a></li>
+<li><a href="#examples">Examples</a></li>
 </ul>
 <hr />
 <h1 id="nbuild">Nbuild</h1>
@@ -252,6 +254,41 @@
 </tr>
 </tbody>
 </table>
+<h3 id="examples">Examples</h3>
+<p>This section provides examples of how to use the <code>nb.exe</code> command line tool. The examples assume that you are running a powershell terminal.</p>
+<ol>
+<li>
+<p><strong>List Installed Applications</strong>
+   <code>cmd
+   nb.exe list -json $env:ProgramFiles\tools.json</code>
+   Lists all applications specified in the provided JSON file.</p>
+</li>
+<li>
+<p><strong>Install Applications</strong>
+   <code>cmd
+   nb.exe install -json $env:ProgramFiles\tools.json</code>
+   Downloads and installs applications specified in the JSON file (requires admin privileges).  This checks if the application is already installed and if not it will install it.
+   If the application is already installed, it will skip the installation.</p>
+</li>
+<li>
+<p><strong>Display Git Information</strong>
+   <code>cmd
+   nb.exe git_info</code>
+   Displays the current Git branch and tag information for the local repository.</p>
+</li>
+<li>
+<p><strong>Run a Build Target</strong>
+   <code>cmd
+   nb.exe stage -v true</code>
+   Runs the <code>stage</code> target defined in the nbuild.targets file with verbose output enabled.</p>
+</li>
+<li>
+<p><strong>List nbuild targets</strong>
+   <code>cmd
+   nb.exe targets</code>
+   Lists all available build targets defined in the nbuild.targets file and saves them in the targets.md file.</p>
+</li>
+</ol>
               
             </div>
           </div><footer>
