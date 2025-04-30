@@ -1,7 +1,7 @@
 - [Usage](#usage)
 - [nbuild.targets](#nbuildtargets)
 - [common.targets](#commontargets)
-- [Examples](../usage.md)
+- [Examples](#examples)
 ---
 
 # Nbuild
@@ -77,3 +77,38 @@ Below is list of common targets that are defined in the `common.targets` file
 | SingleProject       | Example how to build a single project |
 | HandleError         | Error handling placeholder |
 
+
+### Examples
+
+This section provides examples of how to use the `nb.exe` command line tool. The examples assume that you are running a powershell terminal.
+
+1. **List Installed Applications**
+   ```cmd
+   nb.exe list -json $env:ProgramFiles\tools.json
+   ```
+   Lists all applications specified in the provided JSON file.
+
+2. **Install Applications**
+   ```cmd
+   nb.exe install -json $env:ProgramFiles\tools.json
+   ```
+   Downloads and installs applications specified in the JSON file (requires admin privileges).  This checks if the application is already installed and if not it will install it.
+   If the application is already installed, it will skip the installation.
+
+3. **Display Git Information**
+   ```cmd
+   nb.exe git_info
+   ```
+   Displays the current Git branch and tag information for the local repository.
+
+4. **Run a Build Target**
+   ```cmd
+   nb.exe stage -v true
+   ```
+   Runs the `stage` target defined in the nbuild.targets file with verbose output enabled.
+
+5. **List nbuild targets**
+   ```cmd
+   nb.exe targets
+   ```
+   Lists all available build targets defined in the nbuild.targets file and saves them in the targets.md file.
