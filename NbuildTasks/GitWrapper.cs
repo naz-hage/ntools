@@ -346,6 +346,11 @@ namespace NbuildTasks
             var DevDir = $"{DevDrive}\\{MainDir}";
 
             var solutionDir = $@"{DevDir}\{projectName}";
+            if (Verbose)
+            {
+                Console.WriteLine($"Clone path: {solutionDir}");
+            }
+
             var dirExists = Directory.Exists(solutionDir);
             if (!dirExists)
             {

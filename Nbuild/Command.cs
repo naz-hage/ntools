@@ -957,17 +957,18 @@ namespace Nbuild
         /// Clone specified Git repo in the -url option
         /// </summary>
         /// <param name="url">Specifies the Git repository URL used for git_clone command.</param>
-        public static ResultHelper Clone(string? url)
+        /// <param name="verbose">Specifies the verbose output.</param>
+        public static ResultHelper Clone(Cli options)
         {
-            var gitWrapper = new GitWrapper();
-            if (string.IsNullOrEmpty(url))
+            var gitWrapper = new GitWrapper(verbose:options.Verbose);
+            if (string.IsNullOrEmpty(options.Url))
             {
                 Colorizer.WriteLine($"[{ConsoleColor.Red}!Error: valid url is required]");
                 Parser.DisplayHelp<Cli>(HelpFormat.Full);
                 return ResultHelper.Fail(-1, "Valid url is required");
             }
 
-            var result = gitWrapper.CloneProject(url); ;
+            var result = gitWrapper.CloneProject(options.Url);
             if (result.IsSuccess())
             {
                 // reset Process.StartInfo.WorkingDirectory
