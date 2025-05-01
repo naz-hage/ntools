@@ -76,6 +76,9 @@ public class Cli
     [OptionalArgument("", "tag", "Specifies the tag used for git_settag command.")]
     public string? Tag { get; set; }
 
+    [OptionalArgument("", "path", "Specifies the path used for git_clone command. If not specified, the current directory will be used.")]
+    public string? Path { get; set; }
+
     /// <summary>
     /// Gets or sets the build type used for git_autotag and git_push_autotag commands.
     /// Possible values: STAGE, PROD.

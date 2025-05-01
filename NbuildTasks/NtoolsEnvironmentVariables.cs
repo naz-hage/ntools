@@ -10,14 +10,19 @@ namespace NbuildTasks
     public class NtoolsEnvironmentVariables
     {
         /// <summary>
-        /// Gets or sets the development drive.
+        /// Gets the development drive.
         /// </summary>
-        public string DevDrive { get; set; }
+        public string DevDrive { get; }
 
         /// <summary>
-        /// Gets or sets the main directory.
+        /// Gets the main directory.
         /// </summary>
-        public string MainDir { get; set; }
+        public string MainDir { get; }
+
+        /// Summary>
+        /// Gets the Source directory.
+        /// </summary>
+        public string SourceDir { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NtoolsEnvironmentVariables"/> class.
@@ -28,24 +33,35 @@ namespace NbuildTasks
             DevDrive = GetDevDrive();
 
             MainDir = GetMainDir(testMode);
+
+            SourceDir = $"{DevDrive}\\{MainDir}";
         }
 
         /// <summary>
         /// Gets the development drive.
         /// </summary>
         /// <returns>The development drive path.</returns>
-        public static string GetDevDrive()
+        /// <remarks>
+        /// The Development Drive is defined as the root directory of the current working directory.
+        /// This method retrieves the root path of the drive where the application is currently running.
+        /// </remarks>
+        private static string GetDevDrive()
         {
             string currentDirectory = Directory.GetCurrentDirectory();
             return Path.GetPathRoot(currentDirectory);
-        }
+        }
 
         /// <summary>
         /// Gets the main directory.
         /// </summary>
         /// <param name="testMode">Indicates whether the test mode is enabled.</param>
         /// <returns>The main directory path.</returns>
-        public static string GetMainDir(bool testMode = false)
+        /// <remarks>
+        /// The Main Directory is defined as the parent directory of the current working directory 
+        /// and calculates the main directory path relative to the root of the drive. 
+        /// If test mode is enabled, it ensures that the returned path does not end with "ntools".
+        /// </remarks>
+        private static string GetMainDir(bool testMode = false)
         {
             var parentDir = Directory.GetParent(Environment.CurrentDirectory).FullName;
             var mainDir = Path.GetFullPath(parentDir).Substring(Path.GetPathRoot(parentDir).Length);

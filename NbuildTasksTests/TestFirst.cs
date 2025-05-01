@@ -19,7 +19,7 @@ namespace NbuildTasks.Tests
             var githubActionsEnvironment = Environment.GetEnvironmentVariable("GITHUB_ACTIONS");
             GitHubActions = githubActionsEnvironment != null;
             Console.WriteLine($"GitHubActions: {GitHubActions}");
-            ProjectName = TestProject.Split('/').Last().Split('.').First();
+            ProjectName = GitWrapper.ProjectNameFromUrl(TestProject);
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace NbuildTasks.Tests
         public static void RandomRepoTest()
         {
             // extract project name from url
-            ProjectName = TestProject.Split('/').Last().Split('.').First();
+            ProjectName = GitWrapper.ProjectNameFromUrl(TestProject);
             Assert.IsNotNull(ProjectName);
 
             var gitWrapper = new GitWrapper(ProjectName, verbose:true, testMode:true);

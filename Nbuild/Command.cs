@@ -866,6 +866,7 @@ namespace Nbuild
         /// </summary>
         public static ResultHelper DisplayGitInfo()
         {
+            Console.WriteLine("DisplayGitInfo");
             var project = Path.GetFileName(Directory.GetCurrentDirectory());
             var gitWrapper = new GitWrapper();
             if (string.IsNullOrEmpty(gitWrapper.Branch))
@@ -968,12 +969,16 @@ namespace Nbuild
                 return ResultHelper.Fail(-1, "Valid url is required");
             }
 
-            var result = gitWrapper.CloneProject(options.Url);
+            var result = gitWrapper.CloneProject(options.Url, options.Path);
             if (result.IsSuccess())
             {
                 // reset Process.StartInfo.WorkingDirectory
                 var solutionDir = gitWrapper.WorkingDirectory;
                 gitWrapper.WorkingDirectory = solutionDir;
+
+                // Switch cloned path
+                // change to solution directory 
+                Directory.SetCurrentDirectory(solutionDir);
 
                 Colorizer.WriteLine($"[{ConsoleColor.Green}!√ Project cloned to `{solutionDir}`.]");
                 DisplayGitInfo();

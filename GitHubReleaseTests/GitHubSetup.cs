@@ -26,7 +26,9 @@ namespace GitHubRelease.Tests
 
         protected string CreateAsset(string tag)
         {
-            var assetPath = $"C:\\Artifacts\\{Repo}\\release\\{tag}.zip";
+            // Extract reponame from userName/repoName
+            var repoName = Repo.Split('/')[1];
+            var assetPath = $"C:\\Artifacts\\{repoName}\\release\\{tag}.zip";
             if (File.Exists(assetPath))
             {
                 return assetPath;

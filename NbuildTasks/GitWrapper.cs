@@ -45,18 +45,25 @@ namespace NbuildTasks
             if (verbose) Console.WriteLine($"GitWrapper.Process.StartInfo.WorkingDirectory: {Process.StartInfo.WorkingDirectory}");
         }
 
+        public static string ProjectNameFromUrl(string url)
+        {
+            if (string.IsNullOrEmpty(url))
+            {
+                throw new ArgumentException("URL cannot be null or empty", nameof(url));
+            }
+
+            return url.Split('/').Last().Split('.').First();
+        }
+
         public bool SetWorkingDir(string url)
         {
-            var projectName = url.Split('/').Last().Split('.').First();
+            var projectName = ProjectNameFromUrl(url);
             if (string.IsNullOrEmpty(projectName))
             {
                 return false;
             }
 
-              // change to project directory
-            var DevDir = $"{DevDrive}\\{MainDir}";
-
-            var solutionDir = $@"{DevDir}\{projectName}";
+            var solutionDir = $@"{SourceDir}\{projectName}";
 
             Process.StartInfo.WorkingDirectory = string.IsNullOrEmpty(projectName) ? Environment.CurrentDirectory : solutionDir;
 
@@ -322,7 +329,7 @@ namespace NbuildTasks
             return false;
         }
 
-        public ResultHelper CloneProject(string url)
+        public ResultHelper CloneProject(string url, string sourceDir = null)
         {
             if (string.IsNullOrEmpty(url))
             {
@@ -330,56 +337,60 @@ namespace NbuildTasks
             }
 
             // extract project name from url
-            var projectName = url.Split('/').Last().Split('.').First();
+            var projectName = ProjectNameFromUrl(url);
             if (string.IsNullOrEmpty(projectName))
             {
                 return ResultHelper.Fail(ResultHelper.InvalidParameter, $"Invalid url: {url}");
             }
-            // check if dev drive exists
-            if (!Directory.Exists(DevDrive))
-            {
-                return ResultHelper.Fail(ResultHelper.InvalidParameter, $"Invalid DevDrive: {DevDrive}");
-            }
 
-            ResultHelper result;
-            // change to project directory
-            var DevDir = $"{DevDrive}\\{MainDir}";
-
-            var solutionDir = $@"{DevDir}\{projectName}";
-            if (Verbose)
+            if (string.IsNullOrEmpty(sourceDir))
             {
-                Console.WriteLine($"Clone path: {solutionDir}");
-            }
-
-            var dirExists = Directory.Exists(solutionDir);
-            if (!dirExists)
-            {
-                if (!Directory.Exists(DevDir))
+                // check if dev drive exists
+                if (!Directory.Exists(DevDrive))
                 {
-                    Directory.CreateDirectory(DevDir);
+                    return ResultHelper.Fail(ResultHelper.InvalidParameter, $"Invalid DevDrive: {DevDrive}");
                 }
 
-                Process.StartInfo.WorkingDirectory = DevDir;
+                sourceDir = SourceDir;
+            }
+            var clonePath = $"{sourceDir}\\{projectName}";
+
+            if (Verbose)
+            {
+                Console.WriteLine($"Clone path: {clonePath}");
+            }
+
+            var dirExists = Directory.Exists(clonePath);
+            if (!dirExists)
+            {
+                if (!Directory.Exists(sourceDir))
+                {
+                    Directory.CreateDirectory(sourceDir);
+                }
+
+                Process.StartInfo.WorkingDirectory = sourceDir;
                 Process.StartInfo.Arguments = $"clone {url} ";
 
-                result = Process.LockStart(Verbose);
+                ResultHelper result = Process.LockStart(Verbose);
                 if ((result.Code == 0) && (result.Output.Count > 0))
                 {
                     if (CheckForErrorAndDisplayOutput(result.Output))
                     {
                         return ResultHelper.Fail((int)RetCode.CloneProjectFailed, $"Failed to clone project: {projectName}");
                     }
+
                     // reset working directory so other dir commands can be executed
                     SetWorkingDir(url);
                 }
             }
             else
             {
-                return ResultHelper.Fail((int)RetCode.CloneProjectFailed, $"Project already exists: {solutionDir}");
+                return ResultHelper.Fail((int)RetCode.CloneProjectFailed, $"Project already exists: {clonePath}");
             }
+
             // change to solution directory 
-            Directory.SetCurrentDirectory(solutionDir);
-            return result;
+            Directory.SetCurrentDirectory(sourceDir);
+            return ResultHelper.Success();
         }
 
         public bool CheckoutBranch(string branch, bool create = false)
