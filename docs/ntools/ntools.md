@@ -18,6 +18,8 @@ The [Windows dev environment](https://learn.microsoft.com/en-us/windows/dev-envi
 | [Download .NET SDKs for Visual Studio](https://dotnet.microsoft.com/en-us/download/dotnet/9.0)           | 9.0.100     | 15-Nov-24       |
 | [Burp Suite](https://portswigger.net/burp/communitydownload)                                             | 2021.11.2   | 01-Oct-23       |
 | [Draw.io](https://app.diagrams.net/)                                                                     | N/A         | 01-Oct-23       |
+| [Dotnet8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet)                               | 8.0.408       | 02-May-25       |
+| [Dotnet9 Runtime](https://dotnet.microsoft.com/en-us/download/dotnet)                               | 9.0.203       | 02-May-25       |
 | [Dotnet Runtime](https://dotnet.microsoft.com/en-us/download/dotnet)                               | 9.0.2       | 10-Mar-25       |
 | [PowerShell](https://github.com/PowerShell/PowerShell/releases)                                          | 7.5.1       | 26-May-25       |
 | [NuGet](https://www.nuget.org/downloads)                                                                 | 6.13.2      | 10-mar-25       |

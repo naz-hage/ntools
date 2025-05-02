@@ -567,8 +567,9 @@ namespace Nbuild
                     ? $"{fileVersionInfo.FileMajorPart}.{fileVersionInfo.FileMinorPart}.{fileVersionInfo.FileBuildPart}.{fileVersionInfo.FilePrivatePart}"
                     : null;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Red}!X {nbuildApp.Name} {nbuildApp.Version} failed to get file version: {ex.Message}]");
                 return null;
             }
         }
