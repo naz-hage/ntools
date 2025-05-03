@@ -983,5 +983,35 @@ namespace Nbuild
             Colorizer.WriteLine($"[{ConsoleColor.Red}!X {result.GetFirstOutput()}]");
             return ResultHelper.Fail(-1, "Clone failed");
         }
+
+        public static ResultHelper Clone(Cli options)
+        {
+            var gitWrapper = new GitWrapper(verbose: options.Verbose);
+            if (string.IsNullOrEmpty(options.Url))
+            {
+                Colorizer.WriteLine($"[{ConsoleColor.Red}!Error: valid url is required]");
+                Parser.DisplayHelp<Cli>(HelpFormat.Full);
+                return ResultHelper.Fail(-1, "Valid url is required");
+            }
+
+            var result = gitWrapper.CloneProject(options.Url, options.Path);
+            if (result.IsSuccess())
+            {
+                // reset Process.StartInfo.WorkingDirectory
+                var solutionDir = gitWrapper.WorkingDirectory;
+                gitWrapper.WorkingDirectory = solutionDir;
+
+                // Switch cloned path
+                // change to solution directory 
+                Directory.SetCurrentDirectory(solutionDir);
+
+                Colorizer.WriteLine($"[{ConsoleColor.Green}!√ Project cloned to `{solutionDir}`.]");
+                DisplayGitInfo();
+                return ResultHelper.Success();
+
+            }
+            Colorizer.WriteLine($"[{ConsoleColor.Red}!X {result.GetFirstOutput()}]");
+            return ResultHelper.Fail(-1, "Clone failed");
+        }
     }
 }
