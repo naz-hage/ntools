@@ -19,7 +19,7 @@ namespace NbuildTasks
         /// </summary>
         public string MainDir { get; }
 
-        /// Summary>
+        /// summary>
         /// Gets the Source directory.
         /// </summary>
         public string SourceDir { get; }
