@@ -139,8 +139,6 @@ This section provides examples of how to use the `nb.exe` command line tool. The
 
 10. **Clone a Git Repository**
     ```cmd
-    nb.exe git_clone -url https://github.com/example/repo.git -path C:\Projects
+    nb.exe git_clone -url https://github.com/example/repo -path C:\Projects
     ```
     Clones the specified Git repository (`https://github.com/example/repo`) into the specified path (`C:\Projects`).
-
----
