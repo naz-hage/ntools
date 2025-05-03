@@ -45,9 +45,19 @@ namespace NbuildTasks
             if (verbose) Console.WriteLine($"GitWrapper.Process.StartInfo.WorkingDirectory: {Process.StartInfo.WorkingDirectory}");
         }
 
+        public static string ProjectNameFromUrl(string url)
+        {
+            if (string.IsNullOrEmpty(url))
+            {
+                throw new ArgumentException("URL cannot be null or empty", nameof(url));
+            }
+
+            return url.Split('/').Last().Split('.').First();
+        }
+
         public bool SetWorkingDir(string url)
         {
-            var projectName = url.Split('/').Last().Split('.').First();
+            var projectName = ProjectNameFromUrl(url);
             if (string.IsNullOrEmpty(projectName))
             {
                 return false;
@@ -330,7 +340,7 @@ namespace NbuildTasks
             }
 
             // extract project name from url
-            var projectName = url.Split('/').Last().Split('.').First();
+            var projectName = ProjectNameFromUrl(url);
             if (string.IsNullOrEmpty(projectName))
             {
                 return ResultHelper.Fail(ResultHelper.InvalidParameter, $"Invalid url: {url}");
@@ -375,6 +385,70 @@ namespace NbuildTasks
             // change to solution directory 
             Directory.SetCurrentDirectory(solutionDir);
             return result;
+        }
+
+        public ResultHelper CloneProject(string url, string sourceDir)
+        {
+            if (string.IsNullOrEmpty(url))
+            {
+                return ResultHelper.Fail(ResultHelper.InvalidParameter, $"Invalid url: {url}");
+            }
+
+            // extract project name from url
+            var projectName = ProjectNameFromUrl(url);
+            if (string.IsNullOrEmpty(projectName))
+            {
+                return ResultHelper.Fail(ResultHelper.InvalidParameter, $"Invalid url: {url}");
+            }
+
+            if (string.IsNullOrEmpty(sourceDir))
+            {
+                // check if dev drive exists
+                if (!Directory.Exists(DevDrive))
+                {
+                    return ResultHelper.Fail(ResultHelper.InvalidParameter, $"Invalid DevDrive: {DevDrive}");
+                }
+
+                sourceDir = SourceDir;
+            }
+            var clonePath = $"{sourceDir}\\{projectName}";
+
+            if (Verbose)
+            {
+                Console.WriteLine($"Clone path: {clonePath}");
+            }
+
+            var dirExists = Directory.Exists(clonePath);
+            if (!dirExists)
+            {
+                if (!Directory.Exists(sourceDir))
+                {
+                    Directory.CreateDirectory(sourceDir);
+                }
+
+                Process.StartInfo.WorkingDirectory = sourceDir;
+                Process.StartInfo.Arguments = $"clone {url} ";
+
+                ResultHelper result = Process.LockStart(Verbose);
+                if ((result.Code == 0) && (result.Output.Count > 0))
+                {
+                    if (CheckForErrorAndDisplayOutput(result.Output))
+                    {
+                        return ResultHelper.Fail((int)RetCode.CloneProjectFailed, $"Failed to clone project: {projectName}");
+                    }
+
+                    // reset working directory so other dir commands can be executed
+                    SetWorkingDir(url);
+                }
+            }
+            else
+            {
+                return ResultHelper.Fail((int)RetCode.CloneProjectFailed, $"Project already exists: {clonePath}");
+            }
+
+            // change to solution directory 
+            Directory.SetCurrentDirectory(sourceDir);
+            return ResultHelper.Success();
         }
 
         public bool CheckoutBranch(string branch, bool create = false)
