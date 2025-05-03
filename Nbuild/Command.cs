@@ -1006,12 +1006,14 @@ namespace Nbuild
                 Directory.SetCurrentDirectory(solutionDir);
 
                 Colorizer.WriteLine($"[{ConsoleColor.Green}!√ Project cloned to `{solutionDir}`.]");
-                DisplayGitInfo();
                 return ResultHelper.Success();
 
             }
-            Colorizer.WriteLine($"[{ConsoleColor.Red}!X {result.GetFirstOutput()}]");
-            return ResultHelper.Fail(-1, "Clone failed");
+            else
+            {
+                Colorizer.WriteLine($"[{ConsoleColor.Red}!X {result.GetFirstOutput()}]");
+                return ResultHelper.Fail(-1, "Clone failed");
+            }
         }
     }
 }

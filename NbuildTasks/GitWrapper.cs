@@ -394,6 +394,11 @@ namespace NbuildTasks
                 return ResultHelper.Fail(ResultHelper.InvalidParameter, $"Invalid url: {url}");
             }
 
+            if (string.IsNullOrEmpty(sourceDir))
+            {
+                return ResultHelper.Fail(ResultHelper.InvalidParameter, $"Invalid sourceDir: {sourceDir}");
+            }
+
             // extract project name from url
             var projectName = ProjectNameFromUrl(url);
             if (string.IsNullOrEmpty(projectName))
@@ -401,16 +406,6 @@ namespace NbuildTasks
                 return ResultHelper.Fail(ResultHelper.InvalidParameter, $"Invalid url: {url}");
             }
 
-            if (string.IsNullOrEmpty(sourceDir))
-            {
-                // check if dev drive exists
-                if (!Directory.Exists(DevDrive))
-                {
-                    return ResultHelper.Fail(ResultHelper.InvalidParameter, $"Invalid DevDrive: {DevDrive}");
-                }
-
-                sourceDir = SourceDir;
-            }
             var clonePath = $"{sourceDir}\\{projectName}";
 
             if (Verbose)
