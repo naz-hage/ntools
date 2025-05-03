@@ -954,36 +954,19 @@ namespace Nbuild
             DisplayGitInfo();
             return ResultHelper.Success();
         }
+
         /// <summary>
-        /// Clone specified Git repo in the -url option
+        /// Clones a Git repository to the specified path.
         /// </summary>
-        /// <param name="url">Specifies the Git repository URL used for git_clone command.</param>
-        public static ResultHelper Clone(string? url)
-        {
-            var gitWrapper = new GitWrapper();
-            if (string.IsNullOrEmpty(url))
-            {
-                Colorizer.WriteLine($"[{ConsoleColor.Red}!Error: valid url is required]");
-                Parser.DisplayHelp<Cli>(HelpFormat.Full);
-                return ResultHelper.Fail(-1, "Valid url is required");
-            }
-
-            var result = gitWrapper.CloneProject(url); ;
-            if (result.IsSuccess())
-            {
-                // reset Process.StartInfo.WorkingDirectory
-                var solutionDir = gitWrapper.WorkingDirectory;
-                gitWrapper.WorkingDirectory = solutionDir;
-
-                Colorizer.WriteLine($"[{ConsoleColor.Green}!√ Project cloned to `{solutionDir}`.]");
-                DisplayGitInfo();
-                return ResultHelper.Success();
-
-            }
-            Colorizer.WriteLine($"[{ConsoleColor.Red}!X {result.GetFirstOutput()}]");
-            return ResultHelper.Fail(-1, "Clone failed");
-        }
-
+        /// <param name="options">The CLI options containing the repository URL and target path.</param>
+        /// <returns>
+        /// A <see cref="ResultHelper"/> indicating the success or failure of the operation.
+        /// </returns>
+        /// <remarks>
+        /// This method uses the <see cref="GitWrapper"/> class to clone a Git repository. 
+        /// If the URL is not provided in the options, an error message is displayed, and the operation fails.
+        /// Upon successful cloning, the working directory is switched to the cloned repository's directory.
+        /// </remarks>
         public static ResultHelper Clone(Cli options)
         {
             var gitWrapper = new GitWrapper(verbose: options.Verbose);
@@ -997,17 +980,8 @@ namespace Nbuild
             var result = gitWrapper.CloneProject(options.Url, options.Path);
             if (result.IsSuccess())
             {
-                // reset Process.StartInfo.WorkingDirectory
-                var solutionDir = gitWrapper.WorkingDirectory;
-                gitWrapper.WorkingDirectory = solutionDir;
-
-                // Switch cloned path
-                // change to solution directory 
-                Directory.SetCurrentDirectory(solutionDir);
-
-                Colorizer.WriteLine($"[{ConsoleColor.Green}!√ Project cloned to `{solutionDir}`.]");
+                Colorizer.WriteLine($"[{ConsoleColor.Green}!√ Project cloned successfully to {options.Path}\\{GitWrapper.ProjectNameFromUrl(options.Url)}]");
                 return ResultHelper.Success();
-
             }
             else
             {

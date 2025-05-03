@@ -504,9 +504,6 @@ namespace NbuildTasks
                     {
                         return ResultHelper.Fail((int)RetCode.CloneProjectFailed, $"Failed to clone project: {projectName}");
                     }
-
-                    // reset working directory so other dir commands can be executed
-                    SetWorkingDir(url);
                 }
             }
             else
