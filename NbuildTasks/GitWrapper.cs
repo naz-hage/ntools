@@ -382,6 +382,20 @@ namespace NbuildTasks
             return false;
         }
 
+        /// <summary>
+        /// Clones a Git repository from the specified URL into the default source directory.
+        /// /// </summary>
+        /// <param name="url">The URL of the Git repository to clone.</param>
+        /// <returns>A <see cref="ResultHelper"/> indicating the success or failure of the operation.</returns>
+        /// <remarks>
+        /// This method checks if the specified source directory exists. If it does not, it creates the directory.
+        /// If the project already exists in the source directory, it returns a failure result.
+        /// If the clone operation is successful, it sets the working directory to the cloned project directory.
+        /// Differences between the two <c>CloneProject</c> methods:
+        /// 1. This method does not accept a custom source directory as a parameter. It uses the default source directory.
+        /// 2. The other <c>CloneProject</c> method allows specifying a custom source directory, providing more flexibility.
+        /// 3. Both methods perform similar operations, but the second method is more versatile due to the additional parameter.
+        /// </remarks>
         public ResultHelper CloneProject(string url)
         {
             if (string.IsNullOrEmpty(url))
@@ -435,6 +449,17 @@ namespace NbuildTasks
             return result;
         }
 
+        /// <summary>
+        /// Clones a Git repository from the specified URL into the specified source directory.
+        /// </summary>
+        /// <param name="url">The URL of the Git repository to clone.</param>
+        /// <param name="sourceDir">The directory where the repository will be cloned.</param>
+        /// <returns>A <see cref="ResultHelper"/> indicating the success or failure of the operation.</returns>
+        /// <remarks>
+        /// This method checks if the specified source directory exists. If it does not, it creates the directory.
+        /// If the project already exists in the source directory, it returns a failure result.
+        /// If the clone operation is successful, it sets the working directory to the cloned project directory.
+        /// </remarks>
         public ResultHelper CloneProject(string url, string sourceDir)
         {
             if (string.IsNullOrEmpty(url))
@@ -494,6 +519,17 @@ namespace NbuildTasks
             return ResultHelper.Success();
         }
 
+        /// <summary>
+        /// Checks out a specified branch in the Git repository.
+        /// </summary>
+        /// <param name="branch">The branch to check out.</param>
+        /// <param name="create">If <c>true</c>, creates the branch if it does not exist.</param>
+        /// <returns><c>true</c> if the checkout is successful; otherwise, <c>false</c>.</returns>
+        /// <remarks>
+        /// This method uses the `git checkout` command to switch to the specified branch.
+        /// If the branch does not exist and <paramref name="create"/> is <c>true</c>, it creates a new branch.
+        /// </remarks>
+        /// <exception cref="ArgumentException">Thrown if the branch name is null or empty.</exception>
         public bool CheckoutBranch(string branch, bool create = false)
         {
             ResultHelper result;
@@ -555,6 +591,14 @@ namespace NbuildTasks
             return false;
         }
 
+        /// <summary>
+        /// Checks if the current directory is a Git repository.
+        /// </summary>
+        /// <param name="currentDirectory">The current directory to check.</param>
+        /// <returns><c>true</c> if the current directory is a Git repository; otherwise, <c>false</c>.</returns>
+        /// <remarks>
+        /// This method uses the `git rev-parse --is-inside-work-tree` command to determine if the current directory is a Git repository.
+        /// </remarks>
         public bool IsGitRepository(string currentDirectory)
         {
             Process.StartInfo.Arguments = "rev-parse --is-inside-work-tree";
@@ -714,9 +758,12 @@ namespace NbuildTasks
         /// <summary>
         /// Automatically generates a tag based on the build type.
         /// </summary>
-        /// <param name="buildType">The build type: `production` or `stage`.</param>
-        /// <param name="tag">The tag.</param>
-        /// <returns>The generated tag if the buildType is `production` or `stage`.  Otherwise throw a message</returns>
+        /// <param name="buildType">The build type (e.g., "stage" or "prod").</param>
+        /// <returns>The generated tag if successful; otherwise, an empty string.</returns>
+        /// <remarks>
+        /// This method uses the <see cref="StageTag"/> and <see cref="ProdTag"/> methods to generate the tag.
+        /// </remarks>
+        /// <exception cref="ArgumentException">Thrown if the build type is null or empty.</exception>
         public string AutoTag(string buildType)
         {
             if (string.IsNullOrEmpty(buildType))
@@ -740,12 +787,21 @@ namespace NbuildTasks
             }
         }
 
-
         /// <summary>
-        /// Returns the stage tag based on the provided tag.
-        /// </summary>
-        /// <param name="tag">The tag to generate the stage tag from.</param>
-        /// <returns>The stage tag.</returns>
+        /// Generates a stage tag based on the current tag.
+        /// /// </summary>
+        /// <returns>
+        /// A valid stage tag string if the current tag is valid; otherwise, <c>null</c>.
+        /// </returns>
+        /// <remarks>
+        /// This method performs the following steps:
+        /// 1. Checks if the current tag is <c>null</c>. If it is, returns <c>null</c>.
+        /// 2. Converts a 4-digit tag to a 3-digit tag for backward compatibility if the tag is valid in the 4-digit format.
+        /// 3. Validates the tag. If the tag is invalid, returns <c>null</c>.
+        /// 4. If the tag is valid, increments the third version number by 1 and constructs a new stage tag.
+        /// 5. Validates the newly constructed stage tag. If valid, returns it; otherwise, returns <c>null</c>.
+        /// 6. If an exception occurs during the construction of the stage tag, it logs the exception message and returns <c>null</c>.
+        /// </remarks>
         public string StageTag()
         {
             var tag = Tag;
@@ -772,11 +828,23 @@ namespace NbuildTasks
             }
         }
 
-        /// <summary>
-        /// Generates a production tag based on the provided tag.
+        /// Generates a production tag based on the current tag.
         /// </summary>
-        /// <param name="tag">The input tag.</param>
-        /// <returns>The generated production tag, or null if the input tag is invalid.</returns>
+        /// <returns>
+        /// A valid production tag string if the current tag is valid; otherwise, <c>null</c>.
+        /// </returns>
+        /// <remarks>
+        /// This method performs the following steps:
+        /// 1. Checks if the current tag is <c>null</c>. If it is, returns <c>null</c>.
+        /// 2. Converts a 4-digit tag to a 3-digit tag for backward compatibility if the tag is valid in the 4-digit format.
+        /// 3. Validates the tag. If the tag is invalid, returns <c>null</c>.
+        /// 4. If the tag is valid, increments the second version number by 1, resets the third version number to 0, 
+        ///    and constructs a new production tag.
+        /// 5. Validates the newly constructed production tag. If valid, returns it; otherwise, returns <c>null</c>.
+        /// 
+        /// If an exception occurs during the construction of the production tag, it logs the exception message 
+        /// and returns <c>null</c>.
+        /// </remarks>
         public string ProdTag()
         {
             var tag = Tag;
