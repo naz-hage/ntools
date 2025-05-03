@@ -8,6 +8,9 @@ using static NbuildTasks.Enums;
 
 namespace NbuildTasks
 {
+    /// <summary>
+    /// Provides a wrapper for Git operations, including tag management, branch management, and repository cloning.
+    /// </summary>
     public class GitWrapper : NtoolsEnvironmentVariables
     {
         private const string GitBinary = "git.exe";
@@ -29,12 +32,14 @@ namespace NbuildTasks
         public bool Verbose = false;
 
         /// <summary>
-        /// Initializes a new instance of the GitWrapper class.
-        /// Once Successful, The MainDir and DevDrive are set by the base class NtoolsEnvironmentVariables
+        /// Initializes a new instance of the <see cref="GitWrapper"/> class.
         /// </summary>
         /// <param name="project">The project directory.</param>
         /// <param name="verbose">A flag indicating whether to enable verbose output.</param>
         /// <param name="testMode">A flag indicating whether to enable test mode.</param>
+        /// <remarks>
+        /// The working directory is set to the specified project directory or the current directory if no project is provided.
+        /// </remarks>
         public GitWrapper(string project = null, bool verbose = false, bool testMode = false) : base(testMode)
         { 
             Verbose = verbose;
@@ -45,6 +50,15 @@ namespace NbuildTasks
             if (verbose) Console.WriteLine($"GitWrapper.Process.StartInfo.WorkingDirectory: {Process.StartInfo.WorkingDirectory}");
         }
 
+        /// <summary>
+        /// Extracts the project name from a Git repository URL.
+        /// </summary>
+        /// <param name="url">The Git repository URL.</param>
+        /// <returns>The project name extracted from the URL.</returns>
+        /// <exception cref="ArgumentException">Thrown if the URL is null or empty.</exception>
+        /// <remarks>
+        /// The project name is derived by splitting the URL and extracting the last segment before the file extension.
+        /// </remarks>
         public static string ProjectNameFromUrl(string url)
         {
             if (string.IsNullOrEmpty(url))
@@ -55,6 +69,14 @@ namespace NbuildTasks
             return url.Split('/').Last().Split('.').First();
         }
 
+        /// <summary>
+        /// Sets the working directory for Git operations based on the provided URL.
+        /// </summary>
+        /// <param name="url">The Git repository URL.</param>
+        /// <returns><c>true</c> if the working directory is successfully set; otherwise, <c>false</c>.</returns>
+        /// <remarks>
+        /// The working directory is set to the project directory derived from the URL.
+        /// </remarks>
         public bool SetWorkingDir(string url)
         {
             var projectName = ProjectNameFromUrl(url);
@@ -73,16 +95,42 @@ namespace NbuildTasks
             return true;
         }
 
+        /// <summary>
+        /// Gets the current Git branch.
+        /// </summary>
+        /// <remarks>
+        /// This property retrieves the branch name using the `git rev-parse --abbrev-ref HEAD` command.
+        /// </remarks>
         public string Branch => GetBranch();
 
+        /// <summary>
+        /// Gets the current Git tag.
+        /// </summary>
+        /// <remarks>
+        /// This property retrieves the tag using the `git describe --abbrev=0 --tags` command.
+        /// </remarks>
         public string Tag => GetTag();
 
+        /// <summary>
+        /// Gets or sets the working directory for Git operations.
+        /// </summary>
+        /// <remarks>
+        /// The working directory is used as the base directory for all Git commands executed by this wrapper.
+        /// </remarks>
         public string WorkingDirectory
         {
             get { return Process.StartInfo.WorkingDirectory; }
             set { Process.StartInfo.WorkingDirectory = value; }
         }
 
+        /// <summary>
+        /// Automatically generates and sets a tag based on the build type.
+        /// </summary>
+        /// <param name="buildType">The build type (e.g., "stage" or "production").</param>
+        /// <returns>The generated tag if successful; otherwise, an empty string.</returns>
+        /// <remarks>
+        /// This method uses the <see cref="AutoTag"/> method to generate the tag and sets it using <see cref="SetTag"/>.
+        /// </remarks>
         public string SetAutoTag(string buildType)
         {
             var nextTag = String.Empty;
@@ -100,11 +148,15 @@ namespace NbuildTasks
         }
 
         /// <summary>
-        /// Push new Tag to remote repo
+        /// Pushes a new tag to the remote repository.
         /// </summary>
-        /// <param name="branch"></param>
-        /// <param name="newTag"></param>
-        /// <returns>True if command is successful, otherwise False</returns>
+        /// <param name="newTag">The tag to push.</param>
+        /// <returns><c>true</c> if the tag is successfully pushed; otherwise, <c>false</c>.</returns>
+        /// <exception cref="ArgumentException">Thrown if the tag is null or empty.</exception>
+        /// <exception cref="InvalidOperationException">Thrown if the branch is null or empty.</exception>
+        /// <remarks>
+        /// This method first pulls the latest changes from the remote branch before pushing the tag.
+        /// </remarks>
         public bool PushTag(string newTag)
         {
             if (string.IsNullOrEmpty(newTag))
