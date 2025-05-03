@@ -64,11 +64,9 @@ namespace NbuildTasks
             }
 
               // change to project directory
-            var DevDir = $"{DevDrive}\\{MainDir}";
+            var projectDir = $@"{SourceDir}\{projectName}";
 
-            var solutionDir = $@"{DevDir}\{projectName}";
-
-            Process.StartInfo.WorkingDirectory = string.IsNullOrEmpty(projectName) ? Environment.CurrentDirectory : solutionDir;
+            Process.StartInfo.WorkingDirectory = string.IsNullOrEmpty(projectName) ? Environment.CurrentDirectory : projectDir;
 
             if (Verbose) Console.WriteLine($"GitWrapper.Process.StartInfo.WorkingDirectory: {Process.StartInfo.WorkingDirectory}");
 
@@ -353,18 +351,16 @@ namespace NbuildTasks
 
             ResultHelper result;
             // change to project directory
-            var DevDir = $"{DevDrive}\\{MainDir}";
-
-            var solutionDir = $@"{DevDir}\{projectName}";
-            var dirExists = Directory.Exists(solutionDir);
+              var clonePath = $@"{SourceDir}\{projectName}";
+            var dirExists = Directory.Exists(clonePath);
             if (!dirExists)
             {
-                if (!Directory.Exists(DevDir))
+                if (!Directory.Exists(SourceDir))
                 {
-                    Directory.CreateDirectory(DevDir);
+                    Directory.CreateDirectory(SourceDir);
                 }
 
-                Process.StartInfo.WorkingDirectory = DevDir;
+                Process.StartInfo.WorkingDirectory = SourceDir;
                 Process.StartInfo.Arguments = $"clone {url} ";
 
                 result = Process.LockStart(Verbose);
@@ -380,10 +376,10 @@ namespace NbuildTasks
             }
             else
             {
-                return ResultHelper.Fail((int)RetCode.CloneProjectFailed, $"Project already exists: {solutionDir}");
+                return ResultHelper.Fail((int)RetCode.CloneProjectFailed, $"Project already exists: {clonePath}");
             }
             // change to solution directory 
-            Directory.SetCurrentDirectory(solutionDir);
+            Directory.SetCurrentDirectory(clonePath);
             return result;
         }
 
