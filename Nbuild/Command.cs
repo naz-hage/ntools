@@ -977,6 +977,11 @@ namespace Nbuild
                 return ResultHelper.Fail(-1, "Valid url is required");
             }
 
+            if (string.IsNullOrEmpty(options.Path))
+            {
+                options.Path = Environment.CurrentDirectory;
+            }
+
             var result = gitWrapper.CloneProject(options.Url, options.Path);
             if (result.IsSuccess())
             {
