@@ -64,6 +64,8 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#commontargets">common.targets</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a>
+    </li>
     </ul>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../ngit/">Ngit (ngit.exe)</a>
@@ -117,7 +119,7 @@
 <li><a href="#usage">Usage</a></li>
 <li><a href="#nbuildtargets">nbuild.targets</a></li>
 <li><a href="#commontargets">common.targets</a></li>
-<li><a href="../../usage/">Examples</a></li>
+<li><a href="#examples">Examples</a></li>
 </ul>
 <hr />
 <h1 id="nbuild">Nbuild</h1>
@@ -142,7 +144,7 @@
          path                    -&gt; Displays environment path in local machine.
          git_info                -&gt; Displays the current git information in the local repository.
          git_settag              -&gt; Set specified tag with -tag option
-         git_autotag             -&gt; Set next tag based on the build type: STAGE | PROD
+         git_autotag             -&gt; Set next tag based on the build type: stage | prod
          git_push_autotag        -&gt; Set next tag based on the build type and push to remote repo
          git_branch              -&gt; Displays the current git branch in the local repository
          git_clone               -&gt; Clone specified Git repo in the -url option
@@ -159,7 +161,8 @@
            Run `Nb.exe Targets` to list the available targets.
          -v Possible Values: (true or false, default=False)
   - tag       : Specifies the tag used for git_settag command. (string, default=)
-  - buildtype : Specifies the build type used for git_autotag and git_push_autotag commands. Possible values: STAGE, PROD. (string, default=)
+  - path      : Specifies the path used for git_clone command. If not specified, the current directory will be used. (string, default=)
+  - buildtype : Specifies the build type used for git_autotag and git_push_autotag commands. Possible values: stage, prod. (string, default=)
   - url       : Specifies the Git repository URL used for git_clone command. (string, default=)
 </code></pre>
 <p><strong>If the -json option is not specified, the default json file <code>$(ProgramFiles)\Nbuild\NTools.json</code> is used</strong>. </p>
@@ -252,6 +255,72 @@
 </tr>
 </tbody>
 </table>
+<h3 id="examples">Examples</h3>
+<p>This section provides examples of how to use the <code>nb.exe</code> command line tool. The examples assume that you are running a powershell terminal.</p>
+<ol>
+<li>
+<p><strong>List Installed Applications</strong>
+   <code>cmd
+   nb.exe list -json $env:ProgramFiles\tools.json</code>
+   Lists all applications specified in the provided JSON file.</p>
+</li>
+<li>
+<p><strong>Install Applications</strong>
+   <code>cmd
+   nb.exe install -json $env:ProgramFiles\tools.json</code>
+   Downloads and installs applications specified in the JSON file (requires admin privileges).  This checks if the application is already installed and if not it will install it.
+   If the application is already installed, it will skip the installation.</p>
+</li>
+<li>
+<p><strong>Display Git Information</strong>
+   <code>cmd
+   nb.exe git_info</code>
+   Displays the current Git branch and tag information for the local repository.</p>
+</li>
+<li>
+<p><strong>Run a Build Target</strong>
+   <code>cmd
+   nb.exe stage -v true</code>
+   Runs the <code>stage</code> target defined in the nbuild.targets file with verbose output enabled.</p>
+</li>
+<li>
+<p><strong>List nbuild targets</strong>
+   <code>cmd
+   nb.exe targets</code>
+   Lists all available build targets defined in the nbuild.targets file and saves them in the targets.md file.</p>
+</li>
+<li>
+<p><strong>Set a Specific Git Tag</strong>
+   <code>cmd
+   nb.exe git_settag -tag 1.0.0</code>
+   Sets the specified Git tag (<code>1.0.0</code>) in the local repository.</p>
+</li>
+<li>
+<p><strong>Automatically Set the Next Git Tag</strong>
+   <code>cmd
+   nb.exe git_autotag -buildtype stage</code>
+   Automatically generates and sets the next Git tag based on the specified build type (<code>stage</code> or <code>prod</code>).</p>
+</li>
+<li>
+<p><strong>Push the Next Git Tag to Remote</strong>
+   <code>cmd
+   nb.exe git_push_autotag -buildtype prod</code>
+   Automatically generates the next Git tag based on the specified build type (<code>prod</code>) and pushes it to the remote repository.</p>
+</li>
+<li>
+<p><strong>Display the Current Git Branch</strong>
+   <code>cmd
+   nb.exe git_branch</code>
+   Displays the current Git branch in the local repository.</p>
+</li>
+<li>
+<p><strong>Clone a Git Repository</strong>
+    <code>cmd
+    nb.exe git_clone -url https://github.com/example/repo.git -path C:\Projects</code>
+    Clones the specified Git repository (<code>https://github.com/example/repo</code>) into the specified path (<code>C:\Projects</code>).</p>
+</li>
+</ol>
+<hr />
               
             </div>
           </div><footer>
