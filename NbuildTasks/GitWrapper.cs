@@ -449,12 +449,6 @@ namespace NbuildTasks
             return result;
         }
 
-        /// <summary>
-        /// Clones a Git repository from the specified URL into the specified source directory.
-        /// </summary>
-        /// <param name="url">The URL of the Git repository to clone.</param>
-        /// <param name="sourceDir">The directory where the repository will be cloned.</param>
-        /// <returns>A <see cref="ResultHelper"/> indicating the success or failure of the operation.</returns>
         /// <remarks>
         /// This method checks if the specified source directory exists. If it does not, it creates the directory.
         /// If the project already exists in the source directory, it returns a failure result.
@@ -465,6 +459,11 @@ namespace NbuildTasks
             if (string.IsNullOrEmpty(url))
             {
                 return ResultHelper.Fail(ResultHelper.InvalidParameter, $"Invalid url: {url}");
+            }
+
+            if (!Uri.IsWellFormedUriString(url, UriKind.Absolute))
+            {
+                return ResultHelper.Fail(ResultHelper.InvalidParameter, $"Malformed url: {url}");
             }
 
             if (string.IsNullOrEmpty(sourceDir))
