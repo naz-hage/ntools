@@ -1,7 +1,7 @@
 - [Usage](#usage)
 - [nbuild.targets](#nbuildtargets)
 - [common.targets](#commontargets)
-- [Examples](../usage.md)
+- [Examples](#examples)
 ---
 
 # Nbuild
@@ -25,7 +25,7 @@ Below is a full list of options that can be used with `Nb.exe`:
          path                    -> Displays environment path in local machine.
          git_info                -> Displays the current git information in the local repository.
          git_settag              -> Set specified tag with -tag option
-         git_autotag             -> Set next tag based on the build type: STAGE | PROD
+         git_autotag             -> Set next tag based on the build type: stage | prod
          git_push_autotag        -> Set next tag based on the build type and push to remote repo
          git_branch              -> Displays the current git branch in the local repository
          git_clone               -> Clone specified Git repo in the -url option
@@ -42,7 +42,8 @@ Below is a full list of options that can be used with `Nb.exe`:
            Run `Nb.exe Targets` to list the available targets.
          -v Possible Values: (true or false, default=False)
   - tag       : Specifies the tag used for git_settag command. (string, default=)
-  - buildtype : Specifies the build type used for git_autotag and git_push_autotag commands. Possible values: STAGE, PROD. (string, default=)
+  - path      : Specifies the path used for git_clone command. If not specified, the current directory will be used. (string, default=)
+  - buildtype : Specifies the build type used for git_autotag and git_push_autotag commands. Possible values: stage, prod. (string, default=)
   - url       : Specifies the Git repository URL used for git_clone command. (string, default=)
 ```
 
@@ -77,3 +78,69 @@ Below is list of common targets that are defined in the `common.targets` file
 | SingleProject       | Example how to build a single project |
 | HandleError         | Error handling placeholder |
 
+### Examples
+
+This section provides examples of how to use the `nb.exe` command line tool. The examples assume that you are running a powershell terminal.
+
+1. **List Installed Applications**
+   ```cmd
+   nb.exe list -json $env:ProgramFiles\tools.json
+   ```
+   Lists all applications specified in the provided JSON file.
+
+2. **Install Applications**
+   ```cmd
+   nb.exe install -json $env:ProgramFiles\tools.json
+   ```
+   Downloads and installs applications specified in the JSON file (requires admin privileges).  This checks if the application is already installed and if not it will install it.
+   If the application is already installed, it will skip the installation.
+
+3. **Display Git Information**
+   ```cmd
+   nb.exe git_info
+   ```
+   Displays the current Git branch and tag information for the local repository.
+
+4. **Run a Build Target**
+   ```cmd
+   nb.exe stage -v true
+   ```
+   Runs the `stage` target defined in the nbuild.targets file with verbose output enabled.
+
+5. **List nbuild targets**
+   ```cmd
+   nb.exe targets
+   ```
+   Lists all available build targets defined in the nbuild.targets file and saves them in the targets.md file.
+
+6. **Set a Specific Git Tag**
+   ```cmd
+   nb.exe git_settag -tag 1.0.0
+   ```
+   Sets the specified Git tag (`1.0.0`) in the local repository.
+
+7. **Automatically Set the Next Git Tag**
+   ```cmd
+   nb.exe git_autotag -buildtype stage
+   ```
+   Automatically generates and sets the next Git tag based on the specified build type (`stage` or `prod`).
+
+8. **Push the Next Git Tag to Remote**
+   ```cmd
+   nb.exe git_push_autotag -buildtype prod
+   ```
+   Automatically generates the next Git tag based on the specified build type (`prod`) and pushes it to the remote repository.
+
+9. **Display the Current Git Branch**
+   ```cmd
+   nb.exe git_branch
+   ```
+   Displays the current Git branch in the local repository.
+
+10. **Clone a Git Repository**
+    ```cmd
+    nb.exe git_clone -url https://github.com/example/repo.git -path C:\Projects
+    ```
+    Clones the specified Git repository (`https://github.com/example/repo`) into the specified path (`C:\Projects`).
+
+---
