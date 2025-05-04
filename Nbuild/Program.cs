@@ -72,6 +72,7 @@ public class Program
                         Cli.CommandType.git_push_autotag => Command.SetAutoTag(options.BuildType, push: true),
                         Cli.CommandType.git_branch => Command.DisplayGitBranch(),
                         Cli.CommandType.git_clone => Command.Clone(options.Url, options.Path, options.Verbose),
+                        Cli.CommandType.git_deletetag => Command.DeleteTag(options.Tag),
                         _ => ResultHelper.Fail(-1, $"Invalid Command: '{options.Command}'"),
                     };
                 }

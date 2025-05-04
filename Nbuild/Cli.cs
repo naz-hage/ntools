@@ -24,11 +24,12 @@ public class Cli
         git_push_autotag,
         git_branch,
         git_clone,
+        git_deletetag,
     }
 
     /// <summary>
     /// Gets or sets the command to execute.
-    /// Possible values: targets, install, uninstall, download, list, path, git_info, git_settag, git_autotag, git_push_autotag, git_branch, git_clone.
+    /// Possible values: targets, install, uninstall, download, list, path, git_info, git_settag, git_autotag, git_push_autotag, git_branch, git_clone, git_deletetag.
     /// </summary>
     [RequiredArgument(0, "command", "Specifies the command to execute.\n" +
         "\t list \t\t\t -> Lists apps specified in the -json option.\n" +
@@ -43,6 +44,7 @@ public class Cli
         "\t git_push_autotag \t -> Set next tag based on the build type and push to remote repo\n" +
         "\t git_branch \t\t -> Displays the current git branch in the local repository\n" +
         "\t git_clone \t\t -> Clone specified Git repo in the -url option\n" +
+        "\t git_deletetag \t\t -> Delete specified tag in -tag option\n" +
         "\t ----\n")]
     public CommandType Command { get; set; }
 
@@ -73,7 +75,7 @@ public class Cli
     [OptionalArgument("", "url", "Specifies the Git repository URL.")]
     public string? Url { get; set; }
 
-    [OptionalArgument("", "tag", "Specifies the tag used for git_settag command.")]
+    [OptionalArgument("", "tag", "Specifies the tag used for git_settag and git_deletetag commands.")]
     public string? Tag { get; set; }
 
     [OptionalArgument("", "path", "Specifies the path used for git_clone command. If not specified, the current directory will be used.")]
@@ -100,6 +102,7 @@ public class Cli
             { "git_push_autotag", CommandType.git_push_autotag },
             { "git_branch", CommandType.git_branch },
             { "git_clone", CommandType.git_clone },
+            { "git_deletetag", CommandType.git_deletetag },
         };
 
     /// <summary>
@@ -133,9 +136,10 @@ public class Cli
                 }
                 break;
             case CommandType.git_settag:
+            case CommandType.git_deletetag:
                 if (string.IsNullOrEmpty(Tag))
                 {
-                    throw new ArgumentException("The 'tag' option is required for the 'git_settag' command.");
+                    throw new ArgumentException("The 'tag' option is required for the 'git_settag' and 'git_deletetag' commands.");
                 }
                 break;
             case CommandType.git_autotag:
