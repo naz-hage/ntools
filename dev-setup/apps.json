@@ -15,7 +15,7 @@
     },
     {
       "Name": "Argo CD",
-      "Version": "2.14.5",
+      "Version": "2.14.11",
       "AppFileName": "$(InstallPath)\\argocd.exe",
       "WebDownloadFile": "https://github.com/argoproj/argo-cd/releases/download/v$(Version)/argocd-windows-amd64.exe",
       "DownloadedFile": "argocd.exe",
@@ -24,7 +24,7 @@
       "InstallPath": "$(ProgramFiles)\\ArgoCD",
       "UninstallCommand": "powershell.exe",
       "UninstallArgs": "-Command \"Remove-Item -Path '$(InstallPath)\\' -Recurse -Force\"",
-      "StoredHash": "D93E14EEBE6FD0B8F6677D95617982B7C9D73617D3F714C36D19C087C0E7A9FB",
+      "StoredHash": "527dd257eed3efc288f6cc08b3c6476e2579ab250a46b9d7b4de72ad30c0a002",
       "AddToPath": true
     },
     {
@@ -115,7 +115,7 @@
     },
     {
       "Name": "kubectl",
-      "Version": "1.32.3",
+      "Version": "1.33.0",
       "AppFileName": "$(InstallPath)\\kubectl.exe",
       "WebDownloadFile": "https://dl.k8s.io/release/v$(Version)/bin/windows/amd64/kubectl.exe",
       "DownloadedFile": "kubectl.exe",
@@ -124,7 +124,7 @@
       "InstallPath": "$(ProgramFiles)\\kubectl",
       "UninstallCommand": "powershell.exe",
       "UninstallArgs": "-Command \"Remove-Item -Path '$(InstallPath)\\' -Recurse -Force\"",
-      "StoredHash": "3fd1576a902ecf713f7d6390ae01799e370883e0341177ee09dbdc362db953e3",
+      "StoredHash": "db6d96f65a86426e6c9484ca88a233aa7f160025f40c20b153c5bf4f9746c791",
       "AddToPath": true
     },
     {
@@ -256,7 +256,7 @@
     },
     {
       "Name": "Visual Studio Code",
-      "Version": "1.98.2",
+      "Version": "1.99.3",
       "AppFileName": "$(InstallPath)\\Code.exe",
       "WebDownloadFile": "https://aka.ms/win32-x64-system-stable",
       "DownloadedFile": "VSCodeSetup-x64-$(Version).exe",
