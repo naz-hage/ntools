@@ -478,7 +478,7 @@ namespace NbuildTasks
                 return ResultHelper.Fail(ResultHelper.InvalidParameter, $"Invalid url: {url}");
             }
 
-            var clonePath = $"{sourceDir}\\{projectName}";
+            var clonePath = Path.Combine(sourceDir, projectName);
 
             if (Verbose)
             {

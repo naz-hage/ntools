@@ -967,25 +967,25 @@ namespace Nbuild
         /// If the URL is not provided in the options, an error message is displayed, and the operation fails.
         /// Upon successful cloning, the working directory is switched to the cloned repository's directory.
         /// </remarks>
-        public static ResultHelper Clone(Cli options)
+        public static ResultHelper Clone(string? url, string? path, bool verbose = false)
         {
-            var gitWrapper = new GitWrapper(verbose: options.Verbose);
-            if (string.IsNullOrEmpty(options.Url))
+            var gitWrapper = new GitWrapper(verbose: verbose);
+            if (string.IsNullOrEmpty(url))
             {
                 Colorizer.WriteLine($"[{ConsoleColor.Red}!Error: valid url is required]");
                 Parser.DisplayHelp<Cli>(HelpFormat.Full);
                 return ResultHelper.Fail(-1, "Valid url is required");
             }
 
-            if (string.IsNullOrEmpty(options.Path))
+            if (string.IsNullOrEmpty(path))
             {
-                options.Path = Environment.CurrentDirectory;
+                path = Environment.CurrentDirectory;
             }
 
-            var result = gitWrapper.CloneProject(options.Url, options.Path);
+            var result = gitWrapper.CloneProject(url, path);
             if (result.IsSuccess())
             {
-                Colorizer.WriteLine($"[{ConsoleColor.Green}!√ Project cloned successfully to {options.Path}\\{GitWrapper.ProjectNameFromUrl(options.Url)}]");
+                Colorizer.WriteLine($"[{ConsoleColor.Green}!√ Project cloned successfully to {path.TrimEnd('\\')}\\{GitWrapper.ProjectNameFromUrl(url)}]");
                 return ResultHelper.Success();
             }
             else
