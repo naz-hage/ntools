@@ -3,7 +3,7 @@
   "NbuildAppList": [
     {
       "Name": "Visual Studio Code",
-      "Version": "1.98.2",
+      "Version": "1.99.3",
       "AppFileName": "$(InstallPath)\\Code.exe",
       "WebDownloadFile": "https://aka.ms/win32-x64-system-stable",
       "DownloadedFile": "VSCodeSetup-x64-$(Version).exe",
