@@ -567,8 +567,9 @@ namespace Nbuild
                     ? $"{fileVersionInfo.FileMajorPart}.{fileVersionInfo.FileMinorPart}.{fileVersionInfo.FileBuildPart}.{fileVersionInfo.FilePrivatePart}"
                     : null;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Red}!X {nbuildApp.Name} {nbuildApp.Version} failed to get file version: {ex.Message}]");
                 return null;
             }
         }
@@ -908,7 +909,6 @@ namespace Nbuild
         /// </summary>
         /// <param name="buildType">The build type (string): STAGE | PROD.</param>
         /// <param name="push">A boolean flag indicating whether to push the tag after setting it. Default is false.</param>
-        /// <returns>Returns a RetCode indicating the result of the operation.</returns>
         public static ResultHelper SetAutoTag(string? buildType, bool push = false)
         {
             var gitWrapper = new GitWrapper();
@@ -953,6 +953,46 @@ namespace Nbuild
             Colorizer.WriteLine($"[{ConsoleColor.Green}!Current branch: {gitWrapper.Branch}]");
             DisplayGitInfo();
             return ResultHelper.Success();
+        }
+
+        /// <summary>
+        /// Clones a Git repository to the specified path.
+        /// </summary>
+        /// <param name="options">The CLI options containing the repository URL and target path.</param>
+        /// <returns>
+        /// A <see cref="ResultHelper"/> indicating the success or failure of the operation.
+        /// </returns>
+        /// <remarks>
+        /// This method uses the <see cref="GitWrapper"/> class to clone a Git repository. 
+        /// If the URL is not provided in the options, an error message is displayed, and the operation fails.
+        /// Upon successful cloning, the working directory is switched to the cloned repository's directory.
+        /// </remarks>
+        public static ResultHelper Clone(string? url, string? path, bool verbose = false)
+        {
+            var gitWrapper = new GitWrapper(verbose: verbose);
+            if (string.IsNullOrEmpty(url))
+            {
+                Colorizer.WriteLine($"[{ConsoleColor.Red}!Error: valid url is required]");
+                Parser.DisplayHelp<Cli>(HelpFormat.Full);
+                return ResultHelper.Fail(-1, "Valid url is required");
+            }
+
+            if (string.IsNullOrEmpty(path))
+            {
+                path = Environment.CurrentDirectory;
+            }
+
+            var result = gitWrapper.CloneProject(url, path);
+            if (result.IsSuccess())
+            {
+                Colorizer.WriteLine($"[{ConsoleColor.Green}!√ Project cloned successfully to {path.TrimEnd('\\')}\\{GitWrapper.ProjectNameFromUrl(url)}]");
+                return ResultHelper.Success();
+            }
+            else
+            {
+                Colorizer.WriteLine($"[{ConsoleColor.Red}!X {result.GetFirstOutput()}]");
+                return ResultHelper.Fail(-1, "Clone failed");
+            }
         }
     }
 }

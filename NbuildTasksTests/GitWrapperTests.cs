@@ -1,8 +1,10 @@
-﻿using NbuildTasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Ntools;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using static NbuildTasks.Enums;
 
 
 namespace NbuildTasks.Tests
@@ -12,6 +14,10 @@ namespace NbuildTasks.Tests
     {
         private readonly GitWrapper GitWrapper = new(ProjectName, verbose: true, testMode: true);
 
+        private const string ValidUrl = "https://github.com/naz-hage/getting-started";
+        private const string InvalidUrl = "invalid-url";
+        private string TempSourceDir;
+
         public GitWrapperTests()
         {
             Console.WriteLine($"Current Directory: {Directory.GetCurrentDirectory()}");
@@ -19,6 +25,97 @@ namespace NbuildTasks.Tests
             //Assert.AreEqual(GitWrapper.WorkingDirectory, Directory.GetCurrentDirectory());
             Console.WriteLine($"Current Branch: {GitWrapper.Branch}");
             Console.WriteLine($"Current Tag: {GitWrapper.Tag}");
+        }
+
+        [TestInitialize]
+        public void TestInitialize()
+        {
+            // Create a temporary source directory for testing
+            TempSourceDir = Path.Combine(Path.GetTempPath(), "GitWrapperTests");
+            if (!Directory.Exists(TempSourceDir))
+            {
+                Directory.CreateDirectory(TempSourceDir);
+            }
+        }
+
+        private static string GenerateRandomString(int length)
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            var random = new Random();
+            return new string(Enumerable.Repeat(chars, length)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
+        public void TestCleanup()
+        {
+            // Clean up the temporary source directory after each test
+            if (Directory.Exists(TempSourceDir))
+            {
+                Directory.Delete(TempSourceDir, true);
+            }
+        }
+
+        [TestMethod]
+        public void CloneProject_ShouldSucceed_WithValidUrl()
+        {
+            // Arrange
+            var gitWrapper = new GitWrapper(verbose: true);
+
+            // Act
+            var result = gitWrapper.CloneProject(ValidUrl, TempSourceDir);
+
+            // Assert
+            Assert.IsTrue(result.IsSuccess(), "CloneProject should succeed for a valid URL.");
+            var projectName = GitWrapper.ProjectNameFromUrl(ValidUrl);
+            var projectPath = Path.Combine(TempSourceDir, projectName);
+            Assert.IsTrue(Directory.Exists(projectPath), "The project directory should be created.");
+
+            CloneProject_ShouldFail_WhenProjectAlreadyExists();
+        }
+
+        [TestMethod]
+        public void CloneProject_ShouldFail_WithInvalidUrl()
+        {
+            // Arrange
+            var gitWrapper = new GitWrapper(verbose: true);
+
+            // Act
+            var result = gitWrapper.CloneProject(InvalidUrl, TempSourceDir);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccess(), "CloneProject should fail for an invalid URL.");
+            Assert.AreEqual(ResultHelper.InvalidParameter, result.Code, "Expected invalid parameter error code.");
+        }
+
+        public void CloneProject_ShouldFail_WhenProjectAlreadyExists()
+        {
+            // Arrange
+            var gitWrapper = new GitWrapper(verbose: true);
+            var projectName = GitWrapper.ProjectNameFromUrl(ValidUrl);
+            var projectPath = Path.Combine(TempSourceDir, projectName);
+            Directory.CreateDirectory(projectPath); // Simulate existing project directory
+
+            // Act
+            var result = gitWrapper.CloneProject(ValidUrl, TempSourceDir);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccess(), "CloneProject should fail if the project already exists.");
+            Assert.AreEqual((int)RetCode.CloneProjectFailed, result.Code, "Expected CloneProjectFailed error code.");
+        }
+
+        [TestMethod]
+        public void CloneProject_ShouldCreateSourceDir_IfNotExists()
+        {
+            // Arrange
+            var gitWrapper = new GitWrapper(verbose: true);
+            var nonExistentSourceDir = Path.Combine(TempSourceDir, GenerateRandomString(5));
+
+            // Act
+            var result = gitWrapper.CloneProject(ValidUrl, nonExistentSourceDir);
+
+            // Assert
+            Assert.IsTrue(result.IsSuccess(), "CloneProject should succeed when the source directory does not exist.");
+            Assert.IsTrue(Directory.Exists(nonExistentSourceDir), "The source directory should be created.");
         }
 
         [TestMethod()]
