@@ -57,7 +57,7 @@ public class Program
                 {
                     options.Json = UpdateJsonOption(options);
 
-
+                    options.Validate();
                     result = options.Command switch
                     {
                         Cli.CommandType.targets => BuildStarter.DisplayTargets(Environment.CurrentDirectory),
