@@ -287,7 +287,7 @@ namespace NbuildTasks.Tests
             // Assert
             Assert.IsTrue(result);
 
-            // Assert is false when deletting a non existing tag
+            // Assert false when deletinga non existing tag
 
             // Act
             result = GitWrapper.DeleteTag(currentTag);
