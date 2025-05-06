@@ -86,34 +86,31 @@ public class Program
             Environment.CurrentDirectory = currentDirectory;
         }
 
-        if (options == null || !Enum.IsDefined(options.Command))
+        // Don't use the options object here, as it may not be initialized correctly
+        if (result.IsSuccess())
         {
-            // Don't use the options object here, as it may not be initialized correctly
-            if (result.IsSuccess())
+            Colorizer.WriteLine($"[{ConsoleColor.Green}!√ Build completed.]");
+        }
+        else
+        {
+            if (result.Code == int.MaxValue)
             {
-                Colorizer.WriteLine($"[{ConsoleColor.Green}!√ Build completed.]");
+                // Display Help
+                Parser.DisplayHelp<Cli>(HelpFormat.Full);
             }
             else
             {
-                if (result.Code == int.MaxValue)
+                foreach (var item in result.Output.TakeLast(linesToDisplay))
                 {
-                    // Display Help
-                    Parser.DisplayHelp<Cli>(HelpFormat.Full);
+                    Colorizer.WriteLine($"[{ConsoleColor.Red}! {item}]");
                 }
-                else
-                {
-                    foreach (var item in result.Output.TakeLast(linesToDisplay))
-                    {
-                        Colorizer.WriteLine($"[{ConsoleColor.Red}! {item}]");
-                    }
 
-                    Colorizer.WriteLine($"[{ConsoleColor.Red}!X Build failed!]");
+                Colorizer.WriteLine($"[{ConsoleColor.Red}!X Build failed!]");
 
-                }
             }
+        }
 
             Command.DisplayGitInfo();
-        }
         return (int)result.Code;
     }
 
