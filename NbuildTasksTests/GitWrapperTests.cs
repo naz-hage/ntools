@@ -273,8 +273,7 @@ namespace NbuildTasks.Tests
             return tag;
         }
 
-        // Ignore this test because it is failing when run in GitHub Actions
-        [TestMethod, TestCategory("Manual"), Ignore("This test is intended to be run manually because it fails in GitHub Actions.")]
+        [TestMethod]
         public void DeleteTagTest()
         {
             // Arrange
@@ -288,10 +287,18 @@ namespace NbuildTasks.Tests
             // Assert
             Assert.IsTrue(result);
 
+            // Assert false when deletinga non existing tag
+
+            // Act
+            result = GitWrapper.DeleteTag(currentTag);
+
+            // Assert
+            Assert.IsFalse(result);
+
             // reinitialize tag in case no tags are left
             Assert.IsNotNull(InitTag());
         }
-
+        
         [TestMethod()]
         public void ListBranchesTest()
         {

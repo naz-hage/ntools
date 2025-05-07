@@ -290,17 +290,16 @@ namespace NbuildTasks
 
         public bool DeleteTag(string tag)
         {
-            bool bResult = !ListLocalTags().Contains(tag) || DeleteLocalTag(tag);
+            // Check if the tag exists locally and attempt to delete it
+            bool localTagDeleted = ListLocalTags().Contains(tag) && DeleteLocalTag(tag);
 
-            // check if tag exists
+            // Check if the tag exists remotely and attempt to delete it
+            bool remoteTagDeleted = ListRemoteTags().Contains(tag) && DeleteRemoteTag(tag);
 
-            var remoteTags = ListRemoteTags();
-            if (bResult && remoteTags.Any(x => x.Contains(tag)))
-                bResult = DeleteRemoteTag(tag);
-
-            return bResult;
+            // Return true only if the tag was deleted from at least one location
+            return localTagDeleted || remoteTagDeleted;
         }
-
+        
         public List<string> ListLocalTags()
         {
             Process.StartInfo.Arguments = $"tag --list";

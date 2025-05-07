@@ -994,5 +994,26 @@ namespace Nbuild
                 return ResultHelper.Fail(-1, "Clone failed");
             }
         }
+        /// <summary>
+        /// Deletes the specified tag.
+        /// </summary>
+        /// <param name="tag">The string representing the tag to delete.</param>    
+        public static ResultHelper DeleteTag(string? tag)
+        {
+            var gitWrapper = new GitWrapper();
+
+            if (string.IsNullOrEmpty(tag))
+            {
+                Colorizer.WriteLine($"[{ConsoleColor.Red}!Error: valid tag is required]");
+                Parser.DisplayHelp<Cli>(HelpFormat.Full);
+                return ResultHelper.Fail(-1, "Tag is required");
+            }
+            var result = gitWrapper.DeleteTag(tag) == true ? ResultHelper.Success() : ResultHelper.Fail(-1, "Delete tag failed");
+            if (result.IsSuccess())
+            {
+                DisplayGitInfo();
+            }
+            return result;
+        }
     }
 }
