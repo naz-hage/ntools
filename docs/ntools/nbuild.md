@@ -143,3 +143,9 @@ This section provides examples of how to use the `nb.exe` command line tool. The
     nb.exe git_clone -url https://github.com/example/repo -path C:\Projects
     ```
     Clones the specified Git repository (`https://github.com/example/repo`) into the specified path (`C:\Projects`).
+
+11. **Delete a specific tag**
+
+   ```cmd
+   nb.exe git_deletetag -tag 1.0.0 -v true
+   ```
