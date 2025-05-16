@@ -45,8 +45,12 @@ public class Cli
         "\t git_branch \t\t -> Displays the current git branch in the local repository\n" +
         "\t git_clone \t\t -> Clone specified Git repo in the -url option\n" +
         "\t git_deletetag \t\t -> Delete specified tag in -tag option\n" +
-        "\t ----\n")]
-    public CommandType Command { get; set; }
+        "\t ----" +
+        "\"The nbuild.exe can also execute targets defined in an nbuild.targets file if one " +
+        "exists in the current folder.\n" +
+        "To execute a target defined in nbuild.targets, simply use its name as the command.\n" +
+        "For example, if nbuild.targets defines a target named 'build', you can run it" +
+    " with: nbuild build\n")]    public CommandType Command { get; set; }
 
     /// <summary>
     /// Gets or sets the JSON file that holds the list of apps.
