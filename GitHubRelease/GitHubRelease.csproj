@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -36,6 +36,7 @@
 
   <ItemGroup>
     <PackageReference Include="CommandLine.Net" Version="2.3.0" />
+    <PackageReference Include="ntools-launcher" Version="1.7.0" />
   </ItemGroup>
 
   <ItemGroup>

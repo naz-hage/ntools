@@ -26,5 +26,5 @@ The [Windows dev environment](https://learn.microsoft.com/en-us/windows/dev-envi
 | [Terraform](https://releases.hashicorp.com/terraform)                                                     | 1.11.1      | 09-Mar-25       |
 | [Terraform Lint](https://github.com/terraform-linters/tflint/releases)                                    | 0.55.1      | 09-Mar-25       |
 | [Visual Studio 2022 Community Edition](https://visualstudio.microsoft.com/vs/community/)                  | 17.11.3     | 14-Sep-24       |
-| [Visual Studio Code](https://code.visualstudio.com/download)                                              | 1.99.3      | 04-May-25       |
+| [Visual Studio Code](https://code.visualstudio.com/download)                                              | 1.100.1      | 16-May-25       |
 | [Windows Terminal](https://www.microsoft.com/en-us/p/windows-terminal/9n0dx20hk701)                       | 1.21.10351.0| 10-Mar-25       |
