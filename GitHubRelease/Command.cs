@@ -1,11 +1,12 @@
-﻿using OutputColorizer;
+﻿using Ntools;
+using OutputColorizer;
 
 namespace GitHubRelease
 {
     /// <summary>
     /// Provides methods to interact with GitHub releases.
     /// </summary>
-    internal static class Command
+    public static class Command
     {
         /// <summary>
         /// Creates a new release in the specified repository.
@@ -20,7 +21,7 @@ namespace GitHubRelease
         /// It utilizes the ReleaseService to interact with the GitHub API.
         /// If the release creation is successful, it returns true; otherwise, it logs the error and returns false.
         /// </remarks>
-        public static async Task<bool> CreateRelease(string repo, string tag, string branch, string assetFileName, bool preRelease = false)
+        public static async Task<ResultHelper> CreateRelease(string repo, string tag, string branch, string assetFileName, bool preRelease = false)
         {
             var releaseService = new ReleaseService(repo);
 
@@ -38,7 +39,7 @@ namespace GitHubRelease
             var responseMessage = await releaseService.CreateRelease(release, assetFileName);
             if (responseMessage.IsSuccessStatusCode)
             {
-                return true;
+                return ResultHelper.Success();
             }
             else
             {
@@ -46,7 +47,7 @@ namespace GitHubRelease
                 Console.WriteLine($"Failed to create release: {responseMessage.StatusCode}");
                 var content = await responseMessage.Content.ReadAsStringAsync();
                 Console.WriteLine(content);
-                return false; // This line will never be reached, but is required for compilation
+                return ResultHelper.Fail(-1, $"Failed to create release: {responseMessage.StatusCode} - {content}");
             }
         }
 
@@ -60,7 +61,7 @@ namespace GitHubRelease
         /// <remarks>
         /// This method ensures that the assetPath includes a file name and that the download directory exists before attempting to download the asset.
         /// </remarks>/// 
-        public static async Task<bool> DownloadAsset(string repo, string tag, string assetPath)
+        public static async Task<ResultHelper> DownloadAsset(string repo, string tag, string assetPath)
         {
 
             // Ensure the assetPath is a directory
@@ -98,12 +99,12 @@ namespace GitHubRelease
 
             if (response.IsSuccessStatusCode)
             {
-                return true;
+                return ResultHelper.Success();
             }
             else
             {
                 Console.WriteLine($"Failed to download the asset. Status code: {response.StatusCode}");
-                return false;
+                return ResultHelper.Fail(-1, $"Failed to download the asset. Status code: {response.StatusCode}");
             }
         }
 

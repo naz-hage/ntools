@@ -25,6 +25,9 @@ public class Cli
         git_branch,
         git_clone,
         git_deletetag,
+        create_release,
+        create_pre_release,
+        download_release,
     }
 
     /// <summary>
@@ -45,12 +48,13 @@ public class Cli
         "\t git_branch \t\t -> Displays the current git branch in the local repository\n" +
         "\t git_clone \t\t -> Clone specified Git repo in the -url option\n" +
         "\t git_deletetag \t\t -> Delete specified tag in -tag option\n" +
-        "\t ----" +
-        "\"The nbuild.exe can also execute targets defined in an nbuild.targets file if one " +
-        "exists in the current folder.\n" +
-        "To execute a target defined in nbuild.targets, simply use its name as the command.\n" +
-        "For example, if nbuild.targets defines a target named 'build', you can run it" +
-    " with: nbuild build\n")]    public CommandType Command { get; set; }
+        "\t ---dadaad-\n" +
+        "\t  The nbuild.exe can also execute targets defined in an nbuild.targets file if one " +
+        "\t exists in the current folder.\n" +
+        "\t To execute a target defined in nbuild.targets, simply use its name as the command.\n" +
+        "\t For example, if nbuild.targets defines a target named 'build', you can run it" +
+        "\t  with: `nb.exe build`\n")]    
+    public CommandType Command { get; set; }
 
     /// <summary>
     /// Gets or sets the JSON file that holds the list of apps.
@@ -91,6 +95,34 @@ public class Cli
     /// </summary>
     [OptionalArgument("", "buildtype", "Specifies the build type used for git_autotag and git_push_autotag commands. Possible values: STAGE, PROD.")]
     public string? BuildType { get; internal set; }
+
+    /// <summary>
+    /// Gets or sets the repository name in the format userName/repoName.
+    /// </summary>
+    [OptionalArgument("", "repo", "Specifies the Git repository in the format any of the following formats: \n" +
+        "\t repoName  (UserName is declared the `OWNER` environment variable) \n" +
+        "\t userName/repoName\n" +
+        "\t https://github.com/userName/repoName (Full URL to the repository on GitHub). This is applicable to all commands.")]
+    public string? Repo { get; set; }
+
+    /// <summary>
+    /// Gets or sets the branch name.
+    /// </summary>
+    [OptionalArgument("main", "branch", "Specifies the branch name. Applicable for create, pre_release commands")]
+    public string? Branch { get; set; }
+
+    /// <summary>
+    /// Gets or sets the asset file name for `create` command.
+    /// </summary>
+    [OptionalArgument("", "file", "Specifies the asset file name. Must include full path. Applicable for create, pre_release commands")]
+    public string? AssetFileName { get; set; }
+
+    ///// <summary>
+    ///// Gets or sets the asset path.
+    ///// </summary>
+    //[OptionalArgument("", "path", "Specifies the asset path. Must be an absolute path.")]
+    //public string? AssetPath { get; set; }
+
 
     private static readonly Dictionary<string, CommandType> CommandMap = new()
         {

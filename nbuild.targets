@@ -20,6 +20,7 @@
 		 <SetupFolder>$(ArtifactsSolutionFolder)\release</SetupFolder>
         <ArtifactsFolder>$(ArtifactsSolutionFolder)\$(TargetRelease)\$(ProductVersion)</ArtifactsFolder>
 		<ArtifactsTestResultsFolder>$(ArtifactsSolutionFolder)\TestResults\$(ProductVersion)</ArtifactsTestResultsFolder>
+		<NbExe>$(OutputPathRelease)\nb.exe</NbExe>
       </PropertyGroup>  
       <ItemGroup>
             <BinaryFiles 
@@ -216,8 +217,8 @@
 	<!-- Creates a stage or prod release -->
 	<Target Name="GITHUB_RELEASE" DependsOnTargets="ARTIFACTS;GIT_BRANCH" AfterTargets="PROD" >
 		<Git Command="PushTag" TaskParameter="$(ProductVersion)" />
-		<Exec Command='"$(OutputPathRelease)\GitHubRelease.exe" create -repo $(SolutionName) -tag $(ProductVersion) -branch $(GitBranch) -file $(ArtifactsFolder).zip' WorkingDirectory="$(OutputPathRelease)" />
-		<Exec Command="echo GitHubRelease exit Code: %ERRORLEVEL%" />
+		<Exec Command='"$(NbExe)" create_release -repo $(SolutionName) -tag $(ProductVersion) -branch $(GitBranch) -file $(ArtifactsFolder).zip' WorkingDirectory="$(OutputPathRelease)" />
+		<Exec Command="echo $(NbExe) exit Code: %ERRORLEVEL%" />
 
 		<Message Text="==> DONE"/>
 	</Target>
@@ -225,8 +226,8 @@
 	<!-- Creates a stage or prod pre-release -->
 	<Target Name="GITHUB_PRE_RELEASE" DependsOnTargets="ARTIFACTS;GIT_BRANCH" AfterTargets="STAGE" >
 		<Git Command="PushTag" TaskParameter="$(ProductVersion)" />
-		<Exec Command='"$(OutputPathRelease)\GitHubRelease.exe" pre_release -repo $(SolutionName) -tag $(ProductVersion) -branch $(GitBranch) -file $(ArtifactsFolder).zip' WorkingDirectory="$(OutputPathRelease)" />
-		<Exec Command="echo GitHubRelease exit Code: %ERRORLEVEL%" />
+		<Exec Command='"$(NbExe)" create_pre_release -repo $(SolutionName) -tag $(ProductVersion) -branch $(GitBranch) -file $(ArtifactsFolder).zip' WorkingDirectory="$(OutputPathRelease)" />
+		<Exec Command="echo $(NbExe) exit Code: %ERRORLEVEL%" />
 
 		<Message Text="==> DONE"/>
 	</Target>
