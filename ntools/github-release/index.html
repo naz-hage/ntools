@@ -240,7 +240,8 @@
   - tag     : Specifies the tag name. Applicable for all commands (string, default=)
   - branch  : Specifies the branch name. Applicable for create, pre_release commands (string, default=main)
   - file    : Specifies the asset file name. Must include full path. Applicable for create, pre_release commands (string, default=)
-  - path    : Specifies the asset path. Must be an absolute path. (string, default=)
+  - path      : Specifies the path used for git_clone and release commands. If not specified, the current directory will be used.
+         for release commands, it must be an absolute path (string, default=)
   - v       : Optional parameter which sets the console output verbose level. (true or false, default=False)
 </code></pre>
 <h3 id="example-creating-a-release">Example: Creating a Release</h3>
