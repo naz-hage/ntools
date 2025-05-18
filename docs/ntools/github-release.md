@@ -1,4 +1,4 @@
-GitHubRelease is a command-line tool designed to help you create and manage GitHub releases. It also enables you to download release assets, such as files named in the format x.y.z.zip. The tool expects downloaded assets to be in a zip file named ${tag}.zip, where tag must be a valid tag in the repository created by the tool (e.g., ``x.y.z``).  checkout the [tagging](../versioning.md) section for more details.
+Nb.exe is also designed to help you create and manage GitHub releases. It also enables you to download release assets, such as files named in the format x.y.z.zip. The tool expects downloaded assets to be in a zip file named ${tag}.zip, where tag must be a valid tag in the repository created by the tool (e.g., ``x.y.z``).  checkout the [tagging](../versioning.md) section for more details.
 
 ## Requirements
 
@@ -83,60 +83,4 @@ The access token must have the following permissions:
 ## GitHubRelease Command Line Options
 
 ### Usage
-```batch
-GitHubRelease.exe command [-repo value] [-tag value] [-branch value] [-file value] [-path value] [-v value]
-  - command : Specifies the command to execute.
-         create          -> Create a release. Requires repo, tag, branch and file.
-         pre_release     -> Create a pre_release. Requires repo, tag, branch and file.
-         download        -> Download an asset. Requires repo, tag, and path (optional)
-         ----
- (one of create,pre_release,download, required)
-  - repo    : Specifies the Git repository in the format any of the following formats:
-         repoName  (UserName is declared the `OWNER` environment variable)
-         userName/repoName
-         https://github.com/userName/repoName (Full URL to the repository on GitHub). This is applicable to all commands. (string, default=)
-  - tag     : Specifies the tag name. Applicable for all commands (string, default=)
-  - branch  : Specifies the branch name. Applicable for create, pre_release commands (string, default=main)
-  - file    : Specifies the asset file name. Must include full path. Applicable for create, pre_release commands (string, default=)
-  - path      : Specifies the path used for git_clone and release commands. If not specified, the current directory will be used.
-         for release commands, it must be an absolute path (string, default=)
-  - v       : Optional parameter which sets the console output verbose level. (true or false, default=False)
-```
-### Example: Creating a Release
-To create a release for the repository `my-repo` with the tag `1.0.0`, branch `main`, and an asset located at `C:\Releases\1.0.0.zip`, you would use the following command:
-
-```batch
-GitHubRelease.exe create -repo userName/my-repo -tag 1.0.0 -branch main -file C:\Releases\1.1.0.zip
-```
-
-### Example: Creating a Pre-Release
-To create a pre-release for the repository `my-repo` with the tag `1.0.0`, branch `main`, and an asset located at `C:\Releases\1.0.0.zip`, you would use the following command:
-
-```batch
-GitHubRelease.exe pre_release -repo userName/my-repo -tag 1.0.0 -branch main -file C:\Releases\1.1.0.zip
-```
-
-### Example: Downloading an Asset
-To download an asset from the release with the tag `1.0.0` in the repository `my-repo` to the path `C:\Downloads`:
-
-```batch
-GitHubRelease.exe download -repo userName/my-repo -tag 1.0.0 -path C:\Downloads
-```
-An asset named 1.0.0.zip will be downloaded to the specified path if it exists in the release.
-
-Here is the updated section in github-release.md with an example using the `-repo` option with a full GitHub URL:
-
-### Example: Creating a Release with Full GitHub URL
-To create a release for the repository `my-repo` with the tag `1.0.0`, branch `main`, and an asset located at `C:\Releases\1.0.0.zip`, using the full GitHub URL:
-
-```batch
-GitHubRelease.exe create -repo https://github.com/userName/my-repo -tag 1.0.0 -branch main -file C:\Releases\1.0.0.zip
-```
-
-### Example: Downloading an Asset with Full GitHub URL
-To download an asset from the release with the tag `1.0.0` in the repository `my-repo` to the path `C:\Downloads`, using the full GitHub URL:
-
-```batch
-GitHubRelease.exe download -repo https://github.com/userName/my-repo -tag 1.0.0 -path C:\Downloads
-```
-An asset named `1.0.0.zip` will be downloaded to the specified path if it exists in the release.
+See [nb.exe](../ntools/nbuild.md) for the command line options.
