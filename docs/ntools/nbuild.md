@@ -30,9 +30,9 @@ Below is a full list of options that can be used with `Nb.exe`:
          git_branch              -> Displays the current git branch in the local repository
          git_clone               -> Clone specified Git repo in the -url option
          git_deletetag           -> Delete specified tag in -tag option
-         create_release          -> Create a release. Requires repo, tag, branch and file.
-         create_pre_release      -> Create a pre-release. Requires repo, tag, branch and file.
-         download_release        -> Download an asset. Requires repo, tag, and path (optional)
+         release_create          -> Create a release. Requires repo, tag, branch and file.
+         pre_release_create      -> Create a pre-release. Requires repo, tag, branch and file.
+         release_download        -> Download an asset. Requires repo, tag, and path (optional)
          ----
  (one of list,install,uninstall,download,targets,path,git_info,git_settag,git_autotag,git_push_autotag,git_branch,git_clone,git_deletetag, required)
   - json      : Specifies the JSON file that holds the list of apps. Only valid for the install, download, and list commands.
@@ -54,8 +54,8 @@ Below is a full list of options that can be used with `Nb.exe`:
          repoName  (UserName is declared the `OWNER` environment variable)
          userName/repoName
          https://github.com/userName/repoName (Full URL to the repository on GitHub). This is applicable to all commands. (string, default=)
-  - branch    : Specifies the branch name. Applicable for create_release, create_pre_release commands (string, default=main)
-  - file      : Specifies the asset file name. Must include full path. Applicable for create_release, create_pre_release commands (string, default=)
+  - branch    : Specifies the branch name. Applicable for release_create, pre_release_create commands (string, default=main)
+  - file      : Specifies the asset file name. Must include full path. Applicable for release_create, pre_release_create commands (string, default=)
 ```
 
 **If the -json option is not specified, the default json file `$(ProgramFiles)\Nbuild\NTools.json` is used**. 
@@ -163,21 +163,21 @@ nb.exe git_deletetag -tag 1.0.0 -v true
 To create a release for the repository `my-repo` with the tag `1.0.0`, branch `main`, and an asset located at `C:\Releases\1.0.0.zip`, you would use the following command:
 
 ```batch
-nb.exe create_release -repo userName/my-repo -tag 1.0.0 -branch main -file C:\Releases\1.1.0.zip
+nb.exe release_create -repo userName/my-repo -tag 1.0.0 -branch main -file C:\Releases\1.1.0.zip
 ```
 
 ## 13. Creating a Pre-Release
 To create a pre-release for the repository `my-repo` with the tag `1.0.0`, branch `main`, and an asset located at `C:\Releases\1.0.0.zip`, you would use the following command:
 
 ```batch
-nb.exe create_pre_release -repo userName/my-repo -tag 1.0.0 -branch main -file C:\Releases\1.1.0.zip
+nb.exe pre_release_create -repo userName/my-repo -tag 1.0.0 -branch main -file C:\Releases\1.1.0.zip
 ```
 
 ## 14. Downloading an Asset
 To download an asset from the release with the tag `1.0.0` in the repository `my-repo` to the path `C:\Downloads`:
 
 ```batch
-nb.exe download_release -repo userName/my-repo -tag 1.0.0 -path C:\Downloads
+nb.exe release_download -repo userName/my-repo -tag 1.0.0 -path C:\Downloads
 ```
 An asset named 1.0.0.zip will be downloaded to the specified path if it exists in the release.
 
@@ -185,13 +185,13 @@ An asset named 1.0.0.zip will be downloaded to the specified path if it exists i
 To create a release for the repository `my-repo` with the tag `1.0.0`, branch `main`, and an asset located at `C:\Releases\1.0.0.zip`, using the full GitHub URL:
 
 ```batch
-nb.exe create_release -repo https://github.com/userName/my-repo -tag 1.0.0 -branch main -file C:\Releases\1.0.0.zip
+nb.exe release_create -repo https://github.com/userName/my-repo -tag 1.0.0 -branch main -file C:\Releases\1.0.0.zip
 ```
 
 ## 16. Downloading an Asset with Full GitHub URL
 To download an asset from the release with the tag `1.0.0` in the repository `my-repo` to the path `C:\Downloads`, using the full GitHub URL:
 
 ```batch
-nb.exe download_release -repo https://github.com/userName/my-repo -tag 1.0.0 -path C:\Downloads
+nb.exe release_download -repo https://github.com/userName/my-repo -tag 1.0.0 -path C:\Downloads
 ```
 An asset named `1.0.0.zip` will be downloaded to the specified path if it exists in the release.

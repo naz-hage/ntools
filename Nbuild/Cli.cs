@@ -28,9 +28,9 @@ public class Cli
         git_branch,
         git_clone,
         git_deletetag,
-        create_release,
-        create_pre_release,
-        download_release,
+        release_create,
+        pre_release_create,
+        release_download,
     }
 
     /// <summary>
@@ -51,9 +51,9 @@ public class Cli
         "\t git_branch \t\t -> Displays the current git branch in the local repository\n" +
         "\t git_clone \t\t -> Clone specified Git repo in the -url option\n" +
         "\t git_deletetag \t\t -> Delete specified tag in -tag option\n" +
-        "\t create_release \t -> Create a release. Requires repo, tag, branch and file.\n" +
-        "\t create_pre_release \t -> Create a pre-release. Requires repo, tag, branch and file.\n" +
-        "\t download_release \t -> Download an asset. Requires repo, tag, and path (optional)\n" +
+        "\t release_create \t -> Create a release. Requires repo, tag, branch and file.\n" +
+        "\t pre_release_create \t -> Create a pre-release. Requires repo, tag, branch and file.\n" +
+        "\t release_download \t -> Download an asset. Requires repo, tag, and path (optional)\n" +
         "\t ----\n" +
         "\t  The nbuild.exe can also execute targets defined in an nbuild.targets file if one " +
         "\t exists in the current folder.\n" +
@@ -146,9 +146,9 @@ public class Cli
             { "git_branch", CommandType.git_branch },
             { "git_clone", CommandType.git_clone },
             { "git_deletetag", CommandType.git_deletetag },
-            { "create_release", CommandType.create_release },
-            { "create_pre_release", CommandType.create_pre_release },
-            { "download_release", CommandType.download_release }
+            { "release_create", CommandType.release_create },
+            { "pre_release_create", CommandType.pre_release_create },
+            { "release_download", CommandType.release_download }
         };
 
     /// <summary>
@@ -202,9 +202,9 @@ public class Cli
                 }
                 break;
 
-            case CommandType.create_pre_release:
-            case CommandType.create_release:
-            case CommandType.download_release:
+            case CommandType.pre_release_create:
+            case CommandType.release_create:
+            case CommandType.release_download:
                 ValidateReleaseOptions();
                 break;
 
@@ -238,24 +238,24 @@ public class Cli
             throw new ArgumentException($"The 'tag' option '{Tag}' is not a valid tag format.");
         }
 
-        if (Command == CommandType.create_release && string.IsNullOrEmpty(AssetFileName))
+        if (Command == CommandType.release_create && string.IsNullOrEmpty(AssetFileName))
         {
             throw new ArgumentException("The 'file' option is required for the 'create' command.");
 
         }
 
-        if (Command == CommandType.create_pre_release && string.IsNullOrEmpty(AssetFileName))
+        if (Command == CommandType.pre_release_create && string.IsNullOrEmpty(AssetFileName))
         {
             throw new ArgumentException("The 'file' option is required for the 'pre_release' command.");
 
         }
 
-        if (Command != CommandType.download_release && string.IsNullOrEmpty(Branch))
+        if (Command != CommandType.release_download && string.IsNullOrEmpty(Branch))
         {
             throw new ArgumentException("The 'branch' option is required for commands other than 'download'.");
         }
 
-        if (Command == CommandType.download_release && string.IsNullOrEmpty(Path))
+        if (Command == CommandType.release_download && string.IsNullOrEmpty(Path))
         {
             // Default to the current directory if Path is not provided
             Path = Directory.GetCurrentDirectory();

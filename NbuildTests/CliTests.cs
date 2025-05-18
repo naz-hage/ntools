@@ -121,13 +121,13 @@ namespace Nbuild.Tests
         public void GetCommandType_ValidCommand_ShouldReturnCorrectCommandType()
         {
             // Arrange
-            var cli = new Cli { Command = Cli.CommandType.create_release };
+            var cli = new Cli { Command = Cli.CommandType.release_create };
 
             // Act
             var commandType = cli.GetCommandType();
 
             // Assert
-            Assert.AreEqual(Cli.CommandType.create_release, commandType);
+            Assert.AreEqual(Cli.CommandType.release_create, commandType);
         }
 
         [TestMethod]
@@ -148,7 +148,7 @@ namespace Nbuild.Tests
             // Arrange
             var cli = new Cli
             {
-                Command = Cli.CommandType.create_release,
+                Command = Cli.CommandType.release_create,
                 Repo = "naz-hage/ntools",
                 Tag = "1.0.0",
                 Branch = "main",
@@ -166,7 +166,7 @@ namespace Nbuild.Tests
             // Arrange
             var cli = new Cli
             {
-                Command = Cli.CommandType.create_release,
+                Command = Cli.CommandType.release_create,
                 Tag = "v1.0.0",
                 Branch = "main",
                 AssetFileName = "file.zip"
@@ -183,7 +183,7 @@ namespace Nbuild.Tests
             // Arrange
             var cli = new Cli
             {
-                Command = Cli.CommandType.create_release,
+                Command = Cli.CommandType.release_create,
                 Repo = "invalidRepoFormat",
                 Tag = "v1.0.0",
                 Branch = "main",
@@ -201,7 +201,7 @@ namespace Nbuild.Tests
             // Arrange
             var cli = new Cli
             {
-                Command = Cli.CommandType.create_release,
+                Command = Cli.CommandType.release_create,
                 Repo = "user/repo",
                 Branch = "main",
                 AssetFileName = "file.zip"
@@ -218,7 +218,7 @@ namespace Nbuild.Tests
             // Arrange
             var cli = new Cli
             {
-                Command = Cli.CommandType.create_release,
+                Command = Cli.CommandType.release_create,
                 Repo = "user/repo",
                 Tag = "v1.0.0",
                 Branch = "main"
