@@ -261,7 +261,7 @@ public class Cli
             Path = Directory.GetCurrentDirectory();
         }
 
-        if (Command == CommandType.download && !System.IO.Path.IsPathRooted(Path))
+        if (Command == CommandType.release_download && !System.IO.Path.IsPathRooted(Path))
         {
             throw new ArgumentException("The 'path' option is required for the download commands and must be an absolute path.");
         }

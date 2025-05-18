@@ -18,12 +18,14 @@ namespace GitHubRelease
         private const string NoneFound = "N/A";
 
         /// <summary>
-        /// Creates a release with the specified release object, and asset path.
+        /// Creates a release with the specified release object and asset path.
         /// </summary>
-        /// <param name="token">The token for authentication.</param>
-        /// <param name="release">The release object.</param>
-        /// <param name="assetPath">The path to the asset.</param>
-        /// <returns>The HTTP response message.</returns>
+        /// <param name="release">The release object to create.</param>
+        /// <param name="assetPath">The path to the asset file to upload.</param>
+        /// <returns>The HTTP response message from the release creation or asset upload operation.</returns>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if the tag name or target commitish is missing or invalid, or if the branch name cannot be determined in a detached HEAD state.
+        /// </exception>
         public async Task<HttpResponseMessage> CreateRelease(Release release, string assetPath)
         {
             ValidateAssetPath(assetPath);
@@ -58,30 +60,15 @@ namespace GitHubRelease
         }
 
         /// <summary>
-        /// Retrieves the branch name from GitHub Actions based on the current commit SHA.
+        /// Retrieves the name of the branch from GitHub that matches the current commit SHA.
         /// </summary>
+        /// <returns>
+        /// A <see cref="Task{TResult}"/> representing the asynchronous operation, with a result of the branch name as a <see cref="string"/> if found; otherwise, <c>null</c>.
+        /// </returns>
         /// <remarks>
-        /// This method queries the GitHub API to fetch all branches of the repository and compares their commit SHAs
-        /// with the current commit SHA to determine the branch name. It is particularly useful in scenarios where
-        /// the repository is in a detached HEAD state, such as during GitHub Actions workflows.
-        /// 
-        /// - If a matching branch is found, its name is returned.
-        /// - If no matching branch is found, the method returns <c>null</c>.
-        /// 
-        /// Example usage:
-        /// <code>
-        /// var branchName = await GetBranchNameFromGitHubActions();
-        /// if (branchName != null)
-        /// {
-        ///     Console.WriteLine($"Branch name: {branchName}");
-        /// }
-        /// else
-        /// {
-        ///     Console.WriteLine("Branch name could not be determined.");
-        /// }
-        /// </code>
+        /// This method queries the GitHub API for all branches in the specified repository and compares each branch's commit SHA
+        /// with the current commit SHA. If a match is found, the corresponding branch name is returned.
         /// </remarks>
-        /// <returns>The branch name if found; otherwise, <c>null</c>.</returns>
         private async Task<string?> GetBranchNameFromGitHubActions()
         {
             var uri = $"{Constants.GitHubApiPrefix}/{Repo}/branches";
@@ -106,27 +93,12 @@ namespace GitHubRelease
         }
 
         /// <summary>
-        /// Retrieves the current commit SHA from the GitHub API.
+        /// Asynchronously retrieves the SHA of the current commit (HEAD) from the GitHub repository.
         /// </summary>
-        /// <remarks>
-        /// This method sends a GET request to the GitHub API to fetch the commit SHA of the HEAD reference.
-        /// - If the request is successful, the SHA is extracted from the response JSON and returned.
-        /// - If the request fails or the SHA is not found, an empty string is returned.
-        /// 
-        /// Example usage:
-        /// <code>
-        /// var commitSha = await GetCurrentCommitSha();
-        /// if (!string.IsNullOrEmpty(commitSha))
-        /// {
-        ///     Console.WriteLine($"Current Commit SHA: {commitSha}");
-        /// }
-        /// else
-        /// {
-        ///     Console.WriteLine("Failed to retrieve the commit SHA.");
-        /// }
-        /// </code>
-        /// </remarks>
-        /// <returns>The current commit SHA as a string, or an empty string if not found.</returns>
+        /// <returns>
+        /// A <see cref="Task{String}"/> representing the asynchronous operation, containing the SHA string of the current commit.
+        /// Returns an empty string if the request is unsuccessful or the SHA cannot be retrieved.
+        /// </returns>
         private async Task<string> GetCurrentCommitSha()
         {
             var uri = $"{Constants.GitHubApiPrefix}/{Repo}/commits/HEAD";
@@ -154,12 +126,13 @@ namespace GitHubRelease
         }
 
         /// <summary>
-        /// Deletes an existing release.
+        /// Deletes an existing release with the same tag name as the provided release, if it exists.
         /// </summary>
-        /// <param name="token">The authentication token.</param>
-        /// <param name="release">The release to be deleted.</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
-        /// <exception cref="InvalidOperationException">Thrown when the deletion of the release fails.</exception>
+        /// <param name="release">The release whose tag name is used to find and delete an existing release.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the deletion of the existing release fails.
+        /// </exception>
         private async Task DeleteExistingRelease(Release release)
         {
             var releaseId = await GetReleaseByTagNameAsync(release.TagName!);
@@ -174,11 +147,10 @@ namespace GitHubRelease
         }
 
         /// <summary>
-        /// Deletes staging releases if the provided release is a production release.
+        /// Deletes all staging releases if the provided release is a production release.
         /// </summary>
-        /// <param name="token">The authentication token.</param>
         /// <param name="release">The release to be checked.</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         /// <exception cref="InvalidOperationException">Thrown when the deletion of staging releases fails.</exception>
         private async Task DeleteStagingReleasesIfProduction(Release release)
         {
@@ -201,10 +173,13 @@ namespace GitHubRelease
         /// <summary>
         /// Deletes all staging releases from the provided list of tags.
         /// </summary>
-        /// <param name="token">The authentication token.</param>
         /// <param name="tags">The list of tags to check for staging releases.</param>
-        /// <returns>A Task representing the asynchronous operation, containing the HTTP response message of the last deletion operation.</returns>
-        /// <exception cref="InvalidOperationException">Thrown when the deletion of a staging release fails.</exception>
+        /// <returns>
+        /// A <see cref="Task{HttpResponseMessage}"/> representing the asynchronous operation, containing the HTTP response message of the last deletion operation.
+        /// </returns>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the deletion of a staging release fails.
+        /// </exception>
         public async Task<HttpResponseMessage> DeleteStagingReleases(List<string> tags)
         {
             HttpResponseMessage response = new HttpResponseMessage();
@@ -228,11 +203,10 @@ namespace GitHubRelease
         /// <summary>
         /// Updates the release notes of the provided release.
         /// </summary>
-        /// <param name="token">The authentication token.</param>
         /// <param name="release">The release whose notes are to be updated.</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         /// <exception cref="InvalidOperationException">Thrown when no commits are found since the last release.</exception>
-        public async Task  UpdateReleaseNotes(Release release)
+        public async Task UpdateReleaseNotes(Release release)
         {
             Console.WriteLine("Updating release notes...");
             var (sinceLastPublished, sinceTag)  = await GetLatestReleasePublishedAtAndTagAsync(release.TargetCommitish!);
@@ -256,13 +230,16 @@ namespace GitHubRelease
         }
 
         /// <summary>
-        /// Creates a release and uploads an asset to it.
+        /// Creates a release on GitHub and uploads an asset to it.
         /// </summary>
-        /// <param name="token">The authentication token.</param>
-        /// <param name="release">The release to be created.</param>
-        /// <param name="assetPath">The path to the asset to be uploaded.</param>
-        /// <returns>A Task representing the asynchronous operation, containing the HTTP response message.</returns>
-        /// <exception cref="InvalidOperationException">Thrown when the creation of the release or the upload of the asset fails.</exception>
+        /// <param name="release">The <see cref="Release"/> object containing release details to be created.</param>
+        /// <param name="assetPath">The file path of the asset to upload to the created release.</param>
+        /// <returns>
+        /// A <see cref="Task{HttpResponseMessage}"/> representing the asynchronous operation, containing the HTTP response message from the asset upload.
+        /// </returns>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if the release creation or asset upload fails, or if the upload URL cannot be extracted from the GitHub API response.
+        /// </exception>
         private async Task<HttpResponseMessage> CreateReleaseAndUploadAsset(Release release, string assetPath)
         {
             var context = new JsonContext();
@@ -308,12 +285,12 @@ namespace GitHubRelease
         }
 
         /// <summary>
-        /// Gets the releases information from GitHub API.
+        /// Retrieves release information from the GitHub API for the specified branch.
         /// </summary>
-        /// <param name="token">The GitHub access token.</param>
-        /// <param name="branch">The branch name. Set to null if requesting release on any branch.</param>
-        /// <returns>The latest release information as a <see cref="JsonDocument"/> object.
-        /// null if no release is not found.
+        /// <param name="branch">The branch name to filter releases by. If <c>null</c>, returns all releases.</param>
+        /// <returns>
+        /// A <see cref="Task{JsonDocument}"/> representing the asynchronous operation, containing the release information as a <see cref="JsonDocument"/> object.
+        /// Returns <c>null</c> if no releases are found.
         /// </returns>
         public async Task<JsonDocument?> GetReleasesAsync(string branch)
         {
@@ -335,10 +312,16 @@ namespace GitHubRelease
         }
 
         /// <summary>
-        /// Gets the release tags from GitHub API.
+        /// Retrieves the list of release tags from the GitHub API for the current repository.
         /// </summary>
-        /// <param name="token">The GitHub access token.</param>
-        /// <returns>The list of release tags.</returns>
+        /// <remarks>
+        /// This method sends a GET request to the GitHub API to fetch all releases for the specified repository.
+        /// It parses the response JSON to extract the tag names and returns them as a list of strings.
+        /// If the request fails, it logs the error details and returns an empty list.
+        /// </remarks>
+        /// <returns>
+        /// A <see cref="Task{List{string}}"/> representing the asynchronous operation, containing the list of release tag names.
+        /// </returns>
         public async Task<List<string>> GetReleaseTagsAsync()
         {
             ApiService.SetupHeaders();
@@ -371,27 +354,16 @@ namespace GitHubRelease
         }
 
         /// <summary>
-        /// Retrieves the IDs of all releases from the GitHub API.
+        /// Retrieves the IDs of all releases from the GitHub API for the current repository.
         /// </summary>
         /// <remarks>
         /// This method sends a GET request to the GitHub API to fetch all releases for the specified repository.
-        /// - If the request is successful, it parses the response JSON to extract the release IDs and returns them as a list.
-        /// - If the request fails, it logs the error details and returns an empty list.
-        /// 
-        /// Example usage:
-        /// <code>
-        /// var releaseIds = await GetReleaseIdsAsync();
-        /// if (releaseIds.Any())
-        /// {
-        ///     Console.WriteLine($"Found {releaseIds.Count} releases.");
-        /// }
-        /// else
-        /// {
-        ///     Console.WriteLine("No releases found.");
-        /// }
-        /// </code>
+        /// It parses the response JSON to extract the release IDs and returns them as a list of integers.
+        /// If the request fails, it logs the error details and returns an empty list.
         /// </remarks>
-        /// <returns>A list of release IDs.</returns>
+        /// <returns>
+        /// A <see cref="Task{List{int}}"/> representing the asynchronous operation, containing the list of release IDs.
+        /// </returns>
         public async Task<List<int>> GetReleaseIdsAsync()
         {
             ApiService.SetupHeaders();
@@ -415,11 +387,12 @@ namespace GitHubRelease
         }
 
         /// <summary>
-        /// Gets the latest release information from GitHub API.
+        /// Retrieves the latest release information from the GitHub API.
         /// </summary>
-        /// <param name="token">The GitHub access token.</param>
-        /// <returns>The latest release information as a <see cref="JsonDocument"/> object.
-        /// null if no release is not found.
+        /// <param name="branch">The branch name to filter releases by. If <c>null</c>, returns all releases.</param>
+        /// <returns>
+        /// A <see cref="Task{JsonDocument}"/> representing the asynchronous operation, containing the latest release information as a <see cref="JsonDocument"/> object.
+        /// Returns <c>null</c> if no release is found.
         /// </returns>
         private async Task<JsonDocument?> GetLatestReleaseRawAsync(string? branch = null)
         {
@@ -463,11 +436,25 @@ namespace GitHubRelease
 
 
         /// <summary>
-        /// Gets the latest release published date and tag from GitHub API.
+        /// Retrieves the published date and tag name of the latest release from the GitHub API.
         /// </summary>
-        /// <param name="token">The GitHub access token.</param>
-        /// <param name="branch">The branch name. Set to null if requesting release on any branch.</param>
-        /// <returns>A tuple containing the latest release published date and tag.</returns>
+        /// <param name="branch">The branch name to filter releases by. If <c>null</c>, retrieves the latest release on any branch.</param>
+        /// <returns>
+        /// A <see cref="Task{TResult}"/> representing the asynchronous operation, containing a tuple with:
+        /// <list type="bullet">
+        /// <item>
+        /// <description>
+        /// <c>string</c>: The published date of the latest release, or a default value if not found.
+        /// </description>
+        /// </item>
+        /// <item>
+        /// <description>
+        /// <c>string</c>: The tag name of the latest release, or a default value if not found.
+        /// </description>
+        /// </item>
+        /// </list>
+        /// </returns>
+        /// <exception cref="InvalidOperationException">Thrown if the latest release cannot be retrieved or parsed.</exception>
         public async Task<(string, string)> GetLatestReleasePublishedAtAndTagAsync(string branch)
         {
             var releases = await GetReleasesAsync(branch);
@@ -494,12 +481,13 @@ namespace GitHubRelease
                 throw new InvalidOperationException($"Failed to get the latest release. Exception: {ex.Message}");
             }
         }
+
         /// <summary>
-        /// Gets the latest release information from GitHub API.
+        /// Parses the HTTP response from the GitHub API and returns the content as a <see cref="JsonDocument"/>.
         /// </summary>
-        /// <param name="token">The GitHub access token.</param>
-        /// <returns>The latest release information as a <see cref="JsonDocument"/> object.
-        /// null if no release is not found.
+        /// <param name="response">The <see cref="HttpResponseMessage"/> received from the GitHub API.</param>
+        /// <returns>
+        /// A <see cref="Task{JsonDocument}"/> representing the asynchronous operation, containing the parsed JSON document if successful; otherwise, <c>null</c> if the content is empty or cannot be parsed.
         /// </returns>
         private async Task<JsonDocument?> FormatResponse(HttpResponseMessage response)
         {
@@ -547,11 +535,12 @@ namespace GitHubRelease
         }
 
         /// <summary>
-        /// Gets the release ID by tag name.
+        /// Retrieves the release ID for a given tag name from the GitHub API.
         /// </summary>
-        /// <param name="token">The GitHub access token.</param>
         /// <param name="tagName">The tag name of the release.</param>
-        /// <returns>The release ID if found, otherwise null.</returns>
+        /// <returns>
+        /// A <see cref="Task{Nullable{Int32}}"/> representing the asynchronous operation, containing the release ID if found; otherwise, <c>null</c>.
+        /// </returns>
         public async Task<int?> GetReleaseByTagNameAsync(string tagName)
         {
             ApiService.SetupHeaders();
@@ -574,15 +563,21 @@ namespace GitHubRelease
             }
         }
 
-        #region Upload Release
         /// <summary>
-        /// Uploads an asset to the GitHub release.
+        /// Uploads an asset to a GitHub release.
         /// </summary>
-        /// <param name="token">The GitHub access token.</param>
-        /// <param name="release">The GitHub release information.</param>
-        /// <param name="assetPath">The path to the asset file.</param>
-        /// <param name="response">The response from creating the release.</param>
-        /// <returns>The response from uploading the asset.</returns>
+        /// <param name="assetPath">The file path of the asset to upload.</param>
+        /// <param name="uploadUrl">The upload URL provided by the GitHub API (should include query parameters for name/label).</param>
+        /// <returns>
+        /// A <see cref="Task{HttpResponseMessage}"/> representing the asynchronous operation, containing the HTTP response message from the upload operation.
+        /// Returns <see cref="HttpStatusCode.NotFound"/> if the file does not exist.
+        /// </returns>
+        /// <remarks>
+        /// This method uploads a file as a release asset to the specified GitHub release upload URL.
+        /// The asset is read from <paramref name="assetPath"/> and sent as a POST request to <paramref name="uploadUrl"/>.
+        /// The content type is set to <c>application/octet-stream</c>.
+        /// The method logs details about the upload and the response.
+        /// </remarks>
         private async Task<HttpResponseMessage> UploadAsset(string assetPath, string uploadUrl)
         {
             if (!File.Exists(assetPath))
@@ -617,17 +612,13 @@ namespace GitHubRelease
             Console.WriteLine($"Response Content: {responseContent}");
             return uploadResponse;
         }
-
-
-        #endregion
-
-
         /// <summary>
-        /// Gets the release information from GitHub API.
+        /// Retrieves the release information for a specific release ID from the GitHub API.
         /// </summary>
-        /// <param name="token">The GitHub access token.</param>
-        /// <param name="releaseId">The ID of the release.</param>
-        /// <returns>The release information as a <see cref="Release"/> object.</returns>
+        /// <param name="releaseId">The ID of the release to retrieve.</param>
+        /// <returns>
+        /// A <see cref="Task{Release}"/> representing the asynchronous operation, containing the <see cref="Release"/> object if found; otherwise, <c>null</c>.
+        /// </returns>
         public async Task<Release?> GetReleaseAsync(int releaseId)
         {
             ApiService.SetupHeaders();
@@ -667,7 +658,8 @@ namespace GitHubRelease
 
         /// <summary>
         /// Determines whether the given tag is a staging tag.
-        /// A staging tag is a tag with a version number that does not with ".0".
+        /// A staging tag is a tag with a version number that does not end with ".0".
+        /// For example, "1.2.3" is a staging tag, while "1.2.0" is not.
         /// </summary>
         /// <param name="tag">The tag to check.</param>
         /// <returns>True if the tag is a staging tag, false otherwise.</returns>
@@ -681,8 +673,9 @@ namespace GitHubRelease
         }
 
         /// <summary>
-        /// Determines whether the given tag is a producion tag.
+        /// Determines whether the given tag is a production tag.
         /// A production tag is a tag with a version number that ends with ".0".
+        /// For example, "1.2.0" is a production tag, while "1.2.3" is not.
         /// </summary>
         /// <param name="tag">The tag to check.</param>
         /// <returns>True if the tag is a production tag, false otherwise.</returns>
@@ -697,6 +690,17 @@ namespace GitHubRelease
 
         #region Download Release
 
+        /// <summary>
+        /// Downloads a release asset by its asset ID and saves it to the specified file.
+        /// </summary>
+        /// <param name="assetId">The ID of the asset to download.</param>
+        /// <param name="assetFileName">The full path where the asset will be saved.</param>
+        /// <returns>
+        /// A <see cref="Task{HttpResponseMessage}"/> representing the asynchronous operation, containing the HTTP response message from the download operation.
+        /// </returns>
+        /// <remarks>
+        /// This method downloads a release asset from GitHub using its asset ID and saves it to the specified file path.
+        /// </remarks>
         public async Task<HttpResponseMessage> DownloadAsset(int assetId, string assetFileName)
         {
             ApiService.SetupHeaders();
@@ -725,12 +729,13 @@ namespace GitHubRelease
         /// <param name="tagName">The tag name of the release.</param>
         /// <param name="assetName">The name of the asset to download.</param>
         /// <param name="downloadPath">The path where the asset will be downloaded.</param>
-        /// <returns>The HTTP response message from the download operation.</returns>
+        /// <returns>
+        /// A <see cref="Task{HttpResponseMessage}"/> representing the asynchronous operation, containing the HTTP response message from the download operation.
+        /// </returns>
         /// <remarks>
         /// This method retrieves the release ID associated with the specified tag name and fetches the list of assets for that release.
         /// It then searches for the asset by its name and downloads it to the specified path.
         /// If the release or asset is not found, an appropriate HTTP response with a status code of <see cref="HttpStatusCode.NotFound"/> is returned.
-
         /// </remarks>
         public async Task<HttpResponseMessage> DownloadAssetByName(string tagName, string assetName, string downloadPath)
         {
@@ -791,8 +796,17 @@ namespace GitHubRelease
                 return response;
             }
         }
-
         
+        /// <summary>
+        /// Checks the permissions (scopes) of the current GitHub token by making a request to the GitHub API.
+        /// </summary>
+        /// <remarks>
+        /// This method sends a GET request to the GitHub API user endpoint to retrieve the token's scopes from the response headers.
+        /// It logs the Authorization header, the token scopes, and any errors encountered.
+        /// </remarks>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation.
+        /// </returns>
         public async Task CheckTokenPermissions()
         {
             // Setup headers with Authorization
@@ -805,10 +819,6 @@ namespace GitHubRelease
                 Console.WriteLine("Authorization header is not set.");
                 throw new InvalidOperationException("Authorization header is not set.");
             }
-            //else
-            //{
-            //    Console.WriteLine($"Authorization: {authorizationHeader.Scheme} {authorizationHeader.Parameter}");
-            //}
 
             // Make a request to the GitHub API to check token permissions
             var uri = "https://api.github.com/user";
@@ -840,54 +850,18 @@ namespace GitHubRelease
             }
         }
 
-
-        public async Task CheckTokenPermissionsObsolsete()
-        {
-            // Setup headers with Authorization
-            ApiService.SetupHeaders();
-
-            // Make a request to the GitHub API to check token permissions
-            var uri = "https://api.github.com/user";
-            var response = await ApiService.GetAsync(uri);
-
-            if (response.IsSuccessStatusCode)
-            {
-                // Log the scopes
-                if (response.Headers.TryGetValues("X-OAuth-Scopes", out var scopes))
-                {
-                    Console.WriteLine($"Token scopes: {string.Join(", ", scopes)}");
-                }
-                else
-                
-                {
-                    Console.WriteLine("Token scopes not found in the response headers.");
-                }
-            }
-            else
-            {
-                Console.WriteLine($"Error: Could not retrieve token permissions. Status code: {response.StatusCode}");
-                var responseContent = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"Response content: {responseContent}");
-            }
-        }
-
-
         /// <summary>
         /// Downloads an asset from a specified URL and saves it to a file.
         /// </summary>
         /// <param name="downloadUrl">The URL of the asset to download.</param>
         /// <param name="assetFileName">The full path where the asset will be saved.</param>
-        /// <returns>The HTTP response message from the download operation.</returns>
+        /// <returns>
+        /// A <see cref="Task{HttpResponseMessage}"/> representing the asynchronous operation, containing the HTTP response message from the download operation.
+        /// </returns>
         /// <remarks>
         /// This method uses the <see cref="ApiService"/> to set up headers and perform the download operation.
         /// If the download is successful, the asset is saved to the specified file path.
-        /// For larger files, consider using a streaming approach to avoid memory issues.
-        /// for larger than 10 mb files, use the following code:
-        /// using (var contentStream = await response.Content.ReadAsStreamAsync())
-        /// using (var fileStream = System.IO.File.Create(assetFileName))
-        /// {
-        ///     await contentStream.CopyToAsync(fileStream);
-        /// }
+        /// For larger files, a streaming approach is used to avoid memory issues.
         /// </remarks>
         public async Task<HttpResponseMessage> DownloadAssetFromUrl(string downloadUrl, string assetFileName)
         {
@@ -916,6 +890,14 @@ namespace GitHubRelease
         }
 
 
+        /// <summary>
+        /// Verifies whether a specific asset ID exists in a release identified by its tag name.
+        /// </summary>
+        /// <param name="tagName">The tag name of the release.</param>
+        /// <param name="assetId">The ID of the asset to verify.</param>
+        /// <returns>
+        /// A <see cref="Task{bool}"/> representing the asynchronous operation, containing <c>true</c> if the asset ID exists in the release; otherwise, <c>false</c>.
+        /// </returns>
         public async Task<bool> VerifyAssetId(string tagName, int assetId)
         {
             var releaseId = await GetReleaseByTagNameAsync(tagName);
