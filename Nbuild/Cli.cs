@@ -146,6 +146,9 @@ public class Cli
             { "git_branch", CommandType.git_branch },
             { "git_clone", CommandType.git_clone },
             { "git_deletetag", CommandType.git_deletetag },
+            { "create_release", CommandType.create_release },
+            { "create_pre_release", CommandType.create_pre_release },
+            { "download_release", CommandType.download_release }
         };
 
     /// <summary>
@@ -247,12 +250,12 @@ public class Cli
 
         }
 
-        if (Command != CommandType.download && string.IsNullOrEmpty(Branch))
+        if (Command != CommandType.download_release && string.IsNullOrEmpty(Branch))
         {
             throw new ArgumentException("The 'branch' option is required for commands other than 'download'.");
         }
 
-        if (Command == CommandType.download && string.IsNullOrEmpty(Path))
+        if (Command == CommandType.download_release && string.IsNullOrEmpty(Path))
         {
             // Default to the current directory if Path is not provided
             Path = Directory.GetCurrentDirectory();
