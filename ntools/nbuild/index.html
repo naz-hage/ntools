@@ -195,15 +195,16 @@
            Run `Nb.exe Targets` to list the available targets.
          -v Possible Values: (true or false, default=False)
   - tag       : Specifies the tag used for git_settag and git_deletetag commands. (string, default=)
-  - path      : Specifies the path used for git_clone command. If not specified, the current directory will be used. (string, default=)
+    - path      : Specifies the path used for git_clone and release commands. If not specified, the current directory will be used.
+         for release commands, it must be an absolute path (string, default=)
   - buildtype : Specifies the build type used for git_autotag and git_push_autotag commands. Possible values: stage, prod. (string, default=)
   - url       : Specifies the Git repository URL used for git_clone command. (string, default=)
   - repo      : Specifies the Git repository in the format any of the following formats:
          repoName  (UserName is declared the `OWNER` environment variable)
          userName/repoName
          https://github.com/userName/repoName (Full URL to the repository on GitHub). This is applicable to all commands. (string, default=)
-  - branch    : Specifies the branch name. Applicable for create, pre_release commands (string, default=main)
-  - file      : Specifies the asset file name. Must include full path. Applicable for create, pre_release commands (string, default=)
+  - branch    : Specifies the branch name. Applicable for create_release, create_pre_release commands (string, default=main)
+  - file      : Specifies the asset file name. Must include full path. Applicable for create_release, create_pre_release commands (string, default=)
 </code></pre>
 <p><strong>If the -json option is not specified, the default json file <code>$(ProgramFiles)\Nbuild\NTools.json</code> is used</strong>. </p>
 <h3 id="nbuildtargets">nbuild.targets</h3>
