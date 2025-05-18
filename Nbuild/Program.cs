@@ -99,9 +99,9 @@ public class Program
             Cli.CommandType.git_branch => Command.DisplayGitBranch(),
             Cli.CommandType.git_clone => Command.Clone(options.Url, options.Path, options.Verbose),
             Cli.CommandType.git_deletetag => Command.DeleteTag(options.Tag),
-            Cli.CommandType.create_release => await GitHubRelease.Command.CreateRelease(options.Repo!, options.Tag!, options.Branch!, options.AssetFileName!),
-            Cli.CommandType.create_pre_release => await GitHubRelease.Command.CreateRelease(options.Repo!, options.Tag!, options.Branch!, options.AssetFileName!,true),
-            Cli.CommandType.download_release => await GitHubRelease.Command.DownloadAsset(options.Repo!, options.Tag!, options.Path!),
+            Cli.CommandType.create_release => await Command.CreateRelease(options.Repo!, options.Tag!, options.Branch!, options.AssetFileName!),
+            Cli.CommandType.create_pre_release => await Command.CreateRelease(options.Repo!, options.Tag!, options.Branch!, options.AssetFileName!,true),
+            Cli.CommandType.download_release => await Command.DownloadAsset(options.Repo!, options.Tag!, options.Path!),
             _ => ResultHelper.Fail(-1, $"Invalid Command: '{options.Command}'"),
         };
     }
