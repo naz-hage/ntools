@@ -92,7 +92,8 @@ public class Cli
     [OptionalArgument("", "tag", "Specifies the tag used for git_settag and git_deletetag commands.")]
     public string? Tag { get; set; }
 
-    [OptionalArgument("", "path", "Specifies the path used for git_clone command. If not specified, the current directory will be used.")]
+    [OptionalArgument("", "path", "Specifies the path used for git_clone and release commands. If not specified, the current directory will be used.\n" +
+        "\t for release commands, it must be an absolute path")]
     public string? Path { get; set; }
 
     /// <summary>
