@@ -49,6 +49,12 @@ namespace GitHubRelease
             return releaseNotes.ToString();
         }
 
+        /// <summary>
+        /// Generates the full changelog section for the release notes.
+        /// </summary>
+        /// <param name="sinceTag">The tag of the previous release. If null or empty, shows all commits up to the current tag.</param>
+        /// <param name="tag">The tag of the latest release.</param>
+        /// <returns>A <see cref="StringBuilder"/> containing the full changelog link.</returns>
         private StringBuilder GetFullChangelog(string? sinceTag, string tag)
         {
             StringBuilder releaseNotes = new();

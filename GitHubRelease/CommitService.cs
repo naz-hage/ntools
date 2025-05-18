@@ -83,7 +83,7 @@ namespace GitHubRelease
             string? publishedAt = string.Empty;
             foreach (var commit in commits)
             {
-                //Console.WriteLine(JsonSerializer.Serialize(commit, jsonSerializerOptions));
+                //Console.WriteLine(JsonSerializer.Serialize(commit, jsonSerializerOptions))
                 // How do I get the published_at date of the commit?
                 publishedAt = commit.GetProperty(CommitPropertyName).GetProperty(AuthorPropertyName).GetProperty("date").GetString();
                 // append only if the date is different from the previous commit
@@ -149,12 +149,24 @@ namespace GitHubRelease
             return releaseNotes;
         }
 
+        /// <summary>
+        /// Extracts the 'next' link from a GitHub API Link header for pagination.
+        /// </summary>
+        /// <param name="linkHeader">The Link header string from the HTTP response.</param>
+        /// <returns>The URL for the next page, or null if not present.</returns>
         public static string? GetNextLink(string linkHeader)
         {
             var nextLink = Regex.Match(linkHeader, "<(.*)>; rel=\"next\"")?.Groups[1].Value;
             return nextLink;
         }
 
+        /// <summary>
+        /// Retrieves a list of commits from the specified branch and since a given date.
+        /// Handles pagination to return all commits.
+        /// </summary>
+        /// <param name="branch">The branch to retrieve commits from. If null, uses the default branch.</param>
+        /// <param name="sinceLastPublished">The ISO 8601 date string to retrieve commits since. If null, retrieves all commits.</param>
+        /// <returns>A list of JsonElement objects representing the commits.</returns>
         public async Task<List<JsonElement>> GetCommits(string? branch = null, string? sinceLastPublished = null)
         {
             var uri = $"{Constants.GitHubApiPrefix}/{Repo}/commits";
@@ -202,6 +214,16 @@ namespace GitHubRelease
             return commitsList;
         }
 
+        /// <summary>
+        /// Retrieves a list of release tags from the repository.
+        /// </summary>
+        /// <param name="branch">The branch to filter tags by (optional).</param>
+        /// <remarks>
+        /// This method fetches all tags from the GitHub repository using the API.
+        /// If the request is successful, it returns a list of tag names.
+        /// If the request fails, it returns an empty list.
+        /// The <paramref name="branch"/> parameter is currently not used to filter tags.
+        /// </remarks>
         public async Task<List<string>> GetReleaseTags(string? branch = null)
         {
             var uri = $"{Constants.GitHubApiPrefix}/{Repo}/tags";
@@ -217,6 +239,16 @@ namespace GitHubRelease
             return new List<string>();
         }
 
+        /// <summary>
+        /// Retrieves a list of pull request commits associated with a specific commit SHA.
+        /// </summary>
+        /// <param name="sha">The SHA of the commit. If null, retrieves all pull request commits.</param>
+        /// <remarks>
+        /// This method calls the GitHub API to fetch pull request commits related to the specified commit SHA.
+        /// If <paramref name="sha"/> is provided, it fetches pull requests associated with that commit.
+        /// If <paramref name="sha"/> is null, it fetches all pull request commits.
+        /// Returns an empty list if the request fails.
+        /// </remarks>
         public async Task<List<JsonElement>> GetPullRequestCommits(string? sha = null)
         {
             var uri = $"{Constants.GitHubApiPrefix}/{Repo}/commits/pulls";
@@ -235,21 +267,17 @@ namespace GitHubRelease
             return new List<JsonElement>();
         }
 
-        private async Task<string> GetShaFromBranch(string branch)
-        {
-            var branchUri = $"{Constants.GitHubApiPrefix}/{Repo}/branches/{branch}";
-            var branchResponse = await ApiService.GetAsync(branchUri);
-            if (branchResponse.IsSuccessStatusCode)
-            {
-                // Extract the sha from the response
-                var content = await branchResponse.Content.ReadAsStringAsync();
-                var branchSha = JsonDocument.Parse(content).RootElement.GetProperty(CommitPropertyName).GetProperty(ShaPropertyName).GetString();
-                return branchSha ?? string.Empty;
-            }
 
-            return string.Empty;
-        }
-
+        /// <summary>
+        /// Formats the HTTP response from the GitHub API into a list of JsonElement objects.
+        /// </summary>
+        /// <param name="response">The HTTP response message from the API.</param>
+        /// <returns>A list of JsonElement objects representing the parsed JSON array from the response.</returns>
+        /// <remarks>
+        /// This method reads the content of the HTTP response, parses it as a JSON array,
+        /// and converts it into a list of JsonElement objects for further processing.
+        /// If the response content is not a valid JSON array, an exception may be thrown.
+        /// </remarks>
         private async Task<List<JsonElement>> FormatResponseAsync(HttpResponseMessage response)
         {
             var content = await response.Content.ReadAsStringAsync();
@@ -257,6 +285,15 @@ namespace GitHubRelease
             return ConvertToArray(commits);
         }
 
+        /// <summary>
+        /// Converts a JsonElement.ArrayEnumerator to a List of JsonElement.
+        /// </summary>
+        /// <param name="enumerator">The JsonElement.ArrayEnumerator to convert.</param>
+        /// <returns>A list of JsonElement objects.</returns>
+        /// <remarks>
+        /// This method iterates through the provided <paramref name="enumerator"/> and adds each element to a new list.
+        /// It is used to transform the enumerator returned by JSON parsing into a more usable List for further processing.
+        /// </remarks>
         private List<JsonElement> ConvertToArray(JsonElement.ArrayEnumerator enumerator)
         {
             var list = new List<JsonElement>();
@@ -285,36 +322,5 @@ namespace GitHubRelease
             var tagsList = await GetReleaseTags();
             return tagsList.ToArray();
         }
-
- 
-        private bool IsStageTag(string tag)
-        {
-            GitWrapper git = new();
-
-            // Use the git wrapper to determine if the tag is valid
-            if (!git.IsValidTag(tag))
-            {
-                return false;
-            }
-
-            // A stage tag is a tag with a build number that is not zero
-            string[] items = tag.Split('.');
-            return items.Length == 3 && int.TryParse(items[2], out int buildNumber) && buildNumber != 0;
-        }
-
-        private bool IsReleaseProd(string tag)
-        {
-            // Use the git wrapper to determine if the tag is valid
-            GitWrapper git = new();
-            if (!git.IsValidTag(tag))
-            {
-                return false;
-            }
-
-            // A Prod tag is a tag with a build number that is zero
-            string[] items = tag.Split('.');
-            return items.Length == 3 && int.TryParse(items[2], out int buildNumber) && buildNumber == 0;
-        }
-
     }
 }

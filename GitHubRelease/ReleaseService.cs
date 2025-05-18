@@ -154,7 +154,7 @@ namespace GitHubRelease
         /// <exception cref="InvalidOperationException">Thrown when the deletion of staging releases fails.</exception>
         private async Task DeleteStagingReleasesIfProduction(Release release)
         {
-            if (IsProductionTag(release.TagName!))
+            if (IsProdTag(release.TagName!))
             {
                 Console.WriteLine("Production release");
                 var tags = await GetReleaseTagsAsync();
@@ -184,7 +184,7 @@ namespace GitHubRelease
         {
             HttpResponseMessage response = new HttpResponseMessage();
 
-            foreach (var tag in tags.Where(IsStagingTag))
+            foreach (var tag in tags.Where(IsStageTag))
                 {
                     var releaseId = await GetReleaseByTagNameAsync(tag);
                     if (releaseId.HasValue)
@@ -663,7 +663,7 @@ namespace GitHubRelease
         /// </summary>
         /// <param name="tag">The tag to check.</param>
         /// <returns>True if the tag is a staging tag, false otherwise.</returns>
-        private static bool IsStagingTag(string? tag)
+        private static bool IsStageTag(string? tag)
         {
             ArgumentNullException.ThrowIfNull(tag);
 
@@ -679,7 +679,7 @@ namespace GitHubRelease
         /// </summary>
         /// <param name="tag">The tag to check.</param>
         /// <returns>True if the tag is a production tag, false otherwise.</returns>
-        private static bool IsProductionTag(string? tag)
+        private static bool IsProdTag(string? tag)
         {
             ArgumentNullException.ThrowIfNull(tag);
 
