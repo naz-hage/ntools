@@ -48,7 +48,10 @@ public class Cli
         "\t git_branch \t\t -> Displays the current git branch in the local repository\n" +
         "\t git_clone \t\t -> Clone specified Git repo in the -url option\n" +
         "\t git_deletetag \t\t -> Delete specified tag in -tag option\n" +
-        "\t ---dadaad-\n" +
+        "\t create_release \t -> Create a release. Requires repo, tag, branch and file.\n" +
+        "\t create_pre_release \t -> Create a pre-release. Requires repo, tag, branch and file.\n" +
+        "\t download_release \t -> Download an asset. Requires repo, tag, and path (optional)\n" +
+        "\t ----\n" +
         "\t  The nbuild.exe can also execute targets defined in an nbuild.targets file if one " +
         "\t exists in the current folder.\n" +
         "\t To execute a target defined in nbuild.targets, simply use its name as the command.\n" +
