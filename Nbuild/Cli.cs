@@ -39,27 +39,27 @@ public class Cli
     /// </summary>
     [RequiredArgument(0, "command", "Specifies the command to execute.\n" +
         "\t list \t\t\t -> Lists apps specified in the -json option.\n" +
-        "\t install \t\t -> Downloads and installs apps specified in the -json option (require admin privileges to run).\n" +
-        "\t uninstall \t\t -> Uninstalls apps specified in the -json option (require admin privileges to run).\n" +
-        "\t download \t\t -> Downloads apps specified in the -json option (require admin privileges to run).\n" +
-        "\t targets \t\t -> Lists available targets and saves them in the targets.md file.\n" +
-        "\t path \t\t\t -> Displays environment path in local machine.\n" +
-        "\t git_info \t\t -> Displays the current git information in the local repository.\n" +
-        "\t git_settag \t\t -> Set specified tag with -tag option\n" +
-        "\t git_autotag \t\t -> Set next tag based on the build type: STAGE | PROD\n" +
-        "\t git_push_autotag \t -> Set next tag based on the build type and push to remote repo\n" +
-        "\t git_branch \t\t -> Displays the current git branch in the local repository\n" +
-        "\t git_clone \t\t -> Clone specified Git repo in the -url option\n" +
-        "\t git_deletetag \t\t -> Delete specified tag in -tag option\n" +
-        "\t release_create \t -> Create a release. Requires repo, tag, branch and file.\n" +
-        "\t pre_release_create \t -> Create a pre-release. Requires repo, tag, branch and file.\n" +
-        "\t release_download \t -> Download an asset. Requires repo, tag, and path (optional)\n" +
+        "\t install \t\t -> Downloads and installs apps specified in the -json option (requires admin privileges).\n" +
+        "\t uninstall \t\t -> Uninstalls apps specified in the -json option (requires admin privileges).\n" +
+        "\t download \t\t -> Downloads tools or apps listed in the -json option (requires admin privileges).\n" +
+        "\t targets \t\t -> Lists available build targets and saves them in the targets.md file.\n" +
+        "\t path \t\t\t -> Displays the environment PATH variable for the local machine.\n" +
+        "\t git_info \t\t -> Displays the current git information for the local repository.\n" +
+        "\t git_settag \t\t -> Sets the specified tag using the -tag option.\n" +
+        "\t git_autotag \t\t -> Sets the next tag based on the build type: STAGE or PROD.\n" +
+        "\t git_push_autotag \t -> Sets the next tag based on the build type and pushes to the remote repository.\n" +
+        "\t git_branch \t\t -> Displays the current git branch in the local repository.\n" +
+        "\t git_clone \t\t -> Clones the specified Git repository using the -url option.\n" +
+        "\t git_deletetag \t\t -> Deletes the specified tag using the -tag option.\n" +
+        "\t release_create \t -> Creates a GitHub release. Requires -repo, -tag, -branch, and -file options.\n" +
+        "\t pre_release_create \t -> Creates a GitHub pre-release. Requires -repo, -tag, -branch, and -file options.\n" +
+        "\t release_download \t -> Downloads a specific asset from a GitHub release. Requires -repo, -tag, and -path (optional, defaults to current directory).\n" +
         "\t ----\n" +
         "\t  The nbuild.exe can also execute targets defined in an nbuild.targets file if one " +
         "\t exists in the current folder.\n" +
         "\t To execute a target defined in nbuild.targets, simply use its name as the command.\n" +
         "\t For example, if nbuild.targets defines a target named 'build', you can run it" +
-        "\t  with: `nb.exe build`\n")]    
+        "\t  with: `nb.exe build`\n")]
     public CommandType Command { get; set; }
 
     /// <summary>

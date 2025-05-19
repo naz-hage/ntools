@@ -17,22 +17,22 @@ Below is a full list of options that can be used with `Nb.exe`:
 ```cmd
  Nb.exe command [-json value] [-v value] [-tag value] [-buildtype value]
   - command   : Specifies the command to execute.
-         list                    -> Lists apps specified in the -json option.
-         install                 -> Downloads and installs apps specified in the -json option (require admin privileges to run).
-         uninstall               -> Uninstalls apps specified in the -json option (require admin privileges to run).
-         download                -> Downloads apps specified in the -json option (require admin privileges to run).
-         targets                 -> Lists available targets and saves them in the targets.md file.
-         path                    -> Displays environment path in local machine.
-         git_info                -> Displays the current git information in the local repository.
-         git_settag              -> Set specified tag with -tag option
-         git_autotag             -> Set next tag based on the build type: stage | prod
-         git_push_autotag        -> Set next tag based on the build type and push to remote repo
-         git_branch              -> Displays the current git branch in the local repository
-         git_clone               -> Clone specified Git repo in the -url option
-         git_deletetag           -> Delete specified tag in -tag option
-         release_create          -> Create a release. Requires repo, tag, branch and file.
-         pre_release_create      -> Create a pre-release. Requires repo, tag, branch and file.
-         release_download        -> Download an asset. Requires repo, tag, and path (optional)
+list                    -> Lists apps specified in the -json option.
+         install                 -> Downloads and installs apps specified in the -json option (requires admin privileges).
+         uninstall               -> Uninstalls apps specified in the -json option (requires admin privileges).
+         download                -> Downloads tools or apps listed in the -json option (requires admin privileges).
+         targets                 -> Lists available build targets and saves them in the targets.md file.
+         path                    -> Displays the environment PATH variable for the local machine.
+         git_info                -> Displays the current git information for the local repository.
+         git_settag              -> Sets the specified tag using the -tag option.
+         git_autotag             -> Sets the next tag based on the build type: STAGE or PROD.
+         git_push_autotag        -> Sets the next tag based on the build type and pushes to the remote repository.
+         git_branch              -> Displays the current git branch in the local repository.
+         git_clone               -> Clones the specified Git repository using the -url option.
+         git_deletetag           -> Deletes the specified tag using the -tag option.
+         release_create          -> Creates a GitHub release. Requires -repo, -tag, -branch, and -file options.
+         pre_release_create      -> Creates a GitHub pre-release. Requires -repo, -tag, -branch, and -file options.
+         release_download        -> Downloads a specific asset from a GitHub release. Requires -repo, -tag, and -path (optional, defaults to current directory).
          ----
  (one of list,install,uninstall,download,targets,path,git_info,git_settag,git_autotag,git_push_autotag,git_branch,git_clone,git_deletetag, required)
   - json      : Specifies the JSON file that holds the list of apps. Only valid for the install, download, and list commands.
