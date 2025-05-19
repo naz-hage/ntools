@@ -221,7 +221,7 @@ public class Cli
     {
         if (string.IsNullOrEmpty(Repo))
         {
-            throw new ArgumentException("The 'repo' option is required for all commands and must be in the format userName/repoName.");
+            throw new ArgumentException("The 'repo' option is required for release_create, pre_release_create and release_download commands and must be in the format userName/repoName.");
         }
 
         // Use the new ValidateRepo method
@@ -230,7 +230,7 @@ public class Cli
 
         if (string.IsNullOrEmpty(Tag))
         {
-            throw new ArgumentException("The 'tag' option is required for all commands.");
+            throw new ArgumentException("The 'tag' option is required for release_create, pre_release_create and release_download commands.");
         }
 
         if (IsValidTag(Tag) == false)
@@ -240,19 +240,19 @@ public class Cli
 
         if (Command == CommandType.release_create && string.IsNullOrEmpty(AssetFileName))
         {
-            throw new ArgumentException("The 'file' option is required for the 'create' command.");
+            throw new ArgumentException("The 'file' option is required for the release_create command.");
 
         }
 
         if (Command == CommandType.pre_release_create && string.IsNullOrEmpty(AssetFileName))
         {
-            throw new ArgumentException("The 'file' option is required for the 'pre_release' command.");
+            throw new ArgumentException("The 'file' option is required for the pre_release_create command.");
 
         }
 
         if (Command != CommandType.release_download && string.IsNullOrEmpty(Branch))
         {
-            throw new ArgumentException("The 'branch' option is required for commands other than 'download'.");
+            throw new ArgumentException("The 'branch' option is required for release_create, pre_release_create commands.");
         }
 
         if (Command == CommandType.release_download && string.IsNullOrEmpty(Path))
@@ -263,7 +263,7 @@ public class Cli
 
         if (Command == CommandType.release_download && !System.IO.Path.IsPathRooted(Path))
         {
-            throw new ArgumentException("The 'path' option is required for the download commands and must be an absolute path.");
+            throw new ArgumentException("The 'path' option is required for the release_download command and must be an absolute path.");
         }
     }
 
