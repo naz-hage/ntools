@@ -92,8 +92,8 @@ public class Cli
     [OptionalArgument("", "tag", "Specifies the tag used for git_settag and git_deletetag commands.")]
     public string? Tag { get; set; }
 
-    [OptionalArgument("", "path", "Specifies the path used for git_clone and release commands. If not specified, the current directory will be used.\n" +
-        "\t for release commands, it must be an absolute path")]
+    [OptionalArgument("", "path", "Specifies the path used for git_clone, pre_release_create and release_create commands. If not specified, the current directory will be used.\n" +
+        "\t for pre_release_create and release_create commands, it must be an absolute path")]
     public string? Path { get; set; }
 
     /// <summary>
@@ -109,19 +109,19 @@ public class Cli
     [OptionalArgument("", "repo", "Specifies the Git repository in the format any of the following formats: \n" +
         "\t repoName  (UserName is declared the `OWNER` environment variable) \n" +
         "\t userName/repoName\n" +
-        "\t https://github.com/userName/repoName (Full URL to the repository on GitHub). This is applicable to all commands.")]
+        "\t https://github.com/userName/repoName (Full URL to the repository on GitHub). This is applicable to release_create, pre_release_create and release_download commands.")]
     public string? Repo { get; set; }
 
     /// <summary>
     /// Gets or sets the branch name.
     /// </summary>
-    [OptionalArgument("main", "branch", "Specifies the branch name. Applicable for create, pre_release commands")]
+    [OptionalArgument("main", "branch", "Specifies the branch name. Applicable for release_create, pre_release_create commands")]
     public string? Branch { get; set; }
 
     /// <summary>
     /// Gets or sets the asset file name for `create` command.
     /// </summary>
-    [OptionalArgument("", "file", "Specifies the asset file name. Must include full path. Applicable for create, pre_release commands")]
+    [OptionalArgument("", "file", "Specifies the asset file name. Must include full path. Applicable for release_create, pre_release_create commands")]
     public string? AssetFileName { get; set; }
 
     ///// <summary>
