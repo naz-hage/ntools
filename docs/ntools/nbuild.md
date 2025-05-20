@@ -15,9 +15,9 @@
 Below is a full list of options that can be used with `Nb.exe`:
 ### Usage
 ```cmd
- Nb.exe command [-json value] [-v value] [-tag value] [-buildtype value]
+ Nb.exe command [-json value] [-v value] [-url value] [-tag value] [-path value] [-buildtype value] [-repo value] [-branch value] [-file value]
   - command   : Specifies the command to execute.
-list                    -> Lists apps specified in the -json option.
+         list                    -> Lists apps specified in the -json option.
          install                 -> Downloads and installs apps specified in the -json option (requires admin privileges).
          uninstall               -> Uninstalls apps specified in the -json option (requires admin privileges).
          download                -> Downloads tools or apps listed in the -json option (requires admin privileges).
@@ -34,7 +34,10 @@ list                    -> Lists apps specified in the -json option.
          pre_release_create      -> Creates a GitHub pre-release. Requires -repo, -tag, -branch, and -file options.
          release_download        -> Downloads a specific asset from a GitHub release. Requires -repo, -tag, and -path (optional, defaults to current directory).
          ----
- (one of list,install,uninstall,download,targets,path,git_info,git_settag,git_autotag,git_push_autotag,git_branch,git_clone,git_deletetag, required)
+          The nbuild.exe can also execute targets defined in an nbuild.targets file if one       exists in the current folder.
+         To execute a target defined in nbuild.targets, simply use its name as the command.
+         For example, if nbuild.targets defines a target named 'build', you can run it    with: `nb.exe build`
+ (one of list,install,uninstall,download,targets,path,git_info,git_settag,git_autotag,git_push_autotag,git_branch,git_clone,git_deletetag,release_create,pre_release_create,release_download, required)
   - json      : Specifies the JSON file that holds the list of apps. Only valid for the install, download, and list commands.
          - By default, the -json option points to the ntools deployment folder: $(ProgramFiles)\build\ntools.json.
          Sample JSON file: https://github.com/naz-hage/ntools/blob/main/dev-setup/ntools.json
@@ -45,15 +48,15 @@ list                    -> Lists apps specified in the -json option.
            `Nb` will run an MSbuild target `stage` defined in a `nbuild.targets` file which present in the solution folder.
            Run `Nb.exe Targets` to list the available targets.
          -v Possible Values: (true or false, default=False)
+  - url       : Specifies the Git repository URL. (string, default=)
   - tag       : Specifies the tag used for git_settag and git_deletetag commands. (string, default=)
-    - path      : Specifies the path used for git_clone and release commands. If not specified, the current directory will be used.
-         for release commands, it must be an absolute path (string, default=)
-  - buildtype : Specifies the build type used for git_autotag and git_push_autotag commands. Possible values: stage, prod. (string, default=)
-  - url       : Specifies the Git repository URL used for git_clone command. (string, default=)
+  - path      : Specifies the path used for git_clone, pre_release_create and release_create commands. If not specified, the current directory will be used.
+         for pre_release_create and release_create commands, it must be an absolute path (string, default=)
+  - buildtype : Specifies the build type used for git_autotag and git_push_autotag commands. Possible values: STAGE, PROD. (string, default=)
   - repo      : Specifies the Git repository in the format any of the following formats:
          repoName  (UserName is declared the `OWNER` environment variable)
          userName/repoName
-         https://github.com/userName/repoName (Full URL to the repository on GitHub). This is applicable to all commands. (string, default=)
+         https://github.com/userName/repoName (Full URL to the repository on GitHub). This is applicable to release_create, pre_release_create and release_download commands. (string, default=)
   - branch    : Specifies the branch name. Applicable for release_create, pre_release_create commands (string, default=main)
   - file      : Specifies the asset file name. Must include full path. Applicable for release_create, pre_release_create commands (string, default=)
 ```
