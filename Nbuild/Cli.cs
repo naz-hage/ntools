@@ -31,6 +31,7 @@ public class Cli
         release_create,
         pre_release_create,
         release_download,
+        list_release,
     }
 
     /// <summary>
@@ -148,7 +149,8 @@ public class Cli
             { "git_deletetag", CommandType.git_deletetag },
             { "release_create", CommandType.release_create },
             { "pre_release_create", CommandType.pre_release_create },
-            { "release_download", CommandType.release_download }
+            { "release_download", CommandType.release_download },
+            { "list_release", CommandType.list_release }
         };
 
     /// <summary>
@@ -264,6 +266,10 @@ public class Cli
         if (Command == CommandType.release_download && !System.IO.Path.IsPathRooted(Path))
         {
             throw new ArgumentException("The 'path' option is required for the release_download command and must be an absolute path.");
+        }
+        if (Command == CommandType.list_release && string.IsNullOrEmpty(Repo))
+        {
+            throw new ArgumentException("The 'repo' option is required for the list_release command.");
         }
     }
 
