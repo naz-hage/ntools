@@ -1130,5 +1130,83 @@ namespace Nbuild
             throw new NotImplementedException();
         }
 
+        public static async Task<ResultHelper> ListReleases(string repo, bool verbose = false)
+        {
+            if (verbose)
+            {
+                Colorizer.WriteLine($"[{ConsoleColor.Yellow}!Verbose mode enabled]");
+            }
+            // Validate the -repo option
+            if (string.IsNullOrEmpty(repo))
+            {
+                Colorizer.WriteLine($"[{ConsoleColor.Red}!Error: -repo option is required]");
+                return ResultHelper.Fail(-1, "-repo option is required");
+            }
+
+            // Parse the repository name
+            if (repo.StartsWith("https://github.com/"))
+            {
+                repo = repo.Replace("https://github.com/", "").TrimEnd('/');
+            }
+            else if (!repo.Contains("/") && !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("OWNER")))
+            {
+                repo = $"{Environment.GetEnvironmentVariable("OWNER")}/{repo}";
+            }
+            else if (!repo.Contains("/"))
+            {
+                Colorizer.WriteLine($"[{ConsoleColor.Red}!Error: Invalid repository format. Expected userName/repoName]");
+                return ResultHelper.Fail(-1, "Invalid repository format");
+            }
+
+            // Check if the repository exists
+            var gitWrapper = new GitWrapper();
+            if (!gitWrapper.IsGitRepository(repo))
+            {
+                Colorizer.WriteLine($"[{ConsoleColor.Red}!Error: Repository '{repo}' does not exist]");
+                return ResultHelper.Fail(-1, $"Repository '{repo}' does not exist");
+            }
+
+            var releaseService = new ReleaseService(repo);
+            var releases = await releaseService.ListReleasesAsync(verbose);
+
+            if (releases == null || !releases.Any())
+            {
+                Colorizer.WriteLine($"[{ConsoleColor.Yellow}!No releases found for repository: {repo}]");
+                return ResultHelper.Fail(-1, "No releases found");
+            }
+
+            Colorizer.WriteLine($"[{ConsoleColor.Green}!Releases for repository: {repo}]");
+            foreach (var release in releases)
+            {
+                Colorizer.WriteLine($"[{ConsoleColor.Yellow}!----------------------------------------]");
+
+                Colorizer.WriteLine($"[{ConsoleColor.Yellow}!Tag: {release.TagName}]");
+                Colorizer.WriteLine($"[{ConsoleColor.Cyan}!Name: {release.Name}]");
+                Colorizer.WriteLine($"[{ConsoleColor.Cyan}!Pre-release: {(release.Prerelease ? "Yes" : "No")}]");
+                Colorizer.WriteLine($"[{ConsoleColor.Cyan}!Published: {release.PublishedAt}]");
+                if (verbose && !string.IsNullOrEmpty(release.Body))
+                {
+                    Colorizer.WriteLine($"[{ConsoleColor.Magenta}!Description: {release.Body}]");
+                }
+
+                if (verbose && release.Assets != null && release.Assets.Any())
+                {
+                    Colorizer.WriteLine($"[{ConsoleColor.Cyan}!Assets:]");
+                    foreach (var asset in release.Assets)
+                    {
+                        Colorizer.WriteLine($"[{ConsoleColor.Cyan}!  Name: {asset.Name}]");
+                        Colorizer.WriteLine($"[{ConsoleColor.Cyan}!  Size: {asset.Size} bytes]");
+                        Colorizer.WriteLine($"[{ConsoleColor.Cyan}!  Download URL: {asset.BrowserDownloadUrl}]");
+                    }
+                }
+
+                if (verbose && release.Author != null)
+                {
+                    Colorizer.WriteLine($"[{ConsoleColor.Cyan}!Author: {release.Author}]");
+                }
+            }
+            Colorizer.WriteLine($"[{ConsoleColor.Yellow}!----------------------------------------]");
+            return ResultHelper.Success();
+        }
     }
 }
