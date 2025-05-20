@@ -8,6 +8,16 @@ using System.Text.Json;
 namespace GitHubRelease
 {
     /// <summary>
+    /// Represents an asset in a GitHub release.
+    /// </summary>
+    public class Asset
+    {
+        public string? Name { get; set; }
+        public int Size { get; set; }
+        public string? BrowserDownloadUrl { get; set; }
+        public string? Uploader { get; set; }
+    }
+    /// <summary>
     /// Service class for creating GitHub releases and uploading assets.
     /// </summary>
     public class ReleaseService(string repo) : Constants
@@ -928,6 +938,80 @@ namespace GitHubRelease
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Lists all releases for the specified repository.
+        /// </summary>
+        /// <param name="verbose">If true, includes additional details for each release.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        public async Task<List<Release>> ListReleasesAsync(bool verbose)
+        {
+            ApiService.SetupHeaders();
+            var uri = $"{Constants.GitHubApiPrefix}/{Repo}/releases";
+            var response = await ApiService.GetAsync(uri);
+
+            var releasesList = new List<Release>();
+
+            if (response.IsSuccessStatusCode)
+            {
+            var content = await response.Content.ReadAsStringAsync();
+            var releases = JsonDocument.Parse(content).RootElement.EnumerateArray();
+
+            if (!releases.Any())
+            {
+                Console.WriteLine("No releases found.");
+                return releasesList;
+            }
+
+            foreach (var release in releases)
+            {
+                var tagName = release.GetProperty("tag_name").GetString();
+                var releaseName = release.GetProperty("name").GetString() ?? "Unnamed release";
+                var isPreRelease = release.GetProperty("prerelease").GetBoolean();
+                var publishedAt = release.GetProperty("published_at").GetString();
+                var description = release.GetProperty("body").GetString() ?? "No description available.";
+
+                var releaseObj = new Release
+                {
+                TagName = tagName,
+                Name = releaseName,
+                Prerelease = isPreRelease,
+                PublishedAt = publishedAt,
+                Body = description
+                };
+
+                if (verbose)
+                {
+                var assets = new List<Asset>();
+                foreach (var asset in release.GetProperty("assets").EnumerateArray())
+                {
+                    var assetName = asset.GetProperty("name").GetString();
+                    var assetSize = asset.GetProperty("size").GetInt32();
+                    var downloadUrl = asset.GetProperty("browser_download_url").GetString();
+                    var author = asset.GetProperty("uploader").GetProperty("login").GetString();
+
+                    assets.Add(new Asset
+                    {
+                    Name = assetName,
+                    Size = assetSize,
+                    BrowserDownloadUrl = downloadUrl,
+                    Uploader = author
+                    });
+                }
+                releaseObj.Assets = assets;
+                }
+
+                releasesList.Add(releaseObj);
+            }
+            }
+            else
+            {
+            Console.WriteLine($"Failed to retrieve releases. Status code: {response.StatusCode}");
+            Console.WriteLine(await response.Content.ReadAsStringAsync());
+            }
+
+            return releasesList;
         }
         #endregion
     }
