@@ -15,23 +15,29 @@
 Below is a full list of options that can be used with `Nb.exe`:
 ### Usage
 ```cmd
- Nb.exe command [-json value] [-v value] [-tag value] [-buildtype value]
+ Nb.exe command [-json value] [-v value] [-url value] [-tag value] [-path value] [-buildtype value] [-repo value] [-branch value] [-file value]
   - command   : Specifies the command to execute.
          list                    -> Lists apps specified in the -json option.
-         install                 -> Downloads and installs apps specified in the -json option (require admin privileges to run).
-         uninstall               -> Uninstalls apps specified in the -json option (require admin privileges to run).
-         download                -> Downloads apps specified in the -json option (require admin privileges to run).
-         targets                 -> Lists available targets and saves them in the targets.md file.
-         path                    -> Displays environment path in local machine.
-         git_info                -> Displays the current git information in the local repository.
-         git_settag              -> Set specified tag with -tag option
-         git_autotag             -> Set next tag based on the build type: stage | prod
-         git_push_autotag        -> Set next tag based on the build type and push to remote repo
-         git_branch              -> Displays the current git branch in the local repository
-         git_clone               -> Clone specified Git repo in the -url option
-         git_deletetag           -> Delete specified tag in -tag option
+         install                 -> Downloads and installs apps specified in the -json option (requires admin privileges).
+         uninstall               -> Uninstalls apps specified in the -json option (requires admin privileges).
+         download                -> Downloads tools or apps listed in the -json option (requires admin privileges).
+         targets                 -> Lists available build targets and saves them in the targets.md file.
+         path                    -> Displays the environment PATH variable for the local machine.
+         git_info                -> Displays the current git information for the local repository.
+         git_settag              -> Sets the specified tag using the -tag option.
+         git_autotag             -> Sets the next tag based on the build type: STAGE or PROD.
+         git_push_autotag        -> Sets the next tag based on the build type and pushes to the remote repository.
+         git_branch              -> Displays the current git branch in the local repository.
+         git_clone               -> Clones the specified Git repository using the -url option.
+         git_deletetag           -> Deletes the specified tag using the -tag option.
+         release_create          -> Creates a GitHub release. Requires -repo, -tag, -branch, and -file options.
+         pre_release_create      -> Creates a GitHub pre-release. Requires -repo, -tag, -branch, and -file options.
+         release_download        -> Downloads a specific asset from a GitHub release. Requires -repo, -tag, and -path (optional, defaults to current directory).
          ----
- (one of list,install,uninstall,download,targets,path,git_info,git_settag,git_autotag,git_push_autotag,git_branch,git_clone,git_deletetag, required)
+          The nbuild.exe can also execute targets defined in an nbuild.targets file if one       exists in the current folder.
+         To execute a target defined in nbuild.targets, simply use its name as the command.
+         For example, if nbuild.targets defines a target named 'build', you can run it    with: `nb.exe build`
+ (one of list,install,uninstall,download,targets,path,git_info,git_settag,git_autotag,git_push_autotag,git_branch,git_clone,git_deletetag,release_create,pre_release_create,release_download, required)
   - json      : Specifies the JSON file that holds the list of apps. Only valid for the install, download, and list commands.
          - By default, the -json option points to the ntools deployment folder: $(ProgramFiles)\build\ntools.json.
          Sample JSON file: https://github.com/naz-hage/ntools/blob/main/dev-setup/ntools.json
@@ -42,10 +48,17 @@ Below is a full list of options that can be used with `Nb.exe`:
            `Nb` will run an MSbuild target `stage` defined in a `nbuild.targets` file which present in the solution folder.
            Run `Nb.exe Targets` to list the available targets.
          -v Possible Values: (true or false, default=False)
+  - url       : Specifies the Git repository URL. (string, default=)
   - tag       : Specifies the tag used for git_settag and git_deletetag commands. (string, default=)
-  - path      : Specifies the path used for git_clone command. If not specified, the current directory will be used. (string, default=)
-  - buildtype : Specifies the build type used for git_autotag and git_push_autotag commands. Possible values: stage, prod. (string, default=)
-  - url       : Specifies the Git repository URL used for git_clone command. (string, default=)
+  - path      : Specifies the path used for git_clone, pre_release_create and release_create commands. If not specified, the current directory will be used.
+         for pre_release_create and release_create commands, it must be an absolute path (string, default=)
+  - buildtype : Specifies the build type used for git_autotag and git_push_autotag commands. Possible values: STAGE, PROD. (string, default=)
+  - repo      : Specifies the Git repository in the format any of the following formats:
+         repoName  (UserName is declared the `OWNER` environment variable)
+         userName/repoName
+         https://github.com/userName/repoName (Full URL to the repository on GitHub). This is applicable to release_create, pre_release_create and release_download commands. (string, default=)
+  - branch    : Specifies the branch name. Applicable for release_create, pre_release_create commands (string, default=main)
+  - file      : Specifies the asset file name. Must include full path. Applicable for release_create, pre_release_create commands (string, default=)
 ```
 
 **If the -json option is not specified, the default json file `$(ProgramFiles)\Nbuild\NTools.json` is used**. 
@@ -83,69 +96,105 @@ Below is list of common targets that are defined in the `common.targets` file
 
 This section provides examples of how to use the `nb.exe` command line tool. The examples assume that you are running a powershell terminal.
 
-1. **List Installed Applications**
-   ```cmd
-   nb.exe list -json $env:ProgramFiles\tools.json
-   ```
-   Lists all applications specified in the provided JSON file.
+## 1. List Installed Applications
+```cmd
+nb.exe list -json $env:ProgramFiles\tools.json
+```
+Lists all applications specified in the provided JSON file.
 
-2. **Install Applications**
-   ```cmd
-   nb.exe install -json $env:ProgramFiles\tools.json
-   ```
-   Downloads and installs applications specified in the JSON file (requires admin privileges).  This checks if the application is already installed and if not it will install it.
-   If the application is already installed, it will skip the installation.
+## 2. Install Applications
+```cmd
+nb.exe install -json $env:ProgramFiles\tools.json
+```
+Downloads and installs applications specified in the JSON file (requires admin privileges). This checks if the application is already installed and if not it will install it.
+If the application is already installed, it will skip the installation.
 
-3. **Display Git Information**
-   ```cmd
-   nb.exe git_info
-   ```
-   Displays the current Git branch and tag information for the local repository.
+## 3. Display Git Information
+```cmd
+nb.exe git_info
+```
+Displays the current Git branch and tag information for the local repository.
 
-4. **Run a Build Target**
-   ```cmd
-   nb.exe stage -v true
-   ```
-   Runs the `stage` target defined in the nbuild.targets file with verbose output enabled.
+## 4. Run a Build Target
+```cmd
+nb.exe stage -v true
+```
+Runs the `stage` target defined in the nbuild.targets file with verbose output enabled.
 
-5. **List nbuild targets**
-   ```cmd
-   nb.exe targets
-   ```
-   Lists all available build targets defined in the nbuild.targets file and saves them in the targets.md file.
+## 5. List nbuild targets
+```cmd
+nb.exe targets
+```
+Lists all available build targets defined in the nbuild.targets file and saves them in the targets.md file.
 
-6. **Set a Specific Git Tag**
-   ```cmd
-   nb.exe git_settag -tag 1.0.0
-   ```
-   Sets the specified Git tag (`1.0.0`) in the local repository.
+## 6. Set a Specific Git Tag
+```cmd
+nb.exe git_settag -tag 1.0.0
+```
+Sets the specified Git tag (`1.0.0`) in the local repository.
 
-7. **Automatically Set the Next Git Tag**
-   ```cmd
-   nb.exe git_autotag -buildtype stage
-   ```
-   Automatically generates and sets the next Git tag based on the specified build type (`stage` or `prod`).
+## 7. Automatically Set the Next Git Tag
+```cmd
+nb.exe git_autotag -buildtype stage
+```
+Automatically generates and sets the next Git tag based on the specified build type (`stage` or `prod`).
 
-8. **Push the Next Git Tag to Remote**
-   ```cmd
-   nb.exe git_push_autotag -buildtype prod
-   ```
-   Automatically generates the next Git tag based on the specified build type (`prod`) and pushes it to the remote repository.
+## 8. Push the Next Git Tag to Remote
+```cmd
+nb.exe git_push_autotag -buildtype prod
+```
+Automatically generates the next Git tag based on the specified build type (`prod`) and pushes it to the remote repository.
 
-9. **Display the Current Git Branch**
-   ```cmd
-   nb.exe git_branch
-   ```
-   Displays the current Git branch in the local repository.
+## 9. Display the Current Git Branch
+```cmd
+nb.exe git_branch
+```
+Displays the current Git branch in the local repository.
 
-10. **Clone a Git Repository**
-    ```cmd
-    nb.exe git_clone -url https://github.com/example/repo -path C:\Projects
-    ```
-    Clones the specified Git repository (`https://github.com/example/repo`) into the specified path (`C:\Projects`).
+## 10. Clone a Git Repository
+```cmd
+nb.exe git_clone -url https://github.com/example/repo -path C:\Projects
+```
+Clones the specified Git repository (`https://github.com/example/repo`) into the specified path (`C:\Projects`).
 
-11. **Delete a specific tag**
+## 11. Delete a Specific Tag
+```cmd
+nb.exe git_deletetag -tag 1.0.0 -v true
+```
 
-   ```cmd
-   nb.exe git_deletetag -tag 1.0.0 -v true
-   ```
+## 12. Creating a Release
+To create a release for the repository `my-repo` with the tag `1.0.0`, branch `main`, and an asset located at `C:\Releases\1.0.0.zip`, you would use the following command:
+
+```batch
+nb.exe release_create -repo userName/my-repo -tag 1.0.0 -branch main -file C:\Releases\1.1.0.zip
+```
+
+## 13. Creating a Pre-Release
+To create a pre-release for the repository `my-repo` with the tag `1.0.0`, branch `main`, and an asset located at `C:\Releases\1.0.0.zip`, you would use the following command:
+
+```batch
+nb.exe pre_release_create -repo userName/my-repo -tag 1.0.0 -branch main -file C:\Releases\1.1.0.zip
+```
+
+## 14. Downloading an Asset
+To download an asset from the release with the tag `1.0.0` in the repository `my-repo` to the path `C:\Downloads`:
+
+```batch
+nb.exe release_download -repo userName/my-repo -tag 1.0.0 -path C:\Downloads
+```
+An asset named 1.0.0.zip will be downloaded to the specified path if it exists in the release.
+
+## 15. Creating a Release with Full GitHub URL
+To create a release for the repository `my-repo` with the tag `1.0.0`, branch `main`, and an asset located at `C:\Releases\1.0.0.zip`, using the full GitHub URL:
+
+```batch
+nb.exe release_create -repo https://github.com/userName/my-repo -tag 1.0.0 -branch main -file C:\Releases\1.0.0.zip
+```
+
+## 16. Downloading an Asset with Full GitHub URL
+To download an asset from the release with the tag `1.0.0` in the repository `my-repo` to the path `C:\Downloads`, using the full GitHub URL:
+
+```batch
+nb.exe release_download -repo https://github.com/userName/my-repo -tag 1.0.0 -path C:\Downloads
+```
+An asset named `1.0.0.zip` will be downloaded to the specified path if it exists in the release.

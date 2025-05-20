@@ -1,4 +1,6 @@
-namespace GitHubRelease.Tests
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace Nbuild.Tests
 {
     [TestClass]
     public class CliTests
@@ -24,7 +26,7 @@ namespace GitHubRelease.Tests
         public async Task ValidateRepo_ShouldThrowException_ForNonGitHubDomain()
         {
             // Arrange
-            var cli = new GitHubRelease.Cli
+            var cli = new Nbuild.Cli
             {
                 Repo = "https://gitlab.com/userName/repoName"
             };
@@ -41,7 +43,7 @@ namespace GitHubRelease.Tests
         public async Task ValidateRepo_ShouldThrowException_ForInvalidRepoFormat()
         {
             // Arrange
-            var cli = new GitHubRelease.Cli
+            var cli = new Nbuild.Cli
             {
                 Repo = "invalid/repo/format"
             };
@@ -61,7 +63,7 @@ namespace GitHubRelease.Tests
 
             // Arrange
             Environment.SetEnvironmentVariable("OWNER", "naz-hage");
-            var cli = new GitHubRelease.Cli
+            var cli = new Nbuild.Cli
             {
                 Repo = "ntools"
             };
@@ -95,7 +97,7 @@ namespace GitHubRelease.Tests
 
             // Arrange
             Environment.SetEnvironmentVariable("OWNER", null);
-            var cli = new GitHubRelease.Cli
+            var cli = new Nbuild.Cli
             {
                 Repo = "ntools"
             };
@@ -119,13 +121,13 @@ namespace GitHubRelease.Tests
         public void GetCommandType_ValidCommand_ShouldReturnCorrectCommandType()
         {
             // Arrange
-            var cli = new Cli { Command = Cli.CommandType.create };
+            var cli = new Cli { Command = Cli.CommandType.release_create };
 
             // Act
             var commandType = cli.GetCommandType();
 
             // Assert
-            Assert.AreEqual(Cli.CommandType.create, commandType);
+            Assert.AreEqual(Cli.CommandType.release_create, commandType);
         }
 
         [TestMethod]
@@ -146,7 +148,7 @@ namespace GitHubRelease.Tests
             // Arrange
             var cli = new Cli
             {
-                Command = Cli.CommandType.create,
+                Command = Cli.CommandType.release_create,
                 Repo = "naz-hage/ntools",
                 Tag = "1.0.0",
                 Branch = "main",
@@ -164,7 +166,7 @@ namespace GitHubRelease.Tests
             // Arrange
             var cli = new Cli
             {
-                Command = Cli.CommandType.create,
+                Command = Cli.CommandType.release_create,
                 Tag = "v1.0.0",
                 Branch = "main",
                 AssetFileName = "file.zip"
@@ -181,7 +183,7 @@ namespace GitHubRelease.Tests
             // Arrange
             var cli = new Cli
             {
-                Command = Cli.CommandType.create,
+                Command = Cli.CommandType.release_create,
                 Repo = "invalidRepoFormat",
                 Tag = "v1.0.0",
                 Branch = "main",
@@ -199,7 +201,7 @@ namespace GitHubRelease.Tests
             // Arrange
             var cli = new Cli
             {
-                Command = Cli.CommandType.create,
+                Command = Cli.CommandType.release_create,
                 Repo = "user/repo",
                 Branch = "main",
                 AssetFileName = "file.zip"
@@ -216,7 +218,7 @@ namespace GitHubRelease.Tests
             // Arrange
             var cli = new Cli
             {
-                Command = Cli.CommandType.create,
+                Command = Cli.CommandType.release_create,
                 Repo = "user/repo",
                 Tag = "v1.0.0",
                 Branch = "main"

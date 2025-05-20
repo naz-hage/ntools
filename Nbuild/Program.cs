@@ -24,7 +24,7 @@ public class Program
         }
         else
         {
-            result = ExecuteCommand(args, options);
+            result = ExecuteCommandAsync(args, options);
             DisplayResult(result);
         }
 
@@ -54,7 +54,7 @@ public class Program
         return ResultHelper.Fail(-1, "Git is not configured.");
     }
 
-    private static ResultHelper ExecuteCommand(string[] args, Cli? options)
+    private static ResultHelper ExecuteCommandAsync(string[] args, Cli? options)
     {
         var result = ResultHelper.New();
         var currentDirectory = Environment.CurrentDirectory;
@@ -64,9 +64,10 @@ public class Program
             if (options != null && Enum.IsDefined(options.Command))
             {
                 options.Json = UpdateJsonOption(options);
+
                 options.Validate();
 
-                result = ExecuteCommandSwitch(options);
+                result = ExecuteCommandSwitchAsync(options).GetAwaiter().GetResult();
             }
         }
         catch (Exception ex)
@@ -82,7 +83,7 @@ public class Program
         return result;
     }
 
-    private static ResultHelper ExecuteCommandSwitch(Cli options)
+    private static async Task<ResultHelper> ExecuteCommandSwitchAsync(Cli options)
     {
         return options.Command switch
         {
@@ -99,6 +100,9 @@ public class Program
             Cli.CommandType.git_branch => Command.DisplayGitBranch(),
             Cli.CommandType.git_clone => Command.Clone(options.Url, options.Path, options.Verbose),
             Cli.CommandType.git_deletetag => Command.DeleteTag(options.Tag),
+            Cli.CommandType.release_create => await Command.CreateRelease(options.Repo!, options.Tag!, options.Branch!, options.AssetFileName!),
+            Cli.CommandType.pre_release_create => await Command.CreateRelease(options.Repo!, options.Tag!, options.Branch!, options.AssetFileName!,true),
+            Cli.CommandType.release_download => await Command.DownloadAsset(options.Repo!, options.Tag!, options.Path!),
             _ => ResultHelper.Fail(-1, $"Invalid Command: '{options.Command}'"),
         };
     }

@@ -8,6 +8,10 @@ namespace GitHubRelease
         private readonly ApiService apiService = apiService;
         private readonly string Repo = repo;
 
+        /// <summary>
+        /// Retrieves a list of all contributors for the specified repository.
+        /// </summary>
+        /// <returns>A list of contributor usernames.</returns>
         private async Task<List<string>> GetAllContributorsAsync()
         {
             var contributors = new List<string>();
@@ -31,6 +35,11 @@ namespace GitHubRelease
             return contributors;
         }
 
+        /// <summary>
+        /// Gets the release notes for new contributors based on the provided commits.
+        /// </summary>
+        /// <param name="commits">A list of commit JsonElements to analyze.</param>
+        /// <returns>A StringBuilder containing formatted release notes for new contributors.</returns>
         public async Task<StringBuilder> GetNewContributorsAsync(List<JsonElement> commits)
         {
             StringBuilder releaseNotes = new();
@@ -66,6 +75,5 @@ namespace GitHubRelease
 
             return releaseNotes;
         }
-
     }
 }
