@@ -33,7 +33,7 @@ Below is a full list of options that can be used with `Nb.exe`:
          release_create          -> Creates a GitHub release. Requires -repo, -tag, -branch, and -file options.
          pre_release_create      -> Creates a GitHub pre-release. Requires -repo, -tag, -branch, and -file options.
          release_download        -> Downloads a specific asset from a GitHub release. Requires -repo, -tag, and -path (optional, defaults to current directory).
-         list_release            -> Lists all releases for the specified repository. Requires -repo.
+         list_release            -> Lists latest 3 releases for the specified repository (and latest pre-release if newer). Requires -repo.
          ----
           The nbuild.exe can also execute targets defined in an nbuild.targets file if one       exists in the current folder.
          To execute a target defined in nbuild.targets, simply use its name as the command.

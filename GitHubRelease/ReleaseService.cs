@@ -941,7 +941,7 @@ namespace GitHubRelease
         }
 
         /// <summary>
-        /// Lists all releases for the specified repository.
+        /// Lists latest 3 releases for the specified repository (and latest pre-release if newer).
         /// </summary>
         /// <param name="verbose">If true, includes additional details for each release.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
