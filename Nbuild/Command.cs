@@ -1136,35 +1136,6 @@ namespace Nbuild
             {
                 Colorizer.WriteLine($"[{ConsoleColor.Yellow}!Verbose mode enabled]");
             }
-            // Validate the -repo option
-            if (string.IsNullOrEmpty(repo))
-            {
-                Colorizer.WriteLine($"[{ConsoleColor.Red}!Error: -repo option is required]");
-                return ResultHelper.Fail(-1, "-repo option is required");
-            }
-
-            // Parse the repository name
-            if (repo.StartsWith("https://github.com/"))
-            {
-                repo = repo.Replace("https://github.com/", "").TrimEnd('/');
-            }
-            else if (!repo.Contains("/") && !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("OWNER")))
-            {
-                repo = $"{Environment.GetEnvironmentVariable("OWNER")}/{repo}";
-            }
-            else if (!repo.Contains("/"))
-            {
-                Colorizer.WriteLine($"[{ConsoleColor.Red}!Error: Invalid repository format. Expected userName/repoName]");
-                return ResultHelper.Fail(-1, "Invalid repository format");
-            }
-
-            // Check if the repository exists
-            var gitWrapper = new GitWrapper();
-            if (!gitWrapper.IsGitRepository(repo))
-            {
-                Colorizer.WriteLine($"[{ConsoleColor.Red}!Error: Repository '{repo}' does not exist]");
-                return ResultHelper.Fail(-1, $"Repository '{repo}' does not exist");
-            }
 
             var releaseService = new ReleaseService(repo);
             var releases = await releaseService.ListReleasesAsync(verbose);

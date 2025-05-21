@@ -207,6 +207,7 @@ public class Cli
             case CommandType.pre_release_create:
             case CommandType.release_create:
             case CommandType.release_download:
+            case CommandType.list_release:
                 ValidateReleaseOptions();
                 break;
 
@@ -230,46 +231,49 @@ public class Cli
         ValidateRepo().GetAwaiter().GetResult();
 
 
-        if (string.IsNullOrEmpty(Tag))
+        if (Command != CommandType.list_release)
         {
-            throw new ArgumentException("The 'tag' option is required for release_create, pre_release_create and release_download commands.");
-        }
+            if (string.IsNullOrEmpty(Tag))
+            {
+                throw new ArgumentException("The 'tag' option is required for release_create, pre_release_create and release_download commands.");
+            }
 
-        if (IsValidTag(Tag) == false)
-        {
-            throw new ArgumentException($"The 'tag' option '{Tag}' is not a valid tag format.");
-        }
+            if (IsValidTag(Tag) == false)
+            {
+                throw new ArgumentException($"The 'tag' option '{Tag}' is not a valid tag format.");
+            }
 
-        if (Command == CommandType.release_create && string.IsNullOrEmpty(AssetFileName))
-        {
-            throw new ArgumentException("The 'file' option is required for the release_create command.");
+            if (Command == CommandType.release_create && string.IsNullOrEmpty(AssetFileName))
+            {
+                throw new ArgumentException("The 'file' option is required for the release_create command.");
 
-        }
+            }
 
-        if (Command == CommandType.pre_release_create && string.IsNullOrEmpty(AssetFileName))
-        {
-            throw new ArgumentException("The 'file' option is required for the pre_release_create command.");
+            if (Command == CommandType.pre_release_create && string.IsNullOrEmpty(AssetFileName))
+            {
+                throw new ArgumentException("The 'file' option is required for the pre_release_create command.");
 
-        }
+            }
 
-        if (Command != CommandType.release_download && string.IsNullOrEmpty(Branch))
-        {
-            throw new ArgumentException("The 'branch' option is required for release_create, pre_release_create commands.");
-        }
+            if (Command != CommandType.release_download && string.IsNullOrEmpty(Branch))
+            {
+                throw new ArgumentException("The 'branch' option is required for release_create, pre_release_create commands.");
+            }
 
-        if (Command == CommandType.release_download && string.IsNullOrEmpty(Path))
-        {
-            // Default to the current directory if Path is not provided
-            Path = Directory.GetCurrentDirectory();
-        }
+            if (Command == CommandType.release_download && string.IsNullOrEmpty(Path))
+            {
+                // Default to the current directory if Path is not provided
+                Path = Directory.GetCurrentDirectory();
+            }
 
-        if (Command == CommandType.release_download && !System.IO.Path.IsPathRooted(Path))
-        {
-            throw new ArgumentException("The 'path' option is required for the release_download command and must be an absolute path.");
-        }
-        if (Command == CommandType.list_release && string.IsNullOrEmpty(Repo))
-        {
-            throw new ArgumentException("The 'repo' option is required for the list_release command.");
+            if (Command == CommandType.release_download && !System.IO.Path.IsPathRooted(Path))
+            {
+                throw new ArgumentException("The 'path' option is required for the release_download command and must be an absolute path.");
+            }
+            if (Command == CommandType.list_release && string.IsNullOrEmpty(Repo))
+            {
+                throw new ArgumentException("The 'repo' option is required for the list_release command.");
+            }
         }
     }
 
