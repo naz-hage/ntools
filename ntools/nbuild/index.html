@@ -98,6 +98,8 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#16-downloading-an-asset-with-full-github-url">16. Downloading an Asset with Full GitHub URL</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#16-getting-latest-3-releases-and-the-newest-pre-release-if-newer-than-the-latest-release">16. Getting latest 3 releases and the newest pre-release (if newer than the latest release)</a>
+    </li>
     </ul>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../nbackup/">Nbackup (nbackup.exe)</a>
@@ -368,6 +370,9 @@ If the application is already installed, it will skip the installation.</p>
 <pre><code class="language-batch">nb.exe release_download -repo https://github.com/userName/my-repo -tag 1.0.0 -path C:\Downloads
 </code></pre>
 <p>An asset named <code>1.0.0.zip</code> will be downloaded to the specified path if it exists in the release.</p>
+<h2 id="16-getting-latest-3-releases-and-the-newest-pre-release-if-newer-than-the-latest-release">16. Getting latest 3 releases and the newest pre-release (if newer than the latest release)</h2>
+<pre><code class="language-batch">nb.exe list_release -repo https://github.com/userName/my-repo
+</code></pre>
               
             </div>
           </div><footer>
