@@ -1045,7 +1045,11 @@ namespace GitHubRelease
                     Name = asset.GetProperty("name").GetString(),
                     Size = asset.GetProperty("size").GetInt32(),
                     BrowserDownloadUrl = asset.GetProperty("browser_download_url").GetString(),
-                    Uploader = asset.GetProperty("uploader").GetProperty("login").GetString()
+                    // replace Uploader = asset.GetProperty("uploader").GetProperty("login").GetString()
+                    // to avoid an exception if "uploader" is not found
+                    Uploader = asset.TryGetProperty("uploader", out var uploader) &&
+                              uploader.TryGetProperty("login", out var login)
+                              ? login.GetString():null
                 });
             }
 
