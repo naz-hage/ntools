@@ -55,6 +55,7 @@ public class Cli
         "\t release_create \t -> Creates a GitHub release. Requires -repo, -tag, -branch, and -file options.\n" +
         "\t pre_release_create \t -> Creates a GitHub pre-release. Requires -repo, -tag, -branch, and -file options.\n" +
         "\t release_download \t -> Downloads a specific asset from a GitHub release. Requires -repo, -tag, and -path (optional, defaults to current directory).\n" +
+        "\t list_release \t\t -> Lists all releases for the specified repository. Requires -repo.\n" +
         "\t ----\n" +
         "\t  The nbuild.exe can also execute targets defined in an nbuild.targets file if one " +
         "\t exists in the current folder.\n" +
