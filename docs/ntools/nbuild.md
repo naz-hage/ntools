@@ -199,3 +199,9 @@ To download an asset from the release with the tag `1.0.0` in the repository `my
 nb.exe release_download -repo https://github.com/userName/my-repo -tag 1.0.0 -path C:\Downloads
 ```
 An asset named `1.0.0.zip` will be downloaded to the specified path if it exists in the release.
+
+## 16. Getting latest 3 releases and the newest pre-release (if newer than the latest release)
+
+```batch
+nb.exe list_release -repo https://github.com/userName/my-repo
+```
