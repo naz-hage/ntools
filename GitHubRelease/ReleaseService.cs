@@ -964,7 +964,31 @@ namespace GitHubRelease
                 return releasesList;
             }
 
-            foreach (var release in releases)
+            var latestReleases = releases
+                .Where(r => !r.GetProperty("prerelease").GetBoolean())
+                .Take(3)
+                .ToList();
+
+            var latestPreReleases = releases
+                .Where(r => r.GetProperty("prerelease").GetBoolean())
+                .ToList();
+
+            var latestPreRelease = latestPreReleases.FirstOrDefault();
+            var latestRelease = latestReleases.FirstOrDefault();
+
+            // Compare published_at and add pre-release if it's newer
+            if (latestPreRelease.ValueKind != JsonValueKind.Undefined &&
+                latestRelease.ValueKind != JsonValueKind.Undefined &&
+                DateTime.TryParse(latestPreRelease.GetProperty("published_at").GetString(), out var preReleaseDate) &&
+                DateTime.TryParse(latestRelease.GetProperty("published_at").GetString(), out var releaseDate))
+            {
+                if (preReleaseDate > releaseDate)
+                {
+                    latestReleases.Insert(0, latestPreRelease);
+                }
+            }
+
+            foreach (var release in latestReleases)
             {
                 var tagName = release.GetProperty("tag_name").GetString();
                 var releaseName = release.GetProperty("name").GetString() ?? "Unnamed release";
