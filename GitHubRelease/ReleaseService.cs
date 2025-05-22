@@ -8,6 +8,16 @@ using System.Text.Json;
 namespace GitHubRelease
 {
     /// <summary>
+    /// Represents an asset in a GitHub release.
+    /// </summary>
+    public class Asset
+    {
+        public string? Name { get; set; }
+        public int Size { get; set; }
+        public string? BrowserDownloadUrl { get; set; }
+        public string? Uploader { get; set; }
+    }
+    /// <summary>
     /// Service class for creating GitHub releases and uploading assets.
     /// </summary>
     public class ReleaseService(string repo) : Constants
@@ -185,14 +195,14 @@ namespace GitHubRelease
             HttpResponseMessage response = new HttpResponseMessage();
 
             foreach (var tag in tags.Where(IsStageTag))
+            {
+                var releaseId = await GetReleaseByTagNameAsync(tag);
+                if (releaseId.HasValue)
                 {
-                    var releaseId = await GetReleaseByTagNameAsync(tag);
-                    if (releaseId.HasValue)
+                    response = await DeleteReleaseAsync(releaseId.Value);
+                    if (!response.IsSuccessStatusCode)
                     {
-                        response = await DeleteReleaseAsync(releaseId.Value);
-                        if (!response.IsSuccessStatusCode)
-                        {
-                            throw new InvalidOperationException($"Failed to delete staging release with tag {tag}. Status code: {response.StatusCode}");
+                        throw new InvalidOperationException($"Failed to delete staging release with tag {tag}. Status code: {response.StatusCode}");
                     }
                 }
             }
@@ -209,7 +219,7 @@ namespace GitHubRelease
         public async Task UpdateReleaseNotes(Release release)
         {
             Console.WriteLine("Updating release notes...");
-            var (sinceLastPublished, sinceTag)  = await GetLatestReleasePublishedAtAndTagAsync(release.TargetCommitish!);
+            var (sinceLastPublished, sinceTag) = await GetLatestReleasePublishedAtAndTagAsync(release.TargetCommitish!);
             Console.WriteLine($"sinceLastPublished: {sinceLastPublished}");
             Console.WriteLine($"sinceTag: {sinceTag}");
 
@@ -796,7 +806,7 @@ namespace GitHubRelease
                 return response;
             }
         }
-        
+
         /// <summary>
         /// Checks the permissions (scopes) of the current GitHub token by making a request to the GitHub API.
         /// </summary>
@@ -866,7 +876,7 @@ namespace GitHubRelease
         public async Task<HttpResponseMessage> DownloadAssetFromUrl(string downloadUrl, string assetFileName)
         {
             ApiService.SetupHeaders(download: true);
-            
+
             var response = await ApiService.GetClient().GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead);
 
             if (response.IsSuccessStatusCode)
@@ -928,6 +938,122 @@ namespace GitHubRelease
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Lists latest 3 releases for the specified repository (and latest pre-release if newer).
+        /// </summary>
+        /// <param name="verbose">If true, includes additional details for each release.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        public async Task<List<Release>> ListReleasesAsync(bool verbose)
+        {
+            ApiService.SetupHeaders();
+            var uri = $"{Constants.GitHubApiPrefix}/{Repo}/releases";
+            var response = await ApiService.GetAsync(uri);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                await HandleErrorResponse(response);
+                return new List<Release>();
+            }
+
+            var content = await response.Content.ReadAsStringAsync();
+            var releases = JsonDocument.Parse(content).RootElement.EnumerateArray().ToList();
+
+            if (!releases.Any())
+            {
+                Console.WriteLine("No releases found.");
+                return new List<Release>();
+            }
+
+            var finalReleases = SelectLatestReleases(releases);
+            return ParseReleases(finalReleases, verbose);
+        }
+
+        private async Task HandleErrorResponse(HttpResponseMessage response)
+        {
+            Console.WriteLine($"Failed to retrieve releases. Status code: {response.StatusCode}");
+            var content = await response.Content.ReadAsStringAsync();
+            Console.WriteLine(content);
+        }
+
+        private List<JsonElement> SelectLatestReleases(List<JsonElement> releases)
+        {
+            var stableReleases = releases
+                .Where(r => !r.GetProperty("prerelease").GetBoolean())
+                .Take(3)
+                .ToList();
+
+            var preReleases = releases
+                .Where(r => r.GetProperty("prerelease").GetBoolean())
+                .ToList();
+
+            var latestStable = stableReleases.FirstOrDefault();
+            var latestPreRelease = preReleases.FirstOrDefault();
+
+            if (IsPreReleaseNewer(latestPreRelease, latestStable))
+            {
+                stableReleases.Insert(0, latestPreRelease);
+            }
+
+            return stableReleases;
+        }
+
+        private bool IsPreReleaseNewer(JsonElement pre, JsonElement stable)
+        {
+            if (pre.ValueKind == JsonValueKind.Undefined || stable.ValueKind == JsonValueKind.Undefined)
+                return false;
+
+            var preDateStr = pre.GetProperty("published_at").GetString();
+            var stableDateStr = stable.GetProperty("published_at").GetString();
+
+            return DateTime.TryParse(preDateStr, out var preDate) &&
+                   DateTime.TryParse(stableDateStr, out var stableDate) &&
+                   preDate > stableDate;
+        }
+
+        private List<Release> ParseReleases(List<JsonElement> elements, bool verbose)
+        {
+            var result = new List<Release>();
+
+            foreach (var release in elements)
+            {
+                var releaseObj = new Release
+                {
+                    TagName = release.GetProperty("tag_name").GetString(),
+                    Name = release.GetProperty("name").GetString() ?? "Unnamed release",
+                    Prerelease = release.GetProperty("prerelease").GetBoolean(),
+                    PublishedAt = release.GetProperty("published_at").GetString(),
+                    Body = release.GetProperty("body").GetString() ?? "No description available.",
+                    Assets = verbose ? ParseAssets(release) : new List<Asset>()
+                };
+
+                result.Add(releaseObj);
+            }
+
+            return result;
+        }
+
+        private List<Asset> ParseAssets(JsonElement release)
+        {
+            var assets = new List<Asset>();
+
+            foreach (var asset in release.GetProperty("assets").EnumerateArray())
+            {
+                assets.Add(new Asset
+                {
+                    Name = asset.GetProperty("name").GetString(),
+                    Size = asset.GetProperty("size").GetInt32(),
+                    BrowserDownloadUrl = asset.GetProperty("browser_download_url").GetString(),
+                    // replace Uploader = asset.GetProperty("uploader").GetProperty("login").GetString()
+                    // to avoid an exception if "uploader" is not found
+                    Uploader = asset.TryGetProperty("uploader", out var uploader) &&
+                              uploader.TryGetProperty("login", out var login)
+                              ? login.GetString():null
+                });
+            }
+
+            return assets;
         }
         #endregion
     }

@@ -103,6 +103,7 @@ public class Program
             Cli.CommandType.release_create => await Command.CreateRelease(options.Repo!, options.Tag!, options.Branch!, options.AssetFileName!),
             Cli.CommandType.pre_release_create => await Command.CreateRelease(options.Repo!, options.Tag!, options.Branch!, options.AssetFileName!,true),
             Cli.CommandType.release_download => await Command.DownloadAsset(options.Repo!, options.Tag!, options.Path!),
+            Cli.CommandType.list_release => await Command.ListReleases(options.Repo!, options.Verbose),
             _ => ResultHelper.Fail(-1, $"Invalid Command: '{options.Command}'"),
         };
     }

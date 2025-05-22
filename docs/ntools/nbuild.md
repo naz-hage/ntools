@@ -33,11 +33,12 @@ Below is a full list of options that can be used with `Nb.exe`:
          release_create          -> Creates a GitHub release. Requires -repo, -tag, -branch, and -file options.
          pre_release_create      -> Creates a GitHub pre-release. Requires -repo, -tag, -branch, and -file options.
          release_download        -> Downloads a specific asset from a GitHub release. Requires -repo, -tag, and -path (optional, defaults to current directory).
+         list_release            -> Lists latest 3 releases for the specified repository (and latest pre-release if newer). Requires -repo.
          ----
           The nbuild.exe can also execute targets defined in an nbuild.targets file if one       exists in the current folder.
          To execute a target defined in nbuild.targets, simply use its name as the command.
          For example, if nbuild.targets defines a target named 'build', you can run it    with: `nb.exe build`
- (one of list,install,uninstall,download,targets,path,git_info,git_settag,git_autotag,git_push_autotag,git_branch,git_clone,git_deletetag,release_create,pre_release_create,release_download, required)
+ (one of list,install,uninstall,download,targets,path,git_info,git_settag,git_autotag,git_push_autotag,git_branch,git_clone,git_deletetag,release_create,pre_release_create,release_download,list_release, required)
   - json      : Specifies the JSON file that holds the list of apps. Only valid for the install, download, and list commands.
          - By default, the -json option points to the ntools deployment folder: $(ProgramFiles)\build\ntools.json.
          Sample JSON file: https://github.com/naz-hage/ntools/blob/main/dev-setup/ntools.json
@@ -198,3 +199,9 @@ To download an asset from the release with the tag `1.0.0` in the repository `my
 nb.exe release_download -repo https://github.com/userName/my-repo -tag 1.0.0 -path C:\Downloads
 ```
 An asset named `1.0.0.zip` will be downloaded to the specified path if it exists in the release.
+
+## 16. Getting latest 3 releases and the newest pre-release (if newer than the latest release)
+
+```batch
+nb.exe list_release -repo https://github.com/userName/my-repo
+```

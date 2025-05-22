@@ -31,6 +31,7 @@ public class Cli
         release_create,
         pre_release_create,
         release_download,
+        list_release,
     }
 
     /// <summary>
@@ -54,6 +55,7 @@ public class Cli
         "\t release_create \t -> Creates a GitHub release. Requires -repo, -tag, -branch, and -file options.\n" +
         "\t pre_release_create \t -> Creates a GitHub pre-release. Requires -repo, -tag, -branch, and -file options.\n" +
         "\t release_download \t -> Downloads a specific asset from a GitHub release. Requires -repo, -tag, and -path (optional, defaults to current directory).\n" +
+        "\t list_release \t\t -> Lists latest 3 releases for the specified repository (and latest pre-release if newer). Requires -repo.\n" +
         "\t ----\n" +
         "\t  The nbuild.exe can also execute targets defined in an nbuild.targets file if one " +
         "\t exists in the current folder.\n" +
@@ -148,7 +150,8 @@ public class Cli
             { "git_deletetag", CommandType.git_deletetag },
             { "release_create", CommandType.release_create },
             { "pre_release_create", CommandType.pre_release_create },
-            { "release_download", CommandType.release_download }
+            { "release_download", CommandType.release_download },
+            { "list_release", CommandType.list_release }
         };
 
     /// <summary>
@@ -205,6 +208,7 @@ public class Cli
             case CommandType.pre_release_create:
             case CommandType.release_create:
             case CommandType.release_download:
+            case CommandType.list_release:
                 ValidateReleaseOptions();
                 break;
 
@@ -228,42 +232,45 @@ public class Cli
         ValidateRepo().GetAwaiter().GetResult();
 
 
-        if (string.IsNullOrEmpty(Tag))
+        if (Command != CommandType.list_release)
         {
-            throw new ArgumentException("The 'tag' option is required for release_create, pre_release_create and release_download commands.");
-        }
+            if (string.IsNullOrEmpty(Tag))
+            {
+                throw new ArgumentException("The 'tag' option is required for release_create, pre_release_create and release_download commands.");
+            }
 
-        if (IsValidTag(Tag) == false)
-        {
-            throw new ArgumentException($"The 'tag' option '{Tag}' is not a valid tag format.");
-        }
+            if (IsValidTag(Tag) == false)
+            {
+                throw new ArgumentException($"The 'tag' option '{Tag}' is not a valid tag format.");
+            }
 
-        if (Command == CommandType.release_create && string.IsNullOrEmpty(AssetFileName))
-        {
-            throw new ArgumentException("The 'file' option is required for the release_create command.");
+            if (Command == CommandType.release_create && string.IsNullOrEmpty(AssetFileName))
+            {
+                throw new ArgumentException("The 'file' option is required for the release_create command.");
 
-        }
+            }
 
-        if (Command == CommandType.pre_release_create && string.IsNullOrEmpty(AssetFileName))
-        {
-            throw new ArgumentException("The 'file' option is required for the pre_release_create command.");
+            if (Command == CommandType.pre_release_create && string.IsNullOrEmpty(AssetFileName))
+            {
+                throw new ArgumentException("The 'file' option is required for the pre_release_create command.");
 
-        }
+            }
 
-        if (Command != CommandType.release_download && string.IsNullOrEmpty(Branch))
-        {
-            throw new ArgumentException("The 'branch' option is required for release_create, pre_release_create commands.");
-        }
+            if (Command != CommandType.release_download && string.IsNullOrEmpty(Branch))
+            {
+                throw new ArgumentException("The 'branch' option is required for release_create, pre_release_create commands.");
+            }
 
-        if (Command == CommandType.release_download && string.IsNullOrEmpty(Path))
-        {
-            // Default to the current directory if Path is not provided
-            Path = Directory.GetCurrentDirectory();
-        }
+            if (Command == CommandType.release_download && string.IsNullOrEmpty(Path))
+            {
+                // Default to the current directory if Path is not provided
+                Path = Directory.GetCurrentDirectory();
+            }
 
-        if (Command == CommandType.release_download && !System.IO.Path.IsPathRooted(Path))
-        {
-            throw new ArgumentException("The 'path' option is required for the release_download command and must be an absolute path.");
+            if (Command == CommandType.release_download && !System.IO.Path.IsPathRooted(Path))
+            {
+                throw new ArgumentException("The 'path' option is required for the release_download command and must be an absolute path.");
+            }
         }
     }
 

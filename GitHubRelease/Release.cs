@@ -21,5 +21,14 @@ namespace GitHubRelease
 
         [JsonPropertyName("prerelease")]
         public bool Prerelease { get; set; }
+
+        [JsonPropertyName("published_at")]
+        public string? PublishedAt { get; set; }
+
+        [JsonPropertyName("assets")]
+        public List<Asset> Assets { get; set; } = new List<Asset>();
+
+        [JsonPropertyName("author")]
+        public Author? Author { get; set; }
     }
 }
