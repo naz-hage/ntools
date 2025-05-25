@@ -449,7 +449,7 @@ function EnsureMinikubeRunning {
         Write-Host "Minikube is already running."
     } else {
         Write-Host "Starting Minikube..."
-        sudo minikube start --driver=hyperv --cpus=2 --memory=6144 --disk-size=20g
+        sudo minikube start --driver=docker --cpus=2 --memory=6144 --disk-size=20g
     }
 }
 
