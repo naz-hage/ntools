@@ -18,6 +18,7 @@
 // --------------------------------------------------------------------------------------
 using NbuildTasks;
 using System.CommandLine;
+using static System.Net.Mime.MediaTypeNames;
 
 /// <summary>
 /// Initializes a new instance of the <see cref="RootCommand"/> class with a description
@@ -57,23 +58,9 @@ listFilesCommand.AddOption(extensionsOption);
 listFilesCommand.SetHandler((string extensions, string directoryPath) =>
 {
     string[] extensionsArray = extensions.Split(',', StringSplitOptions.RemoveEmptyEntries);
-    foreach (string ext in extensionsArray)
-    {
-        Console.WriteLine($"Searching for files with {ext} extension in {directoryPath} recursively");
-        string[] files = Directory.GetFiles(directoryPath, $"*{ext}", SearchOption.AllDirectories);
-        if (files.Length > 0)
-        {
-            Console.WriteLine($"Found {files.Length} files with {ext} extension:");
-            foreach (string file in files)
-            {
-                ConsoleHelper.WriteLine(file, ConsoleColor.Green);
-            }
-        }
-        else
-        {
-            ConsoleHelper.WriteLine($"No files found with {ext} extension.", ConsoleColor.Red);
-        }
-    }
+    Console.WriteLine($"Searching for files with specified extensions in {directoryPath} recursively");
+    ListSearcher.ListFiles(directoryPath, extensionsArray);
+   
 }, extensionsOption, filesDirectoryPathOption);
 
 rootCommand.AddCommand(listFilesCommand);
@@ -117,11 +104,8 @@ listFoldersCommand.SetHandler((string directoryPath, string names) =>
 {
     string[] folderNames = names.Split(',', StringSplitOptions.RemoveEmptyEntries);
     Console.WriteLine($"Searching for folders containing specified names in {directoryPath} recursively");
+    ListSearcher.ListFoldersContaining(directoryPath, folderNames);
 
-    foreach (string folderName in folderNames)
-    {
-        ListSearcher.ListFoldersContaining(directoryPath, folderName);
-    }
 }, foldersDirectoryPathOption, folderNamesOption);
 
 rootCommand.AddCommand(listFoldersCommand);
