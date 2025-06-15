@@ -4,9 +4,9 @@ public static class ListSearcher
     {
         try
         {
+            var directories = Directory.GetDirectories(directoryPath, "*", SearchOption.AllDirectories);
             foreach (string folderName in folderNames)
             {
-                var directories = Directory.GetDirectories(directoryPath, "*", SearchOption.AllDirectories);
                 var matchingDirs = directories
                     .Where(dir => dir.Contains(folderName, StringComparison.OrdinalIgnoreCase))
                     .ToArray();
@@ -52,7 +52,7 @@ public static class ListSearcher
             }
             else
             {
-                ConsoleHelper.WriteLine($"No files found wih {ext} extension");
+                ConsoleHelper.WriteLine($"No files found with {ext} extension");
             }
         }
     }

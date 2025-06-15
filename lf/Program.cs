@@ -18,7 +18,6 @@
 // --------------------------------------------------------------------------------------
 using NbuildTasks;
 using System.CommandLine;
-using static System.Net.Mime.MediaTypeNames;
 
 /// <summary>
 /// Initializes a new instance of the <see cref="RootCommand"/> class with a description
