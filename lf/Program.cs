@@ -16,18 +16,19 @@
 //   lf files -d C:\Projects -e .cs,.md
 //   lf folders -d C:\Projects -n bin,obj
 // --------------------------------------------------------------------------------------
+using NbuildTasks;
 using System.CommandLine;
 
 /// <summary>
 /// Initializes a new instance of the <see cref="RootCommand"/> class with a description
 /// for the file and folder listing utility.
 /// </summary>
-var rootCommand = new RootCommand("File and folder listing utility");
+var rootCommand = new RootCommand($"File and folder listing utility {Environment.NewLine} {Nversion.Get()}");
 
 /// <summary>
 /// This command searches for files with given extensions recursively in the specified directory.
 /// </summary>
-var listFilesCommand = new Command("files", "List files with specified extensions in a directory");
+var listFilesCommand = new Command("files", $"List files with specified extensions in a directory  {Environment.NewLine} {Nversion.Get()}");
 
 var filesDirectoryPathOption = new Option<string>(
     name: "--directoryPath",
@@ -81,7 +82,7 @@ rootCommand.AddCommand(listFilesCommand);
 /// This command searches for folders
 /// containing specified names recursively in the given directory.
 /// </summary>
-var listFoldersCommand = new Command("folders", "List folders containing specified names in a directory");
+var listFoldersCommand = new Command("folders", $"List folders containing specified names in a directory {Environment.NewLine} {Nversion.Get()}");
 
 /// <summary>
 /// Option to specify the directory path to search in.
