@@ -13,7 +13,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{35AAB912-8196-4DE2-B5DA-98E9F4340A8D}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
-		lf\lf.csproj = lf\lf.csproj
 		mkdocs.yml = mkdocs.yml
 		nbuild.log = nbuild.log
 		nbuild.targets = nbuild.targets
@@ -98,6 +97,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ntools", "ntools", "{DBDD07
 		docs\ntools\ntools.md = docs\ntools\ntools.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHubRelease", "GitHubRelease\GitHubRelease.csproj", "{DE08895C-1D65-4A68-B9CC-144B5FADEB5A}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHubReleaseTests", "GitHubReleaseTests\GitHubReleaseTests.csproj", "{CF5DF473-3089-4B66-A483-9CDA206CC083}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "go", "go", "{72A31A3D-5909-486D-AB92-BF76A06BDAAA}"
@@ -137,6 +138,10 @@ Global
 		{F98C96D6-AF6D-40EB-BFA2-73600DE146B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F98C96D6-AF6D-40EB-BFA2-73600DE146B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F98C96D6-AF6D-40EB-BFA2-73600DE146B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE08895C-1D65-4A68-B9CC-144B5FADEB5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE08895C-1D65-4A68-B9CC-144B5FADEB5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE08895C-1D65-4A68-B9CC-144B5FADEB5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE08895C-1D65-4A68-B9CC-144B5FADEB5A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CF5DF473-3089-4B66-A483-9CDA206CC083}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CF5DF473-3089-4B66-A483-9CDA206CC083}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CF5DF473-3089-4B66-A483-9CDA206CC083}.Release|Any CPU.ActiveCfg = Release|Any CPU
