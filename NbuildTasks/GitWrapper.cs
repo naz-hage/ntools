@@ -576,6 +576,40 @@ namespace NbuildTasks
             return branches;
         }
 
+        /// <summary>
+        /// Deletes all local git branches except the `main` branch.
+        /// </summary>
+        /// <returns>List of deleted branch names.</returns>
+        public List<string> DeleteAllLocalBranches()
+        {
+            var deletedBranches = new List<string>();
+            var currentBranch = Branch;
+            var branches = ListBranches();
+
+            foreach (var branch in branches)
+            {
+                var branchName = branch.Trim();
+                if (!string.Equals(branchName, currentBranch, StringComparison.OrdinalIgnoreCase))
+                {
+                    Process.StartInfo.Arguments = $"branch -D {branchName}";
+                    var result = Process.LockStart(Verbose);
+                    if (result.Code == 0)
+                    {
+                        deletedBranches.Add(branchName);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Failed to delete branch: {branchName}");
+                        foreach (var line in result.Output)
+                        {
+                            if (Verbose) Console.WriteLine(line);
+                        }
+                    }
+                }
+            }
+            return deletedBranches;
+        }
+
         private bool CheckForErrorAndDisplayOutput(List<string> lines)
         {
             foreach (var line in lines)

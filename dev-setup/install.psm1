@@ -25,7 +25,7 @@
     | SetDevEnvironmentVariables  | Sets development environment variables.                       |
     | Write-OutputMessage         | Writes output messages to the console and log files.          |
     | GetFileVersion              | Retrieves the file version of a specified file.               |
-    | EnsureMinikubeRunning       | Checks if Minikube is running and starts it if not.           |
+    | EnsureMinikubeIsRunning       | Checks if Minikube is running and starts it if not.           |
 
 .EXAMPLE
     Import-Module ./install.psm1
@@ -437,19 +437,21 @@ function GetFileVersion {
 }
 
 <#
-    Function: EnsureMinikubeRunning
+    Function: EnsureMinikubeIsRunning
     Description: Checks if Minikube is running and starts it if not.
+    Troubleshooting: https://minikube.sigs.k8s.io/docs/drivers/docker/#Standard%20Docker
 #>
 
-function EnsureMinikubeRunning {
+function EnsureMinikubeIsRunning {
     # Check if Minikube is running
+    Write-Host "Checking if Minikube is running..."
     $minikubeStatus = sudo minikube status | Select-String "host: Running"
 
     if ($minikubeStatus) {
         Write-Host "Minikube is already running."
     } else {
         Write-Host "Starting Minikube..."
-        sudo minikube start --driver=hyperv --cpus=2 --memory=6144 --disk-size=20g
+        sudo minikube start --driver=docker
     }
 }
 
