@@ -5,15 +5,15 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="naz-hage" />
       <link rel="shortcut icon" href="../../img/favicon.ico" />
-    <title>Nbackup (nbackup.exe) - Ntools - Work in Progress</title>
+    <title>lf (lf.exe) - Ntools - Work in Progress</title>
     <link rel="stylesheet" href="../../css/theme.css" />
     <link rel="stylesheet" href="../../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
     
       <script>
         // Current page data
-        var mkdocs_page_name = "Nbackup (nbackup.exe)";
-        var mkdocs_page_input_path = "ntools/nbackup.md";
+        var mkdocs_page_name = "lf (lf.exe)";
+        var mkdocs_page_input_path = "ntools/lf.md";
         var mkdocs_page_url = null;
       </script>
     
@@ -58,11 +58,21 @@
               <ul class="current">
                   <li class="toctree-l1"><a class="reference internal" href="../nbuild/">Nbuild (nb.exe)</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../lf/">lf (lf.exe)</a>
-                  </li>
-                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Nbackup (nbackup.exe)</a>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">lf (lf.exe)</a>
     <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#features">Features</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#commands">Commands</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#1-files">1. files</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-folders">2. folders</a>
+    </li>
+        </ul>
+    </li>
     </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../nbackup/">Nbackup (nbackup.exe)</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../github-release/">Github Release</a>
                   </li>
@@ -97,9 +107,9 @@
   <ul class="wy-breadcrumbs">
     <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
           <li class="breadcrumb-item">List of Tools</li>
-      <li class="breadcrumb-item active">Nbackup (nbackup.exe)</li>
+      <li class="breadcrumb-item active">lf (lf.exe)</li>
     <li class="wy-breadcrumbs-aside">
-          <a href="https://github.com/naz-hage/ntools/edit/main/docs/ntools/nbackup.md">Edit on ntools</a>
+          <a href="https://github.com/naz-hage/ntools/edit/main/docs/ntools/lf.md">Edit on ntools</a>
     </li>
   </ul>
   <hr/>
@@ -107,41 +117,45 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <p><code>Nbackup</code>  (<code>nbackup.exe</code>) is a tool that leverages <code>robocopy</code> to backup a list of files and folders from a source to a destination. It is designed to be reliable and efficient, ensuring that your data is safe.</p>
-<h3 id="usage">Usage</h3>
-<pre><code> Nbackup.exe [-i value] [-e value] [-v value] [-performbackup value]
-  - i             : input json file which specifies source, destination and backup options. (string, default=)
-  - e             : Extract input json example file to current directory. (string, default=)
-  - v             : Verbose level (true or false, default=False)
-  - performbackup :  Set to false to verify json file without backup (true or false, default=True)
+                <h1 id="lf-file-and-folder-listing-utility">lf: File and Folder Listing Utility</h1>
+<p><code>lf</code> is a command-line tool for listing files and folders in a directory tree, with flexible filtering options. It is built using <code>System.CommandLine</code> and is part of the ntools suite.</p>
+<h2 id="features">Features</h2>
+<ul>
+<li><strong>List files</strong> by extension, recursively.</li>
+<li><strong>List folders</strong> containing specified names, recursively.</li>
+<li>Simple, fast, and scriptable.</li>
+</ul>
+<hr />
+<h2 id="commands">Commands</h2>
+<h3 id="1-files">1. <code>files</code></h3>
+<p>Lists files with specified extensions in a directory (recursively).</p>
+<p><strong>Options:</strong>
+- <code>-d</code>, <code>--directoryPath</code><br />
+  Directory path to search in (default: current directory)
+- <code>-e</code>, <code>--extensions</code><br />
+  Comma-separated file extensions (default: <code>.yml,.yaml</code>)</p>
+<p><strong>Example:</strong></p>
+<pre><code class="language-sh">lf files -d C:\Projects -e .cs,.md
 </code></pre>
-<p>A sample json file is provided below:</p>
-<pre><code class="language-json">{
-  &quot;BackupsList&quot;: [
-    {
-      &quot;Source&quot;: &quot;.&quot;,
-      &quot;Destination&quot;: &quot;%APPDATA%\\ntools&quot;,
-      &quot;ExcludeFolders&quot;: [
-        &quot;.git&quot;,
-        &quot;.vs&quot;
-      ],
-      &quot;ExcludeFiles&quot;: [
-        &quot;*.exe&quot;,
-        &quot;*.dll&quot;,
-        &quot;*.pdb&quot;
-      ],
-      &quot;LogFile&quot;: &quot;%APPDATA%\\backup.log&quot;,
-      &quot;BackupOptions&quot;: &quot;/V /R:5 /W:5 /MT:16 /dcopy:DAT /copy:DT&quot;
-    }
-  ]
-}
+<p>This command will list all <code>.cs</code> and <code>.md</code> files in the <code>C:\Projects</code> directory and its subdirectories.</p>
+<hr />
+<h3 id="2-folders">2. <code>folders</code></h3>
+<p>Lists folders containing specified names in a directory (recursively).</p>
+<p><strong>Options:</strong>
+- <code>-d</code>, <code>--directoryPath</code><br />
+  Directory path to search in (default: current directory)
+- <code>-n</code>, <code>--name</code><br />
+  Comma-separated list of folder names to search for</p>
+<p><strong>Example:</strong></p>
+<pre><code class="language-sh">lf folders -d C:\Projects -n bin,obj
 </code></pre>
+<p>This command will list all folders named <code>bin</code> and <code>obj</code> in the <code>C:\Projects</code> directory and its subdirectories.</p>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../lf/" class="btn btn-neutral float-left" title="lf (lf.exe)"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../github-release/" class="btn btn-neutral float-right" title="Github Release">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../nbuild/" class="btn btn-neutral float-left" title="Nbuild (nb.exe)"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../nbackup/" class="btn btn-neutral float-right" title="Nbackup (nbackup.exe)">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -168,10 +182,10 @@
         </span>
     
     
-      <span><a href="../lf/" style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../nbuild/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
-      <span><a href="../github-release/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="../nbackup/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>
