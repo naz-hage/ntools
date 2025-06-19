@@ -15,12 +15,12 @@
 	<Copyright>2020-XXXX</Copyright>
   </PropertyGroup>
 	
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Any CPU'">
     <OutputPath>$(SolutionDir)/Debug</OutputPath>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Any CPU'">
     <OutputPath>$(SolutionDir)/Release</OutputPath>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>

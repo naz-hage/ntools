@@ -52,7 +52,7 @@ listFilesCommand.AddOption(extensionsOption);
 /// This method retrieves the file extensions from the command line arguments,
 /// searches for files with those extensions in the specified directory,
 /// and displays the results.
-/// /// If no files are found, it outputs a message indicating that no files were found.
+/// If no files are found, it outputs a message indicating that no files were found.
 /// </summary>
 listFilesCommand.SetHandler((string extensions, string directoryPath) =>
 {
