@@ -1,4 +1,6 @@
-﻿[TestClass]
+﻿using lf;
+
+[TestClass]
 public class ListSearcherTests
 {
     private string _testRoot = string.Empty; // Initialize to an empty string to satisfy the non-nullable requirement.
