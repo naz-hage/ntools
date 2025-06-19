@@ -28,7 +28,7 @@ var rootCommand = new RootCommand($"File and folder listing utility {Environment
 /// <summary>
 /// This command searches for files with given extensions recursively in the specified directory.
 /// </summary>
-var listFilesCommand = new Command("files", $"List files with specified extensions in a directory  {Environment.NewLine} {Nversion.Get()}");
+var listFilesCommand = new Command("files", $"List files with specified extensions in a directory ");
 
 var filesDirectoryPathOption = new Option<string>(
     name: "--directoryPath",
@@ -68,7 +68,7 @@ rootCommand.AddCommand(listFilesCommand);
 /// This command searches for folders
 /// containing specified names recursively in the given directory.
 /// </summary>
-var listFoldersCommand = new Command("folders", $"List folders containing specified names in a directory {Environment.NewLine} {Nversion.Get()}");
+var listFoldersCommand = new Command("folders", $"List folders containing specified names in a directory");
 
 /// <summary>
 /// Option to specify the directory path to search in.
