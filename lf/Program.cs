@@ -13,6 +13,7 @@
 // Author: [Your Name]
 // --------------------------------------------------------------------------------------
 
+using lf;
 using NbuildTasks;
 using System.CommandLine;
 
