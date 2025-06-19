@@ -1,5 +1,13 @@
+/// <summary>
+/// Provides static methods for searching and listing files and folders in a directory tree.
+/// </summary>
 public static class ListSearcher
 {
+    /// <summary>
+    /// Lists all folders within the specified directory (recursively) that contain any of the provided folder names.
+    /// </summary>
+    /// <param name="directoryPath">The root directory to search in.</param>
+    /// <param name="folderNames">An array of folder name substrings to search for.</param>
     public static void ListFoldersContaining(string directoryPath, string[] folderNames)
     {
         try
@@ -32,11 +40,10 @@ public static class ListSearcher
     }
 
     /// <summary>
-    /// Finds files with specified extensions in a directory recursively.
+    /// Lists all files with the specified extensions in the given directory and its subdirectories.
     /// </summary>
     /// <param name="directory">The directory to search in.</param>
-    /// <param name="extensions">The array of file extensions to search for.</param>
-    /// <returns>An array of file paths matching the specified extensions.</returns>
+    /// <param name="extensions">An array of file extensions to search for (e.g., ".yml", ".yaml").</param>
     public static void ListFiles(string directory, string[] extensions)
     {
         foreach (var ext in extensions)

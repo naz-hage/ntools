@@ -1,35 +1,36 @@
 // --------------------------------------------------------------------------------------
 // File: Program.cs
-// Description: File and folder listing utility using System.CommandLine.
+// Description: Entry point for the lf utility. Provides commands for listing files and folders
+//              in a directory tree with flexible filtering options using System.CommandLine.
 // 
-// Commands:
-//   files   - Lists files with specified extensions in a directory (recursively).
-//             Options:
-//               -d, --directoryPath   Directory path to search in (default: current directory)
-//               -e, --extensions      Comma-separated file extensions (default: .yml,.yaml)
-//   folders - Lists folders containing specified names in a directory (recursively).
-//             Options:
-//               -d, --directoryPath   Directory path to search in (default: current directory)
-//               -n, --name            Comma-separated list of folder names to search for
+// Usage:
+//   lf files   -d <directory> -e <extensions>
+//   lf folders -d <directory> -n <folder names>
 //
-// Usage Examples:
-//   lf files -d C:\Projects -e .cs,.md
-//   lf folders -d C:\Projects -n bin,obj
+// Dependencies:
+//   - NbuildTasks.ListSearcher: Provides static methods for file and folder searching.
+//
+// Author: [Your Name]
 // --------------------------------------------------------------------------------------
+
 using NbuildTasks;
 using System.CommandLine;
 
 /// <summary>
-/// Initializes a new instance of the <see cref="RootCommand"/> class with a description
-/// for the file and folder listing utility.
+/// Entry point for the lf utility. Sets up the root command and subcommands for file and folder listing.
 /// </summary>
 var rootCommand = new RootCommand($"File and folder listing utility {Environment.NewLine} {Nversion.Get()}");
 
 /// <summary>
-/// This command searches for files with given extensions recursively in the specified directory.
+/// Command: files
+/// Lists files with specified extensions in a directory (recursively).
 /// </summary>
-var listFilesCommand = new Command("files", $"List files with specified extensions in a directory ");
+var listFilesCommand = new Command("files", "List files with specified extensions in a directory (recursively).");
 
+/// <summary>
+/// Option: --directoryPath | -d
+/// The directory path to search in. Defaults to the current directory.
+/// </summary>
 var filesDirectoryPathOption = new Option<string>(
     name: "--directoryPath",
     description: "Directory path to search in",
@@ -37,6 +38,10 @@ var filesDirectoryPathOption = new Option<string>(
 );
 filesDirectoryPathOption.AddAlias("-d");
 
+/// <summary>
+/// Option: --extensions | -e
+/// Comma-separated file extensions to search for. Defaults to ".yml,.yaml".
+/// </summary>
 var extensionsOption = new Option<string>(
    name: "--extensions",
    description: "Comma-separated file extensions to search for (e.g., .yml,.yaml)",
@@ -48,30 +53,29 @@ listFilesCommand.AddOption(filesDirectoryPathOption);
 listFilesCommand.AddOption(extensionsOption);
 
 /// <summary>
-/// Sets the handler for the listFilesCommand to search for files with specified extensions.
-/// This method retrieves the file extensions from the command line arguments,
-/// searches for files with those extensions in the specified directory,
-/// and displays the results.
-/// If no files are found, it outputs a message indicating that no files were found.
+/// Handler for the 'files' command.
+/// Splits the extensions string, searches for files, and prints the results.
 /// </summary>
+/// <param name="extensions">Comma-separated list of file extensions.</param>
+/// <param name="directoryPath">Directory to search in.</param>
 listFilesCommand.SetHandler((string extensions, string directoryPath) =>
 {
     string[] extensionsArray = extensions.Split(',', StringSplitOptions.RemoveEmptyEntries);
     Console.WriteLine($"Searching for files with specified extensions in {directoryPath} recursively");
     ListSearcher.ListFiles(directoryPath, extensionsArray);
-   
 }, extensionsOption, filesDirectoryPathOption);
 
 rootCommand.AddCommand(listFilesCommand);
 
 /// <summary>
-/// This command searches for folders
-/// containing specified names recursively in the given directory.
+/// Command: folders
+/// Lists folders containing specified names in a directory (recursively).
 /// </summary>
-var listFoldersCommand = new Command("folders", $"List folders containing specified names in a directory");
+var listFoldersCommand = new Command("folders", "List folders containing specified names in a directory (recursively).");
 
 /// <summary>
-/// Option to specify the directory path to search in.
+/// Option: --directoryPath | -d
+/// The directory path to search in. Defaults to the current directory.
 /// </summary>
 var foldersDirectoryPathOption = new Option<string>(
     name: "--directoryPath",
@@ -81,9 +85,8 @@ var foldersDirectoryPathOption = new Option<string>(
 foldersDirectoryPathOption.AddAlias("-d");
 
 /// <summary>
-/// Option to specify a comma-separated list of folder names to search for.
-/// This option allows the user to specify multiple folder names,
-/// which will be used to search for folders containing any of those names.
+/// Option: --name | -n
+/// Comma-separated list of folder names to search for.
 /// </summary>
 var folderNamesOption = new Option<string>(
     name: "--name",
@@ -92,21 +95,25 @@ var folderNamesOption = new Option<string>(
 );
 folderNamesOption.AddAlias("-n");
 
-// Add options to the listFoldersCommand
 listFoldersCommand.AddOption(foldersDirectoryPathOption);
 listFoldersCommand.AddOption(folderNamesOption);
 
 /// <summary>
-/// Sets the handler for the listFoldersCommand to search for folders containing specified names.
+/// Handler for the 'folders' command.
+/// Splits the names string, searches for folders, and prints the results.
 /// </summary>
+/// <param name="directoryPath">Directory to search in.</param>
+/// <param name="names">Comma-separated list of folder names.</param>
 listFoldersCommand.SetHandler((string directoryPath, string names) =>
 {
     string[] folderNames = names.Split(',', StringSplitOptions.RemoveEmptyEntries);
     Console.WriteLine($"Searching for folders containing specified names in {directoryPath} recursively");
     ListSearcher.ListFoldersContaining(directoryPath, folderNames);
-
 }, foldersDirectoryPathOption, folderNamesOption);
 
 rootCommand.AddCommand(listFoldersCommand);
 
+/// <summary>
+/// Program entry point. Invokes the root command with the provided arguments.
+/// </summary>
 return await rootCommand.InvokeAsync(args);
