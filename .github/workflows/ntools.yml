@@ -31,6 +31,42 @@ env:
   enable_logging: ${{ github.event.inputs.enable_logging || 'false' }}
 
 jobs:
+  test:
+    runs-on: windows-latest
+    needs: [build]
+    steps:
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Test with coverage
+        env:
+          OWNER: ${{ github.repository_owner }}
+          API_GITHUB_KEY: ${{ secrets.API_GITHUB_KEY }}
+        run: dotnet test --no-build --configuration Release --logger "trx;LogFileName=test-results.trx" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=TestResults/
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: '**/TestResults/*.trx'
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: '**/TestResults/coverage.cobertura.xml'
+
+      - name: Publish Test Results
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Tests
+          path: '**/TestResults/*.trx'
+          reporter: dotnet-trx
+
   build:
     name: Running a workflow
     strategy:
@@ -98,38 +134,6 @@ jobs:
         API_GITHUB_KEY: ${{ secrets.API_GITHUB_KEY }}
         DOTNET_CLI_TELEMETRY_OPTOUT: 1
         Build_Type: ${{ github.event.inputs.build_type || 'stage' }}
-
-    - name: Restore dependencies
-      run: dotnet restore
-
-    - name: Build
-      run: dotnet build --no-restore --configuration Release
-
-    - name: Test with coverage
-      env:
-        OWNER: ${{ github.repository_owner }}
-        API_GITHUB_KEY: ${{ secrets.API_GITHUB_KEY }}
-      run: dotnet test --no-build --configuration Release --logger "trx;LogFileName=test-results.trx" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=TestResults/
-
-    - name: Upload test results
-      uses: actions/upload-artifact@v4
-      with:
-        name: test-results
-        path: '**/TestResults/*.trx'
-
-    - name: Upload coverage report
-      uses: actions/upload-artifact@v4
-      with:
-        name: coverage-report
-        path: '**/TestResults/coverage.cobertura.xml'
-
-    - name: Publish Test Results
-      uses: dorny/test-reporter@v1
-      if: always()
-      with:
-        name: Tests
-        path: '**/TestResults/*.trx'
-        reporter: dotnet-trx
 
   docs:
     name: Publish Docs
