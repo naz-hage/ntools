@@ -106,6 +106,8 @@ jobs:
       run: dotnet build --no-restore --configuration Release
 
     - name: Test with coverage
+      env:
+        API_GITHUB_KEY: ${{ secrets.API_GITHUB_KEY }}
       run: dotnet test --no-build --configuration Release /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=TestResults/
 
     - name: Upload coverage report
