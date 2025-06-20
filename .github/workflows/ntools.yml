@@ -32,7 +32,7 @@ env:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -67,8 +67,8 @@ jobs:
           path: '**/TestResults/**/coverage.cobertura.xml'
 
       - name: List all coverage files
-        run: ls -R | grep coverage.cobertura.xml || true
-        shell: bash
+        run: Get-ChildItem -Recurse -Filter coverage.cobertura.xml | Select-Object -ExpandProperty FullName
+        shell: pwsh
 
       - name: Publish Test Results
         uses: dorny/test-reporter@v1
