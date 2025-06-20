@@ -1,16 +1,21 @@
-using System;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
+/// <summary>
+/// Helper class for creating and managing Azure DevOps work items (PBIs and Tasks).
+/// </summary>
 public class AzureDevOpsWorkItemHelper
 {
     private readonly string _organization;
     private readonly string _project;
     private readonly string _pat;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AzureDevOpsWorkItemHelper"/> class.
+    /// </summary>
+    /// <param name="organization">Azure DevOps organization URL.</param>
+    /// <param name="project">Azure DevOps project name.</param>
     public AzureDevOpsWorkItemHelper(string organization, string project)
     {
         _organization = organization;
@@ -23,6 +28,10 @@ public class AzureDevOpsWorkItemHelper
         }
     }
 
+    /// <summary>
+    /// Creates a child Task work item with the same title as the specified PBI.
+    /// </summary>
+    /// <param name="pbiId">The parent PBI work item ID.</param>
     public async Task CreateChildTaskWithSameTitleAsync(int pbiId)
     {
         using var client = new HttpClient();
@@ -70,6 +79,12 @@ public class AzureDevOpsWorkItemHelper
         }
     }
 
+    /// <summary>
+    /// Gets the title of a work item by its ID.
+    /// </summary>
+    /// <param name="client">The HttpClient to use.</param>
+    /// <param name="workItemId">The work item ID.</param>
+    /// <returns>The title string, or null if not found.</returns>
     private async Task<string?> GetWorkItemTitleAsync(HttpClient client, int workItemId)
     {
         var getUri = $"{_organization}/{_project}/_apis/wit/workitems/{workItemId}?api-version={AzureDevOpsApiVersions.Pipelines}";
@@ -91,6 +106,12 @@ public class AzureDevOpsWorkItemHelper
         return titleElement.GetString();
     }
 
+    /// <summary>
+    /// Creates a Product Backlog Item (PBI) with the given title and parent ID.
+    /// </summary>
+    /// <param name="title">The title of the PBI.</param>
+    /// <param name="parentId">The parent work item ID.</param>
+    /// <returns>The new PBI ID, or null if creation failed.</returns>
     public async Task<int?> CreatePbiAsync(string title, int parentId)
     {
         using var client = new HttpClient();
@@ -161,9 +182,18 @@ public class AzureDevOpsWorkItemHelper
 
 }
 
-// Extension method for PATCH
+/// <summary>
+/// Extension methods for HttpClient to support PATCH requests.
+/// </summary>
 public static class HttpClientExtensions
 {
+    /// <summary>
+    /// Sends a PATCH request as an asynchronous operation.
+    /// </summary>
+    /// <param name="client">The HttpClient instance.</param>
+    /// <param name="requestUri">The request URI.</param>
+    /// <param name="content">The HTTP content to send.</param>
+    /// <returns>The HTTP response message.</returns>
     public static Task<HttpResponseMessage> PatchAsync(this HttpClient client, string requestUri, HttpContent content)
     {
         var request = new HttpRequestMessage(new HttpMethod("PATCH"), requestUri) { Content = content };

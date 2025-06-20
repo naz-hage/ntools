@@ -1,8 +1,16 @@
-﻿using System;
-using System.CommandLine;
+﻿using System.CommandLine;
 using System.Net.Http.Headers;
 using System.Text;
-using System.Text.Json;
+
+/// <summary>
+/// Entry point for the Azure DevOps Work Item CLI utility.
+/// Supports creating PBIs and child tasks in Azure DevOps from a services file.
+/// </summary>
+/// <remarks>
+/// Usage:
+///   wi --services <path> --parentId <id>
+///   wi --services <path> --parentId <id> --childTaskOfPbiId <pbiId>
+/// </remarks>
 
 // Fix for CS7036: Provide a parseArgument delegate to the Option constructor
 var servicesFileOption = new Option<string>(
@@ -45,6 +53,11 @@ rootCommand.AddOption(childTaskPbiIdOption);
 rootCommand.AddOption(servicesFileOption);
 rootCommand.AddOption(parentIdOption);
 
+/// <summary>
+/// Handler for creating PBIs and child tasks for each service in the file.
+/// </summary>
+/// <param name="servicesPath">Path to the services file.</param>
+/// <param name="parentId">Parent work item ID.</param>
 rootCommand.SetHandler(async (string servicesPath, int parentId) =>
 {
     string organization = Environment.GetEnvironmentVariable("AZURE_DEVOPS_ORGANIZATION") ?? "https://dev.azure.com/nazh"; // Default organization
@@ -95,6 +108,12 @@ rootCommand.SetHandler(async (string servicesPath, int parentId) =>
 
 }, servicesFileOption, parentIdOption);
 
+/// <summary>
+/// Handler for creating a child task for a specific PBI, or PBIs for all services.
+/// </summary>
+/// <param name="servicesPath">Path to the services file.</param>
+/// <param name="parentId">Parent work item ID.</param>
+/// <param name="childTaskOfPbiId">Optional: PBI ID to create a child task for.</param>
 rootCommand.SetHandler(async (string servicesPath, int parentId, int? childTaskOfPbiId) =>
 {
     string organization = Environment.GetEnvironmentVariable("AZURE_DEVOPS_ORGANIZATION") ?? "https://dev.azure.com/nazh"; // Default organization
@@ -142,4 +161,8 @@ rootCommand.SetHandler(async (string servicesPath, int parentId, int? childTaskO
         await helper.CreateChildTaskWithSameTitleAsync(pbiId.Value);
     }
 }, servicesFileOption, parentIdOption, childTaskPbiIdOption);
+
+/// <summary>
+/// Program entry point. Invokes the root command with the provided arguments.
+/// </summary>
 return await rootCommand.InvokeAsync(args);
