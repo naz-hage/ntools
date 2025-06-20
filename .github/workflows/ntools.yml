@@ -33,7 +33,7 @@ env:
 jobs:
   test:
     runs-on: windows-latest
-    needs: [build]
+    
     steps:
       - name: Restore dependencies
         run: dotnet restore
@@ -69,6 +69,7 @@ jobs:
 
   build:
     name: Running a workflow
+    needs: [test]
     strategy:
       matrix:
         configuration: [Release]
