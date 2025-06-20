@@ -17,7 +17,7 @@ The [Windows dev environment](https://learn.microsoft.com/en-us/windows/dev-envi
 | [minikube](https://github.com/kubernetes/minikube/releases/)                                              | 1.35.0      | 12-Mar-25       |
 | [MongoDB Community Server](https://www.mongodb.com/try/download/community)                                | 8.0.5       | 10-Mar-25       |
 | [Node.js](https://nodejs.org/en/download/)                                                                | 22.14.1     | 10-Mar-25       |
-| [Ntools](https://github.com/naz-hage/ntools/releases)                                                     | 1.21.0      | 20-May-25       |
+| [Ntools](https://github.com/naz-hage/ntools/releases)                                                     | 1.22.0      | 06-Jun-25       |
 | [NuGet](https://www.nuget.org/downloads)                                                                  | 6.13.2      | 10-Mar-25       |
 | [Postman Get Started for Free](https://www.postman.com/downloads/)                                        | v11.36.0    | 10-Mar-25       |
 | [PowerShell](https://github.com/PowerShell/PowerShell/releases)                                           | 7.5.1       | 26-May-25       |
