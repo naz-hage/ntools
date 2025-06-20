@@ -84,8 +84,8 @@
 
 	<!-- Clean up the project and artifacts folder -->
 	<Target Name="CLEAN" >
-		<MSBuild Projects="$(SolutionDir)\$(SolutionName).sln" Targets="Clean" Properties="Configuration=$(TargetRelease);Platform=Any CPU" />
-		<MSBuild Projects="$(SolutionDir)\$(SolutionName).sln" Targets="Clean" Properties="Configuration=$(TargetDebug);Platform=Any CPU"/>
+		<MSBuild Projects="$(SolutionDir)\$(SolutionName).sln" Targets="Clean" Properties="Configuration=$(TargetRelease);Platform=AnyCPU" />
+		<MSBuild Projects="$(SolutionDir)\$(SolutionName).sln" Targets="Clean" Properties="Configuration=$(TargetDebug);Platform=AnyCPU"/>
 		
 		<RemoveDir Directories="$(OutputPathRelease);
                             $(OutputPathDebug);
@@ -187,7 +187,7 @@
 	<!-- Build the solution Release configuration  using MSBuild-->
 	<Target Name="SOLUTION_MSBUILD" DependsOnTargets="TAG">
 		<Exec Command="dotnet restore"></Exec>
-		<MSBuild Projects="$(SolutionDir)\$(SolutionName).sln" Properties="Configuration=$(TargetRelease);Platform=Any CPU;Version=$(ProductVersion);AssemblyVersion=$(ProductVersion);UICulture=en-US;Culture=en-US"/>
+		<MSBuild Projects="$(SolutionDir)\$(SolutionName).sln" Properties="Configuration=$(TargetRelease);Platform=AnyCPU;Version=$(ProductVersion);AssemblyVersion=$(ProductVersion);UICulture=en-US;Culture=en-US"/>
 		<Message Text="==> COMMON_DONE"/>
 	</Target>
 

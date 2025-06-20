@@ -108,6 +108,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "go", "go", "{72A31A3D-5909-
 		go\build-apps.go = go\build-apps.go
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lf", "lf\lf.csproj", "{524E8E3D-3495-C6F7-F624-F7AD1A9F2621}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lfTests", "lfTests\lfTests.csproj", "{B70A8112-F9C0-5646-4C66-B34C8E8AB203}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -146,6 +150,14 @@ Global
 		{CF5DF473-3089-4B66-A483-9CDA206CC083}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CF5DF473-3089-4B66-A483-9CDA206CC083}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CF5DF473-3089-4B66-A483-9CDA206CC083}.Release|Any CPU.Build.0 = Release|Any CPU
+		{524E8E3D-3495-C6F7-F624-F7AD1A9F2621}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{524E8E3D-3495-C6F7-F624-F7AD1A9F2621}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{524E8E3D-3495-C6F7-F624-F7AD1A9F2621}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{524E8E3D-3495-C6F7-F624-F7AD1A9F2621}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B70A8112-F9C0-5646-4C66-B34C8E8AB203}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B70A8112-F9C0-5646-4C66-B34C8E8AB203}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B70A8112-F9C0-5646-4C66-B34C8E8AB203}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B70A8112-F9C0-5646-4C66-B34C8E8AB203}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
