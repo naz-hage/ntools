@@ -35,6 +35,11 @@ jobs:
     runs-on: windows-latest
     
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Restore dependencies
         run: dotnet restore ntools.sln
         working-directory: ${{ github.workspace }}
