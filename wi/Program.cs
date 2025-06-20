@@ -1,6 +1,7 @@
 ﻿using System.CommandLine;
 using System.Net.Http.Headers;
 using System.Text;
+using wi;
 
 /// <summary>
 /// Entry point for the Azure DevOps Work Item CLI utility.
