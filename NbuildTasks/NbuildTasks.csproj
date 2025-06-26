@@ -2,12 +2,13 @@
 
   <PropertyGroup>
 	<TargetFramework>netstandard2.0</TargetFramework>
-	  <Version></Version>
-	  <AssemblyVersion></AssemblyVersion>
-	  <Authors>naz-hage</Authors>
-	  <Company>naz-hage</Company>
-	  <Product>Build automation</Product>
-	  <Copyright>2020-XXXX</Copyright>
+	<CurrentYear>$([System.DateTime]::Now.ToString('yyyy'))</CurrentYear>
+	<Version></Version>
+	<AssemblyVersion></AssemblyVersion>
+	<Authors>naz-hage</Authors>
+	<Company>naz-hage</Company>
+	<Product>Build automation</Product>
+	<Copyright>2020-$(CurrentYear)</Copyright>
   </PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -28,6 +29,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.14.8" />	  
     <PackageReference Include="ntools-launcher" Version="1.7.0" />
+    <PackageReference Include="System.Text.Json" Version="9.0.0" />
   </ItemGroup>
 
 </Project>
