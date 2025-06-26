@@ -7,7 +7,7 @@ namespace wi
     /// <summary>
     /// Helper class for creating and managing Azure DevOps work items (PBIs and Tasks).
     /// </summary>
-    public class AzureDevOpsWorkItemHelper
+    public class AzureDevOpsWorkItemHelper : IAzureDevOpsWorkItemHelper
     {
         private readonly string _organization;
         private readonly string _project;
@@ -36,9 +36,7 @@ namespace wi
         /// <param name="pbiId">The parent PBI work item ID.</param>
         public async Task CreateChildTaskWithSameTitleAsync(int pbiId)
         {
-            using var client = new HttpClient();
-            var authToken = Convert.ToBase64String(Encoding.ASCII.GetBytes($":{_pat}"));
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authToken);
+            using var client = CreateHttpClient();
 
             //1. Get the title of the PBI
             var title = await GetWorkItemTitleAsync(client, pbiId);
@@ -116,9 +114,7 @@ namespace wi
         /// <returns>The new PBI ID, or null if creation failed.</returns>
         public async Task<int?> CreatePbiAsync(string title, int parentId)
         {
-            using var client = new HttpClient();
-            var authToken = Convert.ToBase64String(Encoding.ASCII.GetBytes($":{_pat}"));
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authToken);
+            using var client = CreateHttpClient();
 
             var uri = $"{_organization}/{_project}/_apis/wit/workitems/$Product%20Backlog%20Item?api-version={AzureDevOpsApiVersions.WorkItems}";
 
@@ -180,6 +176,18 @@ namespace wi
                 Console.WriteLine($"Failed to create PBI '{title}'. Error: {ex.Message}");
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Creates and configures an HttpClient instance for Azure DevOps API calls.
+        /// </summary>
+        /// <returns>Configured HttpClient instance.</returns>
+        protected virtual HttpClient CreateHttpClient()
+        {
+            var client = new HttpClient();
+            var authToken = Convert.ToBase64String(Encoding.ASCII.GetBytes($":{_pat}"));
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authToken);
+            return client;
         }
     }
 

@@ -116,6 +116,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nbuild", "Nbuild\Nbuild.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nBackup", "nBackup\nBackup.csproj", "{75AF1D68-CD4A-4C01-9728-7A93B8DDEA1B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "wiTests", "wiTests\wiTests.csproj", "{B8D3FBB1-E102-48FE-838E-5F907B9B3A8D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -258,6 +260,18 @@ Global
 		{75AF1D68-CD4A-4C01-9728-7A93B8DDEA1B}.Release|x64.Build.0 = Release|Any CPU
 		{75AF1D68-CD4A-4C01-9728-7A93B8DDEA1B}.Release|x86.ActiveCfg = Release|Any CPU
 		{75AF1D68-CD4A-4C01-9728-7A93B8DDEA1B}.Release|x86.Build.0 = Release|Any CPU
+		{B8D3FBB1-E102-48FE-838E-5F907B9B3A8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8D3FBB1-E102-48FE-838E-5F907B9B3A8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8D3FBB1-E102-48FE-838E-5F907B9B3A8D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B8D3FBB1-E102-48FE-838E-5F907B9B3A8D}.Debug|x64.Build.0 = Debug|Any CPU
+		{B8D3FBB1-E102-48FE-838E-5F907B9B3A8D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B8D3FBB1-E102-48FE-838E-5F907B9B3A8D}.Debug|x86.Build.0 = Debug|Any CPU
+		{B8D3FBB1-E102-48FE-838E-5F907B9B3A8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8D3FBB1-E102-48FE-838E-5F907B9B3A8D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B8D3FBB1-E102-48FE-838E-5F907B9B3A8D}.Release|x64.ActiveCfg = Release|Any CPU
+		{B8D3FBB1-E102-48FE-838E-5F907B9B3A8D}.Release|x64.Build.0 = Release|Any CPU
+		{B8D3FBB1-E102-48FE-838E-5F907B9B3A8D}.Release|x86.ActiveCfg = Release|Any CPU
+		{B8D3FBB1-E102-48FE-838E-5F907B9B3A8D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
