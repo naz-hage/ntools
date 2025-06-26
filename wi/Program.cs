@@ -1,6 +1,4 @@
 ﻿using System.CommandLine;
-using System.Net.Http.Headers;
-using System.Text;
 using wi;
 
 /// <summary>
@@ -59,66 +57,16 @@ rootCommand.AddOption(parentIdOption);
 /// </summary>
 /// <param name="servicesPath">Path to the services file.</param>
 /// <param name="parentId">Parent work item ID.</param>
-rootCommand.SetHandler(async (string servicesPath, int parentId) =>
-{
-    string organization = Environment.GetEnvironmentVariable("AZURE_DEVOPS_ORGANIZATION") ?? "https://dev.azure.com/nazh"; // Default organization
-    string project = Environment.GetEnvironmentVariable("AZURE_DEVOPS_PROJECT") ?? "Proto"; // Default project
-
-    // output the organization and project for debugging
-    Console.WriteLine($"Organization: {organization}");
-    Console.WriteLine($"Project: {project}");
-    string? pat = Environment.GetEnvironmentVariable("PAT")!;
-    if (string.IsNullOrWhiteSpace(pat))
-    {
-        Console.WriteLine("PAT environment variable is not set.");
-        return;
-    }
-
-    string[] services;
-    try
-    {
-        services = await File.ReadAllLinesAsync(servicesPath);
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Failed to read services file: {ex.Message}");
-        return;
-    }
-
-    using var client = new HttpClient();
-    var authToken = Convert.ToBase64String(Encoding.ASCII.GetBytes($":{pat}"));
-    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authToken);
-
-    var helper = new AzureDevOpsWorkItemHelper(organization, project);
-
-    foreach (var service in services)
-    {
-        if (string.IsNullOrWhiteSpace(service)) continue;
-        var title = $"{service}: update pipeline to perform SCA";
-        var pbiId = await helper.CreatePbiAsync(title, parentId);
-        if (!pbiId.HasValue || string.IsNullOrWhiteSpace(pbiId.ToString()))
-        {
-            Console.WriteLine($"Failed to create PBI for service: {service}");
-            continue;
-        }
-
-        // Optionally, create a child task with the same title  
-        await helper.CreateChildTaskWithSameTitleAsync(pbiId.Value);
-
-    }
-
-}, servicesFileOption, parentIdOption);
-
-/// <summary>
-/// Handler for creating a child task for a specific PBI, or PBIs for all services.
-/// </summary>
-/// <param name="servicesPath">Path to the services file.</param>
-/// <param name="parentId">Parent work item ID.</param>
 /// <param name="childTaskOfPbiId">Optional: PBI ID to create a child task for.</param>
 rootCommand.SetHandler(async (string servicesPath, int parentId, int? childTaskOfPbiId) =>
 {
     string organization = Environment.GetEnvironmentVariable("AZURE_DEVOPS_ORGANIZATION") ?? "https://dev.azure.com/nazh"; // Default organization
     string project = Environment.GetEnvironmentVariable("AZURE_DEVOPS_PROJECT") ?? "Proto"; // Default project
+
+    // Output the organization and project for debugging
+    Console.WriteLine($"Organization: {organization}");
+    Console.WriteLine($"Project: {project}");
+
     string? pat = Environment.GetEnvironmentVariable("PAT");
     if (string.IsNullOrWhiteSpace(pat))
     {
@@ -126,18 +74,16 @@ rootCommand.SetHandler(async (string servicesPath, int parentId, int? childTaskO
         return;
     }
 
-    // Output the organization and project for debugging
-    Console.WriteLine($"Organization: {organization}");
-    Console.WriteLine($"Project: {project}");
     var helper = new AzureDevOpsWorkItemHelper(organization, project);
 
-    // If the child task option is set, just do that and exit
+    // If the child task option is set, just create that task and exit
     if (childTaskOfPbiId.HasValue)
     {
         await helper.CreateChildTaskWithSameTitleAsync(childTaskOfPbiId.Value);
         return;
     }
 
+    // Read services file
     string[] services;
     try
     {
@@ -149,9 +95,11 @@ rootCommand.SetHandler(async (string servicesPath, int parentId, int? childTaskO
         return;
     }
 
+    // Process each service: create PBI and child task
     foreach (var service in services)
     {
         if (string.IsNullOrWhiteSpace(service)) continue;
+
         var title = $"{service}: update pipeline to perform SCA";
         var pbiId = await helper.CreatePbiAsync(title, parentId);
         if (!pbiId.HasValue)
@@ -159,6 +107,7 @@ rootCommand.SetHandler(async (string servicesPath, int parentId, int? childTaskO
             Console.WriteLine($"Failed to create PBI for service: {service}");
             continue;
         }
+
         await helper.CreateChildTaskWithSameTitleAsync(pbiId.Value);
     }
 }, servicesFileOption, parentIdOption, childTaskPbiIdOption);
