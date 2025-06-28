@@ -254,8 +254,8 @@
 	</Target>
 
 	<!-- Update documentation versions from JSON configuration files -->
-	<UsingTask TaskName="UpdateVersionsInDocs" AssemblyFile="C:\source\ntools\Release\NbuildTasks.dll" />
-	<UsingTask TaskName="SetupPreCommitHooks" AssemblyFile="C:\source\ntools\Release\NbuildTasks.dll" />
+	<UsingTask TaskName="UpdateVersionsInDocs" AssemblyFile="$(SolutionDir)\$(TargetRelease)\NbuildTasks.dll" />
+	<UsingTask TaskName="SetupPreCommitHooks" AssemblyFile="$(SolutionDir)\$(TargetRelease)\NbuildTasks.dll" />
 	
 	<Target Name="UPDATE_DOC_VERSIONS">
 		<UpdateVersionsInDocs 
