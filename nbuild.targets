@@ -254,10 +254,11 @@
 	</Target>
 
 	<!-- Update documentation versions from JSON configuration files -->
-	<UsingTask TaskName="UpdateVersionsInDocs" AssemblyFile="$(SolutionDir)\$(TargetRelease)\NbuildTasks.dll" />
-	<UsingTask TaskName="SetupPreCommitHooks" AssemblyFile="$(SolutionDir)\$(TargetRelease)\NbuildTasks.dll" />
+	<UsingTask TaskName="NbuildTasks.UpdateVersionsInDocs" AssemblyFile="C:\source\ntools\Release\NbuildTasks.dll" />
+	<UsingTask TaskName="NbuildTasks.SetupPreCommitHooks" AssemblyFile="C:\source\ntools\Release\NbuildTasks.dll" />
+	<UsingTask TaskName="NbuildTasks.GenerateCommitMessage" AssemblyFile="C:\source\ntools\Release\NbuildTasks.dll" />
 	
-	<Target Name="UPDATE_DOC_VERSIONS">
+	<Target Name="UPDATE_DOC_VERSIONS" DependsOnTargets="PROPERTIES">
 		<UpdateVersionsInDocs 
 			DevSetupPath="$(SolutionDir)\dev-setup" 
 			DocsPath="$(SolutionDir)\docs\ntools\ntools.md" />
@@ -265,11 +266,91 @@
 		<Message Text="==> DONE"/>
 	</Target>
 
-	<Target Name="SETUP_HOOKS">
+	<Target Name="SETUP_HOOKS" DependsOnTargets="PROPERTIES">
 		<SetupPreCommitHooks 
 			GitDirectory="$(SolutionDir)\.git" 
 			HooksSourceDirectory="$(SolutionDir)\dev-setup\hooks" />
 		<Message Text="Pre-commit hooks setup successfully." />
 		<Message Text="==> DONE"/>
+	</Target>
+
+	<!-- Intelligent commit message generation -->
+	<Target Name="GENERATE_COMMIT_MESSAGE" DependsOnTargets="PROPERTIES">
+		<PropertyGroup>
+			<CommitType Condition="'$(CommitType)' == ''">feat</CommitType>
+			<CommitScope Condition="'$(CommitScope)' == ''"></CommitScope>
+			<CommitMessageFile Condition="'$(CommitMessageFile)' == ''">$(SolutionDir)\.commit-message</CommitMessageFile>
+		</PropertyGroup>
+		
+		<GenerateCommitMessage 
+			WorkingDirectory="$(SolutionDir)"
+			CommitType="$(CommitType)"
+			Scope="$(CommitScope)"
+			CommitMessageFile="$(CommitMessageFile)">
+			<Output TaskParameter="CommitMessage" PropertyName="GeneratedCommitMessage" />
+		</GenerateCommitMessage>
+		
+		<Message Text="Generated commit message: $(GeneratedCommitMessage)" />
+		<Message Text="==> DONE"/>
+	</Target>
+
+	<!-- Automated Git commit with intelligent message generation -->
+	<Target Name="GIT_COMMIT_INFRASTRUCTURE" DependsOnTargets="GENERATE_COMMIT_MESSAGE">
+		<PropertyGroup>
+			<!-- Use generated message if no custom message provided -->
+			<FinalCommitMessage Condition="'$(CommitMessage)' == ''">$(GeneratedCommitMessage)</FinalCommitMessage>
+			<FinalCommitMessage Condition="'$(CommitMessage)' != ''">$(CommitMessage)</FinalCommitMessage>
+			<GitAddFiles Condition="'$(GitAddFiles)' == ''">.</GitAddFiles>
+		</PropertyGroup>
+		
+		<!-- Check if there are any changes to commit -->
+		<Exec Command="git status --porcelain" ConsoleToMSBuild="true" WorkingDirectory="$(SolutionDir)">
+			<Output TaskParameter="ConsoleOutput" PropertyName="GitStatus" />
+		</Exec>
+		
+		<Message Text="Git status: $(GitStatus)" Condition="'$(GitStatus)' != ''" />
+		<Message Text="No changes to commit." Condition="'$(GitStatus)' == ''" />
+		
+		<!-- Add files to staging area -->
+		<Exec Command="git add $(GitAddFiles)" 
+			  WorkingDirectory="$(SolutionDir)" 
+			  Condition="'$(GitStatus)' != ''" />
+		<Message Text="Added files to staging area: $(GitAddFiles)" Condition="'$(GitStatus)' != ''" />
+		
+		<!-- Commit the changes with intelligent message -->
+		<Exec Command='git commit -m "$(FinalCommitMessage)"' 
+			  WorkingDirectory="$(SolutionDir)" 
+			  Condition="'$(GitStatus)' != ''" />
+		<Message Text="Committed changes with message: $(FinalCommitMessage)" Condition="'$(GitStatus)' != ''" />
+		
+		<Message Text="==> DONE"/>
+	</Target>
+
+	<!-- Combined target: Update versions and commit with smart message -->
+	<Target Name="UPDATE_AND_COMMIT" DependsOnTargets="UPDATE_DOC_VERSIONS">
+		<PropertyGroup>
+			<CommitType>docs</CommitType>
+			<CommitScope>automation</CommitScope>
+		</PropertyGroup>
+		
+		<CallTarget Targets="GIT_COMMIT_INFRASTRUCTURE" />
+		<Message Text="==> DONE"/>
+	</Target>
+
+	<!-- Full infrastructure update and commit with intelligent analysis -->
+	<Target Name="INFRASTRUCTURE_COMMIT" DependsOnTargets="SOLUTION">
+		<PropertyGroup>
+			<CommitType Condition="'$(CommitType)' == ''">feat</CommitType>
+			<CommitScope Condition="'$(CommitScope)' == ''">infrastructure</CommitScope>
+		</PropertyGroup>
+		
+		<CallTarget Targets="GIT_COMMIT_INFRASTRUCTURE" />
+		<Message Text="==> DONE"/>
+	</Target>
+
+	<!-- Preview commit message without committing -->
+	<Target Name="PREVIEW_COMMIT_MESSAGE">
+		<CallTarget Targets="GENERATE_COMMIT_MESSAGE" />
+		<Message Text="==> Commit message preview complete. Check $(SolutionDir)\.commit-message file"/>
 	</Target>
 </Project>
