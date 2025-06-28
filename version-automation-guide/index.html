@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="naz-hage" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Documentation Version Automation Guide - Ntools - Work in Progress</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Documentation Version Automation Guide";
+        var mkdocs_page_input_path = "version-automation-guide.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Ntools - Work in Progress
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../usage/">Practice</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../setup/">Setup your project</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buildtypes/">Build Types</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../versioning/">Versioning</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">List of Tools</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/nbuild/">Nbuild (nb.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/lf/">lf (lf.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/nbackup/">Nbackup (nbackup.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/wi/">wi (wi.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/github-release/">Github Release</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Custom Build Tasks</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/nbuildtasks/">Nbuild Tasks</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Update</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/ntools/">Development Tools</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Revisions</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../changelog/">Changelog</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Ntools - Work in Progress</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Documentation Version Automation Guide</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/naz-hage/ntools/edit/main/docs/version-automation-guide.md">Edit on ntools</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="documentation-version-automation-guide">Documentation Version Automation Guide</h1>
+<p>This document outlines the automation solutions implemented to keep the <code>docs/ntools/ntools.md</code> file synchronized with version information from JSON configuration files in the <code>dev-setup/</code> directory.</p>
+<h2 id="problem-statement">Problem Statement</h2>
+<p>The ntools project maintains tool version information in two places:
+1. <strong>JSON Configuration Files</strong> (<code>dev-setup/*.json</code>) - Used for automated installation
+2. <strong>Documentation Table</strong> (<code>docs/ntools/ntools.md</code>) - User-facing version reference</p>
+<p>Previously, these had to be updated manually, leading to inconsistencies and outdated documentation.</p>
+<h2 id="solutions-implemented">Solutions Implemented</h2>
+<p>We've implemented <strong>4 complementary automation approaches</strong> that can be used individually or together:</p>
+<hr />
+<h2 id="1-powershell-script-automation">1. 🔧 PowerShell Script Automation</h2>
+<h3 id="what-was-added">What Was Added</h3>
+<ul>
+<li><strong>File</strong>: <code>dev-setup/update-versions.ps1</code></li>
+<li><strong>Purpose</strong>: Standalone script to sync versions between JSON files and documentation</li>
+<li><strong>Execution</strong>: Manual or triggered by other automation</li>
+</ul>
+<h3 id="features">Features</h3>
+<ul>
+<li>Reads all JSON files in <code>dev-setup/</code> directory</li>
+<li>Extracts <code>Name</code> and <code>Version</code> from <code>NbuildAppList[0]</code></li>
+<li>Updates corresponding entries in <code>ntools.md</code> table</li>
+<li>Handles tool name mapping (e.g., "PowerShell" ↔ "Powershell")</li>
+<li>Updates "Last Checked on" dates automatically</li>
+<li>Provides colored console output for better UX</li>
+</ul>
+<h3 id="usage">Usage</h3>
+<pre><code class="language-powershell"># Basic usage
+cd dev-setup
+.\update-versions.ps1
+
+# With custom paths
+.\update-versions.ps1 -DevSetupPath &quot;C:\source\ntools\dev-setup&quot; -DocsPath &quot;C:\source\ntools\docs\ntools\ntools.md&quot;
+</code></pre>
+<h3 id="benefits">Benefits</h3>
+<ul>
+<li>✅ <strong>Immediate execution</strong> - Run anytime manually</li>
+<li>✅ <strong>Portable</strong> - Works on any Windows machine with PowerShell</li>
+<li>✅ <strong>Standalone</strong> - No dependencies on build system</li>
+<li>✅ <strong>Flexible</strong> - Can be called from other scripts</li>
+</ul>
+<hr />
+<h2 id="2-nbuild-task-integration">2. 🏗️ NBuild Task Integration</h2>
+<h3 id="what-was-added_1">What Was Added</h3>
+<ul>
+<li><strong>File</strong>: <code>NbuildTasks/UpdateVersionsInDocs.cs</code></li>
+<li><strong>Purpose</strong>: MSBuild task for build-time automation</li>
+<li><strong>Execution</strong>: Integrated into your existing NBuild workflow</li>
+</ul>
+<h3 id="features_1">Features</h3>
+<ul>
+<li>Native C# MSBuild task implementation</li>
+<li>JSON parsing using <code>System.Text.Json</code></li>
+<li>Regex-based markdown table updating</li>
+<li>Comprehensive tool name mapping logic</li>
+<li>Build-time logging and error handling</li>
+<li>Can be part of CI/CD pipeline</li>
+</ul>
+<h3 id="usage_1">Usage</h3>
+<pre><code class="language-xml">&lt;Target Name=&quot;UpdateDocVersions&quot;&gt;
+  &lt;UpdateVersionsInDocs 
+    DevSetupPath=&quot;$(MSBuildProjectDirectory)\dev-setup&quot; 
+    DocsPath=&quot;$(MSBuildProjectDirectory)\docs\ntools\ntools.md&quot; /&gt;
+&lt;/Target&gt;
+</code></pre>
+<h3 id="benefits_1">Benefits</h3>
+<ul>
+<li>✅ <strong>Build integration</strong> - Automatic during build process</li>
+<li>✅ <strong>Native performance</strong> - C# execution speed</li>
+<li>✅ <strong>MSBuild compatibility</strong> - Works with existing build system</li>
+<li>✅ <strong>CI/CD ready</strong> - Integrates with automated builds</li>
+</ul>
+<hr />
+<h2 id="3-github-actions-workflow">3. 🔄 GitHub Actions Workflow</h2>
+<h3 id="what-was-added_2">What Was Added</h3>
+<ul>
+<li><strong>File</strong>: <code>.github/workflows/update-versions.yml</code></li>
+<li><strong>Purpose</strong>: Automated cloud-based version synchronization</li>
+<li><strong>Execution</strong>: Triggered by changes to JSON files</li>
+</ul>
+<h3 id="features_2">Features</h3>
+<ul>
+<li>Triggers on JSON file changes (<code>dev-setup/*.json</code>)</li>
+<li>Cross-platform execution (Windows runner)</li>
+<li>Automatic commit and push of documentation updates</li>
+<li>Pull request integration</li>
+<li>Manual trigger capability (<code>workflow_dispatch</code>)</li>
+</ul>
+<h3 id="triggers">Triggers</h3>
+<ul>
+<li><strong>Push</strong>: When JSON files are modified and pushed</li>
+<li><strong>Pull Request</strong>: When JSON files are changed in PRs</li>
+<li><strong>Manual</strong>: Via GitHub Actions UI</li>
+</ul>
+<h3 id="benefits_2">Benefits</h3>
+<ul>
+<li>✅ <strong>Zero maintenance</strong> - Runs automatically in cloud</li>
+<li>✅ <strong>Team collaboration</strong> - Works for all contributors</li>
+<li>✅ <strong>Version control</strong> - Creates traceable commits</li>
+<li>✅ <strong>PR integration</strong> - Updates docs in pull requests</li>
+</ul>
+<hr />
+<h2 id="4-git-pre-commit-hooks">4. 🪝 Git Pre-commit Hooks</h2>
+<h3 id="what-was-added_3">What Was Added</h3>
+<ul>
+<li><strong>File</strong>: <code>.git/hooks/pre-commit</code> (Manual approach)</li>
+<li><strong>File</strong>: <code>.pre-commit-config.yaml</code> (Framework approach)</li>
+<li><strong>Purpose</strong>: Local developer workflow automation</li>
+<li><strong>Execution</strong>: Automatically before each commit</li>
+</ul>
+<h3 id="features_3">Features</h3>
+<h4 id="manual-hook-features">Manual Hook Features:</h4>
+<ul>
+<li>Detects JSON file changes in staging area</li>
+<li>Runs PowerShell version update script</li>
+<li>Automatically stages updated documentation</li>
+<li>Additional quality checks (debugging code, large files, JSON validation)</li>
+<li>Colored output with status indicators</li>
+<li>C# code formatting integration</li>
+</ul>
+<h4 id="pre-commit-framework-features">Pre-commit Framework Features:</h4>
+<ul>
+<li>Comprehensive hook ecosystem</li>
+<li>JSON/YAML validation</li>
+<li>Code formatting (C#, PowerShell)</li>
+<li>Conventional commit message validation</li>
+<li>Configurable and extensible</li>
+<li>Performance optimized</li>
+</ul>
+<h3 id="usage_2">Usage</h3>
+<pre><code class="language-bash"># Manual setup
+chmod +x .git/hooks/pre-commit
+
+# Framework setup
+pip install pre-commit
+pre-commit install
+pre-commit install --hook-type commit-msg
+
+# Normal git workflow - hooks run automatically
+git add .
+git commit -m &quot;Update PowerShell version&quot;
+</code></pre>
+<h3 id="benefits_3">Benefits</h3>
+<ul>
+<li>✅ <strong>Developer workflow</strong> - Integrates with daily git usage</li>
+<li>✅ <strong>Immediate feedback</strong> - Catches issues before commit</li>
+<li>✅ <strong>Automatic execution</strong> - No manual intervention required</li>
+<li>✅ <strong>Quality enforcement</strong> - Additional code quality checks</li>
+</ul>
+<hr />
+<h2 id="implementation-strategy">Implementation Strategy</h2>
+<h3 id="recommended-approach">Recommended Approach</h3>
+<ol>
+<li><strong>Start with PowerShell script</strong> - Immediate utility and testing</li>
+<li><strong>Add pre-commit hooks</strong> - Improve developer workflow</li>
+<li><strong>Integrate with NBuild</strong> - Automate in build process</li>
+<li><strong>Enable GitHub Actions</strong> - Complete automation for team</li>
+</ol>
+<h3 id="complementary-usage">Complementary Usage</h3>
+<ul>
+<li><strong>PowerShell Script</strong>: Manual updates and testing</li>
+<li><strong>Pre-commit Hooks</strong>: Developer workflow automation</li>
+<li><strong>NBuild Task</strong>: Build-time verification</li>
+<li><strong>GitHub Actions</strong>: Team collaboration and CI/CD</li>
+</ul>
+<h2 id="tool-name-mapping">Tool Name Mapping</h2>
+<p>The automation handles differences between JSON configuration names and documentation display names:</p>
+<table>
+<thead>
+<tr>
+<th>Documentation Name</th>
+<th>JSON Configuration Name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Node.js</td>
+<td>Node.js</td>
+</tr>
+<tr>
+<td>PowerShell</td>
+<td>Powershell</td>
+</tr>
+<tr>
+<td>Python</td>
+<td>Python</td>
+</tr>
+<tr>
+<td>Git for Windows</td>
+<td>Git for Windows</td>
+</tr>
+<tr>
+<td>Visual Studio Code</td>
+<td>Visual Studio Code</td>
+</tr>
+<tr>
+<td>NuGet</td>
+<td>Nuget</td>
+</tr>
+<tr>
+<td>Terraform</td>
+<td>Terraform</td>
+</tr>
+<tr>
+<td>Terraform Lint</td>
+<td>terraform lint</td>
+</tr>
+<tr>
+<td>kubernetes</td>
+<td>kubectl</td>
+</tr>
+<tr>
+<td>minikube</td>
+<td>minikube</td>
+</tr>
+<tr>
+<td>Azure CLI</td>
+<td>AzureCLI</td>
+</tr>
+<tr>
+<td>MongoDB Community Server</td>
+<td>MongoDB</td>
+</tr>
+<tr>
+<td>pnpm</td>
+<td>pnpm</td>
+</tr>
+<tr>
+<td>Ntools</td>
+<td>Ntools</td>
+</tr>
+</tbody>
+</table>
+<h2 id="benefits-summary">Benefits Summary</h2>
+<h3 id="before-automation">Before Automation</h3>
+<ul>
+<li>❌ Manual synchronization required</li>
+<li>❌ Prone to human error</li>
+<li>❌ Inconsistent version information</li>
+<li>❌ Time-consuming maintenance</li>
+<li>❌ Often forgotten during updates</li>
+</ul>
+<h3 id="after-automation">After Automation</h3>
+<ul>
+<li>✅ <strong>Consistency</strong>: Documentation always matches configuration</li>
+<li>✅ <strong>Accuracy</strong>: Eliminates manual transcription errors</li>
+<li>✅ <strong>Efficiency</strong>: Saves developer time</li>
+<li>✅ <strong>Reliability</strong>: Automated processes don't forget</li>
+<li>✅ <strong>Scalability</strong>: Handles growing number of tools easily</li>
+<li>✅ <strong>Auditability</strong>: Git history tracks all changes</li>
+<li>✅ <strong>Team Collaboration</strong>: Works for all team members</li>
+<li>✅ <strong>CI/CD Integration</strong>: Fits into automated pipelines</li>
+</ul>
+<h2 id="maintenance">Maintenance</h2>
+<h3 id="regular-tasks">Regular Tasks</h3>
+<ul>
+<li>Monitor automation execution logs</li>
+<li>Update tool name mappings when new tools are added</li>
+<li>Review and update hook configurations as needed</li>
+<li>Test automation after major Git or build system changes</li>
+</ul>
+<h3 id="troubleshooting">Troubleshooting</h3>
+<pre><code class="language-powershell"># Test PowerShell script manually
+cd dev-setup
+.\update-versions.ps1 -Verbose
+
+# Skip pre-commit hooks if needed
+git commit --no-verify
+
+# Check GitHub Actions logs
+# Visit: https://github.com/your-repo/actions
+
+# Debug pre-commit framework
+pre-commit run --all-files --verbose
+</code></pre>
+<h2 id="future-enhancements">Future Enhancements</h2>
+<p>Potential improvements to consider:
+- <strong>Semantic version validation</strong>: Ensure versions follow semver
+- <strong>Changelog generation</strong>: Auto-update changelogs with version changes
+- <strong>Notification system</strong>: Alert team of version updates
+- <strong>Dependency checking</strong>: Verify tool compatibility
+- <strong>Release automation</strong>: Tag releases when versions change</p>
+<hr />
+<p><em>This automation system ensures that the ntools documentation remains accurate and up-to-date with minimal manual intervention, improving both developer productivity and end-user experience.</em></p>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/naz-hage/ntools" class="fa fa-code-fork" style="color: #fcfcfc"> ntools</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
