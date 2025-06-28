@@ -31,22 +31,69 @@ env:
   enable_logging: ${{ github.event.inputs.enable_logging || 'false' }}
 
 jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Restore dependencies
+        run: dotnet restore ntools.sln
+        working-directory: ${{ github.workspace }}
+
+      - name: Build
+        run: dotnet build ntools.sln --no-restore --configuration Release
+        working-directory: ${{ github.workspace }}
+
+      - name: Test with coverage
+        env:
+          OWNER: ${{ github.repository_owner }}
+          API_GITHUB_KEY: ${{ secrets.API_GITHUB_KEY }}
+        run: dotnet test ntools.sln --no-build --configuration Release --logger "trx;LogFileName=test-results.trx" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=TestResults/
+        working-directory: ${{ github.workspace }}
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: '**/TestResults/**/*.trx'
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: '**/TestResults/**/coverage.cobertura.xml'
+
+      - name: List all coverage files
+        run: Get-ChildItem -Recurse -Filter coverage.cobertura.xml | Select-Object -ExpandProperty FullName
+        shell: pwsh
+
+      - name: List all coverage.cobertura.xml files
+        run: Get-ChildItem -Path . -Filter coverage.cobertura.xml -Recurse | Select-Object FullName
+        shell: pwsh
+        working-directory: ${{ github.workspace }}
+
+      - name: Publish Test Results
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Tests
+          path: '**/TestResults/**/*.trx'
+          reporter: dotnet-trx
+
   build:
     name: Running a workflow
-    strategy:
-      matrix:
-        configuration: [Release]
+    needs: [test]
     runs-on: windows-latest
 
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
       with:
-        token: ${{ secrets.API_GITHUB_KEY }}
         fetch-depth: 0
-        ref: ${{ github.event.pull_request.head.ref }}
-        repository: ${{ github.event.pull_request.head.repo.full_name }}
-    
+
     - name: Install .NET Core
       uses: actions/setup-dotnet@v4
       with:

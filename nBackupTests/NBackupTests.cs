@@ -5,6 +5,7 @@ using NbuildTasks;
 using Ntools;
 using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text.Json;
 
@@ -13,7 +14,33 @@ namespace NbackupTests
     [TestClass()]
     public class NBackupTests
     {
-        private const string ResourceLocation = "Nbackup.Resources.Nbackup.json";
+        private static string GetEmbeddedResourcePath(string assemblyPath, string resourceFileName)
+        {
+            if (!File.Exists(assemblyPath))
+            {
+                throw new FileNotFoundException($"Assembly not found at: {assemblyPath}");
+            }
+
+            var assembly = Assembly.LoadFrom(assemblyPath);
+            var resourceNames = assembly.GetManifestResourceNames();
+
+            // Debug: Print available resources
+            Console.WriteLine($"Available resources in {Path.GetFileName(assemblyPath)}:");
+            foreach (var name in resourceNames)
+            {
+                Console.WriteLine($"  - {name}");
+            }
+
+            // Try to find the resource that contains our target file name
+            var matchingResource = resourceNames.FirstOrDefault(r => r.EndsWith(resourceFileName, StringComparison.OrdinalIgnoreCase));
+
+            if (matchingResource == null)
+            {
+                throw new InvalidOperationException($"No resource found ending with '{resourceFileName}'. Available resources: {string.Join(", ", resourceNames)}");
+            }
+
+            return matchingResource;
+        }
 
         [TestMethod()]
         public void PerformTest()
@@ -24,7 +51,15 @@ namespace NbackupTests
             string nbackup = $"{Path.GetDirectoryName(assembly.Location)}\\Nbackup.dll";
             var backupInput = $"{Path.GetDirectoryName(assembly.Location)}\\backup.json";
 
-            ResourceHelper.ExtractEmbeddedResourceFromAssembly(nbackup, ResourceLocation, backupInput);
+            try
+            {
+                var correctResourceName = GetEmbeddedResourcePath(nbackup, "Nbackup.json");
+                ResourceHelper.ExtractEmbeddedResourceFromAssembly(nbackup, correctResourceName, backupInput);
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail($"Failed to extract embedded resource: {ex.Message}");
+            }
 
             // Act
             Assert.IsTrue(Parser.TryParse($"-i {backupInput}", out Cli options));
@@ -67,7 +102,15 @@ namespace NbackupTests
             string nbackup = $"{Path.GetDirectoryName(assembly.Location)}\\Nbackup.dll";
             var jsonFile = $"{Path.GetDirectoryName(assembly.Location)}\\backup.json";
 
-            ResourceHelper.ExtractEmbeddedResourceFromAssembly(nbackup, ResourceLocation, jsonFile);
+            try
+            {
+                var correctResourceName = GetEmbeddedResourcePath(nbackup, "Nbackup.json");
+                ResourceHelper.ExtractEmbeddedResourceFromAssembly(nbackup, correctResourceName, jsonFile);
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail($"Failed to extract embedded resource: {ex.Message}");
+            }
 
             Console.WriteLine($"file: {jsonFile}");
             var jsonString = File.ReadAllText(jsonFile);

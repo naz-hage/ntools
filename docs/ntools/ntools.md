@@ -16,12 +16,13 @@ The [Windows dev environment](https://learn.microsoft.com/en-us/windows/dev-envi
 | [kubernetes](https://github.com/kubernetes/kubernetes/releases)                                           | 1.33.0      | 04-May-25       |
 | [minikube](https://github.com/kubernetes/minikube/releases/)                                              | 1.35.0      | 12-Mar-25       |
 | [MongoDB Community Server](https://www.mongodb.com/try/download/community)                                | 8.0.5       | 10-Mar-25       |
-| [Node.js](https://nodejs.org/en/download/)                                                                | 22.14.1     | 10-Mar-25       |
-| [Ntools](https://github.com/naz-hage/ntools/releases)                                                     | 1.22.0      | 06-Jun-25       |
-| [NuGet](https://www.nuget.org/downloads)                                                                  | 6.13.2      | 10-Mar-25       |
+| [Node.js](https://nodejs.org/en/download/)                                                                | 22.12.0     | 26-Jun-25       |
+| [Ntools](https://github.com/naz-hage/ntools/releases)                                                     | 1.22.0      | 26-Jun-25       |
+| [NuGet](https://www.nuget.org/downloads)                                                                  | 6.12.1      | 26-Jun-25       |
+| [pnpm](https://pnpm.io/)                                                                                  | 9.1.2       | 26-Jun-25       |
 | [Postman Get Started for Free](https://www.postman.com/downloads/)                                        | v11.36.0    | 10-Mar-25       |
-| [PowerShell](https://github.com/PowerShell/PowerShell/releases)                                           | 7.5.1       | 26-May-25       |
-| [Python](https://www.python.org/downloads/)                                                               | 3.13.2      | 28-Apr-25       |
+| [PowerShell](https://github.com/PowerShell/PowerShell/releases)                                           | 7.5.2       | 26-Jun-25       |
+| [Python](https://www.python.org/downloads/)                                                               | 3.13.3      | 26-Jun-25       |
 | [SysInternals](https://learn.microsoft.com/en-us/sysinternals/)                                           | 2.90.0      | 22-Jun-24       |
 | [Terraform](https://releases.hashicorp.com/terraform)                                                     | 1.11.1      | 09-Mar-25       |
 | [Terraform Lint](https://github.com/terraform-linters/tflint/releases)                                    | 0.55.1      | 09-Mar-25       |
