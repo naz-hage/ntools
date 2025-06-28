@@ -252,4 +252,24 @@
 		<Message Text="Listed all NuGet sources." />
 		<Message Text="==> DONE"/>
 	</Target>
+
+	<!-- Update documentation versions from JSON configuration files -->
+	<UsingTask TaskName="UpdateVersionsInDocs" AssemblyFile="C:\source\ntools\Release\NbuildTasks.dll" />
+	<UsingTask TaskName="SetupPreCommitHooks" AssemblyFile="C:\source\ntools\Release\NbuildTasks.dll" />
+	
+	<Target Name="UPDATE_DOC_VERSIONS">
+		<UpdateVersionsInDocs 
+			DevSetupPath="$(SolutionDir)\dev-setup" 
+			DocsPath="$(SolutionDir)\docs\ntools\ntools.md" />
+		<Message Text="Documentation versions updated successfully." />
+		<Message Text="==> DONE"/>
+	</Target>
+
+	<Target Name="SETUP_HOOKS">
+		<SetupPreCommitHooks 
+			GitDirectory="$(SolutionDir)\.git" 
+			HooksSourceDirectory="$(SolutionDir)\dev-setup\hooks" />
+		<Message Text="Pre-commit hooks setup successfully." />
+		<Message Text="==> DONE"/>
+	</Target>
 </Project>
