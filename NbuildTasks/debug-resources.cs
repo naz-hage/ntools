@@ -10,12 +10,15 @@ namespace NbuildTasks.Debug
     /// </summary>
     public static class DebugResources
     {
+        private const string AssemblyName = "NbuildTasks";
+        private const string AssemblyFileName = "NbuildTasks.dll";
+
         /// <summary>
         /// Lists all embedded resources in the NbuildTasks assembly.
         /// </summary>
         public static void ListEmbeddedResources()
         {
-            var assembly = Assembly.LoadFrom(@"C:\source\ntools\Release\NbuildTasks.dll");
+            var assembly = GetNbuildTasksAssembly();
             var resourceNames = assembly.GetManifestResourceNames();
 
             Console.WriteLine("Embedded Resources in NbuildTasks.dll:");
@@ -60,7 +63,13 @@ namespace NbuildTasks.Debug
         /// <param name="outputPath">Path where to save the extracted resource</param>
         public static void ExtractResource(string resourceName, string outputPath)
         {
-            var assembly = Assembly.LoadFrom(@"C:\source\ntools\Release\NbuildTasks.dll");
+            if (string.IsNullOrEmpty(resourceName))
+            {
+                Console.WriteLine("Resource 'null' not found.");
+                return;
+            }
+
+            var assembly = GetNbuildTasksAssembly();
 
             using (var stream = assembly.GetManifestResourceStream(resourceName))
             {
@@ -113,6 +122,79 @@ namespace NbuildTasks.Debug
                 Console.WriteLine("  debug-resources");
                 Console.WriteLine("  debug-resources extract NbuildTasks.Resources.template.txt|template.txt");
             }
+        }
+
+        /// <summary>
+        /// Gets the NbuildTasks assembly, trying multiple possible locations.
+        /// </summary>
+        /// <returns>The loaded NbuildTasks assembly</returns>
+        private static Assembly GetNbuildTasksAssembly()
+        {
+            // First try to load the currently executing assembly
+            // (in case this code is running from within NbuildTasks itself)
+            try
+            {
+                var executingAssembly = Assembly.GetExecutingAssembly();
+                if (executingAssembly.GetName().Name == AssemblyName)
+                {
+                    return executingAssembly;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to get executing assembly: {ex.Message}");
+            }
+
+            // Try to load by name from the current application domain
+            try
+            {
+                return Assembly.Load(AssemblyName);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to load {AssemblyName} by name: {ex.Message}");
+            }
+
+            // Try common relative locations for the assembly
+            var possiblePaths = new[]
+            {
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, AssemblyFileName),
+                Path.Combine(Directory.GetCurrentDirectory(), "Release", AssemblyFileName),
+                Path.Combine(Directory.GetCurrentDirectory(), "Debug", AssemblyFileName),
+                Path.Combine(Directory.GetCurrentDirectory(), "..", "Release", AssemblyFileName),
+                Path.Combine(Directory.GetCurrentDirectory(), "..", "Debug", AssemblyFileName)
+            };
+
+            foreach (var path in possiblePaths)
+            {
+                try
+                {
+                    if (File.Exists(path))
+                    {
+                        // Try to load using Assembly.Load with AssemblyName first
+                        try
+                        {
+                            var assemblyName = System.Reflection.AssemblyName.GetAssemblyName(path);
+                            return Assembly.Load(assemblyName);
+                        }
+                        catch
+                        {
+                            // SonarQube prefers Assembly.Load, but for file paths we need LoadFrom
+                            // Suppress warning as this is the appropriate method for loading from paths
+#pragma warning disable S3885
+                            return Assembly.LoadFrom(path);
+#pragma warning restore S3885
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Failed to load from {path}: {ex.Message}");
+                }
+            }
+
+            throw new FileNotFoundException(
+                $"Could not locate {AssemblyFileName}. Make sure the assembly has been built and is available in the current context.");
         }
     }
 }
