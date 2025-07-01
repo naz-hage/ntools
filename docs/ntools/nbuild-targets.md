@@ -1,22 +1,34 @@
 The table below lists all available targets for the Nbuild tool. 
 
-- **c:\source\ntools\nbuild.targets Targets**
+- **C:\source\ntools\nbuild.targets Targets**
 
 | **Target Name** | **Description** |
 | --- | --- |
 | ARTIFACTS           | Setup the ARTIFACTS folders for binaries and test results - override |
-| CLEAN_ARTIFACTS     | Delete the ARTIFACTS folder after PACKAGE target is completed |
-| TEST_GIT            | Temporary Target to test the Git Task |
-| LOCAL               | Build local stage without incrementing the version |
 | FILE_VERSIONS       | Test for FileVersion task and powershell file-version.ps1 |
 | NBUILD_DOWNLOAD     | Download Nbuild specified in the NbuildTargetVersion |
 | NBUILD_INSTALL      | Install Nbuild specified in the NbuildTargetVersion |
 | DEV_SETUP           | Setup Development Environment |
 | MKDOCS              | Build docs locally for testing |
-| NBUILD_DOWNLOAD     | Download Nbuild specified in the NbuildTargetVersion |
-|                     | Update the ntools-launcher nuget package in the local feed fot testing - not needed for normal builds |
-| NBUILD_INSTALL      | Install Nbuild specified in the NbuildTargetVersion |
+| MKDOCS_DEPLOY       | mkdocs deploy locally |
 | GET_PRODUCT_CODES   | Example to get the installation Product code used for uninstallation of product |
+| CORE                | Display core properties |
+| UPDATE_NTOOLS       | Update ntools locally for testing |
+| NUGET_UPDATE        | Update the ntools-launcher nuget package in the local feed for testing - not needed for normal builds |
+| YELLOW_MESSAGE      | Example of a target that displays a yellow color message |
+| RED_MESSAGE         | Example of a target that displays a red color message |
+| GITHUB_RELEASE      | Creates a stage or prod release |
+| GITHUB_PRE_RELEASE  | Creates a stage or prod pre-release |
+| INSTALL_DOTNET_OUTDATED_TOOL | Install dotnet-outdated-tool globally |
+| UPDATE_NUGET_PACKAGES | Update all NuGet packages to the latest version |
+| LIST_NUGET_SOURCES  | List all NuGet sources |
+| UPDATE_DOC_VERSIONS | Update documentation versions from JSON configuration files |
+| SETUP_HOOKS         |  |
+| GENERATE_COMMIT_MESSAGE | Intelligent commit message generation |
+| GIT_COMMIT_INFRASTRUCTURE | Automated Git commit with intelligent message generation |
+| UPDATE_AND_COMMIT   | Combined target: Update versions and commit with smart message |
+| INFRASTRUCTURE_COMMIT | Full infrastructure update and commit with intelligent analysis |
+| PREVIEW_COMMIT_MESSAGE | Preview commit message without committing |
 
 
 - **C:\Program Files\Nbuild\common.targets Targets**
@@ -27,11 +39,13 @@ The table below lists all available targets for the Nbuild tool.
 | CLEAN               | Clean up the project and artifacts folder |
 | INSTALL_DEP         | Install dependencies |
 | TELEMETRY_OPT_OUT   | Opt out of the DOTNET_CLI_TELEMETRY_OPTOUT - move to common |
-| DEV                 | Create a development package for testing |
+| DEV                 | Create a development package for testing without incrementing the version |
 | STAGE               | Create a stage package for testing |
-| PROD                | Create a production package for release |
-| STAGE_DEPLOY      | Create a stage package and deploy for testing |
-| PROD_DEPLOY   | Create a production package and deploy for release |
+| PROD                | Create a PROD package for release |
+| GITHUB_RELEASE      | Creates a stage or prod release |
+| GITHUB_PRE_RELEASE  | Creates a stage or prod pre-release |
+| STAGE_DEPLOY        | Create a STAGE package and deploy for testing |
+| PROD_DEPLOY         | Create a PROD package and deploy for release |
 | SOLUTION            | Build the solution Release configuration  using dotnet build |
 | SOLUTION_MSBUILD    | Build the solution Release configuration  using MSBuild |
 | PACKAGE             | Create a package for the solution default is a zip file of all artifacts |
@@ -107,12 +121,29 @@ The table below lists all available targets for the Nbuild tool.
 | **Target Name** | **Description** |
 | --- | --- |
 | GIT_STATUS          | Display the current git status |
-| AUTOTAG_STAGE     | Increment version for a stage build |
+| AUTOTAG_STAGE       | Increment version for a stage build |
 | SET_TAG             | Set version for a stage build |
 | GIT_PULL            | Get the latest tag from git |
-| AUTOTAG_PROD  | Increment version for a production build |
+| AUTOTAG_PROD        | Increment version for a production build |
 | TAG                 | Get the tag from git |
 | PUSH_TAG            | Push the tag to the remote repo |
 | GIT_BRANCH          | Get the current git branch |
 
 
+- **C:\Program Files\nbuild\docker.targets Targets**
+
+| **Target Name** | **Description** |
+| --- | --- |
+| DOCKER_DOWNLOAD     | Download Docker version specified in DockerTargetVersion - Requires admin mode |
+| DOCKER_INSTALL      | Download Docker version specified in DockerTargetVersion property and install |
+
+
+- **C:\Program Files\nbuild\terraform.targets Targets**
+
+| **Target Name** | **Description** |
+| --- | --- |
+| TF_WORKSPACE        | Create a new terraform workspace `dev` and select it |
+| TF_INIT             | Init terraform |
+| TF_PLAN             | terraform plan |
+| TF_APPLY            | terraform apply |
+| TF_DESTROY          | terraform destroy |
