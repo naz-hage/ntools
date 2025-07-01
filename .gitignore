@@ -182,7 +182,7 @@ publish/
 # Publish Web Output
 *.[Pp]ublish.xml
 *.azurePubxml
-# Note: Comment the next line if you want to checkin your web deploy settings,
+# Comment the next line if you want to checkin your web deploy settings,
 # but database connection strings (with potential passwords) will be unencrypted
 *.pubxml
 *.publishproj
@@ -406,3 +406,4 @@ FodyWeavers.xsd
 /.temp
 /dev-setup/build-apps.exe
 /go/build-apps.exe
+/docs/backlog
