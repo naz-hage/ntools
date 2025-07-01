@@ -89,8 +89,6 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#updateversionsindocs">UpdateVersionsInDocs</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#debug-resources">debug-resources</a>
-    </li>
     <li class="toctree-l2"><a class="reference internal" href="#pwsh">Pwsh</a>
     </li>
     </ul>
@@ -179,11 +177,16 @@
 <td><a href="#zip">Zip</a></td>
 <td>Zips the specified file.</td>
 </tr>
+<tr>
+<td><a href="#pwsh">Pwsh</a></td>
+<td>Runs a PowerShell Core script from MSBuild.</td>
+</tr>
+<tr>
+<td><a href="#updateversionsindocs">UpdateVersionsInDocs</a></td>
+<td>Updates version numbers in documentation files.</td>
+</tr>
 </tbody>
 </table>
-<p>| <a href="#pwsh">Pwsh</a> | Runs a PowerShell Core script from MSBuild. |
-| <a href="#updateversionsindocs">UpdateVersionsInDocs</a> | Updates version numbers in documentation files. |
-| <a href="#debug-resources">debug-resources</a> | Internal/debug task for resource diagnostics. |</p>
 <p>Here are examples of custom Tasks that can be used during builds:</p>
 <h3 id="rederror">RedError</h3>
 <pre><code class="language-xml">&lt;!-- This target uses the `RedError` task to display an error message in red color --&gt;
@@ -261,12 +264,6 @@
 <pre><code class="language-xml">&lt;!-- This target uses the `UpdateVersionsInDocs` task to update version numbers in documentation files --&gt;
 &lt;Target Name=&quot;UPDATE_DOC_VERSIONS&quot;&gt;
     &lt;UpdateVersionsInDocs DocsPath=&quot;$(SolutionDir)docs&quot; Version=&quot;$(Version)&quot; /&gt;
-&lt;/Target&gt;
-</code></pre>
-<h3 id="debug-resources">debug-resources</h3>
-<pre><code class="language-xml">&lt;!-- This target uses the `debug-resources` task for internal resource diagnostics (for development/debug use only) --&gt;
-&lt;Target Name=&quot;DEBUG_RESOURCES&quot;&gt;
-    &lt;debug-resources /&gt;
 &lt;/Target&gt;
 </code></pre>
 <h3 id="pwsh">Pwsh</h3>
