@@ -18,7 +18,9 @@ function Get-VersionFromJson {
         }
     }
     catch {
-        Write-Warning "Failed to parse $JsonPath: $_"
+        # Log a warning for the user if parsing fails (for visibility)
+        Write-Warning "Failed to parse $($JsonPath): $($_)"
+        # Return a hashtable indicating failure so the calling code can skip this file
         return @{ Found = $false }
     }
 }
