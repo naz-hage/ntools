@@ -12,36 +12,40 @@
 | [Unzip](#unzip)  | Unzips the specified file. |
 | [Zip](#zip)  | Zips the specified file. |
 
+| [Pwsh](#pwsh) | Runs a PowerShell Core script from MSBuild. |
+| [UpdateVersionsInDocs](#updateversionsindocs) | Updates version numbers in documentation files. |
+| [debug-resources](#debug-resources) | Internal/debug task for resource diagnostics. |
+
 Here are examples of custom Tasks that can be used during builds:
 
 ### RedError
 ```xml
 <!-- This target uses the `RedError` task to display an error message in red color -->
 <Target Name="RED_ERROR">
-    <RedError Message="This is an error message displayed in Red" />
+	<RedError Message="This is an error message displayed in Red" />
 </Target>
 ```
 ### Git
 ```xml
 <Target Name="TAG">
-    <-- This target uses the `GetTag` task to display the tag from a branch -->
-    <GetTag Branch="$(Branch)" BuildType="$(BuildType)">
-        <Output TaskParameter="Tag" PropertyName="Tag" />
-    </GetTag>
-    <Message Text="Tag: $(Tag)" Importance="high" />
+	<-- This target uses the `GetTag` task to display the tag from a branch -->
+	<GetTag Branch="$(Branch)" BuildType="$(BuildType)">
+		<Output TaskParameter="Tag" PropertyName="Tag" />
+	</GetTag>
+	<Message Text="Tag: $(Tag)" Importance="high" />
 </Target>
 ```
 ### ColorMessage
 ```xml
 <!-- This target uses the `ColorMessage` task to display a message with a specified color -->
 <Target Name="COLOR_MESSAGE">
-    <ColorMessage Message="This is a message displayed in Yellow" Color="Yellow" />
+	<ColorMessage Message="This is a message displayed in Yellow" Color="Yellow" />
 </Target>
 ```
 ### FileVersion
 ```xml
-    <!-- This target uses the `FileVersion` task to file version of specified file -->
-    <Target Name="FILE_VERSION">
+	<!-- This target uses the `FileVersion` task to file version of specified file -->
+	<Target Name="FILE_VERSION">
 		<PropertyGroup>
 			<FileExe>$(ProgramFiles)\Nbuild\nb.exe</FileExe>
 		</PropertyGroup>
@@ -57,9 +61,9 @@ Here are examples of custom Tasks that can be used during builds:
 <Target Name="WEB_DOWNLOAD" DependsOnTargets="IS_ADMIN" >
 	<PropertyGroup>
 		<!-- visit https://nodejs.org/dist/ to get the latest stable version -->
-        <DownloadsDirectory>c:\NtoolsDownloads</DownloadsDirectory>
-        <NodeAppName>Node.js</NodeAppName>
-        <NodeTargetVersion>21.5.0</NodeTargetVersion>
+		<DownloadsDirectory>c:\NtoolsDownloads</DownloadsDirectory>
+		<NodeAppName>Node.js</NodeAppName>
+		<NodeTargetVersion>21.5.0</NodeTargetVersion>
 		<WebUri>https://nodejs.org/dist/v$(NodeTargetVersion)/node-v$(NodeTargetVersion)-x64.msi</WebUri>
 		<FileName>$(DownloadsDirectory)\node-v$(NodeTargetVersion)-x64.msi</FileName>
 	</PropertyGroup>
@@ -92,6 +96,21 @@ Here are examples of custom Tasks that can be used during builds:
 	</PropertyGroup>
 	<Zip FileName="$(FileName)" Path="$(Path)" />
 	<Message Text="==> ZIP_DONE"/>
+</Target>
+```
+### UpdateVersionsInDocs
+```xml
+<!-- This target uses the `UpdateVersionsInDocs` task to update version numbers in documentation files -->
+<Target Name="UPDATE_DOC_VERSIONS">
+	<UpdateVersionsInDocs DocsPath="$(SolutionDir)docs" Version="$(Version)" />
+</Target>
+```
+
+### debug-resources
+```xml
+<!-- This target uses the `debug-resources` task for internal resource diagnostics (for development/debug use only) -->
+<Target Name="DEBUG_RESOURCES">
+	<debug-resources />
 </Target>
 ```
 ### Pwsh
