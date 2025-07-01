@@ -89,6 +89,30 @@
       "UninstallArgs": "/uninstall /quiet /norestart"
     },
     {
+      "Name": ".NET SDK",
+      "Version": "8.0.408",
+      "AppFileName": "$(InstallPath)\\dotnet.dll",
+      "WebDownloadFile": "https://builds.dotnet.microsoft.com/dotnet/Sdk/$(Version)/dotnet-sdk-$(Version)-win-x64.exe",
+      "DownloadedFile": "dotnet-sdk-installer.exe",
+      "InstallCommand": "dotnet-sdk-installer.exe",
+      "InstallArgs": "/quiet /norestart",
+      "InstallPath": "$(ProgramFiles)\\dotnet\\sdk\\$(Version)",
+      "UninstallCommand": "dotnet-sdk-installer.exe",
+      "UninstallArgs": "/uninstall /quiet /norestart"
+    },
+    {
+      "Name": ".NET SDK",
+      "Version": "9.0.203",
+      "AppFileName": "$(InstallPath)\\dotnet.dll",
+      "WebDownloadFile": "https://builds.dotnet.microsoft.com/dotnet/Sdk/$(Version)/dotnet-sdk-$(Version)-win-x64.exe",
+      "DownloadedFile": "dotnet-sdk-installer.exe",
+      "InstallCommand": "dotnet-sdk-installer.exe",
+      "InstallArgs": "/quiet /norestart",
+      "InstallPath": "$(ProgramFiles)\\dotnet\\sdk\\$(Version)",
+      "UninstallCommand": "dotnet-sdk-installer.exe",
+      "UninstallArgs": "/uninstall /quiet /norestart"
+    },
+    {
       "Name": "Git for Windows",
       "Version": "2.49.0",
       "AppFileName": "$(InstallPath)\\bin\\git.exe",
@@ -154,8 +178,21 @@
       "UninstallArgs": "/x {CDE275B4-7DCB-4D35-AD3E-AB7A4EB36CBB} /qn"
     },
     {
+      "Name": "Node.js",
+      "Version": "22.12.0",
+      "AppFileName": "$(InstallPath)\\node.exe",
+      "WebDownloadFile": "https://nodejs.org/dist/v$(Version)/node-v$(Version)-win-x64.zip",
+      "DownloadedFile": "node-v$(Version)-win-x64.zip",
+      "InstallCommand": "powershell.exe",
+      "InstallArgs": "-Command Expand-Archive -Path node-v$(Version)-win-x64.zip -DestinationPath '$(ProgramFiles)\\nodejs-temp' -Force; Move-Item -Path '$(ProgramFiles)\\nodejs-temp\\node-v$(Version)-win-x64\\*' -Destination '$(InstallPath)' -Force; Remove-Item -Path '$(ProgramFiles)\\nodejs-temp' -Recurse -Force",
+      "InstallPath": "$(ProgramFiles)\\nodejs",
+      "UninstallCommand": "powershell.exe",
+      "UninstallArgs": "-Command Remove-Item -Path '$(InstallPath)' -Recurse -Force",
+      "AddToPath": true
+    },
+    {
       "Name": "Ntools",
-      "Version": " 1.12.0",
+      "Version": "1.22.0",
       "AppFileName": "$(InstallPath)\\nb.exe",
       "WebDownloadFile": "https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip",
       "DownloadedFile": "$(Version).zip",
@@ -179,8 +216,21 @@
       "UninstallArgs": "-Command Remove-Item -Path '$(AppFileName)' -Force"
     },
     {
+      "Name": "pnpm",
+      "Version": "9.1.2",
+      "AppFileName": "$(InstallPath)\\pnpm.exe",
+      "WebDownloadFile": "https://github.com/pnpm/pnpm/releases/download/v$(Version)/pnpm-win-x64.exe",
+      "DownloadedFile": "pnpm-win-x64.exe",
+      "InstallCommand": "xcopy.exe",
+      "InstallArgs": "-Command Copy-Item -Path $(DownloadedFile) -Destination '$(InstallPath)\\pnpm.exe' -Force",
+      "InstallPath": "$(ProgramFiles)\\pnpm",
+      "UninstallCommand": "powershell.exe",
+      "UninstallArgs": "-Command Remove-Item -Path '$(InstallPath)' -Recurse -Force",
+      "AddToPath": true
+    },
+    {
       "Name": "Powershell",
-      "Version": "7.5.1",
+      "Version": "7.5.2",
       "AppFileName": "$(InstallPath)\\pwsh.exe",
       "WebDownloadFile": "https://github.com/PowerShell/PowerShell/releases/download/v$(Version)/PowerShell-$(Version)-win-x64.msi",
       "DownloadedFile": "PowerShell-$(Version)-win-x64.msi",
