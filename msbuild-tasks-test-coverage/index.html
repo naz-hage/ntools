@@ -5,14 +5,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="naz-hage" />
       <link rel="shortcut icon" href="../img/favicon.ico" />
-    <title>MSBuild Tasks Unit Test Coverage Report - Ntools - Work in Progress</title>
+    <title>MSBuild Tasks Test Coverage - Ntools - Work in Progress</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
     
       <script>
         // Current page data
-        var mkdocs_page_name = "MSBuild Tasks Unit Test Coverage Report";
+        var mkdocs_page_name = "MSBuild Tasks Test Coverage";
         var mkdocs_page_input_path = "msbuild-tasks-test-coverage.md";
         var mkdocs_page_url = null;
       </script>
@@ -68,8 +68,95 @@
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Custom Build Tasks</span></p>
-              <ul>
+              <ul class="current">
                   <li class="toctree-l1"><a class="reference internal" href="../ntools/nbuildtasks/">Nbuild Tasks</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../nbuild-tasks-integration/">NBuild Tasks Integration</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">MSBuild Tasks Test Coverage</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#test-projects-structure">Test Projects Structure</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#nbuildtaskstestscsproj">NbuildTasksTests.csproj</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#test-coverage-by-task">Test Coverage by Task</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#1-updateversionsindocs-task-tests">1. UpdateVersionsInDocs Task Tests</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#test-scenarios">Test Scenarios:</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#key-features-tested">Key Features Tested:</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-setupprecommithooks-task-tests">2. SetupPreCommitHooks Task Tests</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#test-scenarios_1">Test Scenarios:</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#key-features-tested_1">Key Features Tested:</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#3-generatecommitmessage-task-tests">3. GenerateCommitMessage Task Tests</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#test-scenarios_2">Test Scenarios:</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#key-features-tested_2">Key Features Tested:</a>
+    </li>
+        </ul>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#test-infrastructure-features">Test Infrastructure Features</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#isolated-test-environment">Isolated Test Environment</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#error-handling-coverage">Error Handling Coverage</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#cross-platform-considerations">Cross-Platform Considerations</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#test-execution-results">Test Execution Results</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#current-status-all-tests-passing">Current Status: ✅ All Tests Passing</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#performance">Performance</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#benefits-of-this-test-coverage">Benefits of This Test Coverage</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#1-reliability-assurance">1. Reliability Assurance</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-refactoring-safety">2. Refactoring Safety</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#3-documentation-value">3. Documentation Value</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#4-debugging-support">4. Debugging Support</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#future-enhancements">Future Enhancements</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#potential-additions">Potential Additions</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#continuous-improvement">Continuous Improvement</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#conclusion">Conclusion</a>
+    </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Pre-commit</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../pre-commit-setup/">Pre-commit Setup</a>
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Update</span></p>
@@ -96,7 +183,8 @@
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
-      <li class="breadcrumb-item active">MSBuild Tasks Unit Test Coverage Report</li>
+          <li class="breadcrumb-item">Custom Build Tasks</li>
+      <li class="breadcrumb-item active">MSBuild Tasks Test Coverage</li>
     <li class="wy-breadcrumbs-aside">
           <a href="https://github.com/naz-hage/ntools/edit/main/docs/msbuild-tasks-test-coverage.md">Edit on ntools</a>
     </li>
@@ -279,6 +367,10 @@
               
             </div>
           </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../nbuild-tasks-integration/" class="btn btn-neutral float-left" title="NBuild Tasks Integration"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../pre-commit-setup/" class="btn btn-neutral float-right" title="Pre-commit Setup">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
 
   <hr/>
 
@@ -304,6 +396,10 @@
         </span>
     
     
+      <span><a href="../nbuild-tasks-integration/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../pre-commit-setup/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>
