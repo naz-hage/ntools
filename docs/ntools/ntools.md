@@ -11,7 +11,7 @@ The [Windows dev environment](https://learn.microsoft.com/en-us/windows/dev-envi
 | [Dotnet8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet)                                         | 8.0.408     | 02-May-25       |
 | [Dotnet9 Runtime](https://dotnet.microsoft.com/en-us/download/dotnet)                                     | 9.0.203     | 02-May-25       |
 | [Draw.io](https://app.diagrams.net/)                                                                      | N/A         | 01-Oct-23       |
-| [Git for Windows](https://git-scm.com/downloads)                                                          | 2.49.0     | 01-Jul-25      |
+| [Git for Windows](https://git-scm.com/downloads)                                                          | 2.50.0     | 01-Jul-25      |
 | [Install Docker Desktop on Windows](https://docs.docker.com/docker-for-windows/install/)                  | 4.38.0.0    | 03-Mar-25       |
 | [kubernetes](https://github.com/kubernetes/kubernetes/releases)                                           | 1.33.0     | 01-Jul-25      |
 | [minikube](https://github.com/kubernetes/minikube/releases/)                                              | 1.35.0     | 01-Jul-25      |

@@ -295,7 +295,7 @@
 	</Target>
 
 	<!-- Automated Git commit with intelligent message generation -->
-	<Target Name="GIT_COMMIT_INFRASTRUCTURE" DependsOnTargets="GENERATE_COMMIT_MESSAGE">
+	<Target Name="GIT_COMMIT_INFRASTRUCTURE" DependsOnTargets="UPDATE_DOC_VERSIONS;GENERATE_COMMIT_MESSAGE">
 		<PropertyGroup>
 			<!-- Use generated message if no custom message provided -->
 			<FinalCommitMessage Condition="'$(CommitMessage)' == ''">$(GeneratedCommitMessage)</FinalCommitMessage>
