@@ -11,10 +11,8 @@
 | [WebDownload](#webdownload)  | Downloads a file from the specified URL. |
 | [Unzip](#unzip)  | Unzips the specified file. |
 | [Zip](#zip)  | Zips the specified file. |
-
 | [Pwsh](#pwsh) | Runs a PowerShell Core script from MSBuild. |
 | [UpdateVersionsInDocs](#updateversionsindocs) | Updates version numbers in documentation files. |
-| [debug-resources](#debug-resources) | Internal/debug task for resource diagnostics. |
 
 Here are examples of custom Tasks that can be used during builds:
 
@@ -103,14 +101,6 @@ Here are examples of custom Tasks that can be used during builds:
 <!-- This target uses the `UpdateVersionsInDocs` task to update version numbers in documentation files -->
 <Target Name="UPDATE_DOC_VERSIONS">
 	<UpdateVersionsInDocs DocsPath="$(SolutionDir)docs" Version="$(Version)" />
-</Target>
-```
-
-### debug-resources
-```xml
-<!-- This target uses the `debug-resources` task for internal resource diagnostics (for development/debug use only) -->
-<Target Name="DEBUG_RESOURCES">
-	<debug-resources />
 </Target>
 ```
 ### Pwsh
