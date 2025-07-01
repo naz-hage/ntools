@@ -60,6 +60,24 @@ jobs:
           name: test-results
           path: '**/TestResults/**/*.trx'
 
+      - name: Upload MSBuild Tasks Test Coverage Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: msbuild-tasks-test-coverage
+          path: docs/msbuild-tasks-test-coverage.md
+
+      - name: Upload NBuild Tasks Integration Guide
+        uses: actions/upload-artifact@v4
+        with:
+          name: nbuild-tasks-integration
+          path: docs/nbuild-tasks-integration.md
+
+      - name: Upload Pre-commit Setup Guide
+        uses: actions/upload-artifact@v4
+        with:
+          name: pre-commit-setup
+          path: docs/pre-commit-setup.md
+
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
         with:
