@@ -50,19 +50,47 @@ namespace lf
         {
             foreach (var ext in extensions)
             {
-                var filesWithExt = Directory.GetFiles(directory, $"*{ext}", SearchOption.AllDirectories);
-                if (filesWithExt.Length > 0)
-                {
-                    Console.WriteLine($"Found {filesWithExt.Length} files with {ext} extension:");
-                    foreach (string file in filesWithExt)
-                    {
-                        ConsoleHelper.WriteLine(file, ConsoleColor.Green);
-                    }
-                }
-                else
+                int foundCount = 0;
+                ListFilesRecursive(directory, ext, ref foundCount);
+                if (foundCount == 0)
                 {
                     ConsoleHelper.WriteLine($"No files found with {ext} extension");
                 }
+                else
+                {
+                    Console.WriteLine($"Found {foundCount} files with {ext} extension.");
+                }
+            }
+        }
+
+        // Recursively search for files, skipping inaccessible directories
+        private static void ListFilesRecursive(string directory, string ext, ref int foundCount)
+        {
+            try
+            {
+                var files = Directory.GetFiles(directory, $"*{ext}", SearchOption.TopDirectoryOnly);
+                foreach (var file in files)
+                {
+                    ConsoleHelper.WriteLine(file, ConsoleColor.Green);
+                    foundCount++;
+                }
+                var subdirs = Directory.GetDirectories(directory);
+                foreach (var subdir in subdirs)
+                {
+                    ListFilesRecursive(subdir, ext, ref foundCount);
+                }
+            }
+            catch (UnauthorizedAccessException uaex)
+            {
+                ConsoleHelper.WriteLine($"Access denied to a directory: {uaex.Message}", ConsoleColor.Yellow);
+            }
+            catch (DirectoryNotFoundException dnfx)
+            {
+                ConsoleHelper.WriteLine($"Directory not found: {dnfx.Message}", ConsoleColor.Yellow);
+            }
+            catch (Exception ex)
+            {
+                ConsoleHelper.WriteLine($"An error occurred: {ex.Message}", ConsoleColor.Red);
             }
         }
     }
