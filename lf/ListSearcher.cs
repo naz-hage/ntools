@@ -23,7 +23,7 @@ namespace lf
 
                     if (matchingDirs.Length > 0)
                     {
-                        Console.WriteLine($"Found {matchingDirs.Length} folders containing '{folderName}':");
+                        ConsoleHelper.WriteLine($"Found {matchingDirs.Length} folders containing '{folderName}':");
                         foreach (var dir in matchingDirs)
                         {
                             ConsoleHelper.WriteLine(dir, ConsoleColor.Green);
@@ -58,7 +58,7 @@ namespace lf
                 }
                 else
                 {
-                    Console.WriteLine($"Found {foundCount} files with {ext} extension.");
+                    ConsoleHelper.WriteLine($"Found {foundCount} files with {ext} extension.");
                 }
             }
         }

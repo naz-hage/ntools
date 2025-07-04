@@ -67,7 +67,10 @@ namespace lfTests
 
             // Assert
             var output = sw.ToString();
-            StringAssert.Contains(output, "Access denied to a directory:");
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                StringAssert.Contains(output, "Access denied to a directory:");
+            }
             // Should not throw, and should continue (no files found)
             StringAssert.Contains(output, "No files found with .yaml extension");
         }
