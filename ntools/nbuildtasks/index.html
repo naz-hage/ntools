@@ -87,20 +87,9 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#zip">Zip</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#updateversionsindocs">UpdateVersionsInDocs</a>
-    </li>
     <li class="toctree-l2"><a class="reference internal" href="#pwsh">Pwsh</a>
     </li>
     </ul>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../nbuild-tasks-integration/">NBuild Tasks Integration</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../msbuild-tasks-test-coverage/">MSBuild Tasks Test Coverage</a>
-                  </li>
-              </ul>
-              <p class="caption"><span class="caption-text">Pre-commit</span></p>
-              <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="../../pre-commit-setup/">Pre-commit Setup</a>
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Update</span></p>
@@ -177,14 +166,6 @@
 <td><a href="#zip">Zip</a></td>
 <td>Zips the specified file.</td>
 </tr>
-<tr>
-<td><a href="#pwsh">Pwsh</a></td>
-<td>Runs a PowerShell Core script from MSBuild.</td>
-</tr>
-<tr>
-<td><a href="#updateversionsindocs">UpdateVersionsInDocs</a></td>
-<td>Updates version numbers in documentation files.</td>
-</tr>
 </tbody>
 </table>
 <p>Here are examples of custom Tasks that can be used during builds:</p>
@@ -260,12 +241,6 @@
     &lt;Message Text=&quot;==&gt; ZIP_DONE&quot;/&gt;
 &lt;/Target&gt;
 </code></pre>
-<h3 id="updateversionsindocs">UpdateVersionsInDocs</h3>
-<pre><code class="language-xml">&lt;!-- This target uses the `UpdateVersionsInDocs` task to update version numbers in documentation files --&gt;
-&lt;Target Name=&quot;UPDATE_DOC_VERSIONS&quot;&gt;
-    &lt;UpdateVersionsInDocs DocsPath=&quot;$(SolutionDir)docs&quot; Version=&quot;$(Version)&quot; /&gt;
-&lt;/Target&gt;
-</code></pre>
 <h3 id="pwsh">Pwsh</h3>
 <pre><code class="language-xml">&lt;!-- This target uses the `Pwsh` custom NTools MS Build task to launch a PowerShell Core script --&gt;
 &lt;Target Name=&quot;INSTALL_NTOOLS&quot;&gt;
@@ -292,7 +267,7 @@
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
         <a href="../github-release/" class="btn btn-neutral float-left" title="Github Release"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../../nbuild-tasks-integration/" class="btn btn-neutral float-right" title="NBuild Tasks Integration">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../ntools/" class="btn btn-neutral float-right" title="Development Tools">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -322,7 +297,7 @@
       <span><a href="../github-release/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
-      <span><a href="../../nbuild-tasks-integration/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="../ntools/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>
