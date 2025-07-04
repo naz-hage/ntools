@@ -72,9 +72,9 @@ public class ListSearcherTests
 
         // Assert
         var output = sw.ToString();
-        StringAssert.Contains(output, "Found 1 files with .yml extension:");
+        StringAssert.Contains(output, "Found 1 files with .yml extension.");
         StringAssert.Contains(output, "b.yml");
-        StringAssert.Contains(output, "Found 1 files with .yaml extension:");
+        StringAssert.Contains(output, "Found 1 files with .yaml extension.");
         StringAssert.Contains(output, "a.yaml");
         StringAssert.DoesNotMatch(output, new System.Text.RegularExpressions.Regex("c.txt"));
     }
@@ -173,7 +173,7 @@ public class ListSearcherTests
         // Assert
         var output = sw.ToString();
         // Directory.GetFiles is case-insensitive on Windows, but not on Linux. This test is for Windows.
-        StringAssert.Contains(output, "Found 1 files with .yml extension:");
+        StringAssert.Contains(output, "Found 1 files with .yml extension.");
         StringAssert.Contains(output, "file.YML");
     }
 
@@ -209,7 +209,7 @@ public class ListSearcherTests
 
         // Assert
         var output = sw.ToString();
-        StringAssert.Contains(output, "Found 1 files with .yaml extension:");
+        StringAssert.Contains(output, "Found 1 files with .yaml extension.");
         StringAssert.Contains(output, "file (1).yaml");
     }
 
@@ -245,7 +245,7 @@ public class ListSearcherTests
 
         // Assert
         var output = sw.ToString();
-        StringAssert.Contains(output, "Found 1 files with .yaml extension:");
+        StringAssert.Contains(output, "Found 1 files with .yaml extension.");
         StringAssert.Contains(output, "deep.yaml");
     }
 
@@ -284,7 +284,7 @@ public class ListSearcherTests
 
         // Assert
         var output = sw.ToString();
-        StringAssert.Contains(output, "Found 2 files with .yaml extension:");
+        StringAssert.Contains(output, "Found 2 files with .yaml extension.");
         StringAssert.Contains(output, "a.yaml");
         StringAssert.Contains(output, "b.yaml");
     }
