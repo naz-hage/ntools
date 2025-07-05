@@ -38,6 +38,16 @@ jobs:
         fi
       shell: bash
       
+    - name: Set branch name
+      id: vars
+      run: |
+        if [ "${{ github.event_name }}" = "pull_request" ]; then
+          echo "branch=${{ github.head_ref }}" >> $GITHUB_OUTPUT
+        else
+          echo "branch=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+        fi
+      shell: bash
+
     - name: Commit changes
       if: steps.verify-changed-files.outputs.changed == 'true'
       run: |
@@ -45,10 +55,10 @@ jobs:
         git config --local user.name "GitHub Action"
         git add docs/ntools/ntools.md
         git commit -m "Auto-update documentation versions from JSON files"
-        
+
     - name: Push changes
       if: steps.verify-changed-files.outputs.changed == 'true'
       uses: ad-m/github-push-action@v0.6.0
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: ${{ github.head_ref }}
+        branch: ${{ steps.vars.outputs.branch }}
