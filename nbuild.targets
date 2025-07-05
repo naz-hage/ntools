@@ -10,7 +10,7 @@
 		<!--  Modify these paths to match your Python installation -->
 		<PythonPath>$(ProgramFiles)\Python\3.13.3</PythonPath>
 		<PipPath>$(PythonPath)\Scripts\pip.exe</PipPath>
-		<MkDocsExe>$(USERPROFILE)\AppData\Roaming\Python\Python312\Scripts\mkdocs.exe</MkDocsExe>
+		<MkDocsExe>$(USERPROFILE)\AppData\Roaming\Python\Python313\Scripts\mkdocs.exe</MkDocsExe>
 	</PropertyGroup>
 
 	<!--Setup the ARTIFACTS folders for binaries and test results - override -->
