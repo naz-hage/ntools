@@ -407,3 +407,6 @@ FodyWeavers.xsd
 /dev-setup/build-apps.exe
 /go/build-apps.exe
 /docs/backlog
+
+# Dynamically generated commit message file
+.commit-message
