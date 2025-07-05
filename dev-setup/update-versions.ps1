@@ -68,7 +68,7 @@ function Update-MarkdownTable {
                     if ($line -match '(\| \[[^\]]+\]\([^)]+\)\s+\| )([^|]+)(\| )([^|]+)(\|.*)') {
                         $newLine = $matches[1] + $versionInfo.Version.PadRight(11) + $matches[3] + $today.PadRight(15) + $matches[5]
                         $content[$i] = $newLine
-                        Write-Host "Updated $toolName: $($versionInfo.Version)" -ForegroundColor Green
+                        Write-Host "Updated ${toolName}: $($versionInfo.Version)" -ForegroundColor Green
                         break
                     }
                 }
