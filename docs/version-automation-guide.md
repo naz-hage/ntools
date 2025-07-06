@@ -12,17 +12,10 @@ Previously, these had to be updated manually, leading to inconsistencies and out
 
 ## Solutions Implemented
 
-We've implemented **4 complementary automation approaches** that can be used individually or together:
 
----
+## Version Automation Approach
 
-
-## 1. 🔧 Version Automation (Current Approach)
-
-Tool versions in documentation are now updated using the MSBuild task (`UpdateVersionsInDocs`) via the `nb update_doc_versions` command. This extracts all tool/version pairs from every `NbuildAppList` entry in every `*.json` file in `dev-setup` and updates the documentation table accordingly. See the documentation in `ntools.md` for details.
-
-
-## 2. 🏗️ NBuild Task Integration
+Tool versions in documentation are updated using the MSBuild task (`UpdateVersionsInDocs`) via the `nb update_doc_versions` command. This extracts all tool/version pairs from every `NbuildAppList` entry in every `*.json` file in `dev-setup` and updates the documentation table accordingly. See the documentation in `ntools.md` for details.
 
 ### What Was Added
 - **File**: `NbuildTasks/UpdateVersionsInDocs.cs`
