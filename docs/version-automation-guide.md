@@ -16,38 +16,11 @@ We've implemented **4 complementary automation approaches** that can be used ind
 
 ---
 
-## 1. 🔧 PowerShell Script Automation
 
-### What Was Added
-- **File**: `dev-setup/update-versions.ps1`
-- **Purpose**: Standalone script to sync versions between JSON files and documentation
-- **Execution**: Manual or triggered by other automation
+## 1. 🔧 Version Automation (Current Approach)
 
-### Features
-- Reads all JSON files in `dev-setup/` directory
-- Extracts `Name` and `Version` from `NbuildAppList[0]`
-- Updates corresponding entries in `ntools.md` table
-- Handles tool name mapping (e.g., "PowerShell" ↔ "Powershell")
-- Updates "Last Checked on" dates automatically
-- Provides colored console output for better UX
+Tool versions in documentation are now updated using the MSBuild task (`UpdateVersionsInDocs`) via the `nb update_doc_versions` command. This extracts all tool/version pairs from every `NbuildAppList` entry in every `*.json` file in `dev-setup` and updates the documentation table accordingly. See the documentation in `ntools.md` for details.
 
-### Usage
-```powershell
-# Basic usage
-cd dev-setup
-.\update-versions.ps1
-
-# With custom paths
-.\update-versions.ps1 -DevSetupPath "C:\source\ntools\dev-setup" -DocsPath "C:\source\ntools\docs\ntools\ntools.md"
-```
-
-### Benefits
-- ✅ **Immediate execution** - Run anytime manually
-- ✅ **Portable** - Works on any Windows machine with PowerShell
-- ✅ **Standalone** - No dependencies on build system
-- ✅ **Flexible** - Can be called from other scripts
-
----
 
 ## 2. 🏗️ NBuild Task Integration
 
@@ -143,14 +116,8 @@ The automation handles differences between JSON configuration names and document
 
 ### Troubleshooting
 ```powershell
-# Test PowerShell script manually
-cd dev-setup
-.\update-versions.ps1 -Verbose
-
-
 # Check GitHub Actions logs
 # Visit: https://github.com/your-repo/actions
-
 ```
 
 ## Future Enhancements
