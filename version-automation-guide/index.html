@@ -118,11 +118,8 @@
 2. <strong>Documentation Table</strong> (<code>docs/ntools/ntools.md</code>) - User-facing version reference</p>
 <p>Previously, these had to be updated manually, leading to inconsistencies and outdated documentation.</p>
 <h2 id="solutions-implemented">Solutions Implemented</h2>
-<p>We've implemented <strong>4 complementary automation approaches</strong> that can be used individually or together:</p>
-<hr />
-<h2 id="1-version-automation-current-approach">1. 🔧 Version Automation (Current Approach)</h2>
-<p>Tool versions in documentation are now updated using the MSBuild task (<code>UpdateVersionsInDocs</code>) via the <code>nb update_doc_versions</code> command. This extracts all tool/version pairs from every <code>NbuildAppList</code> entry in every <code>*.json</code> file in <code>dev-setup</code> and updates the documentation table accordingly. See the documentation in <code>ntools.md</code> for details.</p>
-<h2 id="2-nbuild-task-integration">2. 🏗️ NBuild Task Integration</h2>
+<h2 id="version-automation-approach">Version Automation Approach</h2>
+<p>Tool versions in documentation are updated using the MSBuild task (<code>UpdateVersionsInDocs</code>) via the <code>nb update_doc_versions</code> command. This extracts all tool/version pairs from every <code>NbuildAppList</code> entry in every <code>*.json</code> file in <code>dev-setup</code> and updates the documentation table accordingly. See the documentation in <code>ntools.md</code> for details.</p>
 <h3 id="what-was-added">What Was Added</h3>
 <ul>
 <li><strong>File</strong>: <code>NbuildTasks/UpdateVersionsInDocs.cs</code></li>
