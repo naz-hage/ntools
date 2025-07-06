@@ -45,7 +45,7 @@ namespace NbuildTasks
                 var jsonFiles = Directory.GetFiles(DevSetupPath, "*.json");
                 var versionMap = new Dictionary<string, (string Name, string Version)>();
 
-                // Extract versions from JSON files
+                // Extract versions from all NbuildAppList entries in all JSON files
                 foreach (var jsonFile in jsonFiles)
                 {
                     try
@@ -54,16 +54,19 @@ namespace NbuildTasks
                         var jsonDoc = JsonDocument.Parse(jsonContent);
 
                         if (jsonDoc.RootElement.TryGetProperty("NbuildAppList", out var appList) &&
-                            appList.GetArrayLength() > 0)
+                            appList.ValueKind == JsonValueKind.Array)
                         {
-                            var firstApp = appList[0];
-                            if (firstApp.TryGetProperty("Name", out var nameElement) &&
-                                firstApp.TryGetProperty("Version", out var versionElement))
+                            foreach (var app in appList.EnumerateArray())
                             {
-                                var name = nameElement.GetString();
-                                var version = versionElement.GetString();
-                                versionMap[Path.GetFileName(jsonFile)] = (name, version);
-                                Log.LogMessage(MessageImportance.Normal, $"Found {name}: {version}");
+                                if (app.TryGetProperty("Name", out var nameElement) &&
+                                    app.TryGetProperty("Version", out var versionElement))
+                                {
+                                    var name = nameElement.GetString();
+                                    var version = versionElement.GetString();
+                                    // Use tool name as key to allow multiple tools from multiple files
+                                    versionMap[name] = (name, version);
+                                    Log.LogMessage(MessageImportance.Normal, $"Found {name}: {version}");
+                                }
                             }
                         }
                     }
