@@ -135,65 +135,7 @@ namespace NbuildTasks
         }
     }
 
-    public class SetupPreCommitHooks : Task
-    {
-        [Required]
-        public string GitDirectory { get; set; }
-
-        [Required]
-        public string HooksSourceDirectory { get; set; }
-
-        public override bool Execute()
-        {
-            try
-            {
-                Log.LogMessage(MessageImportance.High, "Setting up pre-commit hooks...");
-
-                var hooksDir = Path.Combine(GitDirectory, "hooks");
-                if (!Directory.Exists(hooksDir))
-                {
-                    Directory.CreateDirectory(hooksDir);
-                }
-
-                // Copy hook files
-                var hookFiles = Directory.GetFiles(HooksSourceDirectory);
-                foreach (var hookFile in hookFiles)
-                {
-                    var fileName = Path.GetFileName(hookFile);
-                    var destPath = Path.Combine(hooksDir, fileName);
-
-                    File.Copy(hookFile, destPath, true);
-
-                    // Make executable on Unix-like systems
-                    if (Environment.OSVersion.Platform == PlatformID.Unix ||
-                        Environment.OSVersion.Platform == PlatformID.MacOSX)
-                    {
-                        var chmod = new System.Diagnostics.Process
-                        {
-                            StartInfo = new System.Diagnostics.ProcessStartInfo
-                            {
-                                FileName = "chmod",
-                                Arguments = $"+x {destPath}",
-                                UseShellExecute = false
-                            }
-                        };
-                        chmod.Start();
-                        chmod.WaitForExit();
-                    }
-
-                    Log.LogMessage(MessageImportance.Normal, $"Installed hook: {fileName}");
-                }
-
-                Log.LogMessage(MessageImportance.High, "Pre-commit hooks setup completed!");
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Log.LogError($"Error setting up pre-commit hooks: {ex.Message}");
-                return false;
-            }
-        }
-    }
+    // SetupPreCommitHooks class removed: now isolated in feature branch
 
     public class GenerateCommitMessage : Task
     {

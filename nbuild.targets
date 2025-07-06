@@ -5,7 +5,7 @@
 	<Import Project="$(ProgramFiles)\Nbuild\common.targets"/>
 
 	<PropertyGroup>
-        <!-- This is the folder where the *.sln resides-->
+		<!-- This is the folder where the *.sln resides-->
 		<DeploymentFolder>$(ProgramFiles)\Nbuild</DeploymentFolder>
 		<!--  Modify these paths to match your Python installation -->
 		<PythonPath>$(ProgramFiles)\Python\3.13.3</PythonPath>
@@ -14,16 +14,16 @@
 	</PropertyGroup>
 
 	<!--Setup the ARTIFACTS folders for binaries and test results - override -->
-    <Target Name="ARTIFACTS" DependsOnTargets="TAG">
-      <PropertyGroup>
+	<Target Name="ARTIFACTS" DependsOnTargets="TAG">
+	  <PropertyGroup>
 		 <ArtifactsSolutionFolder>$(ArtifactsDir)\$(SolutionName)</ArtifactsSolutionFolder>
 		 <SetupFolder>$(ArtifactsSolutionFolder)\release</SetupFolder>
-        <ArtifactsFolder>$(ArtifactsSolutionFolder)\$(TargetRelease)\$(ProductVersion)</ArtifactsFolder>
+		<ArtifactsFolder>$(ArtifactsSolutionFolder)\$(TargetRelease)\$(ProductVersion)</ArtifactsFolder>
 		<ArtifactsTestResultsFolder>$(ArtifactsSolutionFolder)\TestResults\$(ProductVersion)</ArtifactsTestResultsFolder>
 		<NbExe>$(OutputPathRelease)\nb.exe</NbExe>
-      </PropertyGroup>  
-      <ItemGroup>
-            <BinaryFiles 
+	  </PropertyGroup>  
+	  <ItemGroup>
+			<BinaryFiles 
 						Exclude="
 						 $(SolutionDir)\$(TargetRelease)\**\*.pdb;
 						 $(SolutionDir)\$(TargetRelease)\test.*;
@@ -32,24 +32,24 @@
 						 $(SolutionDir)\$(TargetRelease)\*CodeCoverage*"
 
 						Include="
-                        $(SolutionDir)\$(TargetRelease)\*.exe;
-                        $(SolutionDir)\$(TargetRelease)\*.exe.config;
-                        $(SolutionDir)\$(TargetRelease)\*.json;
+						$(SolutionDir)\$(TargetRelease)\*.exe;
+						$(SolutionDir)\$(TargetRelease)\*.exe.config;
+						$(SolutionDir)\$(TargetRelease)\*.json;
 						$(SolutionDir)\Nbuild\resources\*.targets;
 						$(SolutionDir)\Nbuild\resources\*.ps1;
 						$(SolutionDir)\Nbuild\resources\*.json;
-                        $(SolutionDir)\$(TargetRelease)\*.dll"
+						$(SolutionDir)\$(TargetRelease)\*.dll"
 						/>
 
-            <RunTimesNetStandard20 Include = "
+			<RunTimesNetStandard20 Include = "
 								   $(SolutionDir)\$(TargetRelease)\netstandard2.0\*.*"
-                                    Exclude="
-						            $(SolutionDir)\$(TargetRelease)\**\*.pdb"
-						            />
-        </ItemGroup>
+									Exclude="
+									$(SolutionDir)\$(TargetRelease)\**\*.pdb"
+									/>
+		</ItemGroup>
 		
-        <Message Text="==> DONE"/>
-    </Target>
+		<Message Text="==> DONE"/>
+	</Target>
 	
 	<!-- Test for FileVersion task and powershell file-version.ps1-->
 	<Target Name="FILE_VERSIONS"  DependsOnTargets="ARTIFACTS">
@@ -78,51 +78,51 @@
 		</PropertyGroup>
 
 		<RedError Condition="'$(IsAdmin)' == false" Message="Must be an admin to install $(NbuildAppName)" />
-        
-        <Delete Files="$(FileName)" Condition="Exists('$(FileName)') == true" />
-        
-        <WebDownload WebUri="$(WebUri)" FileName="$(FileName)" />
-        
-        <Message Text="==> NBUILD_DONE"/>
+		
+		<Delete Files="$(FileName)" Condition="Exists('$(FileName)') == true" />
+		
+		<WebDownload WebUri="$(WebUri)" FileName="$(FileName)" />
+		
+		<Message Text="==> NBUILD_DONE"/>
 	</Target>
 
 	<!-- Install Nbuild specified in the NbuildTargetVersion -->
 	<Target Name="NBUILD_INSTALL" DependsOnTargets="IS_ADMIN">
 		<PropertyGroup>
-            <FileExe>$(ProgramFiles)\Nbuild\nb.exe</FileExe>
-        </PropertyGroup>
-        <Exec Command='"$(FileExe)" --version' Condition="Exists('$(FileExe)')" />
-        
-        <RedError Condition="'$(IsAdmin)' == false" Message="Must be an admin to install $(CodeAppName)" />
-        
-        <FileVersion Name="$(FileExe)" Condition="Exists('$(FileExe)')" >
-            <Output TaskParameter="Output" PropertyName="Version" />
-        </FileVersion>
+			<FileExe>$(ProgramFiles)\Nbuild\nb.exe</FileExe>
+		</PropertyGroup>
+		<Exec Command='"$(FileExe)" --version' Condition="Exists('$(FileExe)')" />
+		
+		<RedError Condition="'$(IsAdmin)' == false" Message="Must be an admin to install $(CodeAppName)" />
+		
+		<FileVersion Name="$(FileExe)" Condition="Exists('$(FileExe)')" >
+			<Output TaskParameter="Output" PropertyName="Version" />
+		</FileVersion>
 
-        <Message Text="$(CodeAppName) is not installed" Condition="'$(Version)' == ''" />
-        <!-- Display the file version -->
-        <Message Text="$(CodeAppName) Version is $(Version)" Condition="'$(Version)' != ''" />
+		<Message Text="$(CodeAppName) is not installed" Condition="'$(Version)' == ''" />
+		<!-- Display the file version -->
+		<Message Text="$(CodeAppName) Version is $(Version)" Condition="'$(Version)' != ''" />
 
-        <Message Text="Installing $(CodeAppName)" Condition="!Exists('$(FileExe)') or '$(Version)' == '' or '$(Version)' &lt; '$(CodeTargetVersion)'"/>
-        <Exec Command='"$(ZipExe)" x $(FileName) -o"C:\Program Files\Nbuild" ' Condition="'$(Verion)' == '' Or '$(Version)' &lt; '$(CodeTargetVersion)'" />
+		<Message Text="Installing $(CodeAppName)" Condition="!Exists('$(FileExe)') or '$(Version)' == '' or '$(Version)' &lt; '$(CodeTargetVersion)'"/>
+		<Exec Command='"$(ZipExe)" x $(FileName) -o"C:\Program Files\Nbuild" ' Condition="'$(Verion)' == '' Or '$(Version)' &lt; '$(CodeTargetVersion)'" />
 
-        <Delete Files="$(FileName)" Condition="Exists('$(FileName)') == true" />
+		<Delete Files="$(FileName)" Condition="Exists('$(FileName)') == true" />
 
-        <Exec Command='"$(FileExe)" --version'  Condition="Exists('$(FileExe)')" />
+		<Exec Command='"$(FileExe)" --version'  Condition="Exists('$(FileExe)')" />
 
-        <FileVersion Name="$(FileExe)" Condition="Exists('$(FileExe)')" >
-            <Output TaskParameter="Output" PropertyName="Version" />
-        </FileVersion>
+		<FileVersion Name="$(FileExe)" Condition="Exists('$(FileExe)')" >
+			<Output TaskParameter="Output" PropertyName="Version" />
+		</FileVersion>
 
-        <Message Text="$(CodeAppName) installed version: $(Version)" />
-        <Message Text="==> CODE_DONE"/>
+		<Message Text="$(CodeAppName) installed version: $(Version)" />
+		<Message Text="==> CODE_DONE"/>
 	</Target>
 
 	<!-- Setup Development Environment -->
 	<Target Name="DEV_SETUP" DependsOnTargets="IS_ADMIN">
 		<Pwsh ScriptPath="$(SolutionDir)\dev-setup\install.ps1" Arguments="" WorkingDirectory ="$(SolutionDir)\dev-setup"/>
 
-	    <Message Text="==> DONE"/>
+		<Message Text="==> DONE"/>
 	</Target>
 
 	<!-- Build docs locally for testing -->
@@ -255,7 +255,7 @@
 
 	<!-- Update documentation versions from JSON configuration files -->
 	<UsingTask TaskName="NbuildTasks.UpdateVersionsInDocs" AssemblyFile="C:\source\ntools\Release\NbuildTasks.dll" />
-	<UsingTask TaskName="NbuildTasks.SetupPreCommitHooks" AssemblyFile="C:\source\ntools\Release\NbuildTasks.dll" />
+  <!-- Removed SetupPreCommitHooks task: now isolated in feature branch -->
 	<UsingTask TaskName="NbuildTasks.GenerateCommitMessage" AssemblyFile="C:\source\ntools\Release\NbuildTasks.dll" />
 	
 	<Target Name="UPDATE_DOC_VERSIONS" DependsOnTargets="PROPERTIES">
@@ -266,13 +266,7 @@
 		<Message Text="==> DONE"/>
 	</Target>
 
-	<Target Name="SETUP_HOOKS" DependsOnTargets="PROPERTIES">
-		<SetupPreCommitHooks 
-			GitDirectory="$(SolutionDir)\.git" 
-			HooksSourceDirectory="$(SolutionDir)\dev-setup\hooks" />
-		<Message Text="Pre-commit hooks setup successfully." />
-		<Message Text="==> DONE"/>
-	</Target>
+  <!-- Removed SETUP_HOOKS target: now isolated in feature branch -->
 
 	<!-- Intelligent commit message generation -->
 	<Target Name="GENERATE_COMMIT_MESSAGE" DependsOnTargets="PROPERTIES">
