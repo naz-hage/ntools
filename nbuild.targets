@@ -5,25 +5,25 @@
 	<Import Project="$(ProgramFiles)\Nbuild\common.targets"/>
 
 	<PropertyGroup>
-        <!-- This is the folder where the *.sln resides-->
+		<!-- This is the folder where the *.sln resides-->
 		<DeploymentFolder>$(ProgramFiles)\Nbuild</DeploymentFolder>
 		<!--  Modify these paths to match your Python installation -->
 		<PythonPath>$(ProgramFiles)\Python\3.13.3</PythonPath>
 		<PipPath>$(PythonPath)\Scripts\pip.exe</PipPath>
-		<MkDocsExe>$(USERPROFILE)\AppData\Roaming\Python\Python312\Scripts\mkdocs.exe</MkDocsExe>
+		<MkDocsExe>$(USERPROFILE)\AppData\Roaming\Python\Python313\Scripts\mkdocs.exe</MkDocsExe>
 	</PropertyGroup>
 
 	<!--Setup the ARTIFACTS folders for binaries and test results - override -->
-    <Target Name="ARTIFACTS" DependsOnTargets="TAG">
-      <PropertyGroup>
+	<Target Name="ARTIFACTS" DependsOnTargets="TAG">
+	  <PropertyGroup>
 		 <ArtifactsSolutionFolder>$(ArtifactsDir)\$(SolutionName)</ArtifactsSolutionFolder>
 		 <SetupFolder>$(ArtifactsSolutionFolder)\release</SetupFolder>
-        <ArtifactsFolder>$(ArtifactsSolutionFolder)\$(TargetRelease)\$(ProductVersion)</ArtifactsFolder>
+		<ArtifactsFolder>$(ArtifactsSolutionFolder)\$(TargetRelease)\$(ProductVersion)</ArtifactsFolder>
 		<ArtifactsTestResultsFolder>$(ArtifactsSolutionFolder)\TestResults\$(ProductVersion)</ArtifactsTestResultsFolder>
 		<NbExe>$(OutputPathRelease)\nb.exe</NbExe>
-      </PropertyGroup>  
-      <ItemGroup>
-            <BinaryFiles 
+	  </PropertyGroup>  
+	  <ItemGroup>
+			<BinaryFiles 
 						Exclude="
 						 $(SolutionDir)\$(TargetRelease)\**\*.pdb;
 						 $(SolutionDir)\$(TargetRelease)\test.*;
@@ -32,24 +32,24 @@
 						 $(SolutionDir)\$(TargetRelease)\*CodeCoverage*"
 
 						Include="
-                        $(SolutionDir)\$(TargetRelease)\*.exe;
-                        $(SolutionDir)\$(TargetRelease)\*.exe.config;
-                        $(SolutionDir)\$(TargetRelease)\*.json;
+						$(SolutionDir)\$(TargetRelease)\*.exe;
+						$(SolutionDir)\$(TargetRelease)\*.exe.config;
+						$(SolutionDir)\$(TargetRelease)\*.json;
 						$(SolutionDir)\Nbuild\resources\*.targets;
 						$(SolutionDir)\Nbuild\resources\*.ps1;
 						$(SolutionDir)\Nbuild\resources\*.json;
-                        $(SolutionDir)\$(TargetRelease)\*.dll"
+						$(SolutionDir)\$(TargetRelease)\*.dll"
 						/>
 
-            <RunTimesNetStandard20 Include = "
+			<RunTimesNetStandard20 Include = "
 								   $(SolutionDir)\$(TargetRelease)\netstandard2.0\*.*"
-                                    Exclude="
-						            $(SolutionDir)\$(TargetRelease)\**\*.pdb"
-						            />
-        </ItemGroup>
+									Exclude="
+									$(SolutionDir)\$(TargetRelease)\**\*.pdb"
+									/>
+		</ItemGroup>
 		
-        <Message Text="==> DONE"/>
-    </Target>
+		<Message Text="==> DONE"/>
+	</Target>
 	
 	<!-- Test for FileVersion task and powershell file-version.ps1-->
 	<Target Name="FILE_VERSIONS"  DependsOnTargets="ARTIFACTS">
@@ -78,51 +78,51 @@
 		</PropertyGroup>
 
 		<RedError Condition="'$(IsAdmin)' == false" Message="Must be an admin to install $(NbuildAppName)" />
-        
-        <Delete Files="$(FileName)" Condition="Exists('$(FileName)') == true" />
-        
-        <WebDownload WebUri="$(WebUri)" FileName="$(FileName)" />
-        
-        <Message Text="==> NBUILD_DONE"/>
+		
+		<Delete Files="$(FileName)" Condition="Exists('$(FileName)') == true" />
+		
+		<WebDownload WebUri="$(WebUri)" FileName="$(FileName)" />
+		
+		<Message Text="==> NBUILD_DONE"/>
 	</Target>
 
 	<!-- Install Nbuild specified in the NbuildTargetVersion -->
 	<Target Name="NBUILD_INSTALL" DependsOnTargets="IS_ADMIN">
 		<PropertyGroup>
-            <FileExe>$(ProgramFiles)\Nbuild\nb.exe</FileExe>
-        </PropertyGroup>
-        <Exec Command='"$(FileExe)" --version' Condition="Exists('$(FileExe)')" />
-        
-        <RedError Condition="'$(IsAdmin)' == false" Message="Must be an admin to install $(CodeAppName)" />
-        
-        <FileVersion Name="$(FileExe)" Condition="Exists('$(FileExe)')" >
-            <Output TaskParameter="Output" PropertyName="Version" />
-        </FileVersion>
+			<FileExe>$(ProgramFiles)\Nbuild\nb.exe</FileExe>
+		</PropertyGroup>
+		<Exec Command='"$(FileExe)" --version' Condition="Exists('$(FileExe)')" />
+		
+		<RedError Condition="'$(IsAdmin)' == false" Message="Must be an admin to install $(CodeAppName)" />
+		
+		<FileVersion Name="$(FileExe)" Condition="Exists('$(FileExe)')" >
+			<Output TaskParameter="Output" PropertyName="Version" />
+		</FileVersion>
 
-        <Message Text="$(CodeAppName) is not installed" Condition="'$(Version)' == ''" />
-        <!-- Display the file version -->
-        <Message Text="$(CodeAppName) Version is $(Version)" Condition="'$(Version)' != ''" />
+		<Message Text="$(CodeAppName) is not installed" Condition="'$(Version)' == ''" />
+		<!-- Display the file version -->
+		<Message Text="$(CodeAppName) Version is $(Version)" Condition="'$(Version)' != ''" />
 
-        <Message Text="Installing $(CodeAppName)" Condition="!Exists('$(FileExe)') or '$(Version)' == '' or '$(Version)' &lt; '$(CodeTargetVersion)'"/>
-        <Exec Command='"$(ZipExe)" x $(FileName) -o"C:\Program Files\Nbuild" ' Condition="'$(Verion)' == '' Or '$(Version)' &lt; '$(CodeTargetVersion)'" />
+		<Message Text="Installing $(CodeAppName)" Condition="!Exists('$(FileExe)') or '$(Version)' == '' or '$(Version)' &lt; '$(CodeTargetVersion)'"/>
+		<Exec Command='"$(ZipExe)" x $(FileName) -o"C:\Program Files\Nbuild" ' Condition="'$(Verion)' == '' Or '$(Version)' &lt; '$(CodeTargetVersion)'" />
 
-        <Delete Files="$(FileName)" Condition="Exists('$(FileName)') == true" />
+		<Delete Files="$(FileName)" Condition="Exists('$(FileName)') == true" />
 
-        <Exec Command='"$(FileExe)" --version'  Condition="Exists('$(FileExe)')" />
+		<Exec Command='"$(FileExe)" --version'  Condition="Exists('$(FileExe)')" />
 
-        <FileVersion Name="$(FileExe)" Condition="Exists('$(FileExe)')" >
-            <Output TaskParameter="Output" PropertyName="Version" />
-        </FileVersion>
+		<FileVersion Name="$(FileExe)" Condition="Exists('$(FileExe)')" >
+			<Output TaskParameter="Output" PropertyName="Version" />
+		</FileVersion>
 
-        <Message Text="$(CodeAppName) installed version: $(Version)" />
-        <Message Text="==> CODE_DONE"/>
+		<Message Text="$(CodeAppName) installed version: $(Version)" />
+		<Message Text="==> CODE_DONE"/>
 	</Target>
 
 	<!-- Setup Development Environment -->
 	<Target Name="DEV_SETUP" DependsOnTargets="IS_ADMIN">
 		<Pwsh ScriptPath="$(SolutionDir)\dev-setup\install.ps1" Arguments="" WorkingDirectory ="$(SolutionDir)\dev-setup"/>
 
-	    <Message Text="==> DONE"/>
+		<Message Text="==> DONE"/>
 	</Target>
 
 	<!-- Build docs locally for testing -->
@@ -251,5 +251,100 @@
 		<Exec Command="dotnet nuget list source" />
 		<Message Text="Listed all NuGet sources." />
 		<Message Text="==> DONE"/>
+	</Target>
+
+	<!-- Update documentation versions from JSON configuration files -->
+	<UsingTask TaskName="NbuildTasks.UpdateVersionsInDocs" AssemblyFile="C:\source\ntools\Release\NbuildTasks.dll" />
+  <!-- Removed SetupPreCommitHooks task: now isolated in feature branch -->
+	<UsingTask TaskName="NbuildTasks.GenerateCommitMessage" AssemblyFile="C:\source\ntools\Release\NbuildTasks.dll" />
+	
+	<Target Name="UPDATE_DOC_VERSIONS" DependsOnTargets="PROPERTIES">
+		<UpdateVersionsInDocs 
+			DevSetupPath="$(SolutionDir)\dev-setup" 
+			DocsPath="$(SolutionDir)\docs\ntools\ntools.md" />
+		<Message Text="Documentation versions updated successfully." />
+		<Message Text="==> DONE"/>
+	</Target>
+
+  <!-- Removed SETUP_HOOKS target: now isolated in feature branch -->
+
+	<!-- Intelligent commit message generation -->
+	<Target Name="GENERATE_COMMIT_MESSAGE" DependsOnTargets="PROPERTIES">
+		<PropertyGroup>
+			<CommitType Condition="'$(CommitType)' == ''">feat</CommitType>
+			<CommitScope Condition="'$(CommitScope)' == ''"></CommitScope>
+			<CommitMessageFile Condition="'$(CommitMessageFile)' == ''">$(SolutionDir)\.commit-message</CommitMessageFile>
+		</PropertyGroup>
+		
+		<GenerateCommitMessage 
+			WorkingDirectory="$(SolutionDir)"
+			CommitType="$(CommitType)"
+			Scope="$(CommitScope)"
+			CommitMessageFile="$(CommitMessageFile)">
+			<Output TaskParameter="CommitMessage" PropertyName="GeneratedCommitMessage" />
+		</GenerateCommitMessage>
+		
+		<Message Text="Generated commit message: $(GeneratedCommitMessage)" />
+		<Message Text="==> DONE"/>
+	</Target>
+
+	<!-- Automated Git commit with intelligent message generation -->
+	<Target Name="GIT_COMMIT_INFRASTRUCTURE" DependsOnTargets="UPDATE_DOC_VERSIONS;GENERATE_COMMIT_MESSAGE">
+		<PropertyGroup>
+			<!-- Use generated message if no custom message provided -->
+			<FinalCommitMessage Condition="'$(CommitMessage)' == ''">$(GeneratedCommitMessage)</FinalCommitMessage>
+			<FinalCommitMessage Condition="'$(CommitMessage)' != ''">$(CommitMessage)</FinalCommitMessage>
+			<GitAddFiles Condition="'$(GitAddFiles)' == ''">.</GitAddFiles>
+		</PropertyGroup>
+		
+		<!-- Check if there are any changes to commit -->
+		<Exec Command="git status --porcelain" ConsoleToMSBuild="true" WorkingDirectory="$(SolutionDir)">
+			<Output TaskParameter="ConsoleOutput" PropertyName="GitStatus" />
+		</Exec>
+		
+		<Message Text="Git status: $(GitStatus)" Condition="'$(GitStatus)' != ''" />
+		<Message Text="No changes to commit." Condition="'$(GitStatus)' == ''" />
+		
+		<!-- Add files to staging area -->
+		<Exec Command="git add $(GitAddFiles)" 
+			  WorkingDirectory="$(SolutionDir)" 
+			  Condition="'$(GitStatus)' != ''" />
+		<Message Text="Added files to staging area: $(GitAddFiles)" Condition="'$(GitStatus)' != ''" />
+		
+		<!-- Commit the changes with intelligent message -->
+		<Exec Command='git commit -m "$(FinalCommitMessage)"' 
+			  WorkingDirectory="$(SolutionDir)" 
+			  Condition="'$(GitStatus)' != ''" />
+		<Message Text="Committed changes with message: $(FinalCommitMessage)" Condition="'$(GitStatus)' != ''" />
+		
+		<Message Text="==> DONE"/>
+	</Target>
+
+	<!-- Combined target: Update versions and commit with smart message -->
+	<Target Name="UPDATE_AND_COMMIT" DependsOnTargets="UPDATE_DOC_VERSIONS">
+		<PropertyGroup>
+			<CommitType>docs</CommitType>
+			<CommitScope>automation</CommitScope>
+		</PropertyGroup>
+		
+		<CallTarget Targets="GIT_COMMIT_INFRASTRUCTURE" />
+		<Message Text="==> DONE"/>
+	</Target>
+
+	<!-- Full infrastructure update and commit with intelligent analysis -->
+	<Target Name="INFRASTRUCTURE_COMMIT" DependsOnTargets="SOLUTION">
+		<PropertyGroup>
+			<CommitType Condition="'$(CommitType)' == ''">feat</CommitType>
+			<CommitScope Condition="'$(CommitScope)' == ''">infrastructure</CommitScope>
+		</PropertyGroup>
+		
+		<CallTarget Targets="GIT_COMMIT_INFRASTRUCTURE" />
+		<Message Text="==> DONE"/>
+	</Target>
+
+	<!-- Preview commit message without committing -->
+	<Target Name="PREVIEW_COMMIT_MESSAGE">
+		<CallTarget Targets="GENERATE_COMMIT_MESSAGE" />
+		<Message Text="==> Commit message preview complete. Check $(SolutionDir)\.commit-message file"/>
 	</Target>
 </Project>
