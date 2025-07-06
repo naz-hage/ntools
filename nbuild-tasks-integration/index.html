@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="naz-hage" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>NBuild Tasks Integration - Ntools - Work in Progress</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "NBuild Tasks Integration";
+        var mkdocs_page_input_path = "nbuild-tasks-integration.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Ntools - Work in Progress
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../usage/">Practice</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../setup/">Setup your project</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buildtypes/">Build Types</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../versioning/">Versioning</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">List of Tools</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/nbuild/">Nbuild (nb.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/lf/">lf (lf.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/nbackup/">Nbackup (nbackup.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/wi/">wi (wi.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/github-release/">Github Release</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Custom Build Tasks</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/nbuildtasks/">Nbuild Tasks</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">NBuild Tasks Integration</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#new-msbuild-tasks-added">New MSBuild Tasks Added</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#1-updateversionsindocs-task">1. UpdateVersionsInDocs Task</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#features">Features:</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters:</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#update_doc_versions-target">UPDATE_DOC_VERSIONS Target</a>
+    </li>
+        </ul>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#tool-name-mapping">Tool Name Mapping</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#benefits">Benefits</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#1-build-integration">1. Build Integration</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-performance">2. Performance</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#3-error-handling">3. Error Handling</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#4-maintainability">4. Maintainability</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#troubleshooting">Troubleshooting</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#common-issues">Common Issues</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#debug-information">Debug Information</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#future-enhancements">Future Enhancements</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../msbuild-tasks-test-coverage/">MSBuild Tasks Test Coverage</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Update</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/ntools/">Development Tools</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Revisions</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../changelog/">Changelog</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Ntools - Work in Progress</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Custom Build Tasks</li>
+      <li class="breadcrumb-item active">NBuild Tasks Integration</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/naz-hage/ntools/edit/main/docs/nbuild-tasks-integration.md">Edit on ntools</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="nbuild-tasks-integration-guide">NBuild Tasks Integration Guide</h1>
+<p>This document explains how the new MSBuild tasks have been integrated into the ntools project for automating documentation version updates setup.</p>
+<h2 id="new-msbuild-tasks-added">New MSBuild Tasks Added</h2>
+<h3 id="1-updateversionsindocs-task">1. UpdateVersionsInDocs Task</h3>
+<p><strong>Location</strong>: <code>NbuildTasks/UpdateVersionsInDocs.cs</code><br />
+<strong>Purpose</strong>: Automatically synchronizes version information from JSON configuration files to the documentation table.</p>
+<h4 id="features">Features:</h4>
+<ul>
+<li>Reads all JSON files in the <code>dev-setup/</code> directory</li>
+<li>Extracts version information from <code>NbuildAppList[0].Version</code></li>
+<li>Updates corresponding entries in the <code>docs/ntools/ntools.md</code> table</li>
+<li>Handles tool name mapping between JSON and documentation names</li>
+<li>Updates "Last Checked on" dates automatically</li>
+<li>Provides detailed logging during execution</li>
+</ul>
+<h4 id="parameters">Parameters:</h4>
+<ul>
+<li><code>DevSetupPath</code> (Required): Path to the directory containing JSON configuration files</li>
+<li><code>DocsPath</code> (Required): Path to the markdown documentation file to update</li>
+</ul>
+<p>Two new targets have been added to <code>nbuild.targets</code>:</p>
+<h4 id="update_doc_versions-target">UPDATE_DOC_VERSIONS Target</h4>
+<pre><code class="language-xml">&lt;Target Name=&quot;UPDATE_DOC_VERSIONS&quot;&gt;
+    &lt;UpdateVersionsInDocs 
+        DevSetupPath=&quot;$(SolutionDir)\dev-setup&quot; 
+        DocsPath=&quot;$(SolutionDir)\docs\ntools\ntools.md&quot; /&gt;
+    &lt;Message Text=&quot;Documentation versions updated successfully.&quot; /&gt;
+    &lt;Message Text=&quot;==&gt; DONE&quot;/&gt;
+&lt;/Target&gt;
+</code></pre>
+<h2 id="tool-name-mapping">Tool Name Mapping</h2>
+<p>The <code>UpdateVersionsInDocs</code> task includes intelligent name mapping between JSON configuration names and documentation display names:</p>
+<table>
+<thead>
+<tr>
+<th>Documentation Name</th>
+<th>JSON Configuration Name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Node.js</td>
+<td>Node.js</td>
+</tr>
+<tr>
+<td>PowerShell</td>
+<td>Powershell</td>
+</tr>
+<tr>
+<td>Git for Windows</td>
+<td>Git for Windows</td>
+</tr>
+<tr>
+<td>Visual Studio Code</td>
+<td>Visual Studio Code</td>
+</tr>
+<tr>
+<td>NuGet</td>
+<td>Nuget</td>
+</tr>
+<tr>
+<td>Terraform Lint</td>
+<td>terraform lint</td>
+</tr>
+<tr>
+<td>kubernetes</td>
+<td>kubectl</td>
+</tr>
+<tr>
+<td>Azure CLI</td>
+<td>AzureCLI</td>
+</tr>
+<tr>
+<td>MongoDB Community Server</td>
+<td>MongoDB</td>
+</tr>
+<tr>
+<td>(and others...)</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="benefits">Benefits</h2>
+<h3 id="1-build-integration">1. <strong>Build Integration</strong></h3>
+<ul>
+<li>Native MSBuild tasks run as part of your build process</li>
+<li>Leverages existing build infrastructure</li>
+<li>Provides consistent execution environment</li>
+</ul>
+<h3 id="2-performance">2. <strong>Performance</strong></h3>
+<ul>
+<li>Compiled C# code executes faster than scripts</li>
+<li>Integrated with MSBuild's dependency tracking</li>
+<li>Efficient JSON parsing with System.Text.Json</li>
+</ul>
+<h3 id="3-error-handling">3. <strong>Error Handling</strong></h3>
+<ul>
+<li>Comprehensive error reporting through MSBuild logging</li>
+<li>Graceful handling of missing files or invalid JSON</li>
+<li>Clear success/failure indicators</li>
+</ul>
+<h3 id="4-maintainability">4. <strong>Maintainability</strong></h3>
+<ul>
+<li>Centralized logic in the NbuildTasks project</li>
+<li>Follows established MSBuild patterns</li>
+<li>Easy to extend with additional functionality</li>
+</ul>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<h3 id="common-issues">Common Issues</h3>
+<ol>
+<li><strong>Assembly not found errors</strong>:</li>
+<li>Ensure the solution is built in Release mode first</li>
+<li>
+<p>Verify NbuildTasks.dll exists in the Release folder</p>
+</li>
+<li>
+<p><strong>Path resolution issues</strong>:</p>
+</li>
+<li>Check that SolutionDir property is correctly set</li>
+<li>
+<p>Verify relative paths resolve correctly from build context</p>
+</li>
+<li>
+<p><strong>JSON parsing errors</strong>:</p>
+</li>
+<li>Ensure all JSON files in dev-setup are valid</li>
+<li>Check that JSON files follow the expected NbuildAppList structure</li>
+</ol>
+<h3 id="debug-information">Debug Information</h3>
+<p>Enable detailed logging by adding to your build command:</p>
+<pre><code class="language-bash">dotnet build nbuild.targets -target:UPDATE_DOC_VERSIONS -verbosity:detailed
+</code></pre>
+<p>This will show:
+- Which JSON files are being processed
+- Which tool versions are found
+- Which documentation entries are updated
+- Any warnings or errors encountered</p>
+<h2 id="future-enhancements">Future Enhancements</h2>
+<p>Potential improvements for the tasks:
+- <strong>Validation</strong>: Verify that all tools in documentation have corresponding JSON files
+- <strong>Reporting</strong>: Generate summary reports of version changes
+- <strong>Configuration</strong>: Support for custom mapping files
+- <strong>Integration</strong>: Automatic changelog generation based on version changes</p>
+<hr />
+<p><em>These MSBuild tasks provide a robust, integrated solution for maintaining documentation consistency within the ntools build system.</em></p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../ntools/nbuildtasks/" class="btn btn-neutral float-left" title="Nbuild Tasks"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../msbuild-tasks-test-coverage/" class="btn btn-neutral float-right" title="MSBuild Tasks Test Coverage">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/naz-hage/ntools" class="fa fa-code-fork" style="color: #fcfcfc"> ntools</a>
+        </span>
+    
+    
+      <span><a href="../ntools/nbuildtasks/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../msbuild-tasks-test-coverage/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

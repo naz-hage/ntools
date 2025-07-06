@@ -71,6 +71,10 @@
               <ul>
                   <li class="toctree-l1"><a class="reference internal" href="../nbuildtasks/">Nbuild Tasks</a>
                   </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../nbuild-tasks-integration/">NBuild Tasks Integration</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../msbuild-tasks-test-coverage/">MSBuild Tasks Test Coverage</a>
+                  </li>
               </ul>
               <p class="caption"><span class="caption-text">Update</span></p>
               <ul>
@@ -108,7 +112,7 @@
               
                 <p>The table below lists all available targets for the Nbuild tool. </p>
 <ul>
-<li><strong>c:\source\ntools\nbuild.targets Targets</strong></li>
+<li><strong>C:\source\ntools\nbuild.targets Targets</strong></li>
 </ul>
 <table>
 <thead>
@@ -121,18 +125,6 @@
 <tr>
 <td>ARTIFACTS</td>
 <td>Setup the ARTIFACTS folders for binaries and test results - override</td>
-</tr>
-<tr>
-<td>CLEAN_ARTIFACTS</td>
-<td>Delete the ARTIFACTS folder after PACKAGE target is completed</td>
-</tr>
-<tr>
-<td>TEST_GIT</td>
-<td>Temporary Target to test the Git Task</td>
-</tr>
-<tr>
-<td>LOCAL</td>
-<td>Build local stage without incrementing the version</td>
 </tr>
 <tr>
 <td>FILE_VERSIONS</td>
@@ -155,20 +147,80 @@
 <td>Build docs locally for testing</td>
 </tr>
 <tr>
-<td>NBUILD_DOWNLOAD</td>
-<td>Download Nbuild specified in the NbuildTargetVersion</td>
-</tr>
-<tr>
-<td></td>
-<td>Update the ntools-launcher nuget package in the local feed fot testing - not needed for normal builds</td>
-</tr>
-<tr>
-<td>NBUILD_INSTALL</td>
-<td>Install Nbuild specified in the NbuildTargetVersion</td>
+<td>MKDOCS_DEPLOY</td>
+<td>mkdocs deploy locally</td>
 </tr>
 <tr>
 <td>GET_PRODUCT_CODES</td>
 <td>Example to get the installation Product code used for uninstallation of product</td>
+</tr>
+<tr>
+<td>CORE</td>
+<td>Display core properties</td>
+</tr>
+<tr>
+<td>UPDATE_NTOOLS</td>
+<td>Update ntools locally for testing</td>
+</tr>
+<tr>
+<td>NUGET_UPDATE</td>
+<td>Update the ntools-launcher nuget package in the local feed for testing - not needed for normal builds</td>
+</tr>
+<tr>
+<td>YELLOW_MESSAGE</td>
+<td>Example of a target that displays a yellow color message</td>
+</tr>
+<tr>
+<td>RED_MESSAGE</td>
+<td>Example of a target that displays a red color message</td>
+</tr>
+<tr>
+<td>GITHUB_RELEASE</td>
+<td>Creates a stage or prod release</td>
+</tr>
+<tr>
+<td>GITHUB_PRE_RELEASE</td>
+<td>Creates a stage or prod pre-release</td>
+</tr>
+<tr>
+<td>INSTALL_DOTNET_OUTDATED_TOOL</td>
+<td>Install dotnet-outdated-tool globally</td>
+</tr>
+<tr>
+<td>UPDATE_NUGET_PACKAGES</td>
+<td>Update all NuGet packages to the latest version</td>
+</tr>
+<tr>
+<td>LIST_NUGET_SOURCES</td>
+<td>List all NuGet sources</td>
+</tr>
+<tr>
+<td>UPDATE_DOC_VERSIONS</td>
+<td>Update documentation versions from JSON configuration files</td>
+</tr>
+<tr>
+<td>SETUP_HOOKS</td>
+<td></td>
+</tr>
+<tr>
+<td>GENERATE_COMMIT_MESSAGE</td>
+<td>Intelligent commit message generation</td>
+</tr>
+<tr>
+<td>GIT_COMMIT_INFRASTRUCTURE</td>
+<td>Automated Git commit with intelligent message generation</td>
+</tr>
+<tr>
+<td>UPDATE_AND_COMMIT</td>
+<td>Combined target: Update versions and commit with smart message</td>
+</tr>
+<tr>
+<td>INFRASTRUCTURE_COMMIT</td>
+<td>Full infrastructure update and commit with intelligent analysis</td>
+</tr>
+<tr>
+<td>PREVIEW_COMMIT_MESSAGE</td>
+<td>Preview commit message without committing</td>
 </tr>
 </tbody>
 </table>
@@ -201,7 +253,7 @@
 </tr>
 <tr>
 <td>DEV</td>
-<td>Create a development package for testing</td>
+<td>Create a development package for testing without incrementing the version</td>
 </tr>
 <tr>
 <td>STAGE</td>
@@ -209,15 +261,23 @@
 </tr>
 <tr>
 <td>PROD</td>
-<td>Create a production package for release</td>
+<td>Create a PROD package for release</td>
+</tr>
+<tr>
+<td>GITHUB_RELEASE</td>
+<td>Creates a stage or prod release</td>
+</tr>
+<tr>
+<td>GITHUB_PRE_RELEASE</td>
+<td>Creates a stage or prod pre-release</td>
 </tr>
 <tr>
 <td>STAGE_DEPLOY</td>
-<td>Create a stage package and deploy for testing</td>
+<td>Create a STAGE package and deploy for testing</td>
 </tr>
 <tr>
 <td>PROD_DEPLOY</td>
-<td>Create a production package and deploy for release</td>
+<td>Create a PROD package and deploy for release</td>
 </tr>
 <tr>
 <td>SOLUTION</td>
@@ -458,6 +518,60 @@
 <tr>
 <td>GIT_BRANCH</td>
 <td>Get the current git branch</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>C:\Program Files\nbuild\docker.targets Targets</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th><strong>Target Name</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DOCKER_DOWNLOAD</td>
+<td>Download Docker version specified in DockerTargetVersion - Requires admin mode</td>
+</tr>
+<tr>
+<td>DOCKER_INSTALL</td>
+<td>Download Docker version specified in DockerTargetVersion property and install</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>C:\Program Files\nbuild\terraform.targets Targets</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th><strong>Target Name</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TF_WORKSPACE</td>
+<td>Create a new terraform workspace <code>dev</code> and select it</td>
+</tr>
+<tr>
+<td>TF_INIT</td>
+<td>Init terraform</td>
+</tr>
+<tr>
+<td>TF_PLAN</td>
+<td>terraform plan</td>
+</tr>
+<tr>
+<td>TF_APPLY</td>
+<td>terraform apply</td>
+</tr>
+<tr>
+<td>TF_DESTROY</td>
+<td>terraform destroy</td>
 </tr>
 </tbody>
 </table>
