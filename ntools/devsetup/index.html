@@ -5,14 +5,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="naz-hage" />
       <link rel="shortcut icon" href="../../img/favicon.ico" />
-    <title>Devsetup - Ntools - Work in Progress</title>
+    <title>Development Environment Setup for ntools - Ntools - Work in Progress</title>
     <link rel="stylesheet" href="../../css/theme.css" />
     <link rel="stylesheet" href="../../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
     
       <script>
         // Current page data
-        var mkdocs_page_name = "Devsetup";
+        var mkdocs_page_name = "Development Environment Setup for ntools";
         var mkdocs_page_input_path = "ntools/devsetup.md";
         var mkdocs_page_url = null;
       </script>
@@ -100,7 +100,7 @@
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
-      <li class="breadcrumb-item active">Devsetup</li>
+      <li class="breadcrumb-item active">Development Environment Setup for ntools</li>
     <li class="wy-breadcrumbs-aside">
           <a href="https://github.com/naz-hage/ntools/edit/main/docs/ntools/devsetup.md">Edit on ntools</a>
     </li>
@@ -110,43 +110,61 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <p>Content of dev-setup.ps1:
-This script sets up the development environment for your project, installs <code>ntools</code> and the necessary development tools, and sets the development environment variables.</p>
-<pre><code class="language-powershell"># dev-setup.ps1
-# Get the common Install module and import it
-$url = &quot;https://raw.githubusercontent.com/naz-hage/ntools/main/dev-setup/install.psm1&quot;
-$output = &quot;./install.psm1&quot;
-Invoke-WebRequest -Uri $url -OutFile $output
-Import-Module ./install.psm1 -Force
-
-$fileName = Split-Path -Leaf $PSCommandPath
-Write-OutputMessage $fileName &quot;Started installation script.&quot;
-
-# Check if the script is running with admin rights
-if (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] &quot;Administrator&quot;)) {
-    Write-OutputMessage $fileName &quot;Error: Please run this script as an administrator.&quot;
-    exit 1
-} else {
-    Write-OutputMessage $fileName &quot;Admin rights detected&quot;
-}
-
-# Install Ntools
-MainInstallApp -command install -json .\app-Ntools.json
-if ($LASTEXITCODE -ne 0) {
-    Write-OutputMessage $fileName &quot;Error: Installation of ntools (app-Ntools.json) failed. Exiting script.&quot;
-    exit 1
-}
-
-# Install development tools for the project
-&amp; $global:NbExePath install -json .\apps.json
-if ($LASTEXITCODE -ne 0) {
-    Write-OutputMessage $fileName &quot;Error: Installation of other tools (apps.json)  failed. Exiting script.&quot;
-    exit 1
-}
-
-Write-OutputMessage $fileName &quot;Completed installation script.&quot;
-Write-OutputMessage $fileName &quot;EmtpyLine&quot;
-</code></pre>
+                <h1 id="development-environment-setup-for-ntools">Development Environment Setup for ntools</h1>
+<p>This guide explains how to set up your development environment for the <code>ntools</code> project. It automates the installation of <code>ntools</code> and all required development tools, ensuring a consistent and reliable onboarding experience for all contributors.</p>
+<hr />
+<h2 id="prerequisites">Prerequisites</h2>
+<ul>
+<li><strong>Windows OS</strong> (PowerShell required)</li>
+<li><strong>PowerShell 5.1+</strong> (or PowerShell Core)</li>
+<li><strong>Administrator rights</strong> (required for installing system tools)</li>
+<li><strong>Internet access</strong> (to download modules and tools)</li>
+</ul>
+<blockquote>
+<p><strong>Tip:</strong> If you encounter issues, see the Troubleshooting and FAQ sections below.</p>
+</blockquote>
+<hr />
+<h2 id="how-to-run-the-setup-script">How to Run the Setup Script</h2>
+<ol>
+<li><strong>Open PowerShell as Administrator</strong></li>
+<li>Right-click on PowerShell and select <strong>Run as administrator</strong>.</li>
+<li><strong>Navigate to the project root directory:</strong>
+   <code>powershell
+   cd path\to\ntools</code></li>
+<li><strong>Run the setup script:</strong>
+   <code>powershell
+   ./dev-setup/install.ps1</code></li>
+</ol>
+<hr />
+<h2 id="troubleshooting">Troubleshooting</h2>
+<ul>
+<li><strong>Admin Rights:</strong> Make sure to run this script as an administrator. If you see an error about permissions, close PowerShell and reopen it as admin.</li>
+<li><strong>Network Issues:</strong> Ensure you have a stable internet connection. Proxy/firewall settings may block downloads.</li>
+<li><strong>Script Errors:</strong> Review the output for error messages. Check that all prerequisites are met and files exist in the expected locations.</li>
+<li><strong>Module Import Fails:</strong> If <code>install.psm1</code> fails to import, check that it was downloaded successfully and is not blocked by Windows security settings.</li>
+</ul>
+<hr />
+<h2 id="faq">FAQ</h2>
+<p><strong>Q: Can I add more tools to the setup?</strong>
+A: Yes! Edit <code>apps.json</code> to include additional tools. See <a href="../nbuildtasks/">nbuildtasks.md</a> for automation details.</p>
+<p><strong>Q: Where do I report issues or request features?</strong>
+A: See <a href="../backlog/backlog.md">backlog.md</a> for instructions on submitting issues and PBIs.</p>
+<p><strong>Q: How do I contribute to ntools?</strong>
+A: See the <a href="../CONTRIBUTING.md">Contribution Guide</a> (if available) or contact the maintainers.</p>
+<p><strong>Q: Where can I find more documentation?</strong>
+A: See the <a href="../ntools/">ntools documentation index</a> for tool usage, automation, and troubleshooting guides.</p>
+<hr />
+<h2 id="related-documentation">Related Documentation</h2>
+<ul>
+<li><a href="../ntools/">ntools documentation index</a></li>
+<li><a href="../nbuildtasks/">nbuildtasks.md</a></li>
+<li><a href="../backlog/backlog.md">backlog.md</a></li>
+<li><a href="../../version-automation-guide/">version-automation-guide.md</a></li>
+</ul>
+<hr />
+<blockquote>
+<p><strong>Last updated:</strong> July 4, 2025</p>
+</blockquote>
               
             </div>
           </div><footer>
