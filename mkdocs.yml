@@ -27,7 +27,6 @@ nav:
       - Nbuild Tasks: ntools/nbuildtasks.md
       - NBuild Tasks Integration: nbuild-tasks-integration.md
       - MSBuild Tasks Test Coverage: msbuild-tasks-test-coverage.md
-  # Pre-commit section removed: feature is now isolated in its own branch
   - Update:
       - Development Tools: ntools/ntools.md
   - Revisions: 

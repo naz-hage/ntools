@@ -269,7 +269,7 @@ namespace NbuildTasks
             if (extension == ".cs") analysis.CodeChanged = true;
             if (fileName.Contains("package") || fileName.Contains("version")) analysis.PackageOrVersionChanged = true;
             if (fileName.Contains("workflow") || fileName.Contains("action") || directory.Contains(".github")) analysis.CiChanged = true;
-            if (fileName.Contains("hook") || fileName.Contains("pre-commit")) analysis.HooksChanged = true;
+            if (fileName.Contains("hook")) analysis.HooksChanged = true;
             if (extension == ".yml" || extension == ".yaml" || extension == ".json") analysis.ConfigChanged = true;
         }
 
@@ -328,7 +328,7 @@ namespace NbuildTasks
             if (analysis.PackageOrVersionChanged)
                 return "Update package management and version automation";
             if (analysis.HooksChanged)
-                return "Update pre-commit hooks and quality gates";
+                return "Update hooks and quality gates";
             if (analysis.CiChanged)
                 return "Update CI/CD workflows and automation";
             if (analysis.DocsChanged && analysis.ScriptsChanged)
@@ -358,7 +358,7 @@ namespace NbuildTasks
 
             if (analysis.DocsChanged) details.Add("- Update documentation");
             if (analysis.ScriptsChanged) details.Add("- Update automation scripts");
-            if (analysis.HooksChanged) details.Add("- Update pre-commit hooks");
+            if (analysis.HooksChanged) details.Add("- Update hooks");
             if (analysis.CiChanged) details.Add("- Update CI/CD workflows");
             if (analysis.TestsChanged) details.Add("- Update tests");
 
