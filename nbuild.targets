@@ -255,6 +255,47 @@
 
 	<!-- Update documentation versions from JSON configuration files -->
 	<UsingTask TaskName="NbuildTasks.UpdateVersionsInDocs" AssemblyFile="C:\source\ntools\Release\NbuildTasks.dll" />
+	<UsingTask TaskName="NbuildTasks.SetupPreCommitHooks" AssemblyFile="C:\source\ntools\Release\NbuildTasks.dll" />
+	<UsingTask TaskName="NbuildTasks.GenerateCommitMessage" AssemblyFile="C:\source\ntools\Release\NbuildTasks.dll" />
+	
+	<Target Name="UPDATE_DOC_VERSIONS" DependsOnTargets="PROPERTIES">
+		<UpdateVersionsInDocs 
+			DevSetupPath="$(SolutionDir)\dev-setup" 
+			DocsPath="$(SolutionDir)\docs\ntools\ntools.md" />
+		<Message Text="Documentation versions updated successfully." />
+		<Message Text="==> DONE"/>
+	</Target>
+
+	<Target Name="SETUP_HOOKS" DependsOnTargets="PROPERTIES">
+		<SetupPreCommitHooks 
+			GitDirectory="$(SolutionDir)\.git" 
+			HooksSourceDirectory="$(SolutionDir)\dev-setup\hooks" />
+		<Message Text="Pre-commit hooks setup successfully." />
+		<Message Text="==> DONE"/>
+	</Target>
+
+	<!-- Intelligent commit message generation -->
+	<Target Name="GENERATE_COMMIT_MESSAGE" DependsOnTargets="PROPERTIES">
+		<PropertyGroup>
+			<CommitType Condition="'$(CommitType)' == ''">feat</CommitType>
+			<CommitScope Condition="'$(CommitScope)' == ''"></CommitScope>
+			<CommitMessageFile Condition="'$(CommitMessageFile)' == ''">$(SolutionDir)\.commit-message</CommitMessageFile>
+		</PropertyGroup>
+		
+		<GenerateCommitMessage 
+			WorkingDirectory="$(SolutionDir)"
+			CommitType="$(CommitType)"
+			Scope="$(CommitScope)"
+			CommitMessageFile="$(CommitMessageFile)">
+			<Output TaskParameter="CommitMessage" PropertyName="GeneratedCommitMessage" />
+		</GenerateCommitMessage>
+		
+		<Message Text="Generated commit message: $(GeneratedCommitMessage)" />
+		<Message Text="==> DONE"/>
+	</Target>
+
+	<!-- Update documentation versions from JSON configuration files -->
+	<UsingTask TaskName="NbuildTasks.UpdateVersionsInDocs" AssemblyFile="C:\source\ntools\Release\NbuildTasks.dll" />
   <!-- Removed SetupPreCommitHooks task: now isolated in feature branch -->
 	<UsingTask TaskName="NbuildTasks.GenerateCommitMessage" AssemblyFile="C:\source\ntools\Release\NbuildTasks.dll" />
 	
