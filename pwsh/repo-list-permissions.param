@@ -1,0 +1,9 @@
+{
+    // Required parameters
+    "repositoryName": "ConsoleApp1-archive", // Name of the repository to check permissions for
+    "organization": "https://dev.azure.com/nazh", // Azure DevOps organization URL
+    "project": "Archive", // Azure DevOps project name
+
+    // Optional parameters
+    "logFile": "repo-list-permissions.log" // Log file path (relative or absolute)
+}

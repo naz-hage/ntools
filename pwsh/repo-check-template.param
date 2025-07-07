@@ -1,0 +1,9 @@
+{
+    // Required parameters
+    "repositoryName": "archive",
+    "organization": "https://dev.azure.com/MyOrganization",
+    
+    // Optional parameters
+    "project": "",              // Leave empty to search all projects, or specify a project name
+    "logFile": "repo-check.log" // Log file path (relative or absolute)
+}

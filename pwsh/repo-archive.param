@@ -1,0 +1,12 @@
+{
+    // Required parameters
+    "sourceRepo": "ConsoleApp1",
+    "sourceOrganization": "https://dev.azure.com/nazh", 
+    "sourceProject": "Proto",
+    
+    // Optional parameters (leave empty string to use defaults)
+    "targetOrganization": "",    // Defaults to sourceOrganization if empty
+    "targetProject": "Archive",  // Defaults to "Archive" if empty
+    "targetRepo": "",            // Defaults to sourceRepo + "-archive" if empty
+    "logFile": "repo-archive.log" // Log file path (relative or absolute)
+}

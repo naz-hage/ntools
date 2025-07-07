@@ -1,0 +1,11 @@
+{
+    // Required parameters
+    "sourceRepo": "MyRepository",
+    "sourceOrganization": "https://dev.azure.com/MyOrganization", 
+    "sourceProject": "SoftwareDevelopment",
+    
+    // Optional parameters (leave empty string to use defaults)
+    "targetOrganization": "",    // Defaults to sourceOrganization if empty
+    "targetProject": "Archive",  // Defaults to "Archive" if empty
+    "targetRepo": ""             // Defaults to sourceRepo if empty
+}

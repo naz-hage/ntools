@@ -1,0 +1,9 @@
+{
+    // Required parameters
+    "repositoryName": "ConsoleApp1-archive",
+    "organization": "https://dev.azure.com/nazh",
+    
+    // Optional parameters
+    "project": "Archive",              // Leave empty to search all projects, or specify a project name
+    "logFile": "check-repo.log" // Log file path (relative or absolute)
+}

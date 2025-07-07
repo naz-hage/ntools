@@ -1,0 +1,9 @@
+{
+    // Required parameters
+    "repositoryName": "MyRepository-ToDelete",
+    "organization": "https://dev.azure.com/MyOrganization",
+    "project": "MyProject",
+    
+    // Optional parameters
+    "logFile": "repo-delete.log"    // Log file path (relative or absolute)
+}

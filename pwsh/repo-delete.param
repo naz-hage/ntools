@@ -1,0 +1,9 @@
+{
+    // Required parameters
+    "repositoryName": "ConsoleApp1-archive",
+    "organization": "https://dev.azure.com/nazh",
+    "project": "Archive",
+    
+    // Optional parameters
+    "logFile": "repo-delete.log"    // Log file path (relative or absolute)
+}

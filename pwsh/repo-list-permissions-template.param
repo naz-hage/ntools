@@ -1,0 +1,9 @@
+{
+    // Required parameters
+    "repositoryName": "archive", // Name of the repository to check permissions for
+    "organization": "https://dev.azure.com/YourOrganization", // Azure DevOps organization URL
+    "project": "SoftwareDevelopment", // Azure DevOps project name
+
+    // Optional parameters
+    "logFile": "repo-list-permissions.log" // Log file path (relative or absolute)
+}
