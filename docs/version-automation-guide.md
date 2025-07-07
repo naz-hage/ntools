@@ -31,6 +31,7 @@ We've implemented **4 complementary automation approaches** that can be used ind
 - Updates "Last Checked on" dates automatically
 - Provides colored console output for better UX
 
+## Version Automation Approach
 ### Usage
 ```powershell
 # Basic usage
@@ -49,6 +50,7 @@ cd dev-setup
 
 ---
 
+Tool versions in documentation are updated using the MSBuild task (`UpdateVersionsInDocs`) via the `nb update_doc_versions` command. This extracts all tool/version pairs from every `NbuildAppList` entry in every `*.json` file in `dev-setup` and updates the documentation table accordingly. See the documentation in `ntools.md` for details.
 ## 2. 🏗️ NBuild Task Integration
 
 ### What Was Added
