@@ -124,162 +124,157 @@ $logFile = if ($paramContent.logFile -and -not [string]::IsNullOrWhiteSpace($par
     $null
 }
 
-# Function to write output to both console and log file
-function Write-LogOutput {
-    param(
-        [string]$Message,
-        [string]$ForegroundColor = "White"
+function Get-RepoArchiveParameters {
+    param (
+        [string]$paramFile = $null
     )
-    
-    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    $logMessage = "[$timestamp] $Message"
-    
-    # Write to console with color
-    Write-Host $Message -ForegroundColor $ForegroundColor
-    
-    # Write to log file if specified
-    if ($logFile) {
-        Add-Content -Path $logFile -Value $logMessage -Encoding UTF8
+    if (-not $paramFile) {
+        $paramFile = Join-Path $PSScriptRoot "repo-archive.param"
     }
+    if (-not (Test-Path $paramFile)) {
+        throw "Parameter file not found: $paramFile"
+    }
+    try {
+        $paramContent = Get-Content $paramFile -Raw | ConvertFrom-Json
+    } catch {
+        throw "Failed to parse parameter file '$paramFile': $($_.Exception.Message)"
+    }
+    $requiredParams = @('sourceRepo', 'sourceOrganization', 'sourceProject')
+    foreach ($param in $requiredParams) {
+        if (-not $paramContent.$param -or [string]::IsNullOrWhiteSpace($paramContent.$param)) {
+            throw "Required parameter '$param' is missing or empty in parameter file"
+        }
+    }
+    $params = @{
+        sourceRepo        = $paramContent.sourceRepo
+        sourceOrganization= $paramContent.sourceOrganization
+        sourceProject     = $paramContent.sourceProject
+        targetOrganization= if ($paramContent.targetOrganization -and -not [string]::IsNullOrWhiteSpace($paramContent.targetOrganization)) { $paramContent.targetOrganization } else { $paramContent.sourceOrganization }
+        targetProject     = if ($paramContent.targetProject -and -not [string]::IsNullOrWhiteSpace($paramContent.targetProject)) { $paramContent.targetProject } else { "Archive" }
+        targetRepo        = if ($paramContent.targetRepo -and -not [string]::IsNullOrWhiteSpace($paramContent.targetRepo)) { $paramContent.targetRepo } else { "$($paramContent.sourceRepo)-archive" }
+        logFile           = if ($paramContent.logFile -and -not [string]::IsNullOrWhiteSpace($paramContent.logFile)) {
+                                if ([System.IO.Path]::IsPathRooted($paramContent.logFile)) {
+                                    $paramContent.logFile
+                                } else {
+                                    Join-Path $PSScriptRoot $paramContent.logFile
+                                }
+                            } else { $null }
+        paramFile         = $paramFile
+        pat               = "$env:PAT"
+    }
+    if (-not $params.pat) {
+        throw "Personal Access Token (PAT) is not set. Please set the PAT in the environment variable 'PAT'."
+    }
+    return $params
 }
 
-Write-LogOutput "Using parameter file: $paramFile" "Green"
+$params = Get-RepoArchiveParameters -paramFile $paramFile
+Start-RepoLog -logFile $params.logFile -paramFile $params.paramFile
 
-# Initialize log file with header
-if ($logFile) {
-    $logHeader = @(
-        "=" * 60
-        "Repository Archive Script Log"
-        "Started: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
-        "Parameter File: $paramFile"
-        "=" * 60
-    )
-    Set-Content -Path $logFile -Value $logHeader -Encoding UTF8
-    Write-LogOutput "Logging to: $logFile" "Green"
-}
-
-Write-LogOutput "Parameters in use:" "Green"
-Write-LogOutput "  Source Organization: $sourceOrganization"
-Write-LogOutput "  Source Project:      $sourceProject"
-Write-LogOutput "  Source Repo:         $sourceRepo"
-Write-LogOutput "  Target Organization: $targetOrganization"
-Write-LogOutput "  Target Project:      $targetProject"
-Write-LogOutput "  Target Repo:         $targetRepo"
-
-
-$personalAccessToken = "$env:PAT"  # Replace with your Azure DevOps Personal Access Token
-if (-not $personalAccessToken) {
-    throw "Personal Access Token (PAT) is not set. Please set the PAT in the environment variable 'PAT'."
-}
-
-# output current project name
-Write-LogOutput "Current Project: $sourceProject" "Cyan"
-Write-LogOutput "Target Project: $targetProject" "Cyan"
-
-Write-LogOutput "Source Repository: $sourceRepo" "Cyan"
-Write-LogOutput "Target Repository: $targetRepo" "Cyan"
+Write-RepoLog "Parameters in use:" "Green" $params.logFile
+Write-RepoLog "  Source Organization: $($params.sourceOrganization)" "White" $params.logFile
+Write-RepoLog "  Source Project:      $($params.sourceProject)" "White" $params.logFile
+Write-RepoLog "  Source Repo:         $($params.sourceRepo)" "White" $params.logFile
+Write-RepoLog "  Target Organization: $($params.targetOrganization)" "White" $params.logFile
+Write-RepoLog "  Target Project:      $($params.targetProject)" "White" $params.logFile
+Write-RepoLog "  Target Repo:         $($params.targetRepo)" "White" $params.logFile
 
 # Save current location
 $currentLocation = Get-Location
 
 # Set source folder
 $sourceFolder = "c:\azdevops\repos"
-# Create source folder if it doesn't exist
 if (-not (Test-Path $sourceFolder)) {
     New-Item -ItemType Directory -Path $sourceFolder -Force | Out-Null
 }
 
 try {
-    # Change to source folder
     Set-Location $sourceFolder
-    $repositoryPath = Join-Path $sourceFolder $sourceRepo
+    $repositoryPath = Join-Path $sourceFolder $params.sourceRepo
 
-    # Delete existing repository folder if it exists
     if (Test-Path $repositoryPath) {
-        Write-LogOutput "Removing existing repository folder: $repositoryPath"
+        Write-RepoLog "Removing existing repository folder: $repositoryPath" "Yellow" $params.logFile
         Remove-Item -Recurse -Force $repositoryPath
     }
 
     # Step 1: Clone the repository from the source project
-    Write-LogOutput "Cloning the repository from the source project..."
-    git clone --mirror "$sourceOrganization/$sourceProject/_git/$sourceRepo" $repositoryPath 2>&1 | Tee-Object -Variable cloneOutput
+    Write-RepoLog "Cloning the repository from the source project..." "Cyan" $params.logFile
+    git clone --mirror "$($params.sourceOrganization)/$($params.sourceProject)/_git/$($params.sourceRepo)" $repositoryPath 2>&1 | Tee-Object -Variable cloneOutput
     if (-not (Test-Path "$repositoryPath")) {
-        Write-LogOutput "Git clone failed. Output:" "Red"
-        $cloneOutput | ForEach-Object { Write-LogOutput "  $_" "Red" }
+        Write-RepoLog "Git clone failed. Output:" "Red" $params.logFile
+        $cloneOutput | ForEach-Object { Write-RepoLog "  $_" "Red" $params.logFile }
         throw "Failed to clone the repository. Ensure the source repository URL is correct."
     }
     Set-Location "$repositoryPath"
 
     # Step 2: Add the target repository as a remote
-    Write-LogOutput "Adding the target repository as a remote..."
-    git remote set-url --push origin "$targetOrganization/$targetProject/_git/$targetRepo" 2>&1 | Tee-Object -Variable remoteOutput
+    Write-RepoLog "Adding the target repository as a remote..." "Cyan" $params.logFile
+    git remote set-url --push origin "$($params.targetOrganization)/$($params.targetProject)/_git/$($params.targetRepo)" 2>&1 | Tee-Object -Variable remoteOutput
     if ($LASTEXITCODE -ne 0) {
-        Write-LogOutput "Git remote set-url failed with exit code: $LASTEXITCODE" "Red"
-        Write-LogOutput "Git output:" "Red"
-        $remoteOutput | ForEach-Object { Write-LogOutput "  $_" "Red" }
+        Write-RepoLog "Git remote set-url failed with exit code: $LASTEXITCODE" "Red" $params.logFile
+        Write-RepoLog "Git output:" "Red" $params.logFile
+        $remoteOutput | ForEach-Object { Write-RepoLog "  $_" "Red" $params.logFile }
         throw "Failed to set the remote URL for the target repository."
     }
 
-    # Add a function that checks if the repository exist in the target project
-    $repositoryExists = CheckRepositoryExists -organization $targetOrganization -project $targetProject -repositoryName $targetRepo -personalAccessToken $personalAccessToken
+    # Check if the repository exists in the target project
+    $repositoryExists = CheckRepositoryExists -organization $params.targetOrganization -project $params.targetProject -repositoryName $params.targetRepo -personalAccessToken $params.pat
 
-    # if repository does not exist, create it
     if (-not $repositoryExists) {
-        Write-LogOutput "Creating the repository in the target project..."
-        CreateRepository -organization $targetOrganization -project $targetProject -repositoryName $targetRepo -personalAccessToken $personalAccessToken
+        Write-RepoLog "Creating the repository in the target project..." "Cyan" $params.logFile
+        CreateRepository -organization $params.targetOrganization -project $params.targetProject -repositoryName $params.targetRepo -personalAccessToken $params.pat
     } else {
-        Write-LogOutput "The repository '$targetRepo' already exists in the target project '$targetProject'." "Yellow"
+        Write-RepoLog "The repository '$($params.targetRepo)' already exists in the target project '$($params.targetProject)'." "Yellow" $params.logFile
         throw "Repository already exists in the target project. Aborting migration."
     }
 
     # Step 3: Push all branches and tags to the target repository
-    Write-LogOutput "Pushing all branches and tags to the target repository..."
-    
-    # First, clean up any pull request refs that can't be pushed
-    Write-LogOutput "Cleaning up pull request references..."
+    Write-RepoLog "Pushing all branches and tags to the target repository..." "Cyan" $params.logFile
+
+    # Clean up pull request refs
+    Write-RepoLog "Cleaning up pull request references..." "Cyan" $params.logFile
     git for-each-ref --format='%(refname)' refs/pull | ForEach-Object {
-        Write-LogOutput "Removing ref: $_"
+        Write-RepoLog "Removing ref: $_" "Gray" $params.logFile
         git update-ref -d $_
     }
-    
+
     # Push all remaining branches
-    Write-LogOutput "Pushing branches..."
+    Write-RepoLog "Pushing branches..." "Cyan" $params.logFile
     git push origin --all 2>&1 | Tee-Object -Variable branchOutput
     if ($LASTEXITCODE -ne 0) {
-        Write-LogOutput "Git push branches failed with exit code: $LASTEXITCODE" "Red"
-        Write-LogOutput "Git output:" "Red"
-        $branchOutput | ForEach-Object { Write-LogOutput "  $_" "Red" }
+        Write-RepoLog "Git push branches failed with exit code: $LASTEXITCODE" "Red" $params.logFile
+        Write-RepoLog "Git output:" "Red" $params.logFile
+        $branchOutput | ForEach-Object { Write-RepoLog "  $_" "Red" $params.logFile }
         throw "Failed to push branches to the target repository. Exit code: $LASTEXITCODE"
     }
-    
-    # Then, push all tags
-    Write-LogOutput "Pushing tags..."
+
+    # Push all tags
+    Write-RepoLog "Pushing tags..." "Cyan" $params.logFile
     git push origin --tags 2>&1 | Tee-Object -Variable tagOutput
     if ($LASTEXITCODE -ne 0) {
-        Write-LogOutput "Git push tags failed with exit code: $LASTEXITCODE" "Red"
-        Write-LogOutput "Git output:" "Red"
-        $tagOutput | ForEach-Object { Write-LogOutput "  $_" "Red" }
+        Write-RepoLog "Git push tags failed with exit code: $LASTEXITCODE" "Red" $params.logFile
+        Write-RepoLog "Git output:" "Red" $params.logFile
+        $tagOutput | ForEach-Object { Write-RepoLog "  $_" "Red" $params.logFile }
         throw "Failed to push tags to the target repository. Exit code: $LASTEXITCODE"
     }
-    
-    Write-LogOutput "Successfully pushed all branches and tags (excluding PR refs)" "Green"
+
+    Write-RepoLog "Successfully pushed all branches and tags (excluding PR refs)" "Green" $params.logFile
 
     # Step 4: Verify the migration
-    Write-LogOutput "Verifying the migration..."
-    Write-LogOutput "Repository successfully moved from $sourceProject to $targetProject." "Green"
+    Write-RepoLog "Verifying the migration..." "Cyan" $params.logFile
+    Write-RepoLog "Repository successfully moved from $($params.sourceProject) to $($params.targetProject)." "Green" $params.logFile
 } catch {
     $errorMessage = "An error occurred: $($_.Exception.Message)"
-    Write-LogOutput $errorMessage "Red"
-    if ($logFile) {
-        Add-Content -Path $logFile -Value "[$((Get-Date -Format 'yyyy-MM-dd HH:mm:ss'))] ERROR: $($_.Exception.Message)" -Encoding UTF8
-        Add-Content -Path $logFile -Value "[$((Get-Date -Format 'yyyy-MM-dd HH:mm:ss'))] Script execution failed." -Encoding UTF8
+    Write-RepoLog $errorMessage "Red" $params.logFile
+    if ($params.logFile) {
+        Add-Content -Path $params.logFile -Value "[$((Get-Date -Format 'yyyy-MM-dd HH:mm:ss'))] ERROR: $($_.Exception.Message)" -Encoding UTF8
+        Add-Content -Path $params.logFile -Value "[$((Get-Date -Format 'yyyy-MM-dd HH:mm:ss'))] Script execution failed." -Encoding UTF8
     }
     Write-Error $errorMessage
 } finally {
-    # Restore original location
     Set-Location $currentLocation
-    if ($logFile) {
-        Add-Content -Path $logFile -Value "[$((Get-Date -Format 'yyyy-MM-dd HH:mm:ss'))] Script execution completed." -Encoding UTF8
-        Add-Content -Path $logFile -Value ("=" * 60) -Encoding UTF8
+    if ($params.logFile) {
+        Add-Content -Path $params.logFile -Value "[$((Get-Date -Format 'yyyy-MM-dd HH:mm:ss'))] Script execution completed." -Encoding UTF8
+        Add-Content -Path $params.logFile -Value ("=" * 60) -Encoding UTF8
     }
 }

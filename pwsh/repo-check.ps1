@@ -52,199 +52,63 @@ param (
     [string]$paramFile = $null
 )
 
-# Call import.ps1
-$importScriptPath = Join-Path $PSScriptRoot "import.ps1"
-if (-Not (Test-Path -Path $importScriptPath)) {
-    Write-Error "The import script does not exist at path $importScriptPath"
-    exit 1
-}
-. $importScriptPath
 
-# Determine parameter file path
-if (-not $paramFile) {
-    $paramFile = Join-Path $PSScriptRoot "repo-check.param"
-}
+# Refactored: Use shared functions from repos.psm1
+. (Join-Path $PSScriptRoot "import.ps1")
 
-# Read and parse parameter file
-if (-not (Test-Path $paramFile)) {
-    throw "Parameter file not found: $paramFile"
+$params = Get-RepoCheckParameters -paramFile $paramFile
+Start-RepoLog -logFile $params.logFile -paramFile $params.paramFile
+
+Write-RepoLog "Parameters in use:" "Green" $params.logFile
+Write-RepoLog "  Organization:   $($params.organization)" "White" $params.logFile
+Write-RepoLog "  Repository:     $($params.repositoryName)" "White" $params.logFile
+if ($params.project) {
+    Write-RepoLog "  Specific Project: $($params.project)" "White" $params.logFile
+} else {
+    Write-RepoLog "  Search Scope:   All projects in organization" "White" $params.logFile
 }
 
 try {
-    $paramContent = Get-Content $paramFile -Raw | ConvertFrom-Json
-} catch {
-    throw "Failed to parse parameter file '$paramFile': $($_.Exception.Message)"
-}
-
-# Validate required parameters
-$requiredParams = @('repositoryName', 'organization')
-foreach ($param in $requiredParams) {
-    if (-not $paramContent.$param -or [string]::IsNullOrWhiteSpace($paramContent.$param)) {
-        throw "Required parameter '$param' is missing or empty in parameter file"
-    }
-}
-
-# Assign variables from parameter file
-$repositoryName = $paramContent.repositoryName
-$organization = $paramContent.organization
-$project = if ($paramContent.project -and -not [string]::IsNullOrWhiteSpace($paramContent.project)) {
-    $paramContent.project
-} else {
-    $null
-}
-
-# Set log file if specified
-$logFile = if ($paramContent.logFile -and -not [string]::IsNullOrWhiteSpace($paramContent.logFile)) {
-    if ([System.IO.Path]::IsPathRooted($paramContent.logFile)) {
-        $paramContent.logFile
+    $projectsToSearch = if ($params.project) {
+        @($params.project)
     } else {
-        Join-Path $PSScriptRoot $paramContent.logFile
-    }
-} else {
-    $null
-}
-
-# Function to write output to both console and log file
-function Write-LogOutput {
-    param(
-        [string]$Message,
-        [string]$ForegroundColor = "White"
-    )
-    
-    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    $logMessage = "[$timestamp] $Message"
-    
-    # Write to console with color
-    Write-Host $Message -ForegroundColor $ForegroundColor
-    
-    # Write to log file if specified
-    if ($logFile) {
-        Add-Content -Path $logFile -Value $logMessage -Encoding UTF8
-    }
-}
-
-Write-LogOutput "Using parameter file: $paramFile" "Green"
-
-# Initialize log file with header
-if ($logFile) {
-    $logHeader = @(
-        "=" * 60
-        "Repository Check Script Log"
-        "Started: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
-        "Parameter File: $paramFile"
-        "=" * 60
-    )
-    Set-Content -Path $logFile -Value $logHeader -Encoding UTF8
-    Write-LogOutput "Logging to: $logFile" "Green"
-}
-
-Write-LogOutput "Parameters in use:" "Green"
-Write-LogOutput "  Organization:   $organization"
-Write-LogOutput "  Repository:     $repositoryName"
-if ($project) {
-    Write-LogOutput "  Specific Project: $project"
-} else {
-    Write-LogOutput "  Search Scope:   All projects in organization"
-}
-
-# Variables
-$personalAccessToken = "$env:PAT"
-if (-not $personalAccessToken) {
-    throw "Personal Access Token (PAT) is not set. Please set the PAT in the environment variable 'PAT'."
-}
-
-try {
-    # Determine which projects to search
-    $projectsToSearch = @()
-    
-    if ($project) {
-        # Search specific project only
-        $projectsToSearch = @($project)
-        Write-LogOutput "Searching in specific project: $project" "Cyan"
-    } else {
-        # Search all projects in organization
-        Write-LogOutput "Fetching all projects in organization..." "Cyan"
-        
-        $headers = @{ Authorization = "Basic " + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(":$personalAccessToken")) }
-        $projectsUrl = "$organization/_apis/projects?api-version=7.1"
-
-        try {
-            $response = Invoke-RestMethod -Uri $projectsUrl -Headers $headers -Method Get
-            if ($response.value) {
-                foreach ($proj in $response.value) {
-                    $projectsToSearch += $proj.name
-                }
-                Write-LogOutput "Found $($projectsToSearch.Count) projects in organization" "Green"
-            } else {
-                Write-LogOutput "No projects found in the organization." "Yellow"
-                return
-            }
-        } catch {
-            Write-LogOutput "Failed to fetch projects from the organization: $($_.Exception.Message)" "Red"
-            throw "Failed to fetch projects from the organization: $_"
-        }
+        Get-AllAzDevOpsProjects -organization $params.organization -pat $params.pat
     }
 
-    # Display projects to search
-    Write-LogOutput "Projects to search:" "Green"
+    Write-RepoLog "Projects to search:" "Green" $params.logFile
     foreach ($proj in $projectsToSearch) {
-        Write-LogOutput "  - $proj" "Yellow"
+        Write-RepoLog "  - $proj" "Yellow" $params.logFile
     }
-    Write-LogOutput ""
+    Write-RepoLog "" "White" $params.logFile
 
-    # Search for repository in projects
     $foundRepositories = @()
-    
     foreach ($proj in $projectsToSearch) {
-        Write-LogOutput "Checking project '$proj'..." "Cyan"
-        
-        $repositoryExists = CheckRepositoryExists -organization $organization -project $proj -repositoryName $repositoryName -personalAccessToken $personalAccessToken
-
+        Write-RepoLog "Checking project '$proj'..." "Cyan" $params.logFile
+        $repositoryExists = CheckRepositoryExists -organization $params.organization -project $proj -repositoryName $params.repositoryName -personalAccessToken $params.pat
         if ($repositoryExists) {
-            $repositoryUrl = "$organization/$proj/_git/$repositoryName"
-            Write-LogOutput "✓ FOUND: Repository exists in project '$proj'" "Green"
-            Write-LogOutput "  URL: $repositoryUrl" "Green"
-            $foundRepositories += @{
-                Project = $proj
-                Url = $repositoryUrl
-            }
+            $repositoryUrl = "$($params.organization)/$proj/_git/$($params.repositoryName)"
+            Write-RepoLog "✓ FOUND: Repository exists in project '$proj'" "Green" $params.logFile
+            Write-RepoLog "  URL: $repositoryUrl" "Green" $params.logFile
+            $foundRepositories += @{ Project = $proj; Url = $repositoryUrl }
         } else {
-            Write-LogOutput "  Not found in project '$proj'" "Gray"
+            Write-RepoLog "  Not found in project '$proj'" "Gray" $params.logFile
         }
     }
 
-    # Summary
-    Write-LogOutput ""
-    Write-LogOutput "=== SEARCH SUMMARY ===" "Cyan"
-    Write-LogOutput "Repository Name: $repositoryName" "Cyan"
-    Write-LogOutput "Projects Searched: $($projectsToSearch.Count)" "Cyan"
-    Write-LogOutput "Repositories Found: $($foundRepositories.Count)" "Cyan"
-
-    if ($foundRepositories.Count -gt 0) {
-        Write-LogOutput ""
-        Write-LogOutput "Repository found in the following locations:" "Green"
-        foreach ($repo in $foundRepositories) {
-            Write-LogOutput "  Project: $($repo.Project)" "Green"
-            Write-LogOutput "  URL:     $($repo.Url)" "Green"
-            Write-LogOutput ""
-        }
-    } else {
-        Write-LogOutput ""
-        Write-LogOutput "Repository '$repositoryName' was not found in any searched projects." "Yellow"
-    }
+    Write-RepoCheckSummary -repositoryName $params.repositoryName -projects $projectsToSearch -found $foundRepositories -logFile $params.logFile
 
 } catch {
     $errorMessage = "An error occurred: $($_.Exception.Message)"
-    Write-LogOutput $errorMessage "Red"
-    if ($logFile) {
-        Add-Content -Path $logFile -Value "[$((Get-Date -Format 'yyyy-MM-dd HH:mm:ss'))] ERROR: $($_.Exception.Message)" -Encoding UTF8
-        Add-Content -Path $logFile -Value "[$((Get-Date -Format 'yyyy-MM-dd HH:mm:ss'))] Script execution failed." -Encoding UTF8
-    }
+    Write-RepoLog $errorMessage "Red" $params.logFile
     Write-Error $errorMessage
+    if ($params.logFile) {
+        Add-Content -Path $params.logFile -Value "[$((Get-Date -Format 'yyyy-MM-dd HH:mm:ss'))] ERROR: $($_.Exception.Message)" -Encoding UTF8
+        Add-Content -Path $params.logFile -Value "[$((Get-Date -Format 'yyyy-MM-dd HH:mm:ss'))] Script execution failed." -Encoding UTF8
+    }
 } finally {
-    if ($logFile) {
-        Add-Content -Path $logFile -Value "[$((Get-Date -Format 'yyyy-MM-dd HH:mm:ss'))] Script execution completed." -Encoding UTF8
-        Add-Content -Path $logFile -Value ("=" * 60) -Encoding UTF8
+    if ($params.logFile) {
+        Add-Content -Path $params.logFile -Value "[$((Get-Date -Format 'yyyy-MM-dd HH:mm:ss'))] Script execution completed." -Encoding UTF8
+        Add-Content -Path $params.logFile -Value ("=" * 60) -Encoding UTF8
     }
 }
 
