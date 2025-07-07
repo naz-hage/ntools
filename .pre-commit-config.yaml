@@ -25,16 +25,18 @@ repos:
     hooks:
       - id: powershell-script-analyzer
 
-  # Custom hook for updating documentation versions
+  # Custom hook for updating documentation versions (NBuild)
   - repo: local
     hooks:
-      - id: update-doc-versions
-        name: Update documentation versions
-        entry: pwsh
-        args: ['-File', 'dev-setup/update-versions.ps1', '-DevSetupPath', 'dev-setup', '-DocsPath', 'docs/ntools/ntools.md']
+      - id: nbuild-update-doc-versions
+        name: Update Documentation Versions (NBuild)
+        entry: nb update_doc_versions
         language: system
-        files: '^dev-setup/.*\.json$'
+        types: [json]
+        files: ^dev-setup/.*\.json$
         pass_filenames: false
+        always_run: true
+        verbose: true
 
   # Commit message validation
   - repo: https://github.com/compilerla/conventional-pre-commit
