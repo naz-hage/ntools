@@ -1,0 +1,17 @@
+{
+    // Required parameters
+    "sourceRepo": "ConsoleApp1",
+    "sourceOrganization": "https://dev.azure.com/nazh",
+    "sourceProject": "Proto",
+    "targetRepo": "ConsoleApp1-archive",
+    "targetOrganization": "https://dev.azure.com/nazh",
+    "targetProject": "Archive",
+
+    // Optional parameters
+    "logFile": "repo-verify.log", // Log file path (relative or absolute)
+    // Verification method:
+    //   "git"  - (default) Full object comparison using local git clone and diff
+    //   "rest" - Compare branch/tag names and tip hashes using Azure DevOps REST API
+    // If omitted, defaults to "git".
+    "verificationMethod": "git"
+}

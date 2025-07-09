@@ -189,6 +189,7 @@ if (-not (Test-Path $sourceFolder)) {
 }
 
 try {
+
     Set-Location $sourceFolder
     $repositoryPath = Join-Path $sourceFolder $params.sourceRepo
 
@@ -197,9 +198,16 @@ try {
         Remove-Item -Recurse -Force $repositoryPath
     }
 
-    # Step 1: Clone the repository from the source project
+    # Build authenticated URLs using PAT
+    $pat = $params.pat
+    $srcUrl = $params.sourceOrganization -replace '^https://', "https://user:$pat@"
+    $srcUrl = "$srcUrl/$($params.sourceProject)/_git/$($params.sourceRepo)"
+    $targetUrl = $params.targetOrganization -replace '^https://', "https://user:$pat@"
+    $targetUrl = "$targetUrl/$($params.targetProject)/_git/$($params.targetRepo)"
+
+    # Step 1: Clone the repository from the source project (use --bare, not --mirror)
     Write-RepoLog "Cloning the repository from the source project..." "Cyan" $params.logFile
-    git clone --mirror "$($params.sourceOrganization)/$($params.sourceProject)/_git/$($params.sourceRepo)" $repositoryPath 2>&1 | Tee-Object -Variable cloneOutput
+    git clone --bare $srcUrl $repositoryPath 2>&1 | Tee-Object -Variable cloneOutput
     if (-not (Test-Path "$repositoryPath")) {
         Write-RepoLog "Git clone failed. Output:" "Red" $params.logFile
         $cloneOutput | ForEach-Object { Write-RepoLog "  $_" "Red" $params.logFile }
@@ -207,9 +215,9 @@ try {
     }
     Set-Location "$repositoryPath"
 
-    # Step 2: Add the target repository as a remote
+    # Step 2: Add the target repository as a remote (with PAT)
     Write-RepoLog "Adding the target repository as a remote..." "Cyan" $params.logFile
-    git remote set-url --push origin "$($params.targetOrganization)/$($params.targetProject)/_git/$($params.targetRepo)" 2>&1 | Tee-Object -Variable remoteOutput
+    git remote set-url origin $targetUrl 2>&1 | Tee-Object -Variable remoteOutput
     if ($LASTEXITCODE -ne 0) {
         Write-RepoLog "Git remote set-url failed with exit code: $LASTEXITCODE" "Red" $params.logFile
         Write-RepoLog "Git output:" "Red" $params.logFile

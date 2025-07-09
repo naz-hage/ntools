@@ -1,0 +1,32 @@
+{
+  // Global parameters for all steps
+  "globalParams": {
+    "sourceOrganization": "https://dev.azure.com/nazh",
+    "sourceProject": "Proto",
+    "targetOrganization": "https://dev.azure.com/nazh",
+    "targetProject": "Archive",
+    "logFile": "repo-archive-check-verify-delete.log"
+  },
+  "steps": [
+    {
+      "type": "archive",
+      "sourceRepo": "ConsoleApp1",
+      "targetRepo": "ConsoleApp1-archive"
+    },
+    {
+      "type": "check",
+      "sourceRepo": "ConsoleApp1",
+      "targetRepo": "ConsoleApp1-archive"
+    },
+    {
+      "type": "verify",
+      "sourceRepo": "ConsoleApp1",
+      "targetRepo": "ConsoleApp1-archive",
+      "verificationMethod": "git"
+    },
+    {
+      "type": "delete",
+      "targetRepo": "ConsoleApp1-archive"
+    }
+  ]
+}
