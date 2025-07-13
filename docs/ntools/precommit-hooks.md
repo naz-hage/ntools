@@ -10,7 +10,7 @@ Pre-commit hooks are scripts that run automatically before each commit to enforc
 1. Ensure you have Python and `pip` installed.
 2. From the repo root or `dev-setup` folder, run:
    ```powershell
-   ./dev-setup/install-precommit-hooks.ps1
+   ./dev-setup/precommit-hook.ps1
    ```
    This will install the pre-commit framework and set up the hooks defined in `.pre-commit-config.yaml`.
 
