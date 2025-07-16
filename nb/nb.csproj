@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net9.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+	<OutputType>Exe</OutputType>
+	<TargetFramework>net9.0</TargetFramework>
+	<ImplicitUsings>enable</ImplicitUsings>
+	<Nullable>enable</Nullable>
 	  <Version></Version>
 	  <AssemblyVersion></AssemblyVersion>
 	  <Authors>naz-hage</Authors>
@@ -26,6 +26,7 @@
 	<PropertyGroup>
 		<GenerateAssemblyInfo>true</GenerateAssemblyInfo>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<AssemblyName>nb</AssemblyName>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -39,16 +40,17 @@
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</EmbeddedResource>
 		<EmbeddedResource Include="..\dev-setup\ntools.json" />
-	    <EmbeddedResource Include="resources\ntools.json" />
+		<EmbeddedResource Include="resources\ntools.json" />
 	</ItemGroup>
 	
 	<ItemGroup>
-	  <PackageReference Include="CommandLine.Net" Version="2.3.0" />
+	<PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
 
 	</ItemGroup>
  <ItemGroup>
-    <ProjectReference Include="..\GitHubRelease\GitHubRelease.csproj" />
-    <ProjectReference Include="..\NbuildTasks\NbuildTasks.csproj" />
+	<ProjectReference Include="..\GitHubRelease\GitHubRelease.csproj" />
+	<ProjectReference Include="..\NbuildTasks\NbuildTasks.csproj" />
+	<ProjectReference Include="..\Nbuild\Nbuild.csproj" />
   </ItemGroup>
 
 </Project>
