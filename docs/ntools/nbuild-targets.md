@@ -23,12 +23,12 @@ The table below lists all available targets for the Nbuild tool.
 | UPDATE_NUGET_PACKAGES | Update all NuGet packages to the latest version |
 | LIST_NUGET_SOURCES  | List all NuGet sources |
 | UPDATE_DOC_VERSIONS | Update documentation versions from JSON configuration files |
-| SETUP_HOOKS         |  |
 | GENERATE_COMMIT_MESSAGE | Intelligent commit message generation |
 | GIT_COMMIT_INFRASTRUCTURE | Automated Git commit with intelligent message generation |
 | UPDATE_AND_COMMIT   | Combined target: Update versions and commit with smart message |
 | INFRASTRUCTURE_COMMIT | Full infrastructure update and commit with intelligent analysis |
 | PREVIEW_COMMIT_MESSAGE | Preview commit message without committing |
+| INSTALL_PRECOMMIT_HOOKS | Install pre-commit hooks using the PowerShell script |
 
 
 - **C:\Program Files\Nbuild\common.targets Targets**

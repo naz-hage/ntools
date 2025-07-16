@@ -24,28 +24,28 @@
 	  </PropertyGroup>  
 	  <ItemGroup>
 			<BinaryFiles 
-						Exclude="
-						 $(SolutionDir)\$(TargetRelease)\**\*.pdb;
-						 $(SolutionDir)\$(TargetRelease)\test.*;
-						 $(SolutionDir)\$(TargetRelease)\*test*;
-						 $(SolutionDir)\$(TargetRelease)\Nuget*;
-						 $(SolutionDir)\$(TargetRelease)\*CodeCoverage*"
+					Exclude="
+					 $(SolutionDir)\$(TargetRelease)\**\*.pdb;
+					 $(SolutionDir)\$(TargetRelease)\test.*;
+					 $(SolutionDir)\$(TargetRelease)\*test*;
+					 $(SolutionDir)\$(TargetRelease)\Nuget*;
+					 $(SolutionDir)\$(TargetRelease)\*CodeCoverage*"
 
-						Include="
-						$(SolutionDir)\$(TargetRelease)\*.exe;
-						$(SolutionDir)\$(TargetRelease)\*.exe.config;
-						$(SolutionDir)\$(TargetRelease)\*.json;
-						$(SolutionDir)\Nbuild\resources\*.targets;
-						$(SolutionDir)\Nbuild\resources\*.ps1;
-						$(SolutionDir)\Nbuild\resources\*.json;
-						$(SolutionDir)\$(TargetRelease)\*.dll"
-						/>
+					Include="
+					$(SolutionDir)\$(TargetRelease)\*.exe;
+					$(SolutionDir)\$(TargetRelease)\*.exe.config;
+					$(SolutionDir)\$(TargetRelease)\*.json;
+					$(SolutionDir)\Nbuild\resources\*.targets;
+					$(SolutionDir)\Nbuild\resources\*.ps1;
+					$(SolutionDir)\Nbuild\resources\*.json;
+					$(SolutionDir)\$(TargetRelease)\*.dll"
+					/>
 
 			<RunTimesNetStandard20 Include = "
-								   $(SolutionDir)\$(TargetRelease)\netstandard2.0\*.*"
-									Exclude="
-									$(SolutionDir)\$(TargetRelease)\**\*.pdb"
-									/>
+							   $(SolutionDir)\$(TargetRelease)\netstandard2.0\*.*"
+								Exclude="
+								$(SolutionDir)\$(TargetRelease)\**\*.pdb"
+								/>
 		</ItemGroup>
 		
 		<Message Text="==> DONE"/>
@@ -143,7 +143,7 @@
 		<Error Condition="'$(MkDocsInstallExitCode)' != '0'" Text="Failed to install mkdocs. Exit code: $(MkDocsInstallExitCode)" />
 
 		<!-- Build the documentation -->
-		<Exec Command='"$(MkDocsExe)" build -d $(ArtifactsDir)\$(SolutionName)\docs"' WorkingDirectory="$(SolutionDir)" />
+		<Exec Command='"$(MkDocsExe)" build -d $(ArtifactsDir)\$(SolutionName)\docs' WorkingDirectory="$(SolutionDir)" />
 		<Message Text="==> DONE" />
 	</Target>
 
@@ -255,7 +255,7 @@
 
 	<!-- Update documentation versions from JSON configuration files -->
 	<UsingTask TaskName="NbuildTasks.UpdateVersionsInDocs" AssemblyFile="C:\source\ntools\Release\NbuildTasks.dll" />
-  <!-- Removed SetupPreCommitHooks task: now isolated in feature branch -->
+	<UsingTask TaskName="NbuildTasks.SetupPreCommitHooks" AssemblyFile="C:\source\ntools\Release\NbuildTasks.dll" />
 	<UsingTask TaskName="NbuildTasks.GenerateCommitMessage" AssemblyFile="C:\source\ntools\Release\NbuildTasks.dll" />
 	
 	<Target Name="UPDATE_DOC_VERSIONS" DependsOnTargets="PROPERTIES">
@@ -265,8 +265,6 @@
 		<Message Text="Documentation versions updated successfully." />
 		<Message Text="==> DONE"/>
 	</Target>
-
-  <!-- Removed SETUP_HOOKS target: now isolated in feature branch -->
 
 	<!-- Intelligent commit message generation -->
 	<Target Name="GENERATE_COMMIT_MESSAGE" DependsOnTargets="PROPERTIES">
@@ -347,4 +345,12 @@
 		<CallTarget Targets="GENERATE_COMMIT_MESSAGE" />
 		<Message Text="==> Commit message preview complete. Check $(SolutionDir)\.commit-message file"/>
 	</Target>
+
+	<!-- Install pre-commit hooks using the PowerShell script -->
+	<Target Name="INSTALL_PRECOMMIT_HOOKS">
+		<Exec Command="powershell -ExecutionPolicy Bypass -File &quot;$(SolutionDir)\dev-setup\precommit-hook.ps1&quot;" WorkingDirectory="$(SolutionDir)" />
+		<Message Text="Pre-commit hooks installed via precommit-hook.ps1" />
+		<Message Text="==> DONE" />
+	</Target>
+
 </Project>
