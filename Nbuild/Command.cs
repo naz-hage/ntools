@@ -624,6 +624,12 @@ namespace Nbuild
                 throw new ArgumentNullException(nameof(json));
             }
 
+            // Strip quotes if they are present around the json parameter
+            if (json.StartsWith('"') && json.EndsWith('"') && json.Length > 1)
+            {
+                json = json.Substring(1, json.Length - 2);
+            }
+
             // check if json is a file path
             if (File.Exists(json))
             {
@@ -635,7 +641,15 @@ namespace Nbuild
                 }
             }
 
-            var listAppData = JsonSerializer.Deserialize<NbuildApps>(json) ?? throw new ParserException("Failed to parse json to list of objects", null);
+            NbuildApps listAppData;
+            try
+            {
+                listAppData = JsonSerializer.Deserialize<NbuildApps>(json) ?? throw new ParserException("Failed to parse json to list of objects", null);
+            }
+            catch (JsonException ex)
+            {
+                throw new ParserException($"Invalid JSON format: {ex.Message}. Please check the JSON file for proper escaping of backslashes and quotes.", ex);
+            }
 
             // make sure version matches supported version
             if (listAppData.Version != SupportedVersion)

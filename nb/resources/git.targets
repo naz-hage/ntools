@@ -1,0 +1,93 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<!--This targets file can be used only if it imported by common.targets-->
+
+    <!-- Download Git For Windows version specified in GitTargetVersion - Requires admin mode -->
+    <Target Name="GIT_DOWNLOAD" DependsOnTargets="IS_ADMIN;APP_COMMON" >
+        <PropertyGroup>
+            <!-- visit https://git-scm.com/download/win to get the latest stable version -->
+            <WebUri>https://github.com/git-for-windows/git/releases/download/v$(GitTargetVersion).windows.$(GitPatch)/Git-$(GitTargetVersion)-64-bit.exe </WebUri>
+            <FileName>$(DownloadsDirectory)\Git-$(GitTargetVersion)-64-bit.exe</FileName>
+        </PropertyGroup>
+        <RedError Condition="'$(IsAdmin)' == false" Message="Must be an admin to install $(GitAppName)" />
+
+        <Delete Files="$(FileName)" Condition="Exists('$(FileName)') == true" />
+
+        <WebDownload WebUri="$(WebUri)" FileName="$(FileName)" />
+
+        <Message Text="==> GIT_DONE"/>
+    </Target>
+
+    <!-- Download Git For Windows version specified in GitTargetVersion property and install-->
+    <Target Name="GIT_INSTALL" DependsOnTargets="IS_ADMIN;GIT_DOWNLOAD" >
+        <PropertyGroup>
+            <GitExe>$(ProgramFiles)\Git\bin\git.exe</GitExe>
+        </PropertyGroup>
+        <Exec Command='"$(GitExe)" --version' Condition="Exists('$(GitExe)')" />
+
+        <RedError Condition="'$(IsAdmin)' == false" Message="Must be an admin to install git" />
+
+        <FileVersion Name="$(GitExe)" Condition="Exists('$(GitExe)')" >
+            <Output TaskParameter="Output" PropertyName="GitVersion" />
+        </FileVersion>
+
+        <!-- strip .windows from GitVersion -->
+        <PropertyGroup>
+            <GitVersion>$(GitVersion.Replace('.windows',''))</GitVersion>
+        </PropertyGroup>
+
+        <Message Text="$(GitAppName) is not installed" Condition="'$(GitVersion)' == ''" />
+        <!-- Display the file version -->
+        <Message Text="$(GitAppName) Version is $(GitVersion)" Condition="'$(GitVersion)' != ''" />
+
+        <Message Text="Installing Git For Windows" Condition="!Exists('$(GitExe)') or '$(GitVersion)' == '' or '$(GitVersion)' &lt; '$(GitTargetVersion)'"/>
+        <Exec Command='"$(FileName)" /SILENT /NORESTART /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS /SP- /LOG' Condition="'$(GitVersion)' == '' Or '$(GitVersion)' &lt; '$(GitTargetVersion)'" />
+
+        <Delete Files="$(FileName)" Condition="Exists('$(FileName)') == true" />
+
+        <Exec Command='"$(GitExe)" --version'  Condition="Exists('$(GitExe)')" />
+
+        <FileVersion Name="$(GitExe)" Condition="Exists('$(GitExe)')" >
+            <Output TaskParameter="Output" PropertyName="GitVersion" />
+        </FileVersion>
+
+        <Message Text="Git For Windows installed version: $(GitVersion)" />
+        <Message Text="==> GIT_DONE"/>
+    </Target>
+
+    <!-- Update the current Git for Windows -->
+    <Target Name="GIT_UPDATE" DependsOnTargets="IS_ADMIN;APP_COMMON" >
+        <PropertyGroup>
+            <GitExe>$(ProgramFiles)\Git\bin\git.exe</GitExe>
+        </PropertyGroup>
+        <Exec Command='"$(GitExe)" --version' Condition="Exists('$(GitExe)')" />
+
+        <RedError Condition="'$(IsAdmin)' == false" Message="Must be an admin to update git" />
+
+        <FileVersion Name="$(GitExe)" Condition="Exists('$(GitExe)')" >
+            <Output TaskParameter="Output" PropertyName="GitVersion" />
+        </FileVersion>
+
+        <!-- strip .windows from GitVersion -->
+        <PropertyGroup>
+            <GitVersion>$(GitVersion.Replace('.windows',''))</GitVersion>
+        </PropertyGroup>
+
+        <Message Text="$(GitAppName) is not installed" Condition="'$(GitVersion)' == ''" />
+        <!-- Display the file version -->
+        <Message Text="$(GitAppName) Version is $(GitVersion)" Condition="'$(GitVersion)' != ''" />
+
+        <Message Text="Updating Git For Windows" />
+        <!-- Update Git For Windows.  Pipe 'y' if an update is available Download and install Git for Windows v2.43.0.windows.1 [N/y]? -->
+        <Exec Command='echo y | "$(GitExe)" update-git-for-windows' IgnoreExitCode="true" />
+
+        <Exec Command='"$(GitExe)" --version'  Condition="Exists('$(GitExe)')" />
+
+        <FileVersion Name="$(GitExe)" Condition="Exists('$(GitExe)')" >
+            <Output TaskParameter="Output" PropertyName="GitVersion" />
+        </FileVersion>
+
+        <Message Text="Git For Windows installed version: $(GitVersion)" />
+        <Message Text="==> GIT_DONE"/>
+    </Target>
+</Project>

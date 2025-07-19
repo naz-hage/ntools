@@ -1,0 +1,53 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<!--This targets file can be used only if it imported by common.targets-->
+
+	<!-- Download Docker version specified in DockerTargetVersion - Requires admin mode -->
+	<Target Name="DOCKER_DOWNLOAD" DependsOnTargets="IS_ADMIN;APP_COMMON" >
+		<PropertyGroup>
+			<WebUri>https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe</WebUri>
+			<FileName>$(DownloadsDirectory)\Docker%20Desktop%20Installer.exe</FileName>
+		</PropertyGroup>
+		<RedError Condition="'$(IsAdmin)' == false" Message="Must be an admin to install $(DockerAppName)" />
+
+		<Delete Files="$(FileName)" Condition="Exists('$(FileName)') == true" />
+
+		<WebDownload WebUri="$(WebUri)" FileName="$(FileName)" />
+
+		<Message Text="==> DONE"/>
+	</Target>
+
+	<!-- Download Docker version specified in DockerTargetVersion property and install-->
+	<Target Name="DOCKER_INSTALL" DependsOnTargets="IS_ADMIN;DOCKER_DOWNLOAD" >
+		<PropertyGroup>
+			<DockerExe>$(ProgramFiles)\Docker\Docker\Docker Desktop.exe</DockerExe>
+		</PropertyGroup>
+		<Exec Command='"$(DockerExe)" --version' Condition="Exists('$(DockerExe)')" />
+
+		<RedError Condition="'$(IsAdmin)' == false" Message="Must be an admin to install $(DockerAppName)" />
+
+		<FileVersion Name="$(DockerExe)" Condition="Exists('$(DockerExe)')" >
+			<Output TaskParameter="Output" PropertyName="DockerVersion" />
+		</FileVersion>
+
+		<Message Text="$(DockerAppName) is not installed" Condition="'$(DockerVersion)' == ''" />
+		<!-- Display the installed file version -->
+		<Message Text="Installed $(DockerAppName) Version is $(DockerVersion)" Condition="'$(DockerVersion)' != ''" />
+
+		<Message Text="Installing $(DockerAppName)" Condition="!Exists('$(DockerExe)') or '$(DockerVersion)' == '' or '$(DockerVersion)' &lt; '$(DockerTargetVersion)'"/>
+		<Exec Command='"$(FileName)" install --quiet' Condition="'$(DockerVersion)' == '' Or '$(DockerVersion)' &lt; '$(DockerTargetVersion)'" />
+
+		<Delete Files="$(FileName)" Condition="Exists('$(FileName)') == true" />
+
+		<Exec Command='"$(DockerExe)" --version'  Condition="Exists('$(DockerExe)')" />
+
+		<FileVersion Name="$(DockerExe)" Condition="Exists('$(DockerExe)')" >
+			<Output TaskParameter="Output" PropertyName="DockerVersion" />
+		</FileVersion>
+
+		<Message Text="$(DockerAppName) installed version: $(DockerVersion)" />
+		<Message Text="==> DONE"/>
+	</Target>
+
+
+</Project>
