@@ -5,15 +5,15 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="naz-hage" />
       <link rel="shortcut icon" href="../img/favicon.ico" />
-    <title>Practice - Ntools - Work in Progress</title>
+    <title>Pre-commit Setup - Ntools - Work in Progress</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
     
       <script>
         // Current page data
-        var mkdocs_page_name = "Practice";
-        var mkdocs_page_input_path = "usage.md";
+        var mkdocs_page_name = "Pre-commit Setup";
+        var mkdocs_page_input_path = "pre-commit-setup.md";
         var mkdocs_page_url = null;
       </script>
     
@@ -40,12 +40,12 @@
 
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption"><span class="caption-text">Getting Started</span></p>
-              <ul class="current">
+              <ul>
                   <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../installation/">Installation</a>
                   </li>
-                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Practice</a>
+                  <li class="toctree-l1"><a class="reference internal" href="../usage/">Practice</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../setup/">Setup your project</a>
                   </li>
@@ -77,8 +77,36 @@
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Pre-commit</span></p>
-              <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="../pre-commit-setup/">Pre-commit Setup</a>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Pre-commit Setup</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#method-1-using-pre-commit-framework-recommended">Method 1: Using Pre-commit Framework (Recommended)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#installation">Installation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#method-2-manual-git-hooks">Method 2: Manual Git Hooks</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#windows-setup">Windows Setup</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#test-the-hook">Test the Hook</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#customization-options">Customization Options</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#skip-specific-hooks">Skip Specific Hooks</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#hook-configuration">Hook Configuration</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#environment-variables">Environment Variables</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Update</span></p>
@@ -105,10 +133,10 @@
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
-          <li class="breadcrumb-item">Getting Started</li>
-      <li class="breadcrumb-item active">Practice</li>
+          <li class="breadcrumb-item">Pre-commit</li>
+      <li class="breadcrumb-item active">Pre-commit Setup</li>
     <li class="wy-breadcrumbs-aside">
-          <a href="https://github.com/naz-hage/ntools/edit/main/docs/usage.md">Edit on ntools</a>
+          <a href="https://github.com/naz-hage/ntools/edit/main/docs/pre-commit-setup.md">Edit on ntools</a>
     </li>
   </ul>
   <hr/>
@@ -116,49 +144,77 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <p>Once Ntools is installed, Open a Developer Command prompt for Visual Studio 2022 and navigate to your solution folder (i.e. <code>c:\source\ntools</code>).  The <a href="../ntools/nbuild/"><code>Nb.exe</code></a> is the main executable for the Ntools.  The following are some examples of how to use the Ntools:</p>
-<ul>
-<li>Build a solution: Compiles the solution in the solution directory</li>
-</ul>
-<pre><code class="language-cmd">Nb.exe solution
+                <h1 id="pre-commit-setup-instructions">Pre-commit Setup Instructions</h1>
+<h2 id="method-1-using-pre-commit-framework-recommended">Method 1: Using Pre-commit Framework (Recommended)</h2>
+<h3 id="installation">Installation</h3>
+<pre><code class="language-powershell"># Install pre-commit (requires Python)
+pip install pre-commit
+
+# Install the git hook scripts
+pre-commit install
+
+# Install commit-msg hook
+pre-commit install --hook-type commit-msg
+
+# Test the hooks
+pre-commit run --all-files
 </code></pre>
-<ul>
-<li>Clean a solution:  Deletes the release/Debug, bin and obj folders in the solution directory</li>
-</ul>
-<pre><code class="language-cmd">Nb.exe clean
+<h3 id="usage">Usage</h3>
+<pre><code class="language-powershell"># Normal git workflow - hooks run automatically
+git add .
+git commit -m &quot;Your commit message&quot;
+
+# Skip hooks (emergency use only)
+git commit -m &quot;Emergency fix&quot; --no-verify
+
+# Run hooks manually
+pre-commit run
+
+# Update hook versions
+pre-commit autoupdate
 </code></pre>
-<ul>
-<li>Test solution: runs all the tests in the solution</li>
-</ul>
-<pre><code class="language-cmd">Nb.exe test
+<h2 id="method-2-manual-git-hooks">Method 2: Manual Git Hooks</h2>
+<h3 id="windows-setup">Windows Setup</h3>
+<pre><code class="language-powershell"># Make the hook executable (Git Bash or WSL)
+chmod +x .git/hooks/pre-commit
+
+# Or copy the hook file
+copy dev-setup\pre-commit-hook.sh .git\hooks\pre-commit
 </code></pre>
-<ul>
-<li>Create a stage release: Creates a stage build which includes the following steps:<ul>
-<li>Clean the solution</li>
-<li>Build the solution</li>
-<li>Run tests</li>
-<li>Create a stage build</li>
-<li>Publish the stage build</li>
-<li>Create a zip file of the stage build file</li>
-</ul>
-</li>
-</ul>
-<pre><code class="language-cmd">Nb.exe stage
+<h3 id="test-the-hook">Test the Hook</h3>
+<pre><code class="language-powershell"># Test by modifying a JSON file
+echo '{&quot;test&quot;: &quot;change&quot;}' &gt; dev-setup/test.json
+git add dev-setup/test.json
+git commit -m &quot;Test commit&quot;
+# Hook should run and update documentation
 </code></pre>
-<ul>
-<li>Display available targets:  Lists all the available targets in the targets file</li>
-</ul>
-<pre><code class="language-cmd">Nb.exe targets
+<h2 id="customization-options">Customization Options</h2>
+<h3 id="skip-specific-hooks">Skip Specific Hooks</h3>
+<pre><code class="language-powershell"># Skip specific hooks
+SKIP=trailing-whitespace git commit -m &quot;Skip whitespace check&quot;
+
+# Skip pre-commit framework entirely
+git commit -m &quot;Emergency commit&quot; --no-verify
 </code></pre>
-<ul>
-<li>See the list of available targets at <a href="../ntools/nbuild-targets/">Nbuild Targets</a></li>
-</ul>
+<h3 id="hook-configuration">Hook Configuration</h3>
+<p>Edit <code>.pre-commit-config.yaml</code> to:
+- Add new hooks
+- Modify existing hook behavior
+- Set file patterns
+- Configure stages (commit, push, etc.)</p>
+<h3 id="environment-variables">Environment Variables</h3>
+<pre><code class="language-powershell"># Debug mode
+export PRE_COMMIT_DEBUG=1
+
+# Colored output
+export PRE_COMMIT_COLOR=always
+</code></pre>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../installation/" class="btn btn-neutral float-left" title="Installation"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../setup/" class="btn btn-neutral float-right" title="Setup your project">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../msbuild-tasks-test-coverage/" class="btn btn-neutral float-left" title="MSBuild Tasks Test Coverage"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../ntools/ntools/" class="btn btn-neutral float-right" title="Development Tools">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -185,10 +241,10 @@
         </span>
     
     
-      <span><a href="../installation/" style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../msbuild-tasks-test-coverage/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
-      <span><a href="../setup/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="../ntools/ntools/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>

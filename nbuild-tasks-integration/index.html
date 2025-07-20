@@ -81,9 +81,39 @@
     </li>
     <li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters:</a>
     </li>
-    <li class="toctree-l4"><a class="reference internal" href="#update_doc_versions-target">UPDATE_DOC_VERSIONS Target</a>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-setupprecommithooks-task">2. SetupPreCommitHooks Task</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#features_1">Features:</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parameters_1">Parameters:</a>
     </li>
         </ul>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#integration-with-nbuild">Integration with NBuild</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#project-configuration">Project Configuration</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#target-definitions">Target Definitions</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#update_doc_versions-target">UPDATE_DOC_VERSIONS Target</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#setup_hooks-target">SETUP_HOOKS Target</a>
+    </li>
+        </ul>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#command-line-usage">Command Line Usage</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#integration-with-build-process">Integration with Build Process</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#automated-cicd-integration">Automated CI/CD Integration</a>
     </li>
         </ul>
     </li>
@@ -114,6 +144,11 @@
     </ul>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../msbuild-tasks-test-coverage/">MSBuild Tasks Test Coverage</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Pre-commit</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../pre-commit-setup/">Pre-commit Setup</a>
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Update</span></p>
@@ -152,7 +187,7 @@
             <div class="section" itemprop="articleBody">
               
                 <h1 id="nbuild-tasks-integration-guide">NBuild Tasks Integration Guide</h1>
-<p>This document explains how the new MSBuild tasks have been integrated into the ntools project for automating documentation version updates setup.</p>
+<p>This document explains how the new MSBuild tasks have been integrated into the ntools project for automating documentation version updates and pre-commit hook setup.</p>
 <h2 id="new-msbuild-tasks-added">New MSBuild Tasks Added</h2>
 <h3 id="1-updateversionsindocs-task">1. UpdateVersionsInDocs Task</h3>
 <p><strong>Location</strong>: <code>NbuildTasks/UpdateVersionsInDocs.cs</code><br />
@@ -171,6 +206,27 @@
 <li><code>DevSetupPath</code> (Required): Path to the directory containing JSON configuration files</li>
 <li><code>DocsPath</code> (Required): Path to the markdown documentation file to update</li>
 </ul>
+<h3 id="2-setupprecommithooks-task">2. SetupPreCommitHooks Task</h3>
+<p><strong>Location</strong>: <code>NbuildTasks/UpdateVersionsInDocs.cs</code><br />
+<strong>Purpose</strong>: Automatically installs pre-commit hooks from a source directory to the Git hooks directory.</p>
+<h4 id="features_1">Features:</h4>
+<ul>
+<li>Copies hook files from source directory to <code>.git/hooks/</code></li>
+<li>Makes hook files executable on Unix-like systems</li>
+<li>Provides logging for installed hooks</li>
+</ul>
+<h4 id="parameters_1">Parameters:</h4>
+<ul>
+<li><code>GitDirectory</code> (Required): Path to the Git directory (usually <code>.git</code>)</li>
+<li><code>HooksSourceDirectory</code> (Required): Path to the directory containing hook files</li>
+</ul>
+<h2 id="integration-with-nbuild">Integration with NBuild</h2>
+<h3 id="project-configuration">Project Configuration</h3>
+<p>The tasks have been properly integrated into the <code>NbuildTasks.csproj</code>:</p>
+<pre><code class="language-xml">&lt;PackageReference Include=&quot;System.Text.Json&quot; Version=&quot;9.0.0&quot; /&gt;
+</code></pre>
+<p>This adds the necessary JSON parsing capabilities to the MSBuild tasks.</p>
+<h3 id="target-definitions">Target Definitions</h3>
 <p>Two new targets have been added to <code>nbuild.targets</code>:</p>
 <h4 id="update_doc_versions-target">UPDATE_DOC_VERSIONS Target</h4>
 <pre><code class="language-xml">&lt;Target Name=&quot;UPDATE_DOC_VERSIONS&quot;&gt;
@@ -180,6 +236,44 @@
     &lt;Message Text=&quot;Documentation versions updated successfully.&quot; /&gt;
     &lt;Message Text=&quot;==&gt; DONE&quot;/&gt;
 &lt;/Target&gt;
+</code></pre>
+<h4 id="setup_hooks-target">SETUP_HOOKS Target</h4>
+<pre><code class="language-xml">&lt;Target Name=&quot;SETUP_HOOKS&quot;&gt;
+    &lt;SetupPreCommitHooks 
+        GitDirectory=&quot;$(SolutionDir)\.git&quot; 
+        HooksSourceDirectory=&quot;$(SolutionDir)\dev-setup\hooks&quot; /&gt;
+    &lt;Message Text=&quot;Pre-commit hooks setup successfully.&quot; /&gt;
+    &lt;Message Text=&quot;==&gt; DONE&quot;/&gt;
+&lt;/Target&gt;
+</code></pre>
+<h2 id="usage">Usage</h2>
+<h3 id="command-line-usage">Command Line Usage</h3>
+<pre><code class="language-bash"># Update documentation versions
+dotnet build nbuild.targets -target:UPDATE_DOC_VERSIONS
+
+# Setup pre-commit hooks
+dotnet build nbuild.targets -target:SETUP_HOOKS
+
+# Run both tasks
+dotnet build nbuild.targets -target:UPDATE_DOC_VERSIONS -target:SETUP_HOOKS
+</code></pre>
+<h3 id="integration-with-build-process">Integration with Build Process</h3>
+<p>You can integrate these targets into your regular build process by adding dependencies:</p>
+<pre><code class="language-xml">&lt;Target Name=&quot;Build&quot; DependsOnTargets=&quot;UPDATE_DOC_VERSIONS;SETUP_HOOKS&quot;&gt;
+    &lt;!-- Your existing build logic --&gt;
+&lt;/Target&gt;
+</code></pre>
+<h3 id="automated-cicd-integration">Automated CI/CD Integration</h3>
+<p>Add to your GitHub Actions workflow:</p>
+<pre><code class="language-yaml">- name: Update Documentation Versions
+  run: dotnet build nbuild.targets -target:UPDATE_DOC_VERSIONS
+
+- name: Commit Updated Documentation
+  run: |
+    git config --local user.email &quot;action@github.com&quot;
+    git config --local user.name &quot;GitHub Action&quot;
+    git add docs/ntools/ntools.md
+    git diff --staged --quiet || git commit -m &quot;Auto-update documentation versions&quot;
 </code></pre>
 <h2 id="tool-name-mapping">Tool Name Mapping</h2>
 <p>The <code>UpdateVersionsInDocs</code> task includes intelligent name mapping between JSON configuration names and documentation display names:</p>
