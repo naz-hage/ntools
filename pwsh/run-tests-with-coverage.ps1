@@ -4,7 +4,6 @@ param(
     [string]$solutionDir = "C:\source\ntools"
 )
 
-$solutionDir = "C:\source\ntools"
 $projectPath = "$solutionDir\$projectName\$projectName.csproj"
 
 # Check if project file exists
