@@ -30,17 +30,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<EmbeddedResource Include="resources\common.targets" />
-		<EmbeddedResource Include="resources\dotnet.targets" />
-		<EmbeddedResource Include="resources\mongodb.targets" />
-		<EmbeddedResource Include="resources\nbuild.bat" />
-		<EmbeddedResource Include="resources\nbuild.targets" />
-		<EmbeddedResource Include="resources\node.targets" />
-		<EmbeddedResource Include="resources\nuget.targets">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</EmbeddedResource>
+	  <Compile Remove="resources\**" />
+	  <EmbeddedResource Remove="resources\**" />
+	  <None Remove="resources\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<EmbeddedResource Include="..\dev-setup\ntools.json" />
-		<EmbeddedResource Include="resources\ntools.json" />
 	</ItemGroup>
 	
 	<ItemGroup>
