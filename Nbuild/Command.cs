@@ -97,13 +97,13 @@ namespace Nbuild
                 var resultInstall = process.LockStart(Verbose);
                 if (resultInstall.IsSuccess())
                 {
-                    Colorizer.WriteLine($"[{ConsoleColor.Green}!√ {DownloadsDirectory} ACL updated.]");
+                    ConsoleHelper.WriteLine($"√ {DownloadsDirectory} ACL updated.", ConsoleColor.Green);
                     return true;
                 }
                 else
                 {
 
-                    Colorizer.WriteLine($"[{ConsoleColor.Red}!X {DownloadsDirectory} ACL failed to update: {resultInstall.Output[0]}]");
+                    ConsoleHelper.WriteLine($"X {DownloadsDirectory} ACL failed to update: {resultInstall.Output[0]}", ConsoleColor.Red);
                     return false;
                 }
             }
@@ -122,7 +122,7 @@ namespace Nbuild
             var apps = GetApps(json);
             if (apps == null) return ResultHelper.Fail(-1, $"Invalid json input");
 
-            if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{apps.Count()} apps to install.]");
+            if (Verbose) ConsoleHelper.WriteLine($"{apps.Count()} apps to install.", ConsoleColor.Yellow);
 
             foreach (var app in apps)
             {
@@ -135,7 +135,7 @@ namespace Nbuild
                 // Print the stored hash of the app file name
                 if (!string.IsNullOrEmpty(app.StoredHash))
                 {
-                    Colorizer.WriteLine($"[{ConsoleColor.Yellow}!Stored hash for {app.AppFileName}: {app.StoredHash}]");
+                    ConsoleHelper.WriteLine($"Stored hash for {app.AppFileName}: {app.StoredHash}", ConsoleColor.Yellow);
                 }
             }
 
@@ -151,7 +151,7 @@ namespace Nbuild
             var apps = GetApps(json);
             if (apps == null) return ResultHelper.Fail(-1, $"Invalid json input");
 
-            if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{apps.Count()} apps to Uninstall.]");
+            if (Verbose) ConsoleHelper.WriteLine($"{apps.Count()} apps to Uninstall.", ConsoleColor.Yellow);
 
             foreach (var app in apps)
             {
@@ -159,7 +159,7 @@ namespace Nbuild
                 if (!result.IsSuccess())
                 {
                     // display error message and continue to next app
-                    Colorizer.WriteLine($"[{ConsoleColor.Red}!{result.GetFirstOutput()}]");
+                    ConsoleHelper.WriteLine($"{result.GetFirstOutput()}", ConsoleColor.Red);
                 }
             }
 
@@ -174,27 +174,27 @@ namespace Nbuild
 
             if (apps == null) return ResultHelper.Fail(-1, $"Invalid json input");
 
-            Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{apps.Count()} apps to list:]");
+            ConsoleHelper.WriteLine($"{apps.Count()} apps to list:", ConsoleColor.Yellow);
 
             // print header
-            Colorizer.WriteLine($"[{ConsoleColor.Yellow}!|--------------------|----------------|-------------------|]");
-            Colorizer.WriteLine($"[{ConsoleColor.Yellow}!| App name           | Target version | Installed version |]");
-            Colorizer.WriteLine($"[{ConsoleColor.Yellow}!|--------------------|----------------|-------------------|]");
+            ConsoleHelper.WriteLine("|--------------------|----------------|-------------------|", ConsoleColor.Yellow);
+            ConsoleHelper.WriteLine("| App name           | Target version | Installed version |", ConsoleColor.Yellow);
+            ConsoleHelper.WriteLine("|--------------------|----------------|-------------------|", ConsoleColor.Yellow);
             foreach (var app in apps)
             {
                 // display app and installed version
                 // InstalledAppFileVersionGreterOrEqual is true, print green, else print red
                 if (IsAppVersionEqual(app))
                 {
-                    Colorizer.WriteLine($"[{ConsoleColor.Green}!| {app.Name,-18} | {app.Version,-14} | {GetAppFileVersion(app),-18}|]");
+                    ConsoleHelper.WriteLine($"| {app.Name,-18} | {app.Version,-14} | {GetAppFileVersion(app),-18}|", ConsoleColor.Green);
                 }
                 else if (IsAppVersionGreaterOrEqual(app))
                 {
-                    Colorizer.WriteLine($"[{ConsoleColor.Cyan}!| {app.Name,-18} | {app.Version,-14} | {GetAppFileVersion(app),-18}|]");
+                    ConsoleHelper.WriteLine($"| {app.Name,-18} | {app.Version,-14} | {GetAppFileVersion(app),-18}|", ConsoleColor.Cyan);
                 }
                 else
                 {
-                    Colorizer.WriteLine($"[{ConsoleColor.Red}!| {app.Name,-18} | {app.Version,-14} | {GetAppFileVersion(app),-18}|]");
+                    ConsoleHelper.WriteLine($"| {app.Name,-18} | {app.Version,-14} | {GetAppFileVersion(app),-18}|", ConsoleColor.Red);
                 }
             }
 
@@ -212,12 +212,12 @@ namespace Nbuild
 
             if (apps == null) return ResultHelper.Fail(-1, $"Invalid json input");
 
-            Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{apps.ToList().Count} apps to download to {DownloadsDirectory}]");
+            ConsoleHelper.WriteLine($"{apps.ToList().Count} apps to download to {DownloadsDirectory}", ConsoleColor.Yellow);
 
             // print header
-            Colorizer.WriteLine($"[{ConsoleColor.Yellow}! |--------------------|--------------------------------|-----------------|]");
-            Colorizer.WriteLine($"[{ConsoleColor.Yellow}! | App name           | Downloaded file                | (hh:mm:ss.ff)   |]");
-            Colorizer.WriteLine($"[{ConsoleColor.Yellow}! |--------------------|--------------------------------|-----------------|]");
+            ConsoleHelper.WriteLine(" |--------------------|--------------------------------|-----------------|", ConsoleColor.Yellow);
+            ConsoleHelper.WriteLine(" | App name           | Downloaded file                | (hh:mm:ss.ff)   |", ConsoleColor.Yellow);
+            ConsoleHelper.WriteLine(" |--------------------|--------------------------------|-----------------|", ConsoleColor.Yellow);
 
             string webDownloadedFile = string.Empty;
             try
@@ -235,13 +235,13 @@ namespace Nbuild
 
                     if (result.IsSuccess())
                     {
-                        Colorizer.WriteLine($"[{ConsoleColor.Green}! | {app.Name,-18} | {app.DownloadedFile,-30} | {stopWatch.Elapsed,-16:hh\\:mm\\:ss\\.ff}|]");
+                        ConsoleHelper.WriteLine($" | {app.Name,-18} | {app.DownloadedFile,-30} | {stopWatch.Elapsed,-16:hh\\:mm\\:ss\\.ff}|", ConsoleColor.Green);
                     }
                     else
                     {
-                        Colorizer.WriteLine($"[{ConsoleColor.Red}! Failed to download {app.WebDownloadFile} to {app.DownloadedFile}]");
+                        ConsoleHelper.WriteLine($" Failed to download {app.WebDownloadFile} to {app.DownloadedFile}", ConsoleColor.Red);
                         Console.WriteLine($"Return: {result.GetFirstOutput()}");
-                        Colorizer.WriteLine($"[{ConsoleColor.Red}! | {app.Name,-18} | {app.DownloadedFile,-30} | {stopWatch.Elapsed,-16:hh\\:mm\\:ss\\.ff}|]");
+                        ConsoleHelper.WriteLine($" | {app.Name,-18} | {app.DownloadedFile,-30} | {stopWatch.Elapsed,-16:hh\\:mm\\:ss\\.ff}|", ConsoleColor.Red);
                     }
 
                 }
@@ -281,11 +281,11 @@ namespace Nbuild
                 //result.DisplayCertificate();
                 if (result.DigitallySigned)
                 {
-                    Colorizer.WriteLine($"[{ConsoleColor.Yellow}! {fileName} is signed]");
+                    ConsoleHelper.WriteLine($" {fileName} is signed", ConsoleColor.Yellow);
                 }
                 else
                 {
-                    Colorizer.WriteLine($"[{ConsoleColor.Yellow}! {fileName} is not signed]");
+                    ConsoleHelper.WriteLine($" {fileName} is not signed", ConsoleColor.Yellow);
                 }
             }
 
@@ -314,16 +314,16 @@ namespace Nbuild
 
             if (IsAppVersionGreaterOrEqual(nbuildApp))
             {
-                Colorizer.WriteLine($"[{ConsoleColor.Yellow}!√ {nbuildApp.Name} {GetAppFileVersion(nbuildApp)} already installed.]");
+                ConsoleHelper.WriteLine($"√ {nbuildApp.Name} {GetAppFileVersion(nbuildApp)} already installed.", ConsoleColor.Yellow);
                 return ResultHelper.Success();
             }
 
-            Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Downloading {nbuildApp.Name} {nbuildApp.Version}]");
+            ConsoleHelper.WriteLine($" Downloading {nbuildApp.Name} {nbuildApp.Version}", ConsoleColor.Yellow);
             var result = DownloadApp(nbuildApp);
 
             if (result.IsSuccess())
             {
-                Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{nbuildApp.Name} {nbuildApp.Version} downloaded.]");
+                ConsoleHelper.WriteLine($"{nbuildApp.Name} {nbuildApp.Version} downloaded.", ConsoleColor.Yellow);
 
                 // Install the Downloaded file
                 var process = new Process
@@ -342,14 +342,14 @@ namespace Nbuild
                 // Update the filename to the full path of executable in the PATH environment variable
                 process.StartInfo.FileName = FileMappins.GetFullPathOfFile(process.StartInfo.FileName);
 
-                Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Installing {nbuildApp.Name} {nbuildApp.Version}]");
+                ConsoleHelper.WriteLine($" Installing {nbuildApp.Name} {nbuildApp.Version}", ConsoleColor.Yellow);
                 if (Verbose)
                 {
-                    Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Working Directory: {process.StartInfo.WorkingDirectory}]");
-                    Colorizer.WriteLine($"[{ConsoleColor.Yellow}! FileName: {process.StartInfo.FileName}]");
-                    Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Arguments: {process.StartInfo.Arguments}]");
+                    ConsoleHelper.WriteLine($" Working Directory: {process.StartInfo.WorkingDirectory}", ConsoleColor.Yellow);
+                    ConsoleHelper.WriteLine($" FileName: {process.StartInfo.FileName}", ConsoleColor.Yellow);
+                    ConsoleHelper.WriteLine($" Arguments: {process.StartInfo.Arguments}", ConsoleColor.Yellow);
 
-                    Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Calling process.LockStart(Verbose)]");
+                    ConsoleHelper.WriteLine($" Calling process.LockStart(Verbose)", ConsoleColor.Yellow);
                 }
 
                 var resultInstall = process.LockStart(Verbose);
@@ -366,13 +366,13 @@ namespace Nbuild
                 else
                 {
                     
-                    //Colorizer.WriteLine($"[{ConsoleColor.Red}!X {appData.Name} {appData.Version} failed to install: {resultInstall.GetFirstOutput()}]");
-                    Colorizer.WriteLine($"[{ConsoleColor.Red}!X {nbuildApp.Name} {nbuildApp.Version} failed to install: {process.ExitCode}]");
+                    //ConsoleHelper.WriteLine($"X {appData.Name} {appData.Version} failed to install: {resultInstall.GetFirstOutput()}", ConsoleColor.Red);
+                    ConsoleHelper.WriteLine($"X {nbuildApp.Name} {nbuildApp.Version} failed to install: {process.ExitCode}", ConsoleColor.Red);
                     if (Verbose) DisplayCodeAndOutput(result);
                     // print resultInstall.Output
                     foreach (var item in resultInstall.Output)
                     {
-                        Colorizer.WriteLine(item.ToString());
+                        ConsoleHelper.WriteLine(item.ToString());
                     }
                     return ResultHelper.Fail(process.ExitCode, $"Failed to install {nbuildApp.Name} {nbuildApp.Version}");
                 }
@@ -401,7 +401,7 @@ namespace Nbuild
 
             if (IsAppInstallPathInEnvironmentPath(nbuildApp))
             {
-                Colorizer.WriteLine($"[{ConsoleColor.Yellow}! {nbuildApp.InstallPath} is already in PATH.]");
+                ConsoleHelper.WriteLine($"{nbuildApp.InstallPath} is already in PATH.", ConsoleColor.Yellow);
                 return;
             }
             var path = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine) ?? string.Empty;
@@ -414,11 +414,11 @@ namespace Nbuild
                 }
                 pathCount = path.Split(";").Length;
                 Environment.SetEnvironmentVariable("PATH", path, EnvironmentVariableTarget.Machine);
-                Colorizer.WriteLine($"[{ConsoleColor.Green}!√ {nbuildApp.InstallPath} added to PATH.]");
+                ConsoleHelper.WriteLine($"√ {nbuildApp.InstallPath} added to PATH.", ConsoleColor.Green);
             }
             else
             {
-                Colorizer.WriteLine($"[{ConsoleColor.Yellow}! {nbuildApp.InstallPath} is already in PATH.]");
+                ConsoleHelper.WriteLine($"{nbuildApp.InstallPath} is already in PATH.", ConsoleColor.Yellow);
             }
         }
 
@@ -446,14 +446,14 @@ namespace Nbuild
         {
             if (IsAppVersionGreaterOrEqual(nbuildApp))
             {
-                Colorizer.WriteLine($"[{ConsoleColor.Green}!√ {nbuildApp.Name} {GetAppFileVersion(nbuildApp)} installed.]");
+                ConsoleHelper.WriteLine($"√ {nbuildApp.Name} {GetAppFileVersion(nbuildApp)} installed.", ConsoleColor.Green);
                 return ResultHelper.Success();
             }
             else
             {
                 if (result.Code == MsiReturnCodeRestartRequired)
                 {
-                    Colorizer.WriteLine($"[{ConsoleColor.Yellow}!√ {nbuildApp.Name} {nbuildApp.Version} installed.  Restart Required]");
+                    ConsoleHelper.WriteLine($"√ {nbuildApp.Name} {nbuildApp.Version} installed.  Restart Required", ConsoleColor.Yellow);
                     result.Code = 0;
                     return result;
                 }
@@ -461,17 +461,17 @@ namespace Nbuild
                 // Print the stored hash of the app file name
                 if (!string.IsNullOrEmpty(nbuildApp.StoredHash))
                 {
-                    Colorizer.WriteLine($"[{ConsoleColor.Yellow}!Stored hash for {nbuildApp.AppFileName}: {FileHashString(nbuildApp.AppFileName)}]");
+                    ConsoleHelper.WriteLine($"Stored hash for {nbuildApp.AppFileName}: {FileHashString(nbuildApp.AppFileName)}", ConsoleColor.Yellow);
                 }
 
 
                 if (IsFileHashEqual(nbuildApp.AppFileName, nbuildApp.StoredHash))
                 {
-                    Colorizer.WriteLine($"[{ConsoleColor.Green}!√ {nbuildApp.Name} {nbuildApp.Version} installed.]");
+                    ConsoleHelper.WriteLine($"√ {nbuildApp.Name} {nbuildApp.Version} installed.", ConsoleColor.Green);
                     return ResultHelper.Success();
                 }
 
-                Colorizer.WriteLine($"[{ConsoleColor.Red}!X {nbuildApp.Name} {nbuildApp.Version} failed to install]");
+                ConsoleHelper.WriteLine($"X {nbuildApp.Name} {nbuildApp.Version} failed to install", ConsoleColor.Red);
                 // print out ResultHelper code and output
                 DisplayCodeAndOutput(result);
                 return ResultHelper.Fail(-1, $"Failed to install {nbuildApp.Name} {nbuildApp.Version}");
@@ -480,10 +480,10 @@ namespace Nbuild
 
         private static void DisplayCodeAndOutput(ResultHelper result)
         {
-            Colorizer.WriteLine($"[{ConsoleColor.Yellow}!X Code: {result.Code}]");
+            ConsoleHelper.WriteLine($"X Code: {result.Code}", ConsoleColor.Yellow);
             foreach (var output in result.Output)
             {
-                Colorizer.WriteLine($"[{ConsoleColor.Yellow}!X Output: {output}]");
+                ConsoleHelper.WriteLine($"X Output: {output}", ConsoleColor.Yellow);
             }
         }
 
@@ -509,7 +509,7 @@ namespace Nbuild
             // if app is not installed, return success with app not installed message
             if (!IsAppVersionGreaterOrEqual(nbuildApp))
             {
-                Colorizer.WriteLine($"[{ConsoleColor.Yellow}!√ {nbuildApp.Name} {nbuildApp.Version} not installed.]");
+                ConsoleHelper.WriteLine($"√ {nbuildApp.Name} {nbuildApp.Version} not installed.", ConsoleColor.Yellow);
                 return ResultHelper.Success();
             }
 
@@ -530,12 +530,12 @@ namespace Nbuild
             // Update the filename to the full path of executable in the PATH environment variable
             process.StartInfo.FileName = FileMappins.GetFullPathOfFile(process.StartInfo.FileName);
 
-            Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Uninstalling {nbuildApp.Name} {nbuildApp.Version}]");
-            if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Working Directory: {process.StartInfo.WorkingDirectory}]");
-            if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}! FileName: {process.StartInfo.FileName}]");
-            if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Arguments: {process.StartInfo.Arguments}]");
+            ConsoleHelper.WriteLine($"Uninstalling {nbuildApp.Name} {nbuildApp.Version}", ConsoleColor.Yellow);
+            if (Verbose) ConsoleHelper.WriteLine($"Working Directory: {process.StartInfo.WorkingDirectory}", ConsoleColor.Yellow);
+            if (Verbose) ConsoleHelper.WriteLine($"FileName: {process.StartInfo.FileName}", ConsoleColor.Yellow);
+            if (Verbose) ConsoleHelper.WriteLine($"Arguments: {process.StartInfo.Arguments}", ConsoleColor.Yellow);
 
-            if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}! Calling process.LockStart(Verbose)]");
+            if (Verbose) ConsoleHelper.WriteLine($"Calling process.LockStart(Verbose)", ConsoleColor.Yellow);
             var result = process.LockStart(Verbose);
             if (result.IsSuccess())
 
@@ -546,12 +546,12 @@ namespace Nbuild
                     RemoveAppInstallPathFromEnvironmentPath(nbuildApp);
                 }
 
-                Colorizer.WriteLine($"[{ConsoleColor.Green}!√ {nbuildApp.Name} {nbuildApp.Version} Uninstalled.]");
+                ConsoleHelper.WriteLine($"√ {nbuildApp.Name} {nbuildApp.Version} Uninstalled.", ConsoleColor.Green);
                 return ResultHelper.Success();
             }
             else
             {
-                Colorizer.WriteLine($"[{ConsoleColor.Red}!X {nbuildApp.Name} {nbuildApp.Version} failed to Uninstall: {process.ExitCode}]");
+                ConsoleHelper.WriteLine($"X {nbuildApp.Name} {nbuildApp.Version} failed to Uninstall: {process.ExitCode}", ConsoleColor.Red);
                 DisplayCodeAndOutput(result);
                 return ResultHelper.Fail(process.ExitCode, $"Failed to Uninstall {nbuildApp.Name} {nbuildApp.Version}");
             }
@@ -570,7 +570,7 @@ namespace Nbuild
             }
             catch (Exception ex)
             {
-                if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Red}!X {nbuildApp.Name} {nbuildApp.Version} failed to get file version: {ex.Message}]");
+                if (Verbose) ConsoleHelper.WriteLine($"X {nbuildApp.Name} {nbuildApp.Version} failed to get file version: {ex.Message}", ConsoleColor.Red);
                 return null;
             }
         }
@@ -588,7 +588,7 @@ namespace Nbuild
             }
             else
             {
-                if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{nbuildApp.Name} {nbuildApp.Version} current version: {currentVersion}]");
+                if (Verbose) ConsoleHelper.WriteLine($"{nbuildApp.Name} {nbuildApp.Version} current version: {currentVersion}", ConsoleColor.Yellow);
 
                 if (!Version.TryParse(currentVersion, out Version? currentVersionParsed)) return false;
 
@@ -608,7 +608,7 @@ namespace Nbuild
                 return false;
             }
 
-            if (Verbose) Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{nbuildApp.Name} {nbuildApp.Version} current version: {currentVersion}]");
+            if (Verbose) ConsoleHelper.WriteLine($"{nbuildApp.Name} {nbuildApp.Version} current version: {currentVersion}", ConsoleColor.Yellow);
 
             if (!Version.TryParse(currentVersion, out Version? currentVersionParsed)) return false;
 
@@ -793,11 +793,11 @@ namespace Nbuild
                 pathSegments.RemoveAll(p => p.Equals(nbuildApp.InstallPath, StringComparison.OrdinalIgnoreCase));
                 var updatedPath = string.Join(';', pathSegments);
                 Environment.SetEnvironmentVariable("PATH", updatedPath, EnvironmentVariableTarget.Machine);
-                Colorizer.WriteLine($"[{ConsoleColor.Green}!√ {nbuildApp.InstallPath} removed from PATH.]");
+                ConsoleHelper.WriteLine($"√ {nbuildApp.InstallPath} removed from PATH.", ConsoleColor.Green);
             }
             else
             {
-                Colorizer.WriteLine($"[{ConsoleColor.Yellow}! {nbuildApp.InstallPath} is not in PATH.]");
+                ConsoleHelper.WriteLine($"{nbuildApp.InstallPath} is not in PATH.", ConsoleColor.Yellow);
             }
         }
 
@@ -843,7 +843,7 @@ namespace Nbuild
         {
             var path = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine) ?? string.Empty;
             var pathSegments = RemoveDuplicatePathSegments(path);
-            Colorizer.WriteLine($"[{ConsoleColor.Yellow}! PATH Segments:]");
+            ConsoleHelper.WriteLine($"PATH Segments:", ConsoleColor.Yellow);
             foreach (var segment in pathSegments)
             {
                 Console.WriteLine($" '{segment}'");
@@ -886,13 +886,11 @@ namespace Nbuild
             var gitWrapper = new GitWrapper();
             if (string.IsNullOrEmpty(gitWrapper.Branch))
             {
-                Colorizer.WriteLine($"[{ConsoleColor.Red}!Error: [{ConsoleColor.Yellow}!{project}] directory is not a git repository]");
+                ConsoleHelper.WriteLine($"Error: [{project}] directory is not a git repository", ConsoleColor.Red);
                 Parser.DisplayHelp<Cli>(HelpFormat.Full);
                 return ResultHelper.Fail(-1, "Not a git repository");
             }
-            Colorizer.WriteLine($"[{ConsoleColor.DarkMagenta}!Project [{ConsoleColor.Yellow}!{project}] " +
-                                                    $"Branch [{ConsoleColor.Yellow}!{gitWrapper.Branch}] " +
-                                                    $"Tag [{ConsoleColor.Yellow}!{gitWrapper.Tag}]]");
+            ConsoleHelper.WriteLine($"Project [{project}] Branch [{gitWrapper.Branch}] Tag [{gitWrapper.Tag}]", ConsoleColor.DarkMagenta);
             return ResultHelper.Success();
         }
 
@@ -906,7 +904,7 @@ namespace Nbuild
             // Project and branch required
             if (string.IsNullOrEmpty(tag))
             {
-                Colorizer.WriteLine($"[{ConsoleColor.Red}!Error: valid tag is required]");
+                ConsoleHelper.WriteLine($"Error: valid tag is required", ConsoleColor.Red);
                 Parser.DisplayHelp<Cli>(HelpFormat.Full);
                 return ResultHelper.Fail(-1, "Tag is required");
             }
@@ -930,7 +928,7 @@ namespace Nbuild
 
             if (string.IsNullOrEmpty(buildType))
             {
-                Colorizer.WriteLine($"[{ConsoleColor.Red}!Error: valid build type is required]");
+                ConsoleHelper.WriteLine($"Error: valid build type is required", ConsoleColor.Red);
                 Parser.DisplayHelp<Cli>(HelpFormat.Full);
                 return ResultHelper.Fail(-1, "Build type is required");
             }
@@ -943,7 +941,7 @@ namespace Nbuild
             var result = gitWrapper.SetTag(nextTag) == true ? ResultHelper.Success() : ResultHelper.Fail(-1, "SetTag failed");
             if (result.IsSuccess() && push)
             {
-                Colorizer.WriteLine($"[{ConsoleColor.Green}!new tag: {gitWrapper.Tag}]");
+                ConsoleHelper.WriteLine($"new tag: {gitWrapper.Tag}", ConsoleColor.Green);
                 gitWrapper.PushTag(nextTag);
                 DisplayGitInfo();
             }
@@ -962,10 +960,10 @@ namespace Nbuild
             var gitWrapper = new GitWrapper();
             if (string.IsNullOrEmpty(gitWrapper.Branch))
             {
-                Colorizer.WriteLine($"[{ConsoleColor.Red}!Error: Not a git repository]");
+                ConsoleHelper.WriteLine($"Error: Not a git repository", ConsoleColor.Red);
                 return ResultHelper.Fail(-1, "Not a git repository");
             }
-            Colorizer.WriteLine($"[{ConsoleColor.Green}!Current branch: {gitWrapper.Branch}]");
+            ConsoleHelper.WriteLine($"Current branch: {gitWrapper.Branch}", ConsoleColor.Green);
             DisplayGitInfo();
             return ResultHelper.Success();
         }
@@ -987,7 +985,7 @@ namespace Nbuild
             var gitWrapper = new GitWrapper(verbose: verbose);
             if (string.IsNullOrEmpty(url))
             {
-                Colorizer.WriteLine($"[{ConsoleColor.Red}!Error: valid url is required]");
+                ConsoleHelper.WriteLine($"Error: valid url is required", ConsoleColor.Red);
                 Parser.DisplayHelp<Cli>(HelpFormat.Full);
                 return ResultHelper.Fail(-1, "Valid url is required");
             }
@@ -1000,12 +998,12 @@ namespace Nbuild
             var result = gitWrapper.CloneProject(url, path);
             if (result.IsSuccess())
             {
-                Colorizer.WriteLine($"[{ConsoleColor.Green}!√ Project cloned successfully to {path.TrimEnd('\\')}\\{GitWrapper.ProjectNameFromUrl(url)}]");
+                ConsoleHelper.WriteLine($"√ Project cloned successfully to {path.TrimEnd('\\')}\\{GitWrapper.ProjectNameFromUrl(url)}", ConsoleColor.Green);
                 return ResultHelper.Success();
             }
             else
             {
-                Colorizer.WriteLine($"[{ConsoleColor.Red}!X {result.GetFirstOutput()}]");
+                ConsoleHelper.WriteLine($"X {result.GetFirstOutput()}", ConsoleColor.Red);
                 return ResultHelper.Fail(-1, "Clone failed");
             }
         }
@@ -1019,7 +1017,7 @@ namespace Nbuild
 
             if (string.IsNullOrEmpty(tag))
             {
-                Colorizer.WriteLine($"[{ConsoleColor.Red}!Error: valid tag is required]");
+                ConsoleHelper.WriteLine($"Error: valid tag is required", ConsoleColor.Red);
                 Parser.DisplayHelp<Cli>(HelpFormat.Full);
                 return ResultHelper.Fail(-1, "Tag is required");
             }
@@ -1148,7 +1146,7 @@ namespace Nbuild
         {
             if (verbose)
             {
-                Colorizer.WriteLine($"[{ConsoleColor.Yellow}!Verbose mode enabled]");
+                ConsoleHelper.WriteLine($"Verbose mode enabled", ConsoleColor.Yellow);
             }
 
             var releaseService = new ReleaseService(repo);
@@ -1156,41 +1154,41 @@ namespace Nbuild
 
             if (releases == null || !releases.Any())
             {
-                Colorizer.WriteLine($"[{ConsoleColor.Yellow}!No releases found for repository: {repo}]");
+                ConsoleHelper.WriteLine($"No releases found for repository: {repo}", ConsoleColor.Yellow);
                 return ResultHelper.Fail(-1, "No releases found");
             }
 
-            Colorizer.WriteLine($"[{ConsoleColor.Green}!Releases for repository: {repo}]");
+            ConsoleHelper.WriteLine($"Releases for repository: {repo}", ConsoleColor.Green);
             foreach (var release in releases)
             {
-                Colorizer.WriteLine($"[{ConsoleColor.Yellow}!----------------------------------------]");
+                ConsoleHelper.WriteLine($"----------------------------------------", ConsoleColor.Yellow);
 
-                Colorizer.WriteLine($"[{ConsoleColor.Yellow}!Tag: {release.TagName}]");
-                Colorizer.WriteLine($"[{ConsoleColor.Cyan}!Name: {release.Name}]");
-                Colorizer.WriteLine($"[{ConsoleColor.Cyan}!Pre-release: {(release.Prerelease ? "Yes" : "No")}]");
-                Colorizer.WriteLine($"[{ConsoleColor.Cyan}!Published: {release.PublishedAt}]");
+                ConsoleHelper.WriteLine($"Tag: {release.TagName}", ConsoleColor.Yellow);
+                ConsoleHelper.WriteLine($"Name: {release.Name}", ConsoleColor.Cyan);
+                ConsoleHelper.WriteLine($"Pre-release: {(release.Prerelease ? "Yes" : "No")}", ConsoleColor.Cyan);
+                ConsoleHelper.WriteLine($"Published: {release.PublishedAt}", ConsoleColor.Cyan);
                 if (verbose && !string.IsNullOrEmpty(release.Body))
                 {
-                    Colorizer.WriteLine($"[{ConsoleColor.Magenta}!Description: {release.Body}]");
+                    ConsoleHelper.WriteLine($"Description: {release.Body}", ConsoleColor.Magenta);
                 }
 
                 if (verbose && release.Assets != null && release.Assets.Any())
                 {
-                    Colorizer.WriteLine($"[{ConsoleColor.Cyan}!Assets:]");
+                    ConsoleHelper.WriteLine($"Assets:", ConsoleColor.Cyan);
                     foreach (var asset in release.Assets)
                     {
-                        Colorizer.WriteLine($"[{ConsoleColor.Cyan}!  Name: {asset.Name}]");
-                        Colorizer.WriteLine($"[{ConsoleColor.Cyan}!  Size: {asset.Size} bytes]");
-                        Colorizer.WriteLine($"[{ConsoleColor.Cyan}!  Download URL: {asset.BrowserDownloadUrl}]");
+                        ConsoleHelper.WriteLine($"  Name: {asset.Name}", ConsoleColor.Cyan);
+                        ConsoleHelper.WriteLine($"  Size: {asset.Size} bytes", ConsoleColor.Cyan);
+                        ConsoleHelper.WriteLine($"  Download URL: {asset.BrowserDownloadUrl}", ConsoleColor.Cyan);
                     }
                 }
 
                 if (verbose && release.Author != null)
                 {
-                    Colorizer.WriteLine($"[{ConsoleColor.Cyan}!Author: {release.Author}]");
+                    ConsoleHelper.WriteLine($"Author: {release.Author}", ConsoleColor.Cyan);
                 }
             }
-            Colorizer.WriteLine($"[{ConsoleColor.Yellow}!----------------------------------------]");
+            ConsoleHelper.WriteLine($"----------------------------------------", ConsoleColor.Yellow);
             return ResultHelper.Success();
         }
     }

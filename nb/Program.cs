@@ -1,10 +1,6 @@
 ﻿using Nbuild;
 using NbuildTasks;
-using Ntools;
-using System;
-using System.Linq;
 using System.CommandLine;
-using homecli;
 
 namespace nb
 {
@@ -208,30 +204,35 @@ namespace nb
         {
             var listCommand = new System.CommandLine.Command(
                 "list",
-                "Display a formatted table of all tools and their versions as defined in a JSON manifest file.\n\nThis command helps you audit, compare, or document the state of your development environment.\n\nExample usage:\n  nb.exe list --json \"C:\\Program Files\\NBuild\\ntools.json\"\n  nb.exe list --json C:\\NBuild\\ntools.json\n\nIf your path contains spaces, enclose it in double quotes."
+                "Display a formatted table of all tools and their versions.\nUse this command to audit, compare, or document the state of your development environment."
             );
             var jsonOption = new System.CommandLine.Option<string>("--json", () =>
             {
                 var programFiles = Environment.GetEnvironmentVariable("ProgramFiles") ?? "C:\\Program Files";
                 var defaultPath = $"{programFiles}\\NBuild\\ntools.json";
-                ConsoleHelper.WriteLine($"Using default JSON path: {defaultPath}");
                 return $"\"{defaultPath}\"";
-            }, "Full path to the JSON manifest file describing your tools.\n\n- If the path contains spaces, enclose it in double quotes.\n- Example: --json \"C:\\Program Files\\NBuild\\ntools.json\"\n- If omitted, the default is \"C:\\Program Files\\NBuild\\ntools.json\"");
+            }, "Full path to the manifest file containing your tool definitions.\nIf the path contains spaces, use double quotes.");
             listCommand.AddOption(jsonOption);
-            listCommand.SetHandler((string json) => {
-                // Call the real implementation from Command.List
-                try
-                {
-                    var result = Nbuild.Command.List(json, false);
-                    Environment.Exit(result.Code);
-                }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine($"Error: {ex.Message}");
-                    Environment.Exit(-1);
-                }
+            listCommand.SetHandler((string json) =>
+            {
+                var exitCode = HandleListCommand(json);
+                Environment.ExitCode = exitCode;
             }, jsonOption);
             rootCommand.AddCommand(listCommand);
+        }
+
+        private static int HandleListCommand(string json)
+        {
+            try
+            {
+                var result = Nbuild.Command.List(json, false);
+                return result.Code;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+                return -1;
+            }
         }
     }
 }

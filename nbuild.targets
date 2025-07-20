@@ -147,6 +147,14 @@
 		<Message Text="==> DONE" />
 	</Target>
 
+  <!-- Run nbTests and generate code coverage report -->
+  <Target Name="RUN_NBTESTS_COVERAGE">
+	<Exec Command="dotnet test &quot;$(SolutionDir)\nbTests\nbTests.csproj&quot; --collect:\&quot;XPlat Code Coverage\&quot;" WorkingDirectory="$(SolutionDir)" />
+	<Exec Command="dotnet tool install -g dotnet-reportgenerator-globaltool" />
+	<Exec Command="reportgenerator -reports:$(SolutionDir)\TestResults\**\coverage.cobertura.xml -targetdir:$(SolutionDir)\TestResults\CoverageReport" />
+	<Message Text="nbTests executed and code coverage report generated in TestResults\CoverageReport." />
+	<Message Text="==> DONE" />
+  </Target>
 	<!-- mkdocs deploy locally -->
 	<Target Name="MKDOCS_DEPLOY" AfterTargets="MKDOCS">
 		<Exec Command='"$(MkDocsExe)" serve' WorkingDirectory="$(SolutionDir)"/>
@@ -347,4 +355,13 @@
 		<CallTarget Targets="GENERATE_COMMIT_MESSAGE" />
 		<Message Text="==> Commit message preview complete. Check $(SolutionDir)\.commit-message file"/>
 	</Target>
+
+
+	<!-- Install ReportGenerator tool globally -->
+	<Target Name="INSTALL_REPORTGENERATOR">
+		<Exec Command="dotnet tool install -g dotnet-reportgenerator-globaltool" />
+		<Message Text="ReportGenerator tool installed globally." />
+		<Message Text="==> DONE"/>
+	</Target>
+
 </Project>

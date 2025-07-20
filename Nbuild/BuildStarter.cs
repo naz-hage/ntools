@@ -159,7 +159,7 @@ public class BuildStarter
     {
         // Always extract nbuild.bat common.targets.xml
         ResourceHelper.ExtractEmbeddedResourceFromCallingAssembly(ResourceLocation, Path.Combine(Environment.CurrentDirectory, NbuildBatchFile));
-        Colorizer.WriteLine($"[{ConsoleColor.Yellow}!Extracted '{NbuildBatchFile}' to {Environment.CurrentDirectory}]\n");
+        ConsoleHelper.WriteLine($"!Extracted '{NbuildBatchFile}' to {Environment.CurrentDirectory}\n",ConsoleColor.Yellow);
     }
 
     /// <summary>

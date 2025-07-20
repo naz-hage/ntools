@@ -41,10 +41,9 @@
 		<EmbeddedResource Include="..\dev-setup\ntools.json" />
 	    <EmbeddedResource Include="resources\ntools.json" />
 	</ItemGroup>
-	
+
 	<ItemGroup>
 	  <PackageReference Include="CommandLine.Net" Version="2.3.0" />
-
 	</ItemGroup>
  <ItemGroup>
     <ProjectReference Include="..\GitHubRelease\GitHubRelease.csproj" />
