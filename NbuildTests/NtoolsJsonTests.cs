@@ -10,7 +10,7 @@ namespace NbuildTests
     [TestClass()]
     public class NtoolsJsonTests
     {
-        private const string NbuildAssemblyName = "Nb.dll"; // "Nbuild.dll"
+        private const string NbuildAssemblyName = "Nbuild.dll"; // "Nbuild.dll"
         private const string SupportedVersion = "1.2.0";
 
         [TestMethod()]

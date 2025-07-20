@@ -20,7 +20,7 @@ public class Program
         if (!TryParseArguments(args, parserOptions, out Cli? options))
         {
             result = HandleUnparsedArguments(args, out options);
-            DisplayResult(result, value:"Build", runTarget:true);
+            DisplayResult(result, value: "Build", runTarget: true);
         }
         else
         {
@@ -101,7 +101,7 @@ public class Program
             Cli.CommandType.git_clone => Command.Clone(options.Url, options.Path, options.Verbose),
             Cli.CommandType.git_deletetag => Command.DeleteTag(options.Tag),
             Cli.CommandType.release_create => await Command.CreateRelease(options.Repo!, options.Tag!, options.Branch!, options.AssetFileName!),
-            Cli.CommandType.pre_release_create => await Command.CreateRelease(options.Repo!, options.Tag!, options.Branch!, options.AssetFileName!,true),
+            Cli.CommandType.pre_release_create => await Command.CreateRelease(options.Repo!, options.Tag!, options.Branch!, options.AssetFileName!, true),
             Cli.CommandType.release_download => await Command.DownloadAsset(options.Repo!, options.Tag!, options.Path!),
             Cli.CommandType.list_release => await Command.ListReleases(options.Repo!, options.Verbose),
             _ => ResultHelper.Fail(-1, $"Invalid Command: '{options.Command}'"),

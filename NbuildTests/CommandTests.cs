@@ -12,7 +12,7 @@ namespace NbuildTests
     public class CommandTests
     {
         // Constants for test setup
-        private const string NbuildAssemblyName = "Nb.dll";
+        private const string NbuildAssemblyName = "Nbuild.dll";
         private const string NbuildAppListJsonFile = "ntools.json";
         private const string LocalTest = "LOCAL_TEST";
         private const string VersionToTest = "1.10.0";

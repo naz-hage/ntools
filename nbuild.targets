@@ -147,6 +147,13 @@
 		<Message Text="==> DONE" />
 	</Target>
 
+  <!-- Run nbTests and generate code coverage report -->
+  <Target Name="RUN_NBTESTS_COVERAGE" DependsOnTargets="INSTALL_REPORTGENERATOR">
+	<Exec Command="dotnet test &quot;$(SolutionDir)\nbTests\nbTests.csproj&quot; --collect:\&quot;XPlat Code Coverage\&quot;" WorkingDirectory="$(SolutionDir)" />
+	<Exec Command="reportgenerator -reports:$(SolutionDir)\TestResults\**\coverage.cobertura.xml -targetdir:$(SolutionDir)\TestResults\CoverageReport" />
+	<Message Text="nbTests executed and code coverage report generated in TestResults\CoverageReport." />
+	<Message Text="==> DONE" />
+  </Target>
 	<!-- mkdocs deploy locally -->
 	<Target Name="MKDOCS_DEPLOY" AfterTargets="MKDOCS">
 		<Exec Command='"$(MkDocsExe)" serve' WorkingDirectory="$(SolutionDir)"/>
@@ -214,28 +221,25 @@
 		<ColorMessage Message="This is a message displayed in Red" Color="Red" />
 	</Target>
 
-	<!-- Creates a stage or prod release -->
-	<Target Name="GITHUB_RELEASE" DependsOnTargets="ARTIFACTS;GIT_BRANCH" AfterTargets="PROD" >
-		<Git Command="PushTag" TaskParameter="$(ProductVersion)" />
-		<Exec Command='"$(NbExe)" release_create -repo $(SolutionName) -tag $(ProductVersion) -branch $(GitBranch) -file $(ArtifactsFolder).zip' WorkingDirectory="$(OutputPathRelease)" />
-		<Exec Command="echo $(NbExe) exit Code: %ERRORLEVEL%" />
-
-		<Message Text="==> DONE"/>
-	</Target>
-
-	<!-- Creates a stage or prod pre-release -->
-	<Target Name="GITHUB_PRE_RELEASE" DependsOnTargets="ARTIFACTS;GIT_BRANCH" AfterTargets="STAGE" >
-		<Git Command="PushTag" TaskParameter="$(ProductVersion)" />
-		<Exec Command='"$(NbExe)" pre_release_create -repo $(SolutionName) -tag $(ProductVersion) -branch $(GitBranch) -file $(ArtifactsFolder).zip' WorkingDirectory="$(OutputPathRelease)" />
-		<Exec Command="echo $(NbExe) exit Code: %ERRORLEVEL%" />
-
-		<Message Text="==> DONE"/>
-	</Target>
-
 	<!-- Install dotnet-outdated-tool globally -->
 	<Target Name="INSTALL_DOTNET_OUTDATED_TOOL">
-		<Exec Command="dotnet tool install --global dotnet-outdated-tool" />
-		<Message Text="dotnet-outdated-tool installed globally." />
+		<!-- Check if dotnet-outdated is already installed -->
+		<Exec Command="dotnet tool list -g" ConsoleToMSBuild="true" ContinueOnError="true">
+			<Output TaskParameter="ConsoleOutput" PropertyName="InstalledTools" />
+		</Exec>
+		
+		<!-- Check if dotnet-outdated is in the list of installed tools -->
+		<PropertyGroup>
+			<IsOutdatedToolInstalled Condition="$(InstalledTools.Contains('dotnet-outdated-tool'))">true</IsOutdatedToolInstalled>
+			<IsOutdatedToolInstalled Condition="'$(IsOutdatedToolInstalled)' == ''">false</IsOutdatedToolInstalled>
+		</PropertyGroup>
+		
+		<Message Text="dotnet-outdated-tool is already installed globally." Condition="'$(IsOutdatedToolInstalled)' == 'true'" />
+		
+		<!-- Install only if not already installed -->
+		<Exec Command="dotnet tool install --global dotnet-outdated-tool" Condition="'$(IsOutdatedToolInstalled)' == 'false'" />
+		<Message Text="dotnet-outdated-tool installed globally." Condition="'$(IsOutdatedToolInstalled)' == 'false'" />
+		
 		<Message Text="==> DONE"/>
 	</Target>
 
@@ -346,6 +350,28 @@
 		<Message Text="==> Commit message preview complete. Check $(SolutionDir)\.commit-message file"/>
 	</Target>
 
+	<!-- Install ReportGenerator tool globally -->
+	<Target Name="INSTALL_REPORTGENERATOR">
+		<!-- Check if ReportGenerator is already installed -->
+		<Exec Command="dotnet tool list -g" ConsoleToMSBuild="true" ContinueOnError="true">
+			<Output TaskParameter="ConsoleOutput" PropertyName="InstalledTools" />
+		</Exec>
+		
+		<!-- Check if reportgenerator is in the list of installed tools -->
+		<PropertyGroup>
+			<IsReportGeneratorInstalled Condition="$(InstalledTools.Contains('dotnet-reportgenerator-globaltool'))">true</IsReportGeneratorInstalled>
+			<IsReportGeneratorInstalled Condition="'$(IsReportGeneratorInstalled)' == ''">false</IsReportGeneratorInstalled>
+		</PropertyGroup>
+		
+		<Message Text="ReportGenerator is already installed globally." Condition="'$(IsReportGeneratorInstalled)' == 'true'" />
+		
+		<!-- Install only if not already installed -->
+		<Exec Command="dotnet tool install -g dotnet-reportgenerator-globaltool" Condition="'$(IsReportGeneratorInstalled)' == 'false'" />
+		<Message Text="ReportGenerator tool installed globally." Condition="'$(IsReportGeneratorInstalled)' == 'false'" />
+		
+		<Message Text="==> DONE"/>
+	</Target>
+	
 	<!-- Install pre-commit hooks using the PowerShell script -->
 	<Target Name="INSTALL_PRECOMMIT_HOOKS">
 		<Exec Command="powershell -ExecutionPolicy Bypass -File &quot;$(SolutionDir)\dev-setup\precommit-hook.ps1&quot;" WorkingDirectory="$(SolutionDir)" />
