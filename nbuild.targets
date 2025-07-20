@@ -222,15 +222,6 @@
 		<ColorMessage Message="This is a message displayed in Red" Color="Red" />
 	</Target>
 
-	<!-- Creates a stage or prod release -->
-	<Target Name="GITHUB_RELEASE" DependsOnTargets="ARTIFACTS;GIT_BRANCH" AfterTargets="PROD" >
-		<Git Command="PushTag" TaskParameter="$(ProductVersion)" />
-		<Exec Command='"$(NbExe)" release_create -repo $(SolutionName) -tag $(ProductVersion) -branch $(GitBranch) -file $(ArtifactsFolder).zip' WorkingDirectory="$(OutputPathRelease)" />
-		<Exec Command="echo $(NbExe) exit Code: %ERRORLEVEL%" />
-
-		<Message Text="==> DONE"/>
-	</Target>
-
 	<!-- Creates a stage or prod pre-release -->
 	<Target Name="GITHUB_PRE_RELEASE" DependsOnTargets="ARTIFACTS;GIT_BRANCH" AfterTargets="STAGE" >
 		<Git Command="PushTag" TaskParameter="$(ProductVersion)" />

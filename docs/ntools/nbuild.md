@@ -15,51 +15,37 @@
 Below is a full list of options that can be used with `Nb.exe`:
 ### Usage
 ```cmd
- Nb.exe command [-json value] [-v value] [-url value] [-tag value] [-path value] [-buildtype value] [-repo value] [-branch value] [-file value]
-  - command   : Specifies the command to execute.
-         list                    -> Lists apps specified in the -json option.
-         install                 -> Downloads and installs apps specified in the -json option (requires admin privileges).
-         uninstall               -> Uninstalls apps specified in the -json option (requires admin privileges).
-         download                -> Downloads tools or apps listed in the -json option (requires admin privileges).
-         targets                 -> Lists available build targets and saves them in the targets.md file.
-         path                    -> Displays the environment PATH variable for the local machine.
-         git_info                -> Displays the current git information for the local repository.
-         git_settag              -> Sets the specified tag using the -tag option.
-         git_autotag             -> Sets the next tag based on the build type: STAGE or PROD.
-         git_push_autotag        -> Sets the next tag based on the build type and pushes to the remote repository.
-         git_branch              -> Displays the current git branch in the local repository.
-         git_clone               -> Clones the specified Git repository using the -url option.
-         git_deletetag           -> Deletes the specified tag using the -tag option.
-         release_create          -> Creates a GitHub release. Requires -repo, -tag, -branch, and -file options.
-         pre_release_create      -> Creates a GitHub pre-release. Requires -repo, -tag, -branch, and -file options.
-         release_download        -> Downloads a specific asset from a GitHub release. Requires -repo, -tag, and -path (optional, defaults to current directory).
-         list_release            -> Lists latest 3 releases for the specified repository (and latest pre-release if newer). Requires -repo.
-         ----
-          The nbuild.exe can also execute targets defined in an nbuild.targets file if one       exists in the current folder.
-         To execute a target defined in nbuild.targets, simply use its name as the command.
-         For example, if nbuild.targets defines a target named 'build', you can run it    with: `nb.exe build`
- (one of list,install,uninstall,download,targets,path,git_info,git_settag,git_autotag,git_push_autotag,git_branch,git_clone,git_deletetag,release_create,pre_release_create,release_download,list_release, required)
-  - json      : Specifies the JSON file that holds the list of apps. Only valid for the install, download, and list commands.
-         - By default, the -json option points to the ntools deployment folder: $(ProgramFiles)\build\ntools.json.
-         Sample JSON file: https://github.com/naz-hage/ntools/blob/main/dev-setup/ntools.json
-          (string, default=$(ProgramFiles)\nbuild\ntools.json)
-  - v         : Optional parameter which sets the console output verbose level
-         ----
-         - if no command line options are specified with the -v option , i.e.: 'Nb.exe stage -v true`
-           `Nb` will run an MSbuild target `stage` defined in a `nbuild.targets` file which present in the solution folder.
-           Run `Nb.exe Targets` to list the available targets.
-         -v Possible Values: (true or false, default=False)
-  - url       : Specifies the Git repository URL. (string, default=)
-  - tag       : Specifies the tag used for git_settag and git_deletetag commands. (string, default=)
-  - path      : Specifies the path used for git_clone, pre_release_create and release_create commands. If not specified, the current directory will be used.
-         for pre_release_create and release_create commands, it must be an absolute path (string, default=)
-  - buildtype : Specifies the build type used for git_autotag and git_push_autotag commands. Possible values: STAGE, PROD. (string, default=)
-  - repo      : Specifies the Git repository in the format any of the following formats:
-         repoName  (UserName is declared the `OWNER` environment variable)
-         userName/repoName
-         https://github.com/userName/repoName (Full URL to the repository on GitHub). This is applicable to release_create, pre_release_create and release_download commands. (string, default=)
-  - branch    : Specifies the branch name. Applicable for release_create, pre_release_create commands (string, default=main)
-  - file      : Specifies the asset file name. Must include full path. Applicable for release_create, pre_release_create commands (string, default=)
+Description:
+  Nbuild - Build and DevOps Utility
+
+Usage:
+  nb [command] [options]
+
+Options:
+  --version       Show version information
+  -?, -h, --help  Show help and usage information
+
+Commands:
+  install             Install tools from JSON
+  uninstall           Uninstall tools from JSON
+  list                Display a formatted table of all tools and their
+                      versions.
+                      Use this command to audit, compare, or document the
+                      state of your development environment.
+  download            Download tools from JSON
+  path                Display path segments
+  git_info            Display git info
+  git_settag          Set git tag
+  git_autotag         Set git autotag
+  git_push_autotag    Push git autotag
+  git_branch          Display git branch
+  git_clone           Clone git repository
+  git_deletetag       Delete git tag
+  release_create      Create release
+  pre_release_create  Create pre-release
+  release_download    Download release asset
+  list_release        List releases
+  targets             Display build targets
 ```
 
 **If the -json option is not specified, the default json file `$(ProgramFiles)\Nbuild\NTools.json` is used**. 
@@ -97,11 +83,35 @@ Below is list of common targets that are defined in the `common.targets` file
 
 This section provides examples of how to use the `nb.exe` command line tool. The examples assume that you are running a powershell terminal.
 
+#### List Command Details
+The `list` command displays a formatted table of all tools and their versions. Use this command to audit, compare, or document the state of your development environment.
+
+**Usage:**
+```cmd
+nb list [options]
+```
+
+**Options:**
+- `--json <json>` - Full path to the manifest file containing your tool definitions. If the path contains spaces, use double quotes. Default: `"C:\Program Files\NBuild\ntools.json"`
+- `-?, -h, --help` - Show help and usage information
+
+**Examples:**
+```cmd
+# Use default manifest file
+nb.exe list
+
+# Use custom manifest file
+nb.exe list --json "C:\MyTools\custom-tools.json"
+
+# Show help for list command
+nb.exe list --help
+```
+
 ## 1. List Installed Applications
 ```cmd
-nb.exe list -json $env:ProgramFiles\tools.json
+nb.exe list --json "C:\Program Files\NBuild\ntools.json"
 ```
-Lists all applications specified in the provided JSON file.
+Lists all applications specified in the provided JSON file. If no `--json` option is specified, the default file `C:\Program Files\NBuild\ntools.json` is used.
 
 ## 2. Install Applications
 ```cmd
