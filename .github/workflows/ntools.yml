@@ -27,6 +27,7 @@ on:
 env:
   Solution_Name: ntools.sln
   Test_Project_Path: LauncherTests
+  dotnet_version: 9.0.x
   build_type: ${{ github.event.inputs.build_type || 'stage' }}
   enable_logging: ${{ github.event.inputs.enable_logging || 'false' }}
 
@@ -137,14 +138,13 @@ jobs:
     - name: Run Build
       run: |
         & "$env:ProgramFilesPath/nbuild/nb.exe" CORE
-        & "$env:ProgramFilesPath/nbuild/nb.exe" ${{ env.Build_Type }} -v ${{ env.Enable_Logging }}
+        & "$env:ProgramFilesPath/nbuild/nb.exe" ${{ env.build_type }} -v ${{ env.enable_logging }}
       shell: pwsh
       working-directory: ${{ github.workspace }}
       env:
         OWNER: ${{ github.repository_owner }}
         API_GITHUB_KEY: ${{ secrets.API_GITHUB_KEY }}
         DOTNET_CLI_TELEMETRY_OPTOUT: 1
-        Build_Type: ${{ github.event.inputs.build_type || 'stage' }}
 
   docs:
     name: Publish Docs
