@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="naz-hage" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Troubleshooting - Ntools - Work in Progress</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Troubleshooting";
+        var mkdocs_page_input_path = "ntools/troubleshooting.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Ntools - Work in Progress
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../usage/">Practice</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../setup/">Setup your project</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../buildtypes/">Build Types</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../versioning/">Versioning</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">List of Tools</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../nbuild/">Nbuild (nb.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lf/">lf (lf.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../nbackup/">Nbackup (nbackup.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../wi/">wi (wi.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../github-release/">Github Release</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Custom Build Tasks</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../nbuildtasks/">Nbuild Tasks</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../nbuild-tasks-integration/">NBuild Tasks Integration</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../msbuild-tasks-test-coverage/">MSBuild Tasks Test Coverage</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Pre-commit</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../pre-commit-setup/">Pre-commit Setup</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Update</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/">Development Tools</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Revisions</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../changelog/">Changelog</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Ntools - Work in Progress</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Troubleshooting</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/naz-hage/ntools/edit/main/docs/ntools/troubleshooting.md">Edit on ntools</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p><strong>Summary of Issue:</strong><br />
+- Tests for the <code>list</code> command crash because <code>Environment.Exit()</code> is used in some command handlers (like <code>install</code>), which terminates the process immediately. This prevents the test framework from capturing the return code or output.
+- The <code>list</code> command correctly uses <code>Environment.ExitCode = exitCode;</code>, allowing the process to return control to the test runner and enabling proper result checking.</p>
+<p><strong>Root Cause:</strong><br />
+- Using <code>Environment.Exit()</code> in command handlers (e.g., for <code>install</code> and <code>uninstall</code>) causes the process to exit before the test can assert results.
+- The test framework expects the process to complete and return a code, not exit abruptly.</p>
+<p><strong>Resolution in Program.cs:</strong><br />
+- Replace all instances of <code>Environment.Exit(result.Code);</code> in command handlers with <code>Environment.ExitCode = result.Code;</code> and allow the handler to return.
+- This change ensures the process does not terminate prematurely, and tests can capture the exit code and output as expected.</p>
+<p><strong>Example Fix:</strong></p>
+<pre><code class="language-csharp">installCommand.SetHandler((string json, bool verbose) =&gt; {
+    try
+    {
+        var result = Nbuild.Command.Install(json, verbose);
+        Environment.ExitCode = result.Code; // Instead of Environment.Exit(result.Code);
+    }
+    catch (Exception ex)
+    {
+        Console.Error.WriteLine($&quot;Error: {ex.Message}&quot;);
+        Environment.ExitCode = -1; // Instead of Environment.Exit(-1);
+    }
+}, jsonOption, verboseOption);
+</code></pre>
+<ul>
+<li>Apply similar changes to other command handlers that use <code>Environment.Exit()</code>.</li>
+</ul>
+<p><strong>Summary:</strong><br />
+Tests crash because <code>Environment.Exit()</code> terminates the process before the test can check results. Use <code>Environment.ExitCode = ...</code> instead, as done in the <code>list</code> command, to allow proper test execution and result checking. Update all command handlers in Program.cs accordingly.</p>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/naz-hage/ntools" class="fa fa-code-fork" style="color: #fcfcfc"> ntools</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
