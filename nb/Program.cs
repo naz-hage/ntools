@@ -32,11 +32,24 @@ namespace nb
 
     private static void AddDownloadCommand(System.CommandLine.RootCommand rootCommand)
         {
-            var cmd = new System.CommandLine.Command("download", "Download tools from JSON");
-            cmd.SetHandler(() => {
-                ConsoleHelper.WriteLine("[Green!√ Download command executed.]");
-            });
-            rootCommand.AddCommand(cmd);
+            var downloadCommand = new System.CommandLine.Command("download", "Download tools from JSON");
+            var jsonOption = new System.CommandLine.Option<string>("--json", "Path to JSON file");
+            var verboseOption = new System.CommandLine.Option<bool>("--verbose", "Verbose output");
+            downloadCommand.AddOption(jsonOption);
+            downloadCommand.AddOption(verboseOption);
+            downloadCommand.SetHandler((string json, bool verbose) => {
+                try
+                {
+                    var result = Nbuild.Command.Download(json, verbose);
+                    Environment.Exit(result.Code);
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"Error: {ex.Message}");
+                    Environment.Exit(-1);
+                }
+            }, jsonOption, verboseOption);
+            rootCommand.AddCommand(downloadCommand);
         }
 
     private static void AddPathCommand(System.CommandLine.RootCommand rootCommand)
