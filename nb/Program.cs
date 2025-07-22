@@ -38,16 +38,8 @@ namespace nb
             downloadCommand.AddOption(jsonOption);
             downloadCommand.AddOption(verboseOption);
             downloadCommand.SetHandler((string json, bool verbose) => {
-                try
-                {
-                    var result = Nbuild.Command.Download(json, verbose);
-                    Environment.Exit(result.Code);
-                }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine($"Error: {ex.Message}");
-                    Environment.Exit(-1);
-                }
+                var exitCode = HandleDownloadCommand(json, verbose);
+                Environment.ExitCode = exitCode;
             }, jsonOption, verboseOption);
             rootCommand.AddCommand(downloadCommand);
         }
@@ -177,16 +169,8 @@ namespace nb
             installCommand.AddOption(jsonOption);
             installCommand.AddOption(verboseOption);
             installCommand.SetHandler((string json, bool verbose) => {
-                try
-                {
-                    var result = Nbuild.Command.Install(json, verbose);
-                    Environment.Exit(result.Code);
-                }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine($"Error: {ex.Message}");
-                    Environment.Exit(-1);
-                }
+                var exitCode = HandleInstallCommand(json, verbose);
+                Environment.ExitCode = exitCode;
             }, jsonOption, verboseOption);
             rootCommand.AddCommand(installCommand);
         }
@@ -199,16 +183,8 @@ namespace nb
             uninstallCommand.AddOption(jsonOption);
             uninstallCommand.AddOption(verboseOption);
             uninstallCommand.SetHandler((string json, bool verbose) => {
-                try
-                {
-                    var result = Nbuild.Command.Uninstall(json, verbose);
-                    Environment.Exit(result.Code);
-                }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine($"Error: {ex.Message}");
-                    Environment.Exit(-1);
-                }
+                var exitCode = HandleUninstallCommand(json, verbose);
+                Environment.ExitCode = exitCode;
             }, jsonOption, verboseOption);
             rootCommand.AddCommand(uninstallCommand);
         }
@@ -239,6 +215,48 @@ namespace nb
             try
             {
                 var result = Nbuild.Command.List(json, false);
+                return result.Code;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+                return -1;
+            }
+        }
+
+        private static int HandleInstallCommand(string json, bool verbose)
+        {
+            try
+            {
+                var result = Nbuild.Command.Install(json, verbose);
+                return result.Code;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+                return -1;
+            }
+        }
+
+        private static int HandleUninstallCommand(string json, bool verbose)
+        {
+            try
+            {
+                var result = Nbuild.Command.Uninstall(json, verbose);
+                return result.Code;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+                return -1;
+            }
+        }
+
+        private static int HandleDownloadCommand(string json, bool verbose)
+        {
+            try
+            {
+                var result = Nbuild.Command.Download(json, verbose);
                 return result.Code;
             }
             catch (Exception ex)
