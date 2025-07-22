@@ -228,8 +228,16 @@ namespace nb
             listCommand.AddOption(jsonOption);
             listCommand.SetHandler((string json) =>
             {
-                var exitCode = HandleListCommand(json);
-                Environment.ExitCode = exitCode;
+                try
+                {
+                    var result = Nbuild.Command.List(json, false);
+                    Environment.Exit(result.Code);
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"Error: {ex.Message}");
+                    Environment.Exit(-1);
+                }
             }, jsonOption);
             rootCommand.AddCommand(listCommand);
         }
