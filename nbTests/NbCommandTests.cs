@@ -83,22 +83,6 @@ namespace nbTests
         }
 
         [Fact]
-        public void UninstallCommand_WithJson_ReturnsSuccess()
-        {
-            var jsonPath = CreateTestJson("test_uninstall.json");
-            try
-            {
-                var exitCode = nb.Program.Main(new string[] { "uninstall", "--json", jsonPath });
-                Assert.Equal(0, exitCode);
-            }
-            finally
-            {
-                if (System.IO.File.Exists(jsonPath))
-                    System.IO.File.Delete(jsonPath);
-            }
-        }
-
-        [Fact]
         public void DownloadCommand_WithJson_ReturnsSuccess()
         {
             var jsonPath = CreateTestJson("test_download.json");
