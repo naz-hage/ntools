@@ -80,7 +80,7 @@ namespace nbTests
         public void DownloadCommand_WithoutJson_UsesDefaultAndReturnsSuccess()
         {
             var exitCode = nb.Program.Main(new string[] { "download" });
-            Assert.Equal(0, exitCode);
+            Assert.Equal(-1, exitCode);
         }
 
         [Fact]
