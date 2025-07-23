@@ -77,16 +77,44 @@ namespace nbTests
         }
 
         [Fact]
-        public void DownloadCommand_WithoutJson_UsesDefaultAndReturnsSuccess()
+        public void DownloadCommand_WithoutJson_ReturnsError()
         {
             var exitCode = nb.Program.Main(new string[] { "download" });
-            Assert.Equal(-1, exitCode);
+            Assert.NotEqual(0, exitCode);
         }
 
         [Fact]
         public void DownloadCommand_WithJson_DownloadsAndReturnsSuccess()
         {
             RunCommandWithJson("download", "test_download.json");
+        }
+
+        [Fact]
+        public void InstallCommand_Help_ReturnsSuccess()
+        {
+            var exitCode = nb.Program.Main(new string[] { "install", "--help" });
+            Assert.Equal(0, exitCode);
+        }
+
+        [Fact]
+        public void InstallCommand_WithoutJson_ReturnsError()
+        {
+            var exitCode = nb.Program.Main(new string[] { "install" });
+            Assert.NotEqual(0, exitCode);
+        }
+
+        [Fact]
+        public void UninstallCommand_Help_ReturnsSuccess()
+        {
+            var exitCode = nb.Program.Main(new string[] { "uninstall", "--help" });
+            Assert.Equal(0, exitCode);
+        }
+
+        [Fact]
+        public void UninstallCommand_WithoutJson_ReturnsError()
+        {
+            var exitCode = nb.Program.Main(new string[] { "uninstall" });
+            Assert.NotEqual(0, exitCode);
         }
     }
 }

@@ -32,8 +32,11 @@ namespace nb
 
     private static void AddDownloadCommand(System.CommandLine.RootCommand rootCommand)
         {
-            var downloadCommand = new System.CommandLine.Command("download", "Download tools from JSON");
-            var jsonOption = new System.CommandLine.Option<string>("--json", "Path to JSON file");
+            var downloadCommand = new System.CommandLine.Command("download", "Download tools and applications specified in the manifest file.");
+            var jsonOption = new System.CommandLine.Option<string>("--json", "Full path to the manifest file containing your tool definitions.\nIf the path contains spaces, use double quotes.")
+            {
+                IsRequired = true
+            };
             var verboseOption = new System.CommandLine.Option<bool>("--verbose", "Verbose output");
             downloadCommand.AddOption(jsonOption);
             downloadCommand.AddOption(verboseOption);
@@ -163,8 +166,11 @@ namespace nb
 
     private static void AddInstallCommand(System.CommandLine.RootCommand rootCommand)
         {
-            var installCommand = new System.CommandLine.Command("install", "Install tools from JSON");
-            var jsonOption = new System.CommandLine.Option<string>("--json", "Path to JSON file");
+            var installCommand = new System.CommandLine.Command("install", "Install tools and applications specified in the manifest file.");
+            var jsonOption = new System.CommandLine.Option<string>("--json", "Full path to the manifest file containing your tool definitions.\nIf the path contains spaces, use double quotes.")
+            {
+                IsRequired = true
+            };
             var verboseOption = new System.CommandLine.Option<bool>("--verbose", "Verbose output");
             installCommand.AddOption(jsonOption);
             installCommand.AddOption(verboseOption);
@@ -177,8 +183,11 @@ namespace nb
 
     private static void AddUninstallCommand(System.CommandLine.RootCommand rootCommand)
         {
-            var uninstallCommand = new System.CommandLine.Command("uninstall", "Uninstall tools from JSON");
-            var jsonOption = new System.CommandLine.Option<string>("--json", "Path to JSON file");
+            var uninstallCommand = new System.CommandLine.Command("uninstall", "Uninstall tools and applications specified in the manifest file.");
+            var jsonOption = new System.CommandLine.Option<string>("--json", "Full path to the manifest file containing your tool definitions.\nIf the path contains spaces, use double quotes.")
+            {
+                IsRequired = true
+            };
             var verboseOption = new System.CommandLine.Option<bool>("--verbose", "Verbose output");
             uninstallCommand.AddOption(jsonOption);
             uninstallCommand.AddOption(verboseOption);
