@@ -72,37 +72,39 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#1-list-installed-applications">1. List Installed Applications</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#2-install-applications">2. Install Applications</a>
+    <li class="toctree-l2"><a class="reference internal" href="#2-download-applications">2. Download Applications</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#3-display-git-information">3. Display Git Information</a>
+    <li class="toctree-l2"><a class="reference internal" href="#3-install-applications">3. Install Applications</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#4-run-a-build-target">4. Run a Build Target</a>
+    <li class="toctree-l2"><a class="reference internal" href="#4-display-git-information">4. Display Git Information</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#5-list-nbuild-targets">5. List nbuild targets</a>
+    <li class="toctree-l2"><a class="reference internal" href="#5-run-a-build-target">5. Run a Build Target</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#6-set-a-specific-git-tag">6. Set a Specific Git Tag</a>
+    <li class="toctree-l2"><a class="reference internal" href="#6-list-nbuild-targets">6. List nbuild targets</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#7-automatically-set-the-next-git-tag">7. Automatically Set the Next Git Tag</a>
+    <li class="toctree-l2"><a class="reference internal" href="#7-set-a-specific-git-tag">7. Set a Specific Git Tag</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#8-push-the-next-git-tag-to-remote">8. Push the Next Git Tag to Remote</a>
+    <li class="toctree-l2"><a class="reference internal" href="#8-automatically-set-the-next-git-tag">8. Automatically Set the Next Git Tag</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#9-display-the-current-git-branch">9. Display the Current Git Branch</a>
+    <li class="toctree-l2"><a class="reference internal" href="#9-push-the-next-git-tag-to-remote">9. Push the Next Git Tag to Remote</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#10-clone-a-git-repository">10. Clone a Git Repository</a>
+    <li class="toctree-l2"><a class="reference internal" href="#10-display-the-current-git-branch">10. Display the Current Git Branch</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#11-delete-a-specific-tag">11. Delete a Specific Tag</a>
+    <li class="toctree-l2"><a class="reference internal" href="#11-clone-a-git-repository">11. Clone a Git Repository</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#12-creating-a-release">12. Creating a Release</a>
+    <li class="toctree-l2"><a class="reference internal" href="#12-delete-a-specific-tag">12. Delete a Specific Tag</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#13-creating-a-pre-release">13. Creating a Pre-Release</a>
+    <li class="toctree-l2"><a class="reference internal" href="#13-creating-a-release">13. Creating a Release</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#14-downloading-an-asset">14. Downloading an Asset</a>
+    <li class="toctree-l2"><a class="reference internal" href="#14-creating-a-pre-release">14. Creating a Pre-Release</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#15-creating-a-release-with-full-github-url">15. Creating a Release with Full GitHub URL</a>
+    <li class="toctree-l2"><a class="reference internal" href="#15-downloading-an-asset">15. Downloading an Asset</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#16-downloading-an-asset-with-full-github-url">16. Downloading an Asset with Full GitHub URL</a>
+    <li class="toctree-l2"><a class="reference internal" href="#16-creating-a-release-with-full-github-url">16. Creating a Release with Full GitHub URL</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#16-getting-latest-3-releases-and-the-newest-pre-release-if-newer-than-the-latest-release">16. Getting latest 3 releases and the newest pre-release (if newer than the latest release)</a>
+    <li class="toctree-l2"><a class="reference internal" href="#17-downloading-an-asset-with-full-github-url">17. Downloading an Asset with Full GitHub URL</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#18-getting-latest-3-releases-and-the-newest-pre-release-if-newer-than-the-latest-release">18. Getting latest 3 releases and the newest pre-release (if newer than the latest release)</a>
     </li>
     </ul>
                   </li>
@@ -329,69 +331,73 @@ nb.exe list --help
 <pre><code class="language-cmd">nb.exe list --json &quot;C:\Program Files\NBuild\ntools.json&quot;
 </code></pre>
 <p>Lists all applications specified in the provided JSON file. If no <code>--json</code> option is specified, the default file <code>C:\Program Files\NBuild\ntools.json</code> is used.</p>
-<h2 id="2-install-applications">2. Install Applications</h2>
+<h2 id="2-download-applications">2. Download Applications</h2>
+<pre><code class="language-cmd">nb.exe download --json &quot;C:\Program Files\NBuild\ntools.json&quot;
+</code></pre>
+<p>Download tools and applications specified in the manifest file containing your tool definitions. Provide the full path using <code>--json</code> option. If the path contains spaces, use double quotes.</p>
+<h2 id="3-install-applications">3. Install Applications</h2>
 <pre><code class="language-cmd">nb.exe install -json $env:ProgramFiles\tools.json
 </code></pre>
 <p>Downloads and installs applications specified in the JSON file (requires admin privileges). This checks if the application is already installed and if not it will install it.
 If the application is already installed, it will skip the installation.</p>
-<h2 id="3-display-git-information">3. Display Git Information</h2>
+<h2 id="4-display-git-information">4. Display Git Information</h2>
 <pre><code class="language-cmd">nb.exe git_info
 </code></pre>
 <p>Displays the current Git branch and tag information for the local repository.</p>
-<h2 id="4-run-a-build-target">4. Run a Build Target</h2>
+<h2 id="5-run-a-build-target">5. Run a Build Target</h2>
 <pre><code class="language-cmd">nb.exe stage -v true
 </code></pre>
 <p>Runs the <code>stage</code> target defined in the nbuild.targets file with verbose output enabled.</p>
-<h2 id="5-list-nbuild-targets">5. List nbuild targets</h2>
+<h2 id="6-list-nbuild-targets">6. List nbuild targets</h2>
 <pre><code class="language-cmd">nb.exe targets
 </code></pre>
 <p>Lists all available build targets defined in the nbuild.targets file and saves them in the targets.md file.</p>
-<h2 id="6-set-a-specific-git-tag">6. Set a Specific Git Tag</h2>
+<h2 id="7-set-a-specific-git-tag">7. Set a Specific Git Tag</h2>
 <pre><code class="language-cmd">nb.exe git_settag -tag 1.0.0
 </code></pre>
 <p>Sets the specified Git tag (<code>1.0.0</code>) in the local repository.</p>
-<h2 id="7-automatically-set-the-next-git-tag">7. Automatically Set the Next Git Tag</h2>
+<h2 id="8-automatically-set-the-next-git-tag">8. Automatically Set the Next Git Tag</h2>
 <pre><code class="language-cmd">nb.exe git_autotag -buildtype stage
 </code></pre>
 <p>Automatically generates and sets the next Git tag based on the specified build type (<code>stage</code> or <code>prod</code>).</p>
-<h2 id="8-push-the-next-git-tag-to-remote">8. Push the Next Git Tag to Remote</h2>
+<h2 id="9-push-the-next-git-tag-to-remote">9. Push the Next Git Tag to Remote</h2>
 <pre><code class="language-cmd">nb.exe git_push_autotag -buildtype prod
 </code></pre>
 <p>Automatically generates the next Git tag based on the specified build type (<code>prod</code>) and pushes it to the remote repository.</p>
-<h2 id="9-display-the-current-git-branch">9. Display the Current Git Branch</h2>
+<h2 id="10-display-the-current-git-branch">10. Display the Current Git Branch</h2>
 <pre><code class="language-cmd">nb.exe git_branch
 </code></pre>
 <p>Displays the current Git branch in the local repository.</p>
-<h2 id="10-clone-a-git-repository">10. Clone a Git Repository</h2>
+<h2 id="11-clone-a-git-repository">11. Clone a Git Repository</h2>
 <pre><code class="language-cmd">nb.exe git_clone -url https://github.com/example/repo -path C:\Projects
 </code></pre>
 <p>Clones the specified Git repository (<code>https://github.com/example/repo</code>) into the specified path (<code>C:\Projects</code>).</p>
-<h2 id="11-delete-a-specific-tag">11. Delete a Specific Tag</h2>
+<h2 id="12-delete-a-specific-tag">12. Delete a Specific Tag</h2>
 <pre><code class="language-cmd">nb.exe git_deletetag -tag 1.0.0 -v true
 </code></pre>
-<h2 id="12-creating-a-release">12. Creating a Release</h2>
+<h2 id="13-creating-a-release">13. Creating a Release</h2>
 <p>To create a release for the repository <code>my-repo</code> with the tag <code>1.0.0</code>, branch <code>main</code>, and an asset located at <code>C:\Releases\1.0.0.zip</code>, you would use the following command:</p>
 <pre><code class="language-batch">nb.exe release_create -repo userName/my-repo -tag 1.0.0 -branch main -file C:\Releases\1.1.0.zip
 </code></pre>
-<h2 id="13-creating-a-pre-release">13. Creating a Pre-Release</h2>
+<h2 id="14-creating-a-pre-release">14. Creating a Pre-Release</h2>
 <p>To create a pre-release for the repository <code>my-repo</code> with the tag <code>1.0.0</code>, branch <code>main</code>, and an asset located at <code>C:\Releases\1.0.0.zip</code>, you would use the following command:</p>
 <pre><code class="language-batch">nb.exe pre_release_create -repo userName/my-repo -tag 1.0.0 -branch main -file C:\Releases\1.1.0.zip
 </code></pre>
-<h2 id="14-downloading-an-asset">14. Downloading an Asset</h2>
+<h2 id="15-downloading-an-asset">15. Downloading an Asset</h2>
 <p>To download an asset from the release with the tag <code>1.0.0</code> in the repository <code>my-repo</code> to the path <code>C:\Downloads</code>:</p>
 <pre><code class="language-batch">nb.exe release_download -repo userName/my-repo -tag 1.0.0 -path C:\Downloads
 </code></pre>
 <p>An asset named 1.0.0.zip will be downloaded to the specified path if it exists in the release.</p>
-<h2 id="15-creating-a-release-with-full-github-url">15. Creating a Release with Full GitHub URL</h2>
+<h2 id="16-creating-a-release-with-full-github-url">16. Creating a Release with Full GitHub URL</h2>
 <p>To create a release for the repository <code>my-repo</code> with the tag <code>1.0.0</code>, branch <code>main</code>, and an asset located at <code>C:\Releases\1.0.0.zip</code>, using the full GitHub URL:</p>
 <pre><code class="language-batch">nb.exe release_create -repo https://github.com/userName/my-repo -tag 1.0.0 -branch main -file C:\Releases\1.0.0.zip
 </code></pre>
-<h2 id="16-downloading-an-asset-with-full-github-url">16. Downloading an Asset with Full GitHub URL</h2>
+<h2 id="17-downloading-an-asset-with-full-github-url">17. Downloading an Asset with Full GitHub URL</h2>
 <p>To download an asset from the release with the tag <code>1.0.0</code> in the repository <code>my-repo</code> to the path <code>C:\Downloads</code>, using the full GitHub URL:</p>
 <pre><code class="language-batch">nb.exe release_download -repo https://github.com/userName/my-repo -tag 1.0.0 -path C:\Downloads
 </code></pre>
 <p>An asset named <code>1.0.0.zip</code> will be downloaded to the specified path if it exists in the release.</p>
-<h2 id="16-getting-latest-3-releases-and-the-newest-pre-release-if-newer-than-the-latest-release">16. Getting latest 3 releases and the newest pre-release (if newer than the latest release)</h2>
+<h2 id="18-getting-latest-3-releases-and-the-newest-pre-release-if-newer-than-the-latest-release">18. Getting latest 3 releases and the newest pre-release (if newer than the latest release)</h2>
 <pre><code class="language-batch">nb.exe list_release -repo https://github.com/userName/my-repo
 </code></pre>
               
