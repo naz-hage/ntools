@@ -119,11 +119,16 @@ nb.exe download --json "C:\Program Files\NBuild\ntools.json"
 ```
 Download tools and applications specified in the manifest file containing your tool definitions. Provide the full path using `--json` option. If the path contains spaces, use double quotes.
 
-## 3. Install Applications
+## 3. Install and Uninstall Applications
 ```cmd
 nb.exe install --json "C:\Program Files\tools.json"
 ```
-Downloads and installs applications specified in the JSON file (requires admin privileges). If the application is already installed, it will skip the installation.
+Downloads and installs applications specified in the JSON file (requires admin privileges). If the application is already installed, it will skip the installation. Provide the full path using `--json` option. If the path contains spaces, use double quotes.
+
+```cmd
+nb.exe uninstall --json "C:\Program Files\example-tool.json"
+```
+Uninstalls tools and applications specified in the manifest file. Provide the full path using `--json` option. If the path contains spaces, use double quotes.
 
 ## 4. Display Git Information
 ```cmd
