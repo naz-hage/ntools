@@ -336,10 +336,9 @@ nb.exe list --help
 </code></pre>
 <p>Download tools and applications specified in the manifest file containing your tool definitions. Provide the full path using <code>--json</code> option. If the path contains spaces, use double quotes.</p>
 <h2 id="3-install-applications">3. Install Applications</h2>
-<pre><code class="language-cmd">nb.exe install -json $env:ProgramFiles\tools.json
+<pre><code class="language-cmd">nb.exe install --json &quot;C:\Program Files\tools.json&quot;
 </code></pre>
-<p>Downloads and installs applications specified in the JSON file (requires admin privileges). This checks if the application is already installed and if not it will install it.
-If the application is already installed, it will skip the installation.</p>
+<p>Downloads and installs applications specified in the JSON file (requires admin privileges). If the application is already installed, it will skip the installation.</p>
 <h2 id="4-display-git-information">4. Display Git Information</h2>
 <pre><code class="language-cmd">nb.exe git_info
 </code></pre>
