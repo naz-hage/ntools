@@ -121,10 +121,9 @@ Download tools and applications specified in the manifest file containing your t
 
 ## 3. Install Applications
 ```cmd
-nb.exe install -json $env:ProgramFiles\tools.json
+nb.exe install --json "C:\Program Files\tools.json"
 ```
-Downloads and installs applications specified in the JSON file (requires admin privileges). This checks if the application is already installed and if not it will install it.
-If the application is already installed, it will skip the installation.
+Downloads and installs applications specified in the JSON file (requires admin privileges). If the application is already installed, it will skip the installation.
 
 ## 4. Display Git Information
 ```cmd
