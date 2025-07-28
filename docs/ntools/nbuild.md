@@ -124,6 +124,8 @@ Download tools and applications specified in the manifest file containing your t
 nb.exe install --json "C:\Program Files\tools.json"
 ```
 Downloads and installs applications specified in the JSON file (requires admin privileges). If the application is already installed, it will skip the installation. Provide the full path using `--json` option. If the path contains spaces, use double quotes.
+=======
+Downloads and installs applications specified in the JSON file (requires admin privileges). If the application is already installed, it will skip the installation.
 
 ```cmd
 nb.exe uninstall --json "C:\Program Files\example-tool.json"
