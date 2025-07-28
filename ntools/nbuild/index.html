@@ -74,7 +74,7 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#2-download-applications">2. Download Applications</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#3-install-and-uninstall-applications">3. Install and Uninstall Applications</a>
+    <li class="toctree-l2"><a class="reference internal" href="#3-install-applications">3. Install Applications</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#4-display-git-information">4. Display Git Information</a>
     </li>
@@ -335,14 +335,10 @@ nb.exe list --help
 <pre><code class="language-cmd">nb.exe download --json &quot;C:\Program Files\NBuild\ntools.json&quot;
 </code></pre>
 <p>Download tools and applications specified in the manifest file containing your tool definitions. Provide the full path using <code>--json</code> option. If the path contains spaces, use double quotes.</p>
-<h2 id="3-install-and-uninstall-applications">3. Install and Uninstall Applications</h2>
+<h2 id="3-install-applications">3. Install Applications</h2>
 <pre><code class="language-cmd">nb.exe install --json &quot;C:\Program Files\tools.json&quot;
 </code></pre>
-<p>Downloads and installs applications specified in the JSON file (requires admin privileges). If the application is already installed, it will skip the installation. Provide the full path using <code>--json</code> option. If the path contains spaces, use double quotes.</p>
-<pre><code class="language-cmd">nb.exe uninstall --json &quot;C:\Program Files\example-tool.json&quot;
-</code></pre>
-<p>Uninstalls tools and applications specified in the manifest file. Provide the full path using <code>--json</code> option. If the path contains spaces, use double quotes.</p>
-<p>=======</p>
+<p>Downloads and installs applications specified in the JSON file (requires admin privileges). If the application is already installed, it will skip the installation.</p>
 <h2 id="4-display-git-information">4. Display Git Information</h2>
 <pre><code class="language-cmd">nb.exe git_info
 </code></pre>
