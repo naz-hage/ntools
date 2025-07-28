@@ -130,6 +130,7 @@ nb.exe uninstall --json "C:\Program Files\example-tool.json"
 ```
 Uninstalls tools and applications specified in the manifest file. Provide the full path using `--json` option. If the path contains spaces, use double quotes.
 
+=======
 ## 4. Display Git Information
 ```cmd
 nb.exe git_info
