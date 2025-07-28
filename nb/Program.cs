@@ -32,11 +32,19 @@ namespace nb
 
     private static void AddDownloadCommand(System.CommandLine.RootCommand rootCommand)
         {
-            var cmd = new System.CommandLine.Command("download", "Download tools from JSON");
-            cmd.SetHandler(() => {
-                ConsoleHelper.WriteLine("[Green!√ Download command executed.]");
-            });
-            rootCommand.AddCommand(cmd);
+            var downloadCommand = new System.CommandLine.Command("download", "Download tools and applications specified in the manifest file.");
+            var jsonOption = new System.CommandLine.Option<string>("--json", "Full path to the manifest file containing your tool definitions.\nIf the path contains spaces, use double quotes.")
+            {
+                IsRequired = true
+            };
+            var verboseOption = new System.CommandLine.Option<bool>("--verbose", "Verbose output");
+            downloadCommand.AddOption(jsonOption);
+            downloadCommand.AddOption(verboseOption);
+            downloadCommand.SetHandler((string json, bool verbose) => {
+                var exitCode = HandleDownloadCommand(json, verbose);
+                Environment.ExitCode = exitCode;
+            }, jsonOption, verboseOption);
+            rootCommand.AddCommand(downloadCommand);
         }
 
     private static void AddPathCommand(System.CommandLine.RootCommand rootCommand)
@@ -158,44 +166,34 @@ namespace nb
 
     private static void AddInstallCommand(System.CommandLine.RootCommand rootCommand)
         {
-            var installCommand = new System.CommandLine.Command("install", "Install tools from JSON");
-            var jsonOption = new System.CommandLine.Option<string>("--json", "Path to JSON file");
+            var installCommand = new System.CommandLine.Command("install", "Install tools and applications specified in the manifest file.");
+            var jsonOption = new System.CommandLine.Option<string>("--json", "Full path to the manifest file containing your tool definitions.\nIf the path contains spaces, use double quotes.")
+            {
+                IsRequired = true
+            };
             var verboseOption = new System.CommandLine.Option<bool>("--verbose", "Verbose output");
             installCommand.AddOption(jsonOption);
             installCommand.AddOption(verboseOption);
             installCommand.SetHandler((string json, bool verbose) => {
-                try
-                {
-                    var result = Nbuild.Command.Install(json, verbose);
-                    Environment.Exit(result.Code);
-                }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine($"Error: {ex.Message}");
-                    Environment.Exit(-1);
-                }
+                var exitCode = HandleInstallCommand(json, verbose);
+                Environment.ExitCode = exitCode;
             }, jsonOption, verboseOption);
             rootCommand.AddCommand(installCommand);
         }
 
     private static void AddUninstallCommand(System.CommandLine.RootCommand rootCommand)
         {
-            var uninstallCommand = new System.CommandLine.Command("uninstall", "Uninstall tools from JSON");
-            var jsonOption = new System.CommandLine.Option<string>("--json", "Path to JSON file");
+            var uninstallCommand = new System.CommandLine.Command("uninstall", "Uninstall tools and applications specified in the manifest file.");
+            var jsonOption = new System.CommandLine.Option<string>("--json", "Full path to the manifest file containing your tool definitions.\nIf the path contains spaces, use double quotes.")
+            {
+                IsRequired = true
+            };
             var verboseOption = new System.CommandLine.Option<bool>("--verbose", "Verbose output");
             uninstallCommand.AddOption(jsonOption);
             uninstallCommand.AddOption(verboseOption);
             uninstallCommand.SetHandler((string json, bool verbose) => {
-                try
-                {
-                    var result = Nbuild.Command.Uninstall(json, verbose);
-                    Environment.Exit(result.Code);
-                }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine($"Error: {ex.Message}");
-                    Environment.Exit(-1);
-                }
+                var exitCode = HandleUninstallCommand(json, verbose);
+                Environment.ExitCode = exitCode;
             }, jsonOption, verboseOption);
             rootCommand.AddCommand(uninstallCommand);
         }
@@ -226,6 +224,48 @@ namespace nb
             try
             {
                 var result = Nbuild.Command.List(json, false);
+                return result.Code;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+                return -1;
+            }
+        }
+
+        private static int HandleInstallCommand(string json, bool verbose)
+        {
+            try
+            {
+                var result = Nbuild.Command.Install(json, verbose);
+                return result.Code;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+                return -1;
+            }
+        }
+
+        private static int HandleUninstallCommand(string json, bool verbose)
+        {
+            try
+            {
+                var result = Nbuild.Command.Uninstall(json, verbose);
+                return result.Code;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+                return -1;
+            }
+        }
+
+        private static int HandleDownloadCommand(string json, bool verbose)
+        {
+            try
+            {
+                var result = Nbuild.Command.Download(json, verbose);
                 return result.Code;
             }
             catch (Exception ex)

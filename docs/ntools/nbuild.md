@@ -113,81 +113,87 @@ nb.exe list --json "C:\Program Files\NBuild\ntools.json"
 ```
 Lists all applications specified in the provided JSON file. If no `--json` option is specified, the default file `C:\Program Files\NBuild\ntools.json` is used.
 
-## 2. Install Applications
+## 2. Download Applications
+```cmd
+nb.exe download --json "C:\Program Files\NBuild\ntools.json"
+```
+Download tools and applications specified in the manifest file containing your tool definitions. Provide the full path using `--json` option. If the path contains spaces, use double quotes.
+
+## 3. Install Applications
 ```cmd
 nb.exe install -json $env:ProgramFiles\tools.json
 ```
 Downloads and installs applications specified in the JSON file (requires admin privileges). This checks if the application is already installed and if not it will install it.
 If the application is already installed, it will skip the installation.
 
-## 3. Display Git Information
+## 4. Display Git Information
 ```cmd
 nb.exe git_info
 ```
 Displays the current Git branch and tag information for the local repository.
 
-## 4. Run a Build Target
+## 5. Run a Build Target
 ```cmd
 nb.exe stage -v true
 ```
 Runs the `stage` target defined in the nbuild.targets file with verbose output enabled.
 
-## 5. List nbuild targets
+## 6. List nbuild targets
 ```cmd
 nb.exe targets
 ```
 Lists all available build targets defined in the nbuild.targets file and saves them in the targets.md file.
 
-## 6. Set a Specific Git Tag
+## 7. Set a Specific Git Tag
 ```cmd
 nb.exe git_settag -tag 1.0.0
 ```
 Sets the specified Git tag (`1.0.0`) in the local repository.
 
-## 7. Automatically Set the Next Git Tag
+## 8. Automatically Set the Next Git Tag
 ```cmd
 nb.exe git_autotag -buildtype stage
 ```
 Automatically generates and sets the next Git tag based on the specified build type (`stage` or `prod`).
 
-## 8. Push the Next Git Tag to Remote
+## 9. Push the Next Git Tag to Remote
 ```cmd
 nb.exe git_push_autotag -buildtype prod
 ```
 Automatically generates the next Git tag based on the specified build type (`prod`) and pushes it to the remote repository.
 
-## 9. Display the Current Git Branch
+## 10. Display the Current Git Branch
 ```cmd
 nb.exe git_branch
 ```
 Displays the current Git branch in the local repository.
 
-## 10. Clone a Git Repository
+## 11. Clone a Git Repository
 ```cmd
 nb.exe git_clone -url https://github.com/example/repo -path C:\Projects
 ```
 Clones the specified Git repository (`https://github.com/example/repo`) into the specified path (`C:\Projects`).
 
-## 11. Delete a Specific Tag
+## 12. Delete a Specific Tag
 ```cmd
 nb.exe git_deletetag -tag 1.0.0 -v true
 ```
 
-## 12. Creating a Release
+## 13. Creating a Release
 To create a release for the repository `my-repo` with the tag `1.0.0`, branch `main`, and an asset located at `C:\Releases\1.0.0.zip`, you would use the following command:
 
 ```batch
 nb.exe release_create -repo userName/my-repo -tag 1.0.0 -branch main -file C:\Releases\1.1.0.zip
 ```
 
-## 13. Creating a Pre-Release
+## 14. Creating a Pre-Release
 To create a pre-release for the repository `my-repo` with the tag `1.0.0`, branch `main`, and an asset located at `C:\Releases\1.0.0.zip`, you would use the following command:
 
 ```batch
 nb.exe pre_release_create -repo userName/my-repo -tag 1.0.0 -branch main -file C:\Releases\1.1.0.zip
 ```
 
-## 14. Downloading an Asset
+## 15. Downloading an Asset
 To download an asset from the release with the tag `1.0.0` in the repository `my-repo` to the path `C:\Downloads`:
 
 ```batch
@@ -195,14 +201,14 @@ nb.exe release_download -repo userName/my-repo -tag 1.0.0 -path C:\Downloads
 ```
 An asset named 1.0.0.zip will be downloaded to the specified path if it exists in the release.
 
-## 15. Creating a Release with Full GitHub URL
+## 16. Creating a Release with Full GitHub URL
 To create a release for the repository `my-repo` with the tag `1.0.0`, branch `main`, and an asset located at `C:\Releases\1.0.0.zip`, using the full GitHub URL:
 
 ```batch
 nb.exe release_create -repo https://github.com/userName/my-repo -tag 1.0.0 -branch main -file C:\Releases\1.0.0.zip
 ```
 
-## 16. Downloading an Asset with Full GitHub URL
+## 17. Downloading an Asset with Full GitHub URL
 To download an asset from the release with the tag `1.0.0` in the repository `my-repo` to the path `C:\Downloads`, using the full GitHub URL:
 
 ```batch
@@ -210,7 +216,7 @@ nb.exe release_download -repo https://github.com/userName/my-repo -tag 1.0.0 -pa
 ```
 An asset named `1.0.0.zip` will be downloaded to the specified path if it exists in the release.
 
-## 16. Getting latest 3 releases and the newest pre-release (if newer than the latest release)
+## 18. Getting latest 3 releases and the newest pre-release (if newer than the latest release)
 
 ```batch
 nb.exe list_release -repo https://github.com/userName/my-repo
