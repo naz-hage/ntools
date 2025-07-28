@@ -74,37 +74,7 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#2-download-applications">2. Download Applications</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#3-install-applications">3. Install Applications</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#4-display-git-information">4. Display Git Information</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#5-run-a-build-target">5. Run a Build Target</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#6-list-nbuild-targets">6. List nbuild targets</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#7-set-a-specific-git-tag">7. Set a Specific Git Tag</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#8-automatically-set-the-next-git-tag">8. Automatically Set the Next Git Tag</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#9-push-the-next-git-tag-to-remote">9. Push the Next Git Tag to Remote</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#10-display-the-current-git-branch">10. Display the Current Git Branch</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#11-clone-a-git-repository">11. Clone a Git Repository</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#12-delete-a-specific-tag">12. Delete a Specific Tag</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#13-creating-a-release">13. Creating a Release</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#14-creating-a-pre-release">14. Creating a Pre-Release</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#15-downloading-an-asset">15. Downloading an Asset</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#16-creating-a-release-with-full-github-url">16. Creating a Release with Full GitHub URL</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#17-downloading-an-asset-with-full-github-url">17. Downloading an Asset with Full GitHub URL</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#18-getting-latest-3-releases-and-the-newest-pre-release-if-newer-than-the-latest-release">18. Getting latest 3 releases and the newest pre-release (if newer than the latest release)</a>
+    <li class="toctree-l2"><a class="reference internal" href="#3-install-and-uninstall-applications">3. Install and Uninstall Applications</a>
     </li>
     </ul>
                   </li>
@@ -335,10 +305,15 @@ nb.exe list --help
 <pre><code class="language-cmd">nb.exe download --json &quot;C:\Program Files\NBuild\ntools.json&quot;
 </code></pre>
 <p>Download tools and applications specified in the manifest file containing your tool definitions. Provide the full path using <code>--json</code> option. If the path contains spaces, use double quotes.</p>
-<h2 id="3-install-applications">3. Install Applications</h2>
+<h2 id="3-install-and-uninstall-applications">3. Install and Uninstall Applications</h2>
 <pre><code class="language-cmd">nb.exe install --json &quot;C:\Program Files\tools.json&quot;
 </code></pre>
+<h1 id="downloads-and-installs-applications-specified-in-the-json-file-requires-admin-privileges-if-the-application-is-already-installed-it-will-skip-the-installation-provide-the-full-path-using-json-option-if-the-path-contains-spaces-use-double-quotes">Downloads and installs applications specified in the JSON file (requires admin privileges). If the application is already installed, it will skip the installation. Provide the full path using <code>--json</code> option. If the path contains spaces, use double quotes.</h1>
 <p>Downloads and installs applications specified in the JSON file (requires admin privileges). If the application is already installed, it will skip the installation.</p>
+<pre><code class="language-cmd">nb.exe uninstall --json &quot;C:\Program Files\example-tool.json&quot;
+</code></pre>
+<p>Uninstalls tools and applications specified in the manifest file. Provide the full path using <code>--json</code> option. If the path contains spaces, use double quotes.</p>
+<p>=======</p>
 <h2 id="4-display-git-information">4. Display Git Information</h2>
 <pre><code class="language-cmd">nb.exe git_info
 </code></pre>
