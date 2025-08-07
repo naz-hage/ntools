@@ -182,8 +182,8 @@ namespace nb
             releaseCreateCommand.AddOption(tagOption);
             releaseCreateCommand.AddOption(branchOption);
             releaseCreateCommand.AddOption(fileOption);
-            releaseCreateCommand.SetHandler((string repo, string tag, string branch, string file) => {
-                var exitCode = HandleReleaseCreateCommand(repo, tag, branch, file, false);
+            releaseCreateCommand.SetHandler(async (string repo, string tag, string branch, string file) => {
+                var exitCode = await HandleReleaseCreateCommand(repo, tag, branch, file, false);
                 Environment.ExitCode = exitCode;
             }, repoOption, tagOption, branchOption, fileOption);
             rootCommand.AddCommand(releaseCreateCommand);
@@ -212,8 +212,8 @@ namespace nb
             preReleaseCreateCommand.AddOption(tagOption);
             preReleaseCreateCommand.AddOption(branchOption);
             preReleaseCreateCommand.AddOption(fileOption);
-            preReleaseCreateCommand.SetHandler((string repo, string tag, string branch, string file) => {
-                var exitCode = HandleReleaseCreateCommand(repo, tag, branch, file, true);
+            preReleaseCreateCommand.SetHandler(async (string repo, string tag, string branch, string file) => {
+                var exitCode = await HandleReleaseCreateCommand(repo, tag, branch, file, true);
                 Environment.ExitCode = exitCode;
             }, repoOption, tagOption, branchOption, fileOption);
             rootCommand.AddCommand(preReleaseCreateCommand);
@@ -237,8 +237,8 @@ namespace nb
             releaseDownloadCommand.AddOption(repoOption);
             releaseDownloadCommand.AddOption(tagOption);
             releaseDownloadCommand.AddOption(pathOption);
-            releaseDownloadCommand.SetHandler((string repo, string tag, string path) => {
-                var exitCode = HandleReleaseDownloadCommand(repo, tag, path);
+            releaseDownloadCommand.SetHandler(async (string repo, string tag, string path) => {
+                var exitCode = await HandleReleaseDownloadCommand(repo, tag, path);
                 Environment.ExitCode = exitCode;
             }, repoOption, tagOption, pathOption);
             rootCommand.AddCommand(releaseDownloadCommand);
@@ -254,8 +254,8 @@ namespace nb
             var verboseOption = new System.CommandLine.Option<bool>("--verbose", "Verbose output");
             listReleaseCommand.AddOption(repoOption);
             listReleaseCommand.AddOption(verboseOption);
-            listReleaseCommand.SetHandler((string repo, bool verbose) => {
-                var exitCode = HandleListReleasesCommand(repo, verbose);
+            listReleaseCommand.SetHandler(async (string repo, bool verbose) => {
+                var exitCode = await HandleListReleasesCommand(repo, verbose);
                 Environment.ExitCode = exitCode;
             }, repoOption, verboseOption);
             rootCommand.AddCommand(listReleaseCommand);
@@ -464,11 +464,11 @@ namespace nb
                 return -1;
             }
         }
-    private static int HandleReleaseCreateCommand(string repo, string tag, string branch, string file, bool preRelease)
+    private static async Task<int> HandleReleaseCreateCommand(string repo, string tag, string branch, string file, bool preRelease)
         {
             try
             {
-                var result = Nbuild.Command.CreateRelease(repo, tag, branch, file, preRelease);
+                var result = await Nbuild.Command.CreateRelease(repo, tag, branch, file, preRelease);
                 return result.Code;
             }
             catch (Exception ex)
@@ -477,11 +477,11 @@ namespace nb
                 return -1;
             }
         }
-    private static int HandleReleaseDownloadCommand(string repo, string tag, string path)
+    private static async Task<int> HandleReleaseDownloadCommand(string repo, string tag, string path)
         {
             try
             {
-                var result = Nbuild.Command.DownloadAsset(repo, tag, path);
+                var result = await Nbuild.Command.DownloadAsset(repo, tag, path);
                 return result.Code;
             }
             catch (Exception ex)
@@ -490,11 +490,11 @@ namespace nb
                 return -1;
             }
         }
-    private static int HandleListReleasesCommand(string repo, bool verbose)
+    private static async Task<int> HandleListReleasesCommand(string repo, bool verbose)
         {
             try
             {
-                var result = Nbuild.Command.ListReleases(repo, verbose);
+                var result = await Nbuild.Command.ListReleases(repo, verbose);
                 return result.Code;
             }
             catch (Exception ex)
