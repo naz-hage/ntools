@@ -58,8 +58,6 @@
               <ul class="current">
                   <li class="toctree-l1 current"><a class="reference internal current" href="#">Nbuild (nb.exe)</a>
     <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#quick-start">Quick Start</a>
-    </li>
     <li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#nbuildtargets">nbuild.targets</a>
@@ -72,10 +70,6 @@
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#1-list-installed-applications">1. List Installed Applications</a>
     </li>
-        </ul>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#1-list-installed-applications_1">1. List Installed Applications</a>
-        <ul>
     <li class="toctree-l3"><a class="reference internal" href="#2-download-applications">2. Download Applications</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#3-install-and-uninstall-applications">3. Install and Uninstall Applications</a>
@@ -192,25 +186,6 @@
 <blockquote>
 <p><strong>Note:</strong> <code>nb.exe</code> expects the <a href="#nbuildtargets">nbuild.targets</a> file to be present in your solution folder for build-related commands.</p>
 </blockquote>
-<hr />
-<h2 id="quick-start">Quick Start</h2>
-<ol>
-<li><strong>List installed tools:</strong>
-   <code>cmd
-   nb.exe list</code></li>
-<li><strong>Install tools from a manifest:</strong>
-   <code>cmd
-   nb.exe install --json "C:\Path\To\tools.json"</code></li>
-<li><strong>Build a target:</strong>
-   <code>cmd
-   nb.exe [TargetName]
-   # Example:
-   nb.exe stage</code></li>
-<li><strong>See all available commands:</strong>
-   <code>cmd
-   nb.exe --help</code></li>
-</ol>
-<hr />
 <h2 id="usage">Usage</h2>
 <pre><code class="language-cmd">Nbuild - Build and DevOps Utility
 
@@ -341,10 +316,6 @@ Commands:
 nb.exe list --json &quot;C:\Program Files\NBuild\ntools.json&quot;
 </code></pre>
 <p>Lists all applications specified in the provided JSON file. If no <code>--json</code> option is specified, the default file is used.</p>
-<h2 id="1-list-installed-applications_1">1. List Installed Applications</h2>
-<pre><code class="language-cmd">nb.exe list --json &quot;C:\Program Files\NBuild\ntools.json&quot;
-</code></pre>
-<p>Lists all applications specified in the provided JSON file. If no <code>--json</code> option is specified, the default file <code>C:\Program Files\NBuild\ntools.json</code> is used.</p>
 <h3 id="2-download-applications">2. Download Applications</h3>
 <pre><code class="language-cmd">nb.exe download --json &quot;C:\Program Files\NBuild\ntools.json&quot;
 </code></pre>
