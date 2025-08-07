@@ -129,10 +129,7 @@ namespace nb
             {
                 IsRequired = true
             };
-            var pathOption = new System.CommandLine.Option<string>("--path", "The path where the asset will be downloaded")
-            {
-                IsRequired = true
-            };
+            var pathOption = new System.CommandLine.Option<string>("--path", "The path where the repo will be cloned. If not specified, the current directory will be used");
             var verboseOption = new System.CommandLine.Option<bool>("--verbose", "Verbose output");
             gitCloneCommand.AddOption(urlOption);
             gitCloneCommand.AddOption(pathOption);
