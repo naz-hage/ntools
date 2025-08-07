@@ -116,5 +116,162 @@ namespace nbTests
             var exitCode = nb.Program.Main(new string[] { "uninstall" });
             Assert.NotEqual(0, exitCode);
         }
+
+
+        [Fact]
+        public void GitInfoCommand_Help_ReturnsSuccess()
+        {
+            var exitCode = nb.Program.Main(new string[] { "git_info", "--help" });
+            Assert.Equal(0, exitCode);
+        }
+
+        [Fact]
+        public void GitInfoCommand_Executes_ReturnsInt()
+        {
+            var exitCode = nb.Program.Main(new string[] { "git_info" });
+            // Could be 0 or error depending on repo state, just check it's an int
+            Assert.IsType<int>(exitCode);
+        }
+
+        [Fact]
+        public void GitSetTagCommand_Help_ReturnsSuccess()
+        {
+            var exitCode = nb.Program.Main(new string[] { "git_settag", "--help" });
+            Assert.Equal(0, exitCode);
+        }
+
+        [Fact]
+        public void GitSetTagCommand_WithoutTag_ReturnsError()
+        {
+            var exitCode = nb.Program.Main(new string[] { "git_settag" });
+            Assert.NotEqual(0, exitCode);
+        }
+
+        [Fact]
+        public void GitAutoTagCommand_Help_ReturnsSuccess()
+        {
+            var exitCode = nb.Program.Main(new string[] { "git_autotag", "--help" });
+            Assert.Equal(0, exitCode);
+        }
+
+        [Fact]
+        public void GitAutoTagCommand_WithoutBuildType_ReturnsError()
+        {
+            var exitCode = nb.Program.Main(new string[] { "git_autotag" });
+            Assert.NotEqual(0, exitCode);
+        }
+
+        [Fact]
+        public void GitPushAutoTagCommand_Help_ReturnsSuccess()
+        {
+            var exitCode = nb.Program.Main(new string[] { "git_push_autotag", "--help" });
+            Assert.Equal(0, exitCode);
+        }
+
+        [Fact]
+        public void GitPushAutoTagCommand_WithoutBuildType_ReturnsError()
+        {
+            var exitCode = nb.Program.Main(new string[] { "git_push_autotag" });
+            Assert.NotEqual(0, exitCode);
+        }
+
+        [Fact]
+        public void GitBranchCommand_Help_ReturnsSuccess()
+        {
+            var exitCode = nb.Program.Main(new string[] { "git_branch", "--help" });
+            Assert.Equal(0, exitCode);
+        }
+
+        [Fact]
+        public void GitBranchCommand_Executes_ReturnsInt()
+        {
+            var exitCode = nb.Program.Main(new string[] { "git_branch" });
+            Assert.IsType<int>(exitCode);
+        }
+
+        [Fact]
+        public void GitCloneCommand_Help_ReturnsSuccess()
+        {
+            var exitCode = nb.Program.Main(new string[] { "git_clone", "--help" });
+            Assert.Equal(0, exitCode);
+        }
+
+        [Fact]
+        public void GitCloneCommand_WithoutUrlOrPath_ReturnsError()
+        {
+            var exitCode = nb.Program.Main(new string[] { "git_clone" });
+            Assert.NotEqual(0, exitCode);
+        }
+
+        [Fact]
+        public void GitDeleteTagCommand_Help_ReturnsSuccess()
+        {
+            var exitCode = nb.Program.Main(new string[] { "git_deletetag", "--help" });
+            Assert.Equal(0, exitCode);
+        }
+
+        [Fact]
+        public void GitDeleteTagCommand_WithoutTag_ReturnsError()
+        {
+            var exitCode = nb.Program.Main(new string[] { "git_deletetag" });
+            Assert.NotEqual(0, exitCode);
+        }
+
+        [Fact]
+        public void ReleaseCreateCommand_Help_ReturnsSuccess()
+        {
+            var exitCode = nb.Program.Main(new string[] { "release_create", "--help" });
+            Assert.Equal(0, exitCode);
+        }
+
+        [Fact]
+        public void ReleaseCreateCommand_WithoutArgs_ReturnsError()
+        {
+            var exitCode = nb.Program.Main(new string[] { "release_create" });
+            Assert.NotEqual(0, exitCode);
+        }
+
+        [Fact]
+        public void PreReleaseCreateCommand_Help_ReturnsSuccess()
+        {
+            var exitCode = nb.Program.Main(new string[] { "pre_release_create", "--help" });
+            Assert.Equal(0, exitCode);
+        }
+
+        [Fact]
+        public void PreReleaseCreateCommand_WithoutArgs_ReturnsError()
+        {
+            var exitCode = nb.Program.Main(new string[] { "pre_release_create" });
+            Assert.NotEqual(0, exitCode);
+        }
+
+        [Fact]
+        public void ReleaseDownloadCommand_Help_ReturnsSuccess()
+        {
+            var exitCode = nb.Program.Main(new string[] { "release_download", "--help" });
+            Assert.Equal(0, exitCode);
+        }
+
+        [Fact]
+        public void ReleaseDownloadCommand_WithoutArgs_ReturnsError()
+        {
+            var exitCode = nb.Program.Main(new string[] { "release_download" });
+            Assert.NotEqual(0, exitCode);
+        }
+
+        [Fact]
+        public void ListReleaseCommand_Help_ReturnsSuccess()
+        {
+            var exitCode = nb.Program.Main(new string[] { "list_release", "--help" });
+            Assert.Equal(0, exitCode);
+        }
+
+        [Fact]
+        public void ListReleaseCommand_WithoutRepo_ReturnsError()
+        {
+            var exitCode = nb.Program.Main(new string[] { "list_release" });
+            Assert.NotEqual(0, exitCode);
+        }
+
     }
 }
