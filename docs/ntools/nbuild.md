@@ -18,32 +18,6 @@
 
 > **Note:** `nb.exe` expects the [nbuild.targets](#nbuildtargets) file to be present in your solution folder for build-related commands.
 
----
-
-## Quick Start
-
-1. **List installed tools:**
-   ```cmd
-   nb.exe list
-   ```
-2. **Install tools from a manifest:**
-   ```cmd
-   nb.exe install --json "C:\Path\To\tools.json"
-   ```
-3. **Build a target:**
-   ```cmd
-   nb.exe [TargetName]
-   # Example:
-   nb.exe stage
-   ```
-4. **See all available commands:**
-   ```cmd
-   nb.exe --help
-   ```
-
----
-
-
 ## Usage
 
 ```cmd
@@ -124,13 +98,6 @@ nb.exe list
 nb.exe list --json "C:\Program Files\NBuild\ntools.json"
 ```
 Lists all applications specified in the provided JSON file. If no `--json` option is specified, the default file is used.
-
-## 1. List Installed Applications
-```cmd
-nb.exe list --json "C:\Program Files\NBuild\ntools.json"
-```
-Lists all applications specified in the provided JSON file. If no `--json` option is specified, the default file `C:\Program Files\NBuild\ntools.json` is used.
-
 
 ### 2. Download Applications
 ```cmd
