@@ -89,11 +89,11 @@ namespace nb
             {
                 IsRequired = true
             };
-            gitAutoTagCommand.AddOption(buildTypeOption)
+            gitAutoTagCommand.AddOption(buildTypeOption);
             gitAutoTagCommand.SetHandler((string buildType) => {
-                var exitCode = HandleGitSetTagCommand(buildType, false);
+                var exitCode = HandleGitAutoTagCommand(buildType, false);
                 Environment.ExitCode = exitCode;
-            }, buildTypeOption, pushOption);
+            }, buildTypeOption);
             rootCommand.AddCommand(gitAutoTagCommand);
         }
 
@@ -104,11 +104,11 @@ namespace nb
             {
                 IsRequired = true
             };
-            gitPushAutoTagCommand.AddOption(buildTypeOption)
+            gitPushAutoTagCommand.AddOption(buildTypeOption);
             gitPushAutoTagCommand.SetHandler((string buildType) => {
-                var exitCode = HandleGitSetTagCommand(buildType, true);
+                var exitCode = HandleGitAutoTagCommand(buildType, true);
                 Environment.ExitCode = exitCode;
-            }, buildTypeOption, pushOption);
+            }, buildTypeOption);
             rootCommand.AddCommand(gitPushAutoTagCommand);
         }
 
@@ -116,7 +116,7 @@ namespace nb
         {
             var gitBranchCommand = new System.CommandLine.Command("git_branch", "Displays the current git branch in the local repository");
             gitBranchCommand.SetHandler(() => {
-                var exitCode = HandleGitSetTagCommand();
+                var exitCode = HandleGitBranchCommand();
                 Environment.ExitCode = exitCode;
             });
             rootCommand.AddCommand(gitBranchCommand);
@@ -134,9 +134,9 @@ namespace nb
                 IsRequired = true
             };
             var verboseOption = new System.CommandLine.Option<bool>("--verbose", "Verbose output");
-            gitCloneCommand.AddOption(urlOption)
-            gitCloneCommand.AddOption(pathOption)
-            gitCloneCommand.AddOption(verboseOption)
+            gitCloneCommand.AddOption(urlOption);
+            gitCloneCommand.AddOption(pathOption);
+            gitCloneCommand.AddOption(verboseOption);
             gitCloneCommand.SetHandler((string url, string path, bool verbose) => {
                 var exitCode = HandleGitCloneCommand(url, path, verbose);
                 Environment.ExitCode = exitCode;
@@ -151,9 +151,9 @@ namespace nb
             {
                 IsRequired = true
             };
-            gitDeleteTagCommand.AddOption(tagOption)
+            gitDeleteTagCommand.AddOption(tagOption);
             gitDeleteTagCommand.SetHandler((string tag) => {
-                var exitCode = HandleGitSetTagCommand(tag);
+                var exitCode = HandleGitDeleteTagCommand(tag);
                 Environment.ExitCode = exitCode;
             }, tagOption);
             rootCommand.AddCommand(gitDeleteTagCommand);
@@ -178,11 +178,11 @@ namespace nb
             {
                 IsRequired = true
             };
-            releaseCreateCommand.AddOption(repoOption)
-            releaseCreateCommand.AddOption(tagOption)
-            releaseCreateCommand.AddOption(branchOption)
-            releaseCreateCommand.AddOption(fileOption)
-            releaseCreateCommand.SetHandler((string repo, string tag, string branch, string file, bool preRelease) => {
+            releaseCreateCommand.AddOption(repoOption);
+            releaseCreateCommand.AddOption(tagOption);
+            releaseCreateCommand.AddOption(branchOption);
+            releaseCreateCommand.AddOption(fileOption);
+            releaseCreateCommand.SetHandler((string repo, string tag, string branch, string file) => {
                 var exitCode = HandleReleaseCreateCommand(repo, tag, branch, file, false);
                 Environment.ExitCode = exitCode;
             }, repoOption, tagOption, branchOption, fileOption);
@@ -208,11 +208,11 @@ namespace nb
             {
                 IsRequired = true
             };
-            preReleaseCreateCommand.AddOption(repoOption)
-            preReleaseCreateCommand.AddOption(tagOption)
-            preReleaseCreateCommand.AddOption(branchOption)
-            preReleaseCreateCommand.AddOption(fileOption)
-            preReleaseCreateCommand.SetHandler((string repo, string tag, string branch, string file, bool preRelease) => {
+            preReleaseCreateCommand.AddOption(repoOption);
+            preReleaseCreateCommand.AddOption(tagOption);
+            preReleaseCreateCommand.AddOption(branchOption);
+            preReleaseCreateCommand.AddOption(fileOption);
+            preReleaseCreateCommand.SetHandler((string repo, string tag, string branch, string file) => {
                 var exitCode = HandleReleaseCreateCommand(repo, tag, branch, file, true);
                 Environment.ExitCode = exitCode;
             }, repoOption, tagOption, branchOption, fileOption);
@@ -232,11 +232,11 @@ namespace nb
             };
             var pathOption = new System.CommandLine.Option<string>("--path", "Specifies the path used for this command. If not specified, the current directory will be used")
             {
-                IsRequired = true
+                IsRequired = false
             };
-            releaseDownloadCommand.AddOption(repoOption)
-            releaseDownloadCommand.AddOption(tagOption)
-            releaseDownloadCommand.AddOption(pathOption)
+            releaseDownloadCommand.AddOption(repoOption);
+            releaseDownloadCommand.AddOption(tagOption);
+            releaseDownloadCommand.AddOption(pathOption);
             releaseDownloadCommand.SetHandler((string repo, string tag, string path) => {
                 var exitCode = HandleReleaseDownloadCommand(repo, tag, path);
                 Environment.ExitCode = exitCode;
@@ -252,8 +252,8 @@ namespace nb
                 IsRequired = true
             };
             var verboseOption = new System.CommandLine.Option<bool>("--verbose", "Verbose output");
-            listReleaseCommand.AddOption(repoOption)
-            listReleaseCommand.AddOption(verboseOption)
+            listReleaseCommand.AddOption(repoOption);
+            listReleaseCommand.AddOption(verboseOption);
             listReleaseCommand.SetHandler((string repo, bool verbose) => {
                 var exitCode = HandleListReleasesCommand(repo, verbose);
                 Environment.ExitCode = exitCode;
