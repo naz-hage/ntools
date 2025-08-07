@@ -124,7 +124,7 @@ namespace nb
 
     private static void AddGitCloneCommand(System.CommandLine.RootCommand rootCommand)
         {
-            var gitCloneCommand = new System.CommandLine.Command("git_clone", "Clones the specified Git repository using the -url option");
+            var gitCloneCommand = new System.CommandLine.Command("git_clone", "Clones the specified Git repository using the --url option");
             var urlOption = new System.CommandLine.Option<string>("--url", "Specifies the Git repository URL")
             {
                 IsRequired = true
@@ -161,8 +161,8 @@ namespace nb
 
     private static void AddReleaseCreateCommand(System.CommandLine.RootCommand rootCommand)
         {
-            var releaseCreateCommand = new System.CommandLine.Command("release_create", "Creates a GitHub release. Requires -repo, -tag, -branch, and -file options");
-            var repoOption = new System.CommandLine.Option<string>("--repo", "Specifies the Git repository in the format any of the following formats:\nrepoName  (UserName is declared the `OWNER` environment variable)\nuserName/repoName\nhttps://github.com/userName/repoName (Full URL to the repository on GitHub)")
+            var releaseCreateCommand = new System.CommandLine.Command("release_create", "Creates a GitHub release. Requires --repo, --tag, --branch, and --file options");
+            var repoOption = new System.CommandLine.Option<string>("--repo", "Specifies the Git repository in the format any of the following formats:\n- repoName  (UserName is declared the `OWNER` environment variable)\n- userName/repoName\n- https://github.com/userName/repoName (Full URL to the repository on GitHub)")
             {
                 IsRequired = true
             };
@@ -191,7 +191,7 @@ namespace nb
 
     private static void AddPreReleaseCreateCommand(System.CommandLine.RootCommand rootCommand)
         {
-            var preReleaseCreateCommand = new System.CommandLine.Command("pre_release_create", "Creates a GitHub pre-release. Requires -repo, -tag, -branch, and -file options");
+            var preReleaseCreateCommand = new System.CommandLine.Command("pre_release_create", "Creates a GitHub pre-release. Requires --repo, --tag, --branch, and --file options");
             var repoOption = new System.CommandLine.Option<string>("--repo", "Specifies the Git repository in the format any of the following formats:\nrepoName  (UserName is declared the `OWNER` environment variable)\nuserName/repoName\nhttps://github.com/userName/repoName (Full URL to the repository on GitHub)")
             {
                 IsRequired = true
@@ -221,8 +221,8 @@ namespace nb
 
     private static void AddReleaseDownloadCommand(System.CommandLine.RootCommand rootCommand)
         {
-            var releaseDownloadCommand = new System.CommandLine.Command("release_download", "Downloads a specific asset from a GitHub release. Requires -repo, -tag, and -path (optional, defaults to current directory)");
-            var repoOption = new System.CommandLine.Option<string>("--repo", "Specifies the Git repository in the format any of the following formats:\nrepoName  (UserName is declared the `OWNER` environment variable)\nuserName/repoName\nhttps://github.com/userName/repoName (Full URL to the repository on GitHub)")
+            var releaseDownloadCommand = new System.CommandLine.Command("release_download", "Downloads a specific asset from a GitHub release. Requires --repo, --tag, and --path (optional, defaults to current directory)");
+            var repoOption = new System.CommandLine.Option<string>("--repo", "Specifies the Git repository in the format any of the following formats:\n- repoName  (UserName is declared the `OWNER` environment variable)\n- userName/repoName\n- https://github.com/userName/repoName (Full URL to the repository on GitHub)")
             {
                 IsRequired = true
             };
@@ -246,8 +246,8 @@ namespace nb
 
     private static void AddListReleaseCommand(System.CommandLine.RootCommand rootCommand)
         {
-            var listReleaseCommand = new System.CommandLine.Command("list_release", "Lists latest 3 releases for the specified repository (and latest pre-release if newer). Requires -repo");
-            var repoOption = new System.CommandLine.Option<string>("--repo", "Specifies the Git repository in the format any of the following formats:\nrepoName  (UserName is declared the `OWNER` environment variable)\nuserName/repoName\nhttps://github.com/userName/repoName (Full URL to the repository on GitHub)")
+            var listReleaseCommand = new System.CommandLine.Command("list_release", "Lists latest 3 releases for the specified repository (and latest pre-release if newer). Requires ----repo");
+            var repoOption = new System.CommandLine.Option<string>("--repo", "Specifies the Git repository in the format any of the following formats:\n- repoName  (UserName is declared the `OWNER` environment variable)\n- userName/repoName\n- https://github.com/userName/repoName (Full URL to the repository on GitHub)")
             {
                 IsRequired = true
             };
