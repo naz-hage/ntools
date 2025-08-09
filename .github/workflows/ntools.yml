@@ -138,7 +138,7 @@ jobs:
     - name: Run Build
       run: |
         & "$env:ProgramFilesPath/nbuild/nb.exe" CORE
-        & "$env:ProgramFilesPath/nbuild/nb.exe" ${{ env.build_type }} -v ${{ env.enable_logging }}
+        & "$env:ProgramFilesPath/nbuild/nb.exe" ${{ env.build_type }} ${{ env.enable_logging }}
       shell: pwsh
       working-directory: ${{ github.workspace }}
       env:
