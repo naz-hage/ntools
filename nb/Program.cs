@@ -51,7 +51,8 @@ namespace nb
         {
             var cmd = new System.CommandLine.Command("path", "Display path segments");
             cmd.SetHandler(() => {
-                ConsoleHelper.WriteLine("[Green!√ Path command executed.]");
+                var result = Nbuild.Command.DisplayPathSegments();
+                Environment.ExitCode = result.Code;
             });
             rootCommand.AddCommand(cmd);
         }
@@ -263,7 +264,8 @@ namespace nb
         {
             var cmd = new System.CommandLine.Command("targets", "Display build targets");
             cmd.SetHandler(() => {
-                ConsoleHelper.WriteLine("[Green!√ Targets command executed.]");
+                var result = Nbuild.BuildStarter.DisplayTargets(Environment.CurrentDirectory);
+                Environment.ExitCode = result.Code;
             });
             rootCommand.AddCommand(cmd);
         }
