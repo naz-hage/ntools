@@ -898,7 +898,7 @@ namespace Nbuild
         /// Sets a tag in the current git repository.
         /// </summary>
         /// <param name="tag">The string representing the tag to set.</param>    
-        public static ResultHelper SetTag(string? tag)
+        public static ResultHelper SetTag(string? tag, bool verbose = false)
         {
             var gitWrapper = new GitWrapper();
             // Project and branch required
