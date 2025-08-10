@@ -31,23 +31,23 @@ Options:
   -?, -h, --help  Show help and usage information
 
 Commands:
-  install             Install tools from a JSON manifest
-  uninstall           Uninstall tools from a JSON manifest
-  list                List all tools and their versions
-  download            Download tools from a JSON manifest
-  path                Display path segments
-  git_info            Display current git info
-  git_settag          Set a git tag
-  git_autotag         Set the next git tag (STAGE or PROD)
-  git_push_autotag    Set and push the next git tag
-  git_branch          Display the current git branch
-  git_clone           Clone a git repository
-  git_deletetag       Delete a git tag
-  release_create      Create a GitHub release
-  pre_release_create  Create a GitHub pre-release
-  release_download    Download a release asset from GitHub
-  list_release        List latest releases for a repository
-  targets             Display build targets
+  install             Install tools and applications specified in the manifest file.
+  uninstall           Uninstall tools and applications specified in the manifest file.
+  list                Display a formatted table of all tools and their versions.
+  download            Download tools and applications specified in the manifest file.
+  path                Display each segment of your PATH environment variable on a separate line.
+  git_info            Displays the current git information for the local repository, including branch and latest tag.
+  git_settag          Sets a git tag in the local repository. Required: --tag
+  git_autotag         Automatically sets the next git tag based on build type. Required: --buildtype (STAGE or PROD)
+  git_push_autotag    Sets the next git tag based on build type and pushes to remote. Required: --buildtype (STAGE or PROD)
+  git_branch          Displays the current git branch in the local repository.
+  git_clone           Clones a Git repository to a specified path. Required: --url; Optional: --path, --verbose
+  git_deletetag       Deletes a git tag from the local repository. Required: --tag
+  release_create      Creates a GitHub release. Required: --repo, --tag, --branch, --file
+  pre_release_create  Creates a GitHub pre-release. Required: --repo, --tag, --branch, --file
+  release_download    Downloads a specific asset from a GitHub release. Required: --repo, --tag; Optional: --path
+  list_release        Lists the latest 3 releases for the specified repository, and the latest pre-release if newer. Required: --repo; Optional: --verbose
+  targets             Displays all available build targets for the current solution or project. You can run any listed target directly using nb.exe (e.g., nb core)
 ```
 
 > **Tip:** If the `--json` option is not specified, the default manifest file `C:\Program Files\NBuild\ntools.json` is used.
@@ -89,130 +89,129 @@ Below is a list of common targets defined in the `common.targets` file:
 
 ## Command Examples
 
+
 Below are practical examples for using `nb.exe`. These examples assume you are running in a PowerShell terminal.
 
+### 1. Install Applications
+```cmd
+nb.exe install --json "C:\Program Files\tools.json"
+```
+Installs applications specified in the manifest file. (Requires admin privileges.)
 
-### 1. List Installed Applications
+### 2. Uninstall Applications
+```cmd
+nb.exe uninstall --json "C:\Program Files\example-tool.json"
+```
+Uninstalls applications as specified in the manifest file. (Requires admin privileges.)
+
+### 3. List Installed Applications
 ```cmd
 nb.exe list
 nb.exe list --json "C:\Program Files\NBuild\ntools.json"
 ```
 Lists all applications specified in the provided JSON file. If no `--json` option is specified, the default file is used.
 
-### 2. Download Applications
+### 4. Download Applications
 ```cmd
 nb.exe download --json "C:\Program Files\NBuild\ntools.json"
 ```
 Downloads tools and applications specified in the manifest file.
 
-### 3. Install and Uninstall Applications
+### 5. Display Path Segments
 ```cmd
-nb.exe install --json "C:\Program Files\tools.json"
-nb.exe uninstall --json "C:\Program Files\example-tool.json"
+nb.exe path
 ```
-Installs or uninstalls applications as specified in the manifest file. (Requires admin privileges.)
+Displays each segment of your PATH environment variable on a separate line.
 
-### 4. Display Git Information
+### 6. Display Git Information
 ```cmd
 nb.exe git_info
 ```
-Displays the current Git branch and tag information for the local repository.
-
-
-### 5. Run a Build Target
-```cmd
-nb.exe stage --verbose true
-```
-Runs the `stage` target defined in the nbuild.targets file with verbose output enabled.
-
-
-### 6. List nbuild targets
-```cmd
-nb.exe targets
-```
-Lists all available build targets defined in the nbuild.targets file.
-
+Displays the current git branch and latest tag information for the local repository.
 
 ### 7. Set a Specific Git Tag
 ```cmd
-nb.exe git_settag --tag 1.0.0
+nb.exe git_settag --tag 1.24.33
 ```
-Sets the specified Git tag (`1.0.0`) in the local repository.
-
+Sets the specified git tag in the local repository.
 
 ### 8. Automatically Set the Next Git Tag
 ```cmd
-nb.exe git_autotag --buildtype stage
+nb.exe git_autotag --buildtype STAGE
 ```
-Automatically generates and sets the next Git tag based on the specified build type (`stage` or `prod`).
-
+Automatically sets the next git tag based on the specified build type (`STAGE` or `PROD`).
 
 ### 9. Push the Next Git Tag to Remote
 ```cmd
-nb.exe git_push_autotag --buildtype prod
+nb.exe git_push_autotag --buildtype PROD
 ```
-Automatically generates the next Git tag based on the specified build type (`prod`) and pushes it to the remote repository.
-
+Sets the next git tag based on build type and pushes it to the remote repository.
 
 ### 10. Display the Current Git Branch
 ```cmd
 nb.exe git_branch
 ```
-Displays the current Git branch in the local repository.
-
+Displays the current git branch in the local repository.
 
 ### 11. Clone a Git Repository
 ```cmd
-nb.exe git_clone --url https://github.com/example/repo --path C:\Projects
+nb.exe git_clone --url https://github.com/example/repo --path C:\Projects --verbose
 ```
-Clones the specified Git repository into the specified path.
-
+Clones the specified git repository into the specified path. Use `--verbose` for detailed output.
 
 ### 12. Delete a Specific Tag
 ```cmd
-nb.exe git_deletetag --tag 1.0.0
+nb.exe git_deletetag --tag 1.24.33
 ```
-Deletes the specified Git tag.
-
+Deletes the specified git tag from the local repository.
 
 ### 13. Creating a Release
 ```cmd
-nb.exe release_create --repo userName/my-repo --tag 1.0.0 --branch main --file C:\Releases\1.0.0.zip
+nb.exe release_create --repo userName/my-repo --tag 1.24.33 --branch main --file C:\Releases\1.0.0.zip
 ```
 Creates a GitHub release for the specified repository, tag, branch, and asset file.
 
-
 ### 14. Creating a Pre-Release
 ```cmd
-nb.exe pre_release_create --repo userName/my-repo --tag 1.0.0 --branch main --file C:\Releases\1.0.0.zip
+nb.exe pre_release_create --repo userName/my-repo --tag 1.24.33 --branch main --file C:\Releases\1.0.0.zip
 ```
 Creates a GitHub pre-release for the specified repository, tag, branch, and asset file.
 
-
 ### 15. Downloading an Asset
 ```cmd
-nb.exe release_download --repo userName/my-repo --tag 1.0.0 --path C:\Downloads
+nb.exe release_download --repo userName/my-repo --tag 1.24.33 --path C:\Downloads
 ```
 Downloads an asset from the specified release to the given path.
 
-
 ### 16. Creating a Release with Full GitHub URL
 ```cmd
-nb.exe release_create --repo https://github.com/userName/my-repo --tag 1.0.0 --branch main --file C:\Releases\1.0.0.zip
+nb.exe release_create --repo https://github.com/userName/my-repo --tag 1.24.33 --branch main --file C:\Releases\1.0.0.zip
 ```
-
+Creates a GitHub release using the full GitHub repository URL.
 
 ### 17. Downloading an Asset with Full GitHub URL
 ```cmd
-nb.exe release_download --repo https://github.com/userName/my-repo --tag 1.0.0 --path C:\Downloads
+nb.exe release_download --repo https://github.com/userName/my-repo --tag 1.24.33 --path C:\Downloads
 ```
-
+Downloads an asset using the full GitHub repository URL.
 
 ### 18. List Latest Releases
 ```cmd
-nb.exe list_release --repo https://github.com/userName/my-repo
+nb.exe list_release --repo https://github.com/userName/my-repo --verbose
 ```
-Lists the latest 3 releases and the newest pre-release (if newer than the latest release).
+Lists the latest 3 releases and the newest pre-release (if newer than the latest release). Use `--verbose` for detailed output.
+
+### 19. List Build Targets
+```cmd
+nb.exe targets
+```
+Lists all available build targets for the current solution or project.
+
+### 20. Run Any Listed Target
+```cmd
+nb.exe core
+```
+Runs the target named `core` if it is listed by `nb targets`.
 
 ---
 

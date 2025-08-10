@@ -94,9 +94,9 @@ namespace nb
             var gitSetTagCommand = new System.CommandLine.Command("git_settag",
                 "Sets a git tag in the local repository.\n\n" +
                 "Required option:\n" +
-                "  --tag   The tag to set (e.g., v1.24.33)\n\n" +
+                "  --tag   The tag to set (e.g., 1.24.33)\n\n" +
                 "Example:\n" +
-                "  nb git_settag --tag v1.24.33\n");
+                "  nb git_settag --tag 1.24.33\n");
             var tagOption = new System.CommandLine.Option<string>("--tag", "Tag to set (e.g., v1.24.33)")
             {
                 IsRequired = true
@@ -195,9 +195,9 @@ namespace nb
             var gitDeleteTagCommand = new System.CommandLine.Command("git_deletetag",
                 "Deletes a git tag from the local repository.\n\n" +
                 "Required option:\n" +
-                "  --tag   The tag to delete (e.g., v1.24.33)\n\n" +
+                "  --tag   The tag to delete (e.g., 1.24.33)\n\n" +
                 "Example:\n" +
-                "  nb git_deletetag --tag v1.24.33\n");
+                "  nb git_deletetag --tag 1.24.33\n");
             var tagOption = new System.CommandLine.Option<string>("--tag", "Tag to delete (e.g., v1.24.33)")
             {
                 IsRequired = true
@@ -216,12 +216,12 @@ namespace nb
                 "Creates a GitHub release.\n\n" +
                 "Required options:\n" +
                 "  --repo   Git repository (formats: repoName, userName/repoName, or full GitHub URL)\n" +
-                "  --tag    Tag to use for the release (e.g., v1.24.33)\n" +
+                "  --tag    Tag to use for the release (e.g., 1.24.33)\n" +
                 "  --branch Branch name to release from (e.g., main)\n" +
                 "  --file   Asset file name (full path required)\n\n" +
                 "Examples:\n" +
-                "  nb release_create --repo user/repo --tag v1.24.33 --branch main --file C:\\path\\to\\asset.zip\n" +
-                "  nb release_create --repo https://github.com/user/repo --tag v1.24.33 --branch main --file ./asset.zip\n");
+                "  nb release_create --repo user/repo --tag 1.24.33 --branch main --file C:\\path\\to\\asset.zip\n" +
+                "  nb release_create --repo https://github.com/user/repo --tag 1.24.33 --branch main --file ./asset.zip\n");
             var repoOption = new System.CommandLine.Option<string>("--repo",
                 "Git repository. Accepts:\n  - repoName (uses OWNER env variable)\n  - userName/repoName\n  - Full GitHub URL (https://github.com/userName/repoName)")
             {
@@ -257,11 +257,11 @@ namespace nb
                 "Creates a GitHub pre-release.\n\n" +
                 "Required options:\n" +
                 "  --repo   Git repository (formats: repoName, userName/repoName, or full GitHub URL)\n" +
-                "  --tag    Tag to use for the pre-release (e.g., v1.24.33)\n" +
+                "  --tag    Tag to use for the pre-release (e.g., 1.24.33)\n" +
                 "  --branch Branch name to release from (e.g., main)\n" +
                 "  --file   Asset file name (full path required)\n\n" +
                 "Example:\n" +
-                "  nb pre_release_create --repo user/repo --tag v1.24.33 --branch main --file C:\\path\\to\\asset.zip\n"
+                "  nb pre_release_create --repo user/repo --tag 1.24.33 --branch main --file C:\\path\\to\\asset.zip\n"
             );
             var repoOption = new System.CommandLine.Option<string>("--repo", "Specifies the Git repository in any of the following formats:\n- repoName  (UserName is declared the `OWNER` environment variable)\n- userName/repoName\n- https://github.com/userName/repoName (Full URL to the repository on GitHub)")
             {
@@ -297,11 +297,11 @@ namespace nb
                 "Downloads a specific asset from a GitHub release.\n\n" +
                 "Required options:\n" +
                 "  --repo   Git repository (formats: repoName, userName/repoName, or full GitHub URL)\n" +
-                "  --tag    Tag to use for the release (e.g., v1.24.33)\n" +
+                "  --tag    Tag to use for the release (e.g., 1.24.33)\n" +
                 "Optional option:\n" +
                 "  --path   Path to download asset to (default: current directory)\n\n" +
                 "Example:\n" +
-                "  nb release_download --repo user/repo --tag v1.24.33 --path C:\\downloads\n"
+                "  nb release_download --repo user/repo --tag 1.24.33 --path C:\\downloads\n"
             );
             var repoOption = new System.CommandLine.Option<string>("--repo", "Specifies the Git repository in any of the following formats:\n- repoName  (UserName is declared the `OWNER` environment variable)\n- userName/repoName\n- https://github.com/userName/repoName (Full URL to the repository on GitHub)")
             {
