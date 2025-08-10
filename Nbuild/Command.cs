@@ -839,9 +839,9 @@ namespace Nbuild
             return pathSegments.Contains(nbuildApp.InstallPath, StringComparer.OrdinalIgnoreCase);
         }
 
-        internal static ResultHelper DisplayPathSegments()
+        public static ResultHelper DisplayPathSegments()
         {
-            var path = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine) ?? string.Empty;
+            var path = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User) ?? string.Empty;
             var pathSegments = RemoveDuplicatePathSegments(path);
             ConsoleHelper.WriteLine($"PATH Segments:", ConsoleColor.Yellow);
             foreach (var segment in pathSegments)
@@ -873,7 +873,7 @@ namespace Nbuild
 
             // Add the renewed segments to the PATH environment variable
             var renewedPath = string.Join(';', uniqueSegments);
-            Environment.SetEnvironmentVariable("PATH", renewedPath, EnvironmentVariableTarget.Machine);
+            Environment.SetEnvironmentVariable("PATH", renewedPath, EnvironmentVariableTarget.User);
             return uniqueSegments;
         }
 
@@ -898,7 +898,7 @@ namespace Nbuild
         /// Sets a tag in the current git repository.
         /// </summary>
         /// <param name="tag">The string representing the tag to set.</param>    
-        public static ResultHelper SetTag(string? tag)
+        public static ResultHelper SetTag(string? tag, bool verbose = false)
         {
             var gitWrapper = new GitWrapper();
             // Project and branch required

@@ -36,6 +36,7 @@ public class BuildStarter
         // check if target is valid
         if (!ValidTarget(target, verbose))
         {
+            ConsoleHelper.WriteLine($"Target '{target}' not found");
             return ResultHelper.Fail(-1, $"Target '{target}' not found");
         }
 
