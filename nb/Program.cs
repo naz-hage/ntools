@@ -27,6 +27,22 @@ namespace nb
             AddReleaseDownloadCommand(rootCommand);
             AddListReleaseCommand(rootCommand);
             AddTargetsCommand(rootCommand);
+            rootCommand.TreatUnmatchedTokensAsErrors = false;
+            rootCommand.SetHandler((System.CommandLine.Invocation.InvocationContext ctx) => {
+                var unmatched = ctx.ParseResult.UnmatchedTokens;
+                if (unmatched.Count == 1)
+                {
+                    var target = unmatched[0];
+                    ConsoleHelper.WriteLine($"Executing target: {target}", ConsoleColor.Green);
+                    var resultHelper = BuildStarter.Build(target, false);
+                    Environment.ExitCode = resultHelper.Code;
+                }
+                else if (unmatched.Count > 1)
+                {
+                    Console.Error.WriteLine($"Unknown command or too many arguments: {string.Join(' ', unmatched)}");
+                    Environment.ExitCode = 1;
+                }
+            });
             return rootCommand.Invoke(args);
         }
 
