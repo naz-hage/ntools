@@ -65,7 +65,7 @@ namespace nb
 
     private static void AddPathCommand(System.CommandLine.RootCommand rootCommand)
         {
-            var cmd = new System.CommandLine.Command("path", "Display path segments");
+            var cmd = new System.CommandLine.Command("path", "Display each segment of your PATH environment variable on a separate line. Similar to 'echo %PATH%'.");
             cmd.SetHandler(() => {
                 var result = Nbuild.Command.DisplayPathSegments();
                 Environment.ExitCode = result.Code;
@@ -75,7 +75,12 @@ namespace nb
 
     private static void AddGitInfoCommand(System.CommandLine.RootCommand rootCommand)
         {
-            var gitInfoCommand = new System.CommandLine.Command("git_info", "Displays the current git information for the local repository");
+            var gitInfoCommand = new System.CommandLine.Command(
+                "git_info",
+                "Displays the current git information for the local repository, including branch, and latest tag.\n\n" +
+                "Example:\n" +
+                "  nb git_info\n"
+            );
             gitInfoCommand.SetHandler(() => {
                 var exitCode = HandleGitInfoCommand();
                 Environment.ExitCode = exitCode;
@@ -86,8 +91,13 @@ namespace nb
 
     private static void AddGitSetTagCommand(System.CommandLine.RootCommand rootCommand)
         {
-            var gitSetTagCommand = new System.CommandLine.Command("git_settag", "Sets the specified tag using the --tag option");
-            var tagOption = new System.CommandLine.Option<string>("--tag", "Specifies the tag used")
+            var gitSetTagCommand = new System.CommandLine.Command("git_settag",
+                "Sets a git tag in the local repository.\n\n" +
+                "Required option:\n" +
+                "  --tag   The tag to set (e.g., v1.24.33)\n\n" +
+                "Example:\n" +
+                "  nb git_settag --tag v1.24.33\n");
+            var tagOption = new System.CommandLine.Option<string>("--tag", "Tag to set (e.g., v1.24.33)")
             {
                 IsRequired = true
             };
@@ -101,7 +111,12 @@ namespace nb
 
     private static void AddGitAutoTagCommand(System.CommandLine.RootCommand rootCommand)
         {
-            var gitAutoTagCommand = new System.CommandLine.Command("git_autotag", "Sets the next tag based on the build type: STAGE or PROD");
+            var gitAutoTagCommand = new System.CommandLine.Command("git_autotag",
+                "Automatically sets the next git tag based on build type.\n\n" +
+                "Required option:\n" +
+                "  --buildtype   Build type (STAGE or PROD)\n\n" +
+                "Example:\n" +
+                "  nb git_autotag --buildtype STAGE\n");
             gitAutoTagCommand.AddAlias("auto_tag");
             var buildTypeOption = new System.CommandLine.Option<string>("--buildtype", "Specifies the build type used for this command. Possible values: STAGE, PROD")
             {
@@ -117,7 +132,12 @@ namespace nb
 
     private static void AddGitPushAutoTagCommand(System.CommandLine.RootCommand rootCommand)
         {
-            var gitPushAutoTagCommand = new System.CommandLine.Command("git_push_autotag", "Sets the next tag based on the build type and pushes to the remote repository");
+            var gitPushAutoTagCommand = new System.CommandLine.Command("git_push_autotag",
+                "Sets the next git tag based on build type and pushes to remote.\n\n" +
+                "Required option:\n" +
+                "  --buildtype   Build type (STAGE or PROD)\n\n" +
+                "Example:\n" +
+                "  nb git_push_autotag --buildtype PROD\n");
             var buildTypeOption = new System.CommandLine.Option<string>("--buildtype", "Specifies the build type used for this command. Possible values: STAGE, PROD")
             {
                 IsRequired = true
@@ -132,7 +152,10 @@ namespace nb
 
     private static void AddGitBranchCommand(System.CommandLine.RootCommand rootCommand)
         {
-            var gitBranchCommand = new System.CommandLine.Command("git_branch", "Displays the current git branch in the local repository");
+            var gitBranchCommand = new System.CommandLine.Command("git_branch",
+                "Displays the current git branch in the local repository.\n\n" +
+                "Example:\n" +
+                "  nb git_branch\n");
             gitBranchCommand.SetHandler(() => {
                 var exitCode = HandleGitBranchCommand();
                 Environment.ExitCode = exitCode;
@@ -142,7 +165,15 @@ namespace nb
 
     private static void AddGitCloneCommand(System.CommandLine.RootCommand rootCommand)
         {
-            var gitCloneCommand = new System.CommandLine.Command("git_clone", "Clones the specified Git repository using the --url option");
+            var gitCloneCommand = new System.CommandLine.Command("git_clone",
+                "Clones a Git repository to a specified path.\n\n" +
+                "Required option:\n" +
+                "  --url   Git repository URL\n" +
+                "Optional options:\n" +
+                "  --path      Path to clone into (default: current directory)\n" +
+                "  --verbose   Verbose output\n\n" +
+                "Example:\n" +
+                "  nb git_clone --url https://github.com/user/repo --path ./repo\n");
             var urlOption = new System.CommandLine.Option<string>("--url", "Specifies the Git repository URL")
             {
                 IsRequired = true
@@ -161,8 +192,13 @@ namespace nb
 
     private static void AddGitDeleteTagCommand(System.CommandLine.RootCommand rootCommand)
         {
-            var gitDeleteTagCommand = new System.CommandLine.Command("git_deletetag", "Deletes the specified tag using the --tag option");
-            var tagOption = new System.CommandLine.Option<string>("--tag", "Specifies the tag used")
+            var gitDeleteTagCommand = new System.CommandLine.Command("git_deletetag",
+                "Deletes a git tag from the local repository.\n\n" +
+                "Required option:\n" +
+                "  --tag   The tag to delete (e.g., v1.24.33)\n\n" +
+                "Example:\n" +
+                "  nb git_deletetag --tag v1.24.33\n");
+            var tagOption = new System.CommandLine.Option<string>("--tag", "Tag to delete (e.g., v1.24.33)")
             {
                 IsRequired = true
             };
@@ -176,8 +212,18 @@ namespace nb
 
     private static void AddReleaseCreateCommand(System.CommandLine.RootCommand rootCommand)
         {
-            var releaseCreateCommand = new System.CommandLine.Command("release_create", "Creates a GitHub release. Requires --repo, --tag, --branch, and --file options");
-            var repoOption = new System.CommandLine.Option<string>("--repo", "Specifies the Git repository in any of the following formats:\n- repoName  (UserName is declared the `OWNER` environment variable)\n- userName/repoName\n- https://github.com/userName/repoName (Full URL to the repository on GitHub)")
+            var releaseCreateCommand = new System.CommandLine.Command("release_create",
+                "Creates a GitHub release.\n\n" +
+                "Required options:\n" +
+                "  --repo   Git repository (formats: repoName, userName/repoName, or full GitHub URL)\n" +
+                "  --tag    Tag to use for the release (e.g., v1.24.33)\n" +
+                "  --branch Branch name to release from (e.g., main)\n" +
+                "  --file   Asset file name (full path required)\n\n" +
+                "Examples:\n" +
+                "  nb release_create --repo user/repo --tag v1.24.33 --branch main --file C:\\path\\to\\asset.zip\n" +
+                "  nb release_create --repo https://github.com/user/repo --tag v1.24.33 --branch main --file ./asset.zip\n");
+            var repoOption = new System.CommandLine.Option<string>("--repo",
+                "Git repository. Accepts:\n  - repoName (uses OWNER env variable)\n  - userName/repoName\n  - Full GitHub URL (https://github.com/userName/repoName)")
             {
                 IsRequired = true
             };
@@ -206,7 +252,17 @@ namespace nb
 
     private static void AddPreReleaseCreateCommand(System.CommandLine.RootCommand rootCommand)
         {
-            var preReleaseCreateCommand = new System.CommandLine.Command("pre_release_create", "Creates a GitHub pre-release. Requires --repo, --tag, --branch, and --file options");
+            var preReleaseCreateCommand = new System.CommandLine.Command(
+                "pre_release_create",
+                "Creates a GitHub pre-release.\n\n" +
+                "Required options:\n" +
+                "  --repo   Git repository (formats: repoName, userName/repoName, or full GitHub URL)\n" +
+                "  --tag    Tag to use for the pre-release (e.g., v1.24.33)\n" +
+                "  --branch Branch name to release from (e.g., main)\n" +
+                "  --file   Asset file name (full path required)\n\n" +
+                "Example:\n" +
+                "  nb pre_release_create --repo user/repo --tag v1.24.33 --branch main --file C:\\path\\to\\asset.zip\n"
+            );
             var repoOption = new System.CommandLine.Option<string>("--repo", "Specifies the Git repository in any of the following formats:\n- repoName  (UserName is declared the `OWNER` environment variable)\n- userName/repoName\n- https://github.com/userName/repoName (Full URL to the repository on GitHub)")
             {
                 IsRequired = true
@@ -236,7 +292,17 @@ namespace nb
 
     private static void AddReleaseDownloadCommand(System.CommandLine.RootCommand rootCommand)
         {
-            var releaseDownloadCommand = new System.CommandLine.Command("release_download", "Downloads a specific asset from a GitHub release. Requires --repo, --tag, and --path (optional, defaults to current directory)");
+            var releaseDownloadCommand = new System.CommandLine.Command(
+                "release_download",
+                "Downloads a specific asset from a GitHub release.\n\n" +
+                "Required options:\n" +
+                "  --repo   Git repository (formats: repoName, userName/repoName, or full GitHub URL)\n" +
+                "  --tag    Tag to use for the release (e.g., v1.24.33)\n" +
+                "Optional option:\n" +
+                "  --path   Path to download asset to (default: current directory)\n\n" +
+                "Example:\n" +
+                "  nb release_download --repo user/repo --tag v1.24.33 --path C:\\downloads\n"
+            );
             var repoOption = new System.CommandLine.Option<string>("--repo", "Specifies the Git repository in any of the following formats:\n- repoName  (UserName is declared the `OWNER` environment variable)\n- userName/repoName\n- https://github.com/userName/repoName (Full URL to the repository on GitHub)")
             {
                 IsRequired = true
@@ -261,7 +327,16 @@ namespace nb
 
     private static void AddListReleaseCommand(System.CommandLine.RootCommand rootCommand)
         {
-            var listReleaseCommand = new System.CommandLine.Command("list_release", "Lists latest 3 releases for the specified repository (and latest pre-release if newer). Requires ----repo");
+            var listReleaseCommand = new System.CommandLine.Command(
+                "list_release",
+                "Lists the latest 3 releases for the specified repository, and the latest pre-release if newer.\n\n" +
+                "Required option:\n" +
+                "  --repo   Git repository (formats: repoName, userName/repoName, or full GitHub URL)\n" +
+                "Optional option:\n" +
+                "  --verbose   Verbose output\n\n" +
+                "Example:\n" +
+                "  nb list_release --repo user/repo --verbose\n"
+            );
             var repoOption = new System.CommandLine.Option<string>("--repo", "Specifies the Git repository in any of the following formats:\n- repoName  (UserName is declared the `OWNER` environment variable)\n- userName/repoName\n- https://github.com/userName/repoName (Full URL to the repository on GitHub)")
             {
                 IsRequired = true
@@ -278,7 +353,15 @@ namespace nb
 
     private static void AddTargetsCommand(System.CommandLine.RootCommand rootCommand)
         {
-            var cmd = new System.CommandLine.Command("targets", "Display build targets");
+            var cmd = new System.CommandLine.Command(
+                "targets",
+                "Displays all available build targets for the current solution or project.\n\n" +
+                "You can run any listed target directly using nb.exe.\n" +
+                "Example: If 'core' is listed, you can run:\n" +
+                "  nb core\n\n" +
+                "To list all targets:\n" +
+                "  nb targets\n"
+            );
             cmd.SetHandler(() => {
                 var result = Nbuild.BuildStarter.DisplayTargets(Environment.CurrentDirectory);
                 Environment.ExitCode = result.Code;
