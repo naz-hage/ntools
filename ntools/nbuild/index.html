@@ -68,17 +68,17 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#command-examples">Command Examples</a>
         <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#1-list-installed-applications">1. List Installed Applications</a>
+    <li class="toctree-l3"><a class="reference internal" href="#1-install-applications">1. Install Applications</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#2-download-applications">2. Download Applications</a>
+    <li class="toctree-l3"><a class="reference internal" href="#2-uninstall-applications">2. Uninstall Applications</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#3-install-and-uninstall-applications">3. Install and Uninstall Applications</a>
+    <li class="toctree-l3"><a class="reference internal" href="#3-list-installed-applications">3. List Installed Applications</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#4-display-git-information">4. Display Git Information</a>
+    <li class="toctree-l3"><a class="reference internal" href="#4-download-applications">4. Download Applications</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#5-run-a-build-target">5. Run a Build Target</a>
+    <li class="toctree-l3"><a class="reference internal" href="#5-display-path-segments">5. Display Path Segments</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#6-list-nbuild-targets">6. List nbuild targets</a>
+    <li class="toctree-l3"><a class="reference internal" href="#6-display-git-information">6. Display Git Information</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#7-set-a-specific-git-tag">7. Set a Specific Git Tag</a>
     </li>
@@ -103,6 +103,10 @@
     <li class="toctree-l3"><a class="reference internal" href="#17-downloading-an-asset-with-full-github-url">17. Downloading an Asset with Full GitHub URL</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#18-list-latest-releases">18. List Latest Releases</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#19-list-build-targets">19. List Build Targets</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#20-run-any-listed-target">20. Run Any Listed Target</a>
     </li>
         </ul>
     </li>
@@ -197,23 +201,23 @@ Options:
   -?, -h, --help  Show help and usage information
 
 Commands:
-  install             Install tools from a JSON manifest
-  uninstall           Uninstall tools from a JSON manifest
-  list                List all tools and their versions
-  download            Download tools from a JSON manifest
-  path                Display path segments
-  git_info            Display current git info
-  git_settag          Set a git tag
-  git_autotag         Set the next git tag (STAGE or PROD)
-  git_push_autotag    Set and push the next git tag
-  git_branch          Display the current git branch
-  git_clone           Clone a git repository
-  git_deletetag       Delete a git tag
-  release_create      Create a GitHub release
-  pre_release_create  Create a GitHub pre-release
-  release_download    Download a release asset from GitHub
-  list_release        List latest releases for a repository
-  targets             Display build targets
+  install             Install tools and applications specified in the manifest file.
+  uninstall           Uninstall tools and applications specified in the manifest file.
+  list                Display a formatted table of all tools and their versions.
+  download            Download tools and applications specified in the manifest file.
+  path                Display each segment of your PATH environment variable on a separate line.
+  git_info            Displays the current git information for the local repository, including branch and latest tag.
+  git_settag          Sets a git tag in the local repository. Required: --tag
+  git_autotag         Automatically sets the next git tag based on build type. Required: --buildtype (STAGE or PROD)
+  git_push_autotag    Sets the next git tag based on build type and pushes to remote. Required: --buildtype (STAGE or PROD)
+  git_branch          Displays the current git branch in the local repository.
+  git_clone           Clones a Git repository to a specified path. Required: --url; Optional: --path, --verbose
+  git_deletetag       Deletes a git tag from the local repository. Required: --tag
+  release_create      Creates a GitHub release. Required: --repo, --tag, --branch, --file
+  pre_release_create  Creates a GitHub pre-release. Required: --repo, --tag, --branch, --file
+  release_download    Downloads a specific asset from a GitHub release. Required: --repo, --tag; Optional: --path
+  list_release        Lists the latest 3 releases for the specified repository, and the latest pre-release if newer. Required: --repo; Optional: --verbose
+  targets             Displays all available build targets for the current solution or project. You can run any listed target directly using nb.exe (e.g., nb core)
 </code></pre>
 <blockquote>
 <p><strong>Tip:</strong> If the <code>--json</code> option is not specified, the default manifest file <code>C:\Program Files\NBuild\ntools.json</code> is used.</p>
@@ -311,78 +315,87 @@ Commands:
 <hr />
 <h2 id="command-examples">Command Examples</h2>
 <p>Below are practical examples for using <code>nb.exe</code>. These examples assume you are running in a PowerShell terminal.</p>
-<h3 id="1-list-installed-applications">1. List Installed Applications</h3>
+<h3 id="1-install-applications">1. Install Applications</h3>
+<pre><code class="language-cmd">nb.exe install --json &quot;C:\Program Files\tools.json&quot;
+</code></pre>
+<p>Installs applications specified in the manifest file. (Requires admin privileges.)</p>
+<h3 id="2-uninstall-applications">2. Uninstall Applications</h3>
+<pre><code class="language-cmd">nb.exe uninstall --json &quot;C:\Program Files\example-tool.json&quot;
+</code></pre>
+<p>Uninstalls applications as specified in the manifest file. (Requires admin privileges.)</p>
+<h3 id="3-list-installed-applications">3. List Installed Applications</h3>
 <pre><code class="language-cmd">nb.exe list
 nb.exe list --json &quot;C:\Program Files\NBuild\ntools.json&quot;
 </code></pre>
 <p>Lists all applications specified in the provided JSON file. If no <code>--json</code> option is specified, the default file is used.</p>
-<h3 id="2-download-applications">2. Download Applications</h3>
+<h3 id="4-download-applications">4. Download Applications</h3>
 <pre><code class="language-cmd">nb.exe download --json &quot;C:\Program Files\NBuild\ntools.json&quot;
 </code></pre>
 <p>Downloads tools and applications specified in the manifest file.</p>
-<h3 id="3-install-and-uninstall-applications">3. Install and Uninstall Applications</h3>
-<pre><code class="language-cmd">nb.exe install --json &quot;C:\Program Files\tools.json&quot;
-nb.exe uninstall --json &quot;C:\Program Files\example-tool.json&quot;
+<h3 id="5-display-path-segments">5. Display Path Segments</h3>
+<pre><code class="language-cmd">nb.exe path
 </code></pre>
-<p>Installs or uninstalls applications as specified in the manifest file. (Requires admin privileges.)</p>
-<h3 id="4-display-git-information">4. Display Git Information</h3>
+<p>Displays each segment of your PATH environment variable on a separate line.</p>
+<h3 id="6-display-git-information">6. Display Git Information</h3>
 <pre><code class="language-cmd">nb.exe git_info
 </code></pre>
-<p>Displays the current Git branch and tag information for the local repository.</p>
-<h3 id="5-run-a-build-target">5. Run a Build Target</h3>
-<pre><code class="language-cmd">nb.exe stage --verbose true
-</code></pre>
-<p>Runs the <code>stage</code> target defined in the nbuild.targets file with verbose output enabled.</p>
-<h3 id="6-list-nbuild-targets">6. List nbuild targets</h3>
-<pre><code class="language-cmd">nb.exe targets
-</code></pre>
-<p>Lists all available build targets defined in the nbuild.targets file.</p>
+<p>Displays the current git branch and latest tag information for the local repository.</p>
 <h3 id="7-set-a-specific-git-tag">7. Set a Specific Git Tag</h3>
-<pre><code class="language-cmd">nb.exe git_settag --tag 1.0.0
+<pre><code class="language-cmd">nb.exe git_settag --tag 1.24.33
 </code></pre>
-<p>Sets the specified Git tag (<code>1.0.0</code>) in the local repository.</p>
+<p>Sets the specified git tag in the local repository.</p>
 <h3 id="8-automatically-set-the-next-git-tag">8. Automatically Set the Next Git Tag</h3>
-<pre><code class="language-cmd">nb.exe git_autotag --buildtype stage
+<pre><code class="language-cmd">nb.exe git_autotag --buildtype STAGE
 </code></pre>
-<p>Automatically generates and sets the next Git tag based on the specified build type (<code>stage</code> or <code>prod</code>).</p>
+<p>Automatically sets the next git tag based on the specified build type (<code>STAGE</code> or <code>PROD</code>).</p>
 <h3 id="9-push-the-next-git-tag-to-remote">9. Push the Next Git Tag to Remote</h3>
-<pre><code class="language-cmd">nb.exe git_push_autotag --buildtype prod
+<pre><code class="language-cmd">nb.exe git_push_autotag --buildtype PROD
 </code></pre>
-<p>Automatically generates the next Git tag based on the specified build type (<code>prod</code>) and pushes it to the remote repository.</p>
+<p>Sets the next git tag based on build type and pushes it to the remote repository.</p>
 <h3 id="10-display-the-current-git-branch">10. Display the Current Git Branch</h3>
 <pre><code class="language-cmd">nb.exe git_branch
 </code></pre>
-<p>Displays the current Git branch in the local repository.</p>
+<p>Displays the current git branch in the local repository.</p>
 <h3 id="11-clone-a-git-repository">11. Clone a Git Repository</h3>
-<pre><code class="language-cmd">nb.exe git_clone --url https://github.com/example/repo --path C:\Projects
+<pre><code class="language-cmd">nb.exe git_clone --url https://github.com/example/repo --path C:\Projects --verbose
 </code></pre>
-<p>Clones the specified Git repository into the specified path.</p>
+<p>Clones the specified git repository into the specified path. Use <code>--verbose</code> for detailed output.</p>
 <h3 id="12-delete-a-specific-tag">12. Delete a Specific Tag</h3>
-<pre><code class="language-cmd">nb.exe git_deletetag --tag 1.0.0
+<pre><code class="language-cmd">nb.exe git_deletetag --tag 1.24.33
 </code></pre>
-<p>Deletes the specified Git tag.</p>
+<p>Deletes the specified git tag from the local repository.</p>
 <h3 id="13-creating-a-release">13. Creating a Release</h3>
-<pre><code class="language-cmd">nb.exe release_create --repo userName/my-repo --tag 1.0.0 --branch main --file C:\Releases\1.0.0.zip
+<pre><code class="language-cmd">nb.exe release_create --repo userName/my-repo --tag 1.24.33 --branch main --file C:\Releases\1.0.0.zip
 </code></pre>
 <p>Creates a GitHub release for the specified repository, tag, branch, and asset file.</p>
 <h3 id="14-creating-a-pre-release">14. Creating a Pre-Release</h3>
-<pre><code class="language-cmd">nb.exe pre_release_create --repo userName/my-repo --tag 1.0.0 --branch main --file C:\Releases\1.0.0.zip
+<pre><code class="language-cmd">nb.exe pre_release_create --repo userName/my-repo --tag 1.24.33 --branch main --file C:\Releases\1.0.0.zip
 </code></pre>
 <p>Creates a GitHub pre-release for the specified repository, tag, branch, and asset file.</p>
 <h3 id="15-downloading-an-asset">15. Downloading an Asset</h3>
-<pre><code class="language-cmd">nb.exe release_download --repo userName/my-repo --tag 1.0.0 --path C:\Downloads
+<pre><code class="language-cmd">nb.exe release_download --repo userName/my-repo --tag 1.24.33 --path C:\Downloads
 </code></pre>
 <p>Downloads an asset from the specified release to the given path.</p>
 <h3 id="16-creating-a-release-with-full-github-url">16. Creating a Release with Full GitHub URL</h3>
-<pre><code class="language-cmd">nb.exe release_create --repo https://github.com/userName/my-repo --tag 1.0.0 --branch main --file C:\Releases\1.0.0.zip
+<pre><code class="language-cmd">nb.exe release_create --repo https://github.com/userName/my-repo --tag 1.24.33 --branch main --file C:\Releases\1.0.0.zip
 </code></pre>
+<p>Creates a GitHub release using the full GitHub repository URL.</p>
 <h3 id="17-downloading-an-asset-with-full-github-url">17. Downloading an Asset with Full GitHub URL</h3>
-<pre><code class="language-cmd">nb.exe release_download --repo https://github.com/userName/my-repo --tag 1.0.0 --path C:\Downloads
+<pre><code class="language-cmd">nb.exe release_download --repo https://github.com/userName/my-repo --tag 1.24.33 --path C:\Downloads
 </code></pre>
+<p>Downloads an asset using the full GitHub repository URL.</p>
 <h3 id="18-list-latest-releases">18. List Latest Releases</h3>
-<pre><code class="language-cmd">nb.exe list_release --repo https://github.com/userName/my-repo
+<pre><code class="language-cmd">nb.exe list_release --repo https://github.com/userName/my-repo --verbose
 </code></pre>
-<p>Lists the latest 3 releases and the newest pre-release (if newer than the latest release).</p>
+<p>Lists the latest 3 releases and the newest pre-release (if newer than the latest release). Use <code>--verbose</code> for detailed output.</p>
+<h3 id="19-list-build-targets">19. List Build Targets</h3>
+<pre><code class="language-cmd">nb.exe targets
+</code></pre>
+<p>Lists all available build targets for the current solution or project.</p>
+<h3 id="20-run-any-listed-target">20. Run Any Listed Target</h3>
+<pre><code class="language-cmd">nb.exe core
+</code></pre>
+<p>Runs the target named <code>core</code> if it is listed by <code>nb targets</code>.</p>
 <hr />
 <h2 id="troubleshooting">Troubleshooting</h2>
 <ul>
