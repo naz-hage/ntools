@@ -306,7 +306,7 @@ function InstallNtools {
         # 
         if (Test-Path -Path $NtoolsJsonPath) {
             try {
-                $NtoolsJson = Get-Content -Path $NtoolsJsonPath -Raw | ConvertFrom--json
+                $NtoolsJson = Get-Content -Path $NtoolsJsonPath -Raw | ConvertFrom-json
                 $Version = $NtoolsJson.NbuildAppList[0].Version
                 Write-Host "Version read from ntools.json: $Version"
             }
