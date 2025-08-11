@@ -30,13 +30,13 @@
 .EXAMPLE
     Import-Module ./install.psm1
     PrepareDownloadsDirectory -directory "C:\NToolsDownloads"
-    $appInfo = GetAppInfo -json "C:\NToolsDownloads\ntools.json"
-    $isInstalled = CheckIfAppInstalled -json "C:\NToolsDownloads\ntools.json"
-    Install -json "C:\NToolsDownloads\ntools.json"
+    $appInfo = GetAppInfo --json "C:\NToolsDownloads\ntools.json"
+    $isInstalled = CheckIfAppInstalled --json "C:\NToolsDownloads\ntools.json"
+    Install --json "C:\NToolsDownloads\ntools.json"
     SetDevEnvironmentVariables -devDrive "D:" -mainDir "C:\MainDir"
     InstallDotNetCore -dotnetVersion "3.1.0"
 
-    MainInstallApp -command install -json "C:\NToolsDownloads\ntools.json"
+    MainInstallApp -command install --json "C:\NToolsDownloads\ntools.json"
     
     SetDevEnvironmentVariables -devDrive "D:" -mainDir "C:\MainDir"
     Write-OutputMessage -Prefix "Info" -Message "Installation completed successfully."
@@ -75,10 +75,10 @@ function GetAppInfo {
     # read file git.json and convert to json object
     $json = Get-Content -Path $jsonFile -Raw
     
-    # $config = $json | ConvertFrom-Json
+    # $config = $json | ConvertFrom--json
     # Retrieve elements using dot notation
 
-    $config = $json | ConvertFrom-Json | Select-Object -ExpandProperty NbuildAppList | Select-Object -First 1
+    $config = $json | ConvertFrom--json | Select-Object -ExpandProperty NbuildAppList | Select-Object -First 1
 
     $appInfo = @{
         Name = $config.Name
@@ -306,7 +306,7 @@ function InstallNtools {
         # 
         if (Test-Path -Path $NtoolsJsonPath) {
             try {
-                $NtoolsJson = Get-Content -Path $NtoolsJsonPath -Raw | ConvertFrom-Json
+                $NtoolsJson = Get-Content -Path $NtoolsJsonPath -Raw | ConvertFrom-json
                 $Version = $NtoolsJson.NbuildAppList[0].Version
                 Write-Host "Version read from ntools.json: $Version"
             }
