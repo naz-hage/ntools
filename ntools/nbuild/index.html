@@ -110,8 +110,6 @@
     </li>
         </ul>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#troubleshooting">Troubleshooting</a>
-    </li>
     </ul>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../lf/">lf (lf.exe)</a>
@@ -129,16 +127,15 @@
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../../nbuild-tasks-integration/">NBuild Tasks Integration</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../msbuild-tasks-test-coverage/">MSBuild Tasks Test Coverage</a>
+                  <li class="toctree-l1"><a class="" href="../../msbuild-tasks-test-coverage.md">MSBuild Tasks Test Coverage</a>
                   </li>
               </ul>
-              <p class="caption"><span class="caption-text">Pre-commit</span></p>
+              <p class="caption"><span class="caption-text">Developer setup</span></p>
               <ul>
                   <li class="toctree-l1"><a class="reference internal" href="../../pre-commit-setup/">Pre-commit Setup</a>
                   </li>
-              </ul>
-              <p class="caption"><span class="caption-text">Update</span></p>
-              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../version-automation-guide/">Version Automation Guide</a>
+                  </li>
                   <li class="toctree-l1"><a class="reference internal" href="../ntools/">Development Tools</a>
                   </li>
               </ul>
@@ -334,7 +331,7 @@ Additional Arguments:
 </blockquote>
 <hr />
 <h2 id="nbuildtargets">nbuild.targets</h2>
-<p>See <a href="../../setup/#nbuildtargets">nbuild.targets</a> for more information on how to create a <code>nbuild.targets</code> file.</p>
+<p>See <a href="https://github.com/naz-hage/ntools/blob/main/Nbuild/resources/nbuild.targets"><code>nbuild.targets</code></a> for more information and checkout other targets in <a href="https://github.com/naz-hage/ntools/blob/main/Nbuild/resources"><code>Nbuild/resources</code></a>.</p>
 <h3 id="commontargets">common.targets</h3>
 <ul>
 <li>The <code>common.targets</code> file includes all the defaults targets needed to build, test and deploy a solution.  The <code>common.targets</code> file is located in the <code>$(ProgramFiles)\Nbuild</code> folder.  The <code>nbuild.targets</code> file in the solution folder imports the <code>common.targets</code> file</li>
@@ -506,14 +503,6 @@ nb.exe list --json &quot;C:\Program Files\NBuild\ntools.json&quot;
 <pre><code class="language-cmd">nb.exe core
 </code></pre>
 <p>Runs the target named <code>core</code> if it is listed by <code>nb targets</code>.</p>
-<hr />
-<h2 id="troubleshooting">Troubleshooting</h2>
-<ul>
-<li><strong>Admin Privileges:</strong> Some commands (like install/uninstall) may require running your terminal as administrator.</li>
-<li><strong>Default Manifest:</strong> If you do not specify <code>--json</code>, the default manifest is <code>C:\Program Files\NBuild\ntools.json</code>.</li>
-<li><strong>Path with Spaces:</strong> Always wrap file paths with spaces in double quotes.</li>
-<li><strong>GitHub Authentication:</strong> For release-related commands, ensure you have the correct permissions and authentication set up for your GitHub account.</li>
-</ul>
 <hr />
               
             </div>

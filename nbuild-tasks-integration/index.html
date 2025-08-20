@@ -139,20 +139,17 @@
     </li>
         </ul>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#future-enhancements">Future Enhancements</a>
-    </li>
     </ul>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../msbuild-tasks-test-coverage/">MSBuild Tasks Test Coverage</a>
+                  <li class="toctree-l1"><a class="" href="../msbuild-tasks-test-coverage.md">MSBuild Tasks Test Coverage</a>
                   </li>
               </ul>
-              <p class="caption"><span class="caption-text">Pre-commit</span></p>
+              <p class="caption"><span class="caption-text">Developer setup</span></p>
               <ul>
                   <li class="toctree-l1"><a class="reference internal" href="../pre-commit-setup/">Pre-commit Setup</a>
                   </li>
-              </ul>
-              <p class="caption"><span class="caption-text">Update</span></p>
-              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../version-automation-guide/">Version Automation Guide</a>
+                  </li>
                   <li class="toctree-l1"><a class="reference internal" href="../ntools/ntools/">Development Tools</a>
                   </li>
               </ul>
@@ -355,47 +352,49 @@ dotnet build nbuild.targets -target:UPDATE_DOC_VERSIONS -target:SETUP_HOOKS
 <h2 id="troubleshooting">Troubleshooting</h2>
 <h3 id="common-issues">Common Issues</h3>
 <ol>
-<li><strong>Assembly not found errors</strong>:</li>
-<li>Ensure the solution is built in Release mode first</li>
+<li>
+<p><strong>Assembly not found errors</strong>:</p>
+</li>
+<li>
+<p>Ensure the solution is built in Release mode first</p>
+</li>
 <li>
 <p>Verify NbuildTasks.dll exists in the Release folder</p>
 </li>
 <li>
 <p><strong>Path resolution issues</strong>:</p>
 </li>
-<li>Check that SolutionDir property is correctly set</li>
+<li>
+<p>Check that SolutionDir property is correctly set</p>
+</li>
 <li>
 <p>Verify relative paths resolve correctly from build context</p>
 </li>
 <li>
 <p><strong>JSON parsing errors</strong>:</p>
 </li>
-<li>Ensure all JSON files in dev-setup are valid</li>
+<li>
+<p>Ensure all JSON files in dev-setup are valid</p>
+</li>
 <li>Check that JSON files follow the expected NbuildAppList structure</li>
 </ol>
 <h3 id="debug-information">Debug Information</h3>
 <p>Enable detailed logging by adding to your build command:</p>
 <pre><code class="language-bash">dotnet build nbuild.targets -target:UPDATE_DOC_VERSIONS -verbosity:detailed
 </code></pre>
-<p>This will show:
-- Which JSON files are being processed
-- Which tool versions are found
-- Which documentation entries are updated
-- Any warnings or errors encountered</p>
-<h2 id="future-enhancements">Future Enhancements</h2>
-<p>Potential improvements for the tasks:
-- <strong>Validation</strong>: Verify that all tools in documentation have corresponding JSON files
-- <strong>Reporting</strong>: Generate summary reports of version changes
-- <strong>Configuration</strong>: Support for custom mapping files
-- <strong>Integration</strong>: Automatic changelog generation based on version changes</p>
-<hr />
-<p><em>These MSBuild tasks provide a robust, integrated solution for maintaining documentation consistency within the ntools build system.</em></p>
+<p>This will show:</p>
+<ul>
+<li>Which JSON files are being processed</li>
+<li>Which tool versions are found</li>
+<li>Which documentation entries are updated</li>
+<li>Any warnings or errors encountered</li>
+</ul>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
         <a href="../ntools/nbuildtasks/" class="btn btn-neutral float-left" title="Nbuild Tasks"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../msbuild-tasks-test-coverage/" class="btn btn-neutral float-right" title="MSBuild Tasks Test Coverage">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../pre-commit-setup/" class="btn btn-neutral float-right" title="Pre-commit Setup">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -425,7 +424,7 @@ dotnet build nbuild.targets -target:UPDATE_DOC_VERSIONS -target:SETUP_HOOKS
       <span><a href="../ntools/nbuildtasks/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
-      <span><a href="../msbuild-tasks-test-coverage/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="../pre-commit-setup/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>

@@ -65,8 +65,6 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#adding-a-new-development-tool">Adding a New Development Tool</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#notes">Notes</a>
-    </li>
     </ul>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../buildtypes/">Build Types</a>
@@ -93,16 +91,15 @@
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../nbuild-tasks-integration/">NBuild Tasks Integration</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../msbuild-tasks-test-coverage/">MSBuild Tasks Test Coverage</a>
+                  <li class="toctree-l1"><a class="" href="../msbuild-tasks-test-coverage.md">MSBuild Tasks Test Coverage</a>
                   </li>
               </ul>
-              <p class="caption"><span class="caption-text">Pre-commit</span></p>
+              <p class="caption"><span class="caption-text">Developer setup</span></p>
               <ul>
                   <li class="toctree-l1"><a class="reference internal" href="../pre-commit-setup/">Pre-commit Setup</a>
                   </li>
-              </ul>
-              <p class="caption"><span class="caption-text">Update</span></p>
-              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../version-automation-guide/">Version Automation Guide</a>
+                  </li>
                   <li class="toctree-l1"><a class="reference internal" href="../ntools/ntools/">Development Tools</a>
                   </li>
               </ul>
@@ -263,10 +260,12 @@
 <hr />
 <h3 id="3-dev-setupps1">3. <code>dev-setup.ps1</code></h3>
 <p>This PowerShell script automates the installation of tools and sets up the development environment.</p>
-<p><strong>Key Responsibilities:</strong>
-- Installs ntools using ntools.json.
-- Installs other tools listed in apps.json.
-- Verifies administrative privileges before proceeding.</p>
+<p><strong>Key Responsibilities:</strong></p>
+<ul>
+<li>Installs ntools using ntools.json.</li>
+<li>Installs other tools listed in apps.json.</li>
+<li>Verifies administrative privileges before proceeding.</li>
+</ul>
 <p><strong>Example:</strong></p>
 <pre><code class="language-powershell"># Import the install module
 $url = &quot;https://raw.githubusercontent.com/naz-hage/ntools/main/dev-setup/install.psm1&quot;
@@ -327,25 +326,6 @@ Write-OutputMessage &quot;Completed installation script.&quot;
   &quot;AddToPath&quot;: true
 }
 </code></pre>
-<h2 id="notes">Notes</h2>
-<ol>
-<li><strong>Error Handling in <code>dev-setup.ps1</code>:</strong><ul>
-<li>What happens if a tool fails to install? Are there retries or logs generated?</li>
-</ul>
-</li>
-<li><strong>Environment Variables:</strong><ul>
-<li>Are there any required environment variables for <code>dev-setup.ps1</code> to work?</li>
-</ul>
-</li>
-<li><strong>Dependencies:</strong><ul>
-<li>Are there any dependencies for the tools listed in apps.json (e.g., PowerShell version)?</li>
-</ul>
-</li>
-<li><strong>Testing the Setup:</strong><ul>
-<li>How can users verify that the setup was successful?</li>
-</ul>
-</li>
-</ol>
               
             </div>
           </div><footer>

@@ -73,16 +73,15 @@
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../nbuild-tasks-integration/">NBuild Tasks Integration</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../msbuild-tasks-test-coverage/">MSBuild Tasks Test Coverage</a>
+                  <li class="toctree-l1"><a class="" href="../msbuild-tasks-test-coverage.md">MSBuild Tasks Test Coverage</a>
                   </li>
               </ul>
-              <p class="caption"><span class="caption-text">Pre-commit</span></p>
+              <p class="caption"><span class="caption-text">Developer setup</span></p>
               <ul>
                   <li class="toctree-l1"><a class="reference internal" href="../pre-commit-setup/">Pre-commit Setup</a>
                   </li>
-              </ul>
-              <p class="caption"><span class="caption-text">Update</span></p>
-              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../version-automation-guide/">Version Automation Guide</a>
+                  </li>
                   <li class="toctree-l1"><a class="reference internal" href="../ntools/ntools/">Development Tools</a>
                   </li>
               </ul>
@@ -116,21 +115,21 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <p>Once Ntools is installed, Open a Developer Command prompt for Visual Studio 2022 and navigate to your solution folder (i.e. <code>c:\source\ntools</code>).  The <a href="../ntools/nbuild/"><code>Nb.exe</code></a> is the main executable for the Ntools.  The following are some examples of how to use the Ntools:</p>
+                <p>Once Ntools is installed, Open a Developer Command prompt for Visual Studio 2022 and navigate to your solution folder (i.e. <code>c:\source\ntools</code>).  The <a href="../ntools/nbuild/"><code>nb.exe</code></a> is the main executable for the Ntools.  The following are some examples of how to use the Ntools:</p>
 <ul>
 <li>Build a solution: Compiles the solution in the solution directory</li>
 </ul>
-<pre><code class="language-cmd">Nb.exe solution
+<pre><code class="language-cmd">nb.exe solution
 </code></pre>
 <ul>
 <li>Clean a solution:  Deletes the release/Debug, bin and obj folders in the solution directory</li>
 </ul>
-<pre><code class="language-cmd">Nb.exe clean
+<pre><code class="language-cmd">nb.exe clean
 </code></pre>
 <ul>
 <li>Test solution: runs all the tests in the solution</li>
 </ul>
-<pre><code class="language-cmd">Nb.exe test
+<pre><code class="language-cmd">nb.exe test
 </code></pre>
 <ul>
 <li>Create a stage release: Creates a stage build which includes the following steps:<ul>
@@ -143,12 +142,12 @@
 </ul>
 </li>
 </ul>
-<pre><code class="language-cmd">Nb.exe stage
+<pre><code class="language-cmd">nb.exe stage
 </code></pre>
 <ul>
 <li>Display available targets:  Lists all the available targets in the targets file</li>
 </ul>
-<pre><code class="language-cmd">Nb.exe targets
+<pre><code class="language-cmd">nb.exe targets
 </code></pre>
 <ul>
 <li>See the list of available targets at <a href="../ntools/nbuild-targets/">Nbuild Targets</a></li>

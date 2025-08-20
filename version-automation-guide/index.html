@@ -5,14 +5,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="naz-hage" />
       <link rel="shortcut icon" href="../img/favicon.ico" />
-    <title>Documentation Version Automation Guide - Ntools - Work in Progress</title>
+    <title>Version Automation Guide - Ntools - Work in Progress</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
     
       <script>
         // Current page data
-        var mkdocs_page_name = "Documentation Version Automation Guide";
+        var mkdocs_page_name = "Version Automation Guide";
         var mkdocs_page_input_path = "version-automation-guide.md";
         var mkdocs_page_url = null;
       </script>
@@ -73,16 +73,51 @@
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../nbuild-tasks-integration/">NBuild Tasks Integration</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../msbuild-tasks-test-coverage/">MSBuild Tasks Test Coverage</a>
+                  <li class="toctree-l1"><a class="" href="../msbuild-tasks-test-coverage.md">MSBuild Tasks Test Coverage</a>
                   </li>
               </ul>
-              <p class="caption"><span class="caption-text">Pre-commit</span></p>
-              <ul>
+              <p class="caption"><span class="caption-text">Developer setup</span></p>
+              <ul class="current">
                   <li class="toctree-l1"><a class="reference internal" href="../pre-commit-setup/">Pre-commit Setup</a>
                   </li>
-              </ul>
-              <p class="caption"><span class="caption-text">Update</span></p>
-              <ul>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Version Automation Guide</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#solutions-implemented">Solutions Implemented</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#1-powershell-script-automation">1. PowerShell Script Automation</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#features">Features</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#version-automation-approach">Version Automation Approach</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#2-nbuild-task-integration">2. NBuild Task Integration</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#features_1">Features</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#usage_1">Usage</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#3-git-pre-commit-hooks">3. Git Pre-commit Hooks</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#manual-hook-features">Manual Hook Features:</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#pre-commit-framework-features">Pre-commit Framework Features:</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#usage_2">Usage</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#4-tool-name-mapping">4. Tool Name Mapping</a>
+    </li>
+    </ul>
+                  </li>
                   <li class="toctree-l1"><a class="reference internal" href="../ntools/ntools/">Development Tools</a>
                   </li>
               </ul>
@@ -105,7 +140,8 @@
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
-      <li class="breadcrumb-item active">Documentation Version Automation Guide</li>
+          <li class="breadcrumb-item">Developer setup</li>
+      <li class="breadcrumb-item active">Version Automation Guide</li>
     <li class="wy-breadcrumbs-aside">
           <a href="https://github.com/naz-hage/ntools/edit/main/docs/version-automation-guide.md">Edit on ntools</a>
     </li>
@@ -115,18 +151,15 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="documentation-version-automation-guide">Documentation Version Automation Guide</h1>
+                <h1 id="version-automation-guide">Version Automation Guide</h1>
 <p>This document outlines the automation solutions implemented to keep the <code>docs/ntools/ntools.md</code> file synchronized with version information from JSON configuration files in the <code>dev-setup/</code> directory.</p>
-<h2 id="problem-statement">Problem Statement</h2>
 <p>The ntools project maintains tool version information in two places:
 1. <strong>JSON Configuration Files</strong> (<code>dev-setup/*.json</code>) - Used for automated installation
 2. <strong>Documentation Table</strong> (<code>docs/ntools/ntools.md</code>) - User-facing version reference</p>
 <p>Previously, these had to be updated manually, leading to inconsistencies and outdated documentation.</p>
 <h2 id="solutions-implemented">Solutions Implemented</h2>
-<p>We've implemented <strong>4 complementary automation approaches</strong> that can be used individually or together:</p>
 <hr />
-<h2 id="1-powershell-script-automation">1. 🔧 PowerShell Script Automation</h2>
-<h3 id="what-was-added">What Was Added</h3>
+<h2 id="1-powershell-script-automation">1. PowerShell Script Automation</h2>
 <ul>
 <li><strong>File</strong>: <code>dev-setup/update-versions.ps1</code></li>
 <li><strong>Purpose</strong>: Standalone script to sync versions between JSON files and documentation</li>
@@ -150,17 +183,9 @@ cd dev-setup
 # With custom paths
 .\update-versions.ps1 -DevSetupPath &quot;C:\source\ntools\dev-setup&quot; -DocsPath &quot;C:\source\ntools\docs\ntools\ntools.md&quot;
 </code></pre>
-<h3 id="benefits">Benefits</h3>
-<ul>
-<li>✅ <strong>Immediate execution</strong> - Run anytime manually</li>
-<li>✅ <strong>Portable</strong> - Works on any Windows machine with PowerShell</li>
-<li>✅ <strong>Standalone</strong> - No dependencies on build system</li>
-<li>✅ <strong>Flexible</strong> - Can be called from other scripts</li>
-</ul>
 <hr />
 <p>Tool versions in documentation are updated using the MSBuild task (<code>UpdateVersionsInDocs</code>) via the <code>nb update_doc_versions</code> command. This extracts all tool/version pairs from every <code>NbuildAppList</code> entry in every <code>*.json</code> file in <code>dev-setup</code> and updates the documentation table accordingly. See the documentation in <code>ntools.md</code> for details.</p>
-<h2 id="2-nbuild-task-integration">2. 🏗️ NBuild Task Integration</h2>
-<h3 id="what-was-added_1">What Was Added</h3>
+<h2 id="2-nbuild-task-integration">2. NBuild Task Integration</h2>
 <ul>
 <li><strong>File</strong>: <code>NbuildTasks/UpdateVersionsInDocs.cs</code></li>
 <li><strong>Purpose</strong>: MSBuild task for build-time automation</li>
@@ -182,16 +207,8 @@ cd dev-setup
     DocsPath=&quot;$(MSBuildProjectDirectory)\docs\ntools\ntools.md&quot; /&gt;
 &lt;/Target&gt;
 </code></pre>
-<h3 id="benefits_1">Benefits</h3>
-<ul>
-<li>✅ <strong>Build integration</strong> - Automatic during build process</li>
-<li>✅ <strong>Native performance</strong> - C# execution speed</li>
-<li>✅ <strong>MSBuild compatibility</strong> - Works with existing build system</li>
-<li>✅ <strong>CI/CD ready</strong> - Integrates with automated builds</li>
-</ul>
 <hr />
-<h2 id="3-git-pre-commit-hooks">3. 🪝 Git Pre-commit Hooks</h2>
-<h3 id="pre-commit-architecture-and-workflow">Pre-commit Architecture and Workflow</h3>
+<h2 id="3-git-pre-commit-hooks">3. Git Pre-commit Hooks</h2>
 <p>The pre-commit system in this project uses the <a href="https://pre-commit.com/">pre-commit framework</a> to automate checks and updates before every commit. Here’s how it works:</p>
 <ol>
 <li><strong>Configuration</strong>: All hooks are defined in <code>.pre-commit-config.yaml</code>. This file specifies which checks to run, including built-in checks (YAML/JSON validation, trailing whitespace, etc.), code formatting, and custom scripts.</li>
@@ -222,14 +239,6 @@ commit proceeds if all hooks pass
 - Ensures documentation and code quality before every commit
 - Catches issues early in the developer workflow
 - Automates repetitive tasks and reduces human error</p>
-<h3 id="what-was-added_2">What Was Added</h3>
-<ul>
-<li><strong>File</strong>: <code>.git/hooks/pre-commit</code> (Manual approach)</li>
-<li><strong>File</strong>: <code>.pre-commit-config.yaml</code> (Framework approach)</li>
-<li><strong>Purpose</strong>: Local developer workflow automation</li>
-<li><strong>Execution</strong>: Automatically before each commit</li>
-</ul>
-<h3 id="features_2">Features</h3>
 <h4 id="manual-hook-features">Manual Hook Features:</h4>
 <ul>
 <li>Detects JSON file changes in staging area</li>
@@ -261,30 +270,8 @@ pre-commit install --hook-type commit-msg
 git add .
 git commit -m &quot;Update PowerShell version&quot;
 </code></pre>
-<h3 id="benefits_2">Benefits</h3>
-<ul>
-<li>✅ <strong>Developer workflow</strong> - Integrates with daily git usage</li>
-<li>✅ <strong>Immediate feedback</strong> - Catches issues before commit</li>
-<li>✅ <strong>Automatic execution</strong> - No manual intervention required</li>
-<li>✅ <strong>Quality enforcement</strong> - Additional code quality checks</li>
-</ul>
 <hr />
-<h2 id="implementation-strategy">Implementation Strategy</h2>
-<h3 id="recommended-approach">Recommended Approach</h3>
-<ol>
-<li><strong>Start with PowerShell script</strong> - Immediate utility and testing</li>
-<li><strong>Add pre-commit hooks</strong> - Improve developer workflow</li>
-<li><strong>Integrate with NBuild</strong> - Automate in build process</li>
-<li><strong>Enable GitHub Actions</strong> - Complete automation for team</li>
-</ol>
-<h3 id="complementary-usage">Complementary Usage</h3>
-<ul>
-<li><strong>PowerShell Script</strong>: Manual updates and testing</li>
-<li><strong>Pre-commit Hooks</strong>: Developer workflow automation</li>
-<li><strong>NBuild Task</strong>: Build-time verification</li>
-<li><strong>GitHub Actions</strong>: Team collaboration and CI/CD</li>
-</ul>
-<h2 id="tool-name-mapping">Tool Name Mapping</h2>
+<h2 id="4-tool-name-mapping">4. Tool Name Mapping</h2>
 <p>The automation handles differences between JSON configuration names and documentation display names:</p>
 <table>
 <thead>
@@ -352,60 +339,13 @@ git commit -m &quot;Update PowerShell version&quot;
 </tr>
 </tbody>
 </table>
-<h2 id="benefits-summary">Benefits Summary</h2>
-<h3 id="before-automation">Before Automation</h3>
-<ul>
-<li>❌ Manual synchronization required</li>
-<li>❌ Prone to human error</li>
-<li>❌ Inconsistent version information</li>
-<li>❌ Time-consuming maintenance</li>
-<li>❌ Often forgotten during updates</li>
-</ul>
-<h3 id="after-automation">After Automation</h3>
-<ul>
-<li>✅ <strong>Consistency</strong>: Documentation always matches configuration</li>
-<li>✅ <strong>Accuracy</strong>: Eliminates manual transcription errors</li>
-<li>✅ <strong>Efficiency</strong>: Saves developer time</li>
-<li>✅ <strong>Reliability</strong>: Automated processes don't forget</li>
-<li>✅ <strong>Scalability</strong>: Handles growing number of tools easily</li>
-<li>✅ <strong>Auditability</strong>: Git history tracks all changes</li>
-<li>✅ <strong>Team Collaboration</strong>: Works for all team members</li>
-<li>✅ <strong>CI/CD Integration</strong>: Fits into automated pipelines</li>
-</ul>
-<h2 id="maintenance">Maintenance</h2>
-<h3 id="regular-tasks">Regular Tasks</h3>
-<ul>
-<li>Monitor automation execution logs</li>
-<li>Update tool name mappings when new tools are added</li>
-<li>Review and update hook configurations as needed</li>
-<li>Test automation after major Git or build system changes</li>
-</ul>
-<h3 id="troubleshooting">Troubleshooting</h3>
-<pre><code class="language-powershell"># Test PowerShell script manually
-cd dev-setup
-.\update-versions.ps1 -Verbose
-
-# Skip pre-commit hooks if needed
-git commit --no-verify
-
-# Check GitHub Actions logs
-# Visit: https://github.com/your-repo/actions
-
-# Debug pre-commit framework
-pre-commit run --all-files --verbose
-</code></pre>
-<h2 id="future-enhancements">Future Enhancements</h2>
-<p>Potential improvements to consider:
-- <strong>Semantic version validation</strong>: Ensure versions follow semver
-- <strong>Changelog generation</strong>: Auto-update changelogs with version changes
-- <strong>Notification system</strong>: Alert team of version updates
-- <strong>Dependency checking</strong>: Verify tool compatibility
-- <strong>Release automation</strong>: Tag releases when versions change</p>
-<hr />
-<p><em>This automation system ensures that the ntools documentation remains accurate and up-to-date with minimal manual intervention, improving both developer productivity and end-user experience.</em></p>
               
             </div>
           </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../pre-commit-setup/" class="btn btn-neutral float-left" title="Pre-commit Setup"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../ntools/ntools/" class="btn btn-neutral float-right" title="Development Tools">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
 
   <hr/>
 
@@ -431,6 +371,10 @@ pre-commit run --all-files --verbose
         </span>
     
     
+      <span><a href="../pre-commit-setup/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../ntools/ntools/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>

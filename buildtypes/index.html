@@ -51,10 +51,6 @@
                   </li>
                   <li class="toctree-l1 current"><a class="reference internal current" href="#">Build Types</a>
     <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#stage">stage</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#production">Production</a>
-    </li>
     </ul>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../versioning/">Versioning</a>
@@ -79,16 +75,15 @@
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../nbuild-tasks-integration/">NBuild Tasks Integration</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../msbuild-tasks-test-coverage/">MSBuild Tasks Test Coverage</a>
+                  <li class="toctree-l1"><a class="" href="../msbuild-tasks-test-coverage.md">MSBuild Tasks Test Coverage</a>
                   </li>
               </ul>
-              <p class="caption"><span class="caption-text">Pre-commit</span></p>
+              <p class="caption"><span class="caption-text">Developer setup</span></p>
               <ul>
                   <li class="toctree-l1"><a class="reference internal" href="../pre-commit-setup/">Pre-commit Setup</a>
                   </li>
-              </ul>
-              <p class="caption"><span class="caption-text">Update</span></p>
-              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../version-automation-guide/">Version Automation Guide</a>
+                  </li>
                   <li class="toctree-l1"><a class="reference internal" href="../ntools/ntools/">Development Tools</a>
                   </li>
               </ul>
@@ -123,7 +118,6 @@
             <div class="section" itemprop="articleBody">
               
                 <p><strong>ntools</strong> have two predefined build types: <code>stage</code> and <code>prod</code>. The <code>stage</code> build type is deploy code to a stage environment used for debugging and testing, while the <code>prod</code> build type is used for prod deployment. The <code>stage</code> build type includes debugging symbols and is not optimized, while the <code>production</code> build type is optimized for performance and does not include debugging symbols.</p>
-<h2 id="_1"></h2>
 <h3 id="stage">stage</h3>
 <p>The <code>stage</code> build type use the following command:</p>
 <pre><code class="language-powershell">nb stage
@@ -138,7 +132,7 @@
 <li>Run various tests on the stage environment</li>
 <li>The version is set according to the rules in <a href="../versioning/">versioning</a></li>
 </ul>
-<h3 id="production">Production</h3>
+<h3 id="prod">prod</h3>
 <p>The <code>prod</code> build type use the following command:</p>
 <pre><code class="language-powershell">nb prod
 </code></pre>
