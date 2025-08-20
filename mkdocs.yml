@@ -27,9 +27,9 @@ nav:
       - Nbuild Tasks: ntools/nbuildtasks.md
       - NBuild Tasks Integration: nbuild-tasks-integration.md
       - MSBuild Tasks Test Coverage: msbuild-tasks-test-coverage.md
-  - Pre-commit:
+  - Developer setup:
       - Pre-commit Setup: pre-commit-setup.md
-  - Update:
+      - Version Automation Guide: version-automation-guide.md
       - Development Tools: ntools/ntools.md
   - Revisions: 
       - changelog.md
