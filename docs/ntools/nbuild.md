@@ -165,7 +165,7 @@ Additional Arguments:
 ---
 
 ## nbuild.targets
-See [nbuild.targets](../setup.md#nbuildtargets) for more information on how to create a `nbuild.targets` file.
+See [`nbuild.targets`](https://github.com/naz-hage/ntools/blob/main/Nbuild/resources/nbuild.targets) for more information and checkout other targets in [`Nbuild/resources`](https://github.com/naz-hage/ntools/blob/main/Nbuild/resources).
                     
 ### common.targets
 - The `common.targets` file includes all the defaults targets needed to build, test and deploy a solution.  The `common.targets` file is located in the `$(ProgramFiles)\Nbuild` folder.  The `nbuild.targets` file in the solution folder imports the `common.targets` file
@@ -322,14 +322,5 @@ Lists all available build targets for the current solution or project.
 nb.exe core
 ```
 Runs the target named `core` if it is listed by `nb targets`.
-
----
-
-## Troubleshooting
-
-- **Admin Privileges:** Some commands (like install/uninstall) may require running your terminal as administrator.
-- **Default Manifest:** If you do not specify `--json`, the default manifest is `C:\Program Files\NBuild\ntools.json`.
-- **Path with Spaces:** Always wrap file paths with spaces in double quotes.
-- **GitHub Authentication:** For release-related commands, ensure you have the correct permissions and authentication set up for your GitHub account.
 
 ---

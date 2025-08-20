@@ -1,6 +1,5 @@
 **ntools** have two predefined build types: `stage` and `prod`. The `stage` build type is deploy code to a stage environment used for debugging and testing, while the `prod` build type is used for prod deployment. The `stage` build type includes debugging symbols and is not optimized, while the `production` build type is optimized for performance and does not include debugging symbols.
 
-##
 ### stage
 The `stage` build type use the following command:
 
@@ -17,7 +16,7 @@ It includes the following steps:
 - Run various tests on the stage environment
 - The version is set according to the rules in [versioning](versioning.md)
 
-### Production
+### prod
 The `prod` build type use the following command:
 
 ```powershell

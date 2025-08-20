@@ -8,10 +8,10 @@ Throughout this document, the terms "version" and "tag" are used interchangeably
       - Incremented for breaking changes.
     - `Y` is the minor number:
       - Incremented for new features or bug fixes.
-      - Incremented when [production](buildtypes.md#production) Build Type is deployed.
+      - Incremented when [production](buildtypes.md#prod) Build Type is deployed.
       - Incrementing `Y` resets `Z` to 0.
     - `Z` is the build number:
-        - Incremented when [staging](buildtypes.md#staging) Build Type is deployed.
+        - Incremented when [staging](buildtypes.md#stage) Build Type is deployed.
 
 Tags in the [GitHubRelease](./ntools/github-release.md) are used to:
 

@@ -160,16 +160,19 @@ The `UpdateVersionsInDocs` task includes intelligent name mapping between JSON c
 ### Common Issues
 
 1. **Assembly not found errors**:
-   - Ensure the solution is built in Release mode first
-   - Verify NbuildTasks.dll exists in the Release folder
+
+- Ensure the solution is built in Release mode first
+- Verify NbuildTasks.dll exists in the Release folder
 
 2. **Path resolution issues**:
-   - Check that SolutionDir property is correctly set
-   - Verify relative paths resolve correctly from build context
+
+- Check that SolutionDir property is correctly set
+- Verify relative paths resolve correctly from build context
 
 3. **JSON parsing errors**:
-   - Ensure all JSON files in dev-setup are valid
-   - Check that JSON files follow the expected NbuildAppList structure
+
+- Ensure all JSON files in dev-setup are valid
+- Check that JSON files follow the expected NbuildAppList structure
 
 ### Debug Information
 
@@ -179,19 +182,8 @@ dotnet build nbuild.targets -target:UPDATE_DOC_VERSIONS -verbosity:detailed
 ```
 
 This will show:
+
 - Which JSON files are being processed
 - Which tool versions are found
 - Which documentation entries are updated
 - Any warnings or errors encountered
-
-## Future Enhancements
-
-Potential improvements for the tasks:
-- **Validation**: Verify that all tools in documentation have corresponding JSON files
-- **Reporting**: Generate summary reports of version changes
-- **Configuration**: Support for custom mapping files
-- **Integration**: Automatic changelog generation based on version changes
-
----
-
-*These MSBuild tasks provide a robust, integrated solution for maintaining documentation consistency within the ntools build system.*

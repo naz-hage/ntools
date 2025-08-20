@@ -1,4 +1,4 @@
-Nb.exe is also designed to help you create and manage GitHub releases. It also enables you to download release assets, such as files named in the format x.y.z.zip. The tool expects downloaded assets to be in a zip file named ${tag}.zip, where tag must be a valid tag in the repository created by the tool (e.g., ``x.y.z``).  checkout the [tagging](../versioning.md) section for more details.
+nb.exe is also designed to help you create and manage GitHub releases. It also enables you to download release assets, such as files named in the format x.y.z.zip. The tool expects downloaded assets to be in a zip file named ${tag}.zip, where tag must be a valid tag in the repository created by the tool (e.g., ``x.y.z``).  checkout the [versioning](../versioning.md) section for more details.
 
 ## Requirements
 
