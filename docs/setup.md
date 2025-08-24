@@ -92,6 +92,7 @@ This file lists all the development tools required for the project. Each tool is
 This PowerShell script automates the installation of tools and sets up the development environment.
 
 **Key Responsibilities:**
+
 - Installs ntools using ntools.json.
 - Installs other tools listed in apps.json.
 - Verifies administrative privileges before proceeding.
@@ -166,14 +167,3 @@ To add a new tool to your project:
   "AddToPath": true
 }
 ```
-
-## Notes
-
-1. **Error Handling in `dev-setup.ps1`:**
-    - What happens if a tool fails to install? Are there retries or logs generated?
-2. **Environment Variables:**
-    - Are there any required environment variables for `dev-setup.ps1` to work?
-3. **Dependencies:**
-    - Are there any dependencies for the tools listed in apps.json (e.g., PowerShell version)?
-4. **Testing the Setup:**
-    - How can users verify that the setup was successful?
