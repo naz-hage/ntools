@@ -141,8 +141,6 @@
     </li>
     </ul>
                   </li>
-                  <li class="toctree-l1"><a class="" href="../msbuild-tasks-test-coverage.md">MSBuild Tasks Test Coverage</a>
-                  </li>
               </ul>
               <p class="caption"><span class="caption-text">Developer setup</span></p>
               <ul>
@@ -354,29 +352,25 @@ dotnet build nbuild.targets -target:UPDATE_DOC_VERSIONS -target:SETUP_HOOKS
 <ol>
 <li>
 <p><strong>Assembly not found errors</strong>:</p>
-</li>
-<li>
-<p>Ensure the solution is built in Release mode first</p>
-</li>
-<li>
-<p>Verify NbuildTasks.dll exists in the Release folder</p>
+<ul>
+<li>Ensure the solution is built in Release mode first</li>
+<li>Verify NbuildTasks.dll exists in the Release folder</li>
+</ul>
 </li>
 <li>
 <p><strong>Path resolution issues</strong>:</p>
-</li>
-<li>
-<p>Check that SolutionDir property is correctly set</p>
-</li>
-<li>
-<p>Verify relative paths resolve correctly from build context</p>
+<ul>
+<li>Check that SolutionDir property is correctly set</li>
+<li>Verify relative paths resolve correctly from build context</li>
+</ul>
 </li>
 <li>
 <p><strong>JSON parsing errors</strong>:</p>
-</li>
-<li>
-<p>Ensure all JSON files in dev-setup are valid</p>
-</li>
+<ul>
+<li>Ensure all JSON files in dev-setup are valid</li>
 <li>Check that JSON files follow the expected NbuildAppList structure</li>
+</ul>
+</li>
 </ol>
 <h3 id="debug-information">Debug Information</h3>
 <p>Enable detailed logging by adding to your build command:</p>
