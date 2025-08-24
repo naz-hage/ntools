@@ -5,6 +5,9 @@ using Ntools;
 using OutputColorizer;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -273,23 +276,115 @@ namespace Nbuild
             var extension = Path.GetExtension(new Uri(nbuildApp.WebDownloadFile).AbsolutePath);
             Nfile.SetAllowedExtensions([extension]);
 
-            var result = Task.Run(async () => await Nfile.DownloadAsync(nbuildApp.WebDownloadFile, fileName)).Result;
-
             if (Verbose)
             {
-                // display download file signature and size
-                //result.DisplayCertificate();
-                if (result.DigitallySigned)
+                ConsoleHelper.WriteLine($"[VERBOSE] Downloading URL: {nbuildApp.WebDownloadFile} -> {fileName}", ConsoleColor.Gray);
+            }
+
+            try
+            {
+                var result = Task.Run(async () => await Nfile.DownloadAsync(nbuildApp.WebDownloadFile, fileName)).Result;
+
+                if (Verbose)
                 {
-                    ConsoleHelper.WriteLine($" {fileName} is signed", ConsoleColor.Yellow);
+                    // display download file signature and size
+                    //result.DisplayCertificate();
+                    try
+                    {
+                        if (result.DigitallySigned)
+                        {
+                            ConsoleHelper.WriteLine($" {fileName} is signed", ConsoleColor.Yellow);
+                        }
+                        else
+                        {
+                            ConsoleHelper.WriteLine($" {fileName} is not signed", ConsoleColor.Yellow);
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        // result may not expose DigitallySigned in some implementations; ignore safely
+                    }
                 }
-                else
+
+                return result;
+            }
+            catch (AggregateException aggEx)
+            {
+                var ex = aggEx.Flatten().InnerException ?? aggEx;
+                // Try GitHub authenticated fallback if applicable
+                var uri = new Uri(nbuildApp.WebDownloadFile);
+                var fb = TryGithubFallback(uri, fileName, ex);
+                if (fb != null) return fb;
+
+                if (Verbose)
                 {
-                    ConsoleHelper.WriteLine($" {fileName} is not signed", ConsoleColor.Yellow);
+                    ConsoleHelper.WriteLine($"[VERBOSE] Download failed for URL: {nbuildApp.WebDownloadFile}", ConsoleColor.Gray);
+                    ConsoleHelper.WriteLine($"[VERBOSE] Exception: {ex}", ConsoleColor.Gray);
+                }
+                return ResultHelper.Fail(-1, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                var uri = new Uri(nbuildApp.WebDownloadFile);
+                var fb = TryGithubFallback(uri, fileName, ex);
+                if (fb != null) return fb;
+
+                if (Verbose)
+                {
+                    ConsoleHelper.WriteLine($"[VERBOSE] Download failed for URL: {nbuildApp.WebDownloadFile}", ConsoleColor.Gray);
+                    ConsoleHelper.WriteLine($"[VERBOSE] Exception: {ex}", ConsoleColor.Gray);
+                }
+                return ResultHelper.Fail(-1, ex.Message);
+            }
+
+            // local fallback function: if URL is github release and token exists, try authenticated download via GitHubRelease library
+            ResultHelper? TryGithubFallback(Uri uri, string destFile, Exception originalEx)
+            {
+                try
+                {
+                    if (!uri.Host.Contains("github.com", StringComparison.OrdinalIgnoreCase)) return null;
+
+                    // quick token check - ReleaseService will also use the central Credentials logic
+                    var token = Environment.GetEnvironmentVariable("API_GITHUB_KEY") ?? Environment.GetEnvironmentVariable("GITHUB_TOKEN");
+                    if (string.IsNullOrEmpty(token)) return null;
+
+                    // parse owner, repo, tag and asset name from the releases/download URL
+                    var parts = uri.AbsolutePath.Split(new[] {'/'}, StringSplitOptions.RemoveEmptyEntries);
+                    if (parts.Length < 5) return null; // expected: owner/repo/releases/download/tag/asset
+                    var owner = parts[0];
+                    var repoName = parts[1];
+                    var releasesIdx = Array.IndexOf(parts, "releases");
+                    if (releasesIdx < 0 || parts.Length <= releasesIdx + 2) return null;
+                    var tag = parts[releasesIdx + 2];
+                    var assetName = (parts.Length > releasesIdx + 3) ? parts[releasesIdx + 3] : Path.GetFileName(uri.AbsolutePath);
+
+                    if (Verbose) ConsoleHelper.WriteLine($"[VERBOSE] Attempting authenticated GitHub API download (via ReleaseService) for {owner}/{repoName} tag {tag} asset {assetName}", ConsoleColor.Gray);
+
+                    var repo = $"{owner}/{repoName}";
+                    var releaseService = new GitHubRelease.ReleaseService(repo);
+                    var downloadFolder = Path.GetDirectoryName(destFile) ?? DownloadsDirectory;
+
+                    var response = Task.Run(async () => await releaseService.DownloadAssetByName(tag, assetName, downloadFolder)).Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        if (Verbose) ConsoleHelper.WriteLine($"[VERBOSE] Authenticated download saved to: {destFile}", ConsoleColor.Gray);
+                        return ResultHelper.Success();
+                    }
+                    else
+                    {
+                        if (Verbose) ConsoleHelper.WriteLine($"[VERBOSE] Authenticated download failed: {response.StatusCode}", ConsoleColor.Gray);
+                        return null;
+                    }
+                }
+                catch (Exception e)
+                {
+                    if (Verbose) ConsoleHelper.WriteLine($"[VERBOSE] Authenticated fallback failed: {e}", ConsoleColor.Gray);
+                    return null;
                 }
             }
 
-            return result;
+            // end of DownloadApp try/catch - result already returned or failure returned above
         }
 
         private static ResultHelper Install(NbuildApp nbuildApp, bool verbose=false)
