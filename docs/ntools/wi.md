@@ -139,9 +139,3 @@ Common issues and solutions:
 - **"Failed to read services file"**: Ensure the services file path is correct and accessible
 - **"Failed to create PBI"**: Check PAT permissions and Azure DevOps connectivity
 - **Authentication errors**: Verify PAT is valid and has Work Items read/write permissions
-
----
-
-## Integration with ntools
-
-The `wi` tool integrates seamlessly with other ntools utilities and can be used in automation scripts and CI/CD pipelines for Azure DevOps work item management.

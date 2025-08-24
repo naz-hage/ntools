@@ -161,18 +161,18 @@ The `UpdateVersionsInDocs` task includes intelligent name mapping between JSON c
 
 1. **Assembly not found errors**:
 
-- Ensure the solution is built in Release mode first
-- Verify NbuildTasks.dll exists in the Release folder
+    - Ensure the solution is built in Release mode first
+    - Verify NbuildTasks.dll exists in the Release folder
 
 2. **Path resolution issues**:
 
-- Check that SolutionDir property is correctly set
-- Verify relative paths resolve correctly from build context
+    - Check that SolutionDir property is correctly set
+    - Verify relative paths resolve correctly from build context
 
 3. **JSON parsing errors**:
 
-- Ensure all JSON files in dev-setup are valid
-- Check that JSON files follow the expected NbuildAppList structure
+    - Ensure all JSON files in dev-setup are valid
+    - Check that JSON files follow the expected NbuildAppList structure
 
 ### Debug Information
 

@@ -18,7 +18,7 @@ nb.exe is also designed to help you create and manage GitHub releases. It also e
   - For additional security, the GitHub API token should be saved in the Windows Credential Manager with:
     - **Target Name:** `GitHubRelease`
     - **Credential Name:** `API_GITHUB_KEY`
-- 
+
 ### GitHub Actions Workflow Example
 Here is an example of how to set up the required environment variables in a GitHub Actions workflow file:
 
