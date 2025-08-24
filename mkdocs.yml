@@ -25,7 +25,6 @@ nav:
       - Github Release : ntools/github-release.md
   - Custom Build Tasks:
       - Nbuild Tasks: ntools/nbuildtasks.md
-      - NBuild Tasks Integration: nbuild-tasks-integration.md
   - Developer setup:
       - Pre-commit Setup: pre-commit-setup.md
       - Version Automation Guide: version-automation-guide.md
