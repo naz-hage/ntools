@@ -33,7 +33,9 @@ namespace Nbuild
             }
         }
 
-        private static bool _testMode = IsTestMode();
+    private static bool _testMode = IsTestMode();
+    // Factory for creating IReleaseService instances. Can be overridden in tests.
+    public static ReleaseServiceFactory? ReleaseServiceFactory { get; set; } = repo => new ReleaseServiceAdapter(repo);
 
         static Command()
         {
@@ -223,6 +225,7 @@ namespace Nbuild
             ConsoleHelper.WriteLine(" |--------------------|--------------------------------|-----------------|", ConsoleColor.Yellow);
 
             string webDownloadedFile = string.Empty;
+            ResultHelper lastResult = ResultHelper.Success();
             try
             {
                 foreach (var app in apps)
@@ -233,6 +236,7 @@ namespace Nbuild
                     stopWatch.Start();
                     // download app
                     var result = DownloadApp(app);
+                    lastResult = result;
 
                     stopWatch.Stop();
 
@@ -257,6 +261,12 @@ namespace Nbuild
             }
 
             Console.WriteLine();
+
+            // If any download failed, return the last failure result
+            if (lastResult != null && !lastResult.IsSuccess())
+            {
+                return lastResult;
+            }
 
             return ResultHelper.Success();
         }
@@ -303,6 +313,58 @@ namespace Nbuild
                     catch (Exception)
                     {
                         // result may not expose DigitallySigned in some implementations; ignore safely
+                    }
+                }
+
+                // If the unauthenticated download failed, attempt GitHub authenticated fallback
+                if (!result.IsSuccess())
+                {
+                    try
+                    {
+                        var uri = new Uri(nbuildApp.WebDownloadFile);
+                        if (uri.Host.Contains("github.com", StringComparison.OrdinalIgnoreCase))
+                        {
+                            var token = Environment.GetEnvironmentVariable("API_GITHUB_KEY") ?? Environment.GetEnvironmentVariable("GITHUB_TOKEN");
+                            if (!string.IsNullOrEmpty(token))
+                            {
+                                var parts = uri.AbsolutePath.Split(new[] {'/'}, StringSplitOptions.RemoveEmptyEntries);
+                                if (parts.Length >= 5)
+                                {
+                                    var owner = parts[0];
+                                    var repoName = parts[1];
+                                    var releasesIdx = Array.IndexOf(parts, "releases");
+                                    if (releasesIdx >= 0 && parts.Length > releasesIdx + 2)
+                                    {
+                                        var tag = parts[releasesIdx + 2];
+                                        var assetName = (parts.Length > releasesIdx + 3) ? parts[releasesIdx + 3] : Path.GetFileName(uri.AbsolutePath);
+                                        var repo = $"{owner}/{repoName}";
+                                        var downloadFolder = Path.GetDirectoryName(fileName) ?? DownloadsDirectory;
+
+                                        var factory = ReleaseServiceFactory ?? (r => new ReleaseServiceAdapter(r));
+                                        var releaseService = factory(repo);
+
+                                        var response = Task.Run(async () => await releaseService.DownloadAssetByName(tag, assetName, downloadFolder)).Result;
+                                        if (response != null && response.IsSuccessStatusCode)
+                                        {
+                                            if (Verbose) ConsoleHelper.WriteLine($"[VERBOSE] Authenticated download saved to: {fileName}", ConsoleColor.Gray);
+                                            return ResultHelper.Success();
+                                        }
+                                        else
+                                        {
+                                            if (Verbose)
+                                            {
+                                                var status = response == null ? "no response" : response.StatusCode.ToString();
+                                                ConsoleHelper.WriteLine($"[VERBOSE] Authenticated download failed: {status}", ConsoleColor.Gray);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        if (Verbose) ConsoleHelper.WriteLine($"[VERBOSE] Authenticated fallback failed: {e}", ConsoleColor.Gray);
                     }
                 }
 
@@ -361,19 +423,26 @@ namespace Nbuild
                     if (Verbose) ConsoleHelper.WriteLine($"[VERBOSE] Attempting authenticated GitHub API download (via ReleaseService) for {owner}/{repoName} tag {tag} asset {assetName}", ConsoleColor.Gray);
 
                     var repo = $"{owner}/{repoName}";
-                    var releaseService = new GitHubRelease.ReleaseService(repo);
                     var downloadFolder = Path.GetDirectoryName(destFile) ?? DownloadsDirectory;
+
+                    // create the release service via factory (tests can override)
+                    var factory = ReleaseServiceFactory ?? (r => new ReleaseServiceAdapter(r));
+                    var releaseService = factory(repo);
 
                     var response = Task.Run(async () => await releaseService.DownloadAssetByName(tag, assetName, downloadFolder)).Result;
 
-                    if (response.IsSuccessStatusCode)
+                    if (response != null && response.IsSuccessStatusCode)
                     {
                         if (Verbose) ConsoleHelper.WriteLine($"[VERBOSE] Authenticated download saved to: {destFile}", ConsoleColor.Gray);
                         return ResultHelper.Success();
                     }
                     else
                     {
-                        if (Verbose) ConsoleHelper.WriteLine($"[VERBOSE] Authenticated download failed: {response.StatusCode}", ConsoleColor.Gray);
+                        if (Verbose)
+                        {
+                            var status = response == null ? "no response" : response.StatusCode.ToString();
+                            ConsoleHelper.WriteLine($"[VERBOSE] Authenticated download failed: {status}", ConsoleColor.Gray);
+                        }
                         return null;
                     }
                 }

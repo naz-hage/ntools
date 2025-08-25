@@ -154,6 +154,8 @@
 	<Message Text="nbTests executed and code coverage report generated in TestResults\CoverageReport." />
 	<Message Text="==> DONE" />
   </Target>
+
+
 	<!-- mkdocs deploy locally -->
 	<Target Name="MKDOCS_DEPLOY" AfterTargets="MKDOCS">
 		<Exec Command='"$(MkDocsExe)" serve' WorkingDirectory="$(SolutionDir)"/>
@@ -397,4 +399,10 @@
 		<Message Text="==> DONE"/>
 	</Target>
 
+	<!-- Run the focused ReleaseServiceFactoryTests via dotnet test -->
+	<Target Name="RUN_RELEASESERVICEFACTORYTESTS">
+		<Message Text="Running ReleaseServiceFactoryTests (focused)" Importance="high" />
+		<Exec Command="dotnet test &quot;C:\source\ntools\ntools.sln&quot; --filter &quot;FullyQualifiedName~NbuildTests.ReleaseServiceFactoryTests&quot; -v minimal" WorkingDirectory="$(SolutionDir)" />
+		<Message Text="==> RUN_RELEASESERVICEFACTORYTESTS DONE" />
+	</Target>
 </Project>
