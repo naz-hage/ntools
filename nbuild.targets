@@ -50,7 +50,9 @@
 		
 		<Message Text="==> DONE"/>
 	</Target>
+
 	
+		
 	<!-- Test for FileVersion task and powershell file-version.ps1-->
 	<Target Name="FILE_VERSIONS"  DependsOnTargets="ARTIFACTS">
 		<PropertyGroup>
@@ -405,4 +407,117 @@
 		<Exec Command="dotnet test &quot;C:\source\ntools\ntools.sln&quot; --filter &quot;FullyQualifiedName~NbuildTests.ReleaseServiceFactoryTests&quot; -v minimal" WorkingDirectory="$(SolutionDir)" />
 		<Message Text="==> RUN_RELEASESERVICEFACTORYTESTS DONE" />
 	</Target>
+
+	<!-- Pre-check: ensure no machine-level Debug/Release folders are present before running tests -->
+	<Target Name="NB_PRECHECK">
+		<Message Text="Running NB_PRECHECK: ensure C:\\Debug and C:\\Release do not exist on this machine" Importance="high" />
+		<Error Condition="Exists('C:\\Debug')" Text="NB_PRECHECK failed: Found C:\\Debug. Please run 'nb CLEAN' locally to remove repository artifacts and retry, or remove C:\\Debug manually if you understand the contents." />
+		<Error Condition="Exists('C:\\Release')" Text="NB_PRECHECK failed: Found C:\\Release. Please run 'nb CLEAN' locally to remove repository artifacts and retry, or remove C:\\Release manually if you understand the contents." />
+		<Message Text="NB_PRECHECK passed: no machine-level Debug/Release folders found." Importance="high" />
+	</Target>
+
+	<!-- Run the full solution test suite (used by 'nb test') -->
+	<Target Name="NB_TEST" DependsOnTargets="CLEAN;NB_PRECHECK">
+		<Message Text='Running full solution tests sequentially via dev-setup\run-tests-sequential.ps1' Importance="high" />
+		<!-- Use the existing script which stops lingering testhost/dotnet processes, removes local TestPlatform DLLs in Debug, and runs tests sequentially -->
+		<Exec Command='powershell -NoProfile -ExecutionPolicy Bypass -File "$(SolutionDir)\dev-setup\run-tests-sequential.ps1"' WorkingDirectory="$(SolutionDir)" ConsoleToMSBuild="true">
+			<Output TaskParameter="ExitCode" PropertyName="NbTestExitCode" />
+			<Output TaskParameter="ConsoleOutput" PropertyName="NbTestOutput" />
+		</Exec>
+		<Message Text="$(NbTestOutput)" Condition="'$(NbTestOutput)' != ''" Importance="high" />
+		<Message Text="==> NB_TEST DONE" />
+		<Error Condition="'$(NbTestExitCode)' != '0'" Text="NB_TEST failed. See output above for details." />
+	</Target>
+
+	<!-- Diagnostic target to run automatically after NB_TEST to list TestFramework DLLs -->
+	<Target Name="NB_TEST_DIAGNOSTICS" AfterTargets="NB_TEST">
+		<Message Text="==> NB_TEST_DIAGNOSTICS: listing TestFramework DLLs in Debug" Importance="high" />
+		<!-- Run extended diagnostics script which enumerates copies of test-platform/MSTest DLLs and lists package graphs for test projects -->
+		<Exec Command='powershell -NoProfile -ExecutionPolicy Bypass -File "$(SolutionDir)\dev-setup\nb_test_diagnostics_more.ps1" "$(SolutionDir)"' WorkingDirectory="$(SolutionDir)" ConsoleToMSBuild="true">
+			<Output TaskParameter="ConsoleOutput" PropertyName="NbTestDiagnosticsOutput" />
+		</Exec>
+		<Message Text="$(NbTestDiagnosticsOutput)" Importance="high" Condition="'$(NbTestDiagnosticsOutput)' != ''" />
+		<Message Text="==> NB_TEST_DIAGNOSTICS DONE" Importance="high" />
+	</Target>
+
+	<!-- Per-test-project diagnostic targets: run dotnet test with 'diag' to capture VSTest assembly load data -->
+	<!-- Targets auto-generated: one per Tests.csproj in the solution -->
+	<Target Name="NB_DIAG_NbuildTasksTests">
+		<Message Text="Running diag for NbuildTasksTests" Importance="high" />
+		<Exec Command='dotnet test "$(SolutionDir)\NbuildTasksTests\NbuildTasksTests.csproj" --diag:"$(SolutionDir)\TestResults\NbuildTasksTests-diag-vstest.txt" -v minimal' WorkingDirectory="$(SolutionDir)" />
+	</Target>
+
+	<Target Name="NB_DIAG_NbuildTests">
+		<Message Text="Running diag for NbuildTests" Importance="high" />
+		<Exec Command='dotnet test "$(SolutionDir)\NbuildTests\NbuildTests.csproj" --diag:"$(SolutionDir)\TestResults\NbuildTests-diag-vstest.txt" -v minimal' WorkingDirectory="$(SolutionDir)" />
+	</Target>
+
+	<Target Name="NB_DIAG_lfTests">
+		<Message Text="Running diag for lfTests" Importance="high" />
+		<Exec Command='dotnet test "$(SolutionDir)\lfTests\lfTests.csproj" --diag:"$(SolutionDir)\TestResults\lfTests-diag-vstest.txt" -v minimal' WorkingDirectory="$(SolutionDir)" />
+	</Target>
+
+	<Target Name="NB_DIAG_nbTests">
+		<Message Text="Running diag for nbTests" Importance="high" />
+		<Exec Command='dotnet test "$(SolutionDir)\nbTests\nbTests.csproj" --diag:"$(SolutionDir)\TestResults\nbTests-diag-vstest.txt" -v minimal' WorkingDirectory="$(SolutionDir)" />
+	</Target>
+
+	<Target Name="NB_DIAG_nBackupTests">
+		<Message Text="Running diag for nBackupTests" Importance="high" />
+		<Exec Command='dotnet test "$(SolutionDir)\nBackupTests\NbackupTests.csproj" --diag:"$(SolutionDir)\TestResults\nBackupTests-diag-vstest.txt" -v minimal' WorkingDirectory="$(SolutionDir)" />
+	</Target>
+
+	<Target Name="NB_DIAG_wiTests">
+		<Message Text="Running diag for wiTests" Importance="high" />
+		<Exec Command='dotnet test "$(SolutionDir)\wiTests\wiTests.csproj" --diag:"$(SolutionDir)\TestResults\wiTests-diag-vstest.txt" -v minimal' WorkingDirectory="$(SolutionDir)" />
+	</Target>
+
+	<Target Name="NB_DIAG_GitHubReleaseTests">
+		<Message Text="Running diag for GitHubReleaseTests" Importance="high" />
+		<Exec Command='dotnet test "$(SolutionDir)\GitHubReleaseTests\GitHubReleaseTests.csproj" --diag:"$(SolutionDir)\TestResults\GitHubReleaseTests-diag-vstest.txt" -v minimal' WorkingDirectory="$(SolutionDir)" />
+	</Target>
+
+	<!-- Aggregate target: run all per-project diagnostics sequentially -->
+	<Target Name="NB_TEST_DIAG_ALL" DependsOnTargets="NB_DIAG_NbuildTasksTests;NB_DIAG_NbuildTests;NB_DIAG_lfTests;NB_DIAG_nbTests;NB_DIAG_nBackupTests;NB_DIAG_wiTests;NB_DIAG_GitHubReleaseTests">
+		<Message Text=">== NB_TEST_DIAG_ALL completed" Importance="high" />
+	</Target>
+
+	<!-- Clean up the project and artifacts folder -->
+	<Target Name="CLEAN">
+		<Message Text="Cleaning repository: removing bin/, obj/, Debug/, Release/, TestResults/, CoverageReport/ and artifacts (safe mode)" Importance="high" />
+
+		<!-- Safety: ensure SolutionDir is set to avoid accidental root-level deletes -->
+		<PropertyGroup>
+			<_SolutionDir>$(SolutionDir)</_SolutionDir>
+		</PropertyGroup>
+
+		<Error Condition="'$(_SolutionDir)' == ''" Text="CLEAN aborted: $(SolutionDir) is not set. This prevents unsafe deletes." />
+
+		<!-- Collect directories to remove (MSBuild supports wildcards in Item Include) -->
+		<ItemGroup>
+			<DirectoriesToRemove Include="$(_SolutionDir)**\bin;
+										$(_SolutionDir)**\obj;
+										$(_SolutionDir)Debug;
+										$(_SolutionDir)Release;
+										$(_SolutionDir)TestResults;
+										$(_SolutionDir)CoverageReport;
+										c:\debug;
+										c:\release;
+										$(_SolutionDir)artifacts" />
+		</ItemGroup>
+
+		<Message Text="Directories to remove: @(DirectoriesToRemove)" Importance="high" />
+		<RemoveDir Directories="@(DirectoriesToRemove)" />
+
+		<Message Text="Cleaning complete." Importance="high" />
+	</Target>
+
+	<!-- Run all tests using dotnet test in Release mode -->
+	<Target Name="TEST" DependsOnTargets="ARTIFACTS;TAG">
+		<RemoveDir Directories="$(ArtifactsTestResultsFolder)"></RemoveDir>
+		<!--To colllect code coverage, add the following option to the test command: collect:"XPlat Code Coverage"-->
+		<Exec Command='dotnet test $(SolutionName).sln --configuration $(TargetRelease) --logger "console;verbosity=normal" %(DotNetTestFiles.Identity) --logger trx --results-directory:$(ArtifactsTestResultsFolder) --verbosity normal'/>
+		<Message Text="==> COMMON_DONE"/>
+	</Target>
+
 </Project>
