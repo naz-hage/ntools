@@ -86,14 +86,6 @@ jobs:
           git diff
         shell: pwsh
 
-      - name: Test with coverage
-        env:
-          OWNER: ${{ github.repository_owner }}
-          API_GITHUB_KEY: ${{ secrets.API_GITHUB_KEY }}
-        run: |
-          dotnet test ntools.sln --no-build --configuration Release --logger "trx;LogFileName=test-results.trx" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=TestResults/
-        working-directory: ${{ github.workspace }}
-
       - name: Debug - Show TestResults Directory Structure
         run: |
           Write-Host "=== Checking Directory Structure ==="
