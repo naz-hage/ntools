@@ -531,6 +531,7 @@
                 CLEAN;
                 TAG;
                 AUTOTAG_STAGE;
+				TEST;
 				PUBLISH;
 				PACKAGE" >
   </Target>
