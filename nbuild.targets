@@ -535,4 +535,11 @@
 				PUBLISH">
   </Target>
 
+	<!-- Create a package for the solution default is a zip file of all artifacts -->
+	<Target Name="PACKAGE" DependsOnTargets="PUBLISH;TAG">
+		<Exec Command='"$(ZipExe)" a -r -tzip $(ArtifactsFolder).zip $(ArtifactsFolder)\*'/>
+		
+		<RemoveDir Directories="$(ArtifactsFolder);"/> 
+		<Message Text="==> COMMON_DONE"/>
+	</Target>
 </Project>
