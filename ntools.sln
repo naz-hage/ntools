@@ -122,6 +122,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nb", "nb\nb.csproj", "{C555
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nbTests", "nbTests\nbTests.csproj", "{6E74FCF2-6D5E-C144-3FD0-9423D056C869}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiVersions", "ApiVersions\ApiVersions.csproj", "{71123CA7-06B4-BEC1-ED29-A55FCC7F22BB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -300,6 +302,18 @@ Global
 		{6E74FCF2-6D5E-C144-3FD0-9423D056C869}.Release|x64.Build.0 = Release|Any CPU
 		{6E74FCF2-6D5E-C144-3FD0-9423D056C869}.Release|x86.ActiveCfg = Release|Any CPU
 		{6E74FCF2-6D5E-C144-3FD0-9423D056C869}.Release|x86.Build.0 = Release|Any CPU
+		{71123CA7-06B4-BEC1-ED29-A55FCC7F22BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71123CA7-06B4-BEC1-ED29-A55FCC7F22BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71123CA7-06B4-BEC1-ED29-A55FCC7F22BB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{71123CA7-06B4-BEC1-ED29-A55FCC7F22BB}.Debug|x64.Build.0 = Debug|Any CPU
+		{71123CA7-06B4-BEC1-ED29-A55FCC7F22BB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{71123CA7-06B4-BEC1-ED29-A55FCC7F22BB}.Debug|x86.Build.0 = Debug|Any CPU
+		{71123CA7-06B4-BEC1-ED29-A55FCC7F22BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71123CA7-06B4-BEC1-ED29-A55FCC7F22BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71123CA7-06B4-BEC1-ED29-A55FCC7F22BB}.Release|x64.ActiveCfg = Release|Any CPU
+		{71123CA7-06B4-BEC1-ED29-A55FCC7F22BB}.Release|x64.Build.0 = Release|Any CPU
+		{71123CA7-06B4-BEC1-ED29-A55FCC7F22BB}.Release|x86.ActiveCfg = Release|Any CPU
+		{71123CA7-06B4-BEC1-ED29-A55FCC7F22BB}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
