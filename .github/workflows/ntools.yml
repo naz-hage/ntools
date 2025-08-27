@@ -24,70 +24,12 @@ on:
           - "true"
           - "false"
 
-env:
-  Solution_Name: ntools.sln
-  Test_Project_Path: LauncherTests
-  dotnet_version: 9.0.x
-  build_type: ${{ github.event.inputs.build_type || 'stage' }}
-  enable_logging: ${{ github.event.inputs.enable_logging || 'false' }}
-
 jobs:
-  test:
-    runs-on: windows-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Restore dependencies
-        run: dotnet restore ntools.sln
-        working-directory: ${{ github.workspace }}
-
-      - name: Build
-        run: dotnet build ntools.sln --no-restore --configuration Release
-        working-directory: ${{ github.workspace }}
-
-      - name: Test with coverage
-        env:
-          OWNER: ${{ github.repository_owner }}
-          API_GITHUB_KEY: ${{ secrets.API_GITHUB_KEY }}
-        run: dotnet test ntools.sln --no-build --configuration Release --logger "trx;LogFileName=test-results.trx" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=TestResults/
-        working-directory: ${{ github.workspace }}
-
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: '**/TestResults/**/*.trx'
-
-      - name: Upload coverage report
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-report
-          path: '**/TestResults/**/coverage.cobertura.xml'
-
-      - name: List all coverage files
-        run: Get-ChildItem -Recurse -Filter coverage.cobertura.xml | Select-Object -ExpandProperty FullName
-        shell: pwsh
-
-      - name: List all coverage.cobertura.xml files
-        run: Get-ChildItem -Path . -Filter coverage.cobertura.xml -Recurse | Select-Object FullName
-        shell: pwsh
-        working-directory: ${{ github.workspace }}
-
-      - name: Publish Test Results
-        uses: dorny/test-reporter@v1
-        if: always()
-        with:
-          name: Tests
-          path: '**/TestResults/**/*.trx'
-          reporter: dotnet-trx
-
   build:
     name: Running a workflow
-    needs: [test]
     runs-on: windows-latest
+    env:
+      build_type: ${{ github.event.inputs.build_type || 'stage' }}
 
     steps:
     - name: Checkout Repository
@@ -138,7 +80,7 @@ jobs:
     - name: Run Build
       run: |
         & "$env:ProgramFilesPath/nbuild/nb.exe" CORE
-        & "$env:ProgramFilesPath/nbuild/nb.exe" ${{ env.build_type }}
+        & "$env:ProgramFilesPath/nbuild/nb.exe" $env:build_type
       shell: pwsh
       working-directory: ${{ github.workspace }}
       env:
