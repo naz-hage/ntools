@@ -385,7 +385,7 @@
 
 	<!-- Creates a stage or prod release 
 	Add for testing and remove after success-->
-	<Target Name="GITHUB_RELEASE" DependsOnTargets="ARTIFACTS;GIT_BRANCH" AfterTargets="PROD" Condition="'$(GITHUB_ACTIONS)' != ''">
+	<Target Name="GITHUB_RELEASE" DependsOnTargets="ARTIFACTS;GIT_BRANCH" AfterTargets="PROD" Condition="'$(GITHUB_ACTIONS)' != ''" >
 		<Git Command="PushTag" TaskParameter="$(ProductVersion)" />
 		<Exec Command='$(SolutionDir)\nb\bin\Release\nb.exe release_create --repo $(SolutionName) --tag $(ProductVersion) --branch $(GitBranch) --file $(ArtifactsFolder).zip' WorkingDirectory="$(SolutionDir)" />
 
@@ -394,7 +394,7 @@
 
 	<!-- Creates a stage or prod pre-release 
 	Add for testing and remove after success -->
-	<Target Name="GITHUB_PRE_RELEASE" DependsOnTargets="ARTIFACTS;GIT_BRANCH" AfterTargets="STAGE" Condition="'$(GITHUB_ACTIONS)' != ''" >
+	<Target Name="GITHUB_PRE_RELEASE" DependsOnTargets="ARTIFACTS;GIT_BRANCH" AfterTargets="STAGE"  Condition="'$(GITHUB_ACTIONS)' != ''" >
 		<Git Command="PushTag" TaskParameter="$(ProductVersion)" />
 		<Exec Command='"$(SolutionDir)\nb\bin\Release\nb.exe" pre_release_create --repo $(SolutionName) --tag $(ProductVersion) --branch $(GitBranch) --file $(ArtifactsFolder).zip' WorkingDirectory="$(SolutionDir)" />
 
@@ -522,7 +522,7 @@
 
 		<Target Name="PUBLISH" DependsOnTargets="ARTIFACTS;TAG">
 			<Message Text="Publishing all non-test projects using publish-all-projects.ps1" Importance="high" />
-			<Exec Command='pwsh -NoProfile -ExecutionPolicy Bypass -File "$(SolutionDir)\publish-all-projects.ps1" -PublishDir "$(ArtifactsFolder)"' WorkingDirectory="$(SolutionDir)" />
+			<Exec Command='pwsh -NoProfile -ExecutionPolicy Bypass -File "$(SolutionDir)\publish-all-projects.ps1" -PublishDir "$(ArtifactsFolder)" -ProductVersion "$(ProductVersion)"' WorkingDirectory="$(SolutionDir)" />
 			<Message Text="All non-test projects published to $(SolutionDir)\PublishAll" Importance="high" />
 		</Target>
 
@@ -531,12 +531,12 @@
                 CLEAN;
                 TAG;
                 AUTOTAG_STAGE;
-                TEST;
-				PUBLISH">
+				PUBLISH;
+				PACKAGE" >
   </Target>
 
 	<!-- Create a package for the solution default is a zip file of all artifacts -->
-	<Target Name="PACKAGE" DependsOnTargets="PUBLISH;TAG">
+	<Target Name="PACKAGE" DependsOnTargets="PROPERTIES">
 		<Exec Command='"$(ZipExe)" a -r -tzip $(ArtifactsFolder).zip $(ArtifactsFolder)\*'/>
 		
 		<RemoveDir Directories="$(ArtifactsFolder);"/> 
