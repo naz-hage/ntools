@@ -27,8 +27,9 @@ on:
 jobs:
   build:
     name: Running a workflow
-    # Removed dependency on test job
     runs-on: windows-latest
+    env:
+      build_type: ${{ github.event.inputs.build_type || 'stage' }}
 
     steps:
     - name: Checkout Repository
@@ -79,7 +80,7 @@ jobs:
     - name: Run Build
       run: |
         & "$env:ProgramFilesPath/nbuild/nb.exe" CORE
-        & "$env:ProgramFilesPath/nbuild/nb.exe" ${{ env.build_type }}
+        & "$env:ProgramFilesPath/nbuild/nb.exe" $env:build_type
       shell: pwsh
       working-directory: ${{ github.workspace }}
       env:
