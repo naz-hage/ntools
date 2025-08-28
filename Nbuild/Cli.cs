@@ -331,31 +331,50 @@ public class Cli
         await ValidateRepositoryExists();
     }
 
+    /// <summary>
+    /// Validates that the GitHub repository exists and is accessible via the GitHub API.
+    /// </summary>
+    /// <remarks>
+    /// If a GitHub token is available, it is used for authentication. If the token is missing and the repository is private,
+    /// the method will throw an exception. For public repositories, the check may succeed without a token, but access to private
+    /// repositories always requires authentication. Throws an exception if the repository does not exist or is inaccessible.
+    /// </remarks>
     public async Task ValidateRepositoryExists()
     {
         using var httpClient = new HttpClient();
         var apiUrl = $"https://api.github.com/repos/{Repo}";
         Console.WriteLine($"Validating repository via API: {apiUrl}");
 
+        // Add required headers for GitHub API
+        httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("GitHubRelease/1.0");
+        httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
+
+        // Add authentication if a GitHub token is available
+        var token = Credentials.GetToken();
+        if (!string.IsNullOrEmpty(token))
+        {
+            Console.WriteLine("Using GitHub token for authentication.");
+            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+        }
+        else
+        {
+            Console.WriteLine("No GitHub token found. Only public repository validation is possible.");
+        }
+
         try
         {
-            // Add authentication if a GitHub token is available
-            var token = Credentials.GetToken();
-            if (!string.IsNullOrEmpty(token))
-            {
-                Console.WriteLine("Using GitHub token for authentication.");
-                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            }
-
-            // Add required headers for GitHub API
-            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("GitHubRelease/1.0");
-            httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
-
-            // Send a GET request to the GitHub API
             var response = await httpClient.GetAsync(apiUrl);
-            if (!response.IsSuccessStatusCode)
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
                 throw new ArgumentException($"The repository '{Repo}' does not exist or is not accessible. HTTP Status: {response.StatusCode}");
+            }
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            {
+                throw new InvalidOperationException($"Access denied to repository '{Repo}'. A valid GitHub token is required for private repositories.");
+            }
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new ArgumentException($"Failed to validate the repository '{Repo}'. HTTP Status: {response.StatusCode}");
             }
 
             Console.WriteLine($"Repository '{Repo}' is valid and accessible.");
