@@ -255,42 +255,55 @@ namespace GitHubRelease
             var context = new JsonContext();
             string jsonBody = JsonSerializer.Serialize(release, context.Release);
 
-            // Log the JSON body for debugging
-            Console.WriteLine($"Release JSON Body: {jsonBody}");
+            // Verbose logging: show all key elements
+            Console.WriteLine("[VERBOSE] --- CreateReleaseAndUploadAsset ---");
+            Console.WriteLine($"[VERBOSE] Repo: {Repo}");
+            Console.WriteLine($"[VERBOSE] Release Tag: {release.TagName}");
+            Console.WriteLine($"[VERBOSE] Target Commitish: {release.TargetCommitish}");
+            Console.WriteLine($"[VERBOSE] Asset Path: {assetPath}");
+            Console.WriteLine($"[VERBOSE] Release JSON Body: {jsonBody}");
 
             // Send a POST request to create a new release on GitHub
             var uri = $"{Constants.GitHubApiPrefix}/{Repo}/releases";
+            Console.WriteLine($"[VERBOSE] POST URI: {uri}");
             var response = await ApiService.PostAsync(uri, new StringContent(jsonBody, Encoding.UTF8, "application/json"));
+
+            var responseContent = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"[VERBOSE] Release creation response status: {response.StatusCode}");
+            Console.WriteLine($"[VERBOSE] Release creation response body: {responseContent}");
 
             if (!response.IsSuccessStatusCode)
             {
-                var responseContentError = await response.Content.ReadAsStringAsync();
-                throw new InvalidOperationException($"Error: Could not create a release: {release.TagName}. Response: {responseContentError}");
+                throw new InvalidOperationException($"Error: Could not create a release: {release.TagName}. Response: {responseContent}");
             }
 
-            Console.WriteLine($"Successfully created a release {release.TagName}. uploading asset");
+            Console.WriteLine($"[VERBOSE] Successfully created a release {release.TagName}. Uploading asset...");
 
             // Extract the upload URL from the response
-            var responseContent = await response.Content.ReadAsStringAsync();
             var responseObject = JsonDocument.Parse(responseContent);
             var uploadUrlDynamic = responseObject.RootElement.GetProperty("upload_url").GetString();
             if (uploadUrlDynamic is string uploadUrl)
             {
                 uploadUrl = uploadUrl.Replace("{?name,label}", $"?name={Path.GetFileName(assetPath)}");
+                Console.WriteLine($"[VERBOSE] Asset upload URL: {uploadUrl}");
             }
             else
             {
+                Console.WriteLine("[VERBOSE] Failed to extract upload URL from the response.");
                 throw new InvalidOperationException("Failed to extract upload URL from the response.");
             }
 
             // Upload the asset
             response = await UploadAsset(assetPath, uploadUrl);
+            var assetUploadContent = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"[VERBOSE] Asset upload response status: {response.StatusCode}");
+            Console.WriteLine($"[VERBOSE] Asset upload response body: {assetUploadContent}");
             if (!response.IsSuccessStatusCode)
             {
-                throw new InvalidOperationException($"Error: Could not upload the asset: {assetPath}.");
+                throw new InvalidOperationException($"Error: Could not upload the asset: {assetPath}. Response: {assetUploadContent}");
             }
 
-            Console.WriteLine($"Successfully uploaded the asset: {assetPath}.");
+            Console.WriteLine($"[VERBOSE] Successfully uploaded the asset: {assetPath}.");
             return response;
         }
 

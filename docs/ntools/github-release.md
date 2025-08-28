@@ -84,3 +84,24 @@ The access token must have the following permissions:
 
 ### Usage
 See [nb.exe](../ntools/nbuild.md) for the command line options.
+
+## Manifests and private GitHub release assets
+
+- `nb download` and `nb install` can consume JSON manifests that reference GitHub release assets (for example `WebDownloadFile` entries that point at `https://github.com/OWNER/REPO/releases/download/TAG/asset.zip`).
+- For private repositories, unauthenticated requests to the public `releases/download` URL will return 404. `nb` will attempt an authenticated fallback using the GitHub API when a token is available.
+
+How authentication is provided
+- Preferred: set `API_GITHUB_KEY` in the environment or in your CI secrets. `nb` and the `GitHubRelease` library will read the token from the environment or the Windows Credential Manager.
+- Example (PowerShell):
+
+```powershell
+$env:API_GITHUB_KEY = 'ghp_XXXX'
+.\Release\nb.exe install --json ..\home\dev-setup\hbs.json --verbose
+```
+
+Behavior
+- On download failure (404) for a GitHub release URL, `nb` will parse the owner/repo/tag and call into `GitHubRelease.ReleaseService.DownloadAssetByName(tag, assetName, dest)` which uses the GitHub API to find the asset and download it using the authenticated asset endpoint. This approach supports private repositories when the token has appropriate scopes (typically `repo` and `releases`).
+
+Notes and troubleshooting
+- Ensure the token has `repo` / `releases` scopes for private repositories.
+- For enterprise GitHub installations with custom hosts, the `GitHubRelease` helpers must be configured to use the appropriate API base URL.
