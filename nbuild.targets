@@ -21,6 +21,14 @@
 		<ArtifactsFolder>$(ArtifactsSolutionFolder)\$(TargetRelease)\$(ProductVersion)</ArtifactsFolder>
 		<ArtifactsTestResultsFolder>$(ArtifactsSolutionFolder)\TestResults\$(ProductVersion)</ArtifactsTestResultsFolder>
 		<NbExe>$(OutputPathRelease)\nb.exe</NbExe>
+
+          <!-- Default paths for local builds -->
+		<CoverageFolder>$(ArtifactsSolutionFolder)\CoverageReport\$(ProductVersion)</CoverageFolder>
+		
+		<!-- Override paths for GitHub Actions -->
+		<ArtifactsTestResultsFolder Condition="'$(GITHUB_ACTIONS)' == 'true'">$(SolutionDir)\TestResults\$(ProductVersion)</ArtifactsTestResultsFolder>
+		<CoverageFolder Condition="'$(GITHUB_ACTIONS)' == 'true'">$(SolutionDir)\CoverageReport\$(ProductVersion)</CoverageFolder>
+
 	  </PropertyGroup>  
 	  <ItemGroup>
 			<BinaryFiles 
@@ -396,7 +404,11 @@
 	Add for testing and remove after success -->
 	<Target Name="GITHUB_PRE_RELEASE" DependsOnTargets="ARTIFACTS;GIT_BRANCH" AfterTargets="STAGE"  Condition="'$(GITHUB_ACTIONS)' != ''" >
 		<Git Command="PushTag" TaskParameter="$(ProductVersion)" />
+<<<<<<< HEAD
 		<Exec Command='"$(SolutionDir)\nb\bin\Release\nb.exe" pre_release_create --repo $(SolutionName) --tag $(ProductVersion) --branch $(GitBranch) --file $(ArtifactsFolder).zip' WorkingDirectory="$(SolutionDir)" />
+=======
+		<Exec Command='"$(SolutionDir)\nb\bin\Release\nb.exe" pre_release_create --repo $(OWNER)/$(SolutionName) --tag $(ProductVersion) --branch $(GitBranch) --file $(ArtifactsFolder).zip --verbose' WorkingDirectory="$(SolutionDir)" />
+>>>>>>> 151-issue
 
 		<Message Text="==> DONE"/>
 	</Target>
@@ -531,6 +543,12 @@
                 CLEAN;
                 TAG;
                 AUTOTAG_STAGE;
+<<<<<<< HEAD
+=======
+				TEST;
+                COVERAGE;
+                COVERAGE_SUMMARY;
+>>>>>>> 151-issue
 				PUBLISH;
 				PACKAGE" >
   </Target>
@@ -542,4 +560,96 @@
 		<RemoveDir Directories="$(ArtifactsFolder);"/> 
 		<Message Text="==> COMMON_DONE"/>
 	</Target>
+<<<<<<< HEAD
+=======
+
+    <!-- Generate code coverage reports -->
+    <Target Name="COVERAGE" DependsOnTargets="ARTIFACTS;TAG;" 
+            Condition="'$(EnableCodeCoverage)' == 'true'">
+        <Message Text="Generating code coverage reports..." />
+        
+        <!-- Debug: Show property values -->
+        <Message Text="Debug: SolutionDir = $(SolutionDir)" />
+        <Message Text="Debug: CoverageFolder = $(CoverageFolder)" />
+        <Message Text="Debug: ArtifactsTestResultsFolder = $(ArtifactsTestResultsFolder)" />
+        
+        <!-- Ensure we have test results before generating coverage -->
+        <Error Condition="!Exists('$(ArtifactsTestResultsFolder)')" 
+               Text="Test results folder not found at: $(ArtifactsTestResultsFolder). Please run tests first with 'nb STAGE' or 'nb TEST'." />
+        
+        <!-- Install ReportGenerator tool if not already installed -->
+        <Exec Command="dotnet tool install --global dotnet-reportgenerator-globaltool" 
+              ContinueOnError="true" 
+              IgnoreExitCode="true" />
+        
+        <!-- Create coverage directory -->
+        <MakeDir Directories="$(CoverageFolder)" Condition="!Exists('$(CoverageFolder)')" />
+        
+        <!-- Debug: Show what directory was created -->
+        <Message Text="Debug: Coverage directory created/exists at: $(CoverageFolder)" />
+        
+        <!-- Generate coverage report using ReportGenerator with configurable filters -->
+        <Message Text="Debug: Running ReportGenerator with targetdir: $(CoverageFolder)" />
+        <Exec Command='reportgenerator "-reports:$(ArtifactsTestResultsFolder)\**\coverage.cobertura.xml" "-targetdir:$(CoverageFolder)" "-reporttypes:Html;Cobertura;TextSummary" "-assemblyfilters:$(CoverageAssemblyFilters)" "-classfilters:$(CoverageClassFilters)"' 
+              WorkingDirectory="$(SolutionDir)"
+              ContinueOnError="true">
+            <Output TaskParameter="ExitCode" PropertyName="ReportGenExitCode" />
+        </Exec>
+        
+        <!-- Debug: Check if Summary.txt was created in the right place -->
+        <Message Text="Debug: Checking for Summary.txt at: $(CoverageFolder)\Summary.txt" />
+        <Message Condition="Exists('$(CoverageFolder)\Summary.txt')" Text="Debug: ✅ Summary.txt found at correct location" />
+        <Message Condition="!Exists('$(CoverageFolder)\Summary.txt')" Text="Debug: ❌ Summary.txt NOT found at expected location" />
+        
+        <!-- Fallback: try with different coverage file pattern -->
+        <Exec Condition="'$(ReportGenExitCode)' != '0'" 
+              Command='reportgenerator "-reports:$(ArtifactsTestResultsFolder)\**\*.xml" "-targetdir:$(CoverageFolder)" "-reporttypes:Html;Cobertura;TextSummary" "-assemblyfilters:$(CoverageAssemblyFilters)" "-classfilters:$(CoverageClassFilters)"' 
+              WorkingDirectory="$(SolutionDir)"
+              ContinueOnError="true">
+            <Output TaskParameter="ExitCode" PropertyName="ReportGenFallbackExitCode" />
+        </Exec>
+        
+        <!-- Copy coverage file to root for GitHub Actions -->
+        <Copy SourceFiles="$(CoverageFolder)\Cobertura.xml" 
+              DestinationFiles="$(SolutionDir)\coverage.cobertura.xml" 
+              ContinueOnError="true" />
+        
+        <Message Text="Code coverage report generated in: $(CoverageFolder)" />
+        <Message Text="Open $(CoverageFolder)\index.html to view the report" />
+        <Message Text="==> DONE" />
+    </Target>
+
+    <!-- Display high-level code coverage summary -->
+    <Target Name="COVERAGE_SUMMARY" DependsOnTargets="COVERAGE" 
+            Condition="'$(EnableCodeCoverage)' == 'true'">
+        <Message Text="Displaying code coverage summary..." />
+        
+        <!-- Define coverage summary file path using configurable CoverageFolder -->
+        <PropertyGroup>
+            <CoverageSummaryFile>$(CoverageFolder)\Summary.txt</CoverageSummaryFile>
+        </PropertyGroup>
+        
+        <!-- Check if summary file exists -->
+        <Error Condition="!Exists('$(CoverageSummaryFile)')" 
+               Text="Coverage summary file not found at: $(CoverageSummaryFile). Please run 'nb COVERAGE' first to generate coverage reports." />
+        
+        <!-- Display header -->
+        <Message Text="════════════════════════════════════════════════════════════════" />
+        <Message Text="                    CODE COVERAGE SUMMARY" />
+        <Message Text="════════════════════════════════════════════════════════════════" />
+        
+        <!-- Use type command to display the file content -->
+        <Exec Command='type "$(CoverageSummaryFile)"' 
+              WorkingDirectory="$(SolutionDir)" />
+        
+        <!-- Display footer -->
+        <Message Text="════════════════════════════════════════════════════════════════" />
+        <Message Text="💡 For detailed coverage report, open: $(CoverageFolder)\index.html" />
+        <Message Text="📊 Coverage data file: $(SolutionDir)\coverage.cobertura.xml" />
+        <Message Text="════════════════════════════════════════════════════════════════" />
+        
+        <Message Text="==> DONE" />
+    </Target>
+
+>>>>>>> 151-issue
 </Project>
