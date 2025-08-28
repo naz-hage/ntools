@@ -24,18 +24,34 @@ on:
           - "true"
           - "false"
 
+env:
+  solution_name: ntools.sln
+  dotnet_version: 9.0
+  build_type: ${{ github.event.inputs.build_type || 'stage' }}
+  enable_logging: ${{ github.event.inputs.enable_logging || 'false' }}
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+  actions: read
+
 jobs:
   build:
     name: Running a workflow
+    strategy:
+      matrix:
+        configuration: [Release]
     runs-on: windows-latest
-    env:
-      build_type: ${{ github.event.inputs.build_type || 'stage' }}
 
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
       with:
+        token: ${{ secrets.API_GITHUB_KEY }}
         fetch-depth: 0
+        ref: ${{ github.event.pull_request.head.ref }}
+        repository: ${{ github.event.pull_request.head.repo.full_name }}
 
     - name: Install .NET Core
       uses: actions/setup-dotnet@v4
@@ -80,7 +96,7 @@ jobs:
     - name: Run Build
       run: |
         & "$env:ProgramFilesPath/nbuild/nb.exe" CORE
-        & "$env:ProgramFilesPath/nbuild/nb.exe" $env:build_type
+        & "$env:ProgramFilesPath/nbuild/nb.exe" ${{ env.build_type }}
       shell: pwsh
       working-directory: ${{ github.workspace }}
       env:
