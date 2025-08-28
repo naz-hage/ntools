@@ -404,11 +404,7 @@
 	Add for testing and remove after success -->
 	<Target Name="GITHUB_PRE_RELEASE" DependsOnTargets="ARTIFACTS;GIT_BRANCH" AfterTargets="STAGE"  Condition="'$(GITHUB_ACTIONS)' != ''" >
 		<Git Command="PushTag" TaskParameter="$(ProductVersion)" />
-<<<<<<< HEAD
-		<Exec Command='"$(SolutionDir)\nb\bin\Release\nb.exe" pre_release_create --repo $(SolutionName) --tag $(ProductVersion) --branch $(GitBranch) --file $(ArtifactsFolder).zip' WorkingDirectory="$(SolutionDir)" />
-=======
 		<Exec Command='"$(SolutionDir)\nb\bin\Release\nb.exe" pre_release_create --repo $(OWNER)/$(SolutionName) --tag $(ProductVersion) --branch $(GitBranch) --file $(ArtifactsFolder).zip --verbose' WorkingDirectory="$(SolutionDir)" />
->>>>>>> 151-issue
 
 		<Message Text="==> DONE"/>
 	</Target>
@@ -543,12 +539,9 @@
                 CLEAN;
                 TAG;
                 AUTOTAG_STAGE;
-<<<<<<< HEAD
-=======
 				TEST;
                 COVERAGE;
                 COVERAGE_SUMMARY;
->>>>>>> 151-issue
 				PUBLISH;
 				PACKAGE" >
   </Target>
@@ -560,8 +553,6 @@
 		<RemoveDir Directories="$(ArtifactsFolder);"/> 
 		<Message Text="==> COMMON_DONE"/>
 	</Target>
-<<<<<<< HEAD
-=======
 
     <!-- Generate code coverage reports -->
     <Target Name="COVERAGE" DependsOnTargets="ARTIFACTS;TAG;" 
@@ -651,5 +642,4 @@
         <Message Text="==> DONE" />
     </Target>
 
->>>>>>> 151-issue
 </Project>
