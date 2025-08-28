@@ -24,11 +24,6 @@ on:
           - "true"
           - "false"
 
-<<<<<<< HEAD
-jobs:
-  build:
-    name: Running a workflow
-=======
 env:
   solution_name: ntools.sln
   dotnet_version: 9.0
@@ -47,10 +42,7 @@ jobs:
     strategy:
       matrix:
         configuration: [Release]
->>>>>>> 151-issue
     runs-on: windows-latest
-    env:
-      build_type: ${{ github.event.inputs.build_type || 'stage' }}
 
     steps:
     - name: Checkout Repository
@@ -104,7 +96,7 @@ jobs:
     - name: Run Build
       run: |
         & "$env:ProgramFilesPath/nbuild/nb.exe" CORE
-        & "$env:ProgramFilesPath/nbuild/nb.exe" $env:build_type
+        & "$env:ProgramFilesPath/nbuild/nb.exe" ${{ env.build_type }}
       shell: pwsh
       working-directory: ${{ github.workspace }}
       env:
