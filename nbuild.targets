@@ -396,7 +396,7 @@
 	Add for testing and remove after success -->
 	<Target Name="GITHUB_PRE_RELEASE" DependsOnTargets="ARTIFACTS;GIT_BRANCH" AfterTargets="STAGE"  Condition="'$(GITHUB_ACTIONS)' != ''" >
 		<Git Command="PushTag" TaskParameter="$(ProductVersion)" />
-		<Exec Command='"$(SolutionDir)\nb\bin\Release\nb.exe" pre_release_create --repo $(SolutionName) --tag $(ProductVersion) --branch $(GitBranch) --file $(ArtifactsFolder).zip' WorkingDirectory="$(SolutionDir)" />
+		<Exec Command='"$(SolutionDir)\nb\bin\Release\nb.exe" pre_release_create --repo $(SolutionName) --tag $(ProductVersion) --branch $(GitBranch) --file $(ArtifactsFolder).zip --verbose' WorkingDirectory="$(SolutionDir)" />
 
 		<Message Text="==> DONE"/>
 	</Target>
