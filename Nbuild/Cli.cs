@@ -295,6 +295,9 @@ public class Cli
         // otherwise, it is expected to be a repoName, in which case
         // the UserName is derived from the OWNER environment variable
 
+        bool verbose = Verbose;
+        if (verbose) Console.WriteLine($"[VERBOSE] ValidateRepo: Initial Repo argument: {Repo}");
+
         // Check if the input is a full URL
         if (Repo!.StartsWith("https://github.com/", StringComparison.OrdinalIgnoreCase))
         {
@@ -306,6 +309,7 @@ public class Cli
             }
 
             Repo = uri.AbsolutePath.Trim('/'); // Extracts "userName/repoName"
+            if (verbose) Console.WriteLine($"[VERBOSE] ValidateRepo: Repo converted from URL: {Repo}");
         }
 
         var repoParts = Repo!.Split('/');
@@ -318,14 +322,15 @@ public class Cli
                 throw new InvalidOperationException("The 'OWNER' environment variable is required when only the repository name is provided.");
             }
 
-            // Combine OWNER and repoName to form userName/repoName
             Repo = $"{owner}/{Repo}";
-
+            if (verbose) Console.WriteLine($"[VERBOSE] ValidateRepo: Repo resolved using OWNER: {Repo}");
         }
         else if (repoParts.Length != 2 || string.IsNullOrEmpty(repoParts[0]) || string.IsNullOrEmpty(repoParts[1]))
         {
             throw new ArgumentException("The 'repo' option must be in the format userName/repoName.");
         }
+
+        if (verbose) Console.WriteLine($"[VERBOSE] ValidateRepo: Final resolved Repo: {Repo}");
 
         // Validate that the repository exists
         await ValidateRepositoryExists();
