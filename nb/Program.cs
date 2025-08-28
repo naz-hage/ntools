@@ -332,24 +332,24 @@ namespace nb
             preReleaseCreateCommand.AddOption(fileOption);
             preReleaseCreateCommand.AddOption(verboseOption);
             preReleaseCreateCommand.SetHandler(async (string repo, string tag, string branch, string file, bool verbose) => {
-<<<<<<< HEAD
+                
                 // Substitute repoName with OWNER/repoName if only a single name is provided
-                if (!string.IsNullOrWhiteSpace(repo) && !repo.Contains("/") && !repo.StartsWith("https://", StringComparison.OrdinalIgnoreCase)) {
+                if (!string.IsNullOrWhiteSpace(repo) && !repo.Contains("/") && !repo.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                {
                     var owner = Environment.GetEnvironmentVariable("OWNER");
-                    if (!string.IsNullOrEmpty(owner)) {
+                    if (!string.IsNullOrEmpty(owner))
+                    {
                         repo = $"{owner}/{repo}";
                         if (verbose) ConsoleHelper.WriteLine($"[VERBOSE] Substituted repo argument with OWNER: {repo}", ConsoleColor.Gray);
                     }
                 }
-                if (verbose) ConsoleHelper.WriteLine($"[VERBOSE] Creating pre-release for repo: {repo}, tag: {tag}, branch: {branch}, file: {file}", ConsoleColor.Gray);
-=======
+
                 if (verbose)
                 {
                     ConsoleHelper.WriteLine($"[VERBOSE] Creating pre-release for repo: {repo}, tag: {tag}, branch: {branch}, file: {file}", ConsoleColor.Gray);
                     ConsoleHelper.WriteLine($"[VERBOSE] OWNER env: {Environment.GetEnvironmentVariable("OWNER")}", ConsoleColor.Gray);
                     ConsoleHelper.WriteLine($"[VERBOSE] API_GITHUB_KEY env: {(string.IsNullOrEmpty(Environment.GetEnvironmentVariable("API_GITHUB_KEY")) ? "(not set)" : "(set)")}", ConsoleColor.Gray);
                 }
->>>>>>> 151-issue
                 var exitCode = await HandleReleaseCreateCommand(repo, tag, branch, file, true);
                 Environment.ExitCode = exitCode;
             }, repoOption, tagOption, branchOption, fileOption, verboseOption);
