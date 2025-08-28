@@ -228,10 +228,6 @@ public class Cli
             throw new ArgumentException("The 'repo' option is required for release_create, pre_release_create and release_download commands and must be in the format userName/repoName.");
         }
 
-        // Use the new ValidateRepo method
-        ValidateRepo().GetAwaiter().GetResult();
-
-
         if (Command != CommandType.list_release)
         {
             if (string.IsNullOrEmpty(Tag))
@@ -247,13 +243,11 @@ public class Cli
             if (Command == CommandType.release_create && string.IsNullOrEmpty(AssetFileName))
             {
                 throw new ArgumentException("The 'file' option is required for the release_create command.");
-
             }
 
             if (Command == CommandType.pre_release_create && string.IsNullOrEmpty(AssetFileName))
             {
                 throw new ArgumentException("The 'file' option is required for the pre_release_create command.");
-
             }
 
             if (Command != CommandType.release_download && string.IsNullOrEmpty(Branch))
@@ -272,6 +266,9 @@ public class Cli
                 throw new ArgumentException("The 'path' option is required for the release_download command and must be an absolute path.");
             }
         }
+
+        // Use the new ValidateRepo method
+        ValidateRepo().GetAwaiter().GetResult();
     }
 
     /// <summary>
@@ -375,7 +372,7 @@ public class Cli
             }
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == System.Net.HttpStatusCode.Forbidden)
             {
-                throw new InvalidOperationException($"Access denied to repository '{Repo}'. A valid GitHub token is required for private repositories.");
+                throw new ArgumentException($"Access denied to repository '{Repo}'. A valid GitHub token is required for private repositories.");
             }
             if (!response.IsSuccessStatusCode)
             {
