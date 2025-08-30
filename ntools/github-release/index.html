@@ -234,22 +234,6 @@
 <h2 id="githubrelease-command-line-options">GitHubRelease Command Line Options</h2>
 <h3 id="usage">Usage</h3>
 <p>See <a href="../nbuild/">nb.exe</a> for the command line options.</p>
-<h2 id="manifests-and-private-github-release-assets">Manifests and private GitHub release assets</h2>
-<ul>
-<li><code>nb download</code> and <code>nb install</code> can consume JSON manifests that reference GitHub release assets (for example <code>WebDownloadFile</code> entries that point at <code>https://github.com/OWNER/REPO/releases/download/TAG/asset.zip</code>).</li>
-<li>For private repositories, unauthenticated requests to the public <code>releases/download</code> URL will return 404. <code>nb</code> will attempt an authenticated fallback using the GitHub API when a token is available.</li>
-</ul>
-<p>How authentication is provided
-- Preferred: set <code>API_GITHUB_KEY</code> in the environment or in your CI secrets. <code>nb</code> and the <code>GitHubRelease</code> library will read the token from the environment or the Windows Credential Manager.
-- Example (PowerShell):</p>
-<pre><code class="language-powershell">$env:API_GITHUB_KEY = 'ghp_XXXX'
-.\Release\nb.exe install --json ..\home\dev-setup\hbs.json --verbose
-</code></pre>
-<p>Behavior
-- On download failure (404) for a GitHub release URL, <code>nb</code> will parse the owner/repo/tag and call into <code>GitHubRelease.ReleaseService.DownloadAssetByName(tag, assetName, dest)</code> which uses the GitHub API to find the asset and download it using the authenticated asset endpoint. This approach supports private repositories when the token has appropriate scopes (typically <code>repo</code> and <code>releases</code>).</p>
-<p>Notes and troubleshooting
-- Ensure the token has <code>repo</code> / <code>releases</code> scopes for private repositories.
-- For enterprise GitHub installations with custom hosts, the <code>GitHubRelease</code> helpers must be configured to use the appropriate API base URL.</p>
               
             </div>
           </div><footer>
