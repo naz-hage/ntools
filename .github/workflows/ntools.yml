@@ -25,75 +25,33 @@ on:
           - "false"
 
 env:
-  Solution_Name: ntools.sln
-  Test_Project_Path: LauncherTests
-  dotnet_version: 9.0.x
+  solution_name: ntools.sln
+  dotnet_version: 9.0
   build_type: ${{ github.event.inputs.build_type || 'stage' }}
   enable_logging: ${{ github.event.inputs.enable_logging || 'false' }}
 
+permissions:
+  contents: write
+  checks: write
+  pull-requests: write
+  actions: read
+
 jobs:
-  test:
-    runs-on: windows-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Restore dependencies
-        run: dotnet restore ntools.sln
-        working-directory: ${{ github.workspace }}
-
-      - name: Build
-        run: dotnet build ntools.sln --no-restore --configuration Release
-        working-directory: ${{ github.workspace }}
-
-      - name: Test with coverage
-        env:
-          OWNER: ${{ github.repository_owner }}
-          API_GITHUB_KEY: ${{ secrets.API_GITHUB_KEY }}
-        run: dotnet test ntools.sln --no-build --configuration Release --logger "trx;LogFileName=test-results.trx" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=TestResults/
-        working-directory: ${{ github.workspace }}
-
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: '**/TestResults/**/*.trx'
-
-      - name: Upload coverage report
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-report
-          path: '**/TestResults/**/coverage.cobertura.xml'
-
-      - name: List all coverage files
-        run: Get-ChildItem -Recurse -Filter coverage.cobertura.xml | Select-Object -ExpandProperty FullName
-        shell: pwsh
-
-      - name: List all coverage.cobertura.xml files
-        run: Get-ChildItem -Path . -Filter coverage.cobertura.xml -Recurse | Select-Object FullName
-        shell: pwsh
-        working-directory: ${{ github.workspace }}
-
-      - name: Publish Test Results
-        uses: dorny/test-reporter@v1
-        if: always()
-        with:
-          name: Tests
-          path: '**/TestResults/**/*.trx'
-          reporter: dotnet-trx
-
   build:
     name: Running a workflow
-    needs: [test]
+    strategy:
+      matrix:
+        configuration: [Release]
     runs-on: windows-latest
 
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
       with:
+        token: ${{ secrets.API_GITHUB_KEY }}
         fetch-depth: 0
+        ref: ${{ github.event.pull_request.head.ref }}
+        repository: ${{ github.event.pull_request.head.repo.full_name }}
 
     - name: Install .NET Core
       uses: actions/setup-dotnet@v4
@@ -146,6 +104,91 @@ jobs:
         API_GITHUB_KEY: ${{ secrets.API_GITHUB_KEY }}
         DOTNET_CLI_TELEMETRY_OPTOUT: 1
 
+    - name: Debug - Show TestResults Directory Structure
+      run: |
+        Write-Host "=== Checking Directory Structure ==="
+        Write-Host "Current working directory: $(Get-Location)"
+        Write-Host "GitHub workspace: ${{ github.workspace }}"
+        
+        Write-Host "`n=== Checking for TestResults directory ==="
+        if (Test-Path "./TestResults") {
+          Write-Host "./TestResults exists"
+          Get-ChildItem -Path "./TestResults" -Recurse | Select-Object FullName, Length, LastWriteTime
+        } else {
+          Write-Host "./TestResults does not exist"
+        }
+        
+        Write-Host "`n=== Checking for CoverageReport directory ==="
+        if (Test-Path "./CoverageReport") {
+          Write-Host "./CoverageReport exists"
+          Get-ChildItem -Path "./CoverageReport" -Recurse | Select-Object FullName, Length, LastWriteTime
+        } else {
+          Write-Host "./CoverageReport does not exist"
+        }
+        
+        Write-Host "`n=== Searching for any test/coverage files ==="
+        Get-ChildItem -Path "." -Recurse -Include "*.trx", "*.xml", "*.json" -ErrorAction SilentlyContinue | 
+          Where-Object {$_.Name -match "(test|coverage)" -or $_.FullName -match "(TestResults|CoverageReport)"} | 
+          Select-Object FullName, Length, LastWriteTime
+      shell: pwsh
+      if: always()
+
+    - name: Upload Test Results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results-${{ matrix.configuration }}
+        path: |
+          ./TestResults/**/*.trx
+          ./TestResults/**/*.xml
+          ./TestResults/**/*.json
+          **/TestResults/**/*.trx
+          **/TestResults/**/*.xml
+          **/TestResults/**/*.json
+        retention-days: 30
+
+    - name: Upload Code Coverage Reports
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: coverage-reports-${{ matrix.configuration }}
+        path: |
+          ./CoverageReport/**/*
+          ./TestResults/**/*.cobertura.xml
+          coverage.cobertura.xml
+        retention-days: 30
+
+    - name: Publish Test Results
+      uses: dorny/test-reporter@v1
+      if: always()
+      with:
+        name: Test Results (${{ matrix.configuration }})
+        path: './TestResults/**/*.trx'
+        reporter: dotnet-trx
+        fail-on-error: false
+
+    - name: Add Coverage PR Comment
+      uses: marocchino/sticky-pull-request-comment@v2
+      if: github.event_name == 'pull_request'
+      with:
+        recreate: true
+        message: |
+          ## 📊 Code Coverage Report
+          
+          ### �️ Build & Test Status
+          - ✅ **Build:** Successful
+          - ✅ **Tests:** All tests passing
+          - ✅ **Coverage:** Reports generated successfully
+          
+          ### 📁 Available Artifacts
+          - **HTML Report:** Available in `CoverageReport` folder (generated by nbuild)
+          - **Cobertura XML:** `coverage.cobertura.xml`
+          - **Test Results:** Available in `TestResults` folder
+          
+          [📁 Download Coverage Reports](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          
+          **Status: ✅ AUTOMATED COVERAGE REPORTING ACTIVE**
+
   docs:
     name: Publish Docs
     runs-on: ubuntu-latest
@@ -166,7 +209,9 @@ jobs:
         run: |	
           python -m pip install --upgrade pip	
           pip install mkdocs	
-      - name: Update docs	
-        run: |	
-          mkdocs build	
+      - name: Update docs
+        run: |
+          mkdocs build
           mkdocs gh-deploy --force
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

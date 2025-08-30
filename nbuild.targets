@@ -21,6 +21,14 @@
 		<ArtifactsFolder>$(ArtifactsSolutionFolder)\$(TargetRelease)\$(ProductVersion)</ArtifactsFolder>
 		<ArtifactsTestResultsFolder>$(ArtifactsSolutionFolder)\TestResults\$(ProductVersion)</ArtifactsTestResultsFolder>
 		<NbExe>$(OutputPathRelease)\nb.exe</NbExe>
+
+          <!-- Default paths for local builds -->
+		<CoverageFolder>$(ArtifactsSolutionFolder)\CoverageReport\$(ProductVersion)</CoverageFolder>
+		
+		<!-- Override paths for GitHub Actions -->
+		<ArtifactsTestResultsFolder Condition="'$(GITHUB_ACTIONS)' == 'true'">$(SolutionDir)\TestResults\$(ProductVersion)</ArtifactsTestResultsFolder>
+		<CoverageFolder Condition="'$(GITHUB_ACTIONS)' == 'true'">$(SolutionDir)\CoverageReport\$(ProductVersion)</CoverageFolder>
+
 	  </PropertyGroup>  
 	  <ItemGroup>
 			<BinaryFiles 
@@ -50,7 +58,9 @@
 		
 		<Message Text="==> DONE"/>
 	</Target>
+
 	
+		
 	<!-- Test for FileVersion task and powershell file-version.ps1-->
 	<Target Name="FILE_VERSIONS"  DependsOnTargets="ARTIFACTS">
 		<PropertyGroup>
@@ -154,6 +164,8 @@
 	<Message Text="nbTests executed and code coverage report generated in TestResults\CoverageReport." />
 	<Message Text="==> DONE" />
   </Target>
+
+
 	<!-- mkdocs deploy locally -->
 	<Target Name="MKDOCS_DEPLOY" AfterTargets="MKDOCS">
 		<Exec Command='"$(MkDocsExe)" serve' WorkingDirectory="$(SolutionDir)"/>
@@ -378,5 +390,256 @@
 		<Message Text="Pre-commit hooks installed via precommit-hook.ps1" />
 		<Message Text="==> DONE" />
 	</Target>
+
+	<!-- Creates a stage or prod release 
+	Add for testing and remove after success-->
+	<Target Name="GITHUB_RELEASE" DependsOnTargets="ARTIFACTS;GIT_BRANCH" AfterTargets="PROD" Condition="'$(GITHUB_ACTIONS)' != ''" >
+		<Git Command="PushTag" TaskParameter="$(ProductVersion)" />
+		<Exec Command='$(SolutionDir)\nb\bin\Release\nb.exe release_create --repo $(SolutionName) --tag $(ProductVersion) --branch $(GitBranch) --file $(ArtifactsFolder).zip' WorkingDirectory="$(SolutionDir)" />
+
+		<Message Text="==> DONE"/>
+	</Target>
+
+	<!-- Creates a stage or prod pre-release 
+	Add for testing and remove after success -->
+	<Target Name="GITHUB_PRE_RELEASE" DependsOnTargets="ARTIFACTS;GIT_BRANCH" AfterTargets="STAGE"  Condition="'$(GITHUB_ACTIONS)' != ''" >
+		<Git Command="PushTag" TaskParameter="$(ProductVersion)" />
+		<Exec Command='"$(SolutionDir)\nb\bin\Release\nb.exe" pre_release_create --repo $(OWNER)/$(SolutionName) --tag $(ProductVersion) --branch $(GitBranch) --file $(ArtifactsFolder).zip --verbose' WorkingDirectory="$(SolutionDir)" />
+
+		<Message Text="==> DONE"/>
+	</Target>
+
+	<!-- Run the focused ReleaseServiceFactoryTests via dotnet test -->
+	<Target Name="RUN_RELEASESERVICEFACTORYTESTS">
+		<Message Text="Running ReleaseServiceFactoryTests (focused)" Importance="high" />
+		<Exec Command="dotnet test &quot;C:\source\ntools\ntools.sln&quot; --filter &quot;FullyQualifiedName~NbuildTests.ReleaseServiceFactoryTests&quot; -v minimal" WorkingDirectory="$(SolutionDir)" />
+		<Message Text="==> RUN_RELEASESERVICEFACTORYTESTS DONE" />
+	</Target>
+
+	<!-- Pre-check: ensure no machine-level Debug/Release folders are present before running tests -->
+	<Target Name="NB_PRECHECK">
+		<Message Text="Running NB_PRECHECK: ensure C:\\Debug and C:\\Release do not exist on this machine" Importance="high" />
+		<Error Condition="Exists('C:\\Debug')" Text="NB_PRECHECK failed: Found C:\\Debug. Please run 'nb CLEAN' locally to remove repository artifacts and retry, or remove C:\\Debug manually if you understand the contents." />
+		<Error Condition="Exists('C:\\Release')" Text="NB_PRECHECK failed: Found C:\\Release. Please run 'nb CLEAN' locally to remove repository artifacts and retry, or remove C:\\Release manually if you understand the contents." />
+		<Message Text="NB_PRECHECK passed: no machine-level Debug/Release folders found." Importance="high" />
+	</Target>
+
+	<!-- Run the full solution test suite (used by 'nb test') -->
+	<Target Name="NB_TEST" DependsOnTargets="CLEAN;NB_PRECHECK">
+		<Message Text='Running full solution tests sequentially via dev-setup\run-tests-sequential.ps1' Importance="high" />
+		<!-- Use the existing script which stops lingering testhost/dotnet processes, removes local TestPlatform DLLs in Debug, and runs tests sequentially -->
+		<Exec Command='powershell -NoProfile -ExecutionPolicy Bypass -File "$(SolutionDir)\dev-setup\run-tests-sequential.ps1"' WorkingDirectory="$(SolutionDir)" ConsoleToMSBuild="true">
+			<Output TaskParameter="ExitCode" PropertyName="NbTestExitCode" />
+			<Output TaskParameter="ConsoleOutput" PropertyName="NbTestOutput" />
+		</Exec>
+		<Message Text="$(NbTestOutput)" Condition="'$(NbTestOutput)' != ''" Importance="high" />
+		<Message Text="==> NB_TEST DONE" />
+		<Error Condition="'$(NbTestExitCode)' != '0'" Text="NB_TEST failed. See output above for details." />
+	</Target>
+
+	<!-- Diagnostic target to run automatically after NB_TEST to list TestFramework DLLs -->
+	<Target Name="NB_TEST_DIAGNOSTICS" AfterTargets="NB_TEST">
+		<Message Text="==> NB_TEST_DIAGNOSTICS: listing TestFramework DLLs in Debug" Importance="high" />
+		<!-- Run extended diagnostics script which enumerates copies of test-platform/MSTest DLLs and lists package graphs for test projects -->
+		<Exec Command='powershell -NoProfile -ExecutionPolicy Bypass -File "$(SolutionDir)\dev-setup\nb_test_diagnostics_more.ps1" "$(SolutionDir)"' WorkingDirectory="$(SolutionDir)" ConsoleToMSBuild="true">
+			<Output TaskParameter="ConsoleOutput" PropertyName="NbTestDiagnosticsOutput" />
+		</Exec>
+		<Message Text="$(NbTestDiagnosticsOutput)" Importance="high" Condition="'$(NbTestDiagnosticsOutput)' != ''" />
+		<Message Text="==> NB_TEST_DIAGNOSTICS DONE" Importance="high" />
+	</Target>
+
+	<!-- Per-test-project diagnostic targets: run dotnet test with 'diag' to capture VSTest assembly load data -->
+	<!-- Targets auto-generated: one per Tests.csproj in the solution -->
+	<Target Name="NB_DIAG_NbuildTasksTests">
+		<Message Text="Running diag for NbuildTasksTests" Importance="high" />
+		<Exec Command='dotnet test "$(SolutionDir)\NbuildTasksTests\NbuildTasksTests.csproj" --diag:"$(SolutionDir)\TestResults\NbuildTasksTests-diag-vstest.txt" -v minimal' WorkingDirectory="$(SolutionDir)" />
+	</Target>
+
+	<Target Name="NB_DIAG_NbuildTests">
+		<Message Text="Running diag for NbuildTests" Importance="high" />
+		<Exec Command='dotnet test "$(SolutionDir)\NbuildTests\NbuildTests.csproj" --diag:"$(SolutionDir)\TestResults\NbuildTests-diag-vstest.txt" -v minimal' WorkingDirectory="$(SolutionDir)" />
+	</Target>
+
+	<Target Name="NB_DIAG_lfTests">
+		<Message Text="Running diag for lfTests" Importance="high" />
+		<Exec Command='dotnet test "$(SolutionDir)\lfTests\lfTests.csproj" --diag:"$(SolutionDir)\TestResults\lfTests-diag-vstest.txt" -v minimal' WorkingDirectory="$(SolutionDir)" />
+	</Target>
+
+	<Target Name="NB_DIAG_nbTests">
+		<Message Text="Running diag for nbTests" Importance="high" />
+		<Exec Command='dotnet test "$(SolutionDir)\nbTests\nbTests.csproj" --diag:"$(SolutionDir)\TestResults\nbTests-diag-vstest.txt" -v minimal' WorkingDirectory="$(SolutionDir)" />
+	</Target>
+
+	<Target Name="NB_DIAG_nBackupTests">
+		<Message Text="Running diag for nBackupTests" Importance="high" />
+		<Exec Command='dotnet test "$(SolutionDir)\nBackupTests\NbackupTests.csproj" --diag:"$(SolutionDir)\TestResults\nBackupTests-diag-vstest.txt" -v minimal' WorkingDirectory="$(SolutionDir)" />
+	</Target>
+
+	<Target Name="NB_DIAG_wiTests">
+		<Message Text="Running diag for wiTests" Importance="high" />
+		<Exec Command='dotnet test "$(SolutionDir)\wiTests\wiTests.csproj" --diag:"$(SolutionDir)\TestResults\wiTests-diag-vstest.txt" -v minimal' WorkingDirectory="$(SolutionDir)" />
+	</Target>
+
+	<Target Name="NB_DIAG_GitHubReleaseTests">
+		<Message Text="Running diag for GitHubReleaseTests" Importance="high" />
+		<Exec Command='dotnet test "$(SolutionDir)\GitHubReleaseTests\GitHubReleaseTests.csproj" --diag:"$(SolutionDir)\TestResults\GitHubReleaseTests-diag-vstest.txt" -v minimal' WorkingDirectory="$(SolutionDir)" />
+	</Target>
+
+	<!-- Aggregate target: run all per-project diagnostics sequentially -->
+	<Target Name="NB_TEST_DIAG_ALL" DependsOnTargets="NB_DIAG_NbuildTasksTests;NB_DIAG_NbuildTests;NB_DIAG_lfTests;NB_DIAG_nbTests;NB_DIAG_nBackupTests;NB_DIAG_wiTests;NB_DIAG_GitHubReleaseTests">
+		<Message Text=">== NB_TEST_DIAG_ALL completed" Importance="high" />
+	</Target>
+
+	<!-- Clean up the project and artifacts folder -->
+	<Target Name="CLEAN">
+		<Message Text="Cleaning repository: removing bin/, obj/, Debug/, Release/, TestResults/, CoverageReport/ and artifacts (safe mode)" Importance="high" />
+
+		<!-- Safety: ensure SolutionDir is set to avoid accidental root-level deletes -->
+		<PropertyGroup>
+			<_SolutionDir>$(SolutionDir)</_SolutionDir>
+		</PropertyGroup>
+
+		<Error Condition="'$(_SolutionDir)' == ''" Text="CLEAN aborted: $(SolutionDir) is not set. This prevents unsafe deletes." />
+
+		<!-- Collect directories to remove (MSBuild supports wildcards in Item Include) -->
+		<ItemGroup>
+			<DirectoriesToRemove Include="$(_SolutionDir)**\bin;
+										$(_SolutionDir)**\obj;
+										$(_SolutionDir)Debug;
+										$(_SolutionDir)Release;
+										$(_SolutionDir)TestResults;
+										$(_SolutionDir)CoverageReport;
+										c:\debug;
+										c:\release;
+										$(_SolutionDir)artifacts" />
+		</ItemGroup>
+
+		<Message Text="Directories to remove: @(DirectoriesToRemove)" Importance="high" />
+		<RemoveDir Directories="@(DirectoriesToRemove)" />
+
+		<Message Text="Cleaning complete." Importance="high" />
+	</Target>
+
+	<!-- Run all tests using dotnet test in Release mode -->
+	<Target Name="TEST" DependsOnTargets="ARTIFACTS;TAG">
+		<RemoveDir Directories="$(ArtifactsTestResultsFolder)"></RemoveDir>
+		<!--To colllect code coverage, add the following option to the test command: collect:"XPlat Code Coverage"-->
+		<Exec Command='dotnet test $(SolutionName).sln --configuration $(TargetRelease) --logger "console;verbosity=normal" %(DotNetTestFiles.Identity) --logger trx --results-directory:$(ArtifactsTestResultsFolder) --verbosity normal'/>
+		<Message Text="==> COMMON_DONE"/>
+	</Target>
+
+		<Target Name="PUBLISH" DependsOnTargets="ARTIFACTS;TAG">
+			<Message Text="Publishing all non-test projects using publish-all-projects.ps1" Importance="high" />
+			<Exec Command='pwsh -NoProfile -ExecutionPolicy Bypass -File "$(SolutionDir)\publish-all-projects.ps1" -PublishDir "$(ArtifactsFolder)" -ProductVersion "$(ProductVersion)"' WorkingDirectory="$(SolutionDir)" />
+			<Message Text="All non-test projects published to $(SolutionDir)\PublishAll" Importance="high" />
+		</Target>
+
+			<!-- Create a stage package for testing -->
+	<Target Name="STAGE" DependsOnTargets="
+                CLEAN;
+                TAG;
+                AUTOTAG_STAGE;
+				TEST;
+                COVERAGE;
+                COVERAGE_SUMMARY;
+				PUBLISH;
+				PACKAGE" >
+  </Target>
+
+	<!-- Create a package for the solution default is a zip file of all artifacts -->
+	<Target Name="PACKAGE" DependsOnTargets="PROPERTIES">
+		<Exec Command='"$(ZipExe)" a -r -tzip $(ArtifactsFolder).zip $(ArtifactsFolder)\*'/>
+		
+		<RemoveDir Directories="$(ArtifactsFolder);"/> 
+		<Message Text="==> COMMON_DONE"/>
+	</Target>
+
+    <!-- Generate code coverage reports -->
+    <Target Name="COVERAGE" DependsOnTargets="ARTIFACTS;TAG;" 
+            Condition="'$(EnableCodeCoverage)' == 'true'">
+        <Message Text="Generating code coverage reports..." />
+        
+        <!-- Debug: Show property values -->
+        <Message Text="Debug: SolutionDir = $(SolutionDir)" />
+        <Message Text="Debug: CoverageFolder = $(CoverageFolder)" />
+        <Message Text="Debug: ArtifactsTestResultsFolder = $(ArtifactsTestResultsFolder)" />
+        
+        <!-- Ensure we have test results before generating coverage -->
+        <Error Condition="!Exists('$(ArtifactsTestResultsFolder)')" 
+               Text="Test results folder not found at: $(ArtifactsTestResultsFolder). Please run tests first with 'nb STAGE' or 'nb TEST'." />
+        
+        <!-- Install ReportGenerator tool if not already installed -->
+        <Exec Command="dotnet tool install --global dotnet-reportgenerator-globaltool" 
+              ContinueOnError="true" 
+              IgnoreExitCode="true" />
+        
+        <!-- Create coverage directory -->
+        <MakeDir Directories="$(CoverageFolder)" Condition="!Exists('$(CoverageFolder)')" />
+        
+        <!-- Debug: Show what directory was created -->
+        <Message Text="Debug: Coverage directory created/exists at: $(CoverageFolder)" />
+        
+        <!-- Generate coverage report using ReportGenerator with configurable filters -->
+        <Message Text="Debug: Running ReportGenerator with targetdir: $(CoverageFolder)" />
+        <Exec Command='reportgenerator "-reports:$(ArtifactsTestResultsFolder)\**\coverage.cobertura.xml" "-targetdir:$(CoverageFolder)" "-reporttypes:Html;Cobertura;TextSummary" "-assemblyfilters:$(CoverageAssemblyFilters)" "-classfilters:$(CoverageClassFilters)"' 
+              WorkingDirectory="$(SolutionDir)"
+              ContinueOnError="true">
+            <Output TaskParameter="ExitCode" PropertyName="ReportGenExitCode" />
+        </Exec>
+        
+        <!-- Debug: Check if Summary.txt was created in the right place -->
+        <Message Text="Debug: Checking for Summary.txt at: $(CoverageFolder)\Summary.txt" />
+        <Message Condition="Exists('$(CoverageFolder)\Summary.txt')" Text="Debug: ✅ Summary.txt found at correct location" />
+        <Message Condition="!Exists('$(CoverageFolder)\Summary.txt')" Text="Debug: ❌ Summary.txt NOT found at expected location" />
+        
+        <!-- Fallback: try with different coverage file pattern -->
+        <Exec Condition="'$(ReportGenExitCode)' != '0'" 
+              Command='reportgenerator "-reports:$(ArtifactsTestResultsFolder)\**\*.xml" "-targetdir:$(CoverageFolder)" "-reporttypes:Html;Cobertura;TextSummary" "-assemblyfilters:$(CoverageAssemblyFilters)" "-classfilters:$(CoverageClassFilters)"' 
+              WorkingDirectory="$(SolutionDir)"
+              ContinueOnError="true">
+            <Output TaskParameter="ExitCode" PropertyName="ReportGenFallbackExitCode" />
+        </Exec>
+        
+        <!-- Copy coverage file to root for GitHub Actions -->
+        <Copy SourceFiles="$(CoverageFolder)\Cobertura.xml" 
+              DestinationFiles="$(SolutionDir)\coverage.cobertura.xml" 
+              ContinueOnError="true" />
+        
+        <Message Text="Code coverage report generated in: $(CoverageFolder)" />
+        <Message Text="Open $(CoverageFolder)\index.html to view the report" />
+        <Message Text="==> DONE" />
+    </Target>
+
+    <!-- Display high-level code coverage summary -->
+    <Target Name="COVERAGE_SUMMARY" DependsOnTargets="COVERAGE" 
+            Condition="'$(EnableCodeCoverage)' == 'true'">
+        <Message Text="Displaying code coverage summary..." />
+        
+        <!-- Define coverage summary file path using configurable CoverageFolder -->
+        <PropertyGroup>
+            <CoverageSummaryFile>$(CoverageFolder)\Summary.txt</CoverageSummaryFile>
+        </PropertyGroup>
+        
+        <!-- Check if summary file exists -->
+        <Error Condition="!Exists('$(CoverageSummaryFile)')" 
+               Text="Coverage summary file not found at: $(CoverageSummaryFile). Please run 'nb COVERAGE' first to generate coverage reports." />
+        
+        <!-- Display header -->
+        <Message Text="════════════════════════════════════════════════════════════════" />
+        <Message Text="                    CODE COVERAGE SUMMARY" />
+        <Message Text="════════════════════════════════════════════════════════════════" />
+        
+        <!-- Use type command to display the file content -->
+        <Exec Command='type "$(CoverageSummaryFile)"' 
+              WorkingDirectory="$(SolutionDir)" />
+        
+        <!-- Display footer -->
+        <Message Text="════════════════════════════════════════════════════════════════" />
+        <Message Text="💡 For detailed coverage report, open: $(CoverageFolder)\index.html" />
+        <Message Text="📊 Coverage data file: $(SolutionDir)\coverage.cobertura.xml" />
+        <Message Text="════════════════════════════════════════════════════════════════" />
+        
+        <Message Text="==> DONE" />
+    </Target>
 
 </Project>
