@@ -96,7 +96,7 @@ How authentication is provided
 
 ```powershell
 $env:API_GITHUB_KEY = 'ghp_XXXX'
-.\Release\nb.exe install --json ..\home\dev-setup\hbs.json --verbose
+.\Release\nb.exe install --json private-repo.json --verbose
 ```
 
 Behavior
