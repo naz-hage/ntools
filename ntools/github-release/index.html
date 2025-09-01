@@ -243,7 +243,7 @@
 - Preferred: set <code>API_GITHUB_KEY</code> in the environment or in your CI secrets. <code>nb</code> and the <code>GitHubRelease</code> library will read the token from the environment or the Windows Credential Manager.
 - Example (PowerShell):</p>
 <pre><code class="language-powershell">$env:API_GITHUB_KEY = 'ghp_XXXX'
-.\Release\nb.exe install --json ..\home\dev-setup\hbs.json --verbose
+.\Release\nb.exe install --json private-repo.json --verbose
 </code></pre>
 <p>Behavior
 - On download failure (404) for a GitHub release URL, <code>nb</code> will parse the owner/repo/tag and call into <code>GitHubRelease.ReleaseService.DownloadAssetByName(tag, assetName, dest)</code> which uses the GitHub API to find the asset and download it using the authenticated asset endpoint. This approach supports private repositories when the token has appropriate scopes (typically <code>repo</code> and <code>releases</code>).</p>
