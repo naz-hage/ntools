@@ -157,11 +157,13 @@
 		<Message Text="==> DONE" />
 	</Target>
 
-    <!-- Run nbTests and generate code coverage report -->
-    <!-- NOTE: removed specialized RUN_NBTESTS_COVERAGE target; use the unified COVERAGE target which
-	    reads results from $(ArtifactsTestResultsFolder) and writes HTML into $(CoverageFolder).
-	    Tests should be executed via 'nb TEST' (or CI) which writes results into $(ArtifactsTestResultsFolder).
-    -->
+  <!-- Run nbTests and generate code coverage report -->
+  <Target Name="RUN_NBTESTS_COVERAGE" DependsOnTargets="INSTALL_REPORTGENERATOR">
+	<Exec Command="dotnet test &quot;$(SolutionDir)\nbTests\nbTests.csproj&quot; --collect:\&quot;XPlat Code Coverage\&quot;" WorkingDirectory="$(SolutionDir)" />
+	<Exec Command="reportgenerator -reports:$(SolutionDir)\TestResults\**\coverage.cobertura.xml -targetdir:$(SolutionDir)\TestResults\CoverageReport" />
+	<Message Text="nbTests executed and code coverage report generated in TestResults\CoverageReport." />
+	<Message Text="==> DONE" />
+  </Target>
 
 
 	<!-- mkdocs deploy locally -->
@@ -565,78 +567,61 @@
 		<Message Text="==> COMMON_DONE"/>
 	</Target>
 
-	<!-- Generate code coverage reports -->
-	<!-- Enable coverage by default for local runs unless explicitly disabled -->
-	<PropertyGroup>
-		<EnableCodeCoverage Condition="'$(EnableCodeCoverage)' == ''">true</EnableCodeCoverage>
-	</PropertyGroup>
-	<Target Name="COVERAGE" DependsOnTargets="ARTIFACTS;TAG;" 
-			Condition="'$(EnableCodeCoverage)' == 'true'">
-		<Message Text="Generating code coverage reports..." />
+    <!-- Generate code coverage reports -->
+    <Target Name="COVERAGE" DependsOnTargets="ARTIFACTS;TAG;" 
+            Condition="'$(EnableCodeCoverage)' == 'true'">
+        <Message Text="Generating code coverage reports..." />
         
-		<!-- Debug: Show property values -->
-		<Message Text="Debug: SolutionDir = $(SolutionDir)" />
-		<Message Text="Debug: CoverageFolder = $(CoverageFolder)" />
-		<Message Text="Debug: ArtifactsTestResultsFolder = $(ArtifactsTestResultsFolder)" />
+        <!-- Debug: Show property values -->
+        <Message Text="Debug: SolutionDir = $(SolutionDir)" />
+        <Message Text="Debug: CoverageFolder = $(CoverageFolder)" />
+        <Message Text="Debug: ArtifactsTestResultsFolder = $(ArtifactsTestResultsFolder)" />
         
-		<!-- Ensure we have test results before generating coverage -->
-		<Error Condition="!Exists('$(ArtifactsTestResultsFolder)')" 
-			   Text="Test results folder not found at: $(ArtifactsTestResultsFolder). Please run tests first with 'nb STAGE' or 'nb TEST'." />
+        <!-- Ensure we have test results before generating coverage -->
+        <Error Condition="!Exists('$(ArtifactsTestResultsFolder)')" 
+               Text="Test results folder not found at: $(ArtifactsTestResultsFolder). Please run tests first with 'nb STAGE' or 'nb TEST'." />
         
-		<!-- Install ReportGenerator tool if not already installed -->
-		<Exec Command="dotnet tool install --global dotnet-reportgenerator-globaltool" 
-			  ContinueOnError="true" 
-			  IgnoreExitCode="true" />
+        <!-- Install ReportGenerator tool if not already installed -->
+        <Exec Command="dotnet tool install --global dotnet-reportgenerator-globaltool" 
+              ContinueOnError="true" 
+              IgnoreExitCode="true" />
         
-		<!-- Create coverage directory -->
-		<MakeDir Directories="$(CoverageFolder)" Condition="!Exists('$(CoverageFolder)')" />
+        <!-- Create coverage directory -->
+        <MakeDir Directories="$(CoverageFolder)" Condition="!Exists('$(CoverageFolder)')" />
         
-		<!-- Debug: Show what directory was created -->
-		<Message Text="Debug: Coverage directory created/exists at: $(CoverageFolder)" />
+        <!-- Debug: Show what directory was created -->
+        <Message Text="Debug: Coverage directory created/exists at: $(CoverageFolder)" />
         
-		<!-- Generate coverage report using ReportGenerator with configurable filters -->
-		<Message Text="Debug: Running ReportGenerator with targetdir: $(CoverageFolder)" />
-		<!-- Default filters: include all assemblies but exclude test assemblies and test classes unless overridden -->
-		<PropertyGroup>
-			<CoverageAssemblyFilters Condition="'$(CoverageAssemblyFilters)' == ''">+*;-*.Tests*;-*.Test*;-*test*;-*e2e*</CoverageAssemblyFilters>
-			<CoverageClassFilters Condition="'$(CoverageClassFilters)' == ''">-*.Tests.*;-*.Test.*</CoverageClassFilters>
-		</PropertyGroup>
-	<Exec Command='reportgenerator "-reports:$(ArtifactsTestResultsFolder)\**\coverage.cobertura.xml" "-targetdir:$(CoverageFolder)" "-reporttypes:Html;Cobertura;TextSummary" "-assemblyfilters:$(CoverageAssemblyFilters)" "-classfilters:$(CoverageClassFilters)"' 
-			  WorkingDirectory="$(SolutionDir)"
-			  ContinueOnError="true">
-			<Output TaskParameter="ExitCode" PropertyName="ReportGenExitCode" />
-		</Exec>
+        <!-- Generate coverage report using ReportGenerator with configurable filters -->
+        <Message Text="Debug: Running ReportGenerator with targetdir: $(CoverageFolder)" />
+        <Exec Command='reportgenerator "-reports:$(ArtifactsTestResultsFolder)\**\coverage.cobertura.xml" "-targetdir:$(CoverageFolder)" "-reporttypes:Html;Cobertura;TextSummary" "-assemblyfilters:$(CoverageAssemblyFilters)" "-classfilters:$(CoverageClassFilters)"' 
+              WorkingDirectory="$(SolutionDir)"
+              ContinueOnError="true">
+            <Output TaskParameter="ExitCode" PropertyName="ReportGenExitCode" />
+        </Exec>
         
-		<!-- Debug: Check if Summary.txt was created in the right place -->
-		<Message Text="Debug: Checking for Summary.txt at: $(CoverageFolder)\Summary.txt" />
-		<Message Condition="Exists('$(CoverageFolder)\Summary.txt')" Text="Debug: ✅ Summary.txt found at correct location" />
-		<Message Condition="!Exists('$(CoverageFolder)\Summary.txt')" Text="Debug: ❌ Summary.txt NOT found at expected location" />
+        <!-- Debug: Check if Summary.txt was created in the right place -->
+        <Message Text="Debug: Checking for Summary.txt at: $(CoverageFolder)\Summary.txt" />
+        <Message Condition="Exists('$(CoverageFolder)\Summary.txt')" Text="Debug: ✅ Summary.txt found at correct location" />
+        <Message Condition="!Exists('$(CoverageFolder)\Summary.txt')" Text="Debug: ❌ Summary.txt NOT found at expected location" />
         
-				<!-- Fallbacks: try other coverage file patterns if primary run didn't find coverage files -->
-				<Exec Condition="'$(ReportGenExitCode)' != '0'" 
-							Command='reportgenerator "-reports:$(ArtifactsTestResultsFolder)\**\*.xml" "-targetdir:$(CoverageFolder)" "-reporttypes:Html;Cobertura;TextSummary" "-assemblyfilters:$(CoverageAssemblyFilters)" "-classfilters:$(CoverageClassFilters)"' 
-							WorkingDirectory="$(SolutionDir)"
-							ContinueOnError="true">
-						<Output TaskParameter="ExitCode" PropertyName="ReportGenFallbackExitCode" />
-				</Exec>
-
-				<!-- Final fallback: search the whole solution recursively for cobertura files (covers per-project TestResults) -->
-				<Exec Condition="'$(ReportGenExitCode)' != '0' And '$(ReportGenFallbackExitCode)' != '0'" 
-							Command='reportgenerator "-reports:$(SolutionDir)\**\coverage.cobertura.xml" "-targetdir:$(CoverageFolder)" "-reporttypes:Html;Cobertura;TextSummary" "-assemblyfilters:$(CoverageAssemblyFilters)" "-classfilters:$(CoverageClassFilters)"' 
-							WorkingDirectory="$(SolutionDir)"
-							ContinueOnError="true">
-						<Output TaskParameter="ExitCode" PropertyName="ReportGenFinalFallbackExitCode" />
-				</Exec>
+        <!-- Fallback: try with different coverage file pattern -->
+        <Exec Condition="'$(ReportGenExitCode)' != '0'" 
+              Command='reportgenerator "-reports:$(ArtifactsTestResultsFolder)\**\*.xml" "-targetdir:$(CoverageFolder)" "-reporttypes:Html;Cobertura;TextSummary" "-assemblyfilters:$(CoverageAssemblyFilters)" "-classfilters:$(CoverageClassFilters)"' 
+              WorkingDirectory="$(SolutionDir)"
+              ContinueOnError="true">
+            <Output TaskParameter="ExitCode" PropertyName="ReportGenFallbackExitCode" />
+        </Exec>
         
-		<!-- Copy coverage file to root for GitHub Actions -->
-		<Copy SourceFiles="$(CoverageFolder)\Cobertura.xml" 
-			  DestinationFiles="$(SolutionDir)\coverage.cobertura.xml" 
-			  ContinueOnError="true" />
+        <!-- Copy coverage file to root for GitHub Actions -->
+        <Copy SourceFiles="$(CoverageFolder)\Cobertura.xml" 
+              DestinationFiles="$(SolutionDir)\coverage.cobertura.xml" 
+              ContinueOnError="true" />
         
-		<Message Text="Code coverage report generated in: $(CoverageFolder)" />
-		<Message Text="Open $(CoverageFolder)\index.html to view the report" />
-		<Message Text="==> DONE" />
-	</Target>
+        <Message Text="Code coverage report generated in: $(CoverageFolder)" />
+        <Message Text="Open $(CoverageFolder)\index.html to view the report" />
+        <Message Text="==> DONE" />
+    </Target>
 
     <!-- Display high-level code coverage summary -->
     <Target Name="COVERAGE_SUMMARY" DependsOnTargets="COVERAGE" 
@@ -670,24 +655,4 @@
         <Message Text="==> DONE" />
     </Target>
 
-    <!-- Show code coverage per class (reads coverage.cobertura.xml produced by REPORT step) -->
-    <Target Name="COVERAGE_PER_CLASS" DependsOnTargets="COVERAGE" Condition="'$(EnableCodeCoverage)' == 'true'">
-        <Message Text="Showing code coverage per class (from $(SolutionDir)\coverage.cobertura.xml)" Importance="High" />
-        <Error Condition="!Exists('$(SolutionDir)\coverage.cobertura.xml')" Text="coverage.cobertura.xml not found. Run 'nb COVERAGE' first." />
-
-        <!-- Use PowerShell to parse Cobertura XML and print class-level line coverage sorted descending -->
-    <Exec Command='powershell -NoProfile -File "$(MSBuildProjectDirectory)\devops-scripts\coverage-per-class.ps1" "$(SolutionDir)\coverage.cobertura.xml" "$(ArtifactsFolder)\coverage-per-class.md"' WorkingDirectory="$(SolutionDir)" />
-        <Message Text="==> DONE" />
-    </Target>
-
-
-	<!-- Generate audit report for hardcoded literals and save to artifacts -->
-    <Target Name="AUDIT_REPORT" DependsOnTargets="ARTIFACTS">
-        <Message Text="Generating audit report into: $(ArtifactsFolder)\audit-report.json" Importance="High" />
-        <!-- Ensure artifacts folder exists -->
-        <MakeDir Directories="$(ArtifactsFolder)" Condition="!Exists('$(ArtifactsFolder)')" />
-        <!-- Run the audit script and write JSON directly into the artifacts folder -->
-    <Exec Command='powershell -NoProfile -File "$(MSBuildProjectDirectory)\devops-scripts\audit-hardcoded.ps1" -Output "$(ArtifactsFolder)\audit-report.json" -Allowlist "$(AuditAllowlist)"' WorkingDirectory="$(MSBuildProjectDirectory)" ContinueOnError="false" />
-        <Message Text="Audit report written to: $(ArtifactsFolder)\audit-report.json" Importance="High" />
-    </Target>
 </Project>
