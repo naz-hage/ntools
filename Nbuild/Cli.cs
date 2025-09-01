@@ -307,7 +307,6 @@ public class Cli
 
             Repo = uri.AbsolutePath.Trim('/'); // Extracts "userName/repoName"
             if (verbose) Console.WriteLine($"[VERBOSE] ValidateRepo: Repo converted from URL: {Repo}");
-            if (verbose) Console.WriteLine($"[VERBOSE] ValidateRepo: Repo converted from URL: {Repo}");
         }
 
         var repoParts = Repo!.Split('/');
@@ -322,7 +321,6 @@ public class Cli
 
             Repo = $"{owner}/{Repo}";
             if (verbose) Console.WriteLine($"[VERBOSE] ValidateRepo: Repo resolved using OWNER: {Repo}");
-            if (verbose) Console.WriteLine($"[VERBOSE] ValidateRepo: Repo resolved using OWNER: {Repo}");
         }
         else if (repoParts.Length != 2 || string.IsNullOrEmpty(repoParts[0]) || string.IsNullOrEmpty(repoParts[1]))
         {
@@ -330,9 +328,7 @@ public class Cli
         }
 
         if (verbose) Console.WriteLine($"[VERBOSE] ValidateRepo: Final resolved Repo: {Repo}");
-
-        if (verbose) Console.WriteLine($"[VERBOSE] ValidateRepo: Final resolved Repo: {Repo}");
-
+        
         // Validate that the repository exists
         await ValidateRepositoryExists();
     }
