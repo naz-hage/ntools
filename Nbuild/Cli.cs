@@ -295,6 +295,9 @@ public class Cli
         bool verbose = Verbose;
         if (verbose) Console.WriteLine($"[VERBOSE] ValidateRepo: Initial Repo argument: {Repo}");
 
+        bool verbose = Verbose;
+        if (verbose) Console.WriteLine($"[VERBOSE] ValidateRepo: Initial Repo argument: {Repo}");
+
         // Check if the input is a full URL
         if (Repo!.StartsWith("https://github.com/", StringComparison.OrdinalIgnoreCase))
         {
@@ -306,6 +309,7 @@ public class Cli
             }
 
             Repo = uri.AbsolutePath.Trim('/'); // Extracts "userName/repoName"
+            if (verbose) Console.WriteLine($"[VERBOSE] ValidateRepo: Repo converted from URL: {Repo}");
             if (verbose) Console.WriteLine($"[VERBOSE] ValidateRepo: Repo converted from URL: {Repo}");
         }
 
@@ -321,6 +325,7 @@ public class Cli
 
             Repo = $"{owner}/{Repo}";
             if (verbose) Console.WriteLine($"[VERBOSE] ValidateRepo: Repo resolved using OWNER: {Repo}");
+            if (verbose) Console.WriteLine($"[VERBOSE] ValidateRepo: Repo resolved using OWNER: {Repo}");
         }
         else if (repoParts.Length != 2 || string.IsNullOrEmpty(repoParts[0]) || string.IsNullOrEmpty(repoParts[1]))
         {
@@ -329,10 +334,20 @@ public class Cli
 
         if (verbose) Console.WriteLine($"[VERBOSE] ValidateRepo: Final resolved Repo: {Repo}");
 
+        if (verbose) Console.WriteLine($"[VERBOSE] ValidateRepo: Final resolved Repo: {Repo}");
+
         // Validate that the repository exists
         await ValidateRepositoryExists();
     }
 
+    /// <summary>
+    /// Validates that the GitHub repository exists and is accessible via the GitHub API.
+    /// </summary>
+    /// <remarks>
+    /// If a GitHub token is available, it is used for authentication. If the token is missing and the repository is private,
+    /// the method will throw an exception. For public repositories, the check may succeed without a token, but access to private
+    /// repositories always requires authentication. Throws an exception if the repository does not exist or is inaccessible.
+    /// </remarks>
     /// <summary>
     /// Validates that the GitHub repository exists and is accessible via the GitHub API.
     /// </summary>
@@ -365,7 +380,26 @@ public class Cli
 
         try
         {
+        // Add required headers for GitHub API
+        httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("GitHubRelease/1.0");
+        httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
+
+        // Add authentication if a GitHub token is available
+        var token = Credentials.GetToken();
+        if (!string.IsNullOrEmpty(token))
+        {
+            Console.WriteLine("Using GitHub token for authentication.");
+            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+        }
+        else
+        {
+            Console.WriteLine("No GitHub token found. Only public repository validation is possible.");
+        }
+
+        try
+        {
             var response = await httpClient.GetAsync(apiUrl);
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
                 throw new ArgumentException($"The repository '{Repo}' does not exist or is not accessible. HTTP Status: {response.StatusCode}");
