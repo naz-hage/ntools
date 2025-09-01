@@ -14,13 +14,6 @@ namespace Nbuild.Tests
                 Repo = "https://github.com/naz-hage/ntools"
             };
 
-            // Skip networked test if no GitHub token is available in the environment
-            if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("GITHUB_TOKEN")))
-            {
-                Assert.Inconclusive("No GITHUB_TOKEN set; skipping networked repository validation test.");
-                return;
-            }
-
             // Act
             await cli.ValidateRepo();
 
@@ -74,14 +67,6 @@ namespace Nbuild.Tests
             {
                 Repo = "ntools"
             };
-
-            if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("GITHUB_TOKEN")))
-            {
-                Assert.Inconclusive("No GITHUB_TOKEN set; skipping networked repository validation test.");
-                // restore current "OWNER" env. variable
-                Environment.SetEnvironmentVariable("OWNER", owner);
-                return;
-            }
 
             // Act
             await cli.ValidateRepo();
@@ -169,13 +154,6 @@ namespace Nbuild.Tests
                 Branch = "main",
                 AssetFileName = "file.zip"
             };
-
-            // Skip networked validation when no GitHub token is available
-            if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("GITHUB_TOKEN")))
-            {
-                Assert.Inconclusive("No GITHUB_TOKEN set; skipping validation that requires GitHub API access.");
-                return;
-            }
 
             // Act & Assert
             cli.Validate();
@@ -265,12 +243,6 @@ namespace Nbuild.Tests
                 Repo = "naz-hage/ntools"
             };
 
-            if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("GITHUB_TOKEN")))
-            {
-                Assert.Inconclusive("No GITHUB_TOKEN set; skipping networked repository validation test.");
-                return;
-            }
-
             // Act & Assert
             await cli.ValidateRepo();
         }
@@ -298,12 +270,6 @@ namespace Nbuild.Tests
             {
                 Repo = "naz-hage/ntools"
             };
-
-            if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("GITHUB_TOKEN")))
-            {
-                Assert.Inconclusive("No GITHUB_TOKEN set; skipping networked repository existence test.");
-                return;
-            }
 
             // Act & Assert
             await cli.ValidateRepositoryExists();

@@ -35,13 +35,21 @@ namespace NbuildTests
 
             // Ensure test mode and token are present so fallback is attempted
             System.Environment.SetEnvironmentVariable("LOCAL_TEST", "true", System.EnvironmentVariableTarget.User);
+            var _prevToken = System.Environment.GetEnvironmentVariable("API_GITHUB_KEY", System.EnvironmentVariableTarget.Process);
             System.Environment.SetEnvironmentVariable("API_GITHUB_KEY", "fake-token", System.EnvironmentVariableTarget.Process);
+            try
+            {
+                // Act
+                var result = Command.Download(json, true);
 
-            // Act
-            var result = Command.Download(json, true);
-
-            // Assert - since fake returned OK, Command.Download should succeed
-            Assert.IsTrue(result.IsSuccess());
+                // Assert - since fake returned OK, Command.Download should succeed
+                Assert.IsTrue(result.IsSuccess());
+            }
+            finally
+            {
+                // Restore previous token (may be null)
+                System.Environment.SetEnvironmentVariable("API_GITHUB_KEY", _prevToken, System.EnvironmentVariableTarget.Process);
+            }
         }
 
         [TestMethod]
@@ -70,13 +78,21 @@ namespace NbuildTests
 
             // Ensure test mode and token are present so fallback is attempted
             System.Environment.SetEnvironmentVariable("LOCAL_TEST", "true", System.EnvironmentVariableTarget.User);
+            var _prevToken2 = System.Environment.GetEnvironmentVariable("API_GITHUB_KEY", System.EnvironmentVariableTarget.Process);
             System.Environment.SetEnvironmentVariable("API_GITHUB_KEY", "fake-token", System.EnvironmentVariableTarget.Process);
+            try
+            {
+                // Act
+                var result = Command.Download(json, true);
 
-            // Act
-            var result = Command.Download(json, true);
-
-            // Assert - since fake returned NotFound, Command.Download should return failure (but not throw)
-            Assert.IsFalse(result.IsSuccess());
+                // Assert - since fake returned NotFound, Command.Download should return failure (but not throw)
+                Assert.IsFalse(result.IsSuccess());
+            }
+            finally
+            {
+                // Restore previous token (may be null)
+                System.Environment.SetEnvironmentVariable("API_GITHUB_KEY", _prevToken2, System.EnvironmentVariableTarget.Process);
+            }
         }
 
         // Simple fake implementation of IReleaseService
