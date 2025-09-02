@@ -12,6 +12,34 @@ namespace NbuildTasks.Tests
     [TestClass()]
     public class GitWrapperTests : TestFirst
     {
+        [ClassInitialize]
+        public static void ClassInitialize(TestContext context)
+        {
+            // Quick network check: ensure we can reach the remote repo before running Git integration tests
+            try
+            {
+                var psi = new System.Diagnostics.ProcessStartInfo("git", $"ls-remote {ValidUrl}") { RedirectStandardOutput = true, RedirectStandardError = true, UseShellExecute = false };
+                using var p = System.Diagnostics.Process.Start(psi);
+                if (p == null)
+                {
+                    Assert.Inconclusive("git ls-remote could not be started; skipping GitWrapperTests.");
+                    return;
+                }
+                p.WaitForExit(5000);
+                if (p.ExitCode != 0)
+                {
+                    Console.WriteLine("git ls-remote failed; skipping GitWrapperTests.");
+                    Assert.Inconclusive("Cannot access remote Git repository; skipping Git integration tests.");
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"git ls-remote exception: {ex.Message}");
+                Assert.Inconclusive("Cannot access remote Git repository; skipping Git integration tests.");
+                return;
+            }
+        }
         private readonly GitWrapper GitWrapper = new(ProjectName, verbose: true, testMode: true);
 
         private const string ValidUrl = "https://github.com/naz-hage/getting-started";
@@ -35,6 +63,28 @@ namespace NbuildTasks.Tests
             if (!Directory.Exists(TempSourceDir))
             {
                 Directory.CreateDirectory(TempSourceDir);
+            }
+            // Ensure git is available; if not, skip the tests in this class
+            try
+            {
+                var psi = new System.Diagnostics.ProcessStartInfo("git", "--version") { RedirectStandardOutput = true, RedirectStandardError = true, UseShellExecute = false };
+                using var p = System.Diagnostics.Process.Start(psi);
+                if (p == null)
+                {
+                    Assert.Inconclusive("git is not available on this machine; skipping GitWrapperTests.");
+                    return;
+                }
+                p.WaitForExit(2000);
+                if (p.ExitCode != 0)
+                {
+                    Assert.Inconclusive("git is not available on this machine; skipping GitWrapperTests.");
+                    return;
+                }
+            }
+            catch
+            {
+                Assert.Inconclusive("git is not available on this machine; skipping GitWrapperTests.");
+                return;
             }
         }
 

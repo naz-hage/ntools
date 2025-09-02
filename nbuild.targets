@@ -200,6 +200,19 @@
 		<Message Text="==> DONE"/>
 	</Target>
 
+	<!-- Check for API_GITHUB_KEY environment variable and print its length -->
+	<Target Name="CHECK_GITHUB_KEY">
+		<!-- If not set, print a clear message -->
+		<Message Text="API_GITHUB_KEY is not set." Condition="'$(API_GITHUB_KEY)' == ''" Importance="high" />
+		<!-- If set, compute length and print it -->
+		<PropertyGroup Condition="'$(API_GITHUB_KEY)' != ''">
+			<!-- Use System.String::Copy to get a string instance then read Length -->
+			<GitHubKeyLength>$([System.String]::Copy($(API_GITHUB_KEY)).Length)</GitHubKeyLength>
+		</PropertyGroup>
+		<Message Text="API_GITHUB_KEY length: $(GitHubKeyLength)" Condition="'$(API_GITHUB_KEY)' != ''" Importance="high" />
+		<Message Text="==> CHECK_GITHUB_KEY done" Importance="high" />
+	</Target>
+
 	<!-- Update ntools locally for testing -->
 	<Target Name="UPDATE_NTOOLS" DependsOnTargets="IS_ADMIN" >
 		<PropertyGroup>
@@ -524,7 +537,7 @@
 	<Target Name="TEST" DependsOnTargets="ARTIFACTS;TAG">
 		<RemoveDir Directories="$(ArtifactsTestResultsFolder)"></RemoveDir>
 		<!--To colllect code coverage, add the following option to the test command: collect:"XPlat Code Coverage"-->
-		<Exec Command='dotnet test $(SolutionName).sln --configuration $(TargetRelease) --logger "console;verbosity=normal" %(DotNetTestFiles.Identity) --logger trx --results-directory:$(ArtifactsTestResultsFolder) --verbosity normal'/>
+		<Exec Command='dotnet test $(SolutionName).sln --configuration $(TargetRelease) --logger "console;verbosity=normal" --logger trx --results-directory:$(ArtifactsTestResultsFolder) --verbosity normal'/>
 		<Message Text="==> COMMON_DONE"/>
 	</Target>
 

@@ -700,6 +700,39 @@ namespace NbuildTests
         }
 
         [TestMethod]
+        public void Download_PrivateAsset_NotFound()
+        {
+            // Arrange
+            SetupTestModeFlag();
+            var json = @"{
+                ""Version"": ""1.2.0"",
+                ""NbuildAppList"": [
+                {
+                ""Name"": ""private-app"",
+                ""Version"": ""0.0.0"",
+                ""AppFileName"": ""private.zip"",
+                ""WebDownloadFile"": ""https://github.com/naz-hage/this-repo-does-not-exist/releases/download/0.0.0/0.0.0.zip"",
+                ""DownloadedFile"": ""0.0.0.zip"",
+                ""InstallCommand"": ""powershell.exe"",
+                ""InstallArgs"": ""-Command Write-Output 'noop'"",
+                ""InstallPath"": ""C:\\Temp\\nbuild2"",
+                ""UninstallCommand"": ""powershell.exe"",
+                ""UninstallArgs"": ""-Command Write-Output 'noop'""
+                }
+            ]
+            }";
+
+            // Act
+            var result = Command.Download(json, true);
+
+            // Assert - should return a failure result but not throw
+            Assert.IsFalse(result.IsSuccess());
+
+            // teardown
+            TeardownTestModeFlag();
+        }
+
+        [TestMethod]
         public void RemoveAppInstallPathFromEnvironmentPath_RemovesPath_WhenPresent()
         {
             // Skip test if not running in admin mode

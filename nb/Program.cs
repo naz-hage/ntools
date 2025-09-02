@@ -244,7 +244,7 @@ namespace nb
             rootCommand.AddCommand(gitDeleteTagCommand);
         }
 
-    private static void AddReleaseCreateCommand(System.CommandLine.RootCommand rootCommand)
+        private static void AddReleaseCreateCommand(System.CommandLine.RootCommand rootCommand)
         {
             var releaseCreateCommand = new System.CommandLine.Command("release_create",
                 "Creates a GitHub release.\n\n" +
@@ -281,7 +281,8 @@ namespace nb
             releaseCreateCommand.AddOption(branchOption);
             releaseCreateCommand.AddOption(fileOption);
             releaseCreateCommand.AddOption(verboseOption);
-            releaseCreateCommand.SetHandler(async (string repo, string tag, string branch, string file, bool verbose) => {
+            releaseCreateCommand.SetHandler(async (string repo, string tag, string branch, string file, bool verbose) =>
+            {
                 if (verbose)
                 {
                     ConsoleHelper.WriteLine($"[VERBOSE] Creating release for repo: {repo}, tag: {tag}, branch: {branch}, file: {file}", ConsoleColor.Gray);
@@ -338,6 +339,18 @@ namespace nb
                     ConsoleHelper.WriteLine($"[VERBOSE] OWNER env: {Environment.GetEnvironmentVariable("OWNER")}", ConsoleColor.Gray);
                     ConsoleHelper.WriteLine($"[VERBOSE] API_GITHUB_KEY env: {(string.IsNullOrEmpty(Environment.GetEnvironmentVariable("API_GITHUB_KEY")) ? "(not set)" : "(set)")}", ConsoleColor.Gray);
                 }
+                
+                // Substitute repoName with OWNER/repoName if only a single name is provided
+                if (!string.IsNullOrWhiteSpace(repo) && !repo.Contains("/") && !repo.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                {
+                    var owner = Environment.GetEnvironmentVariable("OWNER");
+                    if (!string.IsNullOrEmpty(owner))
+                    {
+                        repo = $"{owner}/{repo}";
+                        if (verbose) ConsoleHelper.WriteLine($"[VERBOSE] Substituted repo argument with OWNER: {repo}", ConsoleColor.Gray);
+                    }
+                }
+
                 var exitCode = await HandleReleaseCreateCommand(repo, tag, branch, file, true);
                 Environment.ExitCode = exitCode;
             }, repoOption, tagOption, branchOption, fileOption, verboseOption);

@@ -189,6 +189,12 @@ namespace Nbuild.Tests
                 Branch = "main",
                 AssetFileName = "file.zip"
             };
+            // Skip this test if OWNER or GITHUB_TOKEN is not set because Validate() may require OWNER and network access
+            if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("OWNER")) || string.IsNullOrEmpty(Environment.GetEnvironmentVariable("GITHUB_TOKEN")))
+            {
+                Assert.Inconclusive("OWNER or GITHUB_TOKEN not set; skipping test that requires environment and/or network access.");
+                return;
+            }
 
             // Act
             cli.Validate();
