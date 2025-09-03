@@ -406,7 +406,7 @@
 
 	<!-- Creates a stage or prod release 
 	Add for testing and remove after success-->
-	<Target Name="GITHUB_RELEASE" DependsOnTargets="ARTIFACTS;GIT_BRANCH" AfterTargets="PROD" Condition="'$(GITHUB_ACTIONS)' != ''" >
+	<Target Name="GITHUB_RELEASE" DependsOnTargets="ARTIFACTS;GIT_BRANCH" AfterTargets="PROD"  >
 		<Git Command="PushTag" TaskParameter="$(ProductVersion)" />
 		<Exec Command='$(SolutionDir)\nb\bin\Release\nb.exe release_create --repo $(OWNER)/$(SolutionName) --tag $(ProductVersion) --branch $(GitBranch) --file $(ArtifactsFolder).zip' WorkingDirectory="$(SolutionDir)" />
 
@@ -415,7 +415,7 @@
 
 	<!-- Creates a stage or prod pre-release 
 	Add for testing and remove after success -->
-	<Target Name="GITHUB_PRE_RELEASE" DependsOnTargets="ARTIFACTS;GIT_BRANCH" AfterTargets="STAGE"  Condition="'$(GITHUB_ACTIONS)' != ''" >
+	<Target Name="GITHUB_PRE_RELEASE" DependsOnTargets="ARTIFACTS;GIT_BRANCH" AfterTargets="STAGE" >
 		<Git Command="PushTag" TaskParameter="$(ProductVersion)" />
 		<Exec Command='"$(SolutionDir)\nb\bin\Release\nb.exe" pre_release_create --repo $(OWNER)/$(SolutionName) --tag $(ProductVersion) --branch $(GitBranch) --file $(ArtifactsFolder).zip --verbose' WorkingDirectory="$(SolutionDir)" />
 
@@ -556,6 +556,7 @@
                 COVERAGE;
                 COVERAGE_SUMMARY;
 				PUBLISH;
+				SMOKE_TEST;
 				PACKAGE" >
   </Target>
 
