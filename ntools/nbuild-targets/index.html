@@ -293,7 +293,7 @@
 </tr>
 <tr>
 <td>COPY_ARTIFACTS</td>
-<td>Save the artifacts to the artifacts folder</td>
+<td>Save the artifacts to the artifacts folder with organized structure</td>
 </tr>
 <tr>
 <td>DEPLOY</td>
@@ -301,11 +301,31 @@
 </tr>
 <tr>
 <td>TEST</td>
-<td>Run all tests using dotnet test in Release mode</td>
+<td>Run all tests using dotnet test in Release mode with conditional code coverage</td>
 </tr>
 <tr>
 <td>TEST_DEBUG</td>
 <td>Run all tests using dotnet test in Debug mode</td>
+</tr>
+<tr>
+<td>COVERAGE</td>
+<td>Generate comprehensive code coverage reports using ReportGenerator</td>
+</tr>
+<tr>
+<td>COVERAGE_SUMMARY</td>
+<td>Display high-level code coverage summary</td>
+</tr>
+<tr>
+<td>SMOKE_TEST</td>
+<td>Basic artifact verification to ensure build integrity</td>
+</tr>
+<tr>
+<td>SMOKE_TEST_PWSH</td>
+<td>PowerShell-based artifact verification with detailed checks</td>
+</tr>
+<tr>
+<td>SMOKE_TEST_PWSH</td>
+<td>PowerShell-based artifact verification with detailed checks</td>
 </tr>
 <tr>
 <td>IS_ADMIN</td>
@@ -321,8 +341,30 @@
 </tr>
 </tbody>
 </table>
+<h2 id="enhanced-build-pipeline-features">Enhanced Build Pipeline Features</h2>
+<h3 id="code-coverage-support">Code Coverage Support</h3>
+<p>The build system now includes comprehensive code coverage support with the following features:</p>
 <ul>
-<li><strong>C:\Program Files\nbuild\apps-versions.targets Targets</strong></li>
+<li><strong>Conditional Coverage</strong>: Use <code>EnableCodeCoverage</code> property to control coverage collection</li>
+<li><strong>Configurable Filters</strong>: Set <code>CoverageAssemblyFilters</code> and <code>CoverageClassFilters</code> for precise control</li>
+<li><strong>HTML Reports</strong>: Generate detailed HTML coverage reports using ReportGenerator</li>
+<li><strong>CI/CD Integration</strong>: Coverage reports automatically copied for GitHub Actions</li>
+</ul>
+<h3 id="user-level-path-management">User-Level PATH Management</h3>
+<ul>
+<li><strong>Test Mode Protection</strong>: Prevents PATH contamination during testing</li>
+<li><strong>Improved Security</strong>: No longer requires elevated privileges for installation</li>
+</ul>
+<h3 id="target-delegation-system">Target Delegation System</h3>
+<ul>
+<li><strong>Common Targets</strong>: Enhanced <code>common.targets</code> with improved TEST target logic</li>
+<li><strong>Validation Scripts</strong>: PowerShell scripts for validating target delegation</li>
+<li>
+<p><strong>Backward Compatibility</strong>: Existing projects continue to work without changes</p>
+</li>
+<li>
+<p><strong>C:\Program Files\nbuild\apps-versions.targets Targets</strong></p>
+</li>
 </ul>
 <table>
 <thead>

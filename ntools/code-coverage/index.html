@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="naz-hage" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Code Coverage in NTools - Ntools - Work in Progress</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Code Coverage in NTools";
+        var mkdocs_page_input_path = "ntools/code-coverage.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Ntools - Work in Progress
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../usage/">Practice</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../setup/">Setup your project</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../buildtypes/">Build Types</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../versioning/">Versioning</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">List of Tools</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../nbuild/">Nbuild (nb.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lf/">lf (lf.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../nbackup/">Nbackup (nbackup.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../wi/">wi (wi.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../github-release/">Github Release</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Custom Build Tasks</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../nbuildtasks/">Nbuild Tasks</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developer setup</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../pre-commit-setup/">Pre-commit Setup</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../version-automation-guide/">Version Automation Guide</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/">Development Tools</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Revisions</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../changelog/">Changelog</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Ntools - Work in Progress</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Code Coverage in NTools</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/naz-hage/ntools/edit/main/docs/ntools/code-coverage.md">Edit on ntools</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="code-coverage-in-ntools">Code Coverage in NTools</h1>
+<p>The NTools build system includes comprehensive code coverage support that can be easily configured and integrated into your build pipeline.</p>
+<h2 id="overview">Overview</h2>
+<p>Code coverage is automatically collected when running the <code>TEST</code> target if the <code>EnableCodeCoverage</code> property is set to <code>true</code> (which is the default). The system uses XPlat Code Coverage collection and ReportGenerator for creating detailed HTML and text reports.</p>
+<h2 id="configuration">Configuration</h2>
+<h3 id="basic-configuration">Basic Configuration</h3>
+<p>The following properties control code coverage behavior:</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>EnableCodeCoverage</code></td>
+<td><code>true</code></td>
+<td>Controls whether code coverage is collected during test runs</td>
+</tr>
+<tr>
+<td><code>CoverageAssemblyFilters</code></td>
+<td><code>+*;-*Tests*;-*Test*</code></td>
+<td>Filters for assemblies to include/exclude from coverage</td>
+</tr>
+<tr>
+<td><code>CoverageClassFilters</code></td>
+<td><code>+*;-*.Tests.*;-*.Test.*</code></td>
+<td>Filters for classes to include/exclude from coverage</td>
+</tr>
+</tbody>
+</table>
+<h3 id="customizing-coverage-filters">Customizing Coverage Filters</h3>
+<p>You can customize coverage filters by setting properties in your project file:</p>
+<pre><code class="language-xml">&lt;PropertyGroup&gt;
+    &lt;EnableCodeCoverage&gt;true&lt;/EnableCodeCoverage&gt;
+    &lt;CoverageAssemblyFilters&gt;+MyProject*;-*Tests*;-*Mock*&lt;/CoverageAssemblyFilters&gt;
+    &lt;CoverageClassFilters&gt;+*;-*.Tests.*;-*.Mocks.*&lt;/CoverageClassFilters&gt;
+&lt;/PropertyGroup&gt;
+</code></pre>
+<h3 id="filter-syntax">Filter Syntax</h3>
+<p>Coverage filters use the following syntax:
+- <code>+</code> includes the pattern
+- <code>-</code> excludes the pattern
+- <code>*</code> is a wildcard
+- Filters are separated by semicolons (<code>;</code>)</p>
+<h2 id="msbuild-targets">MSBuild Targets</h2>
+<h3 id="coverage-target">COVERAGE Target</h3>
+<p>The <code>COVERAGE</code> target generates comprehensive code coverage reports:</p>
+<pre><code class="language-bash">nb COVERAGE
+</code></pre>
+<p>This target:
+1. Installs ReportGenerator tool if not present
+2. Processes coverage files from test results
+3. Generates HTML reports in <code>CoverageReport</code> folder
+4. Creates text summaries for CI/CD integration
+5. Copies coverage files for GitHub Actions</p>
+<h3 id="coverage_summary-target">COVERAGE_SUMMARY Target</h3>
+<p>For a quick coverage overview:</p>
+<pre><code class="language-bash">nb COVERAGE_SUMMARY
+</code></pre>
+<p>This displays high-level coverage metrics without generating full reports.</p>
+<h3 id="test-target-with-coverage">TEST Target with Coverage</h3>
+<p>The <code>TEST</code> target automatically includes coverage collection when <code>EnableCodeCoverage</code> is true:</p>
+<pre><code class="language-bash">nb TEST
+</code></pre>
+<p>This runs all tests and collects coverage data in a single step.</p>
+<h2 id="output-files">Output Files</h2>
+<p>After running coverage targets, you'll find:</p>
+<h3 id="html-reports">HTML Reports</h3>
+<ul>
+<li><code>CoverageReport/index.html</code> - Main coverage report</li>
+<li><code>CoverageReport/</code> - Detailed HTML coverage reports</li>
+</ul>
+<h3 id="text-reports">Text Reports</h3>
+<ul>
+<li>Console output with coverage summary</li>
+<li>Coverage files copied to artifacts for CI/CD</li>
+</ul>
+<h3 id="coverage-data">Coverage Data</h3>
+<ul>
+<li>Raw coverage files in test results directory</li>
+<li>Processed coverage data for further analysis</li>
+</ul>
+<h2 id="cicd-integration">CI/CD Integration</h2>
+<h3 id="github-actions">GitHub Actions</h3>
+<p>Coverage reports are automatically copied to appropriate locations for GitHub Actions integration. The <code>COVERAGE</code> target handles this automatically.</p>
+<h3 id="disabling-coverage">Disabling Coverage</h3>
+<p>To disable coverage collection (e.g., for faster builds):</p>
+<pre><code class="language-xml">&lt;PropertyGroup&gt;
+    &lt;EnableCodeCoverage&gt;false&lt;/EnableCodeCoverage&gt;
+&lt;/PropertyGroup&gt;
+</code></pre>
+<p>Or via command line:</p>
+<pre><code class="language-bash">nb TEST -p:EnableCodeCoverage=false
+</code></pre>
+<h2 id="best-practices">Best Practices</h2>
+<ol>
+<li><strong>Filter Appropriately</strong>: Use assembly and class filters to focus on relevant code</li>
+<li><strong>CI/CD Integration</strong>: Include coverage in your build pipeline for quality gates</li>
+<li><strong>Regular Monitoring</strong>: Review coverage reports regularly to maintain code quality</li>
+<li><strong>Test Strategy</strong>: Use coverage data to identify untested code paths</li>
+</ol>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<h3 id="reportgenerator-installation">ReportGenerator Installation</h3>
+<p>If ReportGenerator installation fails, install manually:</p>
+<pre><code class="language-bash">dotnet tool install -g dotnet-reportgenerator-globaltool
+</code></pre>
+<h3 id="coverage-collection-issues">Coverage Collection Issues</h3>
+<ol>
+<li>Ensure tests are running in Release configuration</li>
+<li>Check that test assemblies are not excluded by filters</li>
+<li>Verify XPlat Code Coverage collector is available</li>
+</ol>
+<h3 id="report-generation">Report Generation</h3>
+<ol>
+<li>Check that coverage files exist in test results</li>
+<li>Verify ReportGenerator tool is installed</li>
+<li>Ensure proper permissions for output directories</li>
+</ol>
+<h2 id="examples">Examples</h2>
+<h3 id="basic-usage">Basic Usage</h3>
+<pre><code class="language-bash"># Run tests with coverage
+nb TEST
+
+# Generate coverage reports
+nb COVERAGE
+
+# Quick coverage summary
+nb COVERAGE_SUMMARY
+</code></pre>
+<h3 id="custom-configuration">Custom Configuration</h3>
+<pre><code class="language-xml">&lt;PropertyGroup&gt;
+    &lt;EnableCodeCoverage&gt;true&lt;/EnableCodeCoverage&gt;
+    &lt;CoverageAssemblyFilters&gt;+MyProject*;+MyLibrary*;-*Tests*&lt;/CoverageAssemblyFilters&gt;
+    &lt;CoverageClassFilters&gt;+*;-*.Tests.*;-*TestHelpers*&lt;/CoverageClassFilters&gt;
+&lt;/PropertyGroup&gt;
+</code></pre>
+<h3 id="full-build-pipeline">Full Build Pipeline</h3>
+<pre><code class="language-bash"># Complete build with tests and coverage
+nb STAGE
+</code></pre>
+<p>This comprehensive coverage system provides detailed insights into code quality while being flexible enough to adapt to different project needs.</p>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/naz-hage/ntools" class="fa fa-code-fork" style="color: #fcfcfc"> ntools</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

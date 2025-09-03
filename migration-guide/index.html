@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="naz-hage" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Migration Guide - MSBuild Target System Enhancements - Ntools - Work in Progress</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Migration Guide - MSBuild Target System Enhancements";
+        var mkdocs_page_input_path = "migration-guide.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Ntools - Work in Progress
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../usage/">Practice</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../setup/">Setup your project</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buildtypes/">Build Types</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../versioning/">Versioning</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">List of Tools</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/nbuild/">Nbuild (nb.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/lf/">lf (lf.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/nbackup/">Nbackup (nbackup.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/wi/">wi (wi.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/github-release/">Github Release</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Custom Build Tasks</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/nbuildtasks/">Nbuild Tasks</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developer setup</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../pre-commit-setup/">Pre-commit Setup</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../version-automation-guide/">Version Automation Guide</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/ntools/">Development Tools</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Revisions</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../changelog/">Changelog</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Ntools - Work in Progress</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Migration Guide - MSBuild Target System Enhancements</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/naz-hage/ntools/edit/main/docs/migration-guide.md">Edit on ntools</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="migration-guide-msbuild-target-system-enhancements">Migration Guide - MSBuild Target System Enhancements</h1>
+<p>This guide helps you understand and migrate to the enhanced MSBuild target system introduced in version 1.26.x.</p>
+<h2 id="overview">Overview</h2>
+<p>The latest version introduces significant enhancements to the build system while maintaining full backward compatibility. Existing projects will continue to work without any changes, but you can opt into new features for improved functionality.</p>
+<h2 id="whats-changed">What's Changed</h2>
+<h3 id="1-code-coverage-system">1. Code Coverage System</h3>
+<h4 id="before">Before</h4>
+<ul>
+<li>Basic test execution without coverage</li>
+<li>Manual coverage collection if needed</li>
+<li>Limited reporting options</li>
+</ul>
+<h4 id="after">After</h4>
+<ul>
+<li>Automatic code coverage collection during tests</li>
+<li>Comprehensive HTML and text reports</li>
+<li>Configurable assembly and class filters</li>
+<li>CI/CD integration support</li>
+</ul>
+<h3 id="2-path-management">2. PATH Management</h3>
+<h4 id="before_1">Before</h4>
+<ul>
+<li>Required administrator privileges for installation</li>
+<li>System-wide PATH modifications</li>
+<li>Potential security concerns</li>
+</ul>
+<h4 id="after_1">After</h4>
+<ul>
+<li>User-level PATH modifications only</li>
+<li>No administrator privileges required</li>
+<li>Enhanced security and isolation</li>
+<li>Test mode protection</li>
+</ul>
+<h3 id="3-build-pipeline">3. Build Pipeline</h3>
+<h4 id="before_2">Before</h4>
+<ul>
+<li>Basic target execution</li>
+<li>Limited artifact verification</li>
+<li>Manual validation processes</li>
+</ul>
+<h4 id="after_2">After</h4>
+<ul>
+<li>Enhanced target delegation system</li>
+<li>Automated artifact verification</li>
+<li>Comprehensive smoke testing</li>
+<li>Better error handling and diagnostics</li>
+</ul>
+<h2 id="migration-steps">Migration Steps</h2>
+<h3 id="for-existing-projects">For Existing Projects</h3>
+<p><strong>Good News: No action required!</strong> Your existing projects will continue to work exactly as before. The enhancements are backward compatible.</p>
+<h3 id="to-enable-new-features">To Enable New Features</h3>
+<h4 id="1-code-coverage">1. Code Coverage</h4>
+<p>To take advantage of the new code coverage system:</p>
+<pre><code class="language-xml">&lt;!-- Add to your project file or nbuild.targets --&gt;
+&lt;PropertyGroup&gt;
+    &lt;EnableCodeCoverage&gt;true&lt;/EnableCodeCoverage&gt; &lt;!-- Default: true --&gt;
+&lt;/PropertyGroup&gt;
+</code></pre>
+<h4 id="2-custom-coverage-filters">2. Custom Coverage Filters</h4>
+<p>Customize what gets included in coverage reports:</p>
+<pre><code class="language-xml">&lt;PropertyGroup&gt;
+    &lt;CoverageAssemblyFilters&gt;+MyProject*;+MyLibrary*;-*Tests*&lt;/CoverageAssemblyFilters&gt;
+    &lt;CoverageClassFilters&gt;+*;-*.Tests.*;-*.Mocks.*&lt;/CoverageClassFilters&gt;
+&lt;/PropertyGroup&gt;
+</code></pre>
+<h4 id="3-artifact-verification">3. Artifact Verification</h4>
+<p>Add smoke testing to your build pipeline:</p>
+<pre><code class="language-bash"># Basic artifact verification
+nb SMOKE_TEST
+
+# PowerShell-based detailed verification
+nb SMOKE_TEST_PWSH
+</code></pre>
+<h2 id="new-msbuild-targets">New MSBuild Targets</h2>
+<p>The following new targets are available:</p>
+<table>
+<thead>
+<tr>
+<th>Target</th>
+<th>Description</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>COVERAGE</code></td>
+<td>Generate comprehensive coverage reports</td>
+<td><code>nb COVERAGE</code></td>
+</tr>
+<tr>
+<td><code>COVERAGE_SUMMARY</code></td>
+<td>Display coverage summary</td>
+<td><code>nb COVERAGE_SUMMARY</code></td>
+</tr>
+<tr>
+<td><code>SMOKE_TEST</code></td>
+<td>Basic artifact verification</td>
+<td><code>nb SMOKE_TEST</code></td>
+</tr>
+<tr>
+<td><code>SMOKE_TEST_PWSH</code></td>
+<td>PowerShell-based verification</td>
+<td><code>nb SMOKE_TEST_PWSH</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="enhanced-existing-targets">Enhanced Existing Targets</h2>
+<h3 id="test-target">TEST Target</h3>
+<p>The TEST target now includes conditional code coverage:</p>
+<pre><code class="language-bash"># Run tests with coverage (default)
+nb TEST
+
+# Run tests without coverage
+nb TEST -p:EnableCodeCoverage=false
+</code></pre>
+<h3 id="stage-target">STAGE Target</h3>
+<p>The STAGE target now includes the complete enhanced pipeline:
+- Clean → Build → Test with Coverage → Generate Reports → Publish → Verify → Package</p>
+<h2 id="configuration-reference">Configuration Reference</h2>
+<h3 id="code-coverage-properties">Code Coverage Properties</h3>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>EnableCodeCoverage</code></td>
+<td><code>true</code></td>
+<td>Enable/disable coverage collection</td>
+</tr>
+<tr>
+<td><code>CoverageAssemblyFilters</code></td>
+<td><code>+*;-*Tests*;-*Test*</code></td>
+<td>Assembly inclusion/exclusion patterns</td>
+</tr>
+<tr>
+<td><code>CoverageClassFilters</code></td>
+<td><code>+*;-*.Tests.*;-*.Test.*</code></td>
+<td>Class inclusion/exclusion patterns</td>
+</tr>
+</tbody>
+</table>
+<h3 id="filter-syntax">Filter Syntax</h3>
+<ul>
+<li><code>+pattern</code> - Include assemblies/classes matching pattern</li>
+<li><code>-pattern</code> - Exclude assemblies/classes matching pattern</li>
+<li><code>*</code> - Wildcard character</li>
+<li><code>;</code> - Separator between filters</li>
+</ul>
+<h2 id="common-scenarios">Common Scenarios</h2>
+<h3 id="scenario-1-disable-coverage-for-performance">Scenario 1: Disable Coverage for Performance</h3>
+<p>For faster builds during development:</p>
+<pre><code class="language-xml">&lt;PropertyGroup Condition=&quot;'$(Configuration)' == 'Debug'&quot;&gt;
+    &lt;EnableCodeCoverage&gt;false&lt;/EnableCodeCoverage&gt;
+&lt;/PropertyGroup&gt;
+</code></pre>
+<h3 id="scenario-2-custom-coverage-for-microservices">Scenario 2: Custom Coverage for Microservices</h3>
+<p>For projects with multiple services:</p>
+<pre><code class="language-xml">&lt;PropertyGroup&gt;
+    &lt;CoverageAssemblyFilters&gt;+$(SolutionName)*;-*Tests*;-*TestHelpers*&lt;/CoverageAssemblyFilters&gt;
+    &lt;CoverageClassFilters&gt;+*;-*.Tests.*;-*.Mocks.*;-*TestData*&lt;/CoverageClassFilters&gt;
+&lt;/PropertyGroup&gt;
+</code></pre>
+<h3 id="scenario-3-cicd-integration">Scenario 3: CI/CD Integration</h3>
+<p>For GitHub Actions workflows:</p>
+<pre><code class="language-yaml">- name: Run Tests with Coverage
+  run: nb TEST
+
+- name: Generate Coverage Reports
+  run: nb COVERAGE
+
+- name: Verify Artifacts
+  run: nb SMOKE_TEST
+</code></pre>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<h3 id="coverage-collection-issues">Coverage Collection Issues</h3>
+<ol>
+<li><strong>No coverage data collected</strong></li>
+<li>Check that <code>EnableCodeCoverage</code> is true</li>
+<li>Verify test assemblies aren't excluded by filters</li>
+<li>
+<p>Ensure XPlat Code Coverage is available</p>
+</li>
+<li>
+<p><strong>ReportGenerator installation fails</strong></p>
+</li>
+<li>Install manually: <code>dotnet tool install -g dotnet-reportgenerator-globaltool</code></li>
+<li>
+<p>Check network connectivity and permissions</p>
+</li>
+<li>
+<p><strong>PATH issues after upgrade</strong></p>
+</li>
+<li>Restart your terminal/IDE</li>
+<li>Check user PATH environment variable</li>
+<li>Re-run installation if needed</li>
+</ol>
+<h3 id="target-execution-issues">Target Execution Issues</h3>
+<ol>
+<li><strong>Target not found errors</strong></li>
+<li>Verify you're using the latest version</li>
+<li>Check that common.targets is properly imported</li>
+<li>
+<p>Ensure build tools are up to date</p>
+</li>
+<li>
+<p><strong>Permission errors</strong></p>
+</li>
+<li>No longer should occur with user-level PATH</li>
+<li>If still occurring, check file permissions in user directories</li>
+</ol>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="1-gradual-adoption">1. Gradual Adoption</h3>
+<ul>
+<li>Start with default settings</li>
+<li>Gradually customize filters based on your needs</li>
+<li>Monitor coverage reports to ensure quality</li>
+</ul>
+<h3 id="2-cicd-integration">2. CI/CD Integration</h3>
+<ul>
+<li>Include coverage generation in your build pipeline</li>
+<li>Set up quality gates based on coverage thresholds</li>
+<li>Archive coverage reports as build artifacts</li>
+</ul>
+<h3 id="3-team-collaboration">3. Team Collaboration</h3>
+<ul>
+<li>Document your coverage configuration</li>
+<li>Share filter patterns across team members</li>
+<li>Review coverage reports during code reviews</li>
+</ul>
+<h2 id="getting-help">Getting Help</h2>
+<p>If you encounter issues during migration:</p>
+<ol>
+<li>Check the <a href="#troubleshooting">troubleshooting section</a></li>
+<li>Review the <a href="../changelog/">changelog</a> for detailed changes</li>
+<li>Create an <a href="https://github.com/naz-hage/NTools/issues">issue</a> with specific details</li>
+</ol>
+<h2 id="summary">Summary</h2>
+<p>The enhanced MSBuild target system provides:
+- ✅ Full backward compatibility
+- ✅ Enhanced code coverage capabilities
+- ✅ Improved security with user-level installation
+- ✅ Better build pipeline with verification
+- ✅ Comprehensive documentation and tooling</p>
+<p>Your existing workflows continue to work while new capabilities are available when you need them.</p>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/naz-hage/ntools" class="fa fa-code-fork" style="color: #fcfcfc"> ntools</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

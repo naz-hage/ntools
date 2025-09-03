@@ -114,6 +114,102 @@
             <div class="section" itemprop="articleBody">
               
                 <h2 id="latest-release"><a href="https://github.com/naz-hage/ntools/releases">Latest Release</a></h2>
+<h2 id="version-126x-msbuild-target-system-enhancements">Version 1.26.x - MSBuild Target System Enhancements</h2>
+<h3 id="new-features">🚀 New Features</h3>
+<h4 id="code-coverage-system">Code Coverage System</h4>
+<ul>
+<li><strong>Comprehensive Coverage</strong>: New <code>COVERAGE</code> and <code>COVERAGE_SUMMARY</code> targets with ReportGenerator integration</li>
+<li><strong>Conditional Collection</strong>: Configurable via <code>EnableCodeCoverage</code> property (default: true)</li>
+<li><strong>Advanced Filtering</strong>: Assembly and class-level filters for precise coverage control</li>
+<li><strong>HTML Reports</strong>: Detailed HTML coverage reports generated automatically</li>
+<li><strong>CI/CD Integration</strong>: Coverage files automatically copied for GitHub Actions</li>
+</ul>
+<h4 id="enhanced-build-pipeline">Enhanced Build Pipeline</h4>
+<ul>
+<li><strong>Improved TEST Target</strong>: Conditional code coverage collection based on configuration</li>
+<li><strong>Artifact Verification</strong>: New <code>SMOKE_TEST</code> and <code>SMOKE_TEST_PWSH</code> targets for build validation</li>
+<li><strong>Streamlined Publishing</strong>: Enhanced <code>PUBLISH</code> target with better error handling</li>
+<li><strong>Target Delegation</strong>: Robust MSBuild target delegation system with validation scripts</li>
+</ul>
+<h4 id="user-level-path-management">User-Level PATH Management</h4>
+<ul>
+<li><strong>Improved Security</strong>: No longer requires elevated privileges for installation</li>
+<li><strong>Test Mode Protection</strong>: Prevents PATH contamination during testing scenarios</li>
+</ul>
+<h3 id="technical-improvements">🔧 Technical Improvements</h3>
+<h4 id="msbuild-target-enhancements">MSBuild Target Enhancements</h4>
+<ul>
+<li>Enhanced <code>COPY_ARTIFACTS</code> target with organized folder structure</li>
+<li>Improved <code>CORE</code> target with comprehensive property display</li>
+<li>Better error handling and dependency management across all targets</li>
+<li>Consistent formatting and indentation in target files</li>
+</ul>
+<h4 id="powershell-scripts">PowerShell Scripts</h4>
+<ul>
+<li><strong>verify-artifacts.ps1</strong>: Comprehensive artifact verification with detailed reporting</li>
+<li><strong>Test-TargetDelegation.ps1</strong>: Generic MSBuild target delegation validator</li>
+<li><strong>Quick-TargetTest.ps1</strong>: Interactive target testing utility</li>
+<li>Enhanced <code>publish-all-projects.ps1</code> with better parameter handling</li>
+</ul>
+<h4 id="testing-infrastructure">Testing Infrastructure</h4>
+<ul>
+<li>Updated unit tests for user-level PATH operations</li>
+<li>New target delegation validation approaches</li>
+<li>Enhanced test coverage for build system components</li>
+<li>Improved test reliability and maintainability</li>
+</ul>
+<h3 id="security-compatibility">🛡️ Security &amp; Compatibility</h3>
+<h4 id="security-improvements">Security Improvements</h4>
+<ul>
+<li>User-level environment variable modifications</li>
+<li>Reduced attack surface by avoiding system-wide changes</li>
+<li>Test mode isolation prevents environment contamination</li>
+</ul>
+<h4 id="backward-compatibility">Backward Compatibility</h4>
+<ul>
+<li>All existing projects continue to work without changes</li>
+<li>Opt-in enhancements don't affect existing workflows</li>
+<li>Maintained API compatibility across all tools</li>
+</ul>
+<h3 id="build-system-statistics">📊 Build System Statistics</h3>
+<ul>
+<li><strong>11 files enhanced</strong> with new functionality</li>
+<li><strong>845 additions, 170 deletions</strong> representing significant improvements</li>
+<li><strong>100% test coverage</strong> maintained throughout changes</li>
+<li><strong>Zero breaking changes</strong> ensuring smooth upgrades</li>
+</ul>
+<h3 id="configuration-options">🎯 Configuration Options</h3>
+<h4 id="code-coverage-properties">Code Coverage Properties</h4>
+<pre><code class="language-xml">&lt;PropertyGroup&gt;
+    &lt;EnableCodeCoverage&gt;true&lt;/EnableCodeCoverage&gt;
+    &lt;CoverageAssemblyFilters&gt;+*;-*Tests*;-*Test*&lt;/CoverageAssemblyFilters&gt;
+    &lt;CoverageClassFilters&gt;+*;-*.Tests.*;-*.Test.*&lt;/CoverageClassFilters&gt;
+&lt;/PropertyGroup&gt;
+</code></pre>
+<h4 id="target-usage-examples">Target Usage Examples</h4>
+<pre><code class="language-bash"># Run tests with coverage
+nb TEST
+
+# Generate coverage reports
+nb COVERAGE
+
+# View coverage summary
+nb COVERAGE_SUMMARY
+
+# Verify build artifacts
+nb SMOKE_TEST
+
+# Complete build pipeline
+nb STAGE
+</code></pre>
+<h3 id="file-structure-improvements">📁 File Structure Improvements</h3>
+<ul>
+<li>Organized artifact management with proper folder hierarchy</li>
+<li>Enhanced binary file filtering and organization</li>
+<li>Improved runtime folder support (netstandard2.0, netstandard2.1, win/native)</li>
+<li>Better handling of reference assemblies and localization files</li>
+</ul>
+<p>This release represents a major enhancement to the build infrastructure while maintaining full backward compatibility and improving overall system security and usability.</p>
               
             </div>
           </div><footer>

@@ -46,6 +46,14 @@
                   <li class="toctree-l1"><a class="reference internal" href="../installation/">Installation</a>
                   </li>
                   <li class="toctree-l1 current"><a class="reference internal current" href="#">Practice</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#code-coverage">Code Coverage</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#artifact-verification">Artifact Verification</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#build-pipeline">Build Pipeline</a>
+    </li>
+    </ul>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../setup/">Setup your project</a>
                   </li>
@@ -123,17 +131,38 @@
 <pre><code class="language-cmd">nb.exe clean
 </code></pre>
 <ul>
-<li>Test solution: runs all the tests in the solution</li>
+<li>Test solution: runs all the tests in the solution with optional code coverage</li>
 </ul>
 <pre><code class="language-cmd">nb.exe test
+</code></pre>
+<ul>
+<li>Run tests with code coverage disabled (for faster execution):</li>
+</ul>
+<pre><code class="language-cmd">nb.exe test -p:EnableCodeCoverage=false
+</code></pre>
+<ul>
+<li>Generate code coverage reports:</li>
+</ul>
+<pre><code class="language-cmd">nb.exe coverage
+</code></pre>
+<ul>
+<li>View code coverage summary:</li>
+</ul>
+<pre><code class="language-cmd">nb.exe coverage_summary
+</code></pre>
+<ul>
+<li>Verify build artifacts:</li>
+</ul>
+<pre><code class="language-cmd">nb.exe smoke_test
 </code></pre>
 <ul>
 <li>Create a stage release: Creates a stage build which includes the following steps:<ul>
 <li>Clean the solution</li>
 <li>Build the solution</li>
-<li>Run tests</li>
-<li>Create a stage build</li>
+<li>Run tests with code coverage</li>
+<li>Generate coverage reports</li>
 <li>Publish the stage build</li>
+<li>Verify artifacts with smoke tests</li>
 <li>Create a zip file of the stage build file</li>
 </ul>
 </li>
@@ -145,8 +174,28 @@
 </ul>
 <pre><code class="language-cmd">nb.exe targets
 </code></pre>
+<h2 id="enhanced-features">Enhanced Features</h2>
+<h3 id="code-coverage">Code Coverage</h3>
+<p>The build system now includes comprehensive code coverage support:
+- Automatic coverage collection during test runs
+- HTML and text coverage reports
+- Configurable assembly and class filters
+- CI/CD integration support</p>
+<h3 id="artifact-verification">Artifact Verification</h3>
 <ul>
-<li>See the list of available targets at <a href="../ntools/nbuild-targets/">Nbuild Targets</a></li>
+<li>Automated smoke testing of build artifacts</li>
+<li>PowerShell-based verification scripts</li>
+<li>Comprehensive artifact structure validation</li>
+</ul>
+<h3 id="build-pipeline">Build Pipeline</h3>
+<p>The enhanced build pipeline provides:
+- Integrated test execution with coverage
+- Automated artifact verification
+- Streamlined publishing process
+- Better error handling and diagnostics</p>
+<ul>
+<li>See the complete list of available targets at <a href="../ntools/nbuild-targets/">Nbuild Targets</a></li>
+<li>Learn more about code coverage at <a href="../ntools/code-coverage/">Code Coverage</a></li>
 </ul>
               
             </div>
