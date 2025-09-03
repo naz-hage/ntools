@@ -655,4 +655,84 @@
         <Message Text="==> DONE" />
     </Target>
 
+    <!-- Basic smoke test to verify published artifacts -->
+    <Target Name="SMOKE_TEST" DependsOnTargets="ARTIFACTS">
+        <Message Text="Running basic smoke test for artifacts..." />
+        
+        <!-- Check if artifacts folder exists -->
+        <Error Condition="!Exists('$(ArtifactsFolder)')" 
+               Text="Artifacts folder not found at: $(ArtifactsFolder). Please run 'nb PUBLISH' first to generate artifacts." />
+        
+        <!-- Check for key executables -->
+        <PropertyGroup>
+            <NbExePath>$(ArtifactsFolder)\nb.exe</NbExePath>
+            <LfExePath>$(ArtifactsFolder)\lf.exe</LfExePath>
+            <NBackupExePath>$(ArtifactsFolder)\nBackup.exe</NBackupExePath>
+        </PropertyGroup>
+        
+        <!-- Verify key executables exist -->
+        <Error Condition="!Exists('$(NbExePath)')" 
+               Text="Core executable not found: $(NbExePath)" />
+        <Error Condition="!Exists('$(LfExePath)')" 
+               Text="List files executable not found: $(LfExePath)" />
+        <Error Condition="!Exists('$(NBackupExePath)')" 
+               Text="Backup executable not found: $(NBackupExePath)" />
+        
+        <!-- Test that executables can run (basic smoke test) -->
+        <Message Text="Testing executable: $(NbExePath)" />
+        <Exec Command='"$(NbExePath)" --version' 
+              ContinueOnError="true" 
+              IgnoreExitCode="true">
+            <Output TaskParameter="ExitCode" PropertyName="NbExitCode" />
+        </Exec>
+        
+        <Message Text="Testing executable: $(LfExePath)" />
+        <Exec Command='"$(LfExePath)" --help' 
+              ContinueOnError="true" 
+              IgnoreExitCode="true">
+            <Output TaskParameter="ExitCode" PropertyName="LfExitCode" />
+        </Exec>
+        
+        <!-- Display results -->
+        <Message Text="✅ nb.exe test result: Exit code $(NbExitCode)" Condition="'$(NbExitCode)' == '0'" />
+        <Message Text="❌ nb.exe test failed: Exit code $(NbExitCode)" Condition="'$(NbExitCode)' != '0'" />
+        <Message Text="✅ lf.exe test result: Exit code $(LfExitCode)" Condition="'$(LfExitCode)' == '0'" />
+        <Message Text="❌ lf.exe test failed: Exit code $(LfExitCode)" Condition="'$(LfExitCode)' != '0'" />
+        
+        <Message Text="Basic smoke test completed" />
+        <Message Text="==> DONE" />
+    </Target>
+
+    <!-- PowerShell-based comprehensive smoke test -->
+    <Target Name="SMOKE_TEST_PWSH" DependsOnTargets="ARTIFACTS">
+        <Message Text="Running comprehensive PowerShell-based smoke test..." />
+        
+        <!-- Check if artifacts folder exists -->
+        <Error Condition="!Exists('$(ArtifactsFolder)')" 
+               Text="Artifacts folder not found at: $(ArtifactsFolder). Please run 'nb PUBLISH' first to generate artifacts." />
+        
+        <!-- Check if verify-artifacts.ps1 script exists -->
+        <PropertyGroup>
+            <VerifyScriptPath>$(SolutionDir)\verify-artifacts.ps1</VerifyScriptPath>
+        </PropertyGroup>
+        
+        <Error Condition="!Exists('$(VerifyScriptPath)')" 
+               Text="Verification script not found at: $(VerifyScriptPath)" />
+        
+        <!-- Run the PowerShell verification script -->
+        <Message Text="Running artifact verification script..." />
+        <Exec Command='powershell -ExecutionPolicy Bypass -File "$(VerifyScriptPath)" -ArtifactsPath "$(ArtifactsFolder)" -ProductVersion "$(ProductVersion)" -Verbose' 
+              WorkingDirectory="$(SolutionDir)">
+            <Output TaskParameter="ExitCode" PropertyName="VerifyExitCode" />
+        </Exec>
+        
+        <!-- Report results -->
+        <Message Text="✅ PowerShell smoke test passed!" Condition="'$(VerifyExitCode)' == '0'" />
+        <Error Condition="'$(VerifyExitCode)' != '0'" 
+               Text="❌ PowerShell smoke test failed with exit code: $(VerifyExitCode)" />
+        
+        <Message Text="Comprehensive smoke test completed successfully" />
+        <Message Text="==> DONE" />
+    </Target>
+
 </Project>
