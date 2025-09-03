@@ -533,32 +533,11 @@
 		<Message Text="Cleaning complete." Importance="high" />
 	</Target>
 
-	<!-- Run all tests using dotnet test in Release mode -->
-	<Target Name="TEST" DependsOnTargets="ARTIFACTS;TAG">
-		<RemoveDir Directories="$(ArtifactsTestResultsFolder)"></RemoveDir>
-		<!--To colllect code coverage, add the following option to the test command: collect:"XPlat Code Coverage"-->
-		<Exec Command='dotnet test $(SolutionName).sln --configuration $(TargetRelease) --logger "console;verbosity=normal" --logger trx --results-directory:$(ArtifactsTestResultsFolder) --verbosity normal'/>
-		<Message Text="==> COMMON_DONE"/>
-	</Target>
-
-		<Target Name="PUBLISH" DependsOnTargets="ARTIFACTS;TAG">
-			<Message Text="Publishing all non-test projects using publish-all-projects.ps1" Importance="high" />
-			<Exec Command='pwsh -NoProfile -ExecutionPolicy Bypass -File "$(SolutionDir)\publish-all-projects.ps1" -PublishDir "$(ArtifactsFolder)" -ProductVersion "$(ProductVersion)"' WorkingDirectory="$(SolutionDir)" />
-			<Message Text="All non-test projects published to $(SolutionDir)\PublishAll" Importance="high" />
-		</Target>
-
-			<!-- Create a stage package for testing -->
-	<Target Name="STAGE" DependsOnTargets="
-                CLEAN;
-                TAG;
-                AUTOTAG_STAGE;
-				TEST;
-                COVERAGE;
-                COVERAGE_SUMMARY;
-				PUBLISH;
-				SMOKE_TEST;
-				PACKAGE" >
-  </Target>
+	<!-- Create a stage package for testing -->
+	<Target Name="STAGE" DependsOnTargets="STAGE_NEW" >
+		<Message Text="STAGE target completed - delegated to STAGE_NEW in common.targets" />
+		<Message Text="==> DONE"/>
+  	</Target>
 
 	<!-- Create a package for the solution default is a zip file of all artifacts -->
 	<Target Name="PACKAGE" DependsOnTargets="PROPERTIES">
@@ -733,6 +712,33 @@
                Text="❌ PowerShell smoke test failed with exit code: $(VerifyExitCode)" />
         
         <Message Text="Comprehensive smoke test completed successfully" />
+        <Message Text="==> DONE" />
+    </Target>
+
+    <!-- Generic test for target delegation validation -->
+    <Target Name="TEST_TARGET_DELEGATION">
+        <PropertyGroup>
+            <SourceTarget Condition="'$(SourceTarget)' == ''">STAGE</SourceTarget>
+            <DelegateTarget Condition="'$(DelegateTarget)' == ''">STAGE_NEW</DelegateTarget>
+            <SourceFile Condition="'$(SourceFile)' == ''">$(SolutionDir)\nbuild.targets</SourceFile>
+            <DelegateFile Condition="'$(DelegateFile)' == ''">$(SolutionDir)\Nbuild\resources\common.targets</DelegateFile>
+        </PropertyGroup>
+        
+        <!-- Test 1: Check if source target exists and delegates properly -->
+        <Message Text="=== MSBuild Target Delegation Test ===" />
+        <Message Text="Testing: $(SourceTarget) -> $(DelegateTarget)" />
+        <Message Text="" />
+        
+        <!-- Test 2: Verify files exist -->
+        <Error Condition="!Exists('$(SourceFile)')" Text="❌ Source file not found: $(SourceFile)" />
+        <Error Condition="!Exists('$(DelegateFile)')" Text="❌ Delegate file not found: $(DelegateFile)" />
+        <Message Text="✅ Both target files exist" />
+        
+        <!-- Test 3: Use our PowerShell script for validation -->
+        <Exec Command='powershell -ExecutionPolicy Bypass -File "$(SolutionDir)\test-delegation.ps1" "$(SourceTarget)" "$(DelegateTarget)"' 
+              WorkingDirectory="$(SolutionDir)" />
+        
+        <Message Text="=== Target delegation test completed ===" />
         <Message Text="==> DONE" />
     </Target>
 
