@@ -639,12 +639,6 @@ namespace Nbuild
                         return ResultHelper.Fail(-1, $"File hash does not match for {nbuildApp.AppFileName}");
                     }
                 }
-
-                // print out ResultHelper code and output
-                DisplayCodeAndOutput(result);
-
-                // Return the actual installer/result so caller gets the real exit code and output
-                return result;
             }
         }
 
