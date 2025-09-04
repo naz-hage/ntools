@@ -34,6 +34,10 @@ namespace Nbuild.Tests
                 "DEPLOY",
                 "TEST",
                 "TEST_DEBUG",
+                "PUBLISH",
+                "COVERAGE",
+                "COVERAGE_SUMMARY",
+                "STAGE_NEW",
                 "IS_ADMIN",
                 "SingleProject",
                 "HandleError"

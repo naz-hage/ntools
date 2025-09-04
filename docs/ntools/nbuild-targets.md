@@ -49,10 +49,15 @@ The table below lists all available targets for the Nbuild tool.
 | SOLUTION            | Build the solution Release configuration  using dotnet build |
 | SOLUTION_MSBUILD    | Build the solution Release configuration  using MSBuild |
 | PACKAGE             | Create a package for the solution default is a zip file of all artifacts |
-| COPY_ARTIFACTS      | Save the artifacts to the artifacts folder |
+| COPY_ARTIFACTS      | Save the artifacts to the artifacts folder with organized structure |
 | DEPLOY              | Deploy the package. default is to extract artifacts into DeploymentProperty folder |
-| TEST                | Run all tests using dotnet test in Release mode |
+| TEST                | Run all tests using dotnet test in Release mode with conditional code coverage |
 | TEST_DEBUG          | Run all tests using dotnet test in Debug mode |
+| COVERAGE            | Generate comprehensive code coverage reports using ReportGenerator |
+| COVERAGE_SUMMARY    | Display high-level code coverage summary |
+| SMOKE_TEST          | Basic artifact verification to ensure build integrity |
+| SMOKE_TEST_PWSH     | PowerShell-based artifact verification with detailed checks |
+| SMOKE_TEST_PWSH     | PowerShell-based artifact verification with detailed checks |
 | IS_ADMIN            | Check if current process is running in admin mode AdminCheckExitCode property is set |
 | SingleProject       | Example how to build a single project |
 | HandleError         | Error handling placeholder |

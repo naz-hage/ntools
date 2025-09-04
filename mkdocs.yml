@@ -29,5 +29,8 @@ nav:
       - Pre-commit Setup: pre-commit-setup.md
       - Version Automation Guide: version-automation-guide.md
       - Development Tools: ntools/ntools.md
+  - Build System Features:
+    - Code Coverage: ntools/code-coverage.md
+    - MSBuild Targets: ntools/nbuild-targets.md
   - Revisions: 
       - changelog.md

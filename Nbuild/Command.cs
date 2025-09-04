@@ -519,7 +519,7 @@ namespace Nbuild
                 var resultInstall = process.LockStart(Verbose);
                 if (resultInstall.IsSuccess())
                 {
-                    if (nbuildApp.AddToPath == true)
+                    if (nbuildApp.AddToPath == true && !TestMode)
                     {
                         AddAppInstallPathToEnvironmentPath(nbuildApp);
                     }
@@ -548,12 +548,12 @@ namespace Nbuild
         }
 
         /// <summary>
-        /// Adds the application's install path to the system PATH environment variable.
+        /// Adds the application's install path to the user PATH environment variable.
         /// </summary>
         /// <param name="nbuildApp">The application details containing the install path.</param>
         /// <exception cref="ArgumentNullException">Thrown when the install path is null or empty.</exception>
         /// <remarks>
-        /// This method checks if the install path is already present in the system PATH environment variable.
+        /// This method checks if the install path is already present in the user PATH environment variable.
         /// If not, it adds the install path to the PATH. It also logs the action using the Colorizer.
         /// </remarks>
         public static void AddAppInstallPathToEnvironmentPath(NbuildApp nbuildApp)
@@ -568,7 +568,7 @@ namespace Nbuild
                 ConsoleHelper.WriteLine($"{nbuildApp.InstallPath} is already in PATH.", ConsoleColor.Yellow);
                 return;
             }
-            var path = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine) ?? string.Empty;
+            var path = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User) ?? string.Empty;
             var pathCount = path.Split(";").Length;
             if (!path.Split(';').Contains(nbuildApp.InstallPath, StringComparer.OrdinalIgnoreCase))
             {
@@ -577,8 +577,8 @@ namespace Nbuild
                     path = $"{nbuildApp.InstallPath};{path}";
                 }
                 pathCount = path.Split(";").Length;
-                Environment.SetEnvironmentVariable("PATH", path, EnvironmentVariableTarget.Machine);
-                ConsoleHelper.WriteLine($"√ {nbuildApp.InstallPath} added to PATH.", ConsoleColor.Green);
+                Environment.SetEnvironmentVariable("PATH", path, EnvironmentVariableTarget.User);
+                ConsoleHelper.WriteLine($"√ {nbuildApp.InstallPath} added to user PATH.", ConsoleColor.Green);
             }
             else
             {
@@ -626,19 +626,19 @@ namespace Nbuild
                 if (!string.IsNullOrEmpty(nbuildApp.StoredHash))
                 {
                     ConsoleHelper.WriteLine($"Stored hash for {nbuildApp.AppFileName}: {FileHashString(nbuildApp.AppFileName)}", ConsoleColor.Yellow);
+
+                    // Only compare file hash when a StoredHash is provided
+                    if (IsFileHashEqual(nbuildApp.AppFileName, nbuildApp.StoredHash))
+                    {
+                        ConsoleHelper.WriteLine($"√ {nbuildApp.Name} {nbuildApp.Version} installed.", ConsoleColor.Green);
+                        return ResultHelper.Success();
+                    }
+                    else
+                    {
+                        ConsoleHelper.WriteLine($"X {nbuildApp.Name} {nbuildApp.Version} installed, but file hash does not match.", ConsoleColor.Red);
+                        return ResultHelper.Fail(-1, $"File hash does not match for {nbuildApp.AppFileName}");
+                    }
                 }
-
-
-                if (IsFileHashEqual(nbuildApp.AppFileName, nbuildApp.StoredHash))
-                {
-                    ConsoleHelper.WriteLine($"√ {nbuildApp.Name} {nbuildApp.Version} installed.", ConsoleColor.Green);
-                    return ResultHelper.Success();
-                }
-
-                ConsoleHelper.WriteLine($"X {nbuildApp.Name} {nbuildApp.Version} failed to install", ConsoleColor.Red);
-                // print out ResultHelper code and output
-                DisplayCodeAndOutput(result);
-                return ResultHelper.Fail(-1, $"Failed to install {nbuildApp.Name} {nbuildApp.Version}");
             }
         }
 
@@ -934,12 +934,12 @@ namespace Nbuild
             if (!Path.IsPathRooted(nbuildApp.InstallPath)) throw new ParserException($"App: {nbuildApp.Name}, InstallPath {nbuildApp.InstallPath} must be rooted. i.e. C:\\Program Files\\Nbuild", null);
         }
         /// <summary>
-        /// Removes the application's install path from the system PATH environment variable.
+        /// Removes the application's install path from the user PATH environment variable.
         /// </summary>
         /// <param name="nbuildApp">The application details containing the install path.</param>
         /// <exception cref="ArgumentNullException">Thrown when the install path is null or empty.</exception>
         /// <remarks>
-        /// This method checks if the install path is present in the system PATH environment variable.
+        /// This method checks if the install path is present in the user PATH environment variable.
         /// If it is, it removes the install path from the PATH. It also logs the action using the Colorizer.
         /// </remarks>
         public static void RemoveAppInstallPathFromEnvironmentPath(NbuildApp nbuildApp)
@@ -949,15 +949,15 @@ namespace Nbuild
                 throw new ArgumentNullException(nameof(nbuildApp.InstallPath));
             }
 
-            var path = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine) ?? string.Empty;
+            var path = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User) ?? string.Empty;
             List<string> pathSegments = PathToSegments(path);
 
             if (pathSegments.Contains(nbuildApp.InstallPath, StringComparer.OrdinalIgnoreCase))
             {
                 pathSegments.RemoveAll(p => p.Equals(nbuildApp.InstallPath, StringComparison.OrdinalIgnoreCase));
                 var updatedPath = string.Join(';', pathSegments);
-                Environment.SetEnvironmentVariable("PATH", updatedPath, EnvironmentVariableTarget.Machine);
-                ConsoleHelper.WriteLine($"√ {nbuildApp.InstallPath} removed from PATH.", ConsoleColor.Green);
+                Environment.SetEnvironmentVariable("PATH", updatedPath, EnvironmentVariableTarget.User);
+                ConsoleHelper.WriteLine($"√ {nbuildApp.InstallPath} removed from user PATH.", ConsoleColor.Green);
             }
             else
             {
@@ -981,13 +981,13 @@ namespace Nbuild
         }
 
         /// <summary>
-        /// Checks if the application's install path is present in the system PATH environment variable.
+        /// Checks if the application's install path is present in the user PATH environment variable.
         /// </summary>
         /// <param name="nbuildApp">The application details containing the install path.</param>
         /// <returns>True if the install path is present in the PATH, otherwise false.</returns>
         /// <exception cref="ArgumentNullException">Thrown when the install path is null or empty.</exception>
         /// <remarks>
-        /// This method checks if the install path is present in the system PATH environment variable.
+        /// This method checks if the install path is present in the user PATH environment variable.
         /// It returns true if the path is found, otherwise false.
         /// </remarks>
         public static bool IsAppInstallPathInEnvironmentPath(NbuildApp nbuildApp)
@@ -997,7 +997,7 @@ namespace Nbuild
                 throw new ArgumentNullException(nameof(nbuildApp.InstallPath));
             }
 
-            var path = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine) ?? string.Empty;
+            var path = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User) ?? string.Empty;
             var pathSegments = path.Split(';', StringSplitOptions.RemoveEmptyEntries).ToList();
 
             return pathSegments.Contains(nbuildApp.InstallPath, StringComparer.OrdinalIgnoreCase);
@@ -1201,7 +1201,7 @@ namespace Nbuild
         /// <param name="branch">The branch name for the release.</param>
         /// <param name="assetFileName">The path to the asset to be included in the release.</param>
         /// <returns>True if the release was created successfully, otherwise false.</returns>
-        // <remarks>
+        /// <remarks>
         /// This method creates a new release in the specified repository using the provided tag, branch, and asset path.
         /// It utilizes the ReleaseService to interact with the GitHub API.
         /// If the release creation is successful, it returns true; otherwise, it logs the error and returns false.

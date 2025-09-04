@@ -12,7 +12,7 @@ nb.exe solution
 ```cmd
 nb.exe clean
 ```
-- Test solution: runs all the tests in the solution
+- Test solution: runs all the tests in the solution with optional code coverage
 
 ```cmd
 nb.exe test
@@ -20,9 +20,10 @@ nb.exe test
 - Create a stage release: Creates a stage build which includes the following steps:
     - Clean the solution
     - Build the solution
-    - Run tests
-    - Create a stage build
+    - Run tests with code coverage
+    - Generate coverage reports
     - Publish the stage build
+    - Verify artifacts with smoke tests
     - Create a zip file of the stage build file
 
 ```cmd
@@ -33,5 +34,7 @@ nb.exe stage
 ```cmd
 nb.exe targets
 ```
-- See the list of available targets at [Nbuild Targets](./ntools/nbuild-targets.md)
+
+- See the complete list of available targets at [Nbuild Targets](./ntools/nbuild-targets.md)
+- Learn more about code coverage at [Code Coverage](./ntools/code-coverage.md)
 

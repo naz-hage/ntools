@@ -166,7 +166,7 @@ namespace NbuildTests
         // Test method for install from JSON file functionality
         [TestMethod()]
         public void InstallFromJsonFileTest()
-        {
+        {   
             SetupTestModeFlag();
             // Arrange read json from file from embedded resource
 
@@ -200,7 +200,7 @@ namespace NbuildTests
            
 
             // Act
-            var result = Command.Install(jsonContent);
+            var result = Command.Install(jsonContent, true);
 
             if (!result.IsSuccess() && result.Output.Count > 0)
             {
@@ -632,24 +632,25 @@ namespace NbuildTests
             {
                 InstallPath = TestPath
             };
-            var originalPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine);
-            Environment.SetEnvironmentVariable("PATH", string.Empty, EnvironmentVariableTarget.Machine);
+            var originalPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User);
+            Environment.SetEnvironmentVariable("PATH", string.Empty, EnvironmentVariableTarget.User);
 
             // Act
             Command.AddAppInstallPathToEnvironmentPath(nbuildApp);
-            var updatedPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine);
+            var updatedPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User);
 
             // Assert
             Assert.IsTrue(updatedPath!.Contains(nbuildApp.InstallPath));
 
             // Cleanup
-            Environment.SetEnvironmentVariable("PATH", originalPath, EnvironmentVariableTarget.Machine);
+            Environment.SetEnvironmentVariable("PATH", originalPath, EnvironmentVariableTarget.User);
         }
 
         [TestMethod]
         public void AddAppInstallPathToEnvironmentPath_DoesNotAddPath_WhenAlreadyPresent()
         {
-            // Skip test if not running in admin mode
+            // Skip test if not running in admin mode - NOTE: Now that we use User PATH, admin is not required
+            // but keeping the pattern for potential future system-level operations
             if (!CurrentProcess.IsElevated())
             {
                 Assert.Inconclusive("Test skipped because it requires admin privileges.");
@@ -660,25 +661,25 @@ namespace NbuildTests
             {
                 InstallPath = TestPath
             };
-            var originalPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine);
+            var originalPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User);
             var originalPathCount = originalPath!.Split(';').Length;
             if (!Command.IsAppInstallPathInEnvironmentPath(nbuildApp))
             {
-                Environment.SetEnvironmentVariable("PATH", $"{nbuildApp.InstallPath};{originalPath}", EnvironmentVariableTarget.Machine);
+                Environment.SetEnvironmentVariable("PATH", $"{nbuildApp.InstallPath};{originalPath}", EnvironmentVariableTarget.User);
             }
 
-            var updatedPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine);
+            var updatedPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User);
 
             // Act
             Command.AddAppInstallPathToEnvironmentPath(nbuildApp);
-            updatedPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine);
+            updatedPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User);
 
             // Assert
             var pathCount = updatedPath!.Split(';').Length;
             Assert.AreEqual(pathCount, originalPath!.Split(';').Length + 1);
 
             // Cleanup
-            Environment.SetEnvironmentVariable("PATH", originalPath, EnvironmentVariableTarget.Machine);
+            Environment.SetEnvironmentVariable("PATH", originalPath, EnvironmentVariableTarget.User);
 
             Command.RemoveAppInstallPathFromEnvironmentPath(nbuildApp);
         }
@@ -746,18 +747,18 @@ namespace NbuildTests
             {
                 InstallPath = TestPath
             };
-            var originalPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine);
-            Environment.SetEnvironmentVariable("PATH", $"{TestPath};{originalPath}", EnvironmentVariableTarget.Machine);
+            var originalPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User);
+            Environment.SetEnvironmentVariable("PATH", $"{TestPath};{originalPath}", EnvironmentVariableTarget.User);
 
             // Act
             Command.RemoveAppInstallPathFromEnvironmentPath(nbuildApp);
-            var updatedPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine);
+            var updatedPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User);
 
             // Assert
             Assert.IsFalse(updatedPath!.Contains(nbuildApp.InstallPath));
 
             // Cleanup
-            Environment.SetEnvironmentVariable("PATH", originalPath, EnvironmentVariableTarget.Machine);
+            Environment.SetEnvironmentVariable("PATH", originalPath, EnvironmentVariableTarget.User);
         }
 
         [TestMethod]
@@ -780,18 +781,18 @@ namespace NbuildTests
                 Command.RemoveAppInstallPathFromEnvironmentPath(nbuildApp);
             }
 
-            var originalPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine);
-            Environment.SetEnvironmentVariable("PATH", originalPath, EnvironmentVariableTarget.Machine);
+            var originalPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User);
+            Environment.SetEnvironmentVariable("PATH", originalPath, EnvironmentVariableTarget.User);
 
             // Act
             Command.RemoveAppInstallPathFromEnvironmentPath(nbuildApp);
-            var updatedPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine);
+            var updatedPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User);
 
             // Assert
             Assert.AreEqual(originalPath, updatedPath);
 
             // Cleanup
-            Environment.SetEnvironmentVariable("PATH", originalPath, EnvironmentVariableTarget.Machine);
+            Environment.SetEnvironmentVariable("PATH", originalPath, EnvironmentVariableTarget.User);
         }
 
         [TestMethod]
@@ -824,8 +825,8 @@ namespace NbuildTests
             {
                 InstallPath = "C:\\TestPath"
             };
-            var originalPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine);
-            Environment.SetEnvironmentVariable("PATH", $"C:\\TestPath;{originalPath}", EnvironmentVariableTarget.Machine);
+            var originalPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User);
+            Environment.SetEnvironmentVariable("PATH", $"C:\\TestPath;{originalPath}", EnvironmentVariableTarget.User);
 
             // Act
             var result = Command.IsAppInstallPathInEnvironmentPath(nbuildApp);
@@ -834,7 +835,7 @@ namespace NbuildTests
             Assert.IsTrue(result);
 
             // Cleanup
-            Environment.SetEnvironmentVariable("PATH", originalPath, EnvironmentVariableTarget.Machine);
+            Environment.SetEnvironmentVariable("PATH", originalPath, EnvironmentVariableTarget.User);
         }
 
         [TestMethod]
@@ -851,8 +852,8 @@ namespace NbuildTests
             {
                 InstallPath = "C:\\TestPath"
             };
-            var originalPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine);
-            Environment.SetEnvironmentVariable("PATH", originalPath, EnvironmentVariableTarget.Machine);
+            var originalPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User);
+            Environment.SetEnvironmentVariable("PATH", originalPath, EnvironmentVariableTarget.User);
 
             // Act
             var result = Command.IsAppInstallPathInEnvironmentPath(nbuildApp);
@@ -861,7 +862,7 @@ namespace NbuildTests
             Assert.IsFalse(result);
 
             // Cleanup
-            Environment.SetEnvironmentVariable("PATH", originalPath, EnvironmentVariableTarget.Machine);
+            Environment.SetEnvironmentVariable("PATH", originalPath, EnvironmentVariableTarget.User);
         }
 
         [TestMethod]

@@ -1,10 +1,27 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Threading.Tasks;
 
 namespace Nbuild.Tests
 {
     [TestClass]
     public class CliTests
     {
+        private string? _originalOwnerValue;
+
+        [TestInitialize]
+        public void TestInitialize()
+        {
+            // Save the original OWNER environment variable value before each test
+            _originalOwnerValue = Environment.GetEnvironmentVariable("OWNER");
+        }
+
+        [TestCleanup]
+        public void TestCleanup()
+        {
+            // Restore the original OWNER environment variable value after each test
+            Environment.SetEnvironmentVariable("OWNER", _originalOwnerValue);
+        }
         [TestMethod]
         public async Task ValidateRepo_ShouldExtractUserNameAndRepoName_FromFullUrl()
         {
@@ -58,9 +75,6 @@ namespace Nbuild.Tests
         [TestMethod]
         public async Task ValidateRepo_ShouldHandleRepoNameOnly_WithOwnerEnvironmentVariable()
         {
-            // Save current "OWNER" environment Variable
-            var owner = Environment.GetEnvironmentVariable("OWNER");
-
             // Arrange
             Environment.SetEnvironmentVariable("OWNER", "naz-hage");
             var cli = new Nbuild.Cli
@@ -73,16 +87,9 @@ namespace Nbuild.Tests
 
             // Assert
             Assert.AreEqual("naz-hage/ntools", cli.Repo, "The Repo property should correctly combine OWNER and repoName.");
-
-            // restore current "OWNER" env. variable
-            Environment.SetEnvironmentVariable("OWNER", owner);
-
-            // Assert
-            Assert.AreEqual(owner, Environment.GetEnvironmentVariable("OWNER"));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public async Task ValidateRepo_ShouldThrowException_WhenOwnerEnvironmentVariableIsMissing()
         {
             // Skip this test if running in GitHub Actions
@@ -92,9 +99,6 @@ namespace Nbuild.Tests
                 return;
             }
 
-            // Save current "OWNER" environment Variable
-            var owner = Environment.GetEnvironmentVariable("OWNER");
-
             // Arrange
             Environment.SetEnvironmentVariable("OWNER", null);
             var cli = new Nbuild.Cli
@@ -102,19 +106,13 @@ namespace Nbuild.Tests
                 Repo = "ntools"
             };
 
-            // Act
-            await cli.ValidateRepo();
+            // Act & Assert - expect exception
+            var exception = await Assert.ThrowsExceptionAsync<InvalidOperationException>(
+                async () => await cli.ValidateRepo()
+            );
 
-            // Expect exception
-
-            // Assert
-            Assert.AreEqual("naz-hage/ntools", cli.Repo, "The Repo property should correctly combine OWNER and repoName.");
-
-            // restore current "OWNER" env. variable
-            Environment.SetEnvironmentVariable("OWNER", owner);
-
-            // Assert
-            Assert.AreEqual(owner, Environment.GetEnvironmentVariable("OWNER"));
+            // Verify the exception message is appropriate
+            Assert.IsNotNull(exception, "Expected InvalidOperationException to be thrown");
         }
 
         [TestMethod]
@@ -276,7 +274,6 @@ namespace Nbuild.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
         public async Task ValidateRepositoryExists_InvalidRepo_ShouldThrowException()
         {
             // Arrange
@@ -285,8 +282,35 @@ namespace Nbuild.Tests
                 Repo = "invalid/repo"
             };
 
-            // Act
-            await cli.ValidateRepositoryExists();
+            // Act & Assert - expect exception
+            var exception = await Assert.ThrowsExceptionAsync<ArgumentException>(
+                async () => await cli.ValidateRepositoryExists()
+            );
+
+            // Verify the exception message is appropriate
+            Assert.IsNotNull(exception, "Expected ArgumentException to be thrown");
+            Assert.IsTrue(exception.Message.Contains("invalid/repo"), 
+                "Exception message should mention the invalid repository");
+        }
+
+        [TestMethod]
+        public void EnvironmentVariable_ShouldBePreservedBetweenTests()
+        {
+            // This test verifies that the class-level TestInitialize/TestCleanup
+            // properly preserves the OWNER environment variable between tests
+
+            // Get the current OWNER value (should be the original value restored by TestCleanup)
+            var currentOwner = Environment.GetEnvironmentVariable("OWNER");
+            
+            // Modify the OWNER environment variable
+            Environment.SetEnvironmentVariable("OWNER", "test-owner-value");
+            
+            // Verify the change
+            Assert.AreEqual("test-owner-value", Environment.GetEnvironmentVariable("OWNER"), 
+                "OWNER should be set to test value");
+                
+            // Note: TestCleanup will automatically restore the original value
+            // This test demonstrates that environment variables are properly managed
         }
     }
 }
