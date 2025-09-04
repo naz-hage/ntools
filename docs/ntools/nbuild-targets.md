@@ -62,25 +62,6 @@ The table below lists all available targets for the Nbuild tool.
 | SingleProject       | Example how to build a single project |
 | HandleError         | Error handling placeholder |
 
-## Enhanced Build Pipeline Features
-
-### Code Coverage Support
-The build system now includes comprehensive code coverage support with the following features:
-
-- **Conditional Coverage**: Use `EnableCodeCoverage` property to control coverage collection
-- **Configurable Filters**: Set `CoverageAssemblyFilters` and `CoverageClassFilters` for precise control
-- **HTML Reports**: Generate detailed HTML coverage reports using ReportGenerator
-- **CI/CD Integration**: Coverage reports automatically copied for GitHub Actions
-
-### User-Level PATH Management
-- **Test Mode Protection**: Prevents PATH contamination during testing
-- **Improved Security**: No longer requires elevated privileges for installation
-
-### Target Delegation System
-- **Common Targets**: Enhanced `common.targets` with improved TEST target logic
-- **Validation Scripts**: PowerShell scripts for validating target delegation
-- **Backward Compatibility**: Existing projects continue to work without changes
-
 
 - **C:\Program Files\nbuild\apps-versions.targets Targets**
 

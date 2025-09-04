@@ -113,31 +113,6 @@ Or via command line:
 nb TEST -p:EnableCodeCoverage=false
 ```
 
-## Best Practices
-
-1. **Filter Appropriately**: Use assembly and class filters to focus on relevant code
-2. **CI/CD Integration**: Include coverage in your build pipeline for quality gates
-3. **Regular Monitoring**: Review coverage reports regularly to maintain code quality
-4. **Test Strategy**: Use coverage data to identify untested code paths
-
-## Troubleshooting
-
-### ReportGenerator Installation
-If ReportGenerator installation fails, install manually:
-```bash
-dotnet tool install -g dotnet-reportgenerator-globaltool
-```
-
-### Coverage Collection Issues
-1. Ensure tests are running in Release configuration
-2. Check that test assemblies are not excluded by filters
-3. Verify XPlat Code Coverage collector is available
-
-### Report Generation
-1. Check that coverage files exist in test results
-2. Verify ReportGenerator tool is installed
-3. Ensure proper permissions for output directories
-
 ## Examples
 
 ### Basic Usage
@@ -166,5 +141,3 @@ nb COVERAGE_SUMMARY
 # Complete build with tests and coverage
 nb STAGE
 ```
-
-This comprehensive coverage system provides detailed insights into code quality while being flexible enough to adapt to different project needs.

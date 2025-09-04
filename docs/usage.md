@@ -17,26 +17,6 @@ nb.exe clean
 ```cmd
 nb.exe test
 ```
-- Run tests with code coverage disabled (for faster execution):
-
-```cmd
-nb.exe test -p:EnableCodeCoverage=false
-```
-- Generate code coverage reports:
-
-```cmd
-nb.exe coverage
-```
-- View code coverage summary:
-
-```cmd
-nb.exe coverage_summary
-```
-- Verify build artifacts:
-
-```cmd
-nb.exe smoke_test
-```
 - Create a stage release: Creates a stage build which includes the following steps:
     - Clean the solution
     - Build the solution
@@ -54,27 +34,6 @@ nb.exe stage
 ```cmd
 nb.exe targets
 ```
-
-## Enhanced Features
-
-### Code Coverage
-The build system now includes comprehensive code coverage support:
-- Automatic coverage collection during test runs
-- HTML and text coverage reports
-- Configurable assembly and class filters
-- CI/CD integration support
-
-### Artifact Verification
-- Automated smoke testing of build artifacts
-- PowerShell-based verification scripts
-- Comprehensive artifact structure validation
-
-### Build Pipeline
-The enhanced build pipeline provides:
-- Integrated test execution with coverage
-- Automated artifact verification
-- Streamlined publishing process
-- Better error handling and diagnostics
 
 - See the complete list of available targets at [Nbuild Targets](./ntools/nbuild-targets.md)
 - Learn more about code coverage at [Code Coverage](./ntools/code-coverage.md)
