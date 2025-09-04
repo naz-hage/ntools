@@ -1,14 +1,13 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Nbuild;
 using NbuildTasks;
 using Ntools;
 using System.Collections;
 using System.Diagnostics;
 using System.Reflection;
+using Xunit;
 
 namespace NbuildTests
 {
-    [TestClass()]
     public class CommandTests
     {
         // Constants for test setup
@@ -45,7 +44,7 @@ namespace NbuildTests
                 };
 
                 var result = process.LockStart(true);
-                Assert.IsTrue(result.IsSuccess());
+                Assert.True(result.IsSuccess());
             }
         }
 
@@ -81,14 +80,14 @@ namespace NbuildTests
                     Console.WriteLine($"{entry.Key}: {entry.Value}");
                 }
 
-                Assert.IsTrue(process.LockStart(true).IsSuccess());
+                Assert.True(process.LockStart(true).IsSuccess());
             }
             LocalTestMode = true;
         }
 
         private string TestPath => "C:\\Temp\\nbuild2";
         // Test method for download functionality
-        [TestMethod()]
+        [Fact]
         public void DownloadTest()
         {
             // Arrange
@@ -116,13 +115,13 @@ namespace NbuildTests
             var result = Command.Download(json);
 
             // Assert
-            Assert.IsTrue(result.IsSuccess());
+            Assert.True(result.IsSuccess());
 
             //teardown
             TeardownTestModeFlag();
         }
 
-        [TestMethod()]
+        [Fact]
         public void DownloadUriNotFoundTest()
         {
             // Arrange
@@ -154,9 +153,9 @@ namespace NbuildTests
             catch (Exception ex)
             {
                 // Assert
-                Assert.IsTrue(ex.Message.Contains("(404)"));
+                Assert.Contains("(404)", ex.Message);
 
-                Assert.IsTrue(ex.Message.Contains("Not Found"));
+                Assert.Contains("Not Found", ex.Message);
             }
 
             //teardown
@@ -164,14 +163,14 @@ namespace NbuildTests
         }
 
         // Test method for install from JSON file functionality
-        [TestMethod()]
+        [Fact]
         public void InstallFromJsonFileTest()
         {   
             SetupTestModeFlag();
             // Arrange read json from file from embedded resource
 
             string? executingAssemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            Assert.IsNotNull(executingAssemblyDirectory);
+            Assert.NotNull(executingAssemblyDirectory);
 
             string json = Path.Combine(executingAssemblyDirectory, NbuildAppListJsonFile);
             var assembly = Path.Combine(executingAssemblyDirectory, NbuildAssemblyName);
@@ -211,14 +210,14 @@ namespace NbuildTests
             var result2 = result.IsSuccess();
 
             // Assert
-            Assert.IsTrue(result2);
+            Assert.True(result2);
 
             // teardown
             TeardownTestModeFlag();
         }
 
         // Test method for install functionality
-        [TestMethod()]
+        [Fact]
         public void InstallTest()
         {
             SetupTestModeFlag();
@@ -255,14 +254,14 @@ namespace NbuildTests
             var result2 = result.IsSuccess();
 
             // Assert
-            Assert.IsTrue(result2);
+            Assert.True(result2);
 
             // teardown
             TeardownTestModeFlag();
         }
 
         // Test method for uninstall functionality
-        [TestMethod()]
+        [Fact]
         public void UninstallTest()
         {
             // Arrange "C:\Program Files\7-Zip\7z.exe" x C:\Artifacts\ntools\Release\%1.zip -o"C:\Program Files\Nbuild" -y
@@ -300,7 +299,7 @@ namespace NbuildTests
 
             // Install the app first before uninstalling
             var result = Command.Install(json);
-            Assert.IsTrue(result.IsSuccess());
+            Assert.True(result.IsSuccess());
 
 
             // Act
@@ -315,7 +314,7 @@ namespace NbuildTests
             var result2 = result.IsSuccess();
 
             // Assert
-            Assert.IsTrue(result2);
+            Assert.True(result2);
 
             // teardown
             TeardownTestModeFlag();
@@ -323,13 +322,14 @@ namespace NbuildTests
 
 
         // Test method for install exception when name is not defined
-        [TestMethod()]
+        [Fact]
         public void InstallExceptionNameTest()
         {
             // Skip test if not running in admin mode
             if (!CurrentProcess.IsElevated())
             {
-                Assert.Inconclusive("Test skipped because it requires admin privileges.");
+                // Test skipped because it requires admin privileges.
+                return;
             }
 
             // Arrange with json and no name define ""Name"": ""nbuild"",
@@ -361,17 +361,18 @@ namespace NbuildTests
 
             // Assert an failed json parsing is returned 
 
-            Assert.AreEqual("Invalid json input: Name is required", result.GetFirstOutput().Trim(' '));
+            Assert.Equal("Invalid json input: Name is required", result.GetFirstOutput().Trim(' '));
         }
 
         // Test method for install exception when AppFileName is not defined
-        [TestMethod()]
+        [Fact]
         public void InstallExceptionAppFileNameTest()
         {
             // Skip test if not running in admin mode
             if (!CurrentProcess.IsElevated())
             {
-                Assert.Inconclusive("Test skipped because it requires admin privileges.");
+                // Test skipped because it requires admin privileges.
+                return;
             }
 
             // Arrange with json and no AppFileName defined
@@ -404,13 +405,13 @@ namespace NbuildTests
             }
 
             // Assert a failed json parsing is returned 
-            Assert.IsFalse(result.IsSuccess());
+            Assert.False(result.IsSuccess());
 
-            Assert.AreEqual(result.GetFirstOutput().Trim(' '), "Invalid json input: AppFileName is required");
+            Assert.Equal("Invalid json input: AppFileName is required", result.GetFirstOutput().Trim(' '));
         }
 
         // Test method for install exception when WebDownloadFile is not defined
-        [TestMethod()]
+        [Fact]
         public void InstallExceptionWebDownloadFileTest()
         {
             // Arrange with json and no WebDownloadFile defined
@@ -424,7 +425,9 @@ namespace NbuildTests
                     ""DownloadedFile"": ""$(Version).zip"",
                     ""InstallCommand"": ""powershell.exe"",
                     ""InstallArgs"": ""-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force"",
-                    ""InstallPath"": ""C:\\Temp\\nbuild2""
+                    ""InstallPath"": ""C:\\Temp\\nbuild2"",
+                    ""UninstallCommand"": ""powershell.exe"",
+                    ""UninstallArgs"": ""-Command Remove-Item -Path '$(InstallPath)' -Recurse -Force""
                     }
                 ]
             }";
@@ -441,19 +444,20 @@ namespace NbuildTests
             }
 
             // Assert a failed json parsing is returned 
-            Assert.IsFalse(result.IsSuccess());
+            Assert.False(result.IsSuccess());
 
-            Assert.AreEqual(result.GetFirstOutput().Trim(' '), "Invalid json input: WebDownloadFile is required");
+            Assert.Equal("Invalid json input: WebDownloadFile is required", result.GetFirstOutput().Trim(' '));
         }
 
         // Test method for install exception when DownloadedFile is not defined
-        [TestMethod()]
+        [Fact]
         public void InstallExceptionDownloadedFileTest()
         {
             // Skip test if not running in admin mode
             if (!CurrentProcess.IsElevated())
             {
-                Assert.Inconclusive("Test skipped because it requires admin privileges.");
+                // Test skipped because it requires admin privileges.
+                return;
             }
 
             // Arrange with json and no DownloadedFile defined
@@ -484,19 +488,20 @@ namespace NbuildTests
             }
 
             // Assert a failed json parsing is returned 
-            Assert.IsFalse(result.IsSuccess());
+            Assert.False(result.IsSuccess());
 
-            Assert.AreEqual(result.GetFirstOutput().Trim(' '), "Invalid json input: DownloadedFile is required");
+            Assert.Equal("Invalid json input: DownloadedFile is required", result.GetFirstOutput().Trim(' '));
         }
 
         // Test method for install exception when InstallCommand is not defined
-        [TestMethod()]
+        [Fact]
         public void InstallExceptionInstallCommandTest()
         {
             // Skip test if not running in admin mode
             if (!CurrentProcess.IsElevated())
             {
-                Assert.Inconclusive("Test skipped because it requires admin privileges.");
+                // Test skipped because it requires admin privileges.
+                return;
             }
 
             // Arrange with json and no InstallCommand defined
@@ -527,19 +532,20 @@ namespace NbuildTests
             }
 
             // Assert a failed json parsing is returned 
-            Assert.IsFalse(result.IsSuccess());
+            Assert.False(result.IsSuccess());
 
-            Assert.AreEqual(result.GetFirstOutput(), "Invalid json input: InstallCommand is required");
+            Assert.Equal("Invalid json input: InstallCommand is required", result.GetFirstOutput());
         }
 
         // Test method for install exception when InstallArgs is not defined
-        [TestMethod()]
+        [Fact]
         public void InstallExceptionInstallArgsTest()
         {
             // Skip test if not running in admin mode
             if (!CurrentProcess.IsElevated())
             {
-                Assert.Inconclusive("Test skipped because it requires admin privileges.");
+                // Test skipped because it requires admin privileges.
+                return;
             }
 
             // Arrange with json and no InstallArgs defined
@@ -570,19 +576,20 @@ namespace NbuildTests
             }
 
             // Assert a failed json parsing is returned 
-            Assert.IsFalse(result.IsSuccess());
+            Assert.False(result.IsSuccess());
 
-            Assert.AreEqual(result.GetFirstOutput().Trim(' '), "Invalid json input: InstallArgs is required");
+            Assert.Equal("Invalid json input: InstallArgs is required", result.GetFirstOutput().Trim(' '));
         }
 
         // Test method for install exception when InstallPath is not defined
-        [TestMethod()]
+        [Fact]
         public void InstallExceptionInstallPathTest()
         {
             // Skip test if not running in admin mode
             if (!CurrentProcess.IsElevated())
             {
-                Assert.Inconclusive("Test skipped because it requires admin privileges.");
+                // Test skipped because it requires admin privileges.
+                return;
             }
 
             // Arrange with json and no InstallPath defined
@@ -613,18 +620,19 @@ namespace NbuildTests
             }
 
             // Assert a failed json parsing is returned 
-            Assert.IsFalse(result.IsSuccess());
+            Assert.False(result.IsSuccess());
 
-            Assert.AreEqual(result.GetFirstOutput(), "Invalid json input: InstallPath is required");
+            Assert.Equal("Invalid json input: InstallPath is required", result.GetFirstOutput());
         }
 
-        [TestMethod]
+        [Fact]
         public void AddAppInstallPathToEnvironmentPath_AddsPath_WhenNotPresent()
         {
             // Skip test if not running in admin mode
             if (!CurrentProcess.IsElevated())
             {
-                Assert.Inconclusive("Test skipped because it requires admin privileges.");
+                // Test skipped because it requires admin privileges.
+                return;
             }
 
             // Arrange
@@ -640,20 +648,21 @@ namespace NbuildTests
             var updatedPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User);
 
             // Assert
-            Assert.IsTrue(updatedPath!.Contains(nbuildApp.InstallPath));
+            Assert.Contains(nbuildApp.InstallPath, updatedPath!);
 
             // Cleanup
             Environment.SetEnvironmentVariable("PATH", originalPath, EnvironmentVariableTarget.User);
         }
 
-        [TestMethod]
+        [Fact]
         public void AddAppInstallPathToEnvironmentPath_DoesNotAddPath_WhenAlreadyPresent()
         {
             // Skip test if not running in admin mode - NOTE: Now that we use User PATH, admin is not required
             // but keeping the pattern for potential future system-level operations
             if (!CurrentProcess.IsElevated())
             {
-                Assert.Inconclusive("Test skipped because it requires admin privileges.");
+                // Test skipped because it requires admin privileges.
+                return;
             }
 
             // Arrange
@@ -676,7 +685,7 @@ namespace NbuildTests
 
             // Assert
             var pathCount = updatedPath!.Split(';').Length;
-            Assert.AreEqual(pathCount, originalPath!.Split(';').Length + 1);
+            Assert.Equal(pathCount, originalPath!.Split(';').Length + 1);
 
             // Cleanup
             Environment.SetEnvironmentVariable("PATH", originalPath, EnvironmentVariableTarget.User);
@@ -684,8 +693,7 @@ namespace NbuildTests
             Command.RemoveAppInstallPathFromEnvironmentPath(nbuildApp);
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void AddAppInstallPathToEnvironmentPath_ThrowsException_WhenInstallPathIsNull()
         {
             // Arrange
@@ -694,13 +702,11 @@ namespace NbuildTests
                 InstallPath = null
             };
 
-            // Act
-            Command.AddAppInstallPathToEnvironmentPath(nbuildApp);
-
-            // Assert is handled by ExpectedException
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => Command.AddAppInstallPathToEnvironmentPath(nbuildApp));
         }
 
-        [TestMethod]
+        [Fact]
         public void Download_PrivateAsset_NotFound()
         {
             // Arrange
@@ -727,19 +733,20 @@ namespace NbuildTests
             var result = Command.Download(json, true);
 
             // Assert - should return a failure result but not throw
-            Assert.IsFalse(result.IsSuccess());
+            Assert.False(result.IsSuccess());
 
             // teardown
             TeardownTestModeFlag();
         }
 
-        [TestMethod]
+        [Fact]
         public void RemoveAppInstallPathFromEnvironmentPath_RemovesPath_WhenPresent()
         {
             // Skip test if not running in admin mode
             if (!CurrentProcess.IsElevated())
             {
-                Assert.Inconclusive("Test skipped because it requires admin privileges.");
+                // Test skipped because it requires admin privileges.
+                return;
             }
 
             // Arrange
@@ -755,19 +762,20 @@ namespace NbuildTests
             var updatedPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User);
 
             // Assert
-            Assert.IsFalse(updatedPath!.Contains(nbuildApp.InstallPath));
+            Assert.DoesNotContain(nbuildApp.InstallPath, updatedPath!);
 
             // Cleanup
             Environment.SetEnvironmentVariable("PATH", originalPath, EnvironmentVariableTarget.User);
         }
 
-        [TestMethod]
+        [Fact]
         public void RemoveAppInstallPathFromEnvironmentPath_DoesNotRemovePath_WhenNotPresent()
         {
             // Skip test if not running in admin mode
             if (!CurrentProcess.IsElevated())
             {
-                Assert.Inconclusive("Test skipped because it requires admin privileges.");
+                // Test skipped because it requires admin privileges.
+                return;
             }
 
             // Arrange
@@ -789,14 +797,13 @@ namespace NbuildTests
             var updatedPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User);
 
             // Assert
-            Assert.AreEqual(originalPath, updatedPath);
+            Assert.Equal(originalPath, updatedPath);
 
             // Cleanup
             Environment.SetEnvironmentVariable("PATH", originalPath, EnvironmentVariableTarget.User);
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void RemoveAppInstallPathFromEnvironmentPath_ThrowsException_WhenInstallPathIsNull()
         {
             // Arrange
@@ -805,19 +812,18 @@ namespace NbuildTests
                 InstallPath = null
             };
 
-            // Act
-            Command.RemoveAppInstallPathFromEnvironmentPath(nbuildApp);
-
-            // Assert is handled by ExpectedException
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => Command.RemoveAppInstallPathFromEnvironmentPath(nbuildApp));
         }
 
-        [TestMethod]
+        [Fact]
         public void IsAppInstallPathInEnvironmentPath_ReturnsTrue_WhenPathIsPresent()
         {
             // Skip test if not running in admin mode
             if (!CurrentProcess.IsElevated())
             {
-                Assert.Inconclusive("Test skipped because it requires admin privileges.");
+                // Test skipped because it requires admin privileges.
+                return;
             }
 
             // Arrange
@@ -832,19 +838,20 @@ namespace NbuildTests
             var result = Command.IsAppInstallPathInEnvironmentPath(nbuildApp);
 
             // Assert
-            Assert.IsTrue(result);
+            Assert.True(result);
 
             // Cleanup
             Environment.SetEnvironmentVariable("PATH", originalPath, EnvironmentVariableTarget.User);
         }
 
-        [TestMethod]
+        [Fact]
         public void IsAppInstallPathInEnvironmentPath_ReturnsFalse_WhenPathIsNotPresent()
         {
             // Skip test if not running in admin mode
             if (!CurrentProcess.IsElevated())
             {
-                Assert.Inconclusive("Test skipped because it requires admin privileges.");
+                // Test skipped because it requires admin privileges.
+                return;
             }
 
             // Arrange
@@ -859,14 +866,13 @@ namespace NbuildTests
             var result = Command.IsAppInstallPathInEnvironmentPath(nbuildApp);
 
             // Assert
-            Assert.IsFalse(result);
+            Assert.False(result);
 
             // Cleanup
             Environment.SetEnvironmentVariable("PATH", originalPath, EnvironmentVariableTarget.User);
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void IsAppInstallPathInEnvironmentPath_ThrowsException_WhenInstallPathIsNull()
         {
             // Arrange
@@ -875,10 +881,8 @@ namespace NbuildTests
                 InstallPath = null
             };
 
-            // Act
-            Command.IsAppInstallPathInEnvironmentPath(nbuildApp);
-
-            // Assert is handled by ExpectedException
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => Command.IsAppInstallPathInEnvironmentPath(nbuildApp));
         }
     }
 }

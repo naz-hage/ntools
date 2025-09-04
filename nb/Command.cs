@@ -1,16 +1,20 @@
 ﻿using GitHubRelease;
 using NbuildTasks;
 using Ntools;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.IO;
-using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Threading.Tasks;
+using Nbuild; // Ensure Cli is available
+using System.Runtime.InteropServices;
 
 namespace Nbuild
 {
@@ -631,6 +635,8 @@ namespace Nbuild
                     }
                 }
             }
+            // Ensure a return in all code paths
+            return ResultHelper.Fail(-1, $"Unknown error in SuccessfullInstall for {nbuildApp.Name}");
         }
 
         private static void DisplayCodeAndOutput(ResultHelper result)
@@ -799,17 +805,17 @@ namespace Nbuild
             NbuildApps listAppData;
             try
             {
-                listAppData = JsonSerializer.Deserialize<NbuildApps>(json) ?? throw new ParserException("Failed to parse json to list of objects", null);
+                listAppData = JsonSerializer.Deserialize<NbuildApps>(json) ?? throw new ArgumentException("Failed to parse json to list of objects");
             }
             catch (JsonException ex)
             {
-                throw new ParserException($"Invalid JSON format: {ex.Message}. Please check the JSON file for proper escaping of backslashes and quotes.", ex);
+                throw new ArgumentException($"Invalid JSON format: {ex.Message}. Please check the JSON file for proper escaping of backslashes and quotes.", ex);
             }
 
             // make sure version matches supported version
             if (listAppData.Version != SupportedVersion)
             {
-                throw new ParserException($"Json Version {listAppData.Version} is not supported. Please use version {SupportedVersion}", null);
+                throw new ArgumentException($"Json Version {listAppData.Version} is not supported. Please use version {SupportedVersion}");
             }
 
             foreach (var appData in listAppData.NbuildAppList)
@@ -824,31 +830,31 @@ namespace Nbuild
         {
             if (string.IsNullOrEmpty(nbuildApp.Name))
             {
-                throw new ParserException("Name is required", null);
+                throw new ArgumentException("Name is required");
             }
             if (string.IsNullOrEmpty(nbuildApp.WebDownloadFile))
             {
-                throw new ParserException("WebDownloadFile is required", null);
+                throw new ArgumentException("WebDownloadFile is required");
             }
             if (string.IsNullOrEmpty(nbuildApp.DownloadedFile))
             {
-                throw new ParserException("DownloadedFile is required", null);
+                throw new ArgumentException("DownloadedFile is required");
             }
             if (string.IsNullOrEmpty(nbuildApp.InstallCommand))
             {
-                throw new ParserException("InstallCommand is required", null);
+                throw new ArgumentException("InstallCommand is required");
             }
             if (string.IsNullOrEmpty(nbuildApp.InstallArgs))
             {
-                throw new ParserException("InstallArgs is required", null);
+                throw new ArgumentException("InstallArgs is required");
             }
             if (string.IsNullOrEmpty(nbuildApp.Version))
             {
-                throw new ParserException("Version is required", null);
+                throw new ArgumentException("Version is required");
             }
             if (string.IsNullOrEmpty(nbuildApp.InstallPath))
             {
-                throw new ParserException("InstallPath is required", null);
+                throw new ArgumentException("InstallPath is required");
             }
 
             // Perform validation
@@ -863,7 +869,7 @@ namespace Nbuild
                 {
                     sb.Append($"{validationResult.ErrorMessage} ");
                 }
-                throw new ParserException(sb.ToString(), null);
+                throw new ArgumentException(sb.ToString());
             }
             ValidJson = true;
 
@@ -922,7 +928,7 @@ namespace Nbuild
                 .Replace("$(ProgramFilesX86)", programFilesX86);
 
 
-            if (!Path.IsPathRooted(nbuildApp.InstallPath)) throw new ParserException($"App: {nbuildApp.Name}, InstallPath {nbuildApp.InstallPath} must be rooted. i.e. C:\\Program Files\\Nbuild", null);
+            if (!Path.IsPathRooted(nbuildApp.InstallPath)) throw new ArgumentException($"App: {nbuildApp.Name}, InstallPath {nbuildApp.InstallPath} must be rooted. i.e. C:\\Program Files\\Nbuild");
         }
         /// <summary>
         /// Removes the application's install path from the user PATH environment variable.
@@ -1042,7 +1048,6 @@ namespace Nbuild
             if (string.IsNullOrEmpty(gitWrapper.Branch))
             {
                 ConsoleHelper.WriteLine($"Error: [{project}] directory is not a git repository", ConsoleColor.Red);
-                Parser.DisplayHelp<Cli>(HelpFormat.Full);
                 return ResultHelper.Fail(-1, "Not a git repository");
             }
             ConsoleHelper.WriteLine($"Project [{project}] Branch [{gitWrapper.Branch}] Tag [{gitWrapper.Tag}]", ConsoleColor.DarkMagenta);
@@ -1060,7 +1065,6 @@ namespace Nbuild
             if (string.IsNullOrEmpty(tag))
             {
                 ConsoleHelper.WriteLine($"Error: valid tag is required", ConsoleColor.Red);
-                Parser.DisplayHelp<Cli>(HelpFormat.Full);
                 return ResultHelper.Fail(-1, "Tag is required");
             }
 
@@ -1084,7 +1088,6 @@ namespace Nbuild
             if (string.IsNullOrEmpty(buildType))
             {
                 ConsoleHelper.WriteLine($"Error: valid build type is required", ConsoleColor.Red);
-                Parser.DisplayHelp<Cli>(HelpFormat.Full);
                 return ResultHelper.Fail(-1, "Build type is required");
             }
             string? nextTag = gitWrapper.AutoTag(buildType);
@@ -1141,7 +1144,6 @@ namespace Nbuild
             if (string.IsNullOrEmpty(url))
             {
                 ConsoleHelper.WriteLine($"Error: valid url is required", ConsoleColor.Red);
-                Parser.DisplayHelp<Cli>(HelpFormat.Full);
                 return ResultHelper.Fail(-1, "Valid url is required");
             }
 
@@ -1173,7 +1175,6 @@ namespace Nbuild
             if (string.IsNullOrEmpty(tag))
             {
                 ConsoleHelper.WriteLine($"Error: valid tag is required", ConsoleColor.Red);
-                Parser.DisplayHelp<Cli>(HelpFormat.Full);
                 return ResultHelper.Fail(-1, "Tag is required");
             }
             var result = gitWrapper.DeleteTag(tag) == true ? ResultHelper.Success() : ResultHelper.Fail(-1, "Delete tag failed");

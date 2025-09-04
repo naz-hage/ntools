@@ -35,7 +35,6 @@ public class BuildStarter
         // check if target is valid
         if (!ValidTarget(target, verbose))
         {
-            ConsoleHelper.WriteLine($"Target '{target}' not found");
             return ResultHelper.Fail(-1, $"Target '{target}' not found");
         }
 
@@ -159,7 +158,6 @@ public class BuildStarter
     {
         // Always extract nbuild.bat common.targets.xml
         ResourceHelper.ExtractEmbeddedResourceFromCallingAssembly(ResourceLocation, Path.Combine(Environment.CurrentDirectory, NbuildBatchFile));
-        ConsoleHelper.WriteLine($"!Extracted '{NbuildBatchFile}' to {Environment.CurrentDirectory}\n",ConsoleColor.Yellow);
     }
 
     /// <summary>

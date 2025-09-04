@@ -1,4 +1,4 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 using Nbuild;
 using System.Net;
 using System.Net.Http;
@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace NbuildTests
 {
-    [TestClass]
     public class ReleaseServiceFactoryTests
     {
-        [TestMethod]
+        [Fact]
         public void DownloadApp_UsesReleaseServiceFactory_OnAuthenticatedFallback_Success()
         {
             // Arrange - inject factory that returns a fake service which returns success
@@ -43,7 +42,7 @@ namespace NbuildTests
                 var result = Command.Download(json, true);
 
                 // Assert - since fake returned OK, Command.Download should succeed
-                Assert.IsTrue(result.IsSuccess());
+                Assert.True(result.IsSuccess());
             }
             finally
             {
@@ -52,7 +51,7 @@ namespace NbuildTests
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void DownloadApp_UsesReleaseServiceFactory_OnAuthenticatedFallback_Failure()
         {
             // Arrange - inject factory that returns a fake service which returns NotFound
@@ -86,7 +85,7 @@ namespace NbuildTests
                 var result = Command.Download(json, true);
 
                 // Assert - since fake returned NotFound, Command.Download should return failure (but not throw)
-                Assert.IsFalse(result.IsSuccess());
+                Assert.False(result.IsSuccess());
             }
             finally
             {
