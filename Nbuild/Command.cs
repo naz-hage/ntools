@@ -1,8 +1,6 @@
-﻿using CommandLine;
-using GitHubRelease;
+﻿using GitHubRelease;
 using NbuildTasks;
 using Ntools;
-using OutputColorizer;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Net.Http;
@@ -102,13 +100,11 @@ namespace Nbuild
                 var resultInstall = process.LockStart(Verbose);
                 if (resultInstall.IsSuccess())
                 {
-                    ConsoleHelper.WriteLine($"√ {DownloadsDirectory} ACL updated.", ConsoleColor.Green);
                     return true;
                 }
                 else
                 {
 
-                    ConsoleHelper.WriteLine($"X {DownloadsDirectory} ACL failed to update: {resultInstall.Output[0]}", ConsoleColor.Red);
                     return false;
                 }
             }
@@ -127,7 +123,6 @@ namespace Nbuild
             var apps = GetApps(json);
             if (apps == null) return ResultHelper.Fail(-1, $"Invalid json input");
 
-            if (Verbose) ConsoleHelper.WriteLine($"{apps.Count()} apps to install.", ConsoleColor.Yellow);
 
             foreach (var app in apps)
             {
@@ -140,7 +135,6 @@ namespace Nbuild
                 // Print the stored hash of the app file name
                 if (!string.IsNullOrEmpty(app.StoredHash))
                 {
-                    ConsoleHelper.WriteLine($"Stored hash for {app.AppFileName}: {app.StoredHash}", ConsoleColor.Yellow);
                 }
             }
 
@@ -156,7 +150,6 @@ namespace Nbuild
             var apps = GetApps(json);
             if (apps == null) return ResultHelper.Fail(-1, $"Invalid json input");
 
-            if (Verbose) ConsoleHelper.WriteLine($"{apps.Count()} apps to Uninstall.", ConsoleColor.Yellow);
 
             foreach (var app in apps)
             {
@@ -164,7 +157,6 @@ namespace Nbuild
                 if (!result.IsSuccess())
                 {
                     // display error message and continue to next app
-                    ConsoleHelper.WriteLine($"{result.GetFirstOutput()}", ConsoleColor.Red);
                 }
             }
 
@@ -179,7 +171,6 @@ namespace Nbuild
 
             if (apps == null) return ResultHelper.Fail(-1, $"Invalid json input");
 
-            ConsoleHelper.WriteLine($"{apps.Count()} apps to list:", ConsoleColor.Yellow);
 
             // print header
             ConsoleHelper.WriteLine("|--------------------|----------------|-------------------|", ConsoleColor.Yellow);

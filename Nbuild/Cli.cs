@@ -1,18 +1,14 @@
-﻿using CommandLine.Attributes;
-using GitHubRelease;
+﻿using GitHubRelease;
 using NbuildTasks;
 using System.IO;
 
 namespace Nbuild;
 
 /// <summary>
-/// Represents the command-line interface (CLI) options for the Nbuild application.
+/// Represents the options for the Nbuild library API (formerly CLI options).
 /// </summary>
 public class Cli
 {
-    /// <summary>
-    /// Enum representing the possible command types.
-    /// </summary>
     public enum CommandType
     {
         list,
@@ -34,10 +30,17 @@ public class Cli
         list_release,
     }
 
-    /// <summary>
-    /// Gets or sets the command to execute.
-    /// Possible values: targets, install, uninstall, download, list, path, git_info, git_settag, git_autotag, git_push_autotag, git_branch, git_clone, git_deletetag.
-    /// </summary>
+    public CommandType Command { get; set; }
+    public string? Json { get; set; }
+    public bool Verbose { get; set; }
+    public string? Tag { get; set; }
+    public string? BuildType { get; set; }
+    public string? Url { get; set; }
+    public string? Path { get; set; }
+    public string? Repo { get; set; }
+    public string? Branch { get; set; }
+    public string? AssetFileName { get; set; }
+}
     [RequiredArgument(0, "command", "Specifies the command to execute.\n" +
         "\t list \t\t\t -> Lists apps specified in the -json option.\n" +
         "\t install \t\t -> Downloads and installs apps specified in the -json option (requires admin privileges).\n" +
@@ -293,7 +296,6 @@ public class Cli
         // the UserName is derived from the OWNER environment variable
 
         bool verbose = Verbose;
-        if (verbose) Console.WriteLine($"[VERBOSE] ValidateRepo: Initial Repo argument: {Repo}");
 
         // Check if the input is a full URL
         if (Repo!.StartsWith("https://github.com/", StringComparison.OrdinalIgnoreCase))
@@ -306,7 +308,6 @@ public class Cli
             }
 
             Repo = uri.AbsolutePath.Trim('/'); // Extracts "userName/repoName"
-            if (verbose) Console.WriteLine($"[VERBOSE] ValidateRepo: Repo converted from URL: {Repo}");
         }
 
         var repoParts = Repo!.Split('/');
@@ -320,14 +321,12 @@ public class Cli
             }
 
             Repo = $"{owner}/{Repo}";
-            if (verbose) Console.WriteLine($"[VERBOSE] ValidateRepo: Repo resolved using OWNER: {Repo}");
         }
         else if (repoParts.Length != 2 || string.IsNullOrEmpty(repoParts[0]) || string.IsNullOrEmpty(repoParts[1]))
         {
             throw new ArgumentException("The 'repo' option must be in the format userName/repoName.");
         }
 
-        if (verbose) Console.WriteLine($"[VERBOSE] ValidateRepo: Final resolved Repo: {Repo}");
         
         // Validate that the repository exists
         await ValidateRepositoryExists();
@@ -345,7 +344,6 @@ public class Cli
     {
         using var httpClient = new HttpClient();
         var apiUrl = $"https://api.github.com/repos/{Repo}";
-        Console.WriteLine($"Validating repository via API: {apiUrl}");
 
         // Add required headers for GitHub API
         httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("GitHubRelease/1.0");
@@ -355,12 +353,10 @@ public class Cli
         var token = Credentials.GetToken();
         if (!string.IsNullOrEmpty(token))
         {
-            Console.WriteLine("Using GitHub token for authentication.");
             httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
         }
         else
         {
-            Console.WriteLine("No GitHub token found. Only public repository validation is possible.");
         }
 
         try
@@ -382,7 +378,6 @@ public class Cli
                 throw new ArgumentException($"Failed to validate the repository '{Repo}'. HTTP Status: {response.StatusCode}");
             }
 
-            Console.WriteLine($"Repository '{Repo}' is valid and accessible.");
         }
         catch (HttpRequestException ex)
         {
