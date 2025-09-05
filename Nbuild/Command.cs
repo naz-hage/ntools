@@ -640,6 +640,9 @@ namespace Nbuild
                     }
                 }
             }
+
+            // If no explicit success/failure was determined above, return the provided installer result
+            return result;
         }
 
         private static void DisplayCodeAndOutput(ResultHelper result)

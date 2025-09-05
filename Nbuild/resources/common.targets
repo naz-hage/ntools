@@ -403,6 +403,21 @@
 				PACKAGE" >
   	</Target>
 
+	<!-- Enhanced prod package for release with coverage and smoke tests -->
+	<Target Name="PROD_NEW" DependsOnTargets="
+				CLEAN;
+				TAG;
+				AUTOTAG_PROD;
+				SOLUTION;
+				TEST;
+				COVERAGE;
+				COVERAGE_SUMMARY;
+				PUBLISH;
+				COPY_ARTIFACTS;
+				SMOKE_TEST;
+				PACKAGE" >
+  	</Target>
+
 	<!-- Check if current process is running in admin mode AdminCheckExitCode property is set -->
 	<Target Name="IS_ADMIN" >
 	    <Exec Command="net session" ContinueOnError="true">
