@@ -539,6 +539,12 @@
 		<Message Text="==> DONE"/>
   	</Target>
 
+	<!-- Create a PROD package for release (delegates to PROD_NEW in common.targets) -->
+	<Target Name="PROD" DependsOnTargets="PROD_NEW" >
+		<Message Text="PROD target completed - delegated to PROD_NEW in common.targets" />
+		<Message Text="==> DONE"/>
+	</Target>
+
 	<!-- Create a package for the solution default is a zip file of all artifacts -->
 	<Target Name="PACKAGE" DependsOnTargets="PROPERTIES">
 		<Exec Command='"$(ZipExe)" a -r -tzip $(ArtifactsFolder).zip $(ArtifactsFolder)\*'/>
