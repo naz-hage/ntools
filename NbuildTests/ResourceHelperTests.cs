@@ -7,7 +7,7 @@ namespace NbuildTests
     [TestClass()]
     public class ResourceHelperTests
     {
-        private const string NbuildAssemblyName = "Nbuild.dll"; // "Nbuild.dll"
+        private const string NbuildAssemblyName = "nb.dll"; // "nb.dll"
         [TestMethod()]
         public void ExtractEmbeddedResourceFromAssemblyTest()
         {

@@ -7,7 +7,7 @@ namespace Nbuild.Tests
     [TestClass()]
     public class BuildStarterTests
     {
-        private const string NbuildAssemblyName = "Nbuild.dll"; // "Nbuild.dll"
+        private const string NbuildAssemblyName = "nb.dll"; // "nb.dll"
 
         [TestMethod()]
         public void GetTargetsTest()

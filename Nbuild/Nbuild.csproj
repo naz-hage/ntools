@@ -17,6 +17,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+	<AssemblyName>nb</AssemblyName>
   </PropertyGroup>
 
 	<ItemGroup>
@@ -34,7 +35,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="CommandLine.Net" Version="2.3.0" />
+	<PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
 	</ItemGroup>
  <ItemGroup>
     <ProjectReference Include="..\GitHubRelease\GitHubRelease.csproj" />

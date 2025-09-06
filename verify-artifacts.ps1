@@ -65,7 +65,6 @@ $ExpectedLibraries = @{
     "lf.dll" = "List files library"
     "nBackup.dll" = "Backup library"
     "wi.dll" = "Work item library"
-    "Nbuild.dll" = "Build engine library"
     "NbuildTasks.dll" = "Build tasks library"
     "GitHubRelease.dll" = "GitHub release library"
     "ApiVersions.dll" = "API versions library"
