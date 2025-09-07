@@ -27,7 +27,9 @@ namespace NbuildTasks
             FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(
                 type == AssemblyType.Executing
                     ? Assembly.GetExecutingAssembly().Location
-                    : Assembly.GetEntryAssembly().Location
+                    : (Assembly.GetEntryAssembly() != null
+                        ? Assembly.GetEntryAssembly().Location
+                        : Assembly.GetExecutingAssembly().Location)
             );
 
             string updatedCopyright = fileVersionInfo.LegalCopyright.Replace("XXXX", DateTime.Now.Year.ToString());
@@ -36,7 +38,7 @@ namespace NbuildTasks
                    $"{fileVersionInfo.ProductName}, " +
                    $"{fileVersionInfo.CompanyName}, " +
                    $"{updatedCopyright} - " +
-                   $" Version: {fileVersionInfo.FileMajorPart}." +
+                   $" Version: {fileVersionInfo.ProductBuildPart}." +
                    $"{fileVersionInfo.ProductMinorPart}." +
                    $"{fileVersionInfo.ProductBuildPart}";
         }
