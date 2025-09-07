@@ -29,7 +29,8 @@ param (
 Write-Host "PSScriptRoot: $PSScriptRoot"
 
 # Import the install module
-Import-Module "$PSScriptRoot\install.psm1" -Force
+$scriptDir = Split-Path -Parent $PSCommandPath
+Import-Module "$scriptDir\..\modules\Install.psm1" -Force
 
 $fileName = Split-Path -Leaf $PSCommandPath
 

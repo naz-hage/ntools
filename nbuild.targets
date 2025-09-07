@@ -611,7 +611,7 @@
         
         <!-- Check if verify-artifacts.ps1 script exists -->
         <PropertyGroup>
-            <VerifyScriptPath>$(SolutionDir)\verify-artifacts.ps1</VerifyScriptPath>
+            <VerifyScriptPath>$(SolutionDir)\scripts\build\build-verify-artifacts.ps1</VerifyScriptPath>
         </PropertyGroup>
         
         <Error Condition="!Exists('$(VerifyScriptPath)')" 
@@ -653,7 +653,7 @@
         <Message Text="✅ Both target files exist" />
         
         <!-- Test 3: Use our PowerShell script for validation -->
-        <Exec Command='powershell -ExecutionPolicy Bypass -File "$(SolutionDir)\test-delegation.ps1" "$(SourceTarget)" "$(DelegateTarget)"' 
+        <Exec Command='powershell -ExecutionPolicy Bypass -File "$(SolutionDir)\scripts\test\test-delegation.ps1" "$(SourceTarget)" "$(DelegateTarget)"' 
               WorkingDirectory="$(SolutionDir)" />
         
         <Message Text="=== Target delegation test completed ===" />

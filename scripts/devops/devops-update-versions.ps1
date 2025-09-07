@@ -1,8 +1,20 @@
 # Script to automatically update ntools.md with versions from JSON files
 param(
-    [string]$DevSetupPath = ".",
-    [string]$DocsPath = "..\docs\ntools\ntools.md"
+    [string]$DevSetupPath = "",
+    [string]$DocsPath = ""
 )
+
+# Set default paths relative to repository root
+$scriptDir = Split-Path -Parent $PSCommandPath
+$repoRoot = Split-Path -Parent (Split-Path -Parent $scriptDir)
+
+if ([string]::IsNullOrEmpty($DevSetupPath)) {
+    $DevSetupPath = Join-Path $repoRoot "dev-setup"
+}
+
+if ([string]::IsNullOrEmpty($DocsPath)) {
+    $DocsPath = Join-Path $repoRoot "docs\ntools\ntools.md"
+}
 
 # Function to extract version from JSON file
 function Get-VersionFromJson {

@@ -107,7 +107,7 @@ Here are examples of custom Tasks that can be used during builds:
 ```xml
 <!-- This target uses the `Pwsh` custom NTools MS Build task to launch a PowerShell Core script -->
 <Target Name="INSTALL_NTOOLS">
-	<Pwsh ScriptPath="$(SolutionDir)\dev-setup\install.ps1" Arguments="" WorkingDirectory ="$(SolutionDir)\dev-setup"/>
+	<Pwsh ScriptPath="$(SolutionDir)\scripts\setup\setup-install-apps.ps1" Arguments="" WorkingDirectory ="$(SolutionDir)\scripts\setup"/>
 
 	<Message Text="==> INSTALL_NTOOLS_DONE"/>
 </Target>
