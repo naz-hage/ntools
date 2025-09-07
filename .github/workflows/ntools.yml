@@ -27,7 +27,7 @@ on:
 env:
   solution_name: ntools.sln
   dotnet_version: 9.0
-  build_type: ${{ github.event.inputs.build_type || 'stage' }}
+  build_type: ${{ github.ref == 'refs/heads/main' && 'prod' || github.event.inputs.build_type || 'stage' }}
   enable_logging: ${{ github.event.inputs.enable_logging || 'false' }}
 
 permissions:
