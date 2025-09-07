@@ -32,21 +32,11 @@
 	  </PropertyGroup>  
 	  <ItemGroup>
 			<BinaryFiles 
-					Exclude="
-					 $(SolutionDir)\$(TargetRelease)\**\*.pdb;
-					 $(SolutionDir)\$(TargetRelease)\test.*;
-					 $(SolutionDir)\$(TargetRelease)\*test*;
-					 $(SolutionDir)\$(TargetRelease)\Nuget*;
-					 $(SolutionDir)\$(TargetRelease)\*CodeCoverage*"
-
 					Include="
-					$(SolutionDir)\$(TargetRelease)\*.exe;
-					$(SolutionDir)\$(TargetRelease)\*.exe.config;
 					$(SolutionDir)\$(TargetRelease)\*.json;
 					$(SolutionDir)\Nbuild\resources\*.targets;
 					$(SolutionDir)\Nbuild\resources\*.ps1;
-					$(SolutionDir)\Nbuild\resources\*.json;
-					$(SolutionDir)\$(TargetRelease)\*.dll"
+					$(SolutionDir)\Nbuild\resources\*.json"
 					/>
 
 			<RunTimesNetStandard20 Include = "
@@ -583,6 +573,16 @@
               IgnoreExitCode="true">
             <Output TaskParameter="ExitCode" PropertyName="NbExitCode" />
         </Exec>
+
+		<Message Text="Testing: nb install --help" />
+		<Exec Command='"$(NbExePath)" install --help' 
+					ContinueOnError="true" 
+					IgnoreExitCode="true">
+				<Output TaskParameter="ExitCode" PropertyName="NbInstallHelpExitCode" />
+		</Exec>
+
+		<Message Text="✅ nb install --help succeeded (Exit code: $(NbInstallHelpExitCode))" Condition="'$(NbInstallHelpExitCode)' == '0'" />
+		<Message Text="❌ nb install --help FAILED (Exit code: $(NbInstallHelpExitCode)). Check if all required DLLs are present in the artifacts folder." Condition="'$(NbInstallHelpExitCode)' != '0'" />
         
         <Message Text="Testing executable: $(LfExePath)" />
         <Exec Command='"$(LfExePath)" --help' 
@@ -659,5 +659,4 @@
         <Message Text="=== Target delegation test completed ===" />
         <Message Text="==> DONE" />
     </Target>
-
 </Project>

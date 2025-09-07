@@ -6,8 +6,6 @@
     <RootNamespace>lf</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <PublishSingleFile>true</PublishSingleFile>
-    <PublishTrimmed>true</PublishTrimmed>
     <Authors>naz-hage</Authors>
     <Company>naz-hage</Company>
     <Product>Build automation</Product>
