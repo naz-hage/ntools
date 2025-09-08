@@ -93,16 +93,26 @@ jobs:
         git diff
       shell: pwsh
   
-    - name: Run Build
+    - name: Run Build (capture output and fail on MSBuild errors)
       run: |
-        & "$env:ProgramFilesPath/nbuild/nb.exe" CORE
-        & "$env:ProgramFilesPath/nbuild/nb.exe" ${{ env.build_type }}
+        $env:OWNER = '${{ github.repository_owner }}'
+        $env:API_GITHUB_KEY = '${{ secrets.API_GITHUB_KEY }}'
+        $env:DOTNET_CLI_TELEMETRY_OPTOUT = '1'
+
+        Write-Host "Running nb.exe CORE (capturing output to build-core.log)"
+        & "$env:ProgramFilesPath/nbuild/nb.exe" CORE 2>&1 | Tee-Object -FilePath build-core.log
+
+        Write-Host "Running nb.exe ${{ env.build_type }} (capturing output to build-stage.log)"
+        & "$env:ProgramFilesPath/nbuild/nb.exe" ${{ env.build_type }} 2>&1 | Tee-Object -FilePath build-stage.log
+
+        # Fail the step if any MSBuild 'Build FAILED' lines are present in the captured logs
+        $failed = Select-String -Path build-*.log -Pattern 'Build FAILED' -SimpleMatch -Quiet
+        if ($failed) {
+          Write-Error "MSBuild failure detected in build logs. See build-core.log / build-stage.log for details."
+          exit 1
+        }
       shell: pwsh
       working-directory: ${{ github.workspace }}
-      env:
-        OWNER: ${{ github.repository_owner }}
-        API_GITHUB_KEY: ${{ secrets.API_GITHUB_KEY }}
-        DOTNET_CLI_TELEMETRY_OPTOUT: 1
 
     - name: Debug - Show TestResults Directory Structure
       run: |
