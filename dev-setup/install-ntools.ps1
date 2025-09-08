@@ -1,29 +1,57 @@
-#
-# Backward compatibility wrapper for install-ntools.ps1
-# This script has been moved to scripts/setup/setup-install-ntools.ps1
-# This wrapper maintains compatibility with existing workflows and documentation
-#
+<#
+.SYNOPSIS
+    Installs NTools.
+.DESCRIPTION
+    This script downloads, unzips, and installs NTools to the specified deployment path.
+    It also adds the deployment path to the PATH environment variable.
+    If the version is not specified, it reads the version from ntools.json file in the same directory as this script.
+.PARAMETER Version
+    The version of NTools to install. If not specified, the version is read from ntools.json.
+.PARAMETER DownloadsDirectory
+    The directory to download the NTools zip file to. Defaults to "c:\NToolsDownloads".
+.EXAMPLE
+    .\install-ntools.ps1 -Version "1.2.3" -DownloadsDirectory "C:\Downloads"
+    .\install-ntools.ps1 -DownloadsDirectory "C:\Downloads" # Reads version from ntools.json
+.NOTES
+    Requires administrative privileges.
+#>
 
-# Show deprecation warning
+# DEPRECATION NOTICE
+#########################
 Write-Warning "DEPRECATION NOTICE: dev-setup/install-ntools.ps1 has been moved to scripts/setup/setup-install-ntools.ps1"
 Write-Warning "Please update your references to use the new centralized location."
-Write-Warning "This wrapper will be removed in a future version."
+Write-Warning "This script will be removed in a future version."
 Write-Host ""
 
-# Get the script root directory
-$scriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Definition
-$repoRoot = Split-Path -Parent $scriptRoot
+[CmdletBinding()]
+param (
+    [Parameter(Mandatory = $false, HelpMessage = "The version of NTools to install. If not specified, the version is read from ntools.json.")]
+    [string]$Version,
 
-# Path to the new centralized script
-$newScriptPath = Join-Path $repoRoot "scripts\setup\setup-install-ntools.ps1"
+    [Parameter(Mandatory = $false, HelpMessage = "The directory to download the NTools zip file to. Defaults to 'c:\\NToolsDownloads'.")]
+    [string]$DownloadsDirectory = "c:\NToolsDownloads"
+)
 
-# Verify the new script exists
-if (-not (Test-Path $newScriptPath)) {
-    Write-Error "The centralized script was not found at: $newScriptPath"
-    Write-Error "Please check your ntools installation."
+# display $PSScriptRoot
+Write-Host "PSScriptRoot: $PSScriptRoot"
+
+# Import the install module
+Import-Module "$PSScriptRoot\install.psm1" -Force
+
+$fileName = Split-Path -Leaf $PSCommandPath
+
+# Check if admin
+#########################
+if (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+    Write-OutputMessage $fileName "Error: Please run this script as an administrator."
     exit 1
+} else {
+    Write-OutputMessage $fileName "Admin rights detected"
 }
 
-# Forward all parameters to the new script
-Write-Host "Forwarding to centralized script: $newScriptPath"
-& $newScriptPath @args
+# Call the InstallNtools function from the install module
+$result = InstallNtools -version $Version -downloadsDirectory $DownloadsDirectory
+if (-not $result) {
+    Write-OutputMessage $fileName "Failed to install NTools. Please check the logs for more details." -ForegroundColor Red
+    exit 1
+}
