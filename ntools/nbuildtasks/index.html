@@ -271,7 +271,7 @@
 <h3 id="pwsh">Pwsh</h3>
 <pre><code class="language-xml">&lt;!-- This target uses the `Pwsh` custom NTools MS Build task to launch a PowerShell Core script --&gt;
 &lt;Target Name=&quot;INSTALL_NTOOLS&quot;&gt;
-    &lt;Pwsh ScriptPath=&quot;$(SolutionDir)\dev-setup\install.ps1&quot; Arguments=&quot;&quot; WorkingDirectory =&quot;$(SolutionDir)\dev-setup&quot;/&gt;
+    &lt;Pwsh ScriptPath=&quot;$(SolutionDir)\scripts\setup\setup-install-apps.ps1&quot; Arguments=&quot;&quot; WorkingDirectory =&quot;$(SolutionDir)\scripts\setup&quot;/&gt;
 
     &lt;Message Text=&quot;==&gt; INSTALL_NTOOLS_DONE&quot;/&gt;
 &lt;/Target&gt;
