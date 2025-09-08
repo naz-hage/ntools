@@ -16,12 +16,6 @@
     Requires administrative privileges.
 #>
 
-# DEPRECATION NOTICE
-#########################
-Write-Warning "DEPRECATION NOTICE: dev-setup/install-ntools.ps1 has been moved to scripts/setup/setup-install-ntools.ps1"
-Write-Warning "Please update your references to use the new centralized location."
-Write-Warning "This script will be removed in a future version."
-Write-Host ""
 
 [CmdletBinding()]
 param (
@@ -31,6 +25,14 @@ param (
     [Parameter(Mandatory = $false, HelpMessage = "The directory to download the NTools zip file to. Defaults to 'c:\\NToolsDownloads'.")]
     [string]$DownloadsDirectory = "c:\NToolsDownloads"
 )
+
+
+# DEPRECATION NOTICE
+#########################
+Write-Warning "DEPRECATION NOTICE: dev-setup/install-ntools.ps1 has been moved to scripts/setup/setup-install-ntools.ps1"
+Write-Warning "Please update your references to use the new centralized location."
+Write-Warning "This script will be removed in a future version."
+Write-Host ""
 
 # display $PSScriptRoot
 Write-Host "PSScriptRoot: $PSScriptRoot"
