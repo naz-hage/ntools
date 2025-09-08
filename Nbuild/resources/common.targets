@@ -296,7 +296,7 @@
 	<Target Name="PUBLISH" DependsOnTargets="ARTIFACTS;TAG">
 		<RemoveDir Directories="$(ArtifactsFolder)"></RemoveDir>
 		<Message Text="Publishing all non-test projects using scripts/build/build-publish-all.ps1" Importance="high" />
-		<Exec Command='pwsh -NoProfile -ExecutionPolicy Bypass -File "$(SolutionDir)\scripts\build\build-publish-all.ps1" -PublishDir "$(ArtifactsFolder)" -ProductVersion "$(ProductVersion)"' WorkingDirectory="$(SolutionDir)" />
+		<Exec Command='pwsh -NoProfile -ExecutionPolicy Bypass -File "$(DeploymentFolder)\build-publish-all.ps1" -PublishDir "$(ArtifactsFolder)" -ProductVersion "$(ProductVersion)"' WorkingDirectory="$(SolutionDir)" />
 		<Message Text="All non-test projects published to $(ArtifactsFolder)" Importance="high" />
 		<Message Text="==> COMMON_DONE"/>
 	</Target>

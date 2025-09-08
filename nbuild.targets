@@ -35,7 +35,7 @@
 					Include="
 					$(SolutionDir)\$(TargetRelease)\*.json;
 					$(SolutionDir)\Nbuild\resources\*.targets;
-					$(SolutionDir)\Nbuild\resources\*.ps1;
+					$(SolutionDir)\scripts\build\*.ps1;
 					$(SolutionDir)\Nbuild\resources\*.json"
 					/>
 
