@@ -75,10 +75,10 @@ function GetAppInfo {
     # read file git.json and convert to json object
     $json = Get-Content -Path $jsonFile -Raw
     
-    # $config = $json | ConvertFrom--json
+    # $config = $json | ConvertFrom-Json
     # Retrieve elements using dot notation
 
-    $config = $json | ConvertFrom--json | Select-Object -ExpandProperty NbuildAppList | Select-Object -First 1
+    $config = $json | ConvertFrom-Json | Select-Object -ExpandProperty NbuildAppList | Select-Object -First 1
 
     $appInfo = @{
         Name = $config.Name

@@ -82,10 +82,10 @@ function GetAppInfo {
     # read file git.json and convert to json object
     $json = Get-Content -Path $jsonFile -Raw
     
-    # $config = $json | ConvertFrom--json
+    # $config = $json | ConvertFrom-Json
     # Retrieve elements using dot notation
 
-    $config = $json | ConvertFrom--json | Select-Object -ExpandProperty NbuildAppList | Select-Object -First 1
+    $config = $json | ConvertFrom-Json | Select-Object -ExpandProperty NbuildAppList | Select-Object -First 1
 
     $appInfo = @{
         Name = $config.Name
@@ -315,7 +315,7 @@ function InstallNtools {
     if (-not $version) {
         $ntoolsJsonPath = Join-Path $PSScriptRoot "ntools.json"
         if (Test-Path $ntoolsJsonPath) {
-            $ntoolsJson = Get-Content $ntoolsJsonPath | ConvertFrom--json
+            $ntoolsJson = Get-Content $ntoolsJsonPath | ConvertFrom-Json
             $version = $ntoolsJson.NbuildAppList[0].Version
             Write-Host "Version not specified. Using version $version from ntools.json."
         } else {
