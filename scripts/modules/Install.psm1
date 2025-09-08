@@ -211,6 +211,25 @@ function MainInstallApp {
 
     $app = GetAppInfo $json
     # check if Git is installed
+    function Write-OutputMessage {
+        param(
+            [Parameter(Mandatory = $true)]
+            [string]$Prefix,
+            [Parameter(Mandatory = $true)]
+            [string]$Message,
+            [Parameter(Mandatory = $false)]
+            [System.ConsoleColor]$ForegroundColor = [System.ConsoleColor]::White,
+            [Parameter(Mandatory = $false)]
+            [switch]$NoNewline
+        )
+
+        $formattedMessage = "[$Prefix] $Message"
+        if ($NoNewline) {
+            Write-Host $formattedMessage -ForegroundColor $ForegroundColor -NoNewline
+        } else {
+            Write-Host $formattedMessage -ForegroundColor $ForegroundColor
+        }
+    }
     $installed = CheckIfAppInstalled $json
     if ($installed) {
         Write-Host "App: $($app.Name) version: $($app.Version) or greater is already installed."
@@ -336,8 +355,11 @@ function InstallNtools {
     Expand-Archive -Path $downloadedFile -DestinationPath $deploymentPath -Force
     # add deployment path to the PATH environment variable if it doesn't already exist
     AddDeploymentPathToEnvironment $deploymentPath
-
++
     Write-Host "NTools version $Version installed to $deploymentPath"
++
+    # indicate success to callers
+    return $true
 }
 
 function DownloadNtools {

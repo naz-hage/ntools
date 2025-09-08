@@ -360,6 +360,8 @@ function InstallNtools {
     AddDeploymentPathToEnvironment $deploymentPath
 
     Write-Host "NTools version $Version installed to $deploymentPath"
+    # indicate success to callers
+    return $true
 }
 
 function DownloadNtools {
@@ -421,27 +423,32 @@ function SetDevEnvironmentVariables {
 function Write-OutputMessage {
     param(
         [Parameter(Mandatory = $true)]
-        [String]
-        $Prefix,
+        [string]$Prefix,
         [Parameter(Mandatory = $true)]
-        [String]
-        $Message
+        [string]$Message,
+        [Parameter(Mandatory = $false)]
+        [System.ConsoleColor]$ForegroundColor = [System.ConsoleColor]::White,
+        [Parameter(Mandatory = $false)]
+        [switch]$NoNewline
     )
 
     $dateTime = Get-Date -Format "yyyy-MM-dd hh:mm tt"
+    $formattedMessage = "[$Prefix] $Message"
 
-    
-    
-    # append to the log file install.log
+    # ensure log file exists
     if (!(Test-Path -Path "install.log")) {
-        New-Item -ItemType File -Path "install.log" -Force
+        New-Item -ItemType File -Path "install.log" -Force | Out-Null
     }
 
     if ($Message -eq "EmtpyLine") {
         Add-Content -Path "install.log" -Value ""
-        Write-Output ""
+        if ($NoNewline) { Write-Host "" -NoNewline -ForegroundColor $ForegroundColor } else { Write-Host "" -ForegroundColor $ForegroundColor }
     } else {
-        Write-Output "$dateTime $Prefix : $Message"
+        if ($NoNewline) {
+            Write-Host $formattedMessage -ForegroundColor $ForegroundColor -NoNewline
+        } else {
+            Write-Host $formattedMessage -ForegroundColor $ForegroundColor
+        }
         Write-Output ""
         Add-Content -Path "install.log" -Value "$dateTime | $Prefix | $Message"
     }
