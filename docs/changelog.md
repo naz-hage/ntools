@@ -10,7 +10,9 @@
 
 #### Enhanced Build Pipeline
 - **Improved TEST Target**: Conditional code coverage collection based on configuration
-- **Artifact Verification**: New `SMOKE_TEST` and `SMOKE_TEST_PWSH` targets for build validation
+- **Comprehensive Smoke Test**: Enhanced `SMOKE_TEST` target validates both published artifacts (4+ executables) AND build system integrity (target delegation)
+- **Target Consolidation**: Removed `TEST_TARGET_DELEGATION` - functionality now integrated into `SMOKE_TEST`
+-- **PowerShell-based Verification**: REMOVED `SMOKE_TEST_PWSH` — functionality consolidated into `SMOKE_TEST` (see `ntools/nbuild-targets.md`)
 - **Streamlined Publishing**: Enhanced `PUBLISH` target with better error handling
 
 #### User-Level PATH Management

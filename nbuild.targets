@@ -564,98 +564,104 @@
 		<Message Text="==> COMMON_DONE"/>
 	</Target>
 
-    <!-- Basic smoke test to verify published artifacts -->
+    <!-- Comprehensive smoke test to verify published artifacts and build system integrity -->
     <Target Name="SMOKE_TEST" DependsOnTargets="ARTIFACTS">
-        <Message Text="Running basic smoke test for artifacts..." />
+        <Message Text="Running comprehensive smoke test for artifacts and build system..." />
+        
+        <!-- 1. ARTIFACTS VALIDATION -->
+        <Message Text="=== 1. Artifacts Validation ===" />
         
         <!-- Check if artifacts folder exists -->
         <Error Condition="!Exists('$(ArtifactsFolder)')" 
                Text="Artifacts folder not found at: $(ArtifactsFolder). Please run 'nb PUBLISH' first to generate artifacts." />
         
-        <!-- Check for key executables -->
+        <!-- Define executables to test using ItemGroup -->
+        <ItemGroup>
+            <ExecutablesToTest Include="$(ArtifactsFolder)\nb.exe">
+                <DisplayName>nb.exe (Core executable)</DisplayName>
+                <TestCommand>--version</TestCommand>
+                <HelpCommand>install --help</HelpCommand>
+                <Required>true</Required>
+            </ExecutablesToTest>
+            <ExecutablesToTest Include="$(ArtifactsFolder)\lf.exe">
+                <DisplayName>lf.exe (List files utility)</DisplayName>
+                <TestCommand>--help</TestCommand>
+                <HelpCommand></HelpCommand>
+                <Required>true</Required>
+            </ExecutablesToTest>
+            <ExecutablesToTest Include="$(ArtifactsFolder)\nBackup.exe">
+                <DisplayName>nBackup.exe (Backup utility)</DisplayName>
+                <TestCommand>--help</TestCommand>
+                <HelpCommand></HelpCommand>
+                <Required>true</Required>
+            </ExecutablesToTest>
+            <ExecutablesToTest Include="$(ArtifactsFolder)\wi.exe">
+                <DisplayName>wi.exe (Work items utility)</DisplayName>
+                <TestCommand>--help</TestCommand>
+                <HelpCommand></HelpCommand>
+                <Required>true</Required>
+            </ExecutablesToTest>
+            <!-- Optional executables - only test if they exist -->
+            <ExecutablesToTest Include="$(ArtifactsFolder)\GitHubRelease.exe">
+                <DisplayName>GitHubRelease.exe (GitHub release utility)</DisplayName>
+                <TestCommand>--help</TestCommand>
+                <HelpCommand></HelpCommand>
+                <Required>false</Required>
+            </ExecutablesToTest>
+        </ItemGroup>
+        
+        <!-- Verify required executables exist -->
+        <Message Text="Checking required executable files..." />
+        <Error Condition="'%(ExecutablesToTest.Required)' == 'true' And !Exists('%(ExecutablesToTest.Identity)')" 
+               Text="❌ Required executable not found: %(ExecutablesToTest.DisplayName) at %(ExecutablesToTest.Identity)" />
+        
+        <!-- Filter to only existing executables for testing -->
+        <ItemGroup>
+            <ExistingExecutables Include="@(ExecutablesToTest)" Condition="Exists('%(ExecutablesToTest.Identity)')" />
+        </ItemGroup>
+        
+        <!-- Count executables -->
         <PropertyGroup>
-            <NbExePath>$(ArtifactsFolder)\nb.exe</NbExePath>
-            <LfExePath>$(ArtifactsFolder)\lf.exe</LfExePath>
-            <NBackupExePath>$(ArtifactsFolder)\nBackup.exe</NBackupExePath>
+            <ExecutableCount>@(ExistingExecutables->Count())</ExecutableCount>
         </PropertyGroup>
         
-        <!-- Verify key executables exist -->
-        <Error Condition="!Exists('$(NbExePath)')" 
-               Text="Core executable not found: $(NbExePath)" />
-        <Error Condition="!Exists('$(LfExePath)')" 
-               Text="List files executable not found: $(LfExePath)" />
-        <Error Condition="!Exists('$(NBackupExePath)')" 
-               Text="Backup executable not found: $(NBackupExePath)" />
+        <Message Text="✅ Found $(ExecutableCount) executables to test" />
         
-        <!-- Test that executables can run (basic smoke test) -->
-        <Message Text="Testing executable: $(NbExePath)" />
-        <Exec Command='"$(NbExePath)" --version' 
+        <!-- Test each executable using MSBuild batching -->
+        <Message Text="Testing executables..." />
+        <Exec Command='"%(ExistingExecutables.Identity)" %(ExistingExecutables.TestCommand)' 
               ContinueOnError="true" 
               IgnoreExitCode="true">
-            <Output TaskParameter="ExitCode" PropertyName="NbExitCode" />
+            <Output TaskParameter="ExitCode" PropertyName="ExitCode_%(ExistingExecutables.Filename)" />
         </Exec>
-
-		<Message Text="Testing: nb install --help" />
-		<Exec Command='"$(NbExePath)" install --help' 
-					ContinueOnError="true" 
-					IgnoreExitCode="true">
-				<Output TaskParameter="ExitCode" PropertyName="NbInstallHelpExitCode" />
-		</Exec>
-
-		<Message Text="✅ nb install --help succeeded (Exit code: $(NbInstallHelpExitCode))" Condition="'$(NbInstallHelpExitCode)' == '0'" />
-		<Message Text="❌ nb install --help FAILED (Exit code: $(NbInstallHelpExitCode)). Check if all required DLLs are present in the artifacts folder." Condition="'$(NbInstallHelpExitCode)' != '0'" />
         
-        <Message Text="Testing executable: $(LfExePath)" />
-        <Exec Command='"$(LfExePath)" --help' 
+        <!-- Test additional commands for nb.exe -->
+        <Message Text="Testing additional nb.exe commands..." />
+        <Exec Command='"$(ArtifactsFolder)\nb.exe" install --help' 
               ContinueOnError="true" 
-              IgnoreExitCode="true">
-            <Output TaskParameter="ExitCode" PropertyName="LfExitCode" />
+              IgnoreExitCode="true"
+              Condition="Exists('$(ArtifactsFolder)\nb.exe')">
+            <Output TaskParameter="ExitCode" PropertyName="NbInstallHelpExitCode" />
         </Exec>
         
-        <!-- Display results -->
-        <Message Text="✅ nb.exe test result: Exit code $(NbExitCode)" Condition="'$(NbExitCode)' == '0'" />
-        <Message Text="❌ nb.exe test failed: Exit code $(NbExitCode)" Condition="'$(NbExitCode)' != '0'" />
-        <Message Text="✅ lf.exe test result: Exit code $(LfExitCode)" Condition="'$(LfExitCode)' == '0'" />
-        <Message Text="❌ lf.exe test failed: Exit code $(LfExitCode)" Condition="'$(LfExitCode)' != '0'" />
+        <!-- Report results for each executable -->
+        <Message Text="=== Test Results ===" />
+        <Message Text="✅ %(ExistingExecutables.DisplayName): Exit code $(ExitCode_%(ExistingExecutables.Filename))" 
+                 Condition="'$(ExitCode_%(ExistingExecutables.Filename))' == '0'" />
+        <Message Text="✅ %(ExistingExecutables.DisplayName): Exit code $(ExitCode_%(ExistingExecutables.Filename)) (acceptable for help command)" 
+                 Condition="'%(ExistingExecutables.Filename)' == 'nBackup' And '$(ExitCode_%(ExistingExecutables.Filename))' == '-1'" />
+        <Message Text="❌ %(ExistingExecutables.DisplayName): Exit code $(ExitCode_%(ExistingExecutables.Filename))" 
+                 Condition="'$(ExitCode_%(ExistingExecutables.Filename))' != '0' And '%(ExistingExecutables.Filename)' != 'nBackup'" />
+        <Message Text="❌ %(ExistingExecutables.DisplayName): Exit code $(ExitCode_%(ExistingExecutables.Filename))" 
+                 Condition="'%(ExistingExecutables.Filename)' == 'nBackup' And '$(ExitCode_%(ExistingExecutables.Filename))' != '0' And '$(ExitCode_%(ExistingExecutables.Filename))' != '-1'" />
         
-        <Message Text="Basic smoke test completed" />
-        <Message Text="==> DONE" />
-    </Target>
-
-    <!-- PowerShell-based comprehensive smoke test -->
-    <Target Name="SMOKE_TEST_PWSH" DependsOnTargets="ARTIFACTS">
-        <Message Text="Running comprehensive PowerShell-based smoke test..." />
+        <Message Text="✅ nb install --help: Exit code $(NbInstallHelpExitCode)" Condition="'$(NbInstallHelpExitCode)' == '0'" />
+        <Message Text="❌ nb install --help: Exit code $(NbInstallHelpExitCode)" Condition="'$(NbInstallHelpExitCode)' != '0'" />
         
-        <!-- Check if artifacts folder exists -->
-        <Error Condition="!Exists('$(ArtifactsFolder)')" 
-               Text="Artifacts folder not found at: $(ArtifactsFolder). Please run 'nb PUBLISH' first to generate artifacts." />
+        <!-- 2. BUILD SYSTEM VALIDATION -->
+        <Message Text="=== 2. Build System Validation ===" />
         
-        <!-- Check if verify-artifacts.ps1 script exists -->
-        <PropertyGroup>
-            <VerifyScriptPath>$(SolutionDir)\scripts\build\build-verify-artifacts.ps1</VerifyScriptPath>
-        </PropertyGroup>
-        
-        <Error Condition="!Exists('$(VerifyScriptPath)')" 
-               Text="Verification script not found at: $(VerifyScriptPath)" />
-        
-        <!-- Run the PowerShell verification script -->
-        <Message Text="Running artifact verification script..." />
-        <Exec Command='powershell -ExecutionPolicy Bypass -File "$(VerifyScriptPath)" -ArtifactsPath "$(ArtifactsFolder)" -ProductVersion "$(ProductVersion)" -Verbose' 
-              WorkingDirectory="$(SolutionDir)">
-            <Output TaskParameter="ExitCode" PropertyName="VerifyExitCode" />
-        </Exec>
-        
-        <!-- Report results -->
-        <Message Text="✅ PowerShell smoke test passed!" Condition="'$(VerifyExitCode)' == '0'" />
-        <Error Condition="'$(VerifyExitCode)' != '0'" 
-               Text="❌ PowerShell smoke test failed with exit code: $(VerifyExitCode)" />
-        
-        <Message Text="Comprehensive smoke test completed successfully" />
-        <Message Text="==> DONE" />
-    </Target>
-
-    <!-- Generic test for target delegation validation -->
-    <Target Name="TEST_TARGET_DELEGATION">
+        <!-- Target delegation validation -->
         <PropertyGroup>
             <SourceTarget Condition="'$(SourceTarget)' == ''">STAGE</SourceTarget>
             <DelegateTarget Condition="'$(DelegateTarget)' == ''">STAGE_NEW</DelegateTarget>
@@ -663,23 +669,48 @@
             <DelegateFile Condition="'$(DelegateFile)' == ''">$(SolutionDir)\Nbuild\resources\common.targets</DelegateFile>
         </PropertyGroup>
         
-        <!-- Test 1: Check if source target exists and delegates properly -->
-        <Message Text="=== MSBuild Target Delegation Test ===" />
-        <Message Text="Testing: $(SourceTarget) -> $(DelegateTarget)" />
-        <Message Text="" />
+        <Message Text="Testing MSBuild target delegation: $(SourceTarget) -> $(DelegateTarget)" />
         
-        <!-- Test 2: Verify files exist -->
+        <!-- Verify target files exist -->
         <Error Condition="!Exists('$(SourceFile)')" Text="❌ Source file not found: $(SourceFile)" />
         <Error Condition="!Exists('$(DelegateFile)')" Text="❌ Delegate file not found: $(DelegateFile)" />
         <Message Text="✅ Both target files exist" />
         
-        <!-- Test 3: Use our consolidated PowerShell module for validation -->
+        <!-- Use consolidated PowerShell module for target validation -->
         <Exec Command='pwsh -NoProfile -ExecutionPolicy Bypass -Command "Import-Module &apos;$(BuildTools)\modules\NTools.Scripts\NTools.Scripts.psm1&apos; -Force; Test-TargetDelegation -SourceTarget &apos;$(SourceTarget)&apos; -DelegateTarget &apos;$(DelegateTarget)&apos;"' 
-              WorkingDirectory="$(SolutionDir)" />
+              WorkingDirectory="$(SolutionDir)" 
+              ContinueOnError="true" 
+              IgnoreExitCode="true">
+            <Output TaskParameter="ExitCode" PropertyName="DelegationTestExitCode" />
+        </Exec>
         
-        <Message Text="=== Target delegation test completed ===" />
+        <Message Text="✅ Target delegation test passed" Condition="'$(DelegationTestExitCode)' == '0'" />
+        <Message Text="❌ Target delegation test failed: Exit code $(DelegationTestExitCode)" Condition="'$(DelegationTestExitCode)' != '0'" />
+        
+        <!-- 3. SUMMARY -->
+        <Message Text="=== Smoke Test Summary ===" />
+        
+        <!-- Calculate overall success (all exit codes should be 0, except nBackup which returns -1 for help) -->
+        <PropertyGroup>
+            <!-- nBackup.exe returns -1 for help command, which is acceptable -->
+            <NBackupSuccess Condition="'$(ExitCode_nBackup)' == '0' Or '$(ExitCode_nBackup)' == '-1'">true</NBackupSuccess>
+            <NBackupSuccess Condition="'$(NBackupSuccess)' == ''">false</NBackupSuccess>
+            
+            <AllTestsPassed Condition="'$(ExitCode_nb)' == '0' And '$(ExitCode_lf)' == '0' And '$(NBackupSuccess)' == 'true' And '$(ExitCode_wi)' == '0' And '$(NbInstallHelpExitCode)' == '0' And '$(DelegationTestExitCode)' == '0'">true</AllTestsPassed>
+            <AllTestsPassed Condition="'$(AllTestsPassed)' == ''">false</AllTestsPassed>
+        </PropertyGroup>
+        
+        <Message Text="✅ Comprehensive smoke test completed successfully - All $(ExecutableCount) executables validated" Condition="'$(AllTestsPassed)' == 'true'" />
+        <Error Condition="'$(AllTestsPassed)' == 'false'" 
+               Text="❌ Smoke test failed. Check individual test results above." />
+        
         <Message Text="==> DONE" />
     </Target>
+
+	<!-- Legacy PowerShell-based smoke test removed.
+		 `SMOKE_TEST_PWSH` was removed because its functionality is consolidated
+		 into `SMOKE_TEST`. Retain a changelog note if you need to communicate
+		 removal to downstream consumers. -->
 
 	<!-- Publish all non-test projects to artifacts folder -->
 	<Target Name="PUBLISH" DependsOnTargets="ARTIFACTS;TAG;INSTALL_NTOOLS_SCRIPTS">

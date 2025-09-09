@@ -65,13 +65,13 @@ The module exports 36 functions organized by category:
 
 ### Test Functions
 - `Invoke-CodeCoverage` - Run tests with code coverage
-- `Test-MSBuildDelegation` - Test MSBuild target delegation
+- `Test-MSBuildDelegation` - Test MSBuild target delegation (**Note**: Now automatically integrated into `nb smoke_test` target)
 - `Test-QuickTargets` - Quick target validation
 - `Test-NToolsScriptsModule` - Test module functionality
 - `Write-TestResult` - Write formatted test results
 - `Test-TargetExists` - Check if MSBuild targets exist
 - `Test-TargetDependencies` - Validate target dependencies
-- `Test-TargetDelegation` - Test target delegation patterns
+- `Test-TargetDelegation` - Test target delegation patterns (**Note**: Core function used by `nb smoke_test` target)
 
 ### Utility Functions
 - `Get-FileHash256` - Calculate SHA256 hash of files
@@ -129,8 +129,11 @@ Publish-AllProjects -OutputDir "C:\Artifacts" -Version "1.0.0" -RepositoryRoot "
 # Run code coverage
 Invoke-CodeCoverage
 
-# Test MSBuild delegation
+# Test MSBuild delegation (also available via 'nb smoke_test')
 Test-MSBuildDelegation
+
+# Or use the comprehensive smoke test target
+# nb smoke_test  # (from command line - includes both artifact validation AND target delegation)
 ```
 
 ## Integration with Build System
@@ -140,7 +143,23 @@ The module is automatically integrated with the NTools build system:
 ### MSBuild Integration
 - **Installation**: `nbuild.targets` automatically installs the module during `INSTALL_NTOOLS_SCRIPTS` target
 - **Usage**: `PUBLISH` target uses `Publish-AllProjects` function with deterministic repository path
+- **Smoke Testing**: `SMOKE_TEST` target uses `Test-TargetDelegation` function for build system validation
 - **Location**: Module installed to `$env:ProgramFiles\nbuild\modules\NTools.Scripts\`
+
+### SMOKE_TEST Target Integration
+The comprehensive `SMOKE_TEST` target combines artifact validation with PowerShell module functions:
+
+```bash
+# Comprehensive smoke test (recommended)
+nb smoke_test
+```
+
+This target performs:
+1. **Artifact Validation**: Tests 4+ executables (nb.exe, lf.exe, nBackup.exe, wi.exe)
+2. **Build System Validation**: Uses `Test-TargetDelegation` function to verify MSBuild target relationships
+3. **Consolidated Results**: Single pass/fail result for all validation checks
+
+**Migration Note**: The deprecated `TEST_TARGET_DELEGATION` target functionality is now integrated into `SMOKE_TEST`.
 
 ### GitHub Actions Integration
 ```yaml

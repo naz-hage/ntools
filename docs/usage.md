@@ -29,6 +29,13 @@ nb.exe test
 ```cmd
 nb.exe stage
 ```
+
+- Comprehensive smoke test: Validates published artifacts and build system integrity
+
+```cmd
+nb.exe smoke_test
+```
+
 - Display available targets:  Lists all the available targets in the targets file
     
 ```cmd
