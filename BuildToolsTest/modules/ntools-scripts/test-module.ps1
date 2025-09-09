@@ -69,3 +69,4 @@ try {
     Write-Error "Get-NtoolsScriptsVersion failed: $_"
     exit 3
 }
+

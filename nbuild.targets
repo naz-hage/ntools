@@ -36,6 +36,9 @@
 					$(SolutionDir)\$(TargetRelease)\*.json;
 					$(SolutionDir)\Nbuild\resources\*.targets;
 					$(SolutionDir)\scripts\build\*.ps1;
+					$(SolutionDir)\scripts\module-package\*.ps1;
+					$(SolutionDir)\scripts\module-package\*.psd1;
+					$(SolutionDir)\scripts\module-package\*.psm1;
 					$(SolutionDir)\Nbuild\resources\*.json"
 					/>
 
@@ -87,29 +90,35 @@
 	<!-- NBUILD_INSTALL removed: Nbuild installation is no longer managed by these targets. -->
 
 	<!-- DEV_SETUP removed: development environment installation should be performed using the
-	     canonical script at dev-setup\install.ps1 or via the NTools.Scripts module where appropriate.
+		canonical script at dev-setup\install.ps1 or via the ntools-scripts module where appropriate.
 	     The DEV_SETUP MSBuild target was removed to avoid accidental in-place replacement of a running
 		 launcher and to reduce confusion between script-first and module-first install flows. -->
 
-	<!-- Install the NTools.Scripts module into BuildTools modules folder -->
+	<!-- Install the ntools-scripts module into BuildTools modules folder -->
 	<Target Name="INSTALL_NTOOLS_SCRIPTS" DependsOnTargets="IS_ADMIN">
-		<Message Text="Installing NTools.Scripts module into $(BuildTools)\modules" Importance="high" />
-		<Exec Command='pwsh -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "$(SolutionDir)\scripts\module-package\install-module.ps1" -BuildTools "$(BuildTools)" -ModuleName "NTools.Scripts"' WorkingDirectory="$(SolutionDir)" />
-		<Message Text="NTools.Scripts installation completed" Importance="high" />
+		<Message Text="Installing ntools-scripts module into $(BuildTools)\modules" Importance="high" />
+		<Exec Command='pwsh -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "$(SolutionDir)\scripts\module-package\install-module.ps1" -BuildTools "$(BuildTools)" -ModuleName "ntools-scripts"' WorkingDirectory="$(SolutionDir)" />
+		<Message Text="ntools-scripts installation completed" Importance="high" />
 	</Target>
 
-	<!-- Uninstall NTools.Scripts module from BuildTools modules folder -->
+	<!-- Uninstall ntools-scripts module from BuildTools modules folder -->
 	<Target Name="UNINSTALL_NTOOLS_SCRIPTS" DependsOnTargets="IS_ADMIN">
-		<Message Text="Uninstalling NTools.Scripts module from $(BuildTools)\modules" Importance="high" />
-		<RemoveDir Directories="$(BuildTools)\modules\NTools.Scripts" Condition="Exists('$(BuildTools)\modules\NTools.Scripts')" />
-		<Message Text="NTools.Scripts uninstallation completed" Importance="high" />
+	<Message Text="Uninstalling ntools-scripts module from $(BuildTools)\modules" Importance="high" />
+	<RemoveDir Directories="$(BuildTools)\modules\ntools-scripts" Condition="Exists('$(BuildTools)\modules\ntools-scripts')" />
+	<Message Text="ntools-scripts uninstallation completed" Importance="high" />
+		<Message Text="Uninstalling ntools-scripts module from $(BuildTools)\modules" Importance="high" />
+		<RemoveDir Directories="$(BuildTools)\modules\ntools-scripts" Condition="Exists('$(BuildTools)\modules\ntools-scripts')" />
+		<Message Text="ntools-scripts uninstallation completed" Importance="high" />
 	</Target>
 
-	<!-- Test that NTools.Scripts module is installed and can report a version -->
+	<!-- Test that ntools-scripts module is installed and can report a version -->
 	<Target Name="TEST_NTOOLS_SCRIPTS" DependsOnTargets="IS_ADMIN">
-		<Message Text="Testing NTools.Scripts installation" Importance="high" />
+	<Message Text="Testing ntools-scripts installation" Importance="high" />
 		<Exec Command='pwsh -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "$(SolutionDir)\scripts\module-package\test-module.ps1" -BuildTools "$(BuildTools)"' WorkingDirectory="$(SolutionDir)" />
-		<Message Text="NTools.Scripts test completed" Importance="high" />
+	<Message Text="ntools-scripts test completed" Importance="high" />
+		<Message Text="Testing ntools-scripts installation" Importance="high" />
+		<Exec Command='pwsh -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "$(SolutionDir)\scripts\module-package\test-module.ps1" -BuildTools "$(BuildTools)"' WorkingDirectory="$(SolutionDir)" />
+		<Message Text="ntools-scripts test completed" Importance="high" />
 	</Target>
 
 	<!-- Build docs locally for testing -->
@@ -643,7 +652,7 @@
         <Message Text="✅ Both target files exist" />
         
         <!-- Use consolidated PowerShell module for target validation -->
-        <Exec Command='pwsh -NoProfile -ExecutionPolicy Bypass -Command "Import-Module &apos;$(BuildTools)\modules\NTools.Scripts\NTools.Scripts.psm1&apos; -Force; Test-TargetDelegation -SourceTarget &apos;$(SourceTarget)&apos; -DelegateTarget &apos;$(DelegateTarget)&apos;"' 
+	<Exec Command='pwsh -NoProfile -ExecutionPolicy Bypass -Command "Import-Module &apos;$(BuildTools)\modules\ntools-scripts\ntools-scripts.psm1&apos; -Force; Test-TargetDelegation -SourceTarget &apos;$(SourceTarget)&apos; -DelegateTarget &apos;$(DelegateTarget)&apos;"' 
               WorkingDirectory="$(SolutionDir)" 
               ContinueOnError="true" 
               IgnoreExitCode="true">
@@ -673,12 +682,5 @@
         <Message Text="==> DONE" />
     </Target>
 
-	<!-- Publish all non-test projects to artifacts folder -->
-	<Target Name="PUBLISH" DependsOnTargets="ARTIFACTS;TAG;INSTALL_NTOOLS_SCRIPTS">
-		<RemoveDir Directories="$(ArtifactsFolder)"></RemoveDir>
-		<Message Text="Publishing all non-test projects using NTools.Scripts module" Importance="high" />
-		<Exec Command='pwsh -NoProfile -ExecutionPolicy Bypass -Command "Import-Module &apos;$(BuildTools)\modules\NTools.Scripts\NTools.Scripts.psm1&apos; -Force; Publish-AllProjects -OutputDir &apos;$(ArtifactsFolder)&apos; -Version &apos;$(ProductVersion)&apos; -RepositoryRoot &apos;$(SolutionDir)&apos;"' WorkingDirectory="$(SolutionDir)" />
-		<Message Text="All non-test projects published to $(ArtifactsFolder)" Importance="high" />
-		<Message Text="==> COMMON_DONE"/>
-	</Target>	
+	<!-- PUBLISH target implemented in common.targets -->
 </Project>

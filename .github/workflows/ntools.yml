@@ -61,15 +61,15 @@ jobs:
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
 
-    - name: Install ntools using NTools.Scripts module
+    - name: Install ntools using ntools-scripts module
       run: |
-        # Import the consolidated NTools.Scripts module
-        Import-Module "./scripts/module-package/NTools.Scripts.psm1" -Force
-        
+        # Import the consolidated ntools-scripts module
+        Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
+
         # Install NTools using the dev-setup/ntools.json file
         Write-Host "Installing NTools using dev-setup/ntools.json..."
         Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
-        
+
         Write-Host "Installed NTools version information:"
         $nbPath = "$env:ProgramFiles\NBuild\nb.exe"
         if (Test-Path $nbPath) {
@@ -90,17 +90,17 @@ jobs:
         git config --global user.name "gitHub-actions"
         git config --global user.email "actions@github.com"
 
-    - name: Verify NTools.Scripts Module
+    - name: Verify ntools-scripts Module
       run: |
-        # Import and verify the NTools.Scripts module
-        Import-Module "./scripts/module-package/NTools.Scripts.psm1" -Force
-        
+        # Import and verify the ntools-scripts module
+        Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
+
         # Display module version and available functions
-        Write-Host "=== NTools.Scripts Module Information ==="
+        Write-Host "=== ntools-scripts Module Information ==="
         Get-NtoolsScriptsVersion
         Write-Host ""
         Write-Host "Available module functions:"
-        Get-Command -Module NTools.Scripts | Select-Object Name | Format-Table -AutoSize
+        Get-Command -Module ntools-scripts | Select-Object Name | Format-Table -AutoSize
       shell: pwsh
       working-directory: ${{ github.workspace }}
 
@@ -210,7 +210,7 @@ jobs:
           ## 📊 Code Coverage Report
           
           ### �️ Build & Test Status
-          - ✅ **Build:** Successful (using NTools.Scripts v2.3.0 module)
+          - ✅ **Build:** Successful (using ntools-scripts v2.3.0 module)
           - ✅ **Tests:** All tests passing
           - ✅ **Coverage:** Reports generated successfully
           

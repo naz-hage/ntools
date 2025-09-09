@@ -1,11 +1,83 @@
-# NTools.Scripts PowerShell Module
+# ntools-scripts PowerShell Module
 
-The NTools.Scripts module is a comprehensive PowerShell module that consolidates all NTools PowerShell functionality into a single, reusable module. This module replaces the previous collection of individual scripts with a structured, function-based approach.
+The ntools-scripts module is a comprehensive PowerShell module that consolidates all NTools PowerShell functionality into a single, reusable module. This module replaces the previous collection of individual scripts with a structured, function-based approach.
+**Location**: `scripts/module-package/ntools-scripts.psm1`  
+
+## Overview
+### After (Consolidated Module)
+```
+scripts/
+├── module-package/
+│   ├── ntools-scripts.psm1     # Main module with all functions
+│   ├── ntools-scripts.psd1     # Module manifest
+### Setup Functions
+-- `Install-NToolsScriptsModule` - Install this module
+-- `Get-NtoolsScriptsVersion` - Get module version information
+### Import the Module
+```powershell
+# Import from local development
+Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
+
+# Import from installed location (after installation)
+Import-Module "$env:ProgramFiles\nbuild\modules\ntools-scripts\ntools-scripts.psm1" -Force
+```
+### Integration with Build System
+-- **Installation**: `nbuild.targets` automatically installs the module during `INSTALL_NTOOLS_SCRIPTS` target
+-- **Usage**: `PUBLISH` target uses `Publish-AllProjects` function with deterministic repository path
+### GitHub Actions Integration
+- name: Install ntools using ntools-scripts module
+  run: |
+    Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
+    Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
+# Migration from Legacy Scripts
+# New way
+run: |
+  Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
+  Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
+<!-- New way (automatically used) -->
+<Exec Command='pwsh -Command "Import-Module ntools-scripts; Publish-AllProjects -RepositoryRoot $(SolutionDir)"' />
+### Module Development
+
+### Adding New Functions
+1. Add function to appropriate section in `ntools-scripts.psm1`
+2. Add function name to `Export-ModuleMember` line
+3. Update `FunctionsToExport` in `ntools-scripts.psd1`
+```powershell
+# Test the module
+Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
+Test-NToolsScriptsModule
+```
+### Installation
+```powershell
+# Install module manually for development
+Install-NToolsScriptsModule -InstallPath "$env:ProgramFiles\WindowsPowerShell\Modules\ntools-scripts" -Force
+```
+## Troubleshooting
+
+### Module Not Found
+```powershell
+# Verify module location
+Test-Path "./scripts/module-package/ntools-scripts.psm1"
+
+# Check if installed
+Test-Path "$env:ProgramFiles\nbuild\modules\ntools-scripts\ntools-scripts.psm1"
+```
+### Function Not Available
+```powershell
+# List all available functions
+Get-Command -Module ntools-scripts
+
+# Check if module is properly imported
+Get-Module ntools-scripts
+```
+# ntools-scripts PowerShell Module
+
+The ntools-scripts module is a comprehensive PowerShell module that consolidates all NTools PowerShell functionality into a single, reusable module. This module replaces the previous collection of individual scripts with a structured, function-based approach.
 
 ## Overview
 
 **Version**: 2.3.0  
-**Location**: `scripts/module-package/NTools.Scripts.psm1`  
+**Location**: `scripts/module-package/ntools-scripts.psm1`  
 **Installation**: Automatically installed via MSBuild targets and GitHub Actions
 
 ## Architecture
@@ -28,8 +100,8 @@ scripts/
 ```
 scripts/
 ├── module-package/
-│   ├── NTools.Scripts.psm1     # Main module with all functions
-│   ├── NTools.Scripts.psd1     # Module manifest
+│   ├── ntools-scripts.psm1     # Main module with all functions
+│   ├── ntools-scripts.psd1     # Module manifest
 │   └── install-module.ps1      # Installation script
 ├── build/                      # Legacy scripts (deprecated)
 ├── devops/                     # Legacy scripts (deprecated)
@@ -94,10 +166,10 @@ The module exports 36 functions organized by category:
 ### Import the Module
 ```powershell
 # Import from local development
-Import-Module "./scripts/module-package/NTools.Scripts.psm1" -Force
+Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
 
 # Import from installed location (after installation)
-Import-Module "$env:ProgramFiles\nbuild\modules\NTools.Scripts\NTools.Scripts.psm1" -Force
+Import-Module "$env:ProgramFiles\nbuild\modules\ntools-scripts\ntools-scripts.psm1" -Force
 ```
 
 ### Get Module Information
@@ -106,7 +178,7 @@ Import-Module "$env:ProgramFiles\nbuild\modules\NTools.Scripts\NTools.Scripts.ps
 Get-NtoolsScriptsVersion
 
 # List all available functions
-Get-Command -Module NTools.Scripts | Select-Object Name | Format-Table -AutoSize
+Get-Command -Module ntools-scripts | Select-Object Name | Format-Table -AutoSize
 ```
 
 ### Install NTools with Custom Configuration
@@ -144,7 +216,7 @@ The module is automatically integrated with the NTools build system:
 - **Installation**: `nbuild.targets` automatically installs the module during `INSTALL_NTOOLS_SCRIPTS` target
 - **Usage**: `PUBLISH` target uses `Publish-AllProjects` function with deterministic repository path
 - **Smoke Testing**: `SMOKE_TEST` target uses `Test-TargetDelegation` function for build system validation
-- **Location**: Module installed to `$env:ProgramFiles\nbuild\modules\NTools.Scripts\`
+- **Location**: Module installed to `$env:ProgramFiles\nbuild\modules\ntools-scripts\`
 
 ### SMOKE_TEST Target Integration
 The comprehensive `SMOKE_TEST` target combines artifact validation with PowerShell module functions:
@@ -163,9 +235,9 @@ This target performs:
 
 ### GitHub Actions Integration
 ```yaml
-- name: Install ntools using NTools.Scripts module
+- name: Install ntools using ntools-scripts module
   run: |
-    Import-Module "./scripts/module-package/NTools.Scripts.psm1" -Force
+    Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
     Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
 ```
 
@@ -213,7 +285,7 @@ Write-Error "Operation failed"
 ./scripts/build/build-verify-artifacts.ps1
 
 # New way
-Import-Module "./scripts/module-package/NTools.Scripts.psm1" -Force
+Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
 Invoke-ArtifactVerification
 ```
 
@@ -224,7 +296,7 @@ run: ./scripts/setup/setup-install-ntools.ps1
 
 # New way  
 run: |
-  Import-Module "./scripts/module-package/NTools.Scripts.psm1" -Force
+  Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
   Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
 ```
 
@@ -234,29 +306,29 @@ run: |
 <Exec Command='pwsh -File "$(SolutionDir)\scripts\build\publish-all-projects.ps1"' />
 
 <!-- New way (automatically used) -->
-<Exec Command='pwsh -Command "Import-Module NTools.Scripts; Publish-AllProjects -RepositoryRoot $(SolutionDir)"' />
+<Exec Command='pwsh -Command "Import-Module ntools-scripts; Publish-AllProjects -RepositoryRoot $(SolutionDir)"' />
 ```
 
 ## Module Development
 
 ### Adding New Functions
-1. Add function to appropriate section in `NTools.Scripts.psm1`
+1. Add function to appropriate section in `ntools-scripts.psm1`
 2. Add function name to `Export-ModuleMember` line
-3. Update `FunctionsToExport` in `NTools.Scripts.psd1`
+3. Update `FunctionsToExport` in `ntools-scripts.psd1`
 4. Increment module version
 5. Update documentation
 
 ### Testing
 ```powershell
 # Test the module
-Import-Module "./scripts/module-package/NTools.Scripts.psm1" -Force
+Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
 Test-NToolsScriptsModule
 ```
 
 ### Installation
 ```powershell
 # Install module manually for development
-Install-NToolsScriptsModule -InstallPath "$env:ProgramFiles\WindowsPowerShell\Modules\NTools.Scripts" -Force
+Install-NToolsScriptsModule -InstallPath "$env:ProgramFiles\WindowsPowerShell\Modules\ntools-scripts" -Force
 ```
 
 ## Best Practices
@@ -272,10 +344,10 @@ Install-NToolsScriptsModule -InstallPath "$env:ProgramFiles\WindowsPowerShell\Mo
 ### Module Not Found
 ```powershell
 # Verify module location
-Test-Path "./scripts/module-package/NTools.Scripts.psm1"
+Test-Path "./scripts/module-package/ntools-scripts.psm1"
 
 # Check if installed
-Test-Path "$env:ProgramFiles\nbuild\modules\NTools.Scripts\NTools.Scripts.psm1"
+Test-Path "$env:ProgramFiles\nbuild\modules\ntools-scripts\ntools-scripts.psm1"
 ```
 
 ### Version Issues
@@ -284,15 +356,15 @@ Test-Path "$env:ProgramFiles\nbuild\modules\NTools.Scripts\NTools.Scripts.psm1"
 Get-NtoolsScriptsVersion
 
 # Check installed version vs source
-Import-Module "./scripts/module-package/NTools.Scripts.psm1" -Force
+Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
 Get-NtoolsScriptsVersion
 ```
 
 ### Function Not Available
 ```powershell
 # List all available functions
-Get-Command -Module NTools.Scripts
+Get-Command -Module ntools-scripts
 
 # Check if module is properly imported
-Get-Module NTools.Scripts
+Get-Module ntools-scripts
 ```

@@ -1,16 +1,16 @@
 # NTools PowerShell Scripts
 
-This directory contains the consolidated PowerShell module for the NTools project. All scripts have been converted to functions within the NTools.Scripts module for better maintainability and reuse.
+This directory contains the consolidated PowerShell module for the NTools project. All scripts have been converted to functions within the ntools-scripts module for better maintainability and reuse.
 
 ## Directory Structure
 
-- **`module-package/`** - **NTools.Scripts PowerShell Module** - Consolidated module containing all functions
+-- **`module-package/`** - **ntools-scripts PowerShell Module** - Consolidated module containing all functions
 - **`setup/`** - Entry point scripts for installation (uses module functions internally)
 - **`build/`**, **`devops/`**, **`test/`** - Legacy individual scripts (deprecated, use module functions instead)
 
-## NTools.Scripts Module (Primary Interface)
+## ntools-scripts Module (Primary Interface)
 
-The **`module-package/`** folder contains the consolidated NTools.Scripts PowerShell module (v2.3.0) that includes functions converted from all original script categories:
+The **`module-package/`** folder contains the consolidated ntools-scripts PowerShell module (v2.3.0) that includes functions converted from all original script categories:
 
 ### Available Functions by Category:
 
@@ -63,11 +63,11 @@ The **`module-package/`** folder contains the consolidated NTools.Scripts PowerS
 
 ```powershell
 # Import the module
-Import-Module "./scripts/module-package/NTools.Scripts.psm1" -Force
+Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
 
 # Get module information
 Get-NtoolsScriptsVersion
-Get-Command -Module NTools.Scripts | Select-Object Name
+Get-Command -Module ntools-scripts | Select-Object Name
 
 # Use module functions
 Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
@@ -83,9 +83,9 @@ The module is automatically integrated with the build system:
 
 ### GitHub Actions Integration:
 ```yaml
-- name: Install ntools using NTools.Scripts module
+-- name: Install ntools using ntools-scripts module
   run: |
-    Import-Module "./scripts/module-package/NTools.Scripts.psm1" -Force
+  Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
     Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
 ```
 
@@ -107,14 +107,14 @@ Individual scripts in `build/`, `devops/`, and `test/` folders are maintained fo
 ./scripts/build/build-verify-artifacts.ps1
 
 # New way
-Import-Module "./scripts/module-package/NTools.Scripts.psm1" -Force
+Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
 Invoke-ArtifactVerification
 
 # Old way  
 ./scripts/devops/devops-get-ip.ps1
 
 # New way
-Import-Module "./scripts/module-package/NTools.Scripts.psm1" -Force
+Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
 Get-AgentIPAddress
 ```
 
@@ -147,7 +147,7 @@ Write-Error "Operation failed"
 
 ## Documentation
 
-For complete module documentation, see [NTools.Scripts Module Documentation](../docs/ntools/ntools-scripts-module.md).
+For complete module documentation, see [ntools-scripts Module Documentation](../docs/ntools/ntools-scripts-module.md).
 
 ## Best Practices
 

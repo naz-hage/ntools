@@ -28,19 +28,20 @@ param (
 # display $PSScriptRoot
 Write-Host "PSScriptRoot: $PSScriptRoot"
 
-# Import the consolidated NTools.Scripts module instead of Install.psm1
+# Import the consolidated ntools-scripts module instead of Install.psm1
 $scriptDir = Split-Path -Parent $PSCommandPath
-$moduleManifest = "$scriptDir\..\module-package\NTools.Scripts.psd1"
+# Prefer the new manifest name, fall back to the legacy manifest for compatibility
+$moduleManifest = "$scriptDir\..\module-package\ntools-scripts.psd1"
 
 if (Test-Path $moduleManifest) {
     Import-Module $moduleManifest -Force
 } else {
-    # Try to import from installed location
-    $installedModule = "$env:ProgramFiles\nbuild\modules\NTools.Scripts\NTools.Scripts.psd1"
+    # Try to import from installed location; prefer new module folder name first
+    $installedModule = "$env:ProgramFiles\nbuild\modules\ntools-scripts\ntools-scripts.psd1"
     if (Test-Path $installedModule) {
         Import-Module $installedModule -Force
     } else {
-        Write-Error "NTools.Scripts module not found. Please install it first using: scripts\module-package\install-module.ps1"
+        Write-Error "ntools-scripts module not found. Please install it first using: scripts\module-package\install-module.ps1"
         exit 1
     }
 }

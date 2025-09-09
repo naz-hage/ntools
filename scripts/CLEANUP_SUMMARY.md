@@ -3,7 +3,7 @@
 ## Completed Actions
 
 ### ✅ **Removed Folders**
-- **`scripts/modules/`** - All PowerShell modules (Common.psm1, Build.psm1, etc.) consolidated into NTools.Scripts module
+- **`scripts/modules/`** - All PowerShell modules (Common.psm1, Build.psm1, etc.) consolidated into ntools-scripts module
 - **`scripts/utils/`** - All utility scripts converted to functions and folder removed
 
 ### ✅ **Removed Individual Scripts**
@@ -15,7 +15,7 @@
 - **`scripts/test/test-target-delegation.ps1`** → Replaced by `Test-TargetDelegation`, `Test-TargetExists`, `Test-TargetDependencies` functions
 
 ### ✅ **Updated MSBuild Integration**
-- **Target delegation test** now uses `Test-TargetDelegation` function from NTools.Scripts module instead of individual script
+- **Target delegation test** now uses `Test-TargetDelegation` function from ntools-scripts module instead of individual script
 - **PUBLISH target** confirmed working with consolidated `Publish-AllProjects` function
 - **Module lifecycle targets** (INSTALL_NTOOLS_SCRIPTS, TEST_NTOOLS_SCRIPTS, UNINSTALL_NTOOLS_SCRIPTS) all functional
 
@@ -32,8 +32,8 @@ scripts/
 │   ├── devops-waf-add-rule.ps1        # Azure WAF rule addition
 │   └── devops-waf-delete-rule.ps1     # Azure WAF rule removal
 ├── module-package/                     # 🆕 CONSOLIDATED MODULE
-│   ├── NTools.Scripts.psd1            # Module manifest (v2.0.0)
-│   ├── NTools.Scripts.psm1            # Module with 11 functions
+│   ├── ntools-scripts.psd1            # Module manifest (v2.0.0)
+│   ├── ntools-scripts.psm1            # Module with 11 functions
 │   ├── install-module.ps1             # Module installer
 │   └── test-module.ps1                # Module validation
 ├── setup/
@@ -48,7 +48,7 @@ scripts/
     └── test-target-quick.ps1           # Quick target validation
 ```
 
-## NTools.Scripts Module (v2.0.0)
+## ntools-scripts Module (v2.0.0)
 
 ### **11 Consolidated Functions:**
 1. `Get-NtoolsScriptsVersion` - Module version info

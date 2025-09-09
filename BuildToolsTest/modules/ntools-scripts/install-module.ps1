@@ -37,3 +37,4 @@ if (Test-Path $repoModules) {
 
 Write-Host "Module installed to $dest"
 Write-Host "You can import it with: Import-Module '$dest\$ModuleName.psd1' -Force"
+

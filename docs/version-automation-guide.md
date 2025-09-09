@@ -14,15 +14,15 @@ Previously, these had to be updated manually, leading to inconsistencies and out
 
 ## 1. PowerShell Module Integration (v2.3.0+)
 
-- **Module**: `scripts/module-package/NTools.Scripts.psm1`
+- **Module**: `scripts/module-package/ntools-scripts.psm1`
 - **Function**: `Update-MarkdownTable` and `Get-VersionFromJson`
-- **Purpose**: Consolidated version management within the NTools.Scripts module
+- **Purpose**: Consolidated version management within the ntools-scripts module
 - **Integration**: Available in all build processes and CI/CD pipelines
 
 ### Using the Module Approach
 ```powershell
 # Import the module
-Import-Module "./scripts/module-package/NTools.Scripts.psm1" -Force
+Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
 
 # Update documentation with latest versions
 Update-MarkdownTable -JsonDirectory "./dev-setup" -MarkdownFile "./docs/ntools/ntools.md"
@@ -35,7 +35,7 @@ $version = Get-VersionFromJson -JsonFilePath "./dev-setup/ntools.json"
 
 - **File**: `scripts/devops/devops-update-versions.ps1` (deprecated in favor of module functions)
 - **Purpose**: Standalone script to sync versions between JSON files and documentation
-- **Status**: Maintained for backward compatibility, but NTools.Scripts module is preferred
+- **Status**: Maintained for backward compatibility, but ntools-scripts module is preferred
 
 ### Features (Now Available as Module Functions)
 - Reads all JSON files in `dev-setup/` directory
