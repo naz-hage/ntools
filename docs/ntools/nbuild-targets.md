@@ -7,8 +7,6 @@ The table below lists all available targets for the Nbuild tool.
 | ARTIFACTS           | Setup the ARTIFACTS folders for binaries and test results - override |
 | FILE_VERSIONS       | Test for FileVersion task and powershell file-version.ps1 |
 | NBUILD_DOWNLOAD     | Download Nbuild specified in the NbuildTargetVersion |
-| NBUILD_INSTALL      | Install Nbuild specified in the NbuildTargetVersion |
-| DEV_SETUP           | Setup Development Environment |
 | MKDOCS              | Build docs locally for testing |
 | MKDOCS_DEPLOY       | mkdocs deploy locally |
 | GET_PRODUCT_CODES   | Example to get the installation Product code used for uninstallation of product |

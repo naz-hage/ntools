@@ -48,8 +48,6 @@
 		
 		<Message Text="==> DONE"/>
 	</Target>
-
-	
 		
 	<!-- Test for FileVersion task and powershell file-version.ps1-->
 	<Target Name="FILE_VERSIONS"  DependsOnTargets="ARTIFACTS">
@@ -86,44 +84,12 @@
 		<Message Text="==> NBUILD_DONE"/>
 	</Target>
 
-	<!-- Install Nbuild specified in the NbuildTargetVersion -->
-	<Target Name="NBUILD_INSTALL" DependsOnTargets="IS_ADMIN">
-		<PropertyGroup>
-			<FileExe>$(ProgramFiles)\Nbuild\nb.exe</FileExe>
-		</PropertyGroup>
-		<Exec Command='"$(FileExe)" --version' Condition="Exists('$(FileExe)')" />
-		
-		<RedError Condition="'$(IsAdmin)' == false" Message="Must be an admin to install $(CodeAppName)" />
-		
-		<FileVersion Name="$(FileExe)" Condition="Exists('$(FileExe)')" >
-			<Output TaskParameter="Output" PropertyName="Version" />
-		</FileVersion>
+	<!-- NBUILD_INSTALL removed: Nbuild installation is no longer managed by these targets. -->
 
-		<Message Text="$(CodeAppName) is not installed" Condition="'$(Version)' == ''" />
-		<!-- Display the file version -->
-		<Message Text="$(CodeAppName) Version is $(Version)" Condition="'$(Version)' != ''" />
-
-		<Message Text="Installing $(CodeAppName)" Condition="!Exists('$(FileExe)') or '$(Version)' == '' or '$(Version)' &lt; '$(CodeTargetVersion)'"/>
-		<Exec Command='"$(ZipExe)" x $(FileName) -o"C:\Program Files\Nbuild" ' Condition="'$(Verion)' == '' Or '$(Version)' &lt; '$(CodeTargetVersion)'" />
-
-		<Delete Files="$(FileName)" Condition="Exists('$(FileName)') == true" />
-
-		<Exec Command='"$(FileExe)" --version'  Condition="Exists('$(FileExe)')" />
-
-		<FileVersion Name="$(FileExe)" Condition="Exists('$(FileExe)')" >
-			<Output TaskParameter="Output" PropertyName="Version" />
-		</FileVersion>
-
-		<Message Text="$(CodeAppName) installed version: $(Version)" />
-		<Message Text="==> CODE_DONE"/>
-	</Target>
-
-	<!-- Setup Development Environment -->
-	<Target Name="DEV_SETUP" DependsOnTargets="IS_ADMIN">
-		<Pwsh ScriptPath="$(SolutionDir)\dev-setup\install.ps1" Arguments="" WorkingDirectory ="$(SolutionDir)\dev-setup"/>
-
-		<Message Text="==> DONE"/>
-	</Target>
+	<!-- DEV_SETUP removed: development environment installation should be performed using the
+	     canonical script at dev-setup\install.ps1 or via the NTools.Scripts module where appropriate.
+	     The DEV_SETUP MSBuild target was removed to avoid accidental in-place replacement of a running
+		 launcher and to reduce confusion between script-first and module-first install flows. -->
 
 	<!-- Install the NTools.Scripts module into BuildTools modules folder -->
 	<Target Name="INSTALL_NTOOLS_SCRIPTS" DependsOnTargets="IS_ADMIN">
@@ -706,11 +672,6 @@
         
         <Message Text="==> DONE" />
     </Target>
-
-	<!-- Legacy PowerShell-based smoke test removed.
-		 `SMOKE_TEST_PWSH` was removed because its functionality is consolidated
-		 into `SMOKE_TEST`. Retain a changelog note if you need to communicate
-		 removal to downstream consumers. -->
 
 	<!-- Publish all non-test projects to artifacts folder -->
 	<Target Name="PUBLISH" DependsOnTargets="ARTIFACTS;TAG;INSTALL_NTOOLS_SCRIPTS">
