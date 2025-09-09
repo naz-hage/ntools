@@ -125,6 +125,27 @@
 		<Message Text="==> DONE"/>
 	</Target>
 
+	<!-- Install the NTools.Scripts module into BuildTools modules folder -->
+	<Target Name="INSTALL_NTOOLS_SCRIPTS" DependsOnTargets="IS_ADMIN">
+		<Message Text="Installing NTools.Scripts module into $(BuildTools)\modules" Importance="high" />
+		<Exec Command='pwsh -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "$(SolutionDir)\scripts\module-package\install-module.ps1" -BuildTools "$(BuildTools)" -ModuleName "NTools.Scripts"' WorkingDirectory="$(SolutionDir)" />
+		<Message Text="NTools.Scripts installation completed" Importance="high" />
+	</Target>
+
+	<!-- Uninstall NTools.Scripts module from BuildTools modules folder -->
+	<Target Name="UNINSTALL_NTOOLS_SCRIPTS" DependsOnTargets="IS_ADMIN">
+		<Message Text="Uninstalling NTools.Scripts module from $(BuildTools)\modules" Importance="high" />
+		<RemoveDir Directories="$(BuildTools)\modules\NTools.Scripts" Condition="Exists('$(BuildTools)\modules\NTools.Scripts')" />
+		<Message Text="NTools.Scripts uninstallation completed" Importance="high" />
+	</Target>
+
+	<!-- Test that NTools.Scripts module is installed and can report a version -->
+	<Target Name="TEST_NTOOLS_SCRIPTS" DependsOnTargets="IS_ADMIN">
+		<Message Text="Testing NTools.Scripts installation" Importance="high" />
+		<Exec Command='pwsh -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "$(SolutionDir)\scripts\module-package\test-module.ps1" -BuildTools "$(BuildTools)"' WorkingDirectory="$(SolutionDir)" />
+		<Message Text="NTools.Scripts test completed" Importance="high" />
+	</Target>
+
 	<!-- Build docs locally for testing -->
 	<Target Name="MKDOCS" >
 		<!-- Check if Python is installed -->
@@ -652,11 +673,20 @@
         <Error Condition="!Exists('$(DelegateFile)')" Text="❌ Delegate file not found: $(DelegateFile)" />
         <Message Text="✅ Both target files exist" />
         
-        <!-- Test 3: Use our PowerShell script for validation -->
-        <Exec Command='powershell -ExecutionPolicy Bypass -File "$(SolutionDir)\scripts\test\test-delegation.ps1" "$(SourceTarget)" "$(DelegateTarget)"' 
+        <!-- Test 3: Use our consolidated PowerShell module for validation -->
+        <Exec Command='pwsh -NoProfile -ExecutionPolicy Bypass -Command "Import-Module &apos;$(BuildTools)\modules\NTools.Scripts\NTools.Scripts.psm1&apos; -Force; Test-TargetDelegation -SourceTarget &apos;$(SourceTarget)&apos; -DelegateTarget &apos;$(DelegateTarget)&apos;"' 
               WorkingDirectory="$(SolutionDir)" />
         
         <Message Text="=== Target delegation test completed ===" />
         <Message Text="==> DONE" />
     </Target>
+
+	<!-- Publish all non-test projects to artifacts folder -->
+	<Target Name="PUBLISH" DependsOnTargets="ARTIFACTS;TAG;INSTALL_NTOOLS_SCRIPTS">
+		<RemoveDir Directories="$(ArtifactsFolder)"></RemoveDir>
+		<Message Text="Publishing all non-test projects using NTools.Scripts module" Importance="high" />
+		<Exec Command='pwsh -NoProfile -ExecutionPolicy Bypass -Command "Import-Module &apos;$(BuildTools)\modules\NTools.Scripts\NTools.Scripts.psm1&apos; -Force; Publish-AllProjects -OutputDir &apos;$(ArtifactsFolder)&apos; -Version &apos;$(ProductVersion)&apos;"' WorkingDirectory="$(SolutionDir)" />
+		<Message Text="All non-test projects published to $(ArtifactsFolder)" Importance="high" />
+		<Message Text="==> COMMON_DONE"/>
+	</Target>	
 </Project>

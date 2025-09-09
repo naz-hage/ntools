@@ -28,9 +28,22 @@ param (
 # display $PSScriptRoot
 Write-Host "PSScriptRoot: $PSScriptRoot"
 
-# Import the install module
+# Import the consolidated NTools.Scripts module instead of Install.psm1
 $scriptDir = Split-Path -Parent $PSCommandPath
-Import-Module "$scriptDir\..\modules\Install.psm1" -Force
+$moduleManifest = "$scriptDir\..\module-package\NTools.Scripts.psd1"
+
+if (Test-Path $moduleManifest) {
+    Import-Module $moduleManifest -Force
+} else {
+    # Try to import from installed location
+    $installedModule = "$env:ProgramFiles\nbuild\modules\NTools.Scripts\NTools.Scripts.psd1"
+    if (Test-Path $installedModule) {
+        Import-Module $installedModule -Force
+    } else {
+        Write-Error "NTools.Scripts module not found. Please install it first using: scripts\module-package\install-module.ps1"
+        exit 1
+    }
+}
 
 $fileName = Split-Path -Leaf $PSCommandPath
 
@@ -43,9 +56,9 @@ if (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
     Write-OutputMessage $fileName "Admin rights detected"
 }
 
-# Call the InstallNtools function from the install module
-$result = InstallNtools -version $Version -downloadsDirectory $DownloadsDirectory
+# Call the Install-NTools function from the consolidated module
+$result = Install-NTools -version $Version -downloadsDirectory $DownloadsDirectory
 if (-not $result) {
-    Write-OutputMessage $fileName "Failed to install NTools. Please check the logs for more details." -ForegroundColor Red
+    Write-OutputMessage $fileName "Failed to install NTools. Please check the logs for more details."
     exit 1
 }
