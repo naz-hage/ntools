@@ -176,13 +176,13 @@
 <h3 id="test-functions">Test Functions</h3>
 <ul>
 <li><code>Invoke-CodeCoverage</code> - Run tests with code coverage</li>
-<li><code>Test-MSBuildDelegation</code> - Test MSBuild target delegation</li>
+<li><code>Test-MSBuildDelegation</code> - Test MSBuild target delegation (<strong>Note</strong>: Now automatically integrated into <code>nb smoke_test</code> target)</li>
 <li><code>Test-QuickTargets</code> - Quick target validation</li>
 <li><code>Test-NToolsScriptsModule</code> - Test module functionality</li>
 <li><code>Write-TestResult</code> - Write formatted test results</li>
 <li><code>Test-TargetExists</code> - Check if MSBuild targets exist</li>
 <li><code>Test-TargetDependencies</code> - Validate target dependencies</li>
-<li><code>Test-TargetDelegation</code> - Test target delegation patterns</li>
+<li><code>Test-TargetDelegation</code> - Test target delegation patterns (<strong>Note</strong>: Core function used by <code>nb smoke_test</code> target)</li>
 </ul>
 <h3 id="utility-functions">Utility Functions</h3>
 <ul>
@@ -232,8 +232,11 @@ Publish-AllProjects -OutputDir &quot;C:\Artifacts&quot; -Version &quot;1.0.0&quo
 <pre><code class="language-powershell"># Run code coverage
 Invoke-CodeCoverage
 
-# Test MSBuild delegation
+# Test MSBuild delegation (also available via 'nb smoke_test')
 Test-MSBuildDelegation
+
+# Or use the comprehensive smoke test target
+# nb smoke_test  # (from command line - includes both artifact validation AND target delegation)
 </code></pre>
 <h2 id="integration-with-build-system">Integration with Build System</h2>
 <p>The module is automatically integrated with the NTools build system:</p>
@@ -241,8 +244,19 @@ Test-MSBuildDelegation
 <ul>
 <li><strong>Installation</strong>: <code>nbuild.targets</code> automatically installs the module during <code>INSTALL_NTOOLS_SCRIPTS</code> target</li>
 <li><strong>Usage</strong>: <code>PUBLISH</code> target uses <code>Publish-AllProjects</code> function with deterministic repository path</li>
+<li><strong>Smoke Testing</strong>: <code>SMOKE_TEST</code> target uses <code>Test-TargetDelegation</code> function for build system validation</li>
 <li><strong>Location</strong>: Module installed to <code>$env:ProgramFiles\nbuild\modules\NTools.Scripts\</code></li>
 </ul>
+<h3 id="smoke_test-target-integration">SMOKE_TEST Target Integration</h3>
+<p>The comprehensive <code>SMOKE_TEST</code> target combines artifact validation with PowerShell module functions:</p>
+<pre><code class="language-bash"># Comprehensive smoke test (recommended)
+nb smoke_test
+</code></pre>
+<p>This target performs:
+1. <strong>Artifact Validation</strong>: Tests 4+ executables (nb.exe, lf.exe, nBackup.exe, wi.exe)
+2. <strong>Build System Validation</strong>: Uses <code>Test-TargetDelegation</code> function to verify MSBuild target relationships
+3. <strong>Consolidated Results</strong>: Single pass/fail result for all validation checks</p>
+<p><strong>Migration Note</strong>: The deprecated <code>TEST_TARGET_DELEGATION</code> target functionality is now integrated into <code>SMOKE_TEST</code>.</p>
 <h3 id="github-actions-integration">GitHub Actions Integration</h3>
 <pre><code class="language-yaml">- name: Install ntools using NTools.Scripts module
   run: |
