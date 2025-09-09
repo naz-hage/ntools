@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="naz-hage" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>NTools.Scripts PowerShell Module - Ntools - Work in Progress</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "NTools.Scripts PowerShell Module";
+        var mkdocs_page_input_path = "ntools/ntools-scripts-module.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Ntools - Work in Progress
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../usage/">Practice</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../setup/">Setup your project</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../buildtypes/">Build Types</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../versioning/">Versioning</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">List of Tools</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../nbuild/">Nbuild (nb.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lf/">lf (lf.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../nbackup/">Nbackup (nbackup.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../wi/">wi (wi.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../github-release/">Github Release</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Custom Build Tasks</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../nbuildtasks/">Nbuild Tasks</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developer setup</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../pre-commit-setup/">Pre-commit Setup</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../version-automation-guide/">Version Automation Guide</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/">Development Tools</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Build System Features</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../code-coverage/">Code Coverage</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../nbuild-targets/">MSBuild Targets</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Revisions</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../changelog/">Changelog</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Ntools - Work in Progress</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">NTools.Scripts PowerShell Module</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/naz-hage/ntools/edit/main/docs/ntools/ntools-scripts-module.md">Edit on ntools</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="ntoolsscripts-powershell-module">NTools.Scripts PowerShell Module</h1>
+<p>The NTools.Scripts module is a comprehensive PowerShell module that consolidates all NTools PowerShell functionality into a single, reusable module. This module replaces the previous collection of individual scripts with a structured, function-based approach.</p>
+<h2 id="overview">Overview</h2>
+<p><strong>Version</strong>: 2.3.0<br />
+<strong>Location</strong>: <code>scripts/module-package/NTools.Scripts.psm1</code><br />
+<strong>Installation</strong>: Automatically installed via MSBuild targets and GitHub Actions</p>
+<h2 id="architecture">Architecture</h2>
+<p>The module consolidates functionality from the previous script structure:</p>
+<h3 id="before-individual-scripts">Before (Individual Scripts)</h3>
+<pre><code>scripts/
+├── build/build-verify-artifacts.ps1
+├── devops/devops-get-ip.ps1
+├── devops/devops-precommit-hooks.ps1
+├── setup/setup-environment.ps1
+├── setup/setup-install-apps.ps1
+├── test/test-coverage.ps1
+└── ... (20+ individual scripts)
+</code></pre>
+<h3 id="after-consolidated-module">After (Consolidated Module)</h3>
+<pre><code>scripts/
+├── module-package/
+│   ├── NTools.Scripts.psm1     # Main module with all functions
+│   ├── NTools.Scripts.psd1     # Module manifest
+│   └── install-module.ps1      # Installation script
+├── build/                      # Legacy scripts (deprecated)
+├── devops/                     # Legacy scripts (deprecated)
+├── setup/                      # Entry point scripts
+└── test/                       # Legacy scripts (deprecated)
+</code></pre>
+<h2 id="available-functions">Available Functions</h2>
+<p>The module exports 36 functions organized by category:</p>
+<h3 id="build-functions">Build Functions</h3>
+<ul>
+<li><code>Publish-AllProjects</code> - Build and publish all non-test projects with deterministic repository path</li>
+<li><code>Invoke-ArtifactVerification</code> - Comprehensive artifact verification</li>
+<li><code>Get-ProjectFiles</code> - Get project files with filtering</li>
+<li><code>Invoke-ProjectPublish</code> - Publish individual projects</li>
+</ul>
+<h3 id="devops-functions">DevOps Functions</h3>
+<ul>
+<li><code>Get-AgentIPAddress</code> - Get public IP for Azure DevOps agents</li>
+<li><code>Install-PreCommitHooks</code> - Install git pre-commit hooks</li>
+<li><code>Add-WAFRule</code> - Add Azure WAF rules</li>
+<li><code>Remove-WAFRule</code> - Remove Azure WAF rules</li>
+<li><code>Get-VersionFromJson</code> - Extract version information from JSON files</li>
+<li><code>Update-MarkdownTable</code> - Update version tables in markdown documentation</li>
+</ul>
+<h3 id="setup-functions">Setup Functions</h3>
+<ul>
+<li><code>Set-DevelopmentEnvironment</code> - Set up development environment</li>
+<li><code>Install-DevelopmentApps</code> - Install development applications</li>
+<li><code>Set-CodeSigningTrust</code> - Configure code signing trust</li>
+<li><code>Set-CodeSigning</code> - Configure code signing</li>
+<li><code>Install-NTools</code> - Install NTools from releases (with configurable ntools.json path)</li>
+<li><code>Install-NToolsScriptsModule</code> - Install this module</li>
+</ul>
+<h3 id="test-functions">Test Functions</h3>
+<ul>
+<li><code>Invoke-CodeCoverage</code> - Run tests with code coverage</li>
+<li><code>Test-MSBuildDelegation</code> - Test MSBuild target delegation</li>
+<li><code>Test-QuickTargets</code> - Quick target validation</li>
+<li><code>Test-NToolsScriptsModule</code> - Test module functionality</li>
+<li><code>Write-TestResult</code> - Write formatted test results</li>
+<li><code>Test-TargetExists</code> - Check if MSBuild targets exist</li>
+<li><code>Test-TargetDependencies</code> - Validate target dependencies</li>
+<li><code>Test-TargetDelegation</code> - Test target delegation patterns</li>
+</ul>
+<h3 id="utility-functions">Utility Functions</h3>
+<ul>
+<li><code>Get-FileHash256</code> - Calculate SHA256 hash of files</li>
+<li><code>Get-FileVersionInfo</code> - Get file version information</li>
+<li><code>Invoke-FastForward</code> - Git fast-forward operations</li>
+<li><code>Write-OutputMessage</code> - Standardized output messaging</li>
+<li><code>Get-NToolsFileVersion</code> - Get NTools file version information</li>
+<li><code>Add-DeploymentPathToEnvironment</code> - Add paths to PATH environment variable</li>
+<li><code>Invoke-NToolsDownload</code> - Download NTools packages</li>
+</ul>
+<h3 id="common-functions">Common Functions</h3>
+<ul>
+<li><code>Write-Info</code> - Write informational messages</li>
+<li><code>Write-Success</code> - Write success messages</li>
+<li><code>Write-Warning</code> - Write warning messages</li>
+<li><code>Write-Error</code> - Write error messages</li>
+<li><code>Get-NtoolsScriptsVersion</code> - Get module version information</li>
+</ul>
+<h2 id="usage-examples">Usage Examples</h2>
+<h3 id="import-the-module">Import the Module</h3>
+<pre><code class="language-powershell"># Import from local development
+Import-Module &quot;./scripts/module-package/NTools.Scripts.psm1&quot; -Force
+
+# Import from installed location (after installation)
+Import-Module &quot;$env:ProgramFiles\nbuild\modules\NTools.Scripts\NTools.Scripts.psm1&quot; -Force
+</code></pre>
+<h3 id="get-module-information">Get Module Information</h3>
+<pre><code class="language-powershell"># Get version
+Get-NtoolsScriptsVersion
+
+# List all available functions
+Get-Command -Module NTools.Scripts | Select-Object Name | Format-Table -AutoSize
+</code></pre>
+<h3 id="install-ntools-with-custom-configuration">Install NTools with Custom Configuration</h3>
+<pre><code class="language-powershell"># Install using specific ntools.json file
+Install-NTools -NtoolsJsonPath &quot;./dev-setup/ntools.json&quot;
+
+# Install specific version
+Install-NTools -Version &quot;1.29.7&quot; -DownloadsDirectory &quot;C:\MyDownloads&quot;
+</code></pre>
+<h3 id="publish-projects-with-deterministic-path">Publish Projects with Deterministic Path</h3>
+<pre><code class="language-powershell"># Publish all projects with explicit repository root
+Publish-AllProjects -OutputDir &quot;C:\Artifacts&quot; -Version &quot;1.0.0&quot; -RepositoryRoot &quot;C:\MyRepo&quot;
+</code></pre>
+<h3 id="run-tests-and-coverage">Run Tests and Coverage</h3>
+<pre><code class="language-powershell"># Run code coverage
+Invoke-CodeCoverage
+
+# Test MSBuild delegation
+Test-MSBuildDelegation
+</code></pre>
+<h2 id="integration-with-build-system">Integration with Build System</h2>
+<p>The module is automatically integrated with the NTools build system:</p>
+<h3 id="msbuild-integration">MSBuild Integration</h3>
+<ul>
+<li><strong>Installation</strong>: <code>nbuild.targets</code> automatically installs the module during <code>INSTALL_NTOOLS_SCRIPTS</code> target</li>
+<li><strong>Usage</strong>: <code>PUBLISH</code> target uses <code>Publish-AllProjects</code> function with deterministic repository path</li>
+<li><strong>Location</strong>: Module installed to <code>$env:ProgramFiles\nbuild\modules\NTools.Scripts\</code></li>
+</ul>
+<h3 id="github-actions-integration">GitHub Actions Integration</h3>
+<pre><code class="language-yaml">- name: Install ntools using NTools.Scripts module
+  run: |
+    Import-Module &quot;./scripts/module-package/NTools.Scripts.psm1&quot; -Force
+    Install-NTools -NtoolsJsonPath &quot;./dev-setup/ntools.json&quot;
+</code></pre>
+<h2 id="key-improvements">Key Improvements</h2>
+<h3 id="1-deterministic-repository-path-detection">1. Deterministic Repository Path Detection</h3>
+<p>The <code>Publish-AllProjects</code> function now requires an explicit <code>RepositoryRoot</code> parameter, eliminating unreliable heuristic detection:</p>
+<pre><code class="language-powershell"># Before (unreliable)
+Publish-AllProjects -OutputDir $output -Version $version
+
+# After (deterministic)
+Publish-AllProjects -OutputDir $output -Version $version -RepositoryRoot $repoRoot
+</code></pre>
+<h3 id="2-configurable-ntoolsjson-path">2. Configurable ntools.json Path</h3>
+<p>The <code>Install-NTools</code> function accepts a custom path to ntools.json:</p>
+<pre><code class="language-powershell"># Use specific configuration file
+Install-NTools -NtoolsJsonPath &quot;./dev-setup/ntools.json&quot;
+</code></pre>
+<h3 id="3-unified-error-handling">3. Unified Error Handling</h3>
+<p>All functions use consistent error handling and logging:</p>
+<pre><code class="language-powershell">Write-Info &quot;Starting operation...&quot;
+Write-Success &quot;Operation completed successfully&quot;
+Write-Warning &quot;Potential issue detected&quot;
+Write-Error &quot;Operation failed&quot;
+</code></pre>
+<h3 id="4-backward-compatibility">4. Backward Compatibility</h3>
+<ul>
+<li>Legacy script entry points in <code>scripts/setup/</code> still work</li>
+<li>Module functions can be called directly</li>
+<li>All original functionality preserved</li>
+</ul>
+<h2 id="migration-from-legacy-scripts">Migration from Legacy Scripts</h2>
+<h3 id="for-developers">For Developers</h3>
+<pre><code class="language-powershell"># Old way
+./scripts/build/build-verify-artifacts.ps1
+
+# New way
+Import-Module &quot;./scripts/module-package/NTools.Scripts.psm1&quot; -Force
+Invoke-ArtifactVerification
+</code></pre>
+<h3 id="for-cicd">For CI/CD</h3>
+<pre><code class="language-yaml"># Old way
+run: ./scripts/setup/setup-install-ntools.ps1
+
+# New way  
+run: |
+  Import-Module &quot;./scripts/module-package/NTools.Scripts.psm1&quot; -Force
+  Install-NTools -NtoolsJsonPath &quot;./dev-setup/ntools.json&quot;
+</code></pre>
+<h3 id="for-msbuild">For MSBuild</h3>
+<pre><code class="language-xml">&lt;!-- Old way --&gt;
+&lt;Exec Command='pwsh -File &quot;$(SolutionDir)\scripts\build\publish-all-projects.ps1&quot;' /&gt;
+
+&lt;!-- New way (automatically used) --&gt;
+&lt;Exec Command='pwsh -Command &quot;Import-Module NTools.Scripts; Publish-AllProjects -RepositoryRoot $(SolutionDir)&quot;' /&gt;
+</code></pre>
+<h2 id="module-development">Module Development</h2>
+<h3 id="adding-new-functions">Adding New Functions</h3>
+<ol>
+<li>Add function to appropriate section in <code>NTools.Scripts.psm1</code></li>
+<li>Add function name to <code>Export-ModuleMember</code> line</li>
+<li>Update <code>FunctionsToExport</code> in <code>NTools.Scripts.psd1</code></li>
+<li>Increment module version</li>
+<li>Update documentation</li>
+</ol>
+<h3 id="testing">Testing</h3>
+<pre><code class="language-powershell"># Test the module
+Import-Module &quot;./scripts/module-package/NTools.Scripts.psm1&quot; -Force
+Test-NToolsScriptsModule
+</code></pre>
+<h3 id="installation">Installation</h3>
+<pre><code class="language-powershell"># Install module manually for development
+Install-NToolsScriptsModule -InstallPath &quot;$env:ProgramFiles\WindowsPowerShell\Modules\NTools.Scripts&quot; -Force
+</code></pre>
+<h2 id="best-practices">Best Practices</h2>
+<ol>
+<li><strong>Always specify -Force when importing</strong> to reload changes during development</li>
+<li><strong>Use explicit parameters</strong> like <code>-RepositoryRoot</code> for deterministic behavior</li>
+<li><strong>Import the module</strong> before calling any functions</li>
+<li><strong>Check module version</strong> with <code>Get-NtoolsScriptsVersion</code> for troubleshooting</li>
+<li><strong>Use the utility functions</strong> like <code>Write-Info</code>, <code>Write-Success</code> for consistent output</li>
+</ol>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<h3 id="module-not-found">Module Not Found</h3>
+<pre><code class="language-powershell"># Verify module location
+Test-Path &quot;./scripts/module-package/NTools.Scripts.psm1&quot;
+
+# Check if installed
+Test-Path &quot;$env:ProgramFiles\nbuild\modules\NTools.Scripts\NTools.Scripts.psm1&quot;
+</code></pre>
+<h3 id="version-issues">Version Issues</h3>
+<pre><code class="language-powershell"># Check module version
+Get-NtoolsScriptsVersion
+
+# Check installed version vs source
+Import-Module &quot;./scripts/module-package/NTools.Scripts.psm1&quot; -Force
+Get-NtoolsScriptsVersion
+</code></pre>
+<h3 id="function-not-available">Function Not Available</h3>
+<pre><code class="language-powershell"># List all available functions
+Get-Command -Module NTools.Scripts
+
+# Check if module is properly imported
+Get-Module NTools.Scripts
+</code></pre>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/naz-hage/ntools" class="fa fa-code-fork" style="color: #fcfcfc"> ntools</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

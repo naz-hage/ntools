@@ -80,9 +80,15 @@
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#solutions-implemented">Solutions Implemented</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#1-powershell-script-automation">1. PowerShell Script Automation</a>
+    <li class="toctree-l2"><a class="reference internal" href="#1-powershell-module-integration-v230">1. PowerShell Module Integration (v2.3.0+)</a>
         <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#features">Features</a>
+    <li class="toctree-l3"><a class="reference internal" href="#using-the-module-approach">Using the Module Approach</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#2-legacy-powershell-script-automation-deprecated">2. Legacy PowerShell Script Automation (Deprecated)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#features-now-available-as-module-functions">Features (Now Available as Module Functions)</a>
     </li>
         </ul>
     </li>
@@ -94,7 +100,7 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#2-nbuild-task-integration">2. NBuild Task Integration</a>
         <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#features_1">Features</a>
+    <li class="toctree-l3"><a class="reference internal" href="#features">Features</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#usage_1">Usage</a>
     </li>
@@ -162,13 +168,30 @@
 <p>Previously, these had to be updated manually, leading to inconsistencies and outdated documentation.</p>
 <h2 id="solutions-implemented">Solutions Implemented</h2>
 <hr />
-<h2 id="1-powershell-script-automation">1. PowerShell Script Automation</h2>
+<h2 id="1-powershell-module-integration-v230">1. PowerShell Module Integration (v2.3.0+)</h2>
 <ul>
-<li><strong>File</strong>: <code>scripts/devops/devops-update-versions.ps1</code></li>
-<li><strong>Purpose</strong>: Standalone script to sync versions between JSON files and documentation</li>
-<li><strong>Execution</strong>: Manual or triggered by other automation</li>
+<li><strong>Module</strong>: <code>scripts/module-package/NTools.Scripts.psm1</code></li>
+<li><strong>Function</strong>: <code>Update-MarkdownTable</code> and <code>Get-VersionFromJson</code></li>
+<li><strong>Purpose</strong>: Consolidated version management within the NTools.Scripts module</li>
+<li><strong>Integration</strong>: Available in all build processes and CI/CD pipelines</li>
 </ul>
-<h3 id="features">Features</h3>
+<h3 id="using-the-module-approach">Using the Module Approach</h3>
+<pre><code class="language-powershell"># Import the module
+Import-Module &quot;./scripts/module-package/NTools.Scripts.psm1&quot; -Force
+
+# Update documentation with latest versions
+Update-MarkdownTable -JsonDirectory &quot;./dev-setup&quot; -MarkdownFile &quot;./docs/ntools/ntools.md&quot;
+
+# Get version from specific JSON file  
+$version = Get-VersionFromJson -JsonFilePath &quot;./dev-setup/ntools.json&quot;
+</code></pre>
+<h2 id="2-legacy-powershell-script-automation-deprecated">2. Legacy PowerShell Script Automation (Deprecated)</h2>
+<ul>
+<li><strong>File</strong>: <code>scripts/devops/devops-update-versions.ps1</code> (deprecated in favor of module functions)</li>
+<li><strong>Purpose</strong>: Standalone script to sync versions between JSON files and documentation</li>
+<li><strong>Status</strong>: Maintained for backward compatibility, but NTools.Scripts module is preferred</li>
+</ul>
+<h3 id="features-now-available-as-module-functions">Features (Now Available as Module Functions)</h3>
 <ul>
 <li>Reads all JSON files in <code>dev-setup/</code> directory</li>
 <li>Extracts <code>Name</code> and <code>Version</code> from <code>NbuildAppList[0]</code></li>
@@ -194,7 +217,7 @@ cd scripts/devops
 <li><strong>Purpose</strong>: MSBuild task for build-time automation</li>
 <li><strong>Execution</strong>: Integrated into your existing NBuild workflow</li>
 </ul>
-<h3 id="features_1">Features</h3>
+<h3 id="features">Features</h3>
 <ul>
 <li>Native C# MSBuild task implementation</li>
 <li>JSON parsing using <code>System.Text.Json</code></li>
