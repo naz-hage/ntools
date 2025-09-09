@@ -103,15 +103,36 @@ Here are examples of custom Tasks that can be used during builds:
 	<UpdateVersionsInDocs DocsPath="$(SolutionDir)docs" Version="$(Version)" />
 </Target>
 ```
-### Pwsh
-```xml
-<!-- This target uses the `Pwsh` custom NTools MS Build task to launch a PowerShell Core script -->
-<Target Name="INSTALL_NTOOLS">
-	<Pwsh ScriptPath="$(SolutionDir)\scripts\setup\setup-install-apps.ps1" Arguments="" WorkingDirectory ="$(SolutionDir)\scripts\setup"/>
 
+### Pwsh (Legacy Approach)
+```xml
+<!-- Legacy: Using individual PowerShell scripts (deprecated in favor of NTools.Scripts module) -->
+<Target Name="INSTALL_NTOOLS_LEGACY">
+	<Pwsh ScriptPath="$(SolutionDir)\scripts\setup\setup-install-apps.ps1" Arguments="" WorkingDirectory ="$(SolutionDir)\scripts\setup"/>
 	<Message Text="==> INSTALL_NTOOLS_DONE"/>
 </Target>
 ```
+
+### Modern Approach with NTools.Scripts Module
+```xml
+<!-- Modern: Using NTools.Scripts module for better integration and reliability -->
+<Target Name="INSTALL_NTOOLS_SCRIPTS">
+	<Exec Command='pwsh -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "$(SolutionDir)\scripts\module-package\install-module.ps1" -BuildTools "$(BuildTools)" -ModuleName "NTools.Scripts"' WorkingDirectory="$(SolutionDir)" />
+</Target>
+
+<Target Name="PUBLISH">
+	<Exec Command='pwsh -NoProfile -ExecutionPolicy Bypass -Command "Import-Module &apos;$(BuildTools)\modules\NTools.Scripts\NTools.Scripts.psm1&apos; -Force; Publish-AllProjects -OutputDir &apos;$(ArtifactsFolder)&apos; -Version &apos;$(ProductVersion)&apos; -RepositoryRoot &apos;$(SolutionDir)&apos;"' WorkingDirectory="$(SolutionDir)" />
+</Target>
+```
+
+**Benefits of the Module Approach:**
+- **Deterministic paths**: Explicit `RepositoryRoot` parameter eliminates path detection issues
+- **Centralized functionality**: All PowerShell functions in one module
+- **Better error handling**: Consistent error reporting and logging
+- **Easier maintenance**: Single module file instead of dozens of scripts
+- **Integration ready**: Automatically installed and available in build process
+
+For complete module documentation, see [NTools.Scripts Module](ntools-scripts-module.md).
 You can also find the complete list of predefined [MSBuild properties in the Microsoft documentation](https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild-reserved-and-well-known-properties?view=vs-2022).
 
 - Here are few examples:

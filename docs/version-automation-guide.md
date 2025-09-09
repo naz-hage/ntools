@@ -12,13 +12,32 @@ Previously, these had to be updated manually, leading to inconsistencies and out
 
 ---
 
-## 1. PowerShell Script Automation
+## 1. PowerShell Module Integration (v2.3.0+)
 
-- **File**: `scripts/devops/devops-update-versions.ps1`
+- **Module**: `scripts/module-package/NTools.Scripts.psm1`
+- **Function**: `Update-MarkdownTable` and `Get-VersionFromJson`
+- **Purpose**: Consolidated version management within the NTools.Scripts module
+- **Integration**: Available in all build processes and CI/CD pipelines
+
+### Using the Module Approach
+```powershell
+# Import the module
+Import-Module "./scripts/module-package/NTools.Scripts.psm1" -Force
+
+# Update documentation with latest versions
+Update-MarkdownTable -JsonDirectory "./dev-setup" -MarkdownFile "./docs/ntools/ntools.md"
+
+# Get version from specific JSON file  
+$version = Get-VersionFromJson -JsonFilePath "./dev-setup/ntools.json"
+```
+
+## 2. Legacy PowerShell Script Automation (Deprecated)
+
+- **File**: `scripts/devops/devops-update-versions.ps1` (deprecated in favor of module functions)
 - **Purpose**: Standalone script to sync versions between JSON files and documentation
-- **Execution**: Manual or triggered by other automation
+- **Status**: Maintained for backward compatibility, but NTools.Scripts module is preferred
 
-### Features
+### Features (Now Available as Module Functions)
 - Reads all JSON files in `dev-setup/` directory
 - Extracts `Name` and `Version` from `NbuildAppList[0]`
 - Updates corresponding entries in `ntools.md` table

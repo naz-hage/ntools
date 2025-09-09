@@ -22,6 +22,14 @@ This command will allow the installation script to run. Once the installation is
 cd c:\source\ntools\dev-setup
 .\install.ps1
 ```
+
+**Or using the new NTools.Scripts module (recommended):**
+
+```powershell
+cd c:\source\ntools
+Import-Module "./scripts/module-package/NTools.Scripts.psm1" -Force
+Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
+```
 - This command will install the Dotnet Core Desktop runtime and download the `ntools` from GitHub, installs the ntools package in the `%ProgramFiles%\Nbuild` folder, sets up the nTools development environment, adds the `%ProgramFiles%\Nbuild` will be added to the system path.  
 
 After the installation is complete, check out the [nbuild.targets](./ntools/nbuild-targets.md) for more all the available targets, and navigate to [Usage](usage.md) to learn how to execute a build target.

@@ -7,6 +7,8 @@ This repository contains a collection of software tools specifically designed to
     - [Install ntools](installation.md)
     - [Practice using ntools](usage.md)
     - [Setup your project](setup.md)
+- PowerShell Module
+    - [NTools.Scripts Module](ntools/ntools-scripts-module.md) - Consolidated PowerShell module with all NTools functions
 - List of tools
     - [Nbuild (nb.exe)](ntools/nbuild.md)
     - [File and Folder Listing Utility (lf.exe)](ntools/lf.md)

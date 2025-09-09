@@ -1,149 +1,157 @@
 # NTools PowerShell Scripts
 
-This directory contains PowerShell scripts for the NTools project, organized by purpose for better maintainability and reuse.
+This directory contains the consolidated PowerShell module for the NTools project. All scripts have been converted to functions within the NTools.Scripts module for better maintainability and reuse.
 
 ## Directory Structure
 
-- **`build/`** - Build and publishing related scripts
-- **`test/`** - Testing and validation scripts  
-- **`devops/`** - DevOps automation and deployment scripts
-- **`setup/`** - Installation and environment setup scripts
-- **`module-package/`** - **NTools.Scripts PowerShell Module** - Consolidated module containing all reusable functions
+- **`module-package/`** - **NTools.Scripts PowerShell Module** - Consolidated module containing all functions
+- **`setup/`** - Entry point scripts for installation (uses module functions internally)
+- **`build/`**, **`devops/`**, **`test/`** - Legacy individual scripts (deprecated, use module functions instead)
 
-## NTools.Scripts Module (Recommended)
+## NTools.Scripts Module (Primary Interface)
 
-The **`module-package/`** folder contains the consolidated NTools.Scripts PowerShell module (v2.0.0) that includes functions from all categories:
+The **`module-package/`** folder contains the consolidated NTools.Scripts PowerShell module (v2.3.0) that includes functions converted from all original script categories:
 
-### Available Functions:
-- **Build Functions**: `Publish-AllProjects`
-- **DevOps Functions**: `Get-VersionFromJson`, `Update-MarkdownTable`
-- **Testing Functions**: `Write-TestResult`, `Test-TargetExists`, `Test-TargetDependencies`, `Test-TargetDelegation`
-- **Utility Functions**: `Get-FileHash256`, `Get-FileVersionInfo`, `Invoke-FastForward`
-- **Module Functions**: `Get-NtoolsScriptsVersion`
+### Available Functions by Category:
 
-### Usage:
+#### Build Functions
+- `Invoke-ArtifactVerification` - Comprehensive artifact verification (was `build-verify-artifacts.ps1`)
+- `Publish-AllProjects` - Build and publish all projects with deterministic repository path
+- `Get-ProjectFiles` - Get project files with filtering
+- `Invoke-ProjectPublish` - Publish individual projects
+
+#### DevOps Functions  
+- `Get-AgentIPAddress` - Get public IP for Azure DevOps agents (was `devops-get-ip.ps1`)
+- `Install-PreCommitHooks` - Install git pre-commit hooks (was `devops-precommit-hooks.ps1`)
+- `Add-WAFRule` - Add Azure WAF rules (was `devops-waf-add-rule.ps1`)
+- `Remove-WAFRule` - Remove Azure WAF rules (was `devops-waf-delete-rule.ps1`)
+- `Get-VersionFromJson` - Extract version information from JSON files
+- `Update-MarkdownTable` - Update version tables in markdown documentation
+
+#### Setup Functions
+- `Set-DevelopmentEnvironment` - Set up development environment (was `setup-environment.ps1`)
+- `Install-DevelopmentApps` - Install development applications (was `setup-install-apps.ps1`)
+- `Set-CodeSigningTrust` - Configure code signing trust (was `setup-signing-trust.ps1`)
+- `Set-CodeSigning` - Configure code signing (was `setup-signing.ps1`)
+- `Install-NTools` - Install NTools from releases with configurable ntools.json path
+- `Install-NToolsScriptsModule` - Install this module (was `install-module.ps1`)
+
+#### Test Functions
+- `Invoke-CodeCoverage` - Run tests with code coverage (was `test-coverage.ps1`)
+- `Test-MSBuildDelegation` - Test MSBuild target delegation (was `test-delegation.ps1`)
+- `Test-QuickTargets` - Quick target validation (was `test-target-quick.ps1`)
+- `Test-NToolsScriptsModule` - Test module functionality (was `test-module.ps1`)
+- `Write-TestResult` - Write formatted test results
+- `Test-TargetExists` - Check if MSBuild targets exist
+- `Test-TargetDependencies` - Validate target dependencies
+- `Test-TargetDelegation` - Test target delegation patterns
+
+#### Utility Functions
+- `Get-FileHash256` - Calculate SHA256 hash of files
+- `Get-FileVersionInfo` - Get file version information
+- `Invoke-FastForward` - Git fast-forward operations
+- `Write-OutputMessage` - Standardized output messaging
+- `Get-NToolsFileVersion` - Get NTools file version information
+- `Add-DeploymentPathToEnvironment` - Add paths to PATH environment variable
+- `Invoke-NToolsDownload` - Download NTools packages
+
+#### Common Functions
+- `Write-Info`, `Write-Success`, `Write-Warning`, `Write-Error` - Standardized logging functions
+- `Get-NtoolsScriptsVersion` - Get module version information
+
+### Usage Examples:
+
 ```powershell
-# Install the module
-.\scripts\module-package\install-module.ps1
+# Import the module
+Import-Module "./scripts/module-package/NTools.Scripts.psm1" -Force
 
-# Import and use
-Import-Module 'C:\Program Files\nbuild\modules\NTools.Scripts\NTools.Scripts.psd1' -Force
-Publish-AllProjects -OutputDir ".\artifacts" -Version "1.0.0"
+# Get module information
+Get-NtoolsScriptsVersion
+Get-Command -Module NTools.Scripts | Select-Object Name
+
+# Use module functions
+Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
+Publish-AllProjects -OutputDir ".\artifacts" -Version "1.0.0" -RepositoryRoot (Get-Location)
+Invoke-CodeCoverage
+Test-MSBuildDelegation
 ```
 
 ### MSBuild Integration:
-- `INSTALL_NTOOLS_SCRIPTS` - Install the module
-- `TEST_NTOOLS_SCRIPTS` - Test module installation
-- `UNINSTALL_NTOOLS_SCRIPTS` - Remove the module
+The module is automatically integrated with the build system:
+- `INSTALL_NTOOLS_SCRIPTS` - Install the module during build
+- `PUBLISH` - Uses `Publish-AllProjects` function with deterministic repository path
 
-## Standalone Scripts
-
-Individual scripts are maintained for specific use cases:
-
-### Build Scripts
-- `build-verify-artifacts.ps1` - Comprehensive artifact verification
-
-### DevOps Scripts  
-- `devops-get-ip.ps1` - Get public IP for Azure DevOps agents
-- `devops-precommit-hooks.ps1` - Install/uninstall git pre-commit hooks
-- `devops-waf-add-rule.ps1` - Add Azure WAF rules
-- `devops-waf-delete-rule.ps1` - Remove Azure WAF rules
-
-### Setup Scripts
-- `setup-environment.ps1` - Development environment setup
-- `setup-install-apps.ps1` - Install required applications
-- `setup-install-ntools.ps1` - Install ntools from releases
-- `setup-signing.ps1` - Configure code signing
-- `setup-signing-trust.ps1` - Trust code signing certificates
-
-### Test Scripts
-- `test-coverage.ps1` - Code coverage analysis
-- `test-delegation.ps1` - Quick MSBuild target delegation test
-- `test-target-quick.ps1` - Quick target validation
-
-## Naming Conventions
-
-- `build-*.ps1` - Build-related scripts
-- `test-*.ps1` - Test-related scripts
-- `setup-*.ps1` - Setup and installation scripts
-- `devops-*.ps1` - DevOps automation scripts
-
-## Migration Notes
-
-The following functionality has been **consolidated into the NTools.Scripts module**:
-- All functions from `scripts/modules/` (Common.psm1, Build.psm1, etc.) - **REMOVED**
-- Build publishing: `build-publish-all.ps1` → `Publish-AllProjects` function - **REMOVED**
-- Utility scripts: `util-*.ps1` → Utility functions in module - **REMOVED**
-- Target delegation testing: `test-target-delegation.ps1` → `Test-Target*` functions - **REMOVED**
-- Version management: `devops-update-versions.ps1` → `Get-VersionFromJson`, `Update-MarkdownTable` - **REMOVED**
-- `*.psm1` - PowerShell modules
-
-## Script Descriptions
-
-### Build Scripts
-- `build-publish-all.ps1` - Publishes all .NET projects to a single output directory
-- `build-verify-artifacts.ps1` - Validates build artifacts after compilation
-
-### Test Scripts  
-- `test-delegation.ps1` - Quick MSBuild target delegation validation
-- `test-target-delegation.ps1` - Comprehensive target delegation testing
-- `test-target-quick.ps1` - Quick target validation utility
-- `test-coverage.ps1` - Runs tests with code coverage collection
-
-### DevOps Scripts
-- `devops-get-ip.ps1` - Retrieves public IP address for pipeline usage
-- `devops-update-versions.ps1` - Synchronizes versions between JSON files and documentation
-- `devops-precommit-hooks.ps1` - Sets up Git pre-commit hooks
-- `devops-waf-rules.ps1` - Manages WAF front door rules
-
-### Setup Scripts
-- `setup-install-ntools.ps1` - Installs NTools from GitHub releases
-- `setup-install-apps.ps1` - Installs development applications from JSON configurations
-- `setup-environment.ps1` - Sets up development environment variables
-- `setup-signing.ps1` - Configures code signing certificates
-
-### Utility Scripts
-- `util-calc-hash.ps1` - Calculates file hashes
-- `util-file-operations.ps1` - Common file operations
-- `util-fast-forward.ps1` - Git fast-forward utility
-
-### Modules
-- `Common.psm1` - Common utility functions used across scripts
-- `Install.psm1` - Installation and setup functions
-- `Build.psm1` - Build and publishing functions
-- `Testing.psm1` - Testing and validation functions
-
-## Usage Examples
-
-```powershell
-# Build all projects
-.\scripts\build\build-publish-all.ps1 -PublishDir "C:\output" -ProductVersion "1.0.0"
-
-# Run quick target test
-.\scripts\test\test-target-quick.ps1
-
-# Install NTools
-.\scripts\setup\setup-install-ntools.ps1 -Version "v1.2.3"
-
-# Get public IP for DevOps pipeline
-.\scripts\devops\devops-get-ip.ps1
+### GitHub Actions Integration:
+```yaml
+- name: Install ntools using NTools.Scripts module
+  run: |
+    Import-Module "./scripts/module-package/NTools.Scripts.psm1" -Force
+    Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
 ```
 
-## Module Usage
+## Entry Point Scripts (setup/ folder)
 
+The `setup/` folder contains entry point scripts that use the module functions internally:
+
+- `setup-install-ntools.ps1` - Entry point for NTools installation (calls `Install-NTools`)
+
+These scripts provide backward compatibility while internally using the consolidated module.
+
+## Legacy Scripts (Deprecated)
+
+Individual scripts in `build/`, `devops/`, and `test/` folders are maintained for reference but are deprecated:
+
+### Migration Path:
 ```powershell
-# Import common functions
-Import-Module .\scripts\modules\Common.psm1
+# Old way
+./scripts/build/build-verify-artifacts.ps1
 
-# Import installation functions  
-Import-Module .\scripts\modules\Install.psm1
+# New way
+Import-Module "./scripts/module-package/NTools.Scripts.psm1" -Force
+Invoke-ArtifactVerification
+
+# Old way  
+./scripts/devops/devops-get-ip.ps1
+
+# New way
+Import-Module "./scripts/module-package/NTools.Scripts.psm1" -Force
+Get-AgentIPAddress
 ```
 
-## Migration Notes
+## Key Improvements in v2.3.0
 
-This consolidation reorganizes scripts from their previous locations:
-- Root directory scripts moved to appropriate subdirectories
-- `dev-setup/` scripts moved to `setup/` and other appropriate directories
-- `pwsh/` scripts moved to `test/`
-- `devops-scripts/` content moved to `devops/`
-- Common functionality extracted into reusable modules
+### 1. Deterministic Repository Path Detection
+The `Publish-AllProjects` function now requires explicit `RepositoryRoot` parameter:
+```powershell
+# Before (unreliable heuristic detection)
+Publish-AllProjects -OutputDir $output -Version $version
+
+# After (deterministic)
+Publish-AllProjects -OutputDir $output -Version $version -RepositoryRoot $repoRoot
+```
+
+### 2. Configurable ntools.json Path
+```powershell
+# Use specific configuration file
+Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
+```
+
+### 3. Unified Error Handling
+All functions use consistent logging:
+```powershell
+Write-Info "Starting operation..."
+Write-Success "Operation completed successfully"
+Write-Warning "Potential issue detected"
+Write-Error "Operation failed"
+```
+
+## Documentation
+
+For complete module documentation, see [NTools.Scripts Module Documentation](../docs/ntools/ntools-scripts-module.md).
+
+## Best Practices
+
+1. **Use the module functions instead of individual scripts**
+2. **Always import with -Force during development** to reload changes
+3. **Use explicit parameters** like `-RepositoryRoot` for deterministic behavior
+4. **Check module version** with `Get-NtoolsScriptsVersion` for troubleshooting
