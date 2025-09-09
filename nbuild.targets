@@ -652,7 +652,7 @@
         <Message Text="✅ Both target files exist" />
         
         <!-- Use consolidated PowerShell module for target validation -->
-	<Exec Command='pwsh -NoProfile -ExecutionPolicy Bypass -Command "Import-Module &apos;$(BuildTools)\modules\ntools-scripts\ntools-scripts.psm1&apos; -Force; Test-TargetDelegation -SourceTarget &apos;$(SourceTarget)&apos; -DelegateTarget &apos;$(DelegateTarget)&apos;"' 
+	<Exec Command='pwsh -NoProfile -ExecutionPolicy Bypass -Command "Import-Module &apos;$(BuildTools)\ntools-scripts.psm1&apos; -Force; Test-TargetDelegation -SourceTarget &apos;$(SourceTarget)&apos; -DelegateTarget &apos;$(DelegateTarget)&apos;"' 
               WorkingDirectory="$(SolutionDir)" 
               ContinueOnError="true" 
               IgnoreExitCode="true">
