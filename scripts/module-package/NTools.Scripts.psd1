@@ -1,6 +1,6 @@
 @{
     RootModule        = 'NTools.Scripts.psm1'
-    ModuleVersion     = '2.1.0'
+    ModuleVersion     = '2.3.0'
     GUID              = 'b3b7d6a8-0000-4000-8000-000000000001'
     Author            = 'n-tools'
     CompanyName       = 'n-tools'

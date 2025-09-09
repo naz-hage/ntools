@@ -61,10 +61,20 @@ jobs:
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
 
-    - name: Install ntools
+    - name: Install ntools using NTools.Scripts module
       run: |
-        cd ./dev-setup
-        ./install-ntools.ps1
+        # Import the consolidated NTools.Scripts module
+        Import-Module "./scripts/module-package/NTools.Scripts.psm1" -Force
+        
+        # Install NTools using the dev-setup/ntools.json file
+        Write-Host "Installing NTools using dev-setup/ntools.json..."
+        Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
+        
+        Write-Host "Installed NTools version information:"
+        $nbPath = "$env:ProgramFiles\NBuild\nb.exe"
+        if (Test-Path $nbPath) {
+          & $nbPath --version
+        }
       shell: pwsh
       working-directory: ${{ github.workspace }}
 
@@ -79,6 +89,20 @@ jobs:
       run: |
         git config --global user.name "gitHub-actions"
         git config --global user.email "actions@github.com"
+
+    - name: Verify NTools.Scripts Module
+      run: |
+        # Import and verify the NTools.Scripts module
+        Import-Module "./scripts/module-package/NTools.Scripts.psm1" -Force
+        
+        # Display module version and available functions
+        Write-Host "=== NTools.Scripts Module Information ==="
+        Get-NtoolsScriptsVersion
+        Write-Host ""
+        Write-Host "Available module functions:"
+        Get-Command -Module NTools.Scripts | Select-Object Name | Format-Table -AutoSize
+      shell: pwsh
+      working-directory: ${{ github.workspace }}
 
     - name: Authenticate with GitHub
       run: |
@@ -186,7 +210,7 @@ jobs:
           ## 📊 Code Coverage Report
           
           ### �️ Build & Test Status
-          - ✅ **Build:** Successful
+          - ✅ **Build:** Successful (using NTools.Scripts v2.3.0 module)
           - ✅ **Tests:** All tests passing
           - ✅ **Coverage:** Reports generated successfully
           

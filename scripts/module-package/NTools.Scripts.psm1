@@ -327,7 +327,7 @@ function Invoke-FastForward {
 # =============================================================================
 
 function Get-NtoolsScriptsVersion {
-    return "NTools.Scripts version 2.2.0"
+    return "NTools.Scripts version 2.3.0"
 }
 
 function Publish-AllProjects {
@@ -483,7 +483,9 @@ function Install-NTools {
         [Parameter(Mandatory=$false, HelpMessage = "The version of NTools to install. If not specified, the version is read from ntools.json.")]
         [string]$Version,
         [Parameter(Mandatory=$false, HelpMessage = "The directory to download the NTools zip file to. Defaults to 'c:\\NToolsDownloads'.")]
-        [string]$DownloadsDirectory = "c:\NToolsDownloads"
+        [string]$DownloadsDirectory = "c:\NToolsDownloads",
+        [Parameter(Mandatory=$false, HelpMessage = "Path to the ntools.json file. If not specified, looks for ntools.json relative to script location.")]
+        [string]$NtoolsJsonPath
     )
 
     $deploymentPath = $env:ProgramFiles + "\NBuild"
@@ -492,11 +494,16 @@ function Install-NTools {
     Write-Host "InstallNtools - Parameters:"
     Write-Host "Version: $Version"
     Write-Host "Downloads directory: $DownloadsDirectory"
+    Write-Host "NTools JSON path: $NtoolsJsonPath"
 
     # If Version is not specified, read it from ntools.json
     if (-not $Version) {
-        $scriptDir = Split-Path -Parent $PSCommandPath
-        $NtoolsJsonPath = "$scriptDir\..\ntools.json"
+        # Determine ntools.json path
+        if (-not $NtoolsJsonPath) {
+            $scriptDir = Split-Path -Parent $PSCommandPath
+            $NtoolsJsonPath = "$scriptDir\..\ntools.json"
+            Write-Host "No NtoolsJsonPath specified, using default: $NtoolsJsonPath"
+        }
 
         Write-Host "Reading version from $NtoolsJsonPath ..."
         
@@ -512,7 +519,7 @@ function Install-NTools {
             }
         }
         else {
-            Write-Warning "ntools.json not found in the script directory. Please specify the version manually."
+            Write-Warning "ntools.json not found at '$NtoolsJsonPath'. Please specify the version manually or provide a valid NtoolsJsonPath."
             return $false
         }
     }
