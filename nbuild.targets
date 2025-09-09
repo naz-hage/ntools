@@ -685,7 +685,7 @@
 	<Target Name="PUBLISH" DependsOnTargets="ARTIFACTS;TAG;INSTALL_NTOOLS_SCRIPTS">
 		<RemoveDir Directories="$(ArtifactsFolder)"></RemoveDir>
 		<Message Text="Publishing all non-test projects using NTools.Scripts module" Importance="high" />
-		<Exec Command='pwsh -NoProfile -ExecutionPolicy Bypass -Command "Import-Module &apos;$(BuildTools)\modules\NTools.Scripts\NTools.Scripts.psm1&apos; -Force; Publish-AllProjects -OutputDir &apos;$(ArtifactsFolder)&apos; -Version &apos;$(ProductVersion)&apos;"' WorkingDirectory="$(SolutionDir)" />
+		<Exec Command='pwsh -NoProfile -ExecutionPolicy Bypass -Command "Import-Module &apos;$(BuildTools)\modules\NTools.Scripts\NTools.Scripts.psm1&apos; -Force; Publish-AllProjects -OutputDir &apos;$(ArtifactsFolder)&apos; -Version &apos;$(ProductVersion)&apos; -RepositoryRoot &apos;$(SolutionDir)&apos;"' WorkingDirectory="$(SolutionDir)" />
 		<Message Text="All non-test projects published to $(ArtifactsFolder)" Importance="high" />
 		<Message Text="==> COMMON_DONE"/>
 	</Target>	

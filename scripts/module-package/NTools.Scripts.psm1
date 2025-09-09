@@ -327,13 +327,14 @@ function Invoke-FastForward {
 # =============================================================================
 
 function Get-NtoolsScriptsVersion {
-    return "NTools.Scripts version 2.1.0"
+    return "NTools.Scripts version 2.2.0"
 }
 
 function Publish-AllProjects {
     param(
         [Parameter(Mandatory=$true)] [string]$OutputDir,
-        [Parameter(Mandatory=$true)] [string]$Version
+        [Parameter(Mandatory=$true)] [string]$Version,
+        [Parameter(Mandatory=$true)] [string]$RepositoryRoot
     )
 
     # Ensure output directory exists
@@ -345,32 +346,16 @@ function Publish-AllProjects {
     Write-Info "Starting project publishing process..."
     Write-Info "Output Directory: $OutputDir"
     Write-Info "Product Version: $Version"
+    Write-Info "Repository root: $RepositoryRoot"
 
-    # Get repository root - we're in modules/NTools.Scripts, so go up to find .csproj files
-    # When installed, we need to find the repo root dynamically
-    $repoRoot = $null
-    $currentPath = $PSScriptRoot
-    
-    # Look for the ntools.sln file to identify repo root
-    while ($currentPath -and $currentPath.Length -gt 3) {
-        if (Test-Path (Join-Path $currentPath "ntools.sln")) {
-            $repoRoot = $currentPath
-            break
-        }
-        $currentPath = Split-Path -Parent $currentPath
+    # Validate repository root exists
+    if (-not (Test-Path $RepositoryRoot)) {
+        Write-Error "Repository root path does not exist: $RepositoryRoot"
+        return @{ Success = 0; Failures = 1 }
     }
-    
-    # Fallback: assume standard structure relative to BuildTools
-    if (-not $repoRoot) {
-        # If we're in C:\Program Files\nbuild\modules\NTools.Scripts, 
-        # assume repo is at C:\source\ntools
-        $repoRoot = "C:\source\ntools"
-    }
-    
-    Write-Info "Repository root: $repoRoot"
     
     # Get all non-test projects
-    $projects = Get-ProjectFiles -SearchPath $repoRoot -ExcludeTests
+    $projects = Get-ProjectFiles -SearchPath $RepositoryRoot -ExcludeTests
     Write-Info "Found $($projects.Count) projects to publish"
 
     $successCount = 0
