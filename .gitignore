@@ -411,3 +411,4 @@ FodyWeavers.xsd
 # Dynamically generated commit message file
 .commit-message
 /.vscode
+BuildToolsTest/
