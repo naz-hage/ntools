@@ -91,7 +91,7 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#pwsh-legacy-approach">Pwsh (Legacy Approach)</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#modern-approach-with-ntoolsscripts-module">Modern Approach with NTools.Scripts Module</a>
+    <li class="toctree-l2"><a class="reference internal" href="#modern-approach-with-ntools-scripts-module">Modern Approach with ntools-scripts module</a>
     </li>
     </ul>
                   </li>
@@ -271,20 +271,20 @@
 &lt;/Target&gt;
 </code></pre>
 <h3 id="pwsh-legacy-approach">Pwsh (Legacy Approach)</h3>
-<pre><code class="language-xml">&lt;!-- Legacy: Using individual PowerShell scripts (deprecated in favor of NTools.Scripts module) --&gt;
+<pre><code class="language-xml">&lt;!-- Legacy: Using individual PowerShell scripts (deprecated in favor of ntools-scripts module) --&gt;
 &lt;Target Name=&quot;INSTALL_NTOOLS_LEGACY&quot;&gt;
     &lt;Pwsh ScriptPath=&quot;$(SolutionDir)\scripts\setup\setup-install-apps.ps1&quot; Arguments=&quot;&quot; WorkingDirectory =&quot;$(SolutionDir)\scripts\setup&quot;/&gt;
     &lt;Message Text=&quot;==&gt; INSTALL_NTOOLS_DONE&quot;/&gt;
 &lt;/Target&gt;
 </code></pre>
-<h3 id="modern-approach-with-ntoolsscripts-module">Modern Approach with NTools.Scripts Module</h3>
-<pre><code class="language-xml">&lt;!-- Modern: Using NTools.Scripts module for better integration and reliability --&gt;
+<h3 id="modern-approach-with-ntools-scripts-module">Modern Approach with ntools-scripts module</h3>
+<pre><code class="language-xml">&lt;!-- Modern: Using ntools-scripts module for better integration and reliability --&gt;
 &lt;Target Name=&quot;INSTALL_NTOOLS_SCRIPTS&quot;&gt;
-    &lt;Exec Command='pwsh -NoProfile -NonInteractive -ExecutionPolicy Bypass -File &quot;$(SolutionDir)\scripts\module-package\install-module.ps1&quot; -BuildTools &quot;$(BuildTools)&quot; -ModuleName &quot;NTools.Scripts&quot;' WorkingDirectory=&quot;$(SolutionDir)&quot; /&gt;
+    &lt;Exec Command='pwsh -NoProfile -NonInteractive -ExecutionPolicy Bypass -File &quot;$(SolutionDir)\scripts\module-package\install-module.ps1&quot; -BuildTools &quot;$(BuildTools)&quot; -ModuleName &quot;ntools-scripts&quot;' WorkingDirectory=&quot;$(SolutionDir)&quot; /&gt;
 &lt;/Target&gt;
 
 &lt;Target Name=&quot;PUBLISH&quot;&gt;
-    &lt;Exec Command='pwsh -NoProfile -ExecutionPolicy Bypass -Command &quot;Import-Module &amp;apos;$(BuildTools)\modules\NTools.Scripts\NTools.Scripts.psm1&amp;apos; -Force; Publish-AllProjects -OutputDir &amp;apos;$(ArtifactsFolder)&amp;apos; -Version &amp;apos;$(ProductVersion)&amp;apos; -RepositoryRoot &amp;apos;$(SolutionDir)&amp;apos;&quot;' WorkingDirectory=&quot;$(SolutionDir)&quot; /&gt;
+    &lt;Exec Command='pwsh -NoProfile -ExecutionPolicy Bypass -Command &quot;Import-Module &amp;apos;$(BuildTools)\modules\ntools-scripts\ntools-scripts.psm1&amp;apos; -Force; Publish-AllProjects -OutputDir &amp;apos;$(ArtifactsFolder)&amp;apos; -Version &amp;apos;$(ProductVersion)&amp;apos; -RepositoryRoot &amp;apos;$(SolutionDir)&amp;apos;&quot;' WorkingDirectory=&quot;$(SolutionDir)&quot; /&gt;
 &lt;/Target&gt;
 </code></pre>
 <p><strong>Benefits of the Module Approach:</strong>
@@ -293,7 +293,7 @@
 - <strong>Better error handling</strong>: Consistent error reporting and logging
 - <strong>Easier maintenance</strong>: Single module file instead of dozens of scripts
 - <strong>Integration ready</strong>: Automatically installed and available in build process</p>
-<p>For complete module documentation, see <a href="../ntools-scripts-module/">NTools.Scripts Module</a>.
+<p>For complete module documentation, see <a href="../ntools-scripts-module/">ntools-scripts Module</a>.
 You can also find the complete list of predefined <a href="https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild-reserved-and-well-known-properties?view=vs-2022">MSBuild properties in the Microsoft documentation</a>.</p>
 <ul>
 <li>

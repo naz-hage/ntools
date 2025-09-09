@@ -170,14 +170,14 @@
 <hr />
 <h2 id="1-powershell-module-integration-v230">1. PowerShell Module Integration (v2.3.0+)</h2>
 <ul>
-<li><strong>Module</strong>: <code>scripts/module-package/NTools.Scripts.psm1</code></li>
+<li><strong>Module</strong>: <code>scripts/module-package/ntools-scripts.psm1</code></li>
 <li><strong>Function</strong>: <code>Update-MarkdownTable</code> and <code>Get-VersionFromJson</code></li>
-<li><strong>Purpose</strong>: Consolidated version management within the NTools.Scripts module</li>
+<li><strong>Purpose</strong>: Consolidated version management within the ntools-scripts module</li>
 <li><strong>Integration</strong>: Available in all build processes and CI/CD pipelines</li>
 </ul>
 <h3 id="using-the-module-approach">Using the Module Approach</h3>
 <pre><code class="language-powershell"># Import the module
-Import-Module &quot;./scripts/module-package/NTools.Scripts.psm1&quot; -Force
+Import-Module &quot;./scripts/module-package/ntools-scripts.psm1&quot; -Force
 
 # Update documentation with latest versions
 Update-MarkdownTable -JsonDirectory &quot;./dev-setup&quot; -MarkdownFile &quot;./docs/ntools/ntools.md&quot;
@@ -189,7 +189,7 @@ $version = Get-VersionFromJson -JsonFilePath &quot;./dev-setup/ntools.json&quot;
 <ul>
 <li><strong>File</strong>: <code>scripts/devops/devops-update-versions.ps1</code> (deprecated in favor of module functions)</li>
 <li><strong>Purpose</strong>: Standalone script to sync versions between JSON files and documentation</li>
-<li><strong>Status</strong>: Maintained for backward compatibility, but NTools.Scripts module is preferred</li>
+<li><strong>Status</strong>: Maintained for backward compatibility, but ntools-scripts module is preferred</li>
 </ul>
 <h3 id="features-now-available-as-module-functions">Features (Now Available as Module Functions)</h3>
 <ul>
