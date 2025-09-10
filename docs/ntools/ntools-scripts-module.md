@@ -50,28 +50,10 @@ run: |
 Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
 Test-NToolsScriptsModule
 ```
-### Installation
+# Installation
 ```powershell
 # Install module manually for development
 Install-NToolsScriptsModule -InstallPath "$env:ProgramFiles\WindowsPowerShell\Modules\ntools-scripts" -Force
-```
-## Troubleshooting
-
-### Module Not Found
-```powershell
-# Verify module location
-Test-Path "./scripts/module-package/ntools-scripts.psm1"
-
-# Check if installed
-Test-Path "$env:ProgramFiles\nbuild\modules\ntools-scripts\ntools-scripts.psm1"
-```
-### Function Not Available
-```powershell
-# List all available functions
-Get-Command -Module ntools-scripts
-
-# Check if module is properly imported
-Get-Module ntools-scripts
 ```
 # ntools-scripts PowerShell Module
 
