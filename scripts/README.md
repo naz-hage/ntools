@@ -29,7 +29,7 @@ The **`module-package/`** folder contains the consolidated ntools-scripts PowerS
 - `Update-MarkdownTable` - Update version tables in markdown documentation
 
 #### Setup Functions
-- `Set-DevelopmentEnvironment` - Set up development environment (was `setup-environment.ps1`)
+- `Set-DevelopmentEnvironment` - Set up development environment 
 - `Install-DevelopmentApps` - Install development applications (was `setup-install-apps.ps1`)
 - `Set-CodeSigningTrust` - Configure code signing trust (was `setup-signing-trust.ps1`)
 - `Set-CodeSigning` - Configure code signing (was `setup-signing.ps1`)
@@ -91,11 +91,14 @@ The module is automatically integrated with the build system:
 
 ## Entry Point Scripts (setup/ folder)
 
-The `setup/` folder contains entry point scripts that use the module functions internally:
+The `setup/` folder previously contained thin wrapper entry point scripts. Installation functionality has been moved into the `ntools-scripts` module; call `Install-NTools` directly or use the module's installer targets.
 
-- `setup-install-ntools.ps1` - Entry point for NTools installation (calls `Install-NTools`)
+Example:
 
-These scripts provide backward compatibility while internally using the consolidated module.
+```powershell
+Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
+Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
+```
 
 ## Legacy Scripts (Deprecated)
 

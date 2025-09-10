@@ -27,6 +27,8 @@ on:
 env:
   solution_name: ntools.sln
   dotnet_version: 9.0
+  # Path to the consolidated ntools-scripts module file in the repository
+  NTOOLS_SCRIPT_MODULE: './scripts/module-package/ntools-scripts.psm1'
   build_type: ${{ github.ref == 'refs/heads/main' && 'prod' || github.event.inputs.build_type || 'stage' }}
   enable_logging: ${{ github.event.inputs.enable_logging || 'false' }}
 
@@ -63,8 +65,8 @@ jobs:
 
     - name: Install ntools using ntools-scripts module
       run: |
-        # Import the consolidated ntools-scripts module
-        Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
+        # Import the consolidated ntools-scripts module using the repo-scoped env var
+        Import-Module $env:NTOOLS_SCRIPT_MODULE -Force
 
         # Install NTools using the dev-setup/ntools.json file
         Write-Host "Installing NTools using dev-setup/ntools.json..."
@@ -92,8 +94,8 @@ jobs:
 
     - name: Verify ntools-scripts Module
       run: |
-        # Import and verify the ntools-scripts module
-        Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
+        # Import and verify the ntools-scripts module using the repo-scoped env var
+        Import-Module $env:NTOOLS_SCRIPT_MODULE -Force
 
         # Display module version and available functions
         Write-Host "=== ntools-scripts Module Information ==="

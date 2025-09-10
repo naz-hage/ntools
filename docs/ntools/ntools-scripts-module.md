@@ -90,7 +90,21 @@ scripts/
 ├── build/build-verify-artifacts.ps1   # deprecated - functionality moved to Invoke-VerifyArtifacts
 ├── devops/devops-get-ip.ps1
 ├── devops/devops-precommit-hooks.ps1
-├── Set-DevelopmentEnvironment (replaces scripts/setup/setup-environment.ps1)
+
+Use the `Set-DevelopmentEnvironment` function in the `ntools-scripts` module instead. It provides the same behavior (sets user `devDrive` and `mainDir` environment variables) and is callable directly from PowerShell or via MSBuild using the `SETUP_ENVIRONMENT` target in `nbuild.targets`.
+
+Example (PowerShell):
+
+```powershell
+Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
+Set-DevelopmentEnvironment -DevDrive 'D:' -MainDir 'source'
+```
+
+MSBuild (from repo root):
+
+```powershell
+msbuild /t:SETUP_ENVIRONMENT /p:DevDrive=D: /p:MainDir=source
+```
 ├── setup/setup-install-apps.ps1
 ├── test/test-coverage.ps1
 └── ... (20+ individual scripts)
@@ -306,14 +320,16 @@ Invoke-VerifyArtifacts -ArtifactsPath "C:\Artifacts\MySolution\Release\1.2.3" -P
 
 ### For CI/CD
 ```yaml
-# Old way
-run: ./scripts/setup/setup-install-ntools.ps1
+# Old way (deprecated)
+# run: ./scripts/setup/setup-install-ntools.ps1
 
-# New way  
+# New way (recommended)
 run: |
   Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
   Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
 ```
+
+**Deprecation note:** `scripts/setup/setup-install-ntools.ps1` is a thin wrapper that called the `Install-NTools` function. The wrapper is deprecated and has been removed from the repository; call `Install-NTools` from the `ntools-scripts` module directly instead (example above) or use the `INSTALL_NTOOLS`/`INSTALL_NTOOLS_SCRIPTS` MSBuild targets where appropriate.
 
 ### For MSBuild
 ```xml

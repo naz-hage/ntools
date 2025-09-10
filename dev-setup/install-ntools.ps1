@@ -29,7 +29,6 @@ param (
 
 # DEPRECATION NOTICE
 #########################
-Write-Warning "DEPRECATION NOTICE: dev-setup/install-ntools.ps1 has been moved to scripts/setup/setup-install-ntools.ps1"
 Write-Warning "Please update your references to use the new centralized location."
 Write-Warning "This script will be removed in a future version."
 Write-Host ""

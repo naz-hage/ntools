@@ -2,8 +2,6 @@
 #########################
 Write-Warning "DEPRECATION NOTICE: dev-setup/install.ps1 has been moved and split into multiple scripts in scripts/setup/"
 Write-Warning "  - scripts/setup/setup-install-apps.ps1 (for apps installation)"
-Write-Warning "  - scripts/setup/setup-install-ntools.ps1 (for ntools installation)"
-Write-Warning "  - Set-DevelopmentEnvironment in scripts/module-package/ntools-scripts.psm1 (replaces scripts/setup/setup-environment.ps1)"
 Write-Warning "Please update your references to use the appropriate new script."
 Write-Warning "This script will be removed in a future version."
 Write-Host ""
