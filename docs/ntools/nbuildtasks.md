@@ -104,15 +104,6 @@ Here are examples of custom Tasks that can be used during builds:
 </Target>
 ```
 
-### Pwsh (Legacy Approach)
-```xml
-<!-- Legacy: Using individual PowerShell scripts (deprecated in favor of ntools-scripts module) -->
-<Target Name="INSTALL_NTOOLS_LEGACY">
-	<Pwsh ScriptPath="$(SolutionDir)\scripts\setup\setup-install-apps.ps1" Arguments="" WorkingDirectory ="$(SolutionDir)\scripts\setup"/>
-	<Message Text="==> INSTALL_NTOOLS_DONE"/>
-</Target>
-```
-
 ### Modern Approach with ntools-scripts module
 ```xml
 <!-- Modern: Using ntools-scripts module for better integration and reliability -->

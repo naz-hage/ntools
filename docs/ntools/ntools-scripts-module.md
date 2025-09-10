@@ -105,7 +105,6 @@ MSBuild (from repo root):
 ```powershell
 msbuild /t:SETUP_ENVIRONMENT /p:DevDrive=D: /p:MainDir=source
 ```
-├── setup/setup-install-apps.ps1
 ├── test/test-coverage.ps1
 └── ... (20+ individual scripts)
 ```
