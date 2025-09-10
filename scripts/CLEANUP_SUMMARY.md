@@ -37,7 +37,7 @@ scripts/
 │   ├── install-module.ps1             # Module installer
 │   └── test-module.ps1                # Module validation
 ├── setup/
-│   ├── setup-environment.ps1          # Dev environment setup
+│   ├── Set-DevelopmentEnvironment     # Dev environment setup was migrated to ntools-scripts module
 │   ├── setup-install-apps.ps1         # Application installation
 │   ├── setup-install-ntools.ps1       # NTools installation
 │   ├── setup-signing.ps1              # Code signing setup

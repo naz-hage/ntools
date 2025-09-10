@@ -90,7 +90,7 @@ scripts/
 ├── build/build-verify-artifacts.ps1   # deprecated - functionality moved to Invoke-VerifyArtifacts
 ├── devops/devops-get-ip.ps1
 ├── devops/devops-precommit-hooks.ps1
-├── setup/setup-environment.ps1
+├── Set-DevelopmentEnvironment (replaces scripts/setup/setup-environment.ps1)
 ├── setup/setup-install-apps.ps1
 ├── test/test-coverage.ps1
 └── ... (20+ individual scripts)

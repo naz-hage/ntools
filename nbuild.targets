@@ -101,6 +101,13 @@
 		<Message Text="ntools-scripts installation completed" Importance="high" />
 	</Target>
 
+	<!-- Setup development environment by importing ntools-scripts and calling Set-DevelopmentEnvironment -->
+	<Target Name="SETUP_ENVIRONMENT" DependsOnTargets="IS_ADMIN">
+		<Message Text="Setting up development environment (Set-DevelopmentEnvironment)" Importance="high" />
+		<Exec Command='pwsh -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "Import-Module \"$(SolutionDir)\scripts\module-package\ntools-scripts.psm1\" -Force; Set-DevelopmentEnvironment -DevDrive \"$(DevDrive)\" -MainDir \"$(MainDir)\""' WorkingDirectory="$(SolutionDir)" />
+		<Message Text="SETUP_ENVIRONMENT completed" Importance="high" />
+	</Target>
+
 	<!-- Uninstall ntools-scripts module from BuildTools modules folder -->
 	<Target Name="UNINSTALL_NTOOLS_SCRIPTS" DependsOnTargets="IS_ADMIN">
 	<Message Text="Uninstalling ntools-scripts module from $(BuildTools)\modules" Importance="high" />
