@@ -320,17 +320,10 @@ Invoke-VerifyArtifacts -ArtifactsPath "C:\Artifacts\MySolution\Release\1.2.3" -P
 
 ### For CI/CD
 ```yaml
-# Old way (deprecated)
-# run: ./scripts/setup/setup-install-ntools.ps1
-
-# New way (recommended)
 run: |
   Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
   Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
 ```
-
-**Deprecation note:** `scripts/setup/setup-install-ntools.ps1` is a thin wrapper that called the `Install-NTools` function. The wrapper is deprecated and has been removed from the repository; call `Install-NTools` from the `ntools-scripts` module directly instead (example above) or use the `INSTALL_NTOOLS`/`INSTALL_NTOOLS_SCRIPTS` MSBuild targets where appropriate.
-
 ### For MSBuild
 ```xml
 <!-- Old way -->
