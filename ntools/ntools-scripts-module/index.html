@@ -166,24 +166,9 @@ Import-Module &quot;$env:ProgramFiles\nbuild\modules\ntools-scripts\ntools-scrip
 Import-Module &quot;./scripts/module-package/ntools-scripts.psm1&quot; -Force
 Test-NToolsScriptsModule
 </code></pre>
-<h3 id="installation">Installation</h3>
+<h1 id="installation">Installation</h1>
 <pre><code class="language-powershell"># Install module manually for development
 Install-NToolsScriptsModule -InstallPath &quot;$env:ProgramFiles\WindowsPowerShell\Modules\ntools-scripts&quot; -Force
-</code></pre>
-<h2 id="troubleshooting">Troubleshooting</h2>
-<h3 id="module-not-found">Module Not Found</h3>
-<pre><code class="language-powershell"># Verify module location
-Test-Path &quot;./scripts/module-package/ntools-scripts.psm1&quot;
-
-# Check if installed
-Test-Path &quot;$env:ProgramFiles\nbuild\modules\ntools-scripts\ntools-scripts.psm1&quot;
-</code></pre>
-<h3 id="function-not-available">Function Not Available</h3>
-<pre><code class="language-powershell"># List all available functions
-Get-Command -Module ntools-scripts
-
-# Check if module is properly imported
-Get-Module ntools-scripts
 </code></pre>
 <h1 id="ntools-scripts-powershell-module_1">ntools-scripts PowerShell Module</h1>
 <p>The ntools-scripts module is a comprehensive PowerShell module that consolidates all NTools PowerShell functionality into a single, reusable module. This module replaces the previous collection of individual scripts with a structured, function-based approach.</p>
@@ -468,8 +453,8 @@ Install-NToolsScriptsModule -InstallPath &quot;$env:ProgramFiles\WindowsPowerShe
 <li><strong>Check module version</strong> with <code>Get-NtoolsScriptsVersion</code> for troubleshooting</li>
 <li><strong>Use the utility functions</strong> like <code>Write-Info</code>, <code>Write-Success</code> for consistent output</li>
 </ol>
-<h2 id="troubleshooting_1">Troubleshooting</h2>
-<h3 id="module-not-found_1">Module Not Found</h3>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<h3 id="module-not-found">Module Not Found</h3>
 <pre><code class="language-powershell"># Verify module location
 Test-Path &quot;./scripts/module-package/ntools-scripts.psm1&quot;
 
@@ -484,7 +469,7 @@ Get-NtoolsScriptsVersion
 Import-Module &quot;./scripts/module-package/ntools-scripts.psm1&quot; -Force
 Get-NtoolsScriptsVersion
 </code></pre>
-<h3 id="function-not-available_1">Function Not Available</h3>
+<h3 id="function-not-available">Function Not Available</h3>
 <pre><code class="language-powershell"># List all available functions
 Get-Command -Module ntools-scripts
 
