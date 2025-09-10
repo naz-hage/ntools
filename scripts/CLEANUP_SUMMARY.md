@@ -7,15 +7,10 @@
 - **`scripts/utils/`** - All utility scripts converted to functions and folder removed
 
 ### ✅ **Removed Individual Scripts**
-- **`scripts/build/build-publish-all.ps1`** → Replaced by `Publish-AllProjects` function
-- **`scripts/utils/util-calc-hash.ps1`** → Replaced by `Get-FileHash256` function  
-- **`scripts/utils/util-list-file-version.ps1`** → Replaced by `Get-FileVersionInfo` function
-- **`scripts/utils/util-fast-forward.ps1`** → Replaced by `Invoke-FastForward` function
-- **`scripts/devops/devops-update-versions.ps1`** → Replaced by `Get-VersionFromJson` and `Update-MarkdownTable` functions
-- **`scripts/test/test-target-delegation.ps1`** → Replaced by `Test-TargetDelegation`, `Test-TargetExists`, `Test-TargetDependencies` functions
+    - Legacy test scripts were consolidated into the module
 
 ### ✅ **Updated MSBuild Integration**
-- **Target delegation test** now uses `Test-TargetDelegation` function from ntools-scripts module instead of individual script
+    - **Target delegation test** now uses `Test-TargetDelegation` function from ntools-scripts module instead of individual scripts
 - **PUBLISH target** confirmed working with consolidated `Publish-AllProjects` function
 - **Module lifecycle targets** (INSTALL_NTOOLS_SCRIPTS, TEST_NTOOLS_SCRIPTS, UNINSTALL_NTOOLS_SCRIPTS) all functional
 
@@ -27,10 +22,7 @@ scripts/
 ├── build/
 │   └── build-verify-artifacts.ps1     # Standalone artifact verification (deprecated - functionality moved to Invoke-VerifyArtifacts in ntools-scripts module)
 ├── devops/
-│   ├── devops-get-ip.ps1              # Azure DevOps IP detection
-│   ├── devops-precommit-hooks.ps1     # Git hooks management
-│   ├── devops-waf-add-rule.ps1        # Azure WAF rule addition
-│   └── devops-waf-delete-rule.ps1     # Azure WAF rule removal
+│   ├── devops/                         # Legacy devops scripts migrated into `module-package/ntools-scripts.psm1`
 ├── module-package/                     # 🆕 CONSOLIDATED MODULE
 │   ├── ntools-scripts.psd1            # Module manifest (v2.0.0)
 │   ├── ntools-scripts.psm1            # Module with 11 functions
@@ -39,10 +31,7 @@ scripts/
 ├── setup/
 │   ├── Set-DevelopmentEnvironment     # Dev environment setup was migrated to ntools-scripts module
 │   ├── setup-install-ntools.ps1       # REMOVED: use Install-NTools in ntools-scripts module
-└── test/
-    ├── test-coverage.ps1               # Code coverage analysis
-    ├── test-delegation.ps1             # Quick delegation test
-    └── test-target-quick.ps1           # Quick target validation
+└── test/  # Legacy test scripts consolidated into the ntools-scripts module
 ```
 
 ## ntools-scripts Module (v2.0.0)

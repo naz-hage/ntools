@@ -66,23 +66,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{F1234567-89AB-CDEF-0123-456789ABCDEF}"
 	ProjectSection(SolutionItems) = preProject
 		scripts\README.md = scripts\README.md
-		scripts\build\build-publish-all.ps1 = scripts\build\build-publish-all.ps1
-		scripts\devops\devops-get-ip.ps1 = scripts\devops\devops-get-ip.ps1
-		scripts\devops\devops-precommit-hooks.ps1 = scripts\devops\devops-precommit-hooks.ps1
-		scripts\devops\devops-update-versions.ps1 = scripts\devops\devops-update-versions.ps1
-		scripts\devops\devops-waf-add-rule.ps1 = scripts\devops\devops-waf-add-rule.ps1
-		scripts\devops\devops-waf-delete-rule.ps1 = scripts\devops\devops-waf-delete-rule.ps1
-		scripts\modules\Build.psm1 = scripts\modules\Build.psm1
-		scripts\modules\Common.psm1 = scripts\modules\Common.psm1
-		scripts\modules\Install.psm1 = scripts\modules\Install.psm1
-		scripts\modules\Testing.psm1 = scripts\modules\Testing.psm1
-		scripts\test\test-coverage.ps1 = scripts\test\test-coverage.ps1
-		scripts\test\test-delegation.ps1 = scripts\test\test-delegation.ps1
-		scripts\test\test-target-delegation.ps1 = scripts\test\test-target-delegation.ps1
-		scripts\test\test-target-quick.ps1 = scripts\test\test-target-quick.ps1
-		scripts\utils\util-calc-hash.ps1 = scripts\utils\util-calc-hash.ps1
-		scripts\utils\util-fast-forward.ps1 = scripts\utils\util-fast-forward.ps1
-		scripts\utils\util-list-file-version.ps1 = scripts\utils\util-list-file-version.ps1
+		scripts\README.md = scripts\README.md
+		scripts\module-package\ntools-scripts.psm1 = scripts\module-package\ntools-scripts.psm1
+		scripts\module-package\ntools-scripts.psd1 = scripts\module-package\ntools-scripts.psd1
+		scripts\module-package\install-module.ps1 = scripts\module-package\install-module.ps1
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{B79CBB23-CB3B-4934-921E-59BF51B96B93}"

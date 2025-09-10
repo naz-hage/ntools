@@ -1,20 +1,23 @@
 # ntools-scripts PowerShell Module
 
-The ntools-scripts module is a comprehensive PowerShell module that consolidates all NTools PowerShell functionality into a single, reusable module. This module replaces the previous collection of individual scripts with a structured, function-based approach.
-**Location**: `scripts/module-package/ntools-scripts.psm1`  
+This page documents the `ntools-scripts` PowerShell module and serves as the canonical API reference for the module's exported functions and usage.
+
+**Location**: `scripts/module-package/ntools-scripts.psm1`
 
 ## Overview
-### After (Consolidated Module)
+Module files:
 ```
 scripts/
-├── module-package/
-│   ├── ntools-scripts.psm1     # Main module with all functions
-│   ├── ntools-scripts.psd1     # Module manifest
-### Setup Functions
--- `Install-NToolsScriptsModule` - Install this module
--- `Get-NtoolsScriptsVersion` - Get module version information
+├─ module-package/
+│  ├─ ntools-scripts.psm1     # Main module with all functions
+│  ├─ ntools-scripts.psd1     # Module manifest
+│  └─ install-module.ps1      # Installation helper
+├─ devops/
+└─ setup/
+```
+Refer to the "Canonical module API" section below for the authoritative list of exported functions and descriptions.
 ### Import the Module
-```powershell
+```
 # Import from local development
 Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
 
@@ -88,8 +91,7 @@ The module consolidates functionality from the previous script structure:
 ```
 scripts/
 ├── build/build-verify-artifacts.ps1   # deprecated - functionality moved to Invoke-VerifyArtifacts
-├── devops/devops-get-ip.ps1
-├── devops/devops-precommit-hooks.ps1
+├── devops/ (legacy scripts migrated into module)
 
 Use the `Set-DevelopmentEnvironment` function in the `ntools-scripts` module instead. It provides the same behavior (sets user `devDrive` and `mainDir` environment variables) and is callable directly from PowerShell or via MSBuild using the `SETUP_ENVIRONMENT` target in `nbuild.targets`.
 
@@ -105,8 +107,8 @@ MSBuild (from repo root):
 ```powershell
 msbuild /t:SETUP_ENVIRONMENT /p:DevDrive=D: /p:MainDir=source
 ```
-├── test/test-coverage.ps1
-└── ... (20+ individual scripts)
+├── test/  # Legacy test scripts were consolidated into the `ntools-scripts` module
+└── ... (legacy scripts removed; use module functions)
 ```
 
 ### After (Consolidated Module)
@@ -133,10 +135,10 @@ The module exports 36 functions organized by category:
 - `Invoke-ProjectPublish` - Publish individual projects
 
 ### DevOps Functions  
-- `Get-AgentIPAddress` - Get public IP for Azure DevOps agents
-- `Install-PreCommitHooks` - Install git pre-commit hooks
-- `Add-WAFRule` - Add Azure WAF rules
-- `Remove-WAFRule` - Remove Azure WAF rules
+- `Get-AgentPublicIp` - Get public IP for Azure DevOps agents and set pipeline variable
+- `Set-PreCommitHooks` - Install/uninstall git pre-commit hooks
+- `Add-WafAllowRule` - Add Azure WAF allow rule for an IP
+- `Remove-WafCustomRule` - Remove Azure WAF custom rule
 - `Get-VersionFromJson` - Extract version information from JSON files
 - `Update-MarkdownTable` - Update version tables in markdown documentation
 
@@ -180,35 +182,35 @@ module API rather than duplicating the function list.
 
 Exported functions (exactly as exported by `Export-ModuleMember` in `ntools-scripts.psm1`):
 
-- `Get-ntoolsScriptsVersion` — module version string and metadata
-- `Publish-AllProjects` — build and publish all non-test projects to an output directory
-- `Get-VersionFromJson` — read version info from a provided JSON manifest
-- `Update-MarkdownTable` — update markdown tables with version information
-- `Write-TestResult` — helper to emit standardized test/pass-fail output
-- `Test-TargetExists` — check whether an MSBuild target exists in a file
-- `Test-TargetDependencies` — validate expected DependsOnTargets for an MSBuild target
-- `Test-TargetDelegation` — end-to-end test for MSBuild target delegation
-- `Get-FileHash256` — compute SHA256 hash for a file
-- `Get-FileVersionInfo` — read file version info (Product/File version)
-- `Invoke-FastForward` — git fast-forward helper (fetch/merge/reset)
-- `Write-OutputMessage` — append standardized log lines to install.log
-- `Get-NToolsFileVersion` — read NTools assembly/file version
-- `Add-DeploymentPathToEnvironment` — add the deployment path to the system PATH
-- `Invoke-NToolsDownload` — download a release zip for a given version
-- `Install-NTools` — install NTools from a release zip (uses Invoke-NToolsDownload)
-- `Invoke-VerifyArtifacts` — comprehensive artifact verification (executables, libs, configs)
-- `Set-DevelopmentEnvironment` — set up developer environment variables (devDrive, mainDir)
-- `Test-IsAdministrator` — helper to detect whether the caller is running as Administrator
-- `Test-MicrosoftPowerShellSecurityModuleLoaded` — ensure Microsoft.PowerShell.Security is available
-- `Test-CertificateStore` — validate that the Certificate PSProvider exists
-- `New-SelfSignedCodeCertificate` — create a self-signed code-signing certificate
-- `Export-CertificateToPfx` — export certificate to a .pfx file (secure password required)
-- `Export-CertificateToCer` — export certificate to a .cer file
-- `Import-CertificateToRoot` — import a .cer into LocalMachine\Root (Administrator required)
-- `Import-CertificateToCurrentUser` — import a .pfx into the CurrentUser\My store
-- `Set-ScriptSignature` — apply an Authenticode signature to a script file
-- `Get-ScriptSignature` — read the Authenticode signature for a script file
-- `Set-CodeSigningTrust` — high-level helper: create cert, export, optionally trust machine, import to user, sign scripts
+- `Get-ntoolsScriptsVersion`
+- `Publish-AllProjects`
+- `Get-VersionFromJson`
+- `Update-MarkdownTable`
+- `Write-TestResult`
+- `Test-TargetExists`
+- `Test-TargetDependencies`
+- `Test-TargetDelegation`
+- `Get-FileHash256`
+- `Get-FileVersionInfo`
+- `Invoke-FastForward`
+- `Write-OutputMessage`
+- `Get-NToolsFileVersion`
+- `Add-DeploymentPathToEnvironment`
+- `Invoke-NToolsDownload`
+- `Install-NTools`
+- `Invoke-VerifyArtifacts`
+- `Set-DevelopmentEnvironment`
+- `Test-IsAdministrator`
+- `Test-MicrosoftPowerShellSecurityModuleLoaded`
+- `Test-CertificateStore`
+- `New-SelfSignedCodeCertificate`
+- `Export-CertificateToPfx`
+- `Export-CertificateToCer`
+- `Import-CertificateToRoot`
+- `Import-CertificateToCurrentUser`
+- `Set-ScriptSignature`
+- `Get-ScriptSignature`
+- `Set-CodeSigningTrust`
 
 Notes:
 - This page is the single authoritative reference for the `ntools-scripts` module API.
