@@ -30,8 +30,6 @@ The **`module-package/`** folder contains the consolidated ntools-scripts PowerS
 
 #### Setup Functions
 - `Set-DevelopmentEnvironment` - Set up development environment 
-- `Set-CodeSigningTrust` - Configure code signing trust (was `setup-signing-trust.ps1`)
-- `Set-CodeSigning` - Configure code signing (was `setup-signing.ps1`)
 - `Install-NTools` - Install NTools from releases with configurable ntools.json path
 - `Install-NToolsScriptsModule` - Install this module (was `install-module.ps1`)
 

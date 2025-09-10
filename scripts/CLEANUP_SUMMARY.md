@@ -39,8 +39,6 @@ scripts/
 ├── setup/
 │   ├── Set-DevelopmentEnvironment     # Dev environment setup was migrated to ntools-scripts module
 │   ├── setup-install-ntools.ps1       # REMOVED: use Install-NTools in ntools-scripts module
-│   ├── setup-signing.ps1              # Code signing setup
-│   └── setup-signing-trust.ps1        # Certificate trust setup
 └── test/
     ├── test-coverage.ps1               # Code coverage analysis
     ├── test-delegation.ps1             # Quick delegation test

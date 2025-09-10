@@ -67,7 +67,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{F123
 	ProjectSection(SolutionItems) = preProject
 		scripts\README.md = scripts\README.md
 		scripts\build\build-publish-all.ps1 = scripts\build\build-publish-all.ps1
-
 		scripts\devops\devops-get-ip.ps1 = scripts\devops\devops-get-ip.ps1
 		scripts\devops\devops-precommit-hooks.ps1 = scripts\devops\devops-precommit-hooks.ps1
 		scripts\devops\devops-update-versions.ps1 = scripts\devops\devops-update-versions.ps1
@@ -77,8 +76,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{F123
 		scripts\modules\Common.psm1 = scripts\modules\Common.psm1
 		scripts\modules\Install.psm1 = scripts\modules\Install.psm1
 		scripts\modules\Testing.psm1 = scripts\modules\Testing.psm1
-		scripts\setup\setup-signing-trust.ps1 = scripts\setup\setup-signing-trust.ps1
-		scripts\setup\setup-signing.ps1 = scripts\setup\setup-signing.ps1
 		scripts\test\test-coverage.ps1 = scripts\test\test-coverage.ps1
 		scripts\test\test-delegation.ps1 = scripts\test\test-delegation.ps1
 		scripts\test\test-target-delegation.ps1 = scripts\test\test-target-delegation.ps1

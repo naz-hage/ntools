@@ -143,8 +143,6 @@ The module exports 36 functions organized by category:
 ### Setup Functions
 - `Set-DevelopmentEnvironment` - Set up development environment
 - `Install-DevelopmentApps` - Install development applications
-- `Set-CodeSigningTrust` - Configure code signing trust
-- `Set-CodeSigning` - Configure code signing
 - `Install-NTools` - Install NTools from releases (with configurable ntools.json path)
 - `Install-NToolsScriptsModule` - Install this module
 
