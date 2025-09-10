@@ -15,7 +15,7 @@ The **`module-package/`** folder contains the consolidated ntools-scripts PowerS
 ### Available Functions by Category:
 
 #### Build Functions
-- `Invoke-ArtifactVerification` - Comprehensive artifact verification (was `build-verify-artifacts.ps1`)
+- `Invoke-VerifyArtifacts` - Comprehensive artifact verification (was `build-verify-artifacts.ps1`)
 - `Publish-AllProjects` - Build and publish all projects with deterministic repository path
 - `Get-ProjectFiles` - Get project files with filtering
 - `Invoke-ProjectPublish` - Publish individual projects
@@ -106,9 +106,9 @@ Individual scripts in `build/`, `devops/`, and `test/` folders are maintained fo
 # Old way
 ./scripts/build/build-verify-artifacts.ps1
 
-# New way
+# New way (module-based)
 Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
-Invoke-ArtifactVerification
+Invoke-VerifyArtifacts -ArtifactsPath "C:\Artifacts\MySolution\Release\1.2.3" -ProductVersion "1.2.3"
 
 # Old way  
 ./scripts/devops/devops-get-ip.ps1

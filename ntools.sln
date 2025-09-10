@@ -67,7 +67,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{F123
 	ProjectSection(SolutionItems) = preProject
 		scripts\README.md = scripts\README.md
 		scripts\build\build-publish-all.ps1 = scripts\build\build-publish-all.ps1
-		scripts\build\build-verify-artifacts.ps1 = scripts\build\build-verify-artifacts.ps1
+
 		scripts\devops\devops-get-ip.ps1 = scripts\devops\devops-get-ip.ps1
 		scripts\devops\devops-precommit-hooks.ps1 = scripts\devops\devops-precommit-hooks.ps1
 		scripts\devops\devops-update-versions.ps1 = scripts\devops\devops-update-versions.ps1

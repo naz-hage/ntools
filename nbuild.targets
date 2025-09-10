@@ -682,5 +682,12 @@
         <Message Text="==> DONE" />
     </Target>
 
+	<!-- Artifact verification: runs consolidated module function Invoke-VerifyArtifacts -->
+	<Target Name="VERIFY_ARTIFACTS" DependsOnTargets="ARTIFACTS">
+		<Message Text="Running artifact verification via ntools-scripts module" Importance="high" />
+		<Exec Command='pwsh -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "Import-Module &apos;.\scripts\module-package\ntools-scripts.psm1&apos; -Force; $r = Invoke-VerifyArtifacts -ArtifactsPath &apos;$(ArtifactsFolder)&apos; -ProductVersion &apos;$(ProductVersion)&apos;; if ($r.Error -gt 0) { exit 1 } else { exit 0 }"' WorkingDirectory="$(SolutionDir)" />
+		<Message Text="VERIFY_ARTIFACTS completed" Importance="high" />
+	</Target>
+
 	<!-- PUBLISH target implemented in common.targets -->
 </Project>

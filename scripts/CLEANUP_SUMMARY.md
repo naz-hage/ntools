@@ -25,7 +25,7 @@
 scripts/
 ├── README.md                          # Updated documentation
 ├── build/
-│   └── build-verify-artifacts.ps1     # Standalone artifact verification
+│   └── build-verify-artifacts.ps1     # Standalone artifact verification (deprecated - functionality moved to Invoke-VerifyArtifacts in ntools-scripts module)
 ├── devops/
 │   ├── devops-get-ip.ps1              # Azure DevOps IP detection
 │   ├── devops-precommit-hooks.ps1     # Git hooks management

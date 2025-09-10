@@ -87,7 +87,7 @@ The module consolidates functionality from the previous script structure:
 ### Before (Individual Scripts)
 ```
 scripts/
-├── build/build-verify-artifacts.ps1
+├── build/build-verify-artifacts.ps1   # deprecated - functionality moved to Invoke-VerifyArtifacts
 ├── devops/devops-get-ip.ps1
 ├── devops/devops-precommit-hooks.ps1
 ├── setup/setup-environment.ps1
@@ -114,8 +114,8 @@ scripts/
 The module exports 36 functions organized by category:
 
 ### Build Functions
-- `Publish-AllProjects` - Build and publish all non-test projects with deterministic repository path
-- `Invoke-ArtifactVerification` - Comprehensive artifact verification
+-- `Publish-AllProjects` - Build and publish all non-test projects with deterministic repository path
+-- `Invoke-VerifyArtifacts` - Comprehensive artifact verification
 - `Get-ProjectFiles` - Get project files with filtering
 - `Invoke-ProjectPublish` - Publish individual projects
 
@@ -208,9 +208,24 @@ Test-MSBuildDelegation
 # nb smoke_test  # (from command line - includes both artifact validation AND target delegation)
 ```
 
-## Integration with Build System
+### Integration with Build System
+- **Installation**: `nbuild.targets` automatically installs the module during `INSTALL_NTOOLS_SCRIPTS` target
+- **Usage**: `PUBLISH` target uses `Publish-AllProjects` function with deterministic repository path
 
-The module is automatically integrated with the NTools build system:
+### Artifact Verification (MSBuild)
+The module exposes `Invoke-VerifyArtifacts` which is also wired into MSBuild via the `VERIFY_ARTIFACTS` target in `nbuild.targets`.
+
+PowerShell example (local):
+```powershell
+Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
+Invoke-VerifyArtifacts -ArtifactsPath "C:\Artifacts\MySolution\Release\1.2.3" -ProductVersion "1.2.3"
+```
+
+MSBuild / nb CLI example:
+```bash
+# Run the MSBuild target from the repo root (nb delegates to MSBuild)
+nb verify_artifacts /p:ArtifactsFolder="C:\Artifacts\MySolution\Release\1.2.3" /p:ProductVersion="1.2.3"
+```
 
 ### MSBuild Integration
 - **Installation**: `nbuild.targets` automatically installs the module during `INSTALL_NTOOLS_SCRIPTS` target
@@ -282,11 +297,11 @@ Write-Error "Operation failed"
 ### For Developers
 ```powershell
 # Old way
-./scripts/build/build-verify-artifacts.ps1
+./scripts/build/build-verify-artifacts.ps1  # deprecated - use Invoke-VerifyArtifacts
 
-# New way
+# New way (module-based)
 Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
-Invoke-ArtifactVerification
+Invoke-VerifyArtifacts -ArtifactsPath "C:\Artifacts\MySolution\Release\1.2.3" -ProductVersion "1.2.3"
 ```
 
 ### For CI/CD
