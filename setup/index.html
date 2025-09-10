@@ -49,6 +49,12 @@
                   </li>
                   <li class="toctree-l1 current"><a class="reference internal current" href="#">Setup your project</a>
     <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#powershell-module-integration">PowerShell Module Integration</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#using-ntools-scripts-module">Using ntools-scripts Module</a>
+    </li>
+        </ul>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#overview-of-dev-setup-folder">Overview of dev-setup Folder</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#file-details">File Details</a>
@@ -138,21 +144,33 @@
               
                 <h1 id="setting-up-your-project-with-dev-setup">Setting Up Your Project with dev-setup</h1>
 <p>The dev-setup folder is a critical part of your project setup. It contains scripts and configuration files to automate the installation of development tools and the setup of your development environment.</p>
+<h2 id="powershell-module-integration">PowerShell Module Integration</h2>
+<p><strong>New in v2.3.0</strong>: NTools now includes a consolidated PowerShell module (<code>ntools-scripts</code>) that replaces individual scripts with a unified, function-based approach. This module is automatically integrated with the setup process.</p>
+<h3 id="using-ntools-scripts-module">Using ntools-scripts Module</h3>
+<pre><code class="language-powershell"># Import the module
+Import-Module &quot;./scripts/module-package/ntools-scripts.psm1&quot; -Force
+
+# Install NTools using the module (recommended approach)
+Install-NTools -NtoolsJsonPath &quot;./dev-setup/ntools.json&quot;
+
+# Set up development environment
+Set-DevelopmentEnvironment
+Install-DevelopmentApps
+</code></pre>
+<p>For complete module documentation, see <a href="../ntools/ntools-scripts-module/">ntools-scripts Module</a>.</p>
 <h2 id="overview-of-dev-setup-folder">Overview of dev-setup Folder</h2>
 <p>The dev-setup folder typically includes the following files:</p>
 <ul>
 <li><strong><code>ntools.json</code></strong>  <ul>
-<li>Contains installation information for ntools. This file is required to install ntools before other deveopment tools.</li>
+<li>Contains installation information for ntools. This file is required to install ntools before other development tools.</li>
 </ul>
 </li>
 <li><strong><code>apps.json</code></strong>  <ul>
 <li>Lists the development tools required for your project, including their installation and uninstallation details.</li>
 </ul>
 </li>
-<li><strong><code>dev-setup.ps1</code></strong>  <ul>
-<li>A PowerShell script that installs the tools listed in apps.json and sets up the development environment.</li>
-</ul>
-</li>
+<li><strong>Legacy scripts</strong> (deprecated in favor of ntools-scripts module)</li>
+<li>Individual PowerShell scripts for specific tasks</li>
 </ul>
 <hr />
 <h2 id="file-details">File Details</h2>

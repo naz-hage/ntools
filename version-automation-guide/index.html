@@ -80,9 +80,15 @@
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#solutions-implemented">Solutions Implemented</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#1-powershell-script-automation">1. PowerShell Script Automation</a>
+    <li class="toctree-l2"><a class="reference internal" href="#1-powershell-module-integration-v230">1. PowerShell Module Integration (v2.3.0+)</a>
         <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#features">Features</a>
+    <li class="toctree-l3"><a class="reference internal" href="#using-the-module-approach">Using the Module Approach</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#2-legacy-powershell-script-automation-deprecated">2. Legacy PowerShell Script Automation (Deprecated)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#features-now-available-as-module-functions">Features (Now Available as Module Functions)</a>
     </li>
         </ul>
     </li>
@@ -94,7 +100,7 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#2-nbuild-task-integration">2. NBuild Task Integration</a>
         <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#features_1">Features</a>
+    <li class="toctree-l3"><a class="reference internal" href="#features">Features</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#usage_1">Usage</a>
     </li>
@@ -162,13 +168,30 @@
 <p>Previously, these had to be updated manually, leading to inconsistencies and outdated documentation.</p>
 <h2 id="solutions-implemented">Solutions Implemented</h2>
 <hr />
-<h2 id="1-powershell-script-automation">1. PowerShell Script Automation</h2>
+<h2 id="1-powershell-module-integration-v230">1. PowerShell Module Integration (v2.3.0+)</h2>
 <ul>
-<li><strong>File</strong>: <code>dev-setup/update-versions.ps1</code></li>
-<li><strong>Purpose</strong>: Standalone script to sync versions between JSON files and documentation</li>
-<li><strong>Execution</strong>: Manual or triggered by other automation</li>
+<li><strong>Module</strong>: <code>scripts/module-package/ntools-scripts.psm1</code></li>
+<li><strong>Function</strong>: <code>Update-MarkdownTable</code> and <code>Get-VersionFromJson</code></li>
+<li><strong>Purpose</strong>: Consolidated version management within the ntools-scripts module</li>
+<li><strong>Integration</strong>: Available in all build processes and CI/CD pipelines</li>
 </ul>
-<h3 id="features">Features</h3>
+<h3 id="using-the-module-approach">Using the Module Approach</h3>
+<pre><code class="language-powershell"># Import the module
+Import-Module &quot;./scripts/module-package/ntools-scripts.psm1&quot; -Force
+
+# Update documentation with latest versions
+Update-MarkdownTable -JsonDirectory &quot;./dev-setup&quot; -MarkdownFile &quot;./docs/ntools/ntools.md&quot;
+
+# Get version from specific JSON file  
+$version = Get-VersionFromJson -JsonFilePath &quot;./dev-setup/ntools.json&quot;
+</code></pre>
+<h2 id="2-legacy-powershell-script-automation-deprecated">2. Legacy PowerShell Script Automation (Deprecated)</h2>
+<ul>
+<li><strong>File</strong>: <code>scripts/devops/devops-update-versions.ps1</code> (deprecated in favor of module functions)</li>
+<li><strong>Purpose</strong>: Standalone script to sync versions between JSON files and documentation</li>
+<li><strong>Status</strong>: Maintained for backward compatibility, but ntools-scripts module is preferred</li>
+</ul>
+<h3 id="features-now-available-as-module-functions">Features (Now Available as Module Functions)</h3>
 <ul>
 <li>Reads all JSON files in <code>dev-setup/</code> directory</li>
 <li>Extracts <code>Name</code> and <code>Version</code> from <code>NbuildAppList[0]</code></li>
@@ -180,11 +203,11 @@
 <h2 id="version-automation-approach">Version Automation Approach</h2>
 <h3 id="usage">Usage</h3>
 <pre><code class="language-powershell"># Basic usage
-cd dev-setup
-.\update-versions.ps1
+cd scripts/devops
+.\devops-update-versions.ps1
 
-# With custom paths
-.\update-versions.ps1 -DevSetupPath &quot;C:\source\ntools\dev-setup&quot; -DocsPath &quot;C:\source\ntools\docs\ntools\ntools.md&quot;
+# With custom paths (relative to repository root)
+.\devops-update-versions.ps1 -DevSetupPath &quot;dev-setup&quot; -DocsPath &quot;docs\ntools\ntools.md&quot;
 </code></pre>
 <hr />
 <p>Tool versions in documentation are updated using the MSBuild task (<code>UpdateVersionsInDocs</code>) via the <code>nb update_doc_versions</code> command. This extracts all tool/version pairs from every <code>NbuildAppList</code> entry in every <code>*.json</code> file in <code>dev-setup</code> and updates the documentation table accordingly. See the documentation in <code>ntools.md</code> for details.</p>
@@ -194,7 +217,7 @@ cd dev-setup
 <li><strong>Purpose</strong>: MSBuild task for build-time automation</li>
 <li><strong>Execution</strong>: Integrated into your existing NBuild workflow</li>
 </ul>
-<h3 id="features_1">Features</h3>
+<h3 id="features">Features</h3>
 <ul>
 <li>Native C# MSBuild task implementation</li>
 <li>JSON parsing using <code>System.Text.Json</code></li>
@@ -217,7 +240,7 @@ cd dev-setup
 <li><strong>Configuration</strong>: All hooks are defined in <code>.pre-commit-config.yaml</code>. This file specifies which checks to run, including built-in checks (YAML/JSON validation, trailing whitespace, etc.), code formatting, and custom scripts.</li>
 <li><strong>Installation</strong>: Developers run <code>pre-commit install</code> once to set up the Git hook. This creates a <code>.git/hooks/pre-commit</code> script that calls the pre-commit framework.</li>
 <li><strong>Trigger</strong>: Every time you run <code>git commit</code>, the pre-commit framework automatically runs all enabled hooks on the files being committed.</li>
-<li><strong>Custom Version Update Hook</strong>: A custom hook (<code>update-doc-versions</code>) is defined to run the PowerShell script <code>dev-setup/update-versions.ps1</code> whenever any <code>dev-setup/*.json</code> file is staged for commit. This ensures that <code>docs/ntools/ntools.md</code> is always updated with the latest tool versions before the commit is finalized.</li>
+<li><strong>Custom Version Update Hook</strong>: A custom hook (<code>update-doc-versions</code>) is defined to run the PowerShell script <code>scripts/devops/devops-update-versions.ps1</code> whenever any <code>dev-setup/*.json</code> file is staged for commit. This ensures that <code>docs/ntools/ntools.md</code> is always updated with the latest tool versions before the commit is finalized.</li>
 <li><strong>Chaining and Enforcement</strong>: If any hook fails (e.g., code formatting, version update, or validation), the commit is blocked until the issues are resolved. This enforces code and documentation quality across all contributors.</li>
 </ol>
 <p><strong>Diagram:</strong></p>
@@ -227,7 +250,7 @@ cd dev-setup
 pre-commit (framework)
    │
    ├─ built-in hooks (YAML/JSON, formatting, etc.)
-   ├─ custom: update-doc-versions (runs update-versions.ps1)
+   ├─ custom: update-doc-versions (runs devops-update-versions.ps1)
    │      └─ updates docs/ntools/ntools.md if needed
    └─ other hooks (commit message, etc.)
    │
@@ -236,7 +259,7 @@ commit proceeds if all hooks pass
 </code></pre>
 <p><strong>Key Files:</strong>
 - <code>.pre-commit-config.yaml</code>: Hook definitions and configuration
-- <code>dev-setup/update-versions.ps1</code>: Script called by the custom hook
+- <code>scripts/devops/devops-update-versions.ps1</code>: Script called by the custom hook
 - <code>.git/hooks/pre-commit</code>: Auto-generated by pre-commit, delegates to the framework</p>
 <p><strong>Benefits:</strong>
 - Ensures documentation and code quality before every commit

@@ -143,14 +143,6 @@
 <td>Download Nbuild specified in the NbuildTargetVersion</td>
 </tr>
 <tr>
-<td>NBUILD_INSTALL</td>
-<td>Install Nbuild specified in the NbuildTargetVersion</td>
-</tr>
-<tr>
-<td>DEV_SETUP</td>
-<td>Setup Development Environment</td>
-</tr>
-<tr>
 <td>MKDOCS</td>
 <td>Build docs locally for testing</td>
 </tr>
@@ -325,15 +317,11 @@
 </tr>
 <tr>
 <td>SMOKE_TEST</td>
-<td>Basic artifact verification to ensure build integrity</td>
+<td><strong>Comprehensive smoke test</strong>: Validates published artifacts (4+ executables) AND build system integrity (target delegation). Consolidated from TEST_TARGET_DELEGATION</td>
 </tr>
 <tr>
 <td>SMOKE_TEST_PWSH</td>
-<td>PowerShell-based artifact verification with detailed checks</td>
-</tr>
-<tr>
-<td>SMOKE_TEST_PWSH</td>
-<td>PowerShell-based artifact verification with detailed checks</td>
+<td>REMOVED: functionality consolidated into <code>SMOKE_TEST</code> (see changelog)</td>
 </tr>
 <tr>
 <td>IS_ADMIN</td>
