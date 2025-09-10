@@ -118,20 +118,21 @@
             <div class="section" itemprop="articleBody">
               
                 <h1 id="ntools-scripts-powershell-module">ntools-scripts PowerShell Module</h1>
-<p>The ntools-scripts module is a comprehensive PowerShell module that consolidates all NTools PowerShell functionality into a single, reusable module. This module replaces the previous collection of individual scripts with a structured, function-based approach.
-<strong>Location</strong>: <code>scripts/module-package/ntools-scripts.psm1</code>  </p>
+<p>This page documents the <code>ntools-scripts</code> PowerShell module and serves as the canonical API reference for the module's exported functions and usage.</p>
+<p><strong>Location</strong>: <code>scripts/module-package/ntools-scripts.psm1</code></p>
 <h2 id="overview">Overview</h2>
-<h3 id="after-consolidated-module">After (Consolidated Module)</h3>
+<p>Module files:</p>
 <pre><code>scripts/
-├── module-package/
-│   ├── ntools-scripts.psm1     # Main module with all functions
-│   ├── ntools-scripts.psd1     # Module manifest
-### Setup Functions
--- `Install-NToolsScriptsModule` - Install this module
--- `Get-NtoolsScriptsVersion` - Get module version information
-### Import the Module
-```powershell
-# Import from local development
+├─ module-package/
+│  ├─ ntools-scripts.psm1     # Main module with all functions
+│  ├─ ntools-scripts.psd1     # Module manifest
+│  └─ install-module.ps1      # Installation helper
+├─ devops/
+└─ setup/
+</code></pre>
+<p>Refer to the "Canonical module API" section below for the authoritative list of exported functions and descriptions.</p>
+<h3 id="import-the-module">Import the Module</h3>
+<pre><code># Import from local development
 Import-Module &quot;./scripts/module-package/ntools-scripts.psm1&quot; -Force
 
 # Import from installed location (after installation)
@@ -195,8 +196,7 @@ Get-Module ntools-scripts
 <h3 id="before-individual-scripts">Before (Individual Scripts)</h3>
 <pre><code>scripts/
 ├── build/build-verify-artifacts.ps1   # deprecated - functionality moved to Invoke-VerifyArtifacts
-├── devops/devops-get-ip.ps1
-├── devops/devops-precommit-hooks.ps1
+├── devops/ (legacy scripts migrated into module)
 
 Use the `Set-DevelopmentEnvironment` function in the `ntools-scripts` module instead. It provides the same behavior (sets user `devDrive` and `mainDir` environment variables) and is callable directly from PowerShell or via MSBuild using the `SETUP_ENVIRONMENT` target in `nbuild.targets`.
 
@@ -209,8 +209,8 @@ Set-DevelopmentEnvironment -DevDrive 'D:' -MainDir 'source'
 <p>MSBuild (from repo root):</p>
 <pre><code class="language-powershell">msbuild /t:SETUP_ENVIRONMENT /p:DevDrive=D: /p:MainDir=source
 </code></pre>
-<p>├── test/test-coverage.ps1
-└── ... (20+ individual scripts)</p>
+<p>├── test/  # Legacy test scripts were consolidated into the <code>ntools-scripts</code> module
+└── ... (legacy scripts removed; use module functions)</p>
 <pre><code>
 ### After (Consolidated Module)
 </code></pre>
@@ -235,10 +235,10 @@ The module exports 36 functions organized by category:
 - `Invoke-ProjectPublish` - Publish individual projects
 
 ### DevOps Functions  
-- `Get-AgentIPAddress` - Get public IP for Azure DevOps agents
-- `Install-PreCommitHooks` - Install git pre-commit hooks
-- `Add-WAFRule` - Add Azure WAF rules
-- `Remove-WAFRule` - Remove Azure WAF rules
+- `Get-AgentPublicIp` - Get public IP for Azure DevOps agents and set pipeline variable
+- `Set-PreCommitHooks` - Install/uninstall git pre-commit hooks
+- `Add-WafAllowRule` - Add Azure WAF allow rule for an IP
+- `Remove-WafCustomRule` - Remove Azure WAF custom rule
 - `Get-VersionFromJson` - Extract version information from JSON files
 - `Update-MarkdownTable` - Update version tables in markdown documentation
 
@@ -273,6 +273,50 @@ The module exports 36 functions organized by category:
 - `Write-Warning` - Write warning messages
 - `Write-Error` - Write error messages
 - `Get-NtoolsScriptsVersion` - Get module version information
+
+## Canonical module API (single source of truth)
+
+The following section is the canonical, authoritative list of functions exported by the
+`ntools-scripts` module. Documentation elsewhere should reference this page for the
+module API rather than duplicating the function list.
+
+Exported functions (exactly as exported by `Export-ModuleMember` in `ntools-scripts.psm1`):
+
+- `Get-ntoolsScriptsVersion`
+- `Publish-AllProjects`
+- `Get-VersionFromJson`
+- `Update-MarkdownTable`
+- `Write-TestResult`
+- `Test-TargetExists`
+- `Test-TargetDependencies`
+- `Test-TargetDelegation`
+- `Get-FileHash256`
+- `Get-FileVersionInfo`
+- `Invoke-FastForward`
+- `Write-OutputMessage`
+- `Get-NToolsFileVersion`
+- `Add-DeploymentPathToEnvironment`
+- `Invoke-NToolsDownload`
+- `Install-NTools`
+- `Invoke-VerifyArtifacts`
+- `Set-DevelopmentEnvironment`
+- `Test-IsAdministrator`
+- `Test-MicrosoftPowerShellSecurityModuleLoaded`
+- `Test-CertificateStore`
+- `New-SelfSignedCodeCertificate`
+- `Export-CertificateToPfx`
+- `Export-CertificateToCer`
+- `Import-CertificateToRoot`
+- `Import-CertificateToCurrentUser`
+- `Set-ScriptSignature`
+- `Get-ScriptSignature`
+- `Set-CodeSigningTrust`
+
+Notes:
+- This page is the single authoritative reference for the `ntools-scripts` module API.
+- If other docs (tutorials, README files, or CI snippets) need to show usage examples,
+  they should link to this page and include only short examples — keep API surface here.
+
 
 ## Usage Examples
 
