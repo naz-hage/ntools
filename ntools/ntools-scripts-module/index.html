@@ -194,7 +194,7 @@ Get-Module ntools-scripts
 <p>The module consolidates functionality from the previous script structure:</p>
 <h3 id="before-individual-scripts">Before (Individual Scripts)</h3>
 <pre><code>scripts/
-├── build/build-verify-artifacts.ps1
+├── build/build-verify-artifacts.ps1   # deprecated - functionality moved to Invoke-VerifyArtifacts
 ├── devops/devops-get-ip.ps1
 ├── devops/devops-precommit-hooks.ps1
 ├── setup/setup-environment.ps1
@@ -216,12 +216,10 @@ Get-Module ntools-scripts
 <h2 id="available-functions">Available Functions</h2>
 <p>The module exports 36 functions organized by category:</p>
 <h3 id="build-functions">Build Functions</h3>
-<ul>
-<li><code>Publish-AllProjects</code> - Build and publish all non-test projects with deterministic repository path</li>
-<li><code>Invoke-ArtifactVerification</code> - Comprehensive artifact verification</li>
-<li><code>Get-ProjectFiles</code> - Get project files with filtering</li>
-<li><code>Invoke-ProjectPublish</code> - Publish individual projects</li>
-</ul>
+<p>-- <code>Publish-AllProjects</code> - Build and publish all non-test projects with deterministic repository path
+-- <code>Invoke-VerifyArtifacts</code> - Comprehensive artifact verification
+- <code>Get-ProjectFiles</code> - Get project files with filtering
+- <code>Invoke-ProjectPublish</code> - Publish individual projects</p>
 <h3 id="devops-functions">DevOps Functions</h3>
 <ul>
 <li><code>Get-AgentIPAddress</code> - Get public IP for Azure DevOps agents</li>
@@ -305,8 +303,21 @@ Test-MSBuildDelegation
 # Or use the comprehensive smoke test target
 # nb smoke_test  # (from command line - includes both artifact validation AND target delegation)
 </code></pre>
-<h2 id="integration-with-build-system_1">Integration with Build System</h2>
-<p>The module is automatically integrated with the NTools build system:</p>
+<h3 id="integration-with-build-system_1">Integration with Build System</h3>
+<ul>
+<li><strong>Installation</strong>: <code>nbuild.targets</code> automatically installs the module during <code>INSTALL_NTOOLS_SCRIPTS</code> target</li>
+<li><strong>Usage</strong>: <code>PUBLISH</code> target uses <code>Publish-AllProjects</code> function with deterministic repository path</li>
+</ul>
+<h3 id="artifact-verification-msbuild">Artifact Verification (MSBuild)</h3>
+<p>The module exposes <code>Invoke-VerifyArtifacts</code> which is also wired into MSBuild via the <code>VERIFY_ARTIFACTS</code> target in <code>nbuild.targets</code>.</p>
+<p>PowerShell example (local):</p>
+<pre><code class="language-powershell">Import-Module &quot;./scripts/module-package/ntools-scripts.psm1&quot; -Force
+Invoke-VerifyArtifacts -ArtifactsPath &quot;C:\Artifacts\MySolution\Release\1.2.3&quot; -ProductVersion &quot;1.2.3&quot;
+</code></pre>
+<p>MSBuild / nb CLI example:</p>
+<pre><code class="language-bash"># Run the MSBuild target from the repo root (nb delegates to MSBuild)
+nb verify_artifacts /p:ArtifactsFolder=&quot;C:\Artifacts\MySolution\Release\1.2.3&quot; /p:ProductVersion=&quot;1.2.3&quot;
+</code></pre>
 <h3 id="msbuild-integration">MSBuild Integration</h3>
 <ul>
 <li><strong>Installation</strong>: <code>nbuild.targets</code> automatically installs the module during <code>INSTALL_NTOOLS_SCRIPTS</code> target</li>
@@ -360,11 +371,11 @@ Write-Error &quot;Operation failed&quot;
 <h2 id="migration-from-legacy-scripts_1">Migration from Legacy Scripts</h2>
 <h3 id="for-developers">For Developers</h3>
 <pre><code class="language-powershell"># Old way
-./scripts/build/build-verify-artifacts.ps1
+./scripts/build/build-verify-artifacts.ps1  # deprecated - use Invoke-VerifyArtifacts
 
-# New way
+# New way (module-based)
 Import-Module &quot;./scripts/module-package/ntools-scripts.psm1&quot; -Force
-Invoke-ArtifactVerification
+Invoke-VerifyArtifacts -ArtifactsPath &quot;C:\Artifacts\MySolution\Release\1.2.3&quot; -ProductVersion &quot;1.2.3&quot;
 </code></pre>
 <h3 id="for-cicd">For CI/CD</h3>
 <pre><code class="language-yaml"># Old way
