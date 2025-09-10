@@ -172,6 +172,50 @@ The module exports 36 functions organized by category:
 - `Write-Error` - Write error messages
 - `Get-NtoolsScriptsVersion` - Get module version information
 
+## Canonical module API (single source of truth)
+
+The following section is the canonical, authoritative list of functions exported by the
+`ntools-scripts` module. Documentation elsewhere should reference this page for the
+module API rather than duplicating the function list.
+
+Exported functions (exactly as exported by `Export-ModuleMember` in `ntools-scripts.psm1`):
+
+- `Get-ntoolsScriptsVersion` — module version string and metadata
+- `Publish-AllProjects` — build and publish all non-test projects to an output directory
+- `Get-VersionFromJson` — read version info from a provided JSON manifest
+- `Update-MarkdownTable` — update markdown tables with version information
+- `Write-TestResult` — helper to emit standardized test/pass-fail output
+- `Test-TargetExists` — check whether an MSBuild target exists in a file
+- `Test-TargetDependencies` — validate expected DependsOnTargets for an MSBuild target
+- `Test-TargetDelegation` — end-to-end test for MSBuild target delegation
+- `Get-FileHash256` — compute SHA256 hash for a file
+- `Get-FileVersionInfo` — read file version info (Product/File version)
+- `Invoke-FastForward` — git fast-forward helper (fetch/merge/reset)
+- `Write-OutputMessage` — append standardized log lines to install.log
+- `Get-NToolsFileVersion` — read NTools assembly/file version
+- `Add-DeploymentPathToEnvironment` — add the deployment path to the system PATH
+- `Invoke-NToolsDownload` — download a release zip for a given version
+- `Install-NTools` — install NTools from a release zip (uses Invoke-NToolsDownload)
+- `Invoke-VerifyArtifacts` — comprehensive artifact verification (executables, libs, configs)
+- `Set-DevelopmentEnvironment` — set up developer environment variables (devDrive, mainDir)
+- `Test-IsAdministrator` — helper to detect whether the caller is running as Administrator
+- `Test-MicrosoftPowerShellSecurityModuleLoaded` — ensure Microsoft.PowerShell.Security is available
+- `Test-CertificateStore` — validate that the Certificate PSProvider exists
+- `New-SelfSignedCodeCertificate` — create a self-signed code-signing certificate
+- `Export-CertificateToPfx` — export certificate to a .pfx file (secure password required)
+- `Export-CertificateToCer` — export certificate to a .cer file
+- `Import-CertificateToRoot` — import a .cer into LocalMachine\Root (Administrator required)
+- `Import-CertificateToCurrentUser` — import a .pfx into the CurrentUser\My store
+- `Set-ScriptSignature` — apply an Authenticode signature to a script file
+- `Get-ScriptSignature` — read the Authenticode signature for a script file
+- `Set-CodeSigningTrust` — high-level helper: create cert, export, optionally trust machine, import to user, sign scripts
+
+Notes:
+- This page is the single authoritative reference for the `ntools-scripts` module API.
+- If other docs (tutorials, README files, or CI snippets) need to show usage examples,
+  they should link to this page and include only short examples — keep API surface here.
+
+
 ## Usage Examples
 
 ### Import the Module

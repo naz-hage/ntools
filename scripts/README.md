@@ -12,49 +12,13 @@ This directory contains the consolidated PowerShell module for the NTools projec
 
 The **`module-package/`** folder contains the consolidated ntools-scripts PowerShell module (v2.3.0) that includes functions converted from all original script categories:
 
-### Available Functions by Category:
+### Module API
+The canonical API documentation for the `ntools-scripts` module lives in the docs site:
 
-#### Build Functions
-- `Invoke-VerifyArtifacts` - Comprehensive artifact verification (was `build-verify-artifacts.ps1`)
-- `Publish-AllProjects` - Build and publish all projects with deterministic repository path
-- `Get-ProjectFiles` - Get project files with filtering
-- `Invoke-ProjectPublish` - Publish individual projects
+- `docs/ntools/ntools-scripts-module.md` — Canonical list of exported functions and descriptions.
 
-#### DevOps Functions  
-- `Get-AgentIPAddress` - Get public IP for Azure DevOps agents (was `devops-get-ip.ps1`)
-- `Install-PreCommitHooks` - Install git pre-commit hooks (was `devops-precommit-hooks.ps1`)
-- `Add-WAFRule` - Add Azure WAF rules (was `devops-waf-add-rule.ps1`)
-- `Remove-WAFRule` - Remove Azure WAF rules (was `devops-waf-delete-rule.ps1`)
-- `Get-VersionFromJson` - Extract version information from JSON files
-- `Update-MarkdownTable` - Update version tables in markdown documentation
-
-#### Setup Functions
-- `Set-DevelopmentEnvironment` - Set up development environment 
-- `Install-NTools` - Install NTools from releases with configurable ntools.json path
-- `Install-NToolsScriptsModule` - Install this module (was `install-module.ps1`)
-
-#### Test Functions
-- `Invoke-CodeCoverage` - Run tests with code coverage (was `test-coverage.ps1`)
-- `Test-MSBuildDelegation` - Test MSBuild target delegation (was `test-delegation.ps1`)
-- `Test-QuickTargets` - Quick target validation (was `test-target-quick.ps1`)
-- `Test-NToolsScriptsModule` - Test module functionality (was `test-module.ps1`)
-- `Write-TestResult` - Write formatted test results
-- `Test-TargetExists` - Check if MSBuild targets exist
-- `Test-TargetDependencies` - Validate target dependencies
-- `Test-TargetDelegation` - Test target delegation patterns
-
-#### Utility Functions
-- `Get-FileHash256` - Calculate SHA256 hash of files
-- `Get-FileVersionInfo` - Get file version information
-- `Invoke-FastForward` - Git fast-forward operations
-- `Write-OutputMessage` - Standardized output messaging
-- `Get-NToolsFileVersion` - Get NTools file version information
-- `Add-DeploymentPathToEnvironment` - Add paths to PATH environment variable
-- `Invoke-NToolsDownload` - Download NTools packages
-
-#### Common Functions
-- `Write-Info`, `Write-Success`, `Write-Warning`, `Write-Error` - Standardized logging functions
-- `Get-NtoolsScriptsVersion` - Get module version information
+Refer to that page for the authoritative function list and usage examples. Keep this README
+focused on getting started and examples.
 
 ### Usage Examples:
 

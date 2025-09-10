@@ -1,16 +1,4 @@
-<#
-sign-trust.psm1
-
-Purpose: Developer helper module for creating a code-signing certificate, optionally trusting it,
-signing scripts and verifying signatures. This module is intended for local developer use only
-and is NOT intended for automated deployment to production systems. Use with caution — importing
-certificates into the LocalMachine Trusted Root requires Administrator rights and is a high-impact
-operation.
-#>
-
-function Test-IsAdministrator {
-    return ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-}
+<# DEPRECATED: Merged into ntools-scripts.psm1. This file is kept temporarily and will be removed. #>
 
 function Test-MicrosoftPowerShellSecurityModuleLoaded {
     try {
