@@ -26,7 +26,6 @@ The table below lists all available targets for the Nbuild tool.
 | UPDATE_AND_COMMIT   | Combined target: Update versions and commit with smart message |
 | INFRASTRUCTURE_COMMIT | Full infrastructure update and commit with intelligent analysis |
 | PREVIEW_COMMIT_MESSAGE | Preview commit message without committing |
-| INSTALL_PRECOMMIT_HOOKS | Install pre-commit hooks using the PowerShell script |
 
 
 - **C:\Program Files\Nbuild\common.targets Targets**

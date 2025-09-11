@@ -277,7 +277,6 @@
 
 	<!-- Update documentation versions from JSON configuration files -->
 	<UsingTask TaskName="NbuildTasks.UpdateVersionsInDocs" AssemblyFile="C:\source\ntools\Release\NbuildTasks.dll" />
-	<UsingTask TaskName="NbuildTasks.SetupPreCommitHooks" AssemblyFile="C:\source\ntools\Release\NbuildTasks.dll" />
 	<UsingTask TaskName="NbuildTasks.GenerateCommitMessage" AssemblyFile="C:\source\ntools\Release\NbuildTasks.dll" />
 	
 	<Target Name="UPDATE_DOC_VERSIONS" DependsOnTargets="PROPERTIES">
@@ -390,13 +389,6 @@
 		<Message Text="==> DONE"/>
 	</Target>
 	
-	<!-- Install pre-commit hooks using the PowerShell script -->
-	<Target Name="INSTALL_PRECOMMIT_HOOKS">
-		<Exec Command="powershell -ExecutionPolicy Bypass -File &quot;$(SolutionDir)\dev-setup\precommit-hook.ps1&quot;" WorkingDirectory="$(SolutionDir)" />
-		<Message Text="Pre-commit hooks installed via precommit-hook.ps1" />
-		<Message Text="==> DONE" />
-	</Target>
-
 	<!-- Creates a stage or prod release 
 	Add for testing and remove after success-->
 	<Target Name="GITHUB_RELEASE" DependsOnTargets="ARTIFACTS;GIT_BRANCH" AfterTargets="PROD"  >

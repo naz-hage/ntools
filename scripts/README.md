@@ -87,10 +87,6 @@ Get-AgentPublicIp
 # Add/remove Azure WAF rules (requires Azure CLI authentication)
 Add-WafAllowRule -ResourceGroupName 'rg' -WafPolicyName 'policy' -CustomRuleName 'allow-agent' -AgentIp '1.2.3.4'
 Remove-WafCustomRule -ResourceGroupName 'rg' -WafPolicyName 'policy' -CustomRuleName 'allow-agent'
-
-# NOTE: Pre-commit integration and helpers were deprecated and removed from the
-# canonical module and repository docs. Historical notes exist in the repository
-# history if needed.
 ```
 ```
 
