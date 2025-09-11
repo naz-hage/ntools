@@ -110,9 +110,6 @@
 
 	<!-- Uninstall ntools-scripts module from BuildTools modules folder -->
 	<Target Name="UNINSTALL_NTOOLS_SCRIPTS" DependsOnTargets="IS_ADMIN">
-	<Message Text="Uninstalling ntools-scripts module from $(BuildTools)\modules" Importance="high" />
-	<RemoveDir Directories="$(BuildTools)\modules\ntools-scripts" Condition="Exists('$(BuildTools)\modules\ntools-scripts')" />
-	<Message Text="ntools-scripts uninstallation completed" Importance="high" />
 		<Message Text="Uninstalling ntools-scripts module from $(BuildTools)\modules" Importance="high" />
 		<RemoveDir Directories="$(BuildTools)\modules\ntools-scripts" Condition="Exists('$(BuildTools)\modules\ntools-scripts')" />
 		<Message Text="ntools-scripts uninstallation completed" Importance="high" />
@@ -120,9 +117,6 @@
 
 	<!-- Test that ntools-scripts module is installed and can report a version -->
 	<Target Name="TEST_NTOOLS_SCRIPTS" DependsOnTargets="IS_ADMIN">
-	<Message Text="Testing ntools-scripts installation" Importance="high" />
-		<Exec Command='pwsh -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "$(SolutionDir)\scripts\module-package\test-module.ps1" -BuildTools "$(BuildTools)"' WorkingDirectory="$(SolutionDir)" />
-	<Message Text="ntools-scripts test completed" Importance="high" />
 		<Message Text="Testing ntools-scripts installation" Importance="high" />
 		<Exec Command='pwsh -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "$(SolutionDir)\scripts\module-package\test-module.ps1" -BuildTools "$(BuildTools)"' WorkingDirectory="$(SolutionDir)" />
 		<Message Text="ntools-scripts test completed" Importance="high" />
