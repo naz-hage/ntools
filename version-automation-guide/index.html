@@ -84,25 +84,11 @@
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#using-the-module-approach">Using the Module Approach</a>
     </li>
-        </ul>
+    <li class="toctree-l3"><a class="reference internal" href="#nbuild-task-integration">NBuild Task Integration</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#2-legacy-powershell-script-automation-deprecated">2. Legacy PowerShell Script Automation (Deprecated)</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#features-now-available-as-module-functions">Features (Now Available as Module Functions)</a>
-    </li>
-        </ul>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#version-automation-approach">Version Automation Approach</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a>
-    </li>
-        </ul>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#2-nbuild-task-integration">2. NBuild Task Integration</a>
-        <ul>
     <li class="toctree-l3"><a class="reference internal" href="#features">Features</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#usage_1">Usage</a>
+    <li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a>
     </li>
         </ul>
     </li>
@@ -112,7 +98,7 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#pre-commit-framework-features">Pre-commit Framework Features:</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#usage_2">Usage</a>
+    <li class="toctree-l3"><a class="reference internal" href="#usage_1">Usage</a>
     </li>
         </ul>
     </li>
@@ -136,11 +122,6 @@
                   <li class="toctree-l1"><a class="reference internal" href="../ntools/code-coverage/">Code Coverage</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../ntools/nbuild-targets/">MSBuild Targets</a>
-                  </li>
-              </ul>
-              <p class="caption"><span class="caption-text">Revisions</span></p>
-              <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="../changelog/">Changelog</a>
                   </li>
               </ul>
       </div>
@@ -179,7 +160,7 @@
 <h2 id="1-powershell-module-integration-v230">1. PowerShell Module Integration (v2.3.0+)</h2>
 <ul>
 <li><strong>Module</strong>: <code>scripts/module-package/ntools-scripts.psm1</code></li>
-<li><strong>Function</strong>: <code>Update-MarkdownTable</code> and <code>Get-VersionFromJson</code></li>
+<li><strong>Function</strong>: <code>Update-DocVersions</code> and <code>Get-VersionFromJson</code></li>
 <li><strong>Purpose</strong>: Consolidated version management within the ntools-scripts module</li>
 <li><strong>Integration</strong>: Available in all build processes and CI/CD pipelines</li>
 </ul>
@@ -188,38 +169,14 @@
 Import-Module &quot;./scripts/module-package/ntools-scripts.psm1&quot; -Force
 
 # Update documentation with latest versions
-Update-MarkdownTable -JsonDirectory &quot;./dev-setup&quot; -MarkdownFile &quot;./docs/ntools/ntools.md&quot;
+Update-DocVersions -JsonDirectory &quot;./dev-setup&quot; -MarkdownFile &quot;./docs/ntools/ntools.md&quot;
 
 # Get version from specific JSON file  
 $version = Get-VersionFromJson -JsonFilePath &quot;./dev-setup/ntools.json&quot;
 </code></pre>
-<h2 id="2-legacy-powershell-script-automation-deprecated">2. Legacy PowerShell Script Automation (Deprecated)</h2>
-<ul>
-<li><strong>File</strong>: <code>scripts/devops/devops-update-versions.ps1</code> (deprecated in favor of module functions)</li>
-<li><strong>Purpose</strong>: Standalone script to sync versions between JSON files and documentation</li>
-<li><strong>Status</strong>: Maintained for backward compatibility, but ntools-scripts module is preferred</li>
-</ul>
-<h3 id="features-now-available-as-module-functions">Features (Now Available as Module Functions)</h3>
-<ul>
-<li>Reads all JSON files in <code>dev-setup/</code> directory</li>
-<li>Extracts <code>Name</code> and <code>Version</code> from <code>NbuildAppList[0]</code></li>
-<li>Updates corresponding entries in <code>ntools.md</code> table</li>
-<li>Handles tool name mapping (e.g., "PowerShell" ↔ "Powershell")</li>
-<li>Updates "Last Checked on" dates automatically</li>
-<li>Provides colored console output for better UX</li>
-</ul>
-<h2 id="version-automation-approach">Version Automation Approach</h2>
-<h3 id="usage">Usage</h3>
-<pre><code class="language-powershell"># Basic usage
-cd scripts/devops
-.\devops-update-versions.ps1
-
-# With custom paths (relative to repository root)
-.\devops-update-versions.ps1 -DevSetupPath &quot;dev-setup&quot; -DocsPath &quot;docs\ntools\ntools.md&quot;
-</code></pre>
 <hr />
 <p>Tool versions in documentation are updated using the MSBuild task (<code>UpdateVersionsInDocs</code>) via the <code>nb update_doc_versions</code> command. This extracts all tool/version pairs from every <code>NbuildAppList</code> entry in every <code>*.json</code> file in <code>dev-setup</code> and updates the documentation table accordingly. See the documentation in <code>ntools.md</code> for details.</p>
-<h2 id="2-nbuild-task-integration">2. NBuild Task Integration</h2>
+<h3 id="nbuild-task-integration">NBuild Task Integration</h3>
 <ul>
 <li><strong>File</strong>: <code>NbuildTasks/UpdateVersionsInDocs.cs</code></li>
 <li><strong>Purpose</strong>: MSBuild task for build-time automation</li>
@@ -234,7 +191,7 @@ cd scripts/devops
 <li>Build-time logging and error handling</li>
 <li>Can be part of CI/CD pipeline</li>
 </ul>
-<h3 id="usage_1">Usage</h3>
+<h3 id="usage">Usage</h3>
 <pre><code class="language-xml">&lt;Target Name=&quot;UpdateDocVersions&quot;&gt;
   &lt;UpdateVersionsInDocs 
     DevSetupPath=&quot;$(MSBuildProjectDirectory)\dev-setup&quot; 
@@ -291,7 +248,7 @@ commit proceeds if all hooks pass
 <li>Configurable and extensible</li>
 <li>Performance optimized</li>
 </ul>
-<h3 id="usage_2">Usage</h3>
+<h3 id="usage_1">Usage</h3>
 <pre><code class="language-bash"># Manual setup
 chmod +x .git/hooks/pre-commit
 

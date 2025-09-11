@@ -87,6 +87,8 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#zip">Zip</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#pwsh">Pwsh</a>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#updateversionsindocs">UpdateVersionsInDocs</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#modern-approach-with-ntools-scripts-module">Modern Approach with ntools-scripts module</a>
@@ -116,11 +118,6 @@
                   <li class="toctree-l1"><a class="reference internal" href="../code-coverage/">Code Coverage</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../nbuild-targets/">MSBuild Targets</a>
-                  </li>
-              </ul>
-              <p class="caption"><span class="caption-text">Revisions</span></p>
-              <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="../../changelog/">Changelog</a>
                   </li>
               </ul>
       </div>
@@ -268,6 +265,20 @@
     &lt;/PropertyGroup&gt;
     &lt;Zip FileName=&quot;$(FileName)&quot; Path=&quot;$(Path)&quot; /&gt;
     &lt;Message Text=&quot;==&gt; ZIP_DONE&quot;/&gt;
+&lt;/Target&gt;
+</code></pre>
+<h3 id="pwsh">Pwsh</h3>
+<pre><code class="language-xml">&lt;!-- This target uses the `Pwsh` task to run a PowerShell Core script from MSBuild --&gt;
+&lt;Target Name=&quot;RUN_PWSH&quot;&gt;
+    &lt;PropertyGroup&gt;
+        &lt;ScriptPath&gt;$(SolutionDir)scripts\build\custom-script.ps1&lt;/ScriptPath&gt;
+        &lt;ScriptArgs&gt;--example true&lt;/ScriptArgs&gt;
+    &lt;/PropertyGroup&gt;
+
+    &lt;!-- Pwsh is a custom MSBuild task that executes a PowerShell Core script --&gt;
+    &lt;Pwsh Script=&quot;$(ScriptPath)&quot; Arguments=&quot;$(ScriptArgs)&quot; NoProfile=&quot;true&quot; ExecutionPolicy=&quot;Bypass&quot; /&gt;
+
+    &lt;Message Text=&quot;==&gt; PWSH_DONE&quot; /&gt;
 &lt;/Target&gt;
 </code></pre>
 <h3 id="updateversionsindocs">UpdateVersionsInDocs</h3>
