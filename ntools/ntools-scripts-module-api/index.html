@@ -5,15 +5,15 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="naz-hage" />
       <link rel="shortcut icon" href="../../img/favicon.ico" />
-    <title>Development Tools - Ntools - Work in Progress</title>
+    <title>API - Ntools - Work in Progress</title>
     <link rel="stylesheet" href="../../css/theme.css" />
     <link rel="stylesheet" href="../../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
     
       <script>
         // Current page data
-        var mkdocs_page_name = "Development Tools";
-        var mkdocs_page_input_path = "ntools/ntools.md";
+        var mkdocs_page_name = "API";
+        var mkdocs_page_input_path = "ntools/ntools-scripts-module-api.md";
         var mkdocs_page_url = null;
       </script>
     
@@ -78,15 +78,15 @@
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../../version-automation-guide/">Version Automation Guide</a>
                   </li>
-                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Development Tools</a>
-    <ul class="current">
-    </ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/">Development Tools</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" >ntools-scripts module</a>
-    <ul>
+                  <li class="toctree-l1 current"><a class="reference internal current" >ntools-scripts module</a>
+    <ul class="current">
                 <li class="toctree-l2"><a class="reference internal" href="../ntools-scripts-module/">Module</a>
                 </li>
-                <li class="toctree-l2"><a class="reference internal" href="../ntools-scripts-module-api/">API</a>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">API</a>
+    <ul class="current">
+    </ul>
                 </li>
     </ul>
                   </li>
@@ -118,9 +118,10 @@
   <ul class="wy-breadcrumbs">
     <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
           <li class="breadcrumb-item">Developer setup</li>
-      <li class="breadcrumb-item active">Development Tools</li>
+          <li class="breadcrumb-item">ntools-scripts module</li>
+      <li class="breadcrumb-item active">API</li>
     <li class="wy-breadcrumbs-aside">
-          <a href="https://github.com/naz-hage/ntools/edit/main/docs/ntools/ntools.md">Edit on ntools</a>
+          <a href="https://github.com/naz-hage/ntools/edit/main/docs/ntools/ntools-scripts-module-api.md">Edit on ntools</a>
     </li>
   </ul>
   <hr/>
@@ -128,162 +129,144 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h2 id="tool-version-automation">Tool version automation</h2>
-<p>Tool versions in this table are automatically updated from the JSON install definitions in the <code>dev-setup</code> folder using the <code>UpdateVersionsInDocs</code> MSBuild task (C#). To update the table, run:</p>
-<pre><code>nb update_doc_versions
-</code></pre>
-<p>This will extract all tool/version pairs from every <code>NbuildAppList</code> entry in every <code>*.json</code> file in <code>dev-setup</code> and update the documentation table accordingly. No PowerShell script is needed or maintained for this process.
-The <a href="https://learn.microsoft.com/en-us/windows/dev-environment/">Windows dev environment</a> has good information on how to setup a Windows dev environment.</p>
-<ul>
-<li>The table below list the latest dev tools used in Ntools.</li>
-</ul>
+                <h1 id="ntools-scripts-module-api">ntools-scripts Module API</h1>
+<p>This page lists the exported functions from the <code>ntools-scripts</code> PowerShell module in a compact table (Function | Description &amp; common usage). Use this as the canonical reference and link to it from other docs.</p>
 <table>
 <thead>
 <tr>
-<th style="text-align: left;">Tool</th>
-<th style="text-align: left;">Version</th>
-<th style="text-align: left;">Last Checked on</th>
+<th>Function</th>
+<th>Description &amp; common usage</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align: left;"><a href="https://github.com/argoproj/argo-cd/releases/">Argo CD</a></td>
-<td style="text-align: left;">2.14.11</td>
-<td style="text-align: left;">07-Sep-25</td>
+<td>Get-ntoolsScriptsVersion</td>
+<td>Returns the module version. Usage: <code>Get-ntoolsScriptsVersion</code></td>
 </tr>
 <tr>
-<td style="text-align: left;"><a href="https://learn.microsoft.com/en-us/cli/azure/install-azure-cli-windows?pivots=msi">Azure CLI</a></td>
-<td style="text-align: left;">2.70.0</td>
-<td style="text-align: left;">07-Sep-25</td>
+<td>Publish-AllProjects</td>
+<td>Build and publish non-test projects to an output directory. Usage: <code>Publish-AllProjects -OutputDir C:\Artifacts -Version 1.0.0 -RepositoryRoot C:\MyRepo</code></td>
 </tr>
 <tr>
-<td style="text-align: left;"><a href="https://portswigger.net/burp/communitydownload">Burp Suite</a></td>
-<td style="text-align: left;">2021.11.2</td>
-<td style="text-align: left;">01-Oct-23</td>
+<td>Get-VersionFromJson</td>
+<td>Read version fields from a JSON file (ntools.json style). Usage: <code>Get-VersionFromJson -Path ./dev-setup/ntools.json</code></td>
 </tr>
 <tr>
-<td style="text-align: left;"><a href="https://dotnet.microsoft.com/en-us/download/dotnet">Dotnet Runtime</a></td>
-<td style="text-align: left;">9.0.2</td>
-<td style="text-align: left;">07-Sep-25</td>
+<td>Update-MarkdownTable</td>
+<td>Update a markdown table of versions in a file. Usage: <code>Update-MarkdownTable -File docs/versions.md -Version 1.2.3</code></td>
 </tr>
 <tr>
-<td style="text-align: left;"><a href="https://dotnet.microsoft.com/en-us/download/dotnet">Dotnet8 SDK</a></td>
-<td style="text-align: left;">8.0.408</td>
-<td style="text-align: left;">02-May-25</td>
+<td>Write-TestResult</td>
+<td>Write a standardized test result line. Usage: <code>Write-TestResult -Name 'smoke' -Passed $true</code></td>
 </tr>
 <tr>
-<td style="text-align: left;"><a href="https://dotnet.microsoft.com/en-us/download/dotnet">Dotnet9 Runtime</a></td>
-<td style="text-align: left;">9.0.203</td>
-<td style="text-align: left;">02-May-25</td>
+<td>Test-TargetExists</td>
+<td>Check whether an MSBuild target exists in a project/targets file. Usage: <code>Test-TargetExists -ProjectFile foo.targets -TargetName Publish</code></td>
 </tr>
 <tr>
-<td style="text-align: left;"><a href="https://app.diagrams.net/">Draw.io</a></td>
-<td style="text-align: left;">N/A</td>
-<td style="text-align: left;">01-Oct-23</td>
+<td>Test-TargetDependencies</td>
+<td>Validate MSBuild target dependencies. Usage: <code>Test-TargetDependencies -ProjectFile foo.targets -TargetName Publish</code></td>
 </tr>
 <tr>
-<td style="text-align: left;"><a href="https://git-scm.com/downloads">Git for Windows</a></td>
-<td style="text-align: left;">2.50.0</td>
-<td style="text-align: left;">07-Sep-25</td>
+<td>Test-TargetDelegation</td>
+<td>Verify MSBuild target delegation patterns used by <code>nb</code>. Usage: <code>Test-TargetDelegation -SolutionDir .</code></td>
 </tr>
 <tr>
-<td style="text-align: left;"><a href="https://docs.docker.com/docker-for-windows/install/">Install Docker Desktop on Windows</a></td>
-<td style="text-align: left;">4.38.0.0</td>
-<td style="text-align: left;">07-Sep-25</td>
+<td>Get-FileHash256</td>
+<td>Compute SHA256 hash of a file. Usage: <code>Get-FileHash256 -Path C:\Artifacts\nb.exe</code></td>
 </tr>
 <tr>
-<td style="text-align: left;"><a href="https://github.com/kubernetes/kubernetes/releases">kubernetes</a></td>
-<td style="text-align: left;">1.33.0</td>
-<td style="text-align: left;">07-Sep-25</td>
+<td>Get-FileVersionInfo</td>
+<td>Read file version metadata (file version/product version). Usage: <code>Get-FileVersionInfo -Path C:\Artifacts\nb.exe</code></td>
 </tr>
 <tr>
-<td style="text-align: left;"><a href="https://github.com/kubernetes/minikube/releases/">minikube</a></td>
-<td style="text-align: left;">1.35.0</td>
-<td style="text-align: left;">07-Sep-25</td>
+<td>Invoke-FastForward</td>
+<td>Fast-forward a git ref to a specified commit/branch. Usage: <code>Invoke-FastForward -Repo . -Remote origin -Branch main</code></td>
 </tr>
 <tr>
-<td style="text-align: left;"><a href="https://www.mongodb.com/try/download/community">MongoDB Community Server</a></td>
-<td style="text-align: left;">8.0.5</td>
-<td style="text-align: left;">07-Sep-25</td>
+<td>Write-OutputMessage</td>
+<td>Consistent formatted output writer (info/warn/error). Usage: <code>Write-OutputMessage -Level Info -Message 'Starting'</code></td>
 </tr>
 <tr>
-<td style="text-align: left;"><a href="https://nodejs.org/en/download/">Node.js</a></td>
-<td style="text-align: left;">22.12.0</td>
-<td style="text-align: left;">07-Sep-25</td>
+<td>Get-NToolsFileVersion</td>
+<td>Helper to get NTools product version from binaries. Usage: <code>Get-NToolsFileVersion -FilePath C:\Artifacts\nb.exe</code></td>
 </tr>
 <tr>
-<td style="text-align: left;"><a href="https://github.com/naz-hage/ntools/releases">Ntools</a></td>
-<td style="text-align: left;">1.27.0</td>
-<td style="text-align: left;">07-Sep-25</td>
+<td>Add-DeploymentPathToEnvironment</td>
+<td>Add deploy path to PATH for current process/user. Usage: <code>Add-DeploymentPathToEnvironment -Path C:\My\deploy\bin</code></td>
 </tr>
 <tr>
-<td style="text-align: left;"><a href="https://github.com/cli/cli/releases">GitHub CLI</a></td>
-<td style="text-align: left;">2.74.2</td>
-<td style="text-align: left;">07-Sep-25</td>
+<td>Invoke-NToolsDownload</td>
+<td>Download NTools release artifacts (zip/nuget). Usage: <code>Invoke-NToolsDownload -Version 1.2.3 -OutputDir C:\Downloads</code></td>
 </tr>
 <tr>
-<td style="text-align: left;"><a href="https://www.nuget.org/downloads">NuGet</a></td>
-<td style="text-align: left;">6.12.1</td>
-<td style="text-align: left;">07-Sep-25</td>
+<td>Install-NTools</td>
+<td>Install NTools packages based on an ntools.json config. Usage: <code>Install-NTools -NtoolsJsonPath ./dev-setup/ntools.json</code></td>
 </tr>
 <tr>
-<td style="text-align: left;"><a href="https://pnpm.io/">pnpm</a></td>
-<td style="text-align: left;">10.14.0</td>
-<td style="text-align: left;">07-Sep-25</td>
+<td>Invoke-VerifyArtifacts</td>
+<td>Run artifact validation (hashes, versions). Usage: <code>Invoke-VerifyArtifacts -ArtifactsPath C:\Artifacts\MySolution\Release\1.2.3 -ProductVersion 1.2.3</code></td>
 </tr>
 <tr>
-<td style="text-align: left;"><a href="https://www.postman.com/downloads/">Postman Get Started for Free</a></td>
-<td style="text-align: left;">v11.36.0</td>
-<td style="text-align: left;">10-Mar-25</td>
+<td>Set-DevelopmentEnvironment</td>
+<td>Set local dev env variables (DevDrive/MainDir). Usage: <code>Set-DevelopmentEnvironment -DevDrive 'D:' -MainDir 'source'</code></td>
 </tr>
 <tr>
-<td style="text-align: left;"><a href="https://github.com/PowerShell/PowerShell/releases">PowerShell</a></td>
-<td style="text-align: left;">10.0.0</td>
-<td style="text-align: left;">07-Sep-25</td>
+<td>Test-IsAdministrator</td>
+<td>Returns true if running elevated. Usage: <code>Test-IsAdministrator</code></td>
 </tr>
 <tr>
-<td style="text-align: left;"><a href="https://www.python.org/downloads/">Python</a></td>
-<td style="text-align: left;">3.13.3</td>
-<td style="text-align: left;">07-Sep-25</td>
+<td>Test-MicrosoftPowerShellSecurityModuleLoaded</td>
+<td>Check for Microsoft.PowerShell.Security module availability. Usage: <code>Test-MicrosoftPowerShellSecurityModuleLoaded</code></td>
 </tr>
 <tr>
-<td style="text-align: left;"><a href="https://learn.microsoft.com/en-us/sysinternals/">SysInternals</a></td>
-<td style="text-align: left;">2.90.0.0</td>
-<td style="text-align: left;">07-Sep-25</td>
+<td>Test-CertificateStore</td>
+<td>Validate certificate presence in store. Usage: <code>Test-CertificateStore -Thumbprint &lt;thumbprint&gt;</code></td>
 </tr>
 <tr>
-<td style="text-align: left;"><a href="https://releases.hashicorp.com/terraform">Terraform</a></td>
-<td style="text-align: left;">0.55.1</td>
-<td style="text-align: left;">07-Sep-25</td>
+<td>New-SelfSignedCodeCertificate</td>
+<td>Create a self-signed code-signing certificate (dev). Usage: <code>New-SelfSignedCodeCertificate -Subject 'CN=ntools-dev' -ExportPath ./dev-cert.pfx</code></td>
 </tr>
 <tr>
-<td style="text-align: left;"><a href="https://github.com/terraform-linters/tflint/releases">Terraform Lint</a></td>
-<td style="text-align: left;">0.55.1</td>
-<td style="text-align: left;">07-Sep-25</td>
+<td>Export-CertificateToPfx</td>
+<td>Export a certificate object to PFX file. Usage: <code>Export-CertificateToPfx -Certificate $cert -Password (ConvertTo-SecureString -AsPlainText 'pw' -Force) -Path ./cert.pfx</code></td>
 </tr>
 <tr>
-<td style="text-align: left;"><a href="https://visualstudio.microsoft.com/vs/community/">Visual Studio 2022 Community Edition</a></td>
-<td style="text-align: left;">17.11.3</td>
-<td style="text-align: left;">07-Sep-25</td>
+<td>Export-CertificateToCer</td>
+<td>Export certificate to .cer (DER/PEM). Usage: <code>Export-CertificateToCer -Certificate $cert -Path ./cert.cer</code></td>
 </tr>
 <tr>
-<td style="text-align: left;"><a href="https://code.visualstudio.com/download">Visual Studio Code</a></td>
-<td style="text-align: left;">1.100.1</td>
-<td style="text-align: left;">07-Sep-25</td>
+<td>Import-CertificateToRoot</td>
+<td>Import a certificate to the LocalMachine\Root store. Usage: <code>Import-CertificateToRoot -Path ./cert.cer</code></td>
 </tr>
 <tr>
-<td style="text-align: left;"><a href="https://www.microsoft.com/en-us/p/windows-terminal/9n0dx20hk701">Windows Terminal</a></td>
-<td style="text-align: left;">1.21.10351.0</td>
-<td style="text-align: left;">10-Mar-25</td>
+<td>Import-CertificateToCurrentUser</td>
+<td>Import a certificate to CurrentUser store. Usage: <code>Import-CertificateToCurrentUser -Path ./cert.pfx -Password (ConvertTo-SecureString -AsPlainText 'pw' -Force)</code></td>
+</tr>
+<tr>
+<td>Set-ScriptSignature</td>
+<td>Sign a script file with a certificate. Usage: <code>Set-ScriptSignature -ScriptPath ./scripts/setup/install.ps1 -CertificateThumbprint &lt;thumbprint&gt;</code></td>
+</tr>
+<tr>
+<td>Get-ScriptSignature</td>
+<td>Get signature information for a script file. Usage: <code>Get-ScriptSignature -ScriptPath ./scripts/setup/install.ps1</code></td>
+</tr>
+<tr>
+<td>Set-CodeSigningTrust</td>
+<td>Add a certificate to the machine/user trust store for code signing flows. Usage: <code>Set-CodeSigningTrust -Path ./cert.cer -Scope Machine</code></td>
 </tr>
 </tbody>
 </table>
+<p>Notes:
+- Keep this file in sync with <code>scripts/module-package/ntools-scripts.psm1</code> and <code>ntools-scripts.psd1</code>.
+- For runtime discovery: <code>Import-Module './scripts/module-package/ntools-scripts.psm1' -Force; Get-Command -Module ntools-scripts</code>.</p>
+<p>Generated: condensed API table with short usage examples to improve discoverability.</p>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../../version-automation-guide/" class="btn btn-neutral float-left" title="Version Automation Guide"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../ntools-scripts-module/" class="btn btn-neutral float-right" title="Module">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../ntools-scripts-module/" class="btn btn-neutral float-left" title="Module"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../code-coverage/" class="btn btn-neutral float-right" title="Code Coverage">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -310,10 +293,10 @@ The <a href="https://learn.microsoft.com/en-us/windows/dev-environment/">Windows
         </span>
     
     
-      <span><a href="../../version-automation-guide/" style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../ntools-scripts-module/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
-      <span><a href="../ntools-scripts-module/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="../code-coverage/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>
