@@ -35,5 +35,3 @@ nav:
   - Build System Features:
     - Code Coverage: ntools/code-coverage.md
     - MSBuild Targets: ntools/nbuild-targets.md
-  - Revisions: 
-      - changelog.md

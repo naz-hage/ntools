@@ -7,7 +7,7 @@ This page lists the exported functions from the `ntools-scripts` PowerShell modu
 | Get-ntoolsScriptsVersion | Returns the module version. Usage: `Get-ntoolsScriptsVersion` |
 | Publish-AllProjects | Build and publish non-test projects to an output directory. Usage: `Publish-AllProjects -OutputDir C:\Artifacts -Version 1.0.0 -RepositoryRoot C:\MyRepo` |
 | Get-VersionFromJson | Read version fields from a JSON file (ntools.json style). Usage: `Get-VersionFromJson -Path ./dev-setup/ntools.json` |
-| Update-MarkdownTable | Update a markdown table of versions in a file. Usage: `Update-MarkdownTable -File docs/versions.md -Version 1.2.3` |
+| Update-DocVersions | Update a markdown table of versions in a file. Usage: `Update-DocVersions -File docs/versions.md -Version 1.2.3` |
 | Write-TestResult | Write a standardized test result line. Usage: `Write-TestResult -Name 'smoke' -Passed $true` |
 | Test-TargetExists | Check whether an MSBuild target exists in a project/targets file. Usage: `Test-TargetExists -ProjectFile foo.targets -TargetName Publish` |
 | Test-TargetDependencies | Validate MSBuild target dependencies. Usage: `Test-TargetDependencies -ProjectFile foo.targets -TargetName Publish` |

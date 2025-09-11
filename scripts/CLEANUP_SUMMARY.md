@@ -40,7 +40,7 @@ scripts/
 1. `Get-NtoolsScriptsVersion` - Module version info
 2. `Publish-AllProjects` - Build and publish all projects
 3. `Get-VersionFromJson` - Extract versions from JSON
-4. `Update-MarkdownTable` - Update markdown tables
+4. `Update-DocVersions` - Update markdown tables
 5. `Write-TestResult` - Formatted test output
 6. `Test-TargetExists` - MSBuild target existence check
 7. `Test-TargetDependencies` - Target dependency validation

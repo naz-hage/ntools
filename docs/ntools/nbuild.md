@@ -197,7 +197,7 @@ Below is a list of common targets defined in the `common.targets` file:
 
 ---
 
-## Command Examples
+## Examples
 
 
 Below are practical examples for using `nb.exe`. These examples assume you are running in a PowerShell terminal.

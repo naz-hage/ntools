@@ -15,7 +15,7 @@ Previously, these had to be updated manually, leading to inconsistencies and out
 ## 1. PowerShell Module Integration (v2.3.0+)
 
 - **Module**: `scripts/module-package/ntools-scripts.psm1`
-- **Function**: `Update-MarkdownTable` and `Get-VersionFromJson`
+- **Function**: `Update-DocVersions` and `Get-VersionFromJson`
 - **Purpose**: Consolidated version management within the ntools-scripts module
 - **Integration**: Available in all build processes and CI/CD pipelines
 
@@ -25,42 +25,17 @@ Previously, these had to be updated manually, leading to inconsistencies and out
 Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
 
 # Update documentation with latest versions
-Update-MarkdownTable -JsonDirectory "./dev-setup" -MarkdownFile "./docs/ntools/ntools.md"
+Update-DocVersions -JsonDirectory "./dev-setup" -MarkdownFile "./docs/ntools/ntools.md"
 
 # Get version from specific JSON file  
 $version = Get-VersionFromJson -JsonFilePath "./dev-setup/ntools.json"
-```
-
-## 2. Legacy PowerShell Script Automation (Deprecated)
-
-- **File**: `scripts/devops/devops-update-versions.ps1` (deprecated in favor of module functions)
-- **Purpose**: Standalone script to sync versions between JSON files and documentation
-- **Status**: Maintained for backward compatibility, but ntools-scripts module is preferred
-
-### Features (Now Available as Module Functions)
-- Reads all JSON files in `dev-setup/` directory
-- Extracts `Name` and `Version` from `NbuildAppList[0]`
-- Updates corresponding entries in `ntools.md` table
-- Handles tool name mapping (e.g., "PowerShell" ↔ "Powershell")
-- Updates "Last Checked on" dates automatically
-- Provides colored console output for better UX
-
-## Version Automation Approach
-### Usage
-```powershell
-# Basic usage
-cd scripts/devops
-.\devops-update-versions.ps1
-
-# With custom paths (relative to repository root)
-.\devops-update-versions.ps1 -DevSetupPath "dev-setup" -DocsPath "docs\ntools\ntools.md"
 ```
 
 ---
 
 Tool versions in documentation are updated using the MSBuild task (`UpdateVersionsInDocs`) via the `nb update_doc_versions` command. This extracts all tool/version pairs from every `NbuildAppList` entry in every `*.json` file in `dev-setup` and updates the documentation table accordingly. See the documentation in `ntools.md` for details.
 
-## 2. NBuild Task Integration
+### NBuild Task Integration
 
 - **File**: `NbuildTasks/UpdateVersionsInDocs.cs`
 - **Purpose**: MSBuild task for build-time automation

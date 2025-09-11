@@ -89,9 +89,9 @@ namespace NbuildTasks
             }
         }
 
-        private void UpdateMarkdownFile(string markdownPath, Dictionary<string, (string Name, string Version)> versionMap)
+        private void UpdateMarkdownFile(string DevSetupPath, Dictionary<string, (string Name, string Version)> versionMap)
         {
-            var lines = File.ReadAllLines(markdownPath);
+            var lines = File.ReadAllLines(DevSetupPath);
             var today = DateTime.Now.ToString("dd-MMM-yy");
 
             for (int i = 0; i < lines.Length; i++)
@@ -128,7 +128,7 @@ namespace NbuildTasks
                 }
             }
 
-            File.WriteAllLines(markdownPath, lines);
+            File.WriteAllLines(DevSetupPath, lines);
         }
 
         private static bool IsToolMatch(string toolName, string jsonName)

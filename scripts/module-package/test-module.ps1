@@ -21,7 +21,7 @@ $expectedFunctions = @(
     'Publish-AllProjects',
     'Get-NtoolsScriptsVersion',
     'Get-VersionFromJson',
-    'Update-MarkdownTable',
+    'Update-DocVersions',
     'Write-TestResult',
     'Test-TargetExists',
     'Test-TargetDependencies',

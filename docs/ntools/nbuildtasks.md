@@ -96,6 +96,21 @@ Here are examples of custom Tasks that can be used during builds:
 	<Message Text="==> ZIP_DONE"/>
 </Target>
 ```
+### Pwsh
+```xml
+<!-- This target uses the `Pwsh` task to run a PowerShell Core script from MSBuild -->
+<Target Name="RUN_PWSH">
+	<PropertyGroup>
+		<ScriptPath>$(SolutionDir)scripts\build\custom-script.ps1</ScriptPath>
+		<ScriptArgs>--example true</ScriptArgs>
+	</PropertyGroup>
+
+	<!-- Pwsh is a custom MSBuild task that executes a PowerShell Core script -->
+	<Pwsh Script="$(ScriptPath)" Arguments="$(ScriptArgs)" NoProfile="true" ExecutionPolicy="Bypass" />
+
+	<Message Text="==> PWSH_DONE" />
+</Target>
+```
 ### UpdateVersionsInDocs
 ```xml
 <!-- This target uses the `UpdateVersionsInDocs` task to update version numbers in documentation files -->
