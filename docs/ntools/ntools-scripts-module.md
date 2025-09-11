@@ -4,62 +4,63 @@ This page documents the `ntools-scripts` PowerShell module and serves as the can
 
 **Location**: `scripts/module-package/ntools-scripts.psm1`
 
+## Quick start
+
+Follow these minimal steps to start using the module locally or in CI.
+
+```powershell
+# Import for local development
+Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
+
+# Check the module version
+Get-NtoolsScriptsVersion
+
+# Install NTools using a local configuration file
+Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
+```
+
+## Table of contents
+
+- Quick start
+- Overview
+- Import the Module
+- Usage examples
+- Module information
+- Architecture & migration
+- Module development
+- Troubleshooting
+- Canonical API reference
+
+
 ## Overview
 Module files:
 ```
 scripts/
-├─ module-package/
-│  ├─ ntools-scripts.psm1     # Main module with all functions
-│  ├─ ntools-scripts.psd1     # Module manifest
-│  └─ install-module.ps1      # Installation helper
-├─ devops/
-└─ setup/
-```
-Refer to the "Canonical module API" section below for the authoritative list of exported functions and descriptions.
-### Import the Module
-```
-# Import from local development
-Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
+## Available functions (summary)
 
-# Import from installed location (after installation)
-Import-Module "$env:ProgramFiles\nbuild\modules\ntools-scripts\ntools-scripts.psm1" -Force
-```
-### Integration with Build System
--- **Installation**: `nbuild.targets` automatically installs the module during `INSTALL_NTOOLS_SCRIPTS` target
--- **Usage**: `PUBLISH` target uses `Publish-AllProjects` function with deterministic repository path
-### GitHub Actions Integration
-- name: Install ntools using ntools-scripts module
-  run: |
-    Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
-    Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
-# Migration from Legacy Scripts
-# New way
-run: |
-  Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
-  Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
-<!-- New way (automatically used) -->
-<Exec Command='pwsh -Command "Import-Module ntools-scripts; Publish-AllProjects -RepositoryRoot $(SolutionDir)"' />
-### Module Development
+The module exports a broad set of functions covering build, CI/devops, setup/install, testing, utilities, and code-signing helpers. For the complete, authoritative list of exported function names and the exact API surface, see the dedicated API reference:
 
-### Adding New Functions
-1. Add function to appropriate section in `ntools-scripts.psm1`
-2. Add function name to `Export-ModuleMember` line
-3. Update `FunctionsToExport` in `ntools-scripts.psd1`
+- docs/ntools/ntools-scripts-module-api.md
+
+If you need to discover functions at runtime, import the module and run:
+
+```powershell
+Get-Command -Module ntools-scripts | Sort-Object Name
+```
 ```powershell
 # Test the module
 Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
 Test-NToolsScriptsModule
 ```
-# Installation
+## Manual Installation
 ```powershell
 # Install module manually for development
 Install-NToolsScriptsModule -InstallPath "$env:ProgramFiles\WindowsPowerShell\Modules\ntools-scripts" -Force
 ```
-# ntools-scripts PowerShell Module
 
 The ntools-scripts module is a comprehensive PowerShell module that consolidates all NTools PowerShell functionality into a single, reusable module. This module replaces the previous collection of individual scripts with a structured, function-based approach.
 
-## Overview
+## Module Information
 
 **Version**: 2.3.0  
 **Location**: `scripts/module-package/ntools-scripts.psm1`  
@@ -158,58 +159,20 @@ The module exports 36 functions organized by category:
 
 ## Canonical module API (single source of truth)
 
-The following section is the canonical, authoritative list of functions exported by the
-`ntools-scripts` module. Documentation elsewhere should reference this page for the
-module API rather than duplicating the function list.
+The complete, authoritative list of exported functions is available in the separate API reference:
 
-Exported functions (exactly as exported by `Export-ModuleMember` in `ntools-scripts.psm1`):
+- docs/ntools/ntools-scripts-module-api.md
 
-- `Get-ntoolsScriptsVersion`
-- `Publish-AllProjects`
-- `Get-VersionFromJson`
-- `Update-MarkdownTable`
-- `Write-TestResult`
-- `Test-TargetExists`
-- `Test-TargetDependencies`
-- `Test-TargetDelegation`
-- `Get-FileHash256`
-- `Get-FileVersionInfo`
-- `Invoke-FastForward`
-- `Write-OutputMessage`
-- `Get-NToolsFileVersion`
-- `Add-DeploymentPathToEnvironment`
-- `Invoke-NToolsDownload`
-- `Install-NTools`
-- `Invoke-VerifyArtifacts`
-- `Set-DevelopmentEnvironment`
-- `Test-IsAdministrator`
-- `Test-MicrosoftPowerShellSecurityModuleLoaded`
-- `Test-CertificateStore`
-- `New-SelfSignedCodeCertificate`
-- `Export-CertificateToPfx`
-- `Export-CertificateToCer`
-- `Import-CertificateToRoot`
-- `Import-CertificateToCurrentUser`
-- `Set-ScriptSignature`
-- `Get-ScriptSignature`
-- `Set-CodeSigningTrust`
+For quick discovery at runtime, import the module and list commands:
 
-Notes:
-- This page is the single authoritative reference for the `ntools-scripts` module API.
-- If other docs (tutorials, README files, or CI snippets) need to show usage examples,
-  they should link to this page and include only short examples — keep API surface here.
+```powershell
+Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
+Get-Command -Module ntools-scripts | Select-Object Name
+```
 
 
 ## Usage Examples
-
-### Import the Module
-```powershell
-# Import from local development
-Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
-
-# Import from installed location (after installation)
-Import-Module "$env:ProgramFiles\nbuild\modules\ntools-scripts\ntools-scripts.psm1" -Force
-```
+For import instructions, see the "Import the Module" section near the top of this page.
 
 ### Get Module Information
 ```powershell

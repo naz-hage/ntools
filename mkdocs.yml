@@ -26,9 +26,12 @@ nav:
   - Custom Build Tasks:
       - Nbuild Tasks: ntools/nbuildtasks.md
   - Developer setup:
-      - Pre-commit Setup: pre-commit-setup.md
-      - Version Automation Guide: version-automation-guide.md
-      - Development Tools: ntools/ntools.md
+    - Pre-commit Setup: pre-commit-setup.md
+    - Version Automation Guide: version-automation-guide.md
+    - Development Tools: ntools/ntools.md
+    - ntools-scripts module:
+      - Module: ntools/ntools-scripts-module.md
+      - API: ntools/ntools-scripts-module-api.md
   - Build System Features:
     - Code Coverage: ntools/code-coverage.md
     - MSBuild Targets: ntools/nbuild-targets.md
