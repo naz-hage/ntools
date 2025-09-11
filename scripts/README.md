@@ -65,7 +65,8 @@ Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
 
 Individual scripts in `build/`, `devops/`, and `test/` folders are maintained for reference but are deprecated:
 
-# Migration Path:
+## Migration Path
+
 ```powershell
 # Old way
 ./scripts/build/build-verify-artifacts.ps1
@@ -75,21 +76,21 @@ Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
 Invoke-VerifyArtifacts -ArtifactsPath "C:\Artifacts\MySolution\Release\1.2.3" -ProductVersion "1.2.3"
 
 # Legacy devops scripts (removed)
-The per-script devops wrappers were removed during consolidation. Use the canonical
-`ntools-scripts` module instead. Example usage:
+# The per-script devops wrappers were removed during consolidation. Use the canonical
+# `ntools-scripts` module instead. Example usage:
 
-```powershell
 Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
 
 # Get public IP for pipeline usage and set pipeline variable
 Get-AgentPublicIp
 
-# Install or uninstall git pre-commit hooks
-Set-PreCommitHooks -Action install
-
 # Add/remove Azure WAF rules (requires Azure CLI authentication)
 Add-WafAllowRule -ResourceGroupName 'rg' -WafPolicyName 'policy' -CustomRuleName 'allow-agent' -AgentIp '1.2.3.4'
 Remove-WafCustomRule -ResourceGroupName 'rg' -WafPolicyName 'policy' -CustomRuleName 'allow-agent'
+
+# NOTE: Pre-commit integration and helpers were deprecated and removed from the
+# canonical module and repository docs. Historical notes exist in the repository
+# history if needed.
 ```
 ```
 
