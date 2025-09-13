@@ -35,7 +35,6 @@ This page lists the exported functions from the `ntools-scripts` PowerShell modu
 | Set-CodeSigningTrust | Add a certificate to the machine/user trust store for code signing flows. Usage: `Set-CodeSigningTrust -Path ./cert.cer -Scope Machine` |
 
 Notes:
-- Keep this file in sync with `scripts/module-package/ntools-scripts.psm1` and `ntools-scripts.psd1`.
 - For runtime discovery: `Import-Module './scripts/module-package/ntools-scripts.psm1' -Force; Get-Command -Module ntools-scripts`.
 
 
