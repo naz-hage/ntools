@@ -69,30 +69,6 @@ Install-NToolsScriptsModule -InstallPath "$env:ProgramFiles\WindowsPowerShell\Mo
 
 The module consolidates functionality from the previous script structure:
 
-### Before (Individual Scripts)
-```
-scripts/
-├── build/build-verify-artifacts.ps1   # deprecated - functionality moved to Invoke-VerifyArtifacts
-├── devops/ (legacy scripts migrated into module)
-
-Use the `Set-DevelopmentEnvironment` function in the `ntools-scripts` module instead. It provides the same behavior (sets user `devDrive` and `mainDir` environment variables) and is callable directly from PowerShell or via MSBuild using the `SETUP_ENVIRONMENT` target in `nbuild.targets`.
-
-Example (PowerShell):
-
-```powershell
-Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
-Set-DevelopmentEnvironment -DevDrive 'D:' -MainDir 'source'
-```
-
-MSBuild (from repo root):
-
-```powershell
-msbuild /t:SETUP_ENVIRONMENT /p:DevDrive=D: /p:MainDir=source
-```
-├── test/  # Legacy test scripts were consolidated into the `ntools-scripts` module
-└── ... (legacy scripts removed; use module functions)
-```
-
 ### After (Consolidated Module)
 ```
 scripts/
