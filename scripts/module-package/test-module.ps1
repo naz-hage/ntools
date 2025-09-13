@@ -6,13 +6,25 @@ param(
 Write-Host "Testing installed ntools-scripts module in: $BuildTools"
 
 
-$modulePsm = Join-Path $BuildTools 'ntools-scripts.psm1'
+# Look for the installed module in a few common locations. Historically the module
+# may be placed at the build root or under modules\ntools-scripts\ when installed
+# using the repository helper script.
+$candidates = @(
+    Join-Path $BuildTools 'ntools-scripts.psm1',
+    Join-Path $BuildTools 'modules\ntools-scripts\ntools-scripts.psm1',
+    Join-Path $BuildTools 'modules\ntools-scripts\ntools-scripts.psd1'
+)
 
-if (Test-Path $modulePsm) {
+$modulePsm = $null
+foreach ($cand in $candidates) {
+    if (Test-Path $cand) { $modulePsm = $cand; break }
+}
+
+if ($modulePsm) {
     Write-Host "Importing module from: $modulePsm"
     Import-Module $modulePsm -Force -ErrorAction Stop
 } else {
-    Write-Error "ntools-scripts module not found at: $modulePsm"
+    Write-Error "ntools-scripts module not found in any of the expected locations:`n  $($candidates -join "`n  ")"
     exit 2
 }
 
