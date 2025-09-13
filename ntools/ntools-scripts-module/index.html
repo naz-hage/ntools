@@ -94,9 +94,27 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#architecture">Architecture</a>
         <ul>
-    <li class="toctree-l4"><a class="reference internal" href="#before-individual-scripts">Before (Individual Scripts)</a>
+    <li class="toctree-l4"><a class="reference internal" href="#after-consolidated-module">After (Consolidated Module)</a>
     </li>
         </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#available-functions">Available Functions</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#build-functions">Build Functions</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#devops-functions">DevOps Functions</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#setup-functions">Setup Functions</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#test-functions">Test Functions</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#utility-functions">Utility Functions</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#common-functions">Common Functions</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#canonical-module-api-single-source-of-truth">Canonical module API (single source of truth)</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#usage-examples">Usage Examples</a>
         <ul>
@@ -117,28 +135,6 @@
     <li class="toctree-l4"><a class="reference internal" href="#smoke_test-target-integration">SMOKE_TEST Target Integration</a>
     </li>
     <li class="toctree-l4"><a class="reference internal" href="#github-actions-integration">GitHub Actions Integration</a>
-    </li>
-        </ul>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#key-improvements">Key Improvements</a>
-        <ul>
-    <li class="toctree-l4"><a class="reference internal" href="#1-deterministic-repository-path-detection">1. Deterministic Repository Path Detection</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#2-configurable-ntoolsjson-path">2. Configurable ntools.json Path</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#3-unified-error-handling">3. Unified Error Handling</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#4-backward-compatibility">4. Backward Compatibility</a>
-    </li>
-        </ul>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#migration-from-legacy-scripts">Migration from Legacy Scripts</a>
-        <ul>
-    <li class="toctree-l4"><a class="reference internal" href="#for-developers">For Developers</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#for-cicd">For CI/CD</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#for-msbuild">For MSBuild</a>
     </li>
         </ul>
     </li>
@@ -252,35 +248,14 @@ Test-NToolsScriptsModule
 <pre><code class="language-powershell"># Install module manually for development
 Install-NToolsScriptsModule -InstallPath &quot;$env:ProgramFiles\WindowsPowerShell\Modules\ntools-scripts&quot; -Force
 </code></pre>
-<p>The ntools-scripts module is a comprehensive PowerShell module that consolidates all NTools PowerShell functionality into a single, reusable module. This module replaces the previous collection of individual scripts with a structured, function-based approach.</p>
 <h2 id="module-information">Module Information</h2>
 <p><strong>Version</strong>: 2.3.0<br />
 <strong>Location</strong>: <code>scripts/module-package/ntools-scripts.psm1</code><br />
 <strong>Installation</strong>: Automatically installed via MSBuild targets and GitHub Actions</p>
 <h2 id="architecture">Architecture</h2>
 <p>The module consolidates functionality from the previous script structure:</p>
-<h3 id="before-individual-scripts">Before (Individual Scripts)</h3>
+<h3 id="after-consolidated-module">After (Consolidated Module)</h3>
 <pre><code>scripts/
-├── build/build-verify-artifacts.ps1   # deprecated - functionality moved to Invoke-VerifyArtifacts
-├── devops/ (legacy scripts migrated into module)
-
-Use the `Set-DevelopmentEnvironment` function in the `ntools-scripts` module instead. It provides the same behavior (sets user `devDrive` and `mainDir` environment variables) and is callable directly from PowerShell or via MSBuild using the `SETUP_ENVIRONMENT` target in `nbuild.targets`.
-
-Example (PowerShell):
-
-```powershell
-Import-Module &quot;./scripts/module-package/ntools-scripts.psm1&quot; -Force
-Set-DevelopmentEnvironment -DevDrive 'D:' -MainDir 'source'
-</code></pre>
-<p>MSBuild (from repo root):</p>
-<pre><code class="language-powershell">msbuild /t:SETUP_ENVIRONMENT /p:DevDrive=D: /p:MainDir=source
-</code></pre>
-<p>├── test/  # Legacy test scripts were consolidated into the <code>ntools-scripts</code> module
-└── ... (legacy scripts removed; use module functions)</p>
-<pre><code>
-### After (Consolidated Module)
-</code></pre>
-<p>scripts/
 ├── module-package/
 │   ├── ntools-scripts.psm1     # Main module with all functions
 │   ├── ntools-scripts.psd1     # Module manifest
@@ -288,67 +263,66 @@ Set-DevelopmentEnvironment -DevDrive 'D:' -MainDir 'source'
 ├── build/                      # Legacy scripts (deprecated)
 ├── devops/                     # Legacy scripts (deprecated)
 ├── setup/                      # Entry point scripts
-└── test/                       # Legacy scripts (deprecated)</p>
-<pre><code>
-## Available Functions
-
-The module exports 36 functions organized by category:
-
-### Build Functions
--- `Publish-AllProjects` - Build and publish all non-test projects with deterministic repository path
--- `Invoke-VerifyArtifacts` - Comprehensive artifact verification
-- `Get-ProjectFiles` - Get project files with filtering
-- `Invoke-ProjectPublish` - Publish individual projects
-
-### DevOps Functions  
-- `Get-AgentPublicIp` - Get public IP for Azure DevOps agents and set pipeline variable
-- `Add-WafAllowRule` - Add Azure WAF allow rule for an IP
-- `Remove-WafCustomRule` - Remove Azure WAF custom rule
-- `Get-VersionFromJson` - Extract version information from JSON files
-- `Update-DocVersions` - Update version tables in markdown documentation
-
-### Setup Functions
-- `Set-DevelopmentEnvironment` - Set up development environment
-- `Install-DevelopmentApps` - Install development applications
-- `Install-NTools` - Install NTools from releases (with configurable ntools.json path)
-- `Install-NToolsScriptsModule` - Install this module
-
-### Test Functions
-- `Invoke-CodeCoverage` - Run tests with code coverage
-- `Test-MSBuildDelegation` - Test MSBuild target delegation (**Note**: Now automatically integrated into `nb smoke_test` target)
-- `Test-QuickTargets` - Quick target validation
-- `Test-NToolsScriptsModule` - Test module functionality
-- `Write-TestResult` - Write formatted test results
-- `Test-TargetExists` - Check if MSBuild targets exist
-- `Test-TargetDependencies` - Validate target dependencies
-- `Test-TargetDelegation` - Test target delegation patterns (**Note**: Core function used by `nb smoke_test` target)
-
-### Utility Functions
-- `Get-FileHash256` - Calculate SHA256 hash of files
-- `Get-FileVersionInfo` - Get file version information
-- `Invoke-FastForward` - Git fast-forward operations
-- `Write-OutputMessage` - Standardized output messaging
-- `Get-NToolsFileVersion` - Get NTools file version information
-- `Add-DeploymentPathToEnvironment` - Add paths to PATH environment variable
-- `Invoke-NToolsDownload` - Download NTools packages
-
-### Common Functions
-- `Write-Info` - Write informational messages
-- `Write-Success` - Write success messages
-- `Write-Warning` - Write warning messages
-- `Write-Error` - Write error messages
-- `Get-NtoolsScriptsVersion` - Get module version information
-
-## Canonical module API (single source of truth)
-
-The complete, authoritative list of exported functions is available in the separate API reference:
-
-- docs/ntools/ntools-scripts-module-api.md
-
-For quick discovery at runtime, import the module and list commands:
-
-```powershell
-Import-Module &quot;./scripts/module-package/ntools-scripts.psm1&quot; -Force
+└── test/                       # Legacy scripts (deprecated)
+</code></pre>
+<h2 id="available-functions">Available Functions</h2>
+<p>The module exports 36 functions organized by category:</p>
+<h3 id="build-functions">Build Functions</h3>
+<p>-- <code>Publish-AllProjects</code> - Build and publish all non-test projects with deterministic repository path
+-- <code>Invoke-VerifyArtifacts</code> - Comprehensive artifact verification
+- <code>Get-ProjectFiles</code> - Get project files with filtering
+- <code>Invoke-ProjectPublish</code> - Publish individual projects</p>
+<h3 id="devops-functions">DevOps Functions</h3>
+<ul>
+<li><code>Get-AgentPublicIp</code> - Get public IP for Azure DevOps agents and set pipeline variable</li>
+<li><code>Add-WafAllowRule</code> - Add Azure WAF allow rule for an IP</li>
+<li><code>Remove-WafCustomRule</code> - Remove Azure WAF custom rule</li>
+<li><code>Get-VersionFromJson</code> - Extract version information from JSON files</li>
+<li><code>Update-DocVersions</code> - Update version tables in markdown documentation</li>
+</ul>
+<h3 id="setup-functions">Setup Functions</h3>
+<ul>
+<li><code>Set-DevelopmentEnvironment</code> - Set up development environment</li>
+<li><code>Install-DevelopmentApps</code> - Install development applications</li>
+<li><code>Install-NTools</code> - Install NTools from releases (with configurable ntools.json path)</li>
+<li><code>Install-NToolsScriptsModule</code> - Install this module</li>
+</ul>
+<h3 id="test-functions">Test Functions</h3>
+<ul>
+<li><code>Invoke-CodeCoverage</code> - Run tests with code coverage</li>
+<li><code>Test-MSBuildDelegation</code> - Test MSBuild target delegation (<strong>Note</strong>: Now automatically integrated into <code>nb smoke_test</code> target)</li>
+<li><code>Test-QuickTargets</code> - Quick target validation</li>
+<li><code>Test-NToolsScriptsModule</code> - Test module functionality</li>
+<li><code>Write-TestResult</code> - Write formatted test results</li>
+<li><code>Test-TargetExists</code> - Check if MSBuild targets exist</li>
+<li><code>Test-TargetDependencies</code> - Validate target dependencies</li>
+<li><code>Test-TargetDelegation</code> - Test target delegation patterns (<strong>Note</strong>: Core function used by <code>nb smoke_test</code> target)</li>
+</ul>
+<h3 id="utility-functions">Utility Functions</h3>
+<ul>
+<li><code>Get-FileHash256</code> - Calculate SHA256 hash of files</li>
+<li><code>Get-FileVersionInfo</code> - Get file version information</li>
+<li><code>Invoke-FastForward</code> - Git fast-forward operations</li>
+<li><code>Write-OutputMessage</code> - Standardized output messaging</li>
+<li><code>Get-NToolsFileVersion</code> - Get NTools file version information</li>
+<li><code>Add-DeploymentPathToEnvironment</code> - Add paths to PATH environment variable</li>
+<li><code>Invoke-NToolsDownload</code> - Download NTools packages</li>
+</ul>
+<h3 id="common-functions">Common Functions</h3>
+<ul>
+<li><code>Write-Info</code> - Write informational messages</li>
+<li><code>Write-Success</code> - Write success messages</li>
+<li><code>Write-Warning</code> - Write warning messages</li>
+<li><code>Write-Error</code> - Write error messages</li>
+<li><code>Get-NtoolsScriptsVersion</code> - Get module version information</li>
+</ul>
+<h2 id="canonical-module-api-single-source-of-truth">Canonical module API (single source of truth)</h2>
+<p>The complete, authoritative list of exported functions is available in the separate API reference:</p>
+<ul>
+<li>docs/ntools/ntools-scripts-module-api.md</li>
+</ul>
+<p>For quick discovery at runtime, import the module and list commands:</p>
+<pre><code class="language-powershell">Import-Module &quot;./scripts/module-package/ntools-scripts.psm1&quot; -Force
 Get-Command -Module ntools-scripts | Select-Object Name
 </code></pre>
 <h2 id="usage-examples">Usage Examples</h2>
@@ -418,54 +392,6 @@ nb smoke_test
   run: |
     Import-Module &quot;./scripts/module-package/ntools-scripts.psm1&quot; -Force
     Install-NTools -NtoolsJsonPath &quot;./dev-setup/ntools.json&quot;
-</code></pre>
-<h2 id="key-improvements">Key Improvements</h2>
-<h3 id="1-deterministic-repository-path-detection">1. Deterministic Repository Path Detection</h3>
-<p>The <code>Publish-AllProjects</code> function now requires an explicit <code>RepositoryRoot</code> parameter, eliminating unreliable heuristic detection:</p>
-<pre><code class="language-powershell"># Before (unreliable)
-Publish-AllProjects -OutputDir $output -Version $version
-
-# After (deterministic)
-Publish-AllProjects -OutputDir $output -Version $version -RepositoryRoot $repoRoot
-</code></pre>
-<h3 id="2-configurable-ntoolsjson-path">2. Configurable ntools.json Path</h3>
-<p>The <code>Install-NTools</code> function accepts a custom path to ntools.json:</p>
-<pre><code class="language-powershell"># Use specific configuration file
-Install-NTools -NtoolsJsonPath &quot;./dev-setup/ntools.json&quot;
-</code></pre>
-<h3 id="3-unified-error-handling">3. Unified Error Handling</h3>
-<p>All functions use consistent error handling and logging:</p>
-<pre><code class="language-powershell">Write-Info &quot;Starting operation...&quot;
-Write-Success &quot;Operation completed successfully&quot;
-Write-Warning &quot;Potential issue detected&quot;
-Write-Error &quot;Operation failed&quot;
-</code></pre>
-<h3 id="4-backward-compatibility">4. Backward Compatibility</h3>
-<ul>
-<li>Legacy script entry points in <code>scripts/setup/</code> still work</li>
-<li>Module functions can be called directly</li>
-<li>All original functionality preserved</li>
-</ul>
-<h2 id="migration-from-legacy-scripts">Migration from Legacy Scripts</h2>
-<h3 id="for-developers">For Developers</h3>
-<pre><code class="language-powershell"># Old way
-./scripts/build/build-verify-artifacts.ps1  # deprecated - use Invoke-VerifyArtifacts
-
-# New way (module-based)
-Import-Module &quot;./scripts/module-package/ntools-scripts.psm1&quot; -Force
-Invoke-VerifyArtifacts -ArtifactsPath &quot;C:\Artifacts\MySolution\Release\1.2.3&quot; -ProductVersion &quot;1.2.3&quot;
-</code></pre>
-<h3 id="for-cicd">For CI/CD</h3>
-<pre><code class="language-yaml">run: |
-  Import-Module &quot;./scripts/module-package/ntools-scripts.psm1&quot; -Force
-  Install-NTools -NtoolsJsonPath &quot;./dev-setup/ntools.json&quot;
-</code></pre>
-<h3 id="for-msbuild">For MSBuild</h3>
-<pre><code class="language-xml">&lt;!-- Old way --&gt;
-&lt;Exec Command='pwsh -File &quot;$(SolutionDir)\scripts\build\publish-all-projects.ps1&quot;' /&gt;
-
-&lt;!-- New way (automatically used) --&gt;
-&lt;Exec Command='pwsh -Command &quot;Import-Module ntools-scripts; Publish-AllProjects -RepositoryRoot $(SolutionDir)&quot;' /&gt;
 </code></pre>
 <h2 id="module-development">Module Development</h2>
 <h3 id="adding-new-functions">Adding New Functions</h3>
