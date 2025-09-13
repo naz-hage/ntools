@@ -29,6 +29,9 @@ except Exception:
 __version__ = '0.1.0'
 TOOL_NAME = Path(__file__).stem
 TOOL_VERSION = __version__
+# When a dry-run prints parsed fields first, set this flag so writers can avoid
+# printing the full body/payload again (prevents duplicated output seen by users).
+DRY_RUN_PRINTED = False
 
 
 # Example markdown templates for reference
@@ -364,32 +367,51 @@ def dry_run_print(fields: dict, args=None):
     if args is not None:
         target = getattr(args, 'target', target) or target
 
-    params = []
-    if target == 'azdo':
-        # AzDo: show Area and Iteration Path (show even if empty)
-        params.append(('Area', meta.get('area') or ''))
-        params.append(('Iteration Path', meta.get('iteration') or ''))
-    else:
-        # GitHub: show org/repo (combined Organization + repository if provided)
-        params.append(('Repo (org/repo)', meta.get('repo') or ''))
-
-    # Shared contextual fields (always show, may be empty)
-    params.append(('Assignee', meta.get('assignee') or ''))
-    params.append(('Labels', meta.get('labels') or ''))
-    params.append(('Config', meta.get('config') or ''))
-
-    if params:
-        print('Parameters:')
-        for k, v in params:
-            print(f'  {k}: {v}')
-
+    # End parsed fields first, then show parameters block (so parameters appear below the 'End' marker)
     print('--- End Parsed Fields ---')
+
+    # Compute effective parameter values (prefer CLI overrides when present)
+    if args is not None:
+        effective_repo = getattr(args, 'repo', None) or meta.get('repository') or meta.get('repo') or ''
+        effective_assignee = getattr(args, 'assignee', None) or meta.get('assignee') or ''
+        effective_labels = getattr(args, 'labels', None) or meta.get('labels') or ''
+        effective_config = getattr(args, 'config', None) or meta.get('config') or ''
+        effective_area = getattr(args, 'area', None) or meta.get('area') or ''
+        effective_iteration = getattr(args, 'iteration', None) or meta.get('iteration') or ''
+    else:
+        effective_repo = meta.get('repository') or meta.get('repo') or ''
+        effective_assignee = meta.get('assignee') or ''
+        effective_labels = meta.get('labels') or ''
+        effective_config = meta.get('config') or ''
+        effective_area = meta.get('area') or ''
+        effective_iteration = meta.get('iteration') or ''
+
+    # Print a fixed set of parameters so output is predictable
+    print('Parameters:')
+    if target == 'azdo':
+        print(f'  Project: {meta.get("project") or ""}')
+        print(f'  Area: {effective_area}')
+        print(f'  Iteration: {effective_iteration}')
+        print(f'  Assignee: {effective_assignee}')
+        print(f'  Labels: {effective_labels}')
+        print(f'  Config: {effective_config}')
+    else:
+        print(f'  Repo (org/repo): {effective_repo}')
+        print(f'  Assignee: {effective_assignee}')
+        print(f'  Labels: {effective_labels}')
+        print(f'  Config: {effective_config}')
+    # Mark that we printed the parsed-fields summary so writers can suppress
+    # duplicate body/payload output when running in dry-run mode.
+    global DRY_RUN_PRINTED
+    DRY_RUN_PRINTED = True
 
 
 def print_header():
     # Standardized header using the tool's name and version
-    years = '2020-2025'
-    print(f"*** {TOOL_NAME}, Build automation, naz-hage, {years} -  Version: {TOOL_VERSION}")
+    start_year = 2020
+    current_year = datetime.now().year
+    years = f"{start_year}-{current_year}" if current_year != start_year else f"{start_year}"
+    print(f"*** {TOOL_NAME}, Build automation, naz-ahmad, {years} -  Version: {TOOL_VERSION}")
     print('')
     print('Description:')
     print('  Nbuild - Build and DevOps Utility')
@@ -517,29 +539,29 @@ def query_azdo_workitem(work_item_id: str, args):
 def main():
     parser, args = parse_args()
 
-    # If no args provided, print a short description and the help, then exit 0
+    # Print the standard header on every invocation so users always see tool
+    # identity and short usage regardless of which sub-path they take.
+    print_header()
+
+    # If no args provided, print the help and exit 0
     if len(sys.argv) == 1:
-        print_header()
         print("")
         parser.print_help()
         sys.exit(0)
 
     # Handle template help
-    # If the user asked for the script-level help, show header then help
+    # If the user asked for the script-level help, show help (header already printed above)
     if getattr(args, 'help_flag', False):
-        print_header()
         print("")
         parser.print_help()
         sys.exit(0)
 
     if args.help_template:
         if args.help_template == 'azdo':
-            print_header()
             print("")
             print("Azure DevOps markdown template:")
             print(AZDO_TEMPLATE)
         else:
-            print_header()
             print("")
             print("GitHub markdown template:")
             print(GITHUB_TEMPLATE)
@@ -672,6 +694,19 @@ def create_github_issue(fields: dict, args, dry_run: bool = False) -> bool:
     assignee = (meta.get('assignee') or '').strip() or None  # handle None case
 
     if dry_run:
+        # If the parsed-fields summary has already been printed, avoid
+        # repeating repository/title/labels which are already shown in the
+        # Parameters block. Only show a concise command preview.
+        if globals().get('DRY_RUN_PRINTED'):
+            label_list = [label.strip() for label in labels.split(',') if label.strip()]
+            cmd_preview = ['gh', 'issue', 'create', '--title', title, '--body-file', '<tempfile>', '--repo', repo]
+            for label in label_list:
+                cmd_preview.extend(['--label', label])
+            if assignee:
+                cmd_preview.extend(['--assignee', assignee])
+            print(f"[dry-run] Command to execute: {' '.join(cmd_preview)}")
+            return True
+        # Otherwise show the full body as before
         print('[dry-run] Would create GitHub issue with:')
         print(f'  Repository: {repo}')
         print(f'  Title: {title}')
@@ -751,6 +786,17 @@ def create_azdo_workitem(fields: dict, args, dry_run: bool = False) -> bool:
         work_item_type = 'Product Backlog Item'
 
     if dry_run:
+        # If the parsed-fields summary has already been printed, avoid
+        # repeating title/other fields; show only the request URL and a
+        # short note to consult the Parameters block above.
+        if globals().get('DRY_RUN_PRINTED'):
+            api_version = '7.0'
+            type_for_url = urllib.parse.quote(work_item_type, safe='')
+            url = f"https://dev.azure.com/{org}/{project}/_apis/wit/workitems/${type_for_url}?api-version={api_version}"
+            print('[dry-run] Azure DevOps payload suppressed; see Parameters above for title/labels.')
+            print('\nRequest URL:')
+            print(' ', url)
+            return True
         # Show the eventual REST payload, URL, and headers so user can inspect before sending
         print('[dry-run] Azure DevOps work item payload preview:')
         print(f'  Title: {title}')
