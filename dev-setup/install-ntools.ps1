@@ -16,6 +16,7 @@
     Requires administrative privileges.
 #>
 
+
 [CmdletBinding()]
 param (
     [Parameter(Mandatory = $false, HelpMessage = "The version of NTools to install. If not specified, the version is read from ntools.json.")]
@@ -24,6 +25,13 @@ param (
     [Parameter(Mandatory = $false, HelpMessage = "The directory to download the NTools zip file to. Defaults to 'c:\\NToolsDownloads'.")]
     [string]$DownloadsDirectory = "c:\NToolsDownloads"
 )
+
+
+# DEPRECATION NOTICE
+#########################
+Write-Warning "Please update your references to use the new centralized location."
+Write-Warning "This script will be removed in a future version."
+Write-Host ""
 
 # display $PSScriptRoot
 Write-Host "PSScriptRoot: $PSScriptRoot"

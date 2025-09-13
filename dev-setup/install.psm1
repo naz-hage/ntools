@@ -45,6 +45,13 @@
 .NOTES
     
 #>
+
+# DEPRECATION NOTICE
+#########################
+Write-Warning "DEPRECATION NOTICE: dev-setup/install.psm1 has been moved to scripts/modules/Install.psm1"
+Write-Warning "Please update your module imports to use: Import-Module ./scripts/modules/Install.psm1"
+Write-Warning "This module will be removed in a future version."
+
 # local variables
 $downloadsDirectory = "c:\NToolsDownloads"
 $deploymentPath = $env:ProgramFiles + "\NBuild"
@@ -75,10 +82,10 @@ function GetAppInfo {
     # read file git.json and convert to json object
     $json = Get-Content -Path $jsonFile -Raw
     
-    # $config = $json | ConvertFrom--json
+    # $config = $json | ConvertFrom-Json
     # Retrieve elements using dot notation
 
-    $config = $json | ConvertFrom--json | Select-Object -ExpandProperty NbuildAppList | Select-Object -First 1
+    $config = $json | ConvertFrom-Json | Select-Object -ExpandProperty NbuildAppList | Select-Object -First 1
 
     $appInfo = @{
         Name = $config.Name
@@ -122,30 +129,28 @@ function CheckIfAppInstalled {
    
     $appInfo = GetAppInfo $json
     #$appInfo.InstallPath = $appInfo.InstallPath -replace '\$\(ProgramFiles\)', $env:ProgramFiles
-    #$appFileName = $appInfo.AppFileName -replace '\$\(InstallPath\)', $appInfo.InstallPath
-    #$appFileName = $appFileName -replace '\$\(ProgramFiles\)', $env:ProgramFiles
-    # check if app is installed
-     if (-not (Test-Path -Path $appInfo.AppFileName)) {
-        Write-Host "$($appInfo.Name) file: $($appInfo.AppFileName) is not found."
-         return $false
-     }
-     else
-     {
-        # check if the version is correct
-        #$installedVersion = & .\file-version.ps1 $appInfo.AppFileName
-        $installedVersion = GetFileVersion -FilePath $appInfo.AppFileName
-        $targetVersion = $appInfo.Version
-        Write-Host "$($appInfo.Name)  version: $($appInfo.Version) is found."
+    #$appInfo.AppFileName = $appInfo.AppFileName -replace '\$\(InstallPath\)', $appInfo.InstallPath
+    #$appInfo.AppFileName = $appInfo.AppFileName -replace '\$\(ProgramFiles\)', $env:ProgramFiles
 
-        # check if the installed version is greater than or equal to the target version
-        if ([version]$installedVersion -ge [version]$targetVersion) {
+    Write-Host "Checking if $($appInfo.Name) is installed at $($appInfo.AppFileName)..."
+
+    # Check if the file exists using Test-Path
+    if (Test-Path -Path $appInfo.AppFileName) {
+        $currentVersion = GetFileVersion -FilePath $appInfo.AppFileName
+        Write-Host "$($appInfo.Name) version $currentVersion is installed."
+
+        # Compare the versions
+        if ($currentVersion -eq $appInfo.Version) {
+            Write-Host "$($appInfo.Name) version $currentVersion is up to date."
             return $true
-        }
-        else
-        {
+        } else {
+            Write-Host "$($appInfo.Name) version $currentVersion is not up to date. Expected version: $($appInfo.Version)."
             return $false
         }
-     }
+    } else {
+        Write-Host "$($appInfo.Name) is not installed."
+        return $false
+    }
 }
 
 function Install {
@@ -153,48 +158,53 @@ function Install {
         [Parameter(Mandatory=$true)]
         [string]$json
     )
-    # Retrieve elements using dot notation
+
+    # Get the app info
     $appInfo = GetAppInfo $json
 
-    # download the App
-    $output = $downloadsDirectory + "\\" + $appInfo.DownloadedFile
-    # replace $(Version) with the version number
-    $output = $output -replace '\$\(Version\)', $appInfo.Version
-    $webUri = $appInfo.WebDownloadFile -replace '\$\(Version\)', $appInfo.Version
-    Write-Host "Downloading $($webUri) to : $($output) ..."
-    Invoke-WebRequest -Uri $webUri -OutFile $output
-
-    #Install the App
-    $installCommand = $appInfo.InstallCommand -replace '\$\(Version\)', $appInfo.Version
-    Write-Host "Installing $($appInfo.Name) version: $($appInfo.Version) ..."
-    Write-Host "Install command: $installCommand"
-    $installArgs = $appInfo.InstallArgs
-    Write-Host "Install arguments: $installArgs"
-    Write-Host "App file Name: $($appInfo.AppFileName) ..."
-
-    $timeout = New-TimeSpan -Minutes 10
-    $sw = [Diagnostics.Stopwatch]::StartNew()
-
-    Start-Process -FilePath $installCommand -ArgumentList $installArgs -WorkingDirectory $downloadsDirectory -Wait
-
-    # Wait for App to be installed or timeout
-    while (!(Test-Path $appInfo.AppFileName) -and $sw.Elapsed -lt $timeout) {
-        Start-Sleep -Seconds 5
+    # Check if the app is already installed
+    if (CheckIfAppInstalled $json) {
+        Write-Host "$($appInfo.Name) is already installed and up to date."
+        return $true
     }
 
-    if ($sw.Elapsed -ge $timeout) {
-        Write-Output "Installation timed out."
+    # Prepare the downloads directory
+    Write-Host "Preparing downloads directory $downloadsDirectory..."
+    PrepareDownloadsDirectory $downloadsDirectory
+
+    # Download the app
+    Write-Host "Downloading $($appInfo.Name) version $($appInfo.Version)..."
+    $downloadedFile = "$downloadsDirectory\$($appInfo.DownloadedFile)"
+    Write-Host "Downloading from $($appInfo.WebDownloadFile) to $downloadedFile..."
+    Invoke-WebRequest -Uri $appInfo.WebDownloadFile -OutFile $downloadedFile
+
+    # Check if the download was successful
+    if (!(Test-Path -Path $downloadedFile)) {
+        Write-Host "Error: Failed to download $($appInfo.Name)."
         return $false
-    } else {
-        Write-Output "Installation completed."
     }
 
-    $installed = CheckIfAppInstalled $json
-    if ($installed) {
-        Write-Host "App $($appInfo.Name) version: $($appInfo.Version) is installed successfully."
+    Write-Host "Downloaded $($appInfo.Name) to $downloadedFile."
+
+    # Create the installation directory if it doesn't exist
+    $installDir = Split-Path -Path $appInfo.InstallPath -Parent
+    if (!(Test-Path -Path $installDir)) {
+        Write-Host "Creating installation directory $installDir..."
+        New-Item -ItemType Directory -Path $installDir -Force | Out-Null
+    }
+
+    # Install the app based on the install command
+    $installCommand = $appInfo.InstallCommand
+    $installArgs = $appInfo.InstallArgs
+    Write-Host "Installing $($appInfo.Name) using command: $installCommand $installArgs"
+    & $installCommand $installArgs
+
+    # Check if the installation was successful
+    if (CheckIfAppInstalled $json) {
+        Write-Host "$($appInfo.Name) installed successfully."
         return $true
     } else {
-        Write-Host "App $($appInfo.Name) version: $($appInfo.Version) is not installed."
+        Write-Host "Error: Failed to install $($appInfo.Name)."
         return $false
     }
 }
@@ -205,139 +215,153 @@ function MainInstallApp {
         [string]$command,
         [Parameter(Mandatory=$true)]
         [string]$json
-        )
+    )
 
-    PrepareDownloadsDirectory $downloadsDirectory
-
-    $app = GetAppInfo $json
-    # check if Git is installed
-    $installed = CheckIfAppInstalled $json
-    if ($installed) {
-        Write-Host "App: $($app.Name) version: $($app.Version) or greater is already installed."
+    if ($command -eq "install") {
+        return Install $json
+    } else {
+        Write-Host "Error: Invalid command '$command'. Valid commands are: install."
+        return $false
     }
-    else {
-        Install $json
-    }
-    Write-OutputMessage $MyInvocation.MyCommand.Name "Installation of $($app.Name) completed successfully."
 }
 
 function CheckIfDotnetInstalled {
     param (
         [Parameter(Mandatory=$true)]
-        [string]$dotnetVersion
+        [string]$version
     )
 
-    # check if nbuildtasks.dll exists in the deployment path
-    $InstalledDotnetVersion = (Get-Command dotnet -ErrorAction SilentlyContinue).Version
-    Write-Host ".NET Core Version: $InstalledDotnetVersion is installed."
-
-    if ([string]::IsNullOrEmpty($InstalledDotnetVersion)) {
-        return $false
-    }
-    if ([version]$InstalledDotnetVersion -ge [version]$dotnetVersion) {
-        return $true
-    }
-    else
-    {
+    # Check if the dotnet command is available
+    try {
+        $dotnetOutput = dotnet --list-runtimes
+        if ($dotnetOutput -match $version) {
+            Write-Host ".NET Core $version is installed."
+            return $true
+        } else {
+            Write-Host ".NET Core $version is not installed."
+            return $false
+        }
+    } catch {
+        Write-Host ".NET Core is not installed."
         return $false
     }
 }
 
 function InstallDotNetCore {
-    param(
+    param (
         [Parameter(Mandatory=$true)]
-        [string]$dotnetVersion)
-   
-    # Check if .NET Core is installed
+        [string]$dotnetVersion
+    )
+
     if (CheckIfDotnetInstalled $dotnetVersion) {
-        return
-    }   
-    else
-    {
-        $dotnetInstallerUrl = "https://download.visualstudio.microsoft.com/download/pr/f18288f6-1732-415b-b577-7fb46510479a/a98239f751a7aed31bc4aa12f348a9bf/windowsdesktop-runtime-%dotnetVersion%-win-x64.exe"
+        Write-Host ".NET Core $dotnetVersion is already installed."
+        return $true
+    }
 
-        # Path where the installer will be downloaded
-        $installerPath = Join-Path -Path $downloadsDirectory -ChildPath "dotnet_installer.exe"
+    Write-Host "Installing .NET Core $dotnetVersion..."
 
-        # Download the installer if it doesn't already exist
-        if (!(Test-Path -Path $installerPath)) {
-            Invoke-WebRequest -Uri $dotnetInstallerUrl -OutFile $installerPath
-        }
-    
-        # Run the installer
-        Start-Process -FilePath $installerPath -ArgumentList "/quiet", "/norestart" -NoNewWindow -Wait
-    }   
+    # Define the installation script URL
+    $installScript = "https://dot.net/v1/dotnet-install.ps1"
+
+    # Download and execute the installation script
+    try {
+        Invoke-WebRequest -Uri $installScript -OutFile "dotnet-install.ps1"
+        .\dotnet-install.ps1 -Version $dotnetVersion
+        Remove-Item "dotnet-install.ps1"
+    } catch {
+        Write-Host "Error: Failed to install .NET Core $dotnetVersion."
+        return $false
+    }
+
+    # Verify the installation
+    if (CheckIfDotnetInstalled $dotnetVersion) {
+        Write-Host ".NET Core $dotnetVersion installed successfully."
+        return $true
+    } else {
+        Write-Host "Error: Failed to install .NET Core $dotnetVersion."
+        return $false
+    }
 }
 
-    function AddDeploymentPathToEnvironment {
-        param (
-            [Parameter(Mandatory=$true)]
-            [string]$deploymentPath
-        )
+function AddDeploymentPathToEnvironment {
+    param (
+        [Parameter(Mandatory=$true)]
+        [string]$deploymentPath
+    )
 
-        $path = [Environment]::GetEnvironmentVariable("PATH", "Machine")
-        if ($path -notlike "*$deploymentPath*") {
-            Write-OutputMessage $MyInvocation.MyCommand.Name "Adding $deploymentPath to the PATH environment variable."
-            [Environment]::SetEnvironmentVariable("PATH", $path + ";$deploymentPath", "Machine")
-        }
-        else {
-            Write-OutputMessage $MyInvocation.MyCommand.Name "$deploymentPath already exists in the PATH environment variable."
-        }
+    # Get the current PATH environment variable
+    $currentPath = [System.Environment]::GetEnvironmentVariable("PATH", [System.EnvironmentVariableTarget]::Machine)
+
+    # Check if the deployment path is already in the PATH
+    if ($currentPath -split ';' -contains $deploymentPath) {
+        Write-Host "Deployment path $deploymentPath is already in the PATH environment variable."
+    } else {
+        # Add the deployment path to the PATH environment variable
+        $newPath = "$currentPath;$deploymentPath"
+        [System.Environment]::SetEnvironmentVariable("PATH", $newPath, [System.EnvironmentVariableTarget]::Machine)
+        Write-Host "Added deployment path $deploymentPath to the PATH environment variable."
     }
+}
 
 function InstallNtools {
     param (
-        [Parameter(Mandatory=$false, HelpMessage = "The version of NTools to install. If not specified, the version is read from ntools.json.")]
+        [Parameter(Mandatory=$false)]
         [string]$version,
-        [Parameter(Mandatory=$false, HelpMessage = "The directory to download the NTools zip file to. Defaults to 'c:\\NToolsDownloads'.")]
+        [Parameter(Mandatory=$false)]
         [string]$downloadsDirectory = "c:\NToolsDownloads"
     )
 
-    # display parameters
-    Write-Host "InstallNtools - Parameters:"
-    Write-Host "Version: $version"
-    Write-Host "Downloads directory: $downloadsDirectory"
-
-    # If Version is not specified, read it from ntools.json
-    if (-not $Version) {
-        $NtoolsJsonPath = "$PSScriptRoot\ntools.json"
-
-        Write-Host "Reading version from $NtoolsJsonPath ..."
-        # 
-        if (Test-Path -Path $NtoolsJsonPath) {
-            try {
-                $NtoolsJson = Get-Content -Path $NtoolsJsonPath -Raw | ConvertFrom-json
-                $Version = $NtoolsJson.NbuildAppList[0].Version
-                Write-Host "Version read from ntools.json: $Version"
-            }
-            catch {
-                Write-Warning "Failed to read version from ntools.json. Please specify the version manually."
-                return
-            }
-        }
-        else {
-            Write-Warning "ntools.json not found in the script directory. Please specify the version manually."
-            return
+    # If version is not specified, read it from ntools.json
+    if (-not $version) {
+        $ntoolsJsonPath = Join-Path $PSScriptRoot "ntools.json"
+        if (Test-Path $ntoolsJsonPath) {
+            $ntoolsJson = Get-Content $ntoolsJsonPath | ConvertFrom-Json
+            $version = $ntoolsJson.NbuildAppList[0].Version
+            Write-Host "Version not specified. Using version $version from ntools.json."
+        } else {
+            Write-Host "Error: Version not specified and ntools.json not found."
+            return $false
         }
     }
 
-    # Download the specified version of NTools
+    $deploymentPath = $env:ProgramFiles + "\NBuild"
+
+    # Check if NTools is already installed
+    $nbExePath = "$deploymentPath\nb.exe"
+    if (Test-Path $nbExePath) {
+        $currentVersion = GetFileVersion -FilePath $nbExePath
+        if ($currentVersion -eq $version) {
+            Write-Host "NTools version $currentVersion is already installed and up to date."
+            return $true
+        } else {
+            Write-Host "NTools version $currentVersion is installed but not up to date. Expected version: $version."
+        }
+    }
+
+    # Download NTools
     DownloadNtools -version $version -downloadsDirectory $downloadsDirectory
 
-    # Check if the downloaded file exists
-    $downloadedFile = Join-Path -Path $downloadsDirectory -ChildPath "$version.zip"
-
-    if (!(Test-Path -Path $downloadedFile)) {
-        Write-Host "Downloaded file not found: $downloadedFile"
-        return
+    # Check if the download was successful
+    $downloadedFile = "$downloadsDirectory\$version.zip"
+    if (!(Test-Path $downloadedFile)) {
+        Write-Host "Error: Failed to download NTools version $version."
+        return $false
     }
-    
+
+    # Create the deployment directory if it doesn't exist
+    if (!(Test-Path $deploymentPath)) {
+        Write-Host "Creating deployment directory $deploymentPath..."
+        New-Item -ItemType Directory -Path $deploymentPath -Force | Out-Null
+    }
+
     # Unzip the downloaded file to the deployment path
     Expand-Archive -Path $downloadedFile -DestinationPath $deploymentPath -Force
     # add deployment path to the PATH environment variable if it doesn't already exist
     AddDeploymentPathToEnvironment $deploymentPath
 
     Write-Host "NTools version $Version installed to $deploymentPath"
+    # indicate success to callers
+    return $true
 }
 
 function DownloadNtools {
@@ -399,27 +423,32 @@ function SetDevEnvironmentVariables {
 function Write-OutputMessage {
     param(
         [Parameter(Mandatory = $true)]
-        [String]
-        $Prefix,
+        [string]$Prefix,
         [Parameter(Mandatory = $true)]
-        [String]
-        $Message
+        [string]$Message,
+        [Parameter(Mandatory = $false)]
+        [System.ConsoleColor]$ForegroundColor = [System.ConsoleColor]::White,
+        [Parameter(Mandatory = $false)]
+        [switch]$NoNewline
     )
 
     $dateTime = Get-Date -Format "yyyy-MM-dd hh:mm tt"
+    $formattedMessage = "[$Prefix] $Message"
 
-    
-    
-    # append to the log file install.log
+    # ensure log file exists
     if (!(Test-Path -Path "install.log")) {
-        New-Item -ItemType File -Path "install.log" -Force
+        New-Item -ItemType File -Path "install.log" -Force | Out-Null
     }
 
     if ($Message -eq "EmtpyLine") {
         Add-Content -Path "install.log" -Value ""
-        Write-Output ""
+        if ($NoNewline) { Write-Host "" -NoNewline -ForegroundColor $ForegroundColor } else { Write-Host "" -ForegroundColor $ForegroundColor }
     } else {
-        Write-Output "$dateTime $Prefix : $Message"
+        if ($NoNewline) {
+            Write-Host $formattedMessage -ForegroundColor $ForegroundColor -NoNewline
+        } else {
+            Write-Host $formattedMessage -ForegroundColor $ForegroundColor
+        }
         Write-Output ""
         Add-Content -Path "install.log" -Value "$dateTime | $Prefix | $Message"
     }

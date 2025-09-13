@@ -89,9 +89,9 @@ namespace NbuildTasks
             }
         }
 
-        private void UpdateMarkdownFile(string markdownPath, Dictionary<string, (string Name, string Version)> versionMap)
+        private void UpdateMarkdownFile(string DevSetupPath, Dictionary<string, (string Name, string Version)> versionMap)
         {
-            var lines = File.ReadAllLines(markdownPath);
+            var lines = File.ReadAllLines(DevSetupPath);
             var today = DateTime.Now.ToString("dd-MMM-yy");
 
             for (int i = 0; i < lines.Length; i++)
@@ -128,7 +128,7 @@ namespace NbuildTasks
                 }
             }
 
-            File.WriteAllLines(markdownPath, lines);
+            File.WriteAllLines(DevSetupPath, lines);
         }
 
         private static bool IsToolMatch(string toolName, string jsonName)
@@ -137,67 +137,6 @@ namespace NbuildTasks
                    Mappings[toolName].Any(m => m.Equals(jsonName, StringComparison.OrdinalIgnoreCase));
         }
     }
-
-    public class SetupPreCommitHooks : Task
-    {
-        [Required]
-        public string GitDirectory { get; set; }
-
-        [Required]
-        public string HooksSourceDirectory { get; set; }
-
-        public override bool Execute()
-        {
-            try
-            {
-                Log.LogMessage(MessageImportance.High, "Setting up pre-commit hooks...");
-
-                var hooksDir = Path.Combine(GitDirectory, "hooks");
-                if (!Directory.Exists(hooksDir))
-                {
-                    Directory.CreateDirectory(hooksDir);
-                }
-
-                // Copy hook files
-                var hookFiles = Directory.GetFiles(HooksSourceDirectory);
-                foreach (var hookFile in hookFiles)
-                {
-                    var fileName = Path.GetFileName(hookFile);
-                    var destPath = Path.Combine(hooksDir, fileName);
-
-                    File.Copy(hookFile, destPath, true);
-
-                    // Make executable on Unix-like systems
-                    if (Environment.OSVersion.Platform == PlatformID.Unix ||
-                        Environment.OSVersion.Platform == PlatformID.MacOSX)
-                    {
-                        var chmod = new System.Diagnostics.Process
-                        {
-                            StartInfo = new System.Diagnostics.ProcessStartInfo
-                            {
-                                FileName = "chmod",
-                                Arguments = $"+x {destPath}",
-                                UseShellExecute = false
-                            }
-                        };
-                        chmod.Start();
-                        chmod.WaitForExit();
-                    }
-
-                    Log.LogMessage(MessageImportance.Normal, $"Installed hook: {fileName}");
-                }
-
-                Log.LogMessage(MessageImportance.High, "Pre-commit hooks setup completed!");
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Log.LogError($"Error setting up pre-commit hooks: {ex.Message}");
-                return false;
-            }
-        }
-    }
-    // SetupPreCommitHooks class removed: now isolated in feature branch
 
     public class GenerateCommitMessage : Task
     {
@@ -331,7 +270,6 @@ namespace NbuildTasks
             if (extension == ".cs") analysis.CodeChanged = true;
             if (fileName.Contains("package") || fileName.Contains("version")) analysis.PackageOrVersionChanged = true;
             if (fileName.Contains("workflow") || fileName.Contains("action") || directory.Contains(".github")) analysis.CiChanged = true;
-            if (fileName.Contains("hook") || fileName.Contains("pre-commit")) analysis.HooksChanged = true;
             if (extension == ".yml" || extension == ".yaml" || extension == ".json") analysis.ConfigChanged = true;
         }
 
@@ -389,8 +327,6 @@ namespace NbuildTasks
         {
             if (analysis.PackageOrVersionChanged)
                 return "Update package management and version automation";
-            if (analysis.HooksChanged)
-                return "Update pre-commit hooks and quality gates";
             if (analysis.CiChanged)
                 return "Update CI/CD workflows and automation";
             if (analysis.DocsChanged && analysis.ScriptsChanged)
@@ -420,7 +356,6 @@ namespace NbuildTasks
 
             if (analysis.DocsChanged) details.Add("- Update documentation");
             if (analysis.ScriptsChanged) details.Add("- Update automation scripts");
-            if (analysis.HooksChanged) details.Add("- Update pre-commit hooks");
             if (analysis.CiChanged) details.Add("- Update CI/CD workflows");
             if (analysis.TestsChanged) details.Add("- Update tests");
 

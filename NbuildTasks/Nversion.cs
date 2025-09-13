@@ -38,7 +38,7 @@ namespace NbuildTasks
                    $"{fileVersionInfo.ProductName}, " +
                    $"{fileVersionInfo.CompanyName}, " +
                    $"{updatedCopyright} - " +
-                   $" Version: {fileVersionInfo.ProductBuildPart}." +
+                   $" Version: {fileVersionInfo.ProductMajorPart}." +
                    $"{fileVersionInfo.ProductMinorPart}." +
                    $"{fileVersionInfo.ProductBuildPart}";
         }

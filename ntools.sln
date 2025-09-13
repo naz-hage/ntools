@@ -44,32 +44,32 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dev-setup", "dev-setup", "{
 		dev-setup\argo-cd.json = dev-setup\argo-cd.json
 		dev-setup\azure-cli.json = dev-setup\azure-cli.json
 		dev-setup\azure-powershell.json = dev-setup\azure-powershell.json
-		dev-setup\calc-file-hash.ps1 = dev-setup\calc-file-hash.ps1
 		dev-setup\docker.json = dev-setup\docker.json
 		dev-setup\dotnet_runtime.json = dev-setup\dotnet_runtime.json
-		dev-setup\ff.ps1 = dev-setup\ff.ps1
 		dev-setup\git_for_windows.json = dev-setup\git_for_windows.json
 		dev-setup\go.json = dev-setup\go.json
-		dev-setup\install-ntools.ps1 = dev-setup\install-ntools.ps1
 		dev-setup\install.log = dev-setup\install.log
-		dev-setup\install.ps1 = dev-setup\install.ps1
-		dev-setup\install.psm1 = dev-setup\install.psm1
 		dev-setup\k8s.json = dev-setup\k8s.json
-		dev-setup\list-file-version.ps1 = dev-setup\list-file-version.ps1
 		dev-setup\minikube.json = dev-setup\minikube.json
 		dev-setup\mongo-db.json = dev-setup\mongo-db.json
 		dev-setup\ntools.json = dev-setup\ntools.json
 		dev-setup\nuget.json = dev-setup\nuget.json
 		dev-setup\powershell.json = dev-setup\powershell.json
 		dev-setup\python.json = dev-setup\python.json
-		dev-setup\setenv.ps1 = dev-setup\setenv.ps1
-		dev-setup\sign-trust.ps1 = dev-setup\sign-trust.ps1
-		dev-setup\sign.ps1 = dev-setup\sign.ps1
 		dev-setup\sysinternals.json = dev-setup\sysinternals.json
 		dev-setup\terraform.json = dev-setup\terraform.json
 		dev-setup\tflint.json = dev-setup\tflint.json
 		dev-setup\visual-studio-22.json = dev-setup\visual-studio-22.json
 		dev-setup\vs-code.json = dev-setup\vs-code.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{F1234567-89AB-CDEF-0123-456789ABCDEF}"
+	ProjectSection(SolutionItems) = preProject
+		scripts\README.md = scripts\README.md
+		scripts\README.md = scripts\README.md
+		scripts\module-package\ntools-scripts.psm1 = scripts\module-package\ntools-scripts.psm1
+		scripts\module-package\ntools-scripts.psd1 = scripts\module-package\ntools-scripts.psd1
+		scripts\module-package\install-module.ps1 = scripts\module-package\install-module.ps1
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{B79CBB23-CB3B-4934-921E-59BF51B96B93}"

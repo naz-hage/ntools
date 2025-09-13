@@ -295,8 +295,8 @@
 	<!-- Publish all non-test projects to artifacts folder -->
 	<Target Name="PUBLISH" DependsOnTargets="ARTIFACTS;TAG">
 		<RemoveDir Directories="$(ArtifactsFolder)"></RemoveDir>
-		<Message Text="Publishing all non-test projects using publish-all-projects.ps1" Importance="high" />
-		<Exec Command='pwsh -NoProfile -ExecutionPolicy Bypass -File "$(SolutionDir)\publish-all-projects.ps1" -PublishDir "$(ArtifactsFolder)" -ProductVersion "$(ProductVersion)"' WorkingDirectory="$(SolutionDir)" />
+		<Message Text="Publishing all non-test projects using ntools-scripts module" Importance="high" />
+		<Exec Command='pwsh -NoProfile -ExecutionPolicy Bypass -Command "Import-Module &apos;$(BuildTools)\ntools-scripts.psm1&apos; -Force; Publish-AllProjects -OutputDir &apos;$(ArtifactsFolder)&apos; -Version &apos;$(ProductVersion)&apos; -RepositoryRoot &apos;$(SolutionDir)&apos;"' WorkingDirectory="$(SolutionDir)" />
 		<Message Text="All non-test projects published to $(ArtifactsFolder)" Importance="high" />
 		<Message Text="==> COMMON_DONE"/>
 	</Target>

@@ -96,6 +96,21 @@ Here are examples of custom Tasks that can be used during builds:
 	<Message Text="==> ZIP_DONE"/>
 </Target>
 ```
+### Pwsh
+```xml
+<!-- This target uses the `Pwsh` task to run a PowerShell Core script from MSBuild -->
+<Target Name="RUN_PWSH">
+	<PropertyGroup>
+		<ScriptPath>$(SolutionDir)scripts\build\custom-script.ps1</ScriptPath>
+		<ScriptArgs>--example true</ScriptArgs>
+	</PropertyGroup>
+
+	<!-- Pwsh is a custom MSBuild task that executes a PowerShell Core script -->
+	<Pwsh Script="$(ScriptPath)" Arguments="$(ScriptArgs)" NoProfile="true" ExecutionPolicy="Bypass" />
+
+	<Message Text="==> PWSH_DONE" />
+</Target>
+```
 ### UpdateVersionsInDocs
 ```xml
 <!-- This target uses the `UpdateVersionsInDocs` task to update version numbers in documentation files -->
@@ -103,15 +118,22 @@ Here are examples of custom Tasks that can be used during builds:
 	<UpdateVersionsInDocs DocsPath="$(SolutionDir)docs" Version="$(Version)" />
 </Target>
 ```
-### Pwsh
-```xml
-<!-- This target uses the `Pwsh` custom NTools MS Build task to launch a PowerShell Core script -->
-<Target Name="INSTALL_NTOOLS">
-	<Pwsh ScriptPath="$(SolutionDir)\dev-setup\install.ps1" Arguments="" WorkingDirectory ="$(SolutionDir)\dev-setup"/>
 
-	<Message Text="==> INSTALL_NTOOLS_DONE"/>
+### Modern Approach with ntools-scripts module
+```xml
+<Target Name="PUBLISH">
+	<Exec Command='pwsh -NoProfile -ExecutionPolicy Bypass -Command "Import-Module &apos;$(BuildTools)\modules\ntools-scripts\ntools-scripts.psm1&apos; -Force; Publish-AllProjects -OutputDir &apos;$(ArtifactsFolder)&apos; -Version &apos;$(ProductVersion)&apos; -RepositoryRoot &apos;$(SolutionDir)&apos;"' WorkingDirectory="$(SolutionDir)" />
 </Target>
 ```
+
+**Benefits of the Module Approach:**
+- **Deterministic paths**: Explicit `RepositoryRoot` parameter eliminates path detection issues
+- **Centralized functionality**: All PowerShell functions in one module
+- **Better error handling**: Consistent error reporting and logging
+- **Easier maintenance**: Single module file instead of dozens of scripts
+- **Integration ready**: Automatically installed and available in build process
+
+For complete module documentation, see [ntools-scripts Module](ntools-scripts-module.md).
 You can also find the complete list of predefined [MSBuild properties in the Microsoft documentation](https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild-reserved-and-well-known-properties?view=vs-2022).
 
 - Here are few examples:

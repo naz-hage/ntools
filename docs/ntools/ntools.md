@@ -13,29 +13,29 @@ The [Windows dev environment](https://learn.microsoft.com/en-us/windows/dev-envi
 
 | Tool                                                                                                       | Version     | Last Checked on |
 | :--------------------------------------------------------------------------------------------------------- | :---------- | :-------------- |
-| [Argo CD](https://github.com/argoproj/argo-cd/releases/)                                                  | 2.14.11    | 09-Aug-25      |
-| [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli-windows?pivots=msi)             | 2.70.0     | 09-Aug-25      |
+| [Argo CD](https://github.com/argoproj/argo-cd/releases/)                                                  | 2.14.11    | 07-Sep-25      |
+| [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli-windows?pivots=msi)             | 2.70.0     | 07-Sep-25      |
 | [Burp Suite](https://portswigger.net/burp/communitydownload)                                              | 2021.11.2   | 01-Oct-23       |
-| [Dotnet Runtime](https://dotnet.microsoft.com/en-us/download/dotnet)                                      | 9.0.2      | 09-Aug-25      |
+| [Dotnet Runtime](https://dotnet.microsoft.com/en-us/download/dotnet)                                      | 9.0.2      | 07-Sep-25      |
 | [Dotnet8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet)                                         | 8.0.408     | 02-May-25       |
 | [Dotnet9 Runtime](https://dotnet.microsoft.com/en-us/download/dotnet)                                     | 9.0.203     | 02-May-25       |
 | [Draw.io](https://app.diagrams.net/)                                                                      | N/A         | 01-Oct-23       |
-| [Git for Windows](https://git-scm.com/downloads)                                                          | 2.50.0     | 09-Aug-25      |
-| [Install Docker Desktop on Windows](https://docs.docker.com/docker-for-windows/install/)                  | 4.38.0.0   | 09-Aug-25      |
-| [kubernetes](https://github.com/kubernetes/kubernetes/releases)                                           | 1.33.0     | 09-Aug-25      |
-| [minikube](https://github.com/kubernetes/minikube/releases/)                                              | 1.35.0     | 09-Aug-25      |
-| [MongoDB Community Server](https://www.mongodb.com/try/download/community)                                | 8.0.5      | 09-Aug-25      |
-| [Node.js](https://nodejs.org/en/download/)                                                                | 22.12.0    | 09-Aug-25      |
-| [Ntools](https://github.com/naz-hage/ntools/releases)                                                     | 1.23.0     | 09-Aug-25      |
-| [GitHub CLI](https://github.com/cli/cli/releases)                                                         | 2.74.2     | 09-Aug-25      |
-| [NuGet](https://www.nuget.org/downloads)                                                                  | 6.12.1     | 09-Aug-25      |
-| [pnpm](https://pnpm.io/)                                                                                  | 9.1.2      | 09-Aug-25      |
+| [Git for Windows](https://git-scm.com/downloads)                                                          | 2.50.0     | 07-Sep-25      |
+| [Install Docker Desktop on Windows](https://docs.docker.com/docker-for-windows/install/)                  | 4.38.0.0   | 07-Sep-25      |
+| [kubernetes](https://github.com/kubernetes/kubernetes/releases)                                           | 1.33.0     | 07-Sep-25      |
+| [minikube](https://github.com/kubernetes/minikube/releases/)                                              | 1.35.0     | 07-Sep-25      |
+| [MongoDB Community Server](https://www.mongodb.com/try/download/community)                                | 8.0.5      | 07-Sep-25      |
+| [Node.js](https://nodejs.org/en/download/)                                                                | 22.12.0    | 07-Sep-25      |
+| [Ntools](https://github.com/naz-hage/ntools/releases)                                                     | 1.27.0     | 07-Sep-25      |
+| [GitHub CLI](https://github.com/cli/cli/releases)                                                         | 2.74.2     | 07-Sep-25      |
+| [NuGet](https://www.nuget.org/downloads)                                                                  | 6.12.1     | 07-Sep-25      |
+| [pnpm](https://pnpm.io/)                                                                                  | 10.14.0    | 07-Sep-25      |
 | [Postman Get Started for Free](https://www.postman.com/downloads/)                                        | v11.36.0    | 10-Mar-25       |
-| [PowerShell](https://github.com/PowerShell/PowerShell/releases)                                           | 10.0.0     | 09-Aug-25      |
-| [Python](https://www.python.org/downloads/)                                                               | 3.13.3     | 09-Aug-25      |
-| [SysInternals](https://learn.microsoft.com/en-us/sysinternals/)                                           | 2.90.0.0   | 09-Aug-25      |
-| [Terraform](https://releases.hashicorp.com/terraform)                                                     | 1.11.1     | 09-Aug-25      |
-| [Terraform Lint](https://github.com/terraform-linters/tflint/releases)                                    | 1.11.1     | 09-Aug-25      |
-| [Visual Studio 2022 Community Edition](https://visualstudio.microsoft.com/vs/community/)                  | 17.11.3    | 09-Aug-25      |
-| [Visual Studio Code](https://code.visualstudio.com/download)                                              | 1.100.1    | 09-Aug-25      |
+| [PowerShell](https://github.com/PowerShell/PowerShell/releases)                                           | 10.0.0     | 07-Sep-25      |
+| [Python](https://www.python.org/downloads/)                                                               | 3.13.3     | 07-Sep-25      |
+| [SysInternals](https://learn.microsoft.com/en-us/sysinternals/)                                           | 2.90.0.0   | 07-Sep-25      |
+| [Terraform](https://releases.hashicorp.com/terraform)                                                     | 0.55.1     | 07-Sep-25      |
+| [Terraform Lint](https://github.com/terraform-linters/tflint/releases)                                    | 0.55.1     | 07-Sep-25      |
+| [Visual Studio 2022 Community Edition](https://visualstudio.microsoft.com/vs/community/)                  | 17.11.3    | 07-Sep-25      |
+| [Visual Studio Code](https://code.visualstudio.com/download)                                              | 1.100.1    | 07-Sep-25      |
 | [Windows Terminal](https://www.microsoft.com/en-us/p/windows-terminal/9n0dx20hk701)                       | 1.21.10351.0| 10-Mar-25       |

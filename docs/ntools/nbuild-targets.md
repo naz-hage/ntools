@@ -7,8 +7,6 @@ The table below lists all available targets for the Nbuild tool.
 | ARTIFACTS           | Setup the ARTIFACTS folders for binaries and test results - override |
 | FILE_VERSIONS       | Test for FileVersion task and powershell file-version.ps1 |
 | NBUILD_DOWNLOAD     | Download Nbuild specified in the NbuildTargetVersion |
-| NBUILD_INSTALL      | Install Nbuild specified in the NbuildTargetVersion |
-| DEV_SETUP           | Setup Development Environment |
 | MKDOCS              | Build docs locally for testing |
 | MKDOCS_DEPLOY       | mkdocs deploy locally |
 | GET_PRODUCT_CODES   | Example to get the installation Product code used for uninstallation of product |
@@ -28,7 +26,6 @@ The table below lists all available targets for the Nbuild tool.
 | UPDATE_AND_COMMIT   | Combined target: Update versions and commit with smart message |
 | INFRASTRUCTURE_COMMIT | Full infrastructure update and commit with intelligent analysis |
 | PREVIEW_COMMIT_MESSAGE | Preview commit message without committing |
-| INSTALL_PRECOMMIT_HOOKS | Install pre-commit hooks using the PowerShell script |
 
 
 - **C:\Program Files\Nbuild\common.targets Targets**
@@ -55,9 +52,8 @@ The table below lists all available targets for the Nbuild tool.
 | TEST_DEBUG          | Run all tests using dotnet test in Debug mode |
 | COVERAGE            | Generate comprehensive code coverage reports using ReportGenerator |
 | COVERAGE_SUMMARY    | Display high-level code coverage summary |
-| SMOKE_TEST          | Basic artifact verification to ensure build integrity |
-| SMOKE_TEST_PWSH     | PowerShell-based artifact verification with detailed checks |
-| SMOKE_TEST_PWSH     | PowerShell-based artifact verification with detailed checks |
+| SMOKE_TEST          | **Comprehensive smoke test**: Validates published artifacts (4+ executables) AND build system integrity (target delegation). Consolidated from TEST_TARGET_DELEGATION |
+| SMOKE_TEST_PWSH     | REMOVED: functionality consolidated into `SMOKE_TEST` (see changelog) |
 | IS_ADMIN            | Check if current process is running in admin mode AdminCheckExitCode property is set |
 | SingleProject       | Example how to build a single project |
 | HandleError         | Error handling placeholder |
