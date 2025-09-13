@@ -357,7 +357,6 @@ Test-MSBuildDelegation
 </code></pre>
 <h3 id="integration-with-build-system">Integration with Build System</h3>
 <ul>
-<li><strong>Installation</strong>: <code>nbuild.targets</code> automatically installs the module during <code>INSTALL_NTOOLS_SCRIPTS</code> target</li>
 <li><strong>Usage</strong>: <code>PUBLISH</code> target uses <code>Publish-AllProjects</code> function with deterministic repository path</li>
 </ul>
 <h3 id="artifact-verification-msbuild">Artifact Verification (MSBuild)</h3>
@@ -372,7 +371,6 @@ nb verify_artifacts /p:ArtifactsFolder=&quot;C:\Artifacts\MySolution\Release\1.2
 </code></pre>
 <h3 id="msbuild-integration">MSBuild Integration</h3>
 <ul>
-<li><strong>Installation</strong>: <code>nbuild.targets</code> automatically installs the module during <code>INSTALL_NTOOLS_SCRIPTS</code> target</li>
 <li><strong>Usage</strong>: <code>PUBLISH</code> target uses <code>Publish-AllProjects</code> function with deterministic repository path</li>
 <li><strong>Smoke Testing</strong>: <code>SMOKE_TEST</code> target uses <code>Test-TargetDelegation</code> function for build system validation</li>
 <li><strong>Location</strong>: Module installed to <code>$env:ProgramFiles\nbuild\modules\ntools-scripts\</code></li>

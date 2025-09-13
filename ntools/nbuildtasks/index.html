@@ -286,12 +286,7 @@
 &lt;/Target&gt;
 </code></pre>
 <h3 id="modern-approach-with-ntools-scripts-module">Modern Approach with ntools-scripts module</h3>
-<pre><code class="language-xml">&lt;!-- Modern: Using ntools-scripts module for better integration and reliability --&gt;
-&lt;Target Name=&quot;INSTALL_NTOOLS_SCRIPTS&quot;&gt;
-    &lt;Exec Command='pwsh -NoProfile -NonInteractive -ExecutionPolicy Bypass -File &quot;$(SolutionDir)\scripts\module-package\install-module.ps1&quot; -BuildTools &quot;$(BuildTools)&quot; -ModuleName &quot;ntools-scripts&quot;' WorkingDirectory=&quot;$(SolutionDir)&quot; /&gt;
-&lt;/Target&gt;
-
-&lt;Target Name=&quot;PUBLISH&quot;&gt;
+<pre><code class="language-xml">&lt;Target Name=&quot;PUBLISH&quot;&gt;
     &lt;Exec Command='pwsh -NoProfile -ExecutionPolicy Bypass -Command &quot;Import-Module &amp;apos;$(BuildTools)\modules\ntools-scripts\ntools-scripts.psm1&amp;apos; -Force; Publish-AllProjects -OutputDir &amp;apos;$(ArtifactsFolder)&amp;apos; -Version &amp;apos;$(ProductVersion)&amp;apos; -RepositoryRoot &amp;apos;$(SolutionDir)&amp;apos;&quot;' WorkingDirectory=&quot;$(SolutionDir)&quot; /&gt;
 &lt;/Target&gt;
 </code></pre>
