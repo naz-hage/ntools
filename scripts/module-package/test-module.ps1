@@ -5,8 +5,8 @@ param(
 
 Write-Host "Testing installed ntools-scripts module in: $BuildTools"
 
-$moduleDir = Join-Path $BuildTools 'modules\ntools-scripts'
-$modulePsm = Join-Path $moduleDir 'ntools-scripts.psm1'
+
+$modulePsm = Join-Path $BuildTools 'ntools-scripts.psm1'
 
 if (Test-Path $modulePsm) {
     Write-Host "Importing module from: $modulePsm"

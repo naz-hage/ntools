@@ -13,8 +13,8 @@
     FunctionsToExport = @(
         'Publish-AllProjects',
         'Get-ntoolsScriptsVersion',
-    'Invoke-VerifyArtifacts',
-    'Set-DevelopmentEnvironment',
+        'Invoke-VerifyArtifacts',
+        'Set-DevelopmentEnvironment',
         'Get-VersionFromJson',
         'Update-DocVersions',
         'Write-TestResult',

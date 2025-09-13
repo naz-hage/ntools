@@ -95,7 +95,7 @@
 	</Target>
 
 	<!-- Test that ntools-scripts module is installed and can report a version -->
-	<Target Name="TEST_NTOOLS_SCRIPTS" DependsOnTargets="IS_ADMIN">
+	<Target Name="TEST_NTOOLS_SCRIPTS" DependsOnTargets="PROPERTIES">
 		<Message Text="Testing ntools-scripts installation" Importance="high" />
 		<Exec Command='pwsh -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "$(SolutionDir)\scripts\module-package\test-module.ps1" -BuildTools "$(BuildTools)"' WorkingDirectory="$(SolutionDir)" />
 		<Message Text="ntools-scripts test completed" Importance="high" />
