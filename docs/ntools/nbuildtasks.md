@@ -121,11 +121,6 @@ Here are examples of custom Tasks that can be used during builds:
 
 ### Modern Approach with ntools-scripts module
 ```xml
-<!-- Modern: Using ntools-scripts module for better integration and reliability -->
-<Target Name="INSTALL_NTOOLS_SCRIPTS">
-	<Exec Command='pwsh -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "$(SolutionDir)\scripts\module-package\install-module.ps1" -BuildTools "$(BuildTools)" -ModuleName "ntools-scripts"' WorkingDirectory="$(SolutionDir)" />
-</Target>
-
 <Target Name="PUBLISH">
 	<Exec Command='pwsh -NoProfile -ExecutionPolicy Bypass -Command "Import-Module &apos;$(BuildTools)\modules\ntools-scripts\ntools-scripts.psm1&apos; -Force; Publish-AllProjects -OutputDir &apos;$(ArtifactsFolder)&apos; -Version &apos;$(ProductVersion)&apos; -RepositoryRoot &apos;$(SolutionDir)&apos;"' WorkingDirectory="$(SolutionDir)" />
 </Target>

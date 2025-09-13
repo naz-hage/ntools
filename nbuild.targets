@@ -87,32 +87,11 @@
 		<Message Text="==> NBUILD_DONE"/>
 	</Target>
 
-	<!-- NBUILD_INSTALL removed: Nbuild installation is no longer managed by these targets. -->
-
-	<!-- DEV_SETUP removed: development environment installation should be performed using the
-		canonical script at dev-setup\install.ps1 or via the ntools-scripts module where appropriate.
-	     The DEV_SETUP MSBuild target was removed to avoid accidental in-place replacement of a running
-		 launcher and to reduce confusion between script-first and module-first install flows. -->
-
-	<!-- Install the ntools-scripts module into BuildTools modules folder -->
-	<Target Name="INSTALL_NTOOLS_SCRIPTS" DependsOnTargets="IS_ADMIN">
-		<Message Text="Installing ntools-scripts module into $(BuildTools)\modules" Importance="high" />
-		<Exec Command='pwsh -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "$(SolutionDir)\scripts\module-package\install-module.ps1" -BuildTools "$(BuildTools)" -ModuleName "ntools-scripts"' WorkingDirectory="$(SolutionDir)" />
-		<Message Text="ntools-scripts installation completed" Importance="high" />
-	</Target>
-
 	<!-- Setup development environment by importing ntools-scripts and calling Set-DevelopmentEnvironment -->
 	<Target Name="SETUP_ENVIRONMENT" DependsOnTargets="IS_ADMIN">
 		<Message Text="Setting up development environment (Set-DevelopmentEnvironment)" Importance="high" />
 		<Exec Command='pwsh -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "Import-Module \"$(SolutionDir)\scripts\module-package\ntools-scripts.psm1\" -Force; Set-DevelopmentEnvironment -DevDrive \"$(DevDrive)\" -MainDir \"$(MainDir)\""' WorkingDirectory="$(SolutionDir)" />
 		<Message Text="SETUP_ENVIRONMENT completed" Importance="high" />
-	</Target>
-
-	<!-- Uninstall ntools-scripts module from BuildTools modules folder -->
-	<Target Name="UNINSTALL_NTOOLS_SCRIPTS" DependsOnTargets="IS_ADMIN">
-		<Message Text="Uninstalling ntools-scripts module from $(BuildTools)\modules" Importance="high" />
-		<RemoveDir Directories="$(BuildTools)\modules\ntools-scripts" Condition="Exists('$(BuildTools)\modules\ntools-scripts')" />
-		<Message Text="ntools-scripts uninstallation completed" Importance="high" />
 	</Target>
 
 	<!-- Test that ntools-scripts module is installed and can report a version -->
