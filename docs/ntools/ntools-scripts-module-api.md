@@ -38,5 +38,4 @@ Notes:
 - Keep this file in sync with `scripts/module-package/ntools-scripts.psm1` and `ntools-scripts.psd1`.
 - For runtime discovery: `Import-Module './scripts/module-package/ntools-scripts.psm1' -Force; Get-Command -Module ntools-scripts`.
 
-Generated: condensed API table with short usage examples to improve discoverability.
 
