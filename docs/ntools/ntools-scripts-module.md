@@ -58,7 +58,6 @@ Test-NToolsScriptsModule
 Install-NToolsScriptsModule -InstallPath "$env:ProgramFiles\WindowsPowerShell\Modules\ntools-scripts" -Force
 ```
 
-The ntools-scripts module is a comprehensive PowerShell module that consolidates all NTools PowerShell functionality into a single, reusable module. This module replaces the previous collection of individual scripts with a structured, function-based approach.
 
 ## Module Information
 
