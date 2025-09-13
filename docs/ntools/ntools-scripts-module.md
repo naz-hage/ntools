@@ -257,69 +257,6 @@ This target performs:
     Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
 ```
 
-## Key Improvements
-
-### 1. Deterministic Repository Path Detection
-The `Publish-AllProjects` function now requires an explicit `RepositoryRoot` parameter, eliminating unreliable heuristic detection:
-
-```powershell
-# Before (unreliable)
-Publish-AllProjects -OutputDir $output -Version $version
-
-# After (deterministic)
-Publish-AllProjects -OutputDir $output -Version $version -RepositoryRoot $repoRoot
-```
-
-### 2. Configurable ntools.json Path
-The `Install-NTools` function accepts a custom path to ntools.json:
-
-```powershell
-# Use specific configuration file
-Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
-```
-
-### 3. Unified Error Handling
-All functions use consistent error handling and logging:
-
-```powershell
-Write-Info "Starting operation..."
-Write-Success "Operation completed successfully"
-Write-Warning "Potential issue detected"
-Write-Error "Operation failed"
-```
-
-### 4. Backward Compatibility
-- Legacy script entry points in `scripts/setup/` still work
-- Module functions can be called directly
-- All original functionality preserved
-
-## Migration from Legacy Scripts
-
-### For Developers
-```powershell
-# Old way
-./scripts/build/build-verify-artifacts.ps1  # deprecated - use Invoke-VerifyArtifacts
-
-# New way (module-based)
-Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
-Invoke-VerifyArtifacts -ArtifactsPath "C:\Artifacts\MySolution\Release\1.2.3" -ProductVersion "1.2.3"
-```
-
-### For CI/CD
-```yaml
-run: |
-  Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
-  Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
-```
-### For MSBuild
-```xml
-<!-- Old way -->
-<Exec Command='pwsh -File "$(SolutionDir)\scripts\build\publish-all-projects.ps1"' />
-
-<!-- New way (automatically used) -->
-<Exec Command='pwsh -Command "Import-Module ntools-scripts; Publish-AllProjects -RepositoryRoot $(SolutionDir)"' />
-```
-
 ## Module Development
 
 ### Adding New Functions
