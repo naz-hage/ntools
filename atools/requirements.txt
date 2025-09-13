@@ -1,0 +1,5 @@
+# Python dependencies for atools/add-issue.py
+# Keep this minimal; requests is optional at runtime but listed here for convenience.
+requests>=2.30.0
+# Optional: pin an exact version if you need reproducible installs
+# requests==2.31.0
