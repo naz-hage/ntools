@@ -184,7 +184,7 @@ Examples:
     parser.add_argument('--require-criteria', action='store_true', help='Fail if Acceptance Criteria section is missing')
     parser.add_argument('--repo', help='GitHub repo owner/name (owner/repo)')
     parser.add_argument('--config', help='Optional path to a config file for tokens/credentials')
-
+    parser.add_argument('--verbose', action='store_true', help='Show verbose output')
     args = parser.parse_args()
     
     # Handle positional file path
@@ -413,12 +413,6 @@ def print_header():
     years = f"{start_year}-{current_year}" if current_year != start_year else f"{start_year}"
     print(f"*** {TOOL_NAME}, Build automation, naz-ahmad, {years} -  Version: {TOOL_VERSION}")
     print('')
-    print('Description:')
-    print('  Nbuild - Build and DevOps Utility')
-    print('')
-    print('Usage:')
-    print('  add-issue.py --file-path <file> [options]')
-    print('')
 
 
 def query_github_issue(issue_id: str, args):
@@ -519,7 +513,9 @@ def query_azdo_workitem(work_item_id: str, args):
         
         print("\nAcceptance Criteria:")
         if ac_content:
-            print(f"(from {ac_field_name}):")
+            # Replacement for the $SELECTION_PLACEHOLDER$:
+            if getattr(args, 'verbose', False):
+                print(f"(from {ac_field_name}):")
             # Clean up HTML for display
             import re
             clean_ac = re.sub(r'<li[^>]*>', '- ', ac_content)
