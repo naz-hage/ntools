@@ -158,7 +158,7 @@ Examples:
     python add-issue.py backlog/pbi-007.md --dry-run                      # Parse and preview (target from file)
     python add-issue.py backlog/pbi-007.md                                # Create work item (all params from file)
     python add-issue.py backlog/pbi-007.md --target azdo                  # Override target
-    python add-issue.py --query 137 --target azdo --project MyProject    # Query existing item
+    python add-issue.py --query 137 --target azdo                      # Query existing item (use ## Project in markdown)
 '''
     )
     # Add custom help flag so we can print a consistent header before help text
@@ -176,7 +176,7 @@ Examples:
     parser.add_argument('--query', '-q', help='Query an existing work item by ID and display its details')
     parser.add_argument('--help-template', choices=['azdo', 'github'], help='Show example markdown template for the specified target')
     parser.add_argument('--work-item-type', choices=['PBI', 'Bug', 'Task'], default='PBI', help='Type of work item to create')
-    parser.add_argument('--project', help='Azure DevOps project name (for azdo target)')
+    # NOTE: --project CLI option removed. Project must be specified in markdown as ## Project
     parser.add_argument('--assignee', help='Assignee (username)')
     parser.add_argument('--labels', help='Comma-separated labels (GitHub) or tags')
     parser.add_argument('--area', help='Area path override (Azure DevOps)')
@@ -428,11 +428,11 @@ def query_azdo_workitem(work_item_id: str, args):
         print('ERROR: requests library is required to query Azure DevOps work items. Install with: pip install requests')
         return
 
-    # Get org and project
+    # Get org and project (project must be set via AZURE_DEVOPS_PROJECT env)
     org = os.environ.get('AZURE_DEVOPS_ORG')
-    project = args.project
+    project = os.environ.get('AZURE_DEVOPS_PROJECT')
     if not org or not project:
-        print('ERROR: Azure DevOps organization and project are required. Set AZURE_DEVOPS_ORG env and pass --project.')
+        print('ERROR: Azure DevOps organization and project are required. Set AZURE_DEVOPS_ORG and AZURE_DEVOPS_PROJECT environment variables.')
         return
 
     # Read PAT from environment
@@ -472,25 +472,7 @@ def query_azdo_workitem(work_item_id: str, args):
         print(f"Area: {area}")
         print(f"Iteration: {iteration}")
         
-        # Display assignee if present
-        if assignee:
-            if isinstance(assignee, dict):
-                assignee_name = assignee.get('displayName') or assignee.get('uniqueName') or str(assignee)
-            else:
-                assignee_name = str(assignee)
-            print(f"Assignee: {assignee_name}")
-        else:
-            print("Assignee: (unassigned)")
-        print("\nDescription:")
-        if description and description.strip():
-            # Strip basic HTML tags for display
-            import re
-            clean_desc = re.sub(r'<[^>]+>', '', description)
-            print(clean_desc.strip())
-        else:
-            print("(no description)")
-        
-        # Look for acceptance criteria in various possible fields
+        # display assignee if present (already shown above)
         ac_content = None
         ac_field_name = None
         
@@ -587,7 +569,9 @@ def main():
 
     # Merge CLI overrides into metadata (CLI wins, but prefer markdown for target)
     meta = fields.get('metadata', {})
-    
+    # Note: project metadata (## Project) is only used for Azure DevOps.
+    # GitHub Project wiring was removed to avoid ambiguity across Project types.
+
     # Use target from markdown if specified, otherwise use CLI --target
     if meta.get('target'):
         target = meta['target'].lower()
@@ -611,8 +595,6 @@ def main():
         meta['config'] = args.config
     if args.work_item_type:
         meta['work_item_type'] = args.work_item_type
-    if args.project:
-        meta['project'] = args.project
     fields['metadata'] = meta
 
     if args.require_criteria and not fields['acceptance_criteria']:
@@ -626,11 +608,11 @@ def main():
             print('ERROR: --repo (or ## Repository in the markdown) is required for GitHub target.')
             sys.exit(2)
     elif args.target == 'azdo':
-        project = fields['metadata'].get('project') or args.project
+        project = fields['metadata'].get('project')
         area = fields['metadata'].get('area')
         iteration = fields['metadata'].get('iteration')
         if not project:
-            print('ERROR: --project (or ## Project in the markdown) is required for Azure DevOps target.')
+            print('ERROR: ## Project in the markdown is required for Azure DevOps target.')
             sys.exit(2)
         if not area or not iteration:
             print('ERROR: ## Area and ## Iteration Path in the markdown are required for Azure DevOps target.')
@@ -688,6 +670,8 @@ def create_github_issue(fields: dict, args, dry_run: bool = False) -> bool:
     body = '\n'.join(body_lines)
     labels = (meta.get('labels') or '').strip()  # handle None case
     assignee = (meta.get('assignee') or '').strip() or None  # handle None case
+    # project is intentionally ignored for GitHub GH CLI invocation; users must manage Projects via gh directly
+    gh_project = None
 
     if dry_run:
         # If the parsed-fields summary has already been printed, avoid
@@ -700,6 +684,7 @@ def create_github_issue(fields: dict, args, dry_run: bool = False) -> bool:
                 cmd_preview.extend(['--label', label])
             if assignee:
                 cmd_preview.extend(['--assignee', assignee])
+            # project support removed for GitHub CLI invocation
             print(f"[dry-run] Command to execute: {' '.join(cmd_preview)}")
             return True
         # Otherwise show the full body as before
@@ -736,6 +721,7 @@ def create_github_issue(fields: dict, args, dry_run: bool = False) -> bool:
             
             if assignee:
                 cmd.extend(['--assignee', assignee])
+            # project support removed for GitHub CLI invocation
             
             if dry_run:
                 print(f"[dry-run] Command to execute: {' '.join(cmd)}")
@@ -776,7 +762,7 @@ def create_azdo_workitem(fields: dict, args, dry_run: bool = False) -> bool:
     ac_list = fields.get('acceptance_criteria') or []
     # Determine organization and project early so dry-run can show URL
     org = os.environ.get('AZURE_DEVOPS_ORG') or fields.get('metadata', {}).get('organization')
-    project = fields.get('metadata', {}).get('project') or args.project
+    project = fields.get('metadata', {}).get('project')
     work_item_type = fields.get('metadata', {}).get('work_item_type') or args.work_item_type or 'PBI'
     if work_item_type.lower() == 'pbi':
         work_item_type = 'Product Backlog Item'
@@ -841,9 +827,9 @@ def create_azdo_workitem(fields: dict, args, dry_run: bool = False) -> bool:
 
     # Determine organization and project
     org = os.environ.get('AZURE_DEVOPS_ORG') or fields.get('metadata', {}).get('organization')
-    project = fields.get('metadata', {}).get('project') or args.project
+    project = fields.get('metadata', {}).get('project')
     if not org or not project:
-        print('ERROR: Azure DevOps organization and project are required. Set AZURE_DEVOPS_ORG env or include ## Organization in markdown, and pass --project or include ## Project in markdown.')
+        print('ERROR: Azure DevOps organization and project are required. Set AZURE_DEVOPS_ORG (env) and include ## Project in the markdown (or set AZURE_DEVOPS_PROJECT env).')
         return False
 
     # Read PAT from environment (preferred)

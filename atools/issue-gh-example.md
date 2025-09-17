@@ -3,7 +3,8 @@
 ## Target: github
 ## Repository: naz-hage/naz
 ## Assignee: 
-## Labels: 
+## Labels: backlog
+
 
 ## Description
 
