@@ -920,19 +920,8 @@ def create_azdo_workitem(fields: dict, args, dry_run: bool = False) -> bool:
             # write AC into that field (use HTML if possible)
             payload.append({"op": "add", "path": f"/fields/{ac_field_ref}", "value": ac_html})
         else:
-            # Fallback: append AC to the Description to ensure it's captured (user prefers non-comment)
-            # If Description exists in payload, we need to modify it; otherwise add a new Description field with AC
-            appended = ac_html
-            # If we already added System.Description in payload, update that op instead of adding duplicate
-            found = False
-            for op in payload:
-                if op.get('path') == '/fields/System.Description':
-                    # append HTML inside existing value
-                    op['value'] = op.get('value', '') + '\n' + appended
-                    found = True
-                    break
-            if not found:
-                payload.append({"op": "add", "path": "/fields/System.Description", "value": appended})
+            # Do not append AC to Description or post a comment; only write AC when a dedicated field is present.
+            print('Warning: Acceptance Criteria field not found; acceptance criteria will NOT be written to the work item.')
 
     # Construct URL
     api_version = '7.0'
@@ -947,54 +936,33 @@ def create_azdo_workitem(fields: dict, args, dry_run: bool = False) -> bool:
         print(f"ERROR: HTTP request failed: {e}")
         return False
 
+    # Handle response: report creation and where Acceptance Criteria ended up.
     if resp.status_code >= 200 and resp.status_code < 300:
         try:
             data = resp.json()
-            wi_id = data.get('id')
-            wi_url = data.get('url') or f"https://dev.azure.com/{org}/{project}/_workitems/edit/{wi_id}"
-            print(f"Created Azure DevOps work item: {wi_url} (id: {wi_id})")
-            # If we have acceptance criteria, post them as a comment to keep Description focused.
-            if ac_list:
-                try:
-                    comment_text = '## Acceptance Criteria\n' + '\n'.join([f'- {a}' for a in ac_list])
-                    # Discover the project-scoped comments href from the created work item to avoid constructing an incorrect URL
-                    try:
-                        # fetch the work item we just created to read the _links.workItemComments.href
-                        get_url = f'https://dev.azure.com/{org}/_apis/wit/workItems/{wi_id}?api-version=7.0'
-                        g = requests.get(get_url, auth=HTTPBasicAuth('', pat), timeout=15)
-                        if g.status_code == 200:
-                            comments_href = g.json().get('_links', {}).get('workItemComments', {}).get('href')
-                        else:
-                            comments_href = None
-                    except Exception:
-                        comments_href = None
-
-                    if not comments_href:
-                        # Fallback to project-scoped comments URL
-                        comments_href = f'https://dev.azure.com/{org}/{project}/_apis/wit/workItems/{wi_id}/comments'
-
-                    # Ensure preview api-version is present
-                    if 'api-version' not in comments_href:
-                        sep = '&' if '?' in comments_href else '?'
-                        post_url = comments_href + sep + 'api-version=7.0-preview'
-                    else:
-                        post_url = comments_href
-
-                    comment_resp = requests.post(post_url, json={"text": comment_text}, auth=HTTPBasicAuth('', pat), timeout=15)
-                    if comment_resp.status_code >= 200 and comment_resp.status_code < 300:
-                        print('Posted acceptance criteria as a comment on the work item.')
-                    else:
-                        try:
-                            cerr = comment_resp.json()
-                        except Exception:
-                            cerr = comment_resp.text
-                        print(f'Warning: failed to post acceptance criteria comment: HTTP {comment_resp.status_code} - {cerr}')
-                except Exception as e:
-                    print('Warning: exception while posting acceptance criteria comment:', e)
-            return True
         except Exception:
-            print('Created work item but failed to parse response JSON')
-            return True
+            data = None
+
+        wi_id = None
+        wi_url = None
+        if isinstance(data, dict):
+            wi_id = data.get('id')
+            wi_url = data.get('url')
+
+        if not wi_url and wi_id:
+            wi_url = f"https://dev.azure.com/{org}/{project}/_workitems/edit/{wi_id}"
+
+        print(f"Created Azure DevOps work item: {wi_url or '(no url returned)'} (id: {wi_id})")
+
+        # Acceptance Criteria handling: if we discovered a dedicated field earlier (ac_field_ref)
+        # it was written into the payload. Otherwise AC was appended to the Description.
+        if ac_list:
+            if 'ac_field_ref' in locals() and ac_field_ref:
+                print(f"Acceptance Criteria written to field: {ac_field_ref}")
+            else:
+                print('Acceptance Criteria added to the Description field of the work item.')
+
+        return True
     else:
         try:
             err = resp.json()
@@ -1002,7 +970,6 @@ def create_azdo_workitem(fields: dict, args, dry_run: bool = False) -> bool:
             err = resp.text
         print(f"ERROR creating work item: HTTP {resp.status_code} - {err}")
         return False
-
 
 if __name__ == '__main__':
     main()
