@@ -3,7 +3,7 @@
 This small folder contains a Python CLI scaffold, `add-issue.py`, that parses backlog markdown and
 creates or previews work items for GitHub and Azure DevOps.
 
-This README documents prerequisites, installation steps, CLI options, and example usage for the tool.
+This README documents prerequisites, installation steps, the new "file-first" behavior for the tool, and example usage.
 
 ## Purpose
 
@@ -56,6 +56,7 @@ gh auth login
 ```pwsh
 $env:AZURE_DEVOPS_EXT_PAT = '...your PAT...'
 $env:AZURE_DEVOPS_ORG = 'your-org'
+$env:AZURE_DEVOPS_PROJECT = '...your Project...'
 ```
 
 Note: For CI, configure secure pipeline variables/secrets for the PAT and set them in the environment.
@@ -86,95 +87,33 @@ python add-issue.py --file-path "path\to\issue-azdo-example.md" --target azdo --
 python add-issue.py --file-path "path\to\issue-azdo-example.md" --target azdo --project "MyProject"
 ```
 
-## Important flags
+## File-first policy (updated)
 
-- `--dry-run` — Parse and display the extracted fields and a concise platform preview, but do not create items.
-- `--file-path` — Path to the markdown file. A positional file-path is supported, but using `--file-path` is recommended.
-- `--require-criteria` — Fail if the Acceptance Criteria section is missing in the markdown.
+This tool now follows a file-first ("file-only") policy: all creation metadata must come from the supplied markdown file. The CLI no longer supports overrides for the following options:
 
-## CLI options (detailed)
+- `--project`
+- `--work-item-type`
+- `--assignee`
+- `--labels`
+- `--area`
+- `--iteration`
+- `--require-criteria`
+- `--repo`
+- `--config`
 
-Below are all supported CLI options for `add-issue.py`. For each option we list whether it is required, optional, and whether it overrides metadata found inside the markdown file.
+Behavioral summary:
 
-- `--file-path, --file, -f` (optional but recommended)
-  - Purpose: Path to the markdown file containing the work item.
-  - Required: Not enforced by argparse so help can be shown, but the script will error if no file-path is provided when creating or previewing items.
-  - Overrides file metadata: N/A — this is the source file itself (positional or named). If both positional and `--file-path` are provided, `--file-path` wins.
+- The authoritative source for repository/project/area/iteration/labels/assignee/work item type is the markdown file passed with `--file-path` (or positional file path).
+- The CLI supports only a small set of operational flags: `--file-path`, `--target`, `--dry-run`, `--query`, `--help-template`, and `--verbose`.
+- For the `github` target, include a `## Repository: owner/repo` heading in your markdown.
+- For the `azdo` target, include `## Project:`, `## Area:`, and `## Iteration:` headings in your markdown. The tool will validate area paths when possible and will refuse to create an AzDo work item if required AzDo headings are missing.
+- Acceptance Criteria in the markdown is parsed and, when present, the tool will attempt to write it to a dedicated Acceptance Criteria field on Azure DevOps (if the project defines one). If such a field is not present, Acceptance Criteria will NOT be written to the work item.
 
-- Positional `file_path_pos` (optional)
-  - Purpose: Convenience positional argument for the markdown file.
-  - Required: Optional. If provided and `--file-path` is not specified, it will be used as `--file-path`.
-  - Overrides file metadata: N/A — same as `--file-path`.
+Why this change?
 
-- `--target` (optional)
-  - Purpose: Which platform to create the work item on. Choices: `github`, `azdo`.
-  - Required: Optional; defaults to `github`.
-  - Overrides file metadata: Yes — this will override a `Target:` or `## Target` metadata heading inside the markdown if present. If the markdown contains a target, the file metadata is used unless the CLI explicitly sets `--target`.
+CLI overrides were a source of confusion and caused mismatch between file contents and created work items. The simpler file-first policy makes the tool deterministic and easier to use in automation: edit the markdown to change the work item, and run the tool to create it.
 
-- `--dry-run` (optional)
-  - Purpose: Parse and preview output without creating items.
-  - Required: Optional.
-  - Overrides file metadata: No — read-only preview only.
-
-- `--query, -q` (optional)
-  - Purpose: Query an existing work item by ID (GitHub issue number or AzDo work item id) and display its details.
-  - Required: Optional.
-  - Overrides file metadata: No.
-
-- `--help-template` (optional)
-  - Purpose: Print an example markdown template for the specified target (`azdo` or `github`).
-  - Required: Optional.
-  - Overrides file metadata: No.
-
-- `--work-item-type` (optional)
-  - Purpose: For AzDo, choose the work item type (`PBI`, `Bug`, `Task`).
-  - Required: Optional; defaults to `PBI`.
-  - Overrides file metadata: Yes — will override a `Work Item Type` or `## Work Item Type` heading in the markdown if provided.
-
-- `--project` (optional; required for AzDo writes)
-  - Purpose: Azure DevOps project name when targeting `azdo`.
-  - Required: Optional for parsing/dry-run, but required at creation time for `azdo` unless the markdown provides a `Project:` metadata heading.
-  - Overrides file metadata: Yes — if provided it overrides `## Project` in the markdown.
-
-- `--assignee` (optional)
-  - Purpose: Assignee/user for the created item.
-  - Required: Optional.
-  - Overrides file metadata: Yes — overrides `## Assignee` in the markdown.
-
-- `--labels` (optional)
-  - Purpose: Comma-separated labels/tags for GitHub or tags for AzDo.
-  - Required: Optional.
-  - Overrides file metadata: Yes — overrides `## Labels` in the markdown.
-
-- `--area` (optional)
-  - Purpose: Azure DevOps area path override.
-  - Required: Optional.
-  - Overrides file metadata: Yes — overrides `## Area` in the markdown.
-
-- `--iteration` (optional)
-  - Purpose: Azure DevOps iteration path override.
-  - Required: Optional.
-  - Overrides file metadata: Yes — overrides `## Iteration` in the markdown.
-
-- `--require-criteria` (optional)
-  - Purpose: Fail if Acceptance Criteria section is missing in the markdown.
-  - Required: Optional.
-  - Overrides file metadata: No — it enforces the presence of the AC section in the file.
-
-- `--repo` (optional)
-  - Purpose: GitHub repository owner/name (`owner/repo`).
-  - Required: Optional for parsing/dry-run; required when creating GitHub issues unless the markdown provides a `Repository:` or `Repo:` metadata heading.
-  - Overrides file metadata: Yes — overrides `## Repository` or `## Repo` in the markdown.
-
-- `--config` (optional)
-  - Purpose: Optional path to a config file for tokens/credentials.
-  - Required: Optional.
-  - Overrides file metadata: If the markdown includes a `Config` heading, CLI `--config` will override it.
-
-Notes on precedence and behavior
-- CLI flags win over markdown metadata for fields where both exist (for example `--labels`, `--assignee`, `--repo`, `--area`, `--iteration`, `--project`, `--work-item-type`).
-- Metadata fields found in the markdown (for example `## Repository`, `## Project`, `## Area`) are used as defaults when CLI flags are not provided.
-- The script prints the parsed fields first when using `--dry-run`; CLI flags used to override metadata are shown in the Parameters block under the parsed fields so you can confirm effective values.
+If you require programmatic overrides, consider a small wrapper script that modifies the markdown before calling `add-issue.py`.
 
 
 ## Troubleshooting
@@ -191,4 +130,45 @@ Notes on precedence and behavior
 - The tool is a scaffold and does not yet implement full API error handling or retries for transient errors.
 - Contributions welcome: consider adding `--json` output for machine-readable dry-run previews or an interactive
   mode that confirms creation before calling `gh` or the Azure DevOps API.
+
+## Running the tests
+
+From the repository root (`C:\source\ntools`) you can run the new tests with Python's pytest. Example PowerShell commands:
+
+Note: avoid using `-q` twice (for example `-qq`) — that suppresses the final summary line. Use a single `-q` for concise output with the final summary.
+
+```pwsh
+# (optional) create & activate a virtual environment
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+
+# install runtime + test deps (requests + pytest)
+python -m pip install -r atools/requirements.txt pytest
+
+# run the whole test file
+python -m pytest -q atools/tests/test_add_issue_file_only.py
+
+# or run just the GitHub dry-run test
+python -m pytest -q atools/tests/test_add_issue_file_only.py::test_github_happy_path_dry_run
+```
+
+## Removing the virtual environment
+
+If you created a `.venv` during testing and want to remove it, simply delete the folder.
+
+PowerShell (Windows):
+
+```pwsh
+# Deactivate first if active
+deactivate
+Remove-Item -Recurse -Force .venv
+```
+
+POSIX (macOS / Linux):
+
+```bash
+# Deactivate first if active
+deactivate
+rm -rf .venv
+```
 
