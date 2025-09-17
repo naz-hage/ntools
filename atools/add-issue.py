@@ -175,15 +175,9 @@ Examples:
     parser.add_argument('--dry-run', action='store_true', help='Parse and print the extracted fields but do not create anything')
     parser.add_argument('--query', '-q', help='Query an existing work item by ID and display its details')
     parser.add_argument('--help-template', choices=['azdo', 'github'], help='Show example markdown template for the specified target')
-    parser.add_argument('--work-item-type', choices=['PBI', 'Bug', 'Task'], default='PBI', help='Type of work item to create')
-    # NOTE: --project CLI option removed. Project must be specified in markdown as ## Project
-    parser.add_argument('--assignee', help='Assignee (username)')
-    parser.add_argument('--labels', help='Comma-separated labels (GitHub) or tags')
-    parser.add_argument('--area', help='Area path override (Azure DevOps)')
-    parser.add_argument('--iteration', help='Iteration path override (Azure DevOps)')
-    parser.add_argument('--require-criteria', action='store_true', help='Fail if Acceptance Criteria section is missing')
-    parser.add_argument('--repo', help='GitHub repo owner/name (owner/repo)')
-    parser.add_argument('--config', help='Optional path to a config file for tokens/credentials')
+    # Removed CLI overrides: the tool reads all configuration from the markdown file
+    # supplied with --file-path. Removed flags: --work-item-type, --assignee,
+    # --labels, --area, --iteration, --require-criteria, --repo, --config.
     parser.add_argument('--verbose', action='store_true', help='Show verbose output')
     args = parser.parse_args()
     
@@ -581,25 +575,10 @@ def main():
         args.target = target
     
     # Apply CLI overrides
-    if args.area:
-        meta['area'] = args.area
-    if args.iteration:
-        meta['iteration'] = args.iteration
-    if args.repo:
-        meta['repository'] = args.repo
-    if args.assignee:
-        meta['assignee'] = args.assignee
-    if args.labels:
-        meta['labels'] = args.labels
-    if args.config:
-        meta['config'] = args.config
-    if args.work_item_type:
-        meta['work_item_type'] = args.work_item_type
+    # CLI overrides removed — all configuration must be in the markdown file.
     fields['metadata'] = meta
-
-    if args.require_criteria and not fields['acceptance_criteria']:
-        print('ERROR: Acceptance Criteria is required but not found.')
-        sys.exit(2)
+    # --require-criteria CLI option removed; the tool will always proceed based on
+    # the content of the provided markdown file.
 
     # Validate required metadata per target before performing actions (and before dry-run output)
     if args.target == 'github':
@@ -763,7 +742,7 @@ def create_azdo_workitem(fields: dict, args, dry_run: bool = False) -> bool:
     # Determine organization and project early so dry-run can show URL
     org = os.environ.get('AZURE_DEVOPS_ORG') or fields.get('metadata', {}).get('organization')
     project = fields.get('metadata', {}).get('project')
-    work_item_type = fields.get('metadata', {}).get('work_item_type') or args.work_item_type or 'PBI'
+    work_item_type = fields.get('metadata', {}).get('work_item_type') or 'PBI'
     if work_item_type.lower() == 'pbi':
         work_item_type = 'Product Backlog Item'
 
@@ -839,7 +818,7 @@ def create_azdo_workitem(fields: dict, args, dry_run: bool = False) -> bool:
         return False
 
     # Build payload (JSON Patch)
-    work_item_type = fields.get('metadata', {}).get('work_item_type') or args.work_item_type or 'PBI'
+    work_item_type = fields.get('metadata', {}).get('work_item_type') or 'PBI'
     # Map generic names to common Azure DevOps work item type names
     if work_item_type.lower() == 'pbi':
         work_item_type = 'Product Backlog Item'
