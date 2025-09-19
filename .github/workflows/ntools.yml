@@ -68,9 +68,18 @@ jobs:
         # Import the consolidated ntools-scripts module using the repo-scoped env var
         Import-Module $env:NTOOLS_SCRIPT_MODULE -Force
 
-        # Install NTools using the dev-setup/ntools.json file
+        # Fail fast on any non-terminating errors
+        $ErrorActionPreference = 'Stop'
+
+        # Install NTools using the dev-setup/ntools.json file and ensure CI step fails on error
         Write-Host "Installing NTools using dev-setup/ntools.json..."
-        Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
+        try {
+          Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
+        }
+        catch {
+          Write-Host "Install-NTools failed: $($_.Exception.Message)"
+          exit 1
+        }
 
         Write-Host "Installed NTools version information:"
         $nbPath = "$env:ProgramFiles\NBuild\nb.exe"

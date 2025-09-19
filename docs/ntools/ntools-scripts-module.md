@@ -69,19 +69,6 @@ Install-NToolsScriptsModule -InstallPath "$env:ProgramFiles\WindowsPowerShell\Mo
 
 The module consolidates functionality from the previous script structure:
 
-### After (Consolidated Module)
-```
-scripts/
-├── module-package/
-│   ├── ntools-scripts.psm1     # Main module with all functions
-│   ├── ntools-scripts.psd1     # Module manifest
-│   └── install-module.ps1      # Installation script
-├── build/                      # Legacy scripts (deprecated)
-├── devops/                     # Legacy scripts (deprecated)
-├── setup/                      # Entry point scripts
-└── test/                       # Legacy scripts (deprecated)
-```
-
 ## Available Functions
 
 The module exports 36 functions organized by category:
@@ -104,6 +91,8 @@ The module exports 36 functions organized by category:
 - `Install-DevelopmentApps` - Install development applications
 - `Install-NTools` - Install NTools from releases (with configurable ntools.json path)
 - `Install-NToolsScriptsModule` - Install this module
+
+> Note: `Install-NTools` raises terminating errors on fatal failures (for example, download 404s or archive/extract errors). Callers that need to handle these failures gracefully should wrap the call in try/catch and handle exceptions accordingly.
 
 ### Test Functions
 - `Invoke-CodeCoverage` - Run tests with code coverage
