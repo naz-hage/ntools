@@ -319,8 +319,7 @@ function InstallNtools {
             $version = $ntoolsJson.NbuildAppList[0].Version
             Write-Host "Version not specified. Using version $version from ntools.json."
         } else {
-            Write-Host "Error: Version not specified and ntools.json not found."
-            return $false
+            throw "Version not specified and ntools.json not found."
         }
     }
 
@@ -355,7 +354,11 @@ function InstallNtools {
     }
 
     # Unzip the downloaded file to the deployment path
-    Expand-Archive -Path $downloadedFile -DestinationPath $deploymentPath -Force
+    try {
+        Expand-Archive -Path $downloadedFile -DestinationPath $deploymentPath -Force -ErrorAction Stop
+    } catch {
+        throw "Failed to extract $downloadedFile : $($_.Exception.Message)"
+    }
     # add deployment path to the PATH environment variable if it doesn't already exist
     AddDeploymentPathToEnvironment $deploymentPath
 
@@ -387,11 +390,10 @@ function DownloadNtools {
     $fileName = "$downloadsDirectory\$version.zip"
     
     try {
-        Invoke-WebRequest -Uri $url -OutFile $fileName -ErrorAction Stop
+            Invoke-WebRequest -Uri $url -OutFile $fileName -UseBasicParsing -ErrorAction Stop
     } catch {
-        Write-Host "Failed to download NTools version $version from $url"
-        Write-Host "Error: $($_.Exception.Message)"
-        return
+            $msg = "Failed to download NTools version $version from $url : $($_.Exception.Message)"
+            throw $msg
     }
 
     if (Test-Path $fileName) {
@@ -437,7 +439,8 @@ function Write-OutputMessage {
 
     # ensure log file exists
     if (!(Test-Path -Path "install.log")) {
-        New-Item -ItemType File -Path "install.log" -Force | Out-Null
+        # create empty log file
+        New-Item -Path "install.log" -ItemType File -Force | Out-Null
     }
 
     if ($Message -eq "EmtpyLine") {
@@ -459,10 +462,12 @@ function GetFileVersion {
         [Parameter(Mandatory=$true)]
         [string]$FilePath
     )   
-
-    $versionInfo = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($FilePath)
-    # return the all file version parts joined by a dot
-    return ($versionInfo.FileMajorPart, $versionInfo.FileMinorPart, $versionInfo.FileBuildPart, $versionInfo.FilePrivatePart) -join "."
+    try {
+        $versionInfo = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($FilePath)
+        return $versionInfo.FileVersion
+    } catch {
+        throw "Failed to get file version for $FilePath : $($_.Exception.Message)"
+    }
 }
 
 <#
