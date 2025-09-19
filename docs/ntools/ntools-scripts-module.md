@@ -69,19 +69,6 @@ Install-NToolsScriptsModule -InstallPath "$env:ProgramFiles\WindowsPowerShell\Mo
 
 The module consolidates functionality from the previous script structure:
 
-### After (Consolidated Module)
-```
-scripts/
-├── module-package/
-│   ├── ntools-scripts.psm1     # Main module with all functions
-│   ├── ntools-scripts.psd1     # Module manifest
-│   └── install-module.ps1      # Installation script
-├── build/                      # Legacy scripts (deprecated)
-├── devops/                     # Legacy scripts (deprecated)
-├── setup/                      # Entry point scripts
-└── test/                       # Legacy scripts (deprecated)
-```
-
 ## Available Functions
 
 The module exports 36 functions organized by category:
