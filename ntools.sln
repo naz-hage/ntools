@@ -65,11 +65,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dev-setup", "dev-setup", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{F1234567-89AB-CDEF-0123-456789ABCDEF}"
 	ProjectSection(SolutionItems) = preProject
-		scripts\README.md = scripts\README.md
-		scripts\README.md = scripts\README.md
-		scripts\module-package\ntools-scripts.psm1 = scripts\module-package\ntools-scripts.psm1
 		scripts\module-package\ntools-scripts.psd1 = scripts\module-package\ntools-scripts.psd1
-		scripts\module-package\install-module.ps1 = scripts\module-package\install-module.ps1
+		scripts\module-package\ntools-scripts.psm1 = scripts\module-package\ntools-scripts.psm1
+		scripts\README.md = scripts\README.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{B79CBB23-CB3B-4934-921E-59BF51B96B93}"

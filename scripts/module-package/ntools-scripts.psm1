@@ -609,17 +609,18 @@ function Invoke-NToolsDownload {
     try {
         Invoke-WebRequest -Uri $url -OutFile $fileName -ErrorAction Stop
     } catch {
-        Write-Host "Failed to download NTools version $Version from $url"
-        Write-Host "Error: $($_.Exception.Message)"
-        return $false
+        $msg = "Failed to download NTools version $Version from $url : $($_.Exception.Message)"
+        Write-Host $msg
+        throw $msg
     }
 
     if (Test-Path $fileName) {
         Write-Host "Downloaded NTools version $Version to $fileName"
         return $true
     } else {
-        Write-Host "Failed to download NTools version $Version from $url"
-        return $false
+        $msg = "Failed to download NTools version $Version from $url - file not found after download"
+        Write-Host $msg
+        throw $msg
     }
 }
 
@@ -672,7 +673,7 @@ function Install-NTools {
     # Download the specified version of NTools
     $downloadResult = Invoke-NToolsDownload -Version $Version -DownloadsDirectory $DownloadsDirectory
     if (-not $downloadResult) {
-        return $false
+        throw "Invoke-NToolsDownload failed for version $Version"
     }
 
     # Check if the downloaded file exists
@@ -694,8 +695,9 @@ function Install-NTools {
         return $true
     }
     catch {
-        Write-Host "Failed to extract or install NTools: $($_.Exception.Message)"
-        return $false
+        $msg = "Failed to extract or install NTools from $downloadedFile : $($_.Exception.Message)"
+        Write-Host $msg
+        throw $msg
     }
 }
 
