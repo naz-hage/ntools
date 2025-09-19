@@ -92,6 +92,8 @@ The module exports 36 functions organized by category:
 - `Install-NTools` - Install NTools from releases (with configurable ntools.json path)
 - `Install-NToolsScriptsModule` - Install this module
 
+> Note: `Install-NTools` raises terminating errors on fatal failures (for example, download 404s or archive/extract errors). Callers that need to handle these failures gracefully should wrap the call in try/catch and handle exceptions accordingly.
+
 ### Test Functions
 - `Invoke-CodeCoverage` - Run tests with code coverage
 - `Test-MSBuildDelegation` - Test MSBuild target delegation (**Note**: Now automatically integrated into `nb smoke_test` target)
