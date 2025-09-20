@@ -125,8 +125,10 @@ python add-issue.py --file-path "path\to\issue-azdo-example.md" --target azdo --
 
 The repository includes example markdown files you can use with `add-issue.py`. These are not copied into the docs — use the files directly from the `atools/` folder:
 
-- [atools/issue-gh-example.md](https://github.com/naz-hage/ntools/blob/main/atools/issue-gh-example.md) — GitHub issue example (contains `Repository:` heading)
-- [atools/issue-azdo-example.md](https://github.com/naz-hage/ntools/blob/main/atools/issue-azdo-example.md) — Azure DevOps work item example (contains `Project:`, `Area:`, and `Iteration:` headings)
+- [issue-gh-example.md](https://github.com/naz-hage/ntools/blob/main/atools/issue-gh-example.md) — GitHub issue example (contains `Repository:` heading)
+- [issue-azdo-example.md](https://github.com/naz-hage/ntools/blob/main/atools/issue-azdo-example.md) — Azure DevOps work item example (contains `Project:`, `Area:`, and `Iteration:` headings)
+
+- In GitHub, labels are not created automatically. You must create any labels you want to use in the target repository before running the tool to create issues with those labels.
 
 ## Troubleshooting
 
@@ -150,7 +152,7 @@ python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 
 # install runtime + test deps (requests + pytest)
-python -m pip install -r atools/requirements.txt pytest
+python -m pip install -r atools/requirements-dev.txt
 
 # run the whole test file
 python -m pytest -q atools/tests/test_add_issue_file_only.py
