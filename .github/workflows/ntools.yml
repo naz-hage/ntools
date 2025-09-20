@@ -203,14 +203,8 @@ jobs:
           coverage.cobertura.xml
         retention-days: 30
 
-    - name: Publish Test Results
-      uses: dorny/test-reporter@v1
-      if: always()
-      with:
-        name: Test Results (${{ matrix.configuration }})
-        path: './TestResults/**/*.trx'
-        reporter: dotnet-trx
-        fail-on-error: false
+    # NOTE: dorny/test-reporter removed. Test result files are uploaded above via
+    # actions/upload-artifact and can be inspected/downloaded from the run.
 
     - name: Add Coverage PR Comment
       uses: marocchino/sticky-pull-request-comment@v2
@@ -267,21 +261,22 @@ jobs:
         run: |
           mkdir -p TestResults
           pytest --junitxml=./TestResults/pytest-results.xml
-
-      - name: Python Tests
-        uses: dorny/test-reporter@v1
+          
+      - name: Upload pytest results
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          name: Python Tests
-          path: ./TestResults/pytest-results.xml
-          reporter: junit  # NOT 'pytest'
-          fail-on-error: false
-          path-replace-backslashes: false
-          list-suites: all
-          list-tests: all
-          max-annotations: 10
-          fail-on-empty: true
-          only-summary: false
-          token: ${{ secrets.GITHUB_TOKEN }}
+          name: pytest-results
+          path: TestResults/pytest-results.xml
+          retention-days: 30
+
+      # NOTE: dorny/test-reporter removed for Python tests because it does not
+      # reliably support pytest/JUnit output in the versions we observed. The
+      # pytest XML artifact is uploaded above and can be inspected/downloaded
+      # to diagnose test failures. If you want PR comments or annotations,
+      # consider adding a lightweight Python step that posts a summary using
+      # the GITHUB_TOKEN or replace this with a different action that supports
+      # pytest explicitly.
 
   docs:
     name: Publish Docs
