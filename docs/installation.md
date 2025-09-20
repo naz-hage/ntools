@@ -19,14 +19,14 @@ This command will allow the installation script to run. Once the installation is
 - Run the following command to install the ntools:
 
 ```powershell
-cd c:\source\ntools\dev-setup
+cd ./ntools\dev-setup
 .\install.ps1
 ```
 
 **Or using the new ntools-scripts module (recommended):**
 
 ```powershell
-cd c:\source\ntools
+cd ./ntools
 Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
 Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
 ```

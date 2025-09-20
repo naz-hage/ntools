@@ -34,3 +34,6 @@ nav:
   - Build System Features:
     - Code Coverage: ntools/code-coverage.md
     - MSBuild Targets: ntools/nbuild-targets.md
+  - atools:
+    - Overview: atools/index.md
+    - AzDO payloads: atools/azdo_payloads.md

@@ -138,6 +138,45 @@
 		<Message Text="==> DONE" />
 	</Target>
 
+	<!-- Install python test dependencies for atools and run pytest (verbose) -->
+	<Target Name="INSTALL_PYTHON_TEST_DEPS">
+		<Message Text="Installing Python test dependencies for atools" Importance="high" />
+		<PropertyGroup>
+			<PythonExe>$(PythonPath)\python.exe</PythonExe>
+			<PipExe Condition="'$(PipPath)' != ''">$(PipPath)</PipExe>
+			<!-- Fallback to python -m pip if PipPath not set -->
+			<PipExe Condition="'$(PipExe)' == ''">&quot;$(PythonExe)&quot; -m pip</PipExe>
+			<AtoolsReq>$(SolutionDir)\atools\requirements.txt</AtoolsReq>
+		</PropertyGroup>
+		<!-- Use requirements.txt if it exists, else install pytest and pytest-mock -->
+		<Exec Command='&quot;$(PipExe)&quot; install -r &quot;$(AtoolsReq)&quot;' WorkingDirectory="$(SolutionDir)" ContinueOnError="true">
+			<Output TaskParameter="ExitCode" PropertyName="PipExitCode" />
+		</Exec>
+		<Message Text="pip install -r returned exit code $(PipExitCode)" Importance="high" />
+		<!-- If requirements install failed or no requirements file, install minimal test deps -->
+		<Exec Command='&quot;$(PipExe)&quot; install pytest pytest-mock' WorkingDirectory="$(SolutionDir)" Condition="!Exists('$(AtoolsReq)') Or '$(PipExitCode)' != '0'">
+			<Output TaskParameter="ExitCode" PropertyName="PipFallbackExitCode" />
+		</Exec>
+		<Error Condition="'$(PipExitCode)' != '0' And '$(PipFallbackExitCode)' != '0'" Text="Failed to install python test dependencies. pip exit codes: $(PipExitCode), $(PipFallbackExitCode)" />
+		<Message Text="==> DONE" />
+	</Target>
+
+	<!-- Run Python pytest for atools package (verbose) -->
+	<Target Name="RUN_PYTESTS_VERBOSE" DependsOnTargets="INSTALL_PYTHON_TEST_DEPS" >
+		<Message Text="Running Python pytest for atools (verbose)" Importance="high" />
+		<PropertyGroup>
+			<PythonExe>$(PythonPath)\python.exe</PythonExe>
+			<!-- Allow overriding test path via TEST_PATH -->
+			<TestPath Condition="'$(TestPath)' == ''">$(SolutionDir)\atools\tests</TestPath>
+		</PropertyGroup>
+		<!-- Run pytest with very verbose output (-vv) -->
+		<Exec Command='&quot;$(PythonExe)&quot; -m pytest -vv &quot;$(TestPath)&quot;' WorkingDirectory="$(SolutionDir)" ConsoleToMSBuild="true">
+			<Output TaskParameter="ExitCode" PropertyName="PytestExitCode" />
+		</Exec>
+		<Error Condition="'$(PytestExitCode)' != '0'" Text="Python pytest failed with exit code $(PytestExitCode). See output above." />
+		<Message Text="==> DONE" />
+	</Target>
+
 	<!-- Example to get the installation 
 		Product code used for uninstallation of product -->
 	<Target Name="GET_PRODUCT_CODES" >

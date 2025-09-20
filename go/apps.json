@@ -113,8 +113,22 @@
       "UninstallArgs": "/uninstall /quiet /norestart"
     },
     {
+      "Name": "GitHub CLI",
+      "Version": "2.74.2",
+      "AppFileName": "$(InstallPath)\\gh.exe",
+      "WebDownloadFile": "https://github.com/cli/cli/releases/download/v$(Version)/gh_$(Version)_windows_amd64.zip",
+      "DownloadedFile": "gh_$(Version)_windows_amd64.zip",
+      "InstallCommand": "powershell.exe",
+      "InstallArgs": "-Command Expand-Archive -Path gh_$(Version)_windows_amd64.zip -DestinationPath '$(InstallPath)' -Force; Move-Item -Path '$(InstallPath)\\bin\\gh.exe' -Destination '$(InstallPath)\\gh.exe' -Force; Remove-Item -Path '$(InstallPath)\\bin' -Recurse -Force",
+      "InstallPath": "$(ProgramFiles)\\GitHub CLI",
+      "UninstallCommand": "powershell.exe",
+      "UninstallArgs": "-Command Remove-Item -Path '$(InstallPath)' -Recurse -Force",
+      "StoredHash": "2d047e7639d45b373f4262563799c391c3f27ff6b2afc5553685bfe6019020b1",
+      "AddToPath": true
+    },
+    {
       "Name": "Git for Windows",
-      "Version": "2.49.0",
+      "Version": "2.50.0",
       "AppFileName": "$(InstallPath)\\bin\\git.exe",
       "WebDownloadFile": "https://github.com/git-for-windows/git/releases/download/v$(Version).windows.1/Git-$(Version)-64-bit.exe",
       "DownloadedFile": "Git-$(Version)-64-bit.exe",
@@ -192,7 +206,7 @@
     },
     {
       "Name": "Ntools",
-      "Version": "1.22.0",
+      "Version": "1.32.0",
       "AppFileName": "$(InstallPath)\\nb.exe",
       "WebDownloadFile": "https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip",
       "DownloadedFile": "$(Version).zip",
@@ -217,12 +231,12 @@
     },
     {
       "Name": "pnpm",
-      "Version": "9.1.2",
+      "Version": "10.14.0",
       "AppFileName": "$(InstallPath)\\pnpm.exe",
       "WebDownloadFile": "https://github.com/pnpm/pnpm/releases/download/v$(Version)/pnpm-win-x64.exe",
       "DownloadedFile": "pnpm-win-x64.exe",
-      "InstallCommand": "xcopy.exe",
-      "InstallArgs": "-Command Copy-Item -Path $(DownloadedFile) -Destination '$(InstallPath)\\pnpm.exe' -Force",
+      "InstallCommand": "powershell.exe",
+      "InstallArgs": "-Command if (!(Test-Path -Path '$(InstallPath)')) { New-Item -ItemType Directory -Path '$(InstallPath)' } ; Copy-Item -Path $(DownloadedFile) -Destination '$(InstallPath)\\pnpm.exe' -Force",
       "InstallPath": "$(ProgramFiles)\\pnpm",
       "UninstallCommand": "powershell.exe",
       "UninstallArgs": "-Command Remove-Item -Path '$(InstallPath)' -Recurse -Force",
@@ -230,7 +244,7 @@
     },
     {
       "Name": "Powershell",
-      "Version": "7.5.2",
+      "Version": "7.5.3",
       "AppFileName": "$(InstallPath)\\pwsh.exe",
       "WebDownloadFile": "https://github.com/PowerShell/PowerShell/releases/download/v$(Version)/PowerShell-$(Version)-win-x64.msi",
       "DownloadedFile": "PowerShell-$(Version)-win-x64.msi",
@@ -242,7 +256,7 @@
     },
     {
       "Name": "Python",
-      "Version": "3.13.3",
+      "Version": "3.13.7",
       "AppFileName": "$(InstallPath)\\python.exe",
       "WebDownloadFile": "https://www.python.org/ftp/python/$(Version)/python-$(Version)-amd64.exe",
       "DownloadedFile": "python-$(Version)-amd64.exe",
