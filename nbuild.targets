@@ -162,7 +162,7 @@
 	</Target>
 
 	<!-- Run Python pytest for atools package (verbose) -->
-	<Target Name="RUN_PYTESTS_VERBOSE" DependsOnTargets="INSTALL_PYTHON_TEST_DEPS" AfterTargets="TEST">
+	<Target Name="RUN_PYTESTS_VERBOSE" DependsOnTargets="INSTALL_PYTHON_TEST_DEPS" >
 		<Message Text="Running Python pytest for atools (verbose)" Importance="high" />
 		<PropertyGroup>
 			<PythonExe>$(PythonPath)\python.exe</PythonExe>
