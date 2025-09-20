@@ -53,7 +53,7 @@ The table below lists all available targets for the Nbuild tool.
 | COVERAGE            | Generate comprehensive code coverage reports using ReportGenerator |
 | COVERAGE_SUMMARY    | Display high-level code coverage summary |
 | SMOKE_TEST          | **Comprehensive smoke test**: Validates published artifacts (4+ executables) AND build system integrity (target delegation). Consolidated from TEST_TARGET_DELEGATION |
-| SMOKE_TEST_PWSH     | REMOVED: functionality consolidated into `SMOKE_TEST` (see changelog) |
+| SMOKE_TEST_PWSH     | REMOVED: functionality consolidated into `SMOKE_TEST` |
 | IS_ADMIN            | Check if current process is running in admin mode AdminCheckExitCode property is set |
 | SingleProject       | Example how to build a single project |
 | HandleError         | Error handling placeholder |

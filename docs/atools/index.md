@@ -7,16 +7,23 @@ title: atools — Issue creation helpers
 
 # atools — Issue creation helpers (add-issue.py)
 
-This small folder contains a Python CLI scaffold, `add-issue.py`, that parses backlog markdown and
+This folder contains a Python CLI tool, `add-issue.py`, that parses backlog markdown and
 creates or previews work items for GitHub and Azure DevOps.
 
-This README documents prerequisites, installation steps, the new "file-first" behavior for the tool, and example usage.
+This README documents prerequisites, installation steps, the tool behavior and example usage.
 
 ## Purpose
 
 `add-issue.py` is a convenience tool for converting human-friendly backlog markdown files into
 GitHub issues or Azure DevOps work items. It supports a dry-run mode that prints the parsed fields
 and a concise platform preview so you can review the output before creating items.
+
+## Experimental
+
+- This tool is experimental. It is functional but may change and currently lacks full API error handling,
+	retries for transient errors, and other production hardening.
+- Contributions welcome: consider adding `--json` output for machine-readable dry-run previews, improved
+	retries/error-handling, or an interactive mode that confirms creation before calling `gh` or the Azure DevOps API.
 
 ## Prerequisites
 
@@ -68,6 +75,26 @@ $env:AZURE_DEVOPS_PROJECT = '...your Project...'
 
 Note: For CI, configure secure pipeline variables/secrets for the PAT and set them in the environment.
 
+### Removing the virtual environment
+
+If you created a `.venv` during testing and want to remove it, simply delete the folder.
+
+PowerShell (Windows):
+
+```pwsh
+# Deactivate first if active
+deactivate
+Remove-Item -Recurse -Force .venv
+```
+
+POSIX (macOS / Linux):
+
+```bash
+# Deactivate first if active
+deactivate
+rm -rf .venv
+```
+
 ## Usage examples
 
 - Preview (dry-run) a GitHub issue from a markdown file:
@@ -94,34 +121,12 @@ python add-issue.py --file-path "path\to\issue-azdo-example.md" --target azdo --
 python add-issue.py --file-path "path\to\issue-azdo-example.md" --target azdo --project "MyProject"
 ```
 
-## File-first policy (updated)
+## Example markdown files
 
-This tool now follows a file-first ("file-only") policy: all creation metadata must come from the supplied markdown file. The CLI no longer supports overrides for the following options:
+The repository includes example markdown files you can use with `add-issue.py`. These are not copied into the docs — use the files directly from the `atools/` folder:
 
-- `--project`
-- `--work-item-type`
-- `--assignee`
-- `--labels`
-- `--area`
-- `--iteration`
-- `--require-criteria`
-- `--repo`
-- `--config`
-
-Behavioral summary:
-
-- The authoritative source for repository/project/area/iteration/labels/assignee/work item type is the markdown file passed with `--file-path` (or positional file path).
-- The CLI supports only a small set of operational flags: `--file-path`, `--target`, `--dry-run`, `--query`, `--help-template`, and `--verbose`.
-- For the `github` target, include a `## Repository: owner/repo` heading in your markdown.
-- For the `azdo` target, include `## Project:`, `## Area:`, and `## Iteration:` headings in your markdown. The tool will validate area paths when possible and will refuse to create an AzDo work item if required AzDo headings are missing.
-- Acceptance Criteria in the markdown is parsed and, when present, the tool will attempt to write it to a dedicated Acceptance Criteria field on Azure DevOps (if the project defines one). If such a field is not present, Acceptance Criteria will NOT be written to the work item.
-
-Why this change?
-
-CLI overrides were a source of confusion and caused mismatch between file contents and created work items. The simpler file-first policy makes the tool deterministic and easier to use in automation: edit the markdown to change the work item, and run the tool to create it.
-
-If you require programmatic overrides, consider a small wrapper script that modifies the markdown before calling `add-issue.py`.
-
+- [atools/issue-gh-example.md](https://github.com/naz-hage/ntools/blob/main/atools/issue-gh-example.md) — GitHub issue example (contains `Repository:` heading)
+- [atools/issue-azdo-example.md](https://github.com/naz-hage/ntools/blob/main/atools/issue-azdo-example.md) — Azure DevOps work item example (contains `Project:`, `Area:`, and `Iteration:` headings)
 
 ## Troubleshooting
 
@@ -132,11 +137,6 @@ If you require programmatic overrides, consider a small wrapper script that modi
 	- `AZURE_DEVOPS_ORG` is set.
 	- The `--project` parameter matches an existing Azure DevOps project when targeting `azdo`.
 
-## Development notes
-
-- The tool is a scaffold and does not yet implement full API error handling or retries for transient errors.
-- Contributions welcome: consider adding `--json` output for machine-readable dry-run previews or an interactive
-	mode that confirms creation before calling `gh` or the Azure DevOps API.
 
 ## Running the tests
 
@@ -159,25 +159,6 @@ python -m pytest -q atools/tests/test_add_issue_file_only.py
 python -m pytest -q atools/tests/test_add_issue_file_only.py::test_github_happy_path_dry_run
 ```
 
-## Removing the virtual environment
-
-If you created a `.venv` during testing and want to remove it, simply delete the folder.
-
-PowerShell (Windows):
-
-```pwsh
-# Deactivate first if active
-deactivate
-Remove-Item -Recurse -Force .venv
-```
-
-POSIX (macOS / Linux):
-
-```bash
-# Deactivate first if active
-deactivate
-rm -rf .venv
-```
 
 ## CI-safe live-create example
 
