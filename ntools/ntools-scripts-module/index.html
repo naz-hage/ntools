@@ -276,7 +276,7 @@ Install-NToolsScriptsModule -InstallPath &quot;$env:ProgramFiles\WindowsPowerShe
 <ul>
 <li><code>Set-DevelopmentEnvironment</code> - Set up development environment</li>
 <li><code>Install-DevelopmentApps</code> - Install development applications</li>
-<li><code>Install-NTools</code> - Install NTools from releases (with configurable ntools.json path)</li>
+<li><code>Install-NTools</code> - Install NTools from releases (with configurable ntools.json path)  <strong>(deprecated: use atools/install-ntools.py)</strong></li>
 <li><code>Install-NToolsScriptsModule</code> - Install this module</li>
 </ul>
 <blockquote>
@@ -330,7 +330,9 @@ Get-NtoolsScriptsVersion
 Get-Command -Module ntools-scripts | Select-Object Name | Format-Table -AutoSize
 </code></pre>
 <h3 id="install-ntools-with-custom-configuration">Install NTools with Custom Configuration</h3>
-<pre><code class="language-powershell"># Install using specific ntools.json file
+<pre><code class="language-powershell"># Install using specific ntools.json file (PowerShell wrapper is deprecated)
+# Prefer the cross-platform Python script for CI and cross-platform installs:
+# python atools/install-ntools.py --version 1.32.0 --json dev-setup/ntools.json
 Install-NTools -NtoolsJsonPath &quot;./dev-setup/ntools.json&quot;
 
 # Install specific version
@@ -384,7 +386,8 @@ nb smoke_test
 <pre><code class="language-yaml">- name: Install ntools using ntools-scripts module
   run: |
     Import-Module &quot;./scripts/module-package/ntools-scripts.psm1&quot; -Force
-    Install-NTools -NtoolsJsonPath &quot;./dev-setup/ntools.json&quot;
+  # Deprecated: prefer calling the Python installer from CI
+  python atools/install-ntools.py --version 1.32.0 --json dev-setup/ntools.json --downloads-dir ${{ runner.temp }} --dry-run
 </code></pre>
 <h2 id="module-development">Module Development</h2>
 <h3 id="adding-new-functions">Adding New Functions</h3>
