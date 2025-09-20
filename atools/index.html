@@ -100,21 +100,23 @@
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#purpose">Purpose</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#experimental">Experimental</a>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#removing-the-virtual-environment">Removing the virtual environment</a>
+    </li>
+        </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#usage-examples">Usage examples</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#file-first-policy-updated">File-first policy (updated)</a>
+    <li class="toctree-l2"><a class="reference internal" href="#example-markdown-files">Example markdown files</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#troubleshooting">Troubleshooting</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#development-notes">Development notes</a>
-    </li>
     <li class="toctree-l2"><a class="reference internal" href="#running-the-tests">Running the tests</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#removing-the-virtual-environment">Removing the virtual environment</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#ci-safe-live-create-example">CI-safe live-create example</a>
     </li>
@@ -151,13 +153,20 @@
                 <!-- Full README content for atools/add-issue.py -->
 
 <h1 id="atools-issue-creation-helpers-add-issuepy">atools — Issue creation helpers (add-issue.py)</h1>
-<p>This small folder contains a Python CLI scaffold, <code>add-issue.py</code>, that parses backlog markdown and
+<p>This folder contains a Python CLI tool, <code>add-issue.py</code>, that parses backlog markdown and
 creates or previews work items for GitHub and Azure DevOps.</p>
-<p>This README documents prerequisites, installation steps, the new "file-first" behavior for the tool, and example usage.</p>
+<p>This README documents prerequisites, installation steps, the tool behavior and example usage.</p>
 <h2 id="purpose">Purpose</h2>
 <p><code>add-issue.py</code> is a convenience tool for converting human-friendly backlog markdown files into
 GitHub issues or Azure DevOps work items. It supports a dry-run mode that prints the parsed fields
 and a concise platform preview so you can review the output before creating items.</p>
+<h2 id="experimental">Experimental</h2>
+<ul>
+<li>This tool is experimental. It is functional but may change and currently lacks full API error handling,
+    retries for transient errors, and other production hardening.</li>
+<li>Contributions welcome: consider adding <code>--json</code> output for machine-readable dry-run previews, improved
+    retries/error-handling, or an interactive mode that confirms creation before calling <code>gh</code> or the Azure DevOps API.</li>
+</ul>
 <h2 id="prerequisites">Prerequisites</h2>
 <ul>
 <li>Python 3.13+ installed and available on PATH. The tool was developed and tested with Python 3.13 and
@@ -210,6 +219,18 @@ $env:AZURE_DEVOPS_ORG = 'your-org'
 $env:AZURE_DEVOPS_PROJECT = '...your Project...'
 </code></pre>
 <p>Note: For CI, configure secure pipeline variables/secrets for the PAT and set them in the environment.</p>
+<h3 id="removing-the-virtual-environment">Removing the virtual environment</h3>
+<p>If you created a <code>.venv</code> during testing and want to remove it, simply delete the folder.</p>
+<p>PowerShell (Windows):</p>
+<pre><code class="language-pwsh"># Deactivate first if active
+deactivate
+Remove-Item -Recurse -Force .venv
+</code></pre>
+<p>POSIX (macOS / Linux):</p>
+<pre><code class="language-bash"># Deactivate first if active
+deactivate
+rm -rf .venv
+</code></pre>
 <h2 id="usage-examples">Usage examples</h2>
 <ul>
 <li>Preview (dry-run) a GitHub issue from a markdown file:</li>
@@ -231,30 +252,12 @@ $env:AZURE_DEVOPS_PROJECT = '...your Project...'
 </ul>
 <pre><code class="language-pwsh">python add-issue.py --file-path &quot;path\to\issue-azdo-example.md&quot; --target azdo --project &quot;MyProject&quot;
 </code></pre>
-<h2 id="file-first-policy-updated">File-first policy (updated)</h2>
-<p>This tool now follows a file-first ("file-only") policy: all creation metadata must come from the supplied markdown file. The CLI no longer supports overrides for the following options:</p>
+<h2 id="example-markdown-files">Example markdown files</h2>
+<p>The repository includes example markdown files you can use with <code>add-issue.py</code>. These are not copied into the docs — use the files directly from the <code>atools/</code> folder:</p>
 <ul>
-<li><code>--project</code></li>
-<li><code>--work-item-type</code></li>
-<li><code>--assignee</code></li>
-<li><code>--labels</code></li>
-<li><code>--area</code></li>
-<li><code>--iteration</code></li>
-<li><code>--require-criteria</code></li>
-<li><code>--repo</code></li>
-<li><code>--config</code></li>
+<li><a href="https://github.com/naz-hage/ntools/blob/main/atools/issue-gh-example.md">atools/issue-gh-example.md</a> — GitHub issue example (contains <code>Repository:</code> heading)</li>
+<li><a href="https://github.com/naz-hage/ntools/blob/main/atools/issue-azdo-example.md">atools/issue-azdo-example.md</a> — Azure DevOps work item example (contains <code>Project:</code>, <code>Area:</code>, and <code>Iteration:</code> headings)</li>
 </ul>
-<p>Behavioral summary:</p>
-<ul>
-<li>The authoritative source for repository/project/area/iteration/labels/assignee/work item type is the markdown file passed with <code>--file-path</code> (or positional file path).</li>
-<li>The CLI supports only a small set of operational flags: <code>--file-path</code>, <code>--target</code>, <code>--dry-run</code>, <code>--query</code>, <code>--help-template</code>, and <code>--verbose</code>.</li>
-<li>For the <code>github</code> target, include a <code>## Repository: owner/repo</code> heading in your markdown.</li>
-<li>For the <code>azdo</code> target, include <code>## Project:</code>, <code>## Area:</code>, and <code>## Iteration:</code> headings in your markdown. The tool will validate area paths when possible and will refuse to create an AzDo work item if required AzDo headings are missing.</li>
-<li>Acceptance Criteria in the markdown is parsed and, when present, the tool will attempt to write it to a dedicated Acceptance Criteria field on Azure DevOps (if the project defines one). If such a field is not present, Acceptance Criteria will NOT be written to the work item.</li>
-</ul>
-<p>Why this change?</p>
-<p>CLI overrides were a source of confusion and caused mismatch between file contents and created work items. The simpler file-first policy makes the tool deterministic and easier to use in automation: edit the markdown to change the work item, and run the tool to create it.</p>
-<p>If you require programmatic overrides, consider a small wrapper script that modifies the markdown before calling <code>add-issue.py</code>.</p>
 <h2 id="troubleshooting">Troubleshooting</h2>
 <ul>
 <li>If the tool reports <code>requests</code> is missing, run <code>pip install -r requirements.txt</code>.</li>
@@ -265,12 +268,6 @@ $env:AZURE_DEVOPS_PROJECT = '...your Project...'
 <li>The <code>--project</code> parameter matches an existing Azure DevOps project when targeting <code>azdo</code>.</li>
 </ul>
 </li>
-</ul>
-<h2 id="development-notes">Development notes</h2>
-<ul>
-<li>The tool is a scaffold and does not yet implement full API error handling or retries for transient errors.</li>
-<li>Contributions welcome: consider adding <code>--json</code> output for machine-readable dry-run previews or an interactive
-    mode that confirms creation before calling <code>gh</code> or the Azure DevOps API.</li>
 </ul>
 <h2 id="running-the-tests">Running the tests</h2>
 <p>From the repository root (<code>./ntools</code>) you can run the new tests with Python's pytest. Example PowerShell commands:</p>
@@ -287,18 +284,6 @@ python -m pytest -q atools/tests/test_add_issue_file_only.py
 
 # or run just the GitHub dry-run test
 python -m pytest -q atools/tests/test_add_issue_file_only.py::test_github_happy_path_dry_run
-</code></pre>
-<h2 id="removing-the-virtual-environment">Removing the virtual environment</h2>
-<p>If you created a <code>.venv</code> during testing and want to remove it, simply delete the folder.</p>
-<p>PowerShell (Windows):</p>
-<pre><code class="language-pwsh"># Deactivate first if active
-deactivate
-Remove-Item -Recurse -Force .venv
-</code></pre>
-<p>POSIX (macOS / Linux):</p>
-<pre><code class="language-bash"># Deactivate first if active
-deactivate
-rm -rf .venv
 </code></pre>
 <h2 id="ci-safe-live-create-example">CI-safe live-create example</h2>
 <p>If you want CI to create work items (GitHub issues or AzDO work items) automatically, it's important to gate this capability and avoid exposing credentials to untrusted pull requests. The pattern below shows a guarded job that only runs on the default branch (or after manual approval) and reads secrets from the repository/organization secrets store.</p>
