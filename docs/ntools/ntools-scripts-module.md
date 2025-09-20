@@ -218,7 +218,6 @@ This target performs:
 - name: Install ntools using ntools-scripts module
   run: |
     Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
-  # Deprecated: prefer calling the Python installer from CI
   python atools/install-ntools.py --version 1.32.0 --json dev-setup/ntools.json --downloads-dir ${{ runner.temp }} --dry-run
 ```
 
