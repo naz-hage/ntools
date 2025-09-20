@@ -255,8 +255,13 @@ rm -rf .venv
 <h2 id="example-markdown-files">Example markdown files</h2>
 <p>The repository includes example markdown files you can use with <code>add-issue.py</code>. These are not copied into the docs — use the files directly from the <code>atools/</code> folder:</p>
 <ul>
-<li><a href="https://github.com/naz-hage/ntools/blob/main/atools/issue-gh-example.md">atools/issue-gh-example.md</a> — GitHub issue example (contains <code>Repository:</code> heading)</li>
-<li><a href="https://github.com/naz-hage/ntools/blob/main/atools/issue-azdo-example.md">atools/issue-azdo-example.md</a> — Azure DevOps work item example (contains <code>Project:</code>, <code>Area:</code>, and <code>Iteration:</code> headings)</li>
+<li><a href="https://github.com/naz-hage/ntools/blob/main/atools/issue-gh-example.md">issue-gh-example.md</a> — GitHub issue example (contains <code>Repository:</code> heading)</li>
+<li>
+<p><a href="https://github.com/naz-hage/ntools/blob/main/atools/issue-azdo-example.md">issue-azdo-example.md</a> — Azure DevOps work item example (contains <code>Project:</code>, <code>Area:</code>, and <code>Iteration:</code> headings)</p>
+</li>
+<li>
+<p>In GitHub, labels are not created automatically. You must create any labels you want to use in the target repository before running the tool to create issues with those labels.</p>
+</li>
 </ul>
 <h2 id="troubleshooting">Troubleshooting</h2>
 <ul>
@@ -277,7 +282,7 @@ python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 
 # install runtime + test deps (requests + pytest)
-python -m pip install -r atools/requirements.txt pytest
+python -m pip install -r atools/requirements-dev.txt
 
 # run the whole test file
 python -m pytest -q atools/tests/test_add_issue_file_only.py
