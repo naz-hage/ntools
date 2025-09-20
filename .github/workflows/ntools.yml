@@ -281,8 +281,12 @@ jobs:
       - name: Install test dependencies
         run: |
           python -m pip install --upgrade pip
-          if [ -f "atools/requirements.txt" ]; then
+          if [ -f "atools/requirements-dev.txt" ]; then
+            pip install -r atools/requirements-dev.txt
+          elif [ -f "atools/requirements.txt" ]; then
             pip install -r atools/requirements.txt
+            # Ensure pytest is available even if requirements.txt only pins runtime deps
+            pip install pytest pytest-mock
           else
             pip install pytest pytest-mock
           fi

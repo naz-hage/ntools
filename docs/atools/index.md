@@ -1,3 +1,10 @@
+---
+title: atools — Issue creation helpers
+---
+
+
+<!-- Full README content for atools/add-issue.py -->
+
 # atools — Issue creation helpers (add-issue.py)
 
 This small folder contains a Python CLI scaffold, `add-issue.py`, that parses backlog markdown and
@@ -14,17 +21,17 @@ and a concise platform preview so you can review the output before creating item
 ## Prerequisites
 
 - Python 3.13+ installed and available on PATH. The tool was developed and tested with Python 3.13 and
-  earlier 3.x versions; Python 3.13 is now the minimum supported runtime.
+	earlier 3.x versions; Python 3.13 is now the minimum supported runtime.
 - The `requests` library is required for Azure DevOps API calls. Install via pip (see Installation).
 - For GitHub target:
-  - The GitHub CLI (`gh`) is required when the tool uses the CLI-based flow to create issues. Install it from
-    https://cli.github.com/ and ensure you have authenticated (`gh auth login`). The tool will show a
-    preview command when running `--dry-run` and will attempt to use `gh` for creation if present.
+	- The GitHub CLI (`gh`) is required when the tool uses the CLI-based flow to create issues. Install it from
+		https://cli.github.com/ and ensure you have authenticated (`gh auth login`). The tool will show a
+		preview command when running `--dry-run` and will attempt to use `gh` for creation if present.
 - For Azure DevOps target:
-  - The tool uses the Azure DevOps REST API. You must set an Azure DevOps Personal Access Token (PAT)
-    in an environment variable named `AZURE_DEVOPS_EXT_PAT` or `AZURE_DEVOPS_PAT`.
-  - The Azure DevOps organization should be available in the environment variable `AZURE_DEVOPS_ORG` (e.g., `myorg`).
-  - The `requests` library is required to talk to the Azure DevOps API.
+	- The tool uses the Azure DevOps REST API. You must set an Azure DevOps Personal Access Token (PAT)
+		in an environment variable named `AZURE_DEVOPS_EXT_PAT` or `AZURE_DEVOPS_PAT`.
+	- The Azure DevOps organization should be available in the environment variable `AZURE_DEVOPS_ORG` (e.g., `myorg`).
+	- The `requests` library is required to talk to the Azure DevOps API.
 
 ## Installation
 
@@ -121,15 +128,15 @@ If you require programmatic overrides, consider a small wrapper script that modi
 - If the tool reports `requests` is missing, run `pip install -r requirements.txt`.
 - If GitHub operations fail, confirm `gh` is installed and authenticated (`gh auth status`).
 - If Azure DevOps operations fail, confirm:
-  - `AZURE_DEVOPS_EXT_PAT` (or `AZURE_DEVOPS_PAT`) is set and has enough scopes to create work items.
-  - `AZURE_DEVOPS_ORG` is set.
-  - The `--project` parameter matches an existing Azure DevOps project when targeting `azdo`.
+	- `AZURE_DEVOPS_EXT_PAT` (or `AZURE_DEVOPS_PAT`) is set and has enough scopes to create work items.
+	- `AZURE_DEVOPS_ORG` is set.
+	- The `--project` parameter matches an existing Azure DevOps project when targeting `azdo`.
 
 ## Development notes
 
 - The tool is a scaffold and does not yet implement full API error handling or retries for transient errors.
 - Contributions welcome: consider adding `--json` output for machine-readable dry-run previews or an interactive
-  mode that confirms creation before calling `gh` or the Azure DevOps API.
+	mode that confirms creation before calling `gh` or the Azure DevOps API.
 
 ## Running the tests
 
@@ -180,48 +187,47 @@ Example GitHub Actions job snippet (add to `.github/workflows/ntools.yml` as a g
 
 ```yaml
 jobs:
-  create-issues:
-    name: Create Issues (gated)
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' # only run on main branch; change per your policy
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Install deps
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r atools/requirements.txt
-      - name: Create issues (guarded)
-        env:
-          AZURE_DEVOPS_EXT_PAT: ${{ secrets.AZURE_DEVOPS_EXT_PAT }}
-          AZURE_DEVOPS_ORG: ${{ secrets.AZURE_DEVOPS_ORG }}
-          API_GITHUB_KEY: ${{ secrets.API_GITHUB_KEY }}
-        run: |
-          # Example: create a GitHub issue from a file
-          python atools/add-issue.py --file-path atools/issue-gh-example.md --target github
+	create-issues:
+		name: Create Issues (gated)
+		runs-on: ubuntu-latest
+		if: github.ref == 'refs/heads/main' # only run on main branch; change per your policy
+		steps:
+			- uses: actions/checkout@v4
+			- name: Set up Python
+				uses: actions/setup-python@v5
+				with:
+					python-version: '3.12'
+			- name: Install deps
+				run: |
+					python -m pip install --upgrade pip
+					pip install -r atools/requirements.txt
+			- name: Create issues (guarded)
+				env:
+					AZURE_DEVOPS_EXT_PAT: ${{ secrets.AZURE_DEVOPS_EXT_PAT }}
+					AZURE_DEVOPS_ORG: ${{ secrets.AZURE_DEVOPS_ORG }}
+					API_GITHUB_KEY: ${{ secrets.API_GITHUB_KEY }}
+				run: |
+					# Example: create a GitHub issue from a file
+					python atools/add-issue.py --file-path atools/issue-gh-example.md --target github
 
-      # Secure practice: require manual approval using environments or GitHub Environments protection rules
-      # (set environment protection to require reviewers) to gate any job that exposes credentials.
+			# Secure practice: require manual approval using environments or GitHub Environments protection rules
+			# (set environment protection to require reviewers) to gate any job that exposes credentials.
 ```
 
 Required secrets and PAT scopes
 
 - For Azure DevOps:
-  - `AZURE_DEVOPS_EXT_PAT` or `AZURE_DEVOPS_PAT` (recommended secure secret)
-  - Required scopes: Work Items (read/write) and potentially Full Access if you need to add links/attachments. Prefer minimal scopes.
-  - `AZURE_DEVOPS_ORG` — organization name (string)
+	- `AZURE_DEVOPS_EXT_PAT` or `AZURE_DEVOPS_PAT` (recommended secure secret)
+	- Required scopes: Work Items (read/write) and potentially Full Access if you need to add links/attachments. Prefer minimal scopes.
+	- `AZURE_DEVOPS_ORG` — organization name (string)
 
 - For GitHub:
-  - `API_GITHUB_KEY` (personal access token) — if using `gh` for creation you can also rely on `GITHUB_TOKEN` provided by GitHub Actions but be aware `GITHUB_TOKEN` has repo-scoped permissions and may be fine for creating issues; use a PAT if you need broader scopes.
-  - Required scopes for creating issues: repo (or public_repo for public repos), and workflow if triggering workflows.
+	- `API_GITHUB_KEY` (personal access token) — if using `gh` for creation you can also rely on `GITHUB_TOKEN` provided by GitHub Actions but be aware `GITHUB_TOKEN` has repo-scoped permissions and may be fine for creating issues; use a PAT if you need broader scopes.
+	- Required scopes for creating issues: repo (or public_repo for public repos), and workflow if triggering workflows.
 
 Guarded step guidance
 
 - Use GitHub Environments with required reviewers to gate jobs that have access to secrets. This prevents PRs from untrusted forks from receiving secrets.
 - Prefer running live-create jobs only on `main` or via manually triggered workflow_dispatch after a review.
 - Avoid using `pull_request` events for live-create jobs unless you explicitly filter or require approvals.
-
 

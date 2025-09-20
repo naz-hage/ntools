@@ -1,6 +1,6 @@
 The table below lists all available targets for the Nbuild tool. 
 
-- **C:\source\ntools\nbuild.targets Targets**
+- **./ntools\nbuild.targets Targets**
 
 | **Target Name** | **Description** |
 | --- | --- |
