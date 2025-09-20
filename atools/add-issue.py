@@ -405,15 +405,80 @@ def print_header():
     start_year = 2020
     current_year = datetime.now().year
     years = f"{start_year}-{current_year}" if current_year != start_year else f"{start_year}"
-    print(f"*** {TOOL_NAME}, Build automation, naz-ahmad, {years} -  Version: {TOOL_VERSION}")
+    # Mark this tool as experimental in the runtime banner
+    print(f"*** {TOOL_NAME} (experimental), Build automation, naz-ahmad, {years} -  Version: {TOOL_VERSION}")
     print('')
 
 
 def query_github_issue(issue_id: str, args):
-    """Query and display a GitHub issue by ID."""
+    """Query and display a GitHub issue by ID using the GitHub CLI as an
+    experimental implementation.
+
+    The repository may be provided in a markdown file passed via --file-path
+    (## Repository: owner/repo) or via the GITHUB_REPOSITORY environment
+    variable (owner/repo). This is intentionally lightweight and intended
+    as an experimental stop-gap until a REST-based implementation is added.
+    """
     print(f"[GitHub Query] Querying issue #{issue_id}...")
-    print("GitHub query functionality not yet implemented.")
-    # TODO: Implement GitHub API call to get issue details
+
+    # Determine repository: prefer metadata from a provided markdown file
+    repo = None
+    file_path = getattr(args, 'file_path', None)
+    if file_path:
+        try:
+            p = validate_file(file_path)
+            fields = extract_fields_from_markdown(p)
+            repo = (fields.get('metadata') or {}).get('repository') or (fields.get('metadata') or {}).get('repo')
+        except Exception:
+            # Fall through to environment lookup if file is invalid
+            repo = None
+
+    # Fallback to environment (commonly set in CI/gh contexts)
+    if not repo:
+        repo = os.environ.get('GITHUB_REPOSITORY')
+
+    if not repo:
+        print('ERROR: Repository not specified. Provide --file-path with ## Repository in the markdown or set GITHUB_REPOSITORY environment variable.')
+        return
+
+    # Use gh CLI to query the issue as an experimental implementation
+    try:
+        import subprocess
+        import json as _json
+
+        cmd = ['gh', 'issue', 'view', str(issue_id), '--repo', repo, '--json', 'number,title,body,labels,assignees']
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+
+        # gh --json returns a JSON object
+        data = _json.loads(result.stdout)
+
+        num = data.get('number')
+        title = data.get('title') or '(no title)'
+        body = data.get('body') or '(no description)'
+        labels = [l.get('name') for l in data.get('labels') or []]
+        assignees = [a.get('login') for a in data.get('assignees') or []]
+
+        print(f"--- GitHub Issue #{num} ---")
+        print(f"Title: {title}\n")
+        print(body)
+        if labels:
+            print('\nLabels: ' + ', '.join(labels))
+        if assignees:
+            print('Assignees: ' + ', '.join(assignees))
+        print(f"--- End Issue #{num} ---")
+        return
+
+    except subprocess.CalledProcessError as e:
+        print(f"ERROR: GitHub CLI command failed: {e}")
+        if getattr(e, 'stderr', None):
+            print(f"stderr: {e.stderr}")
+        return
+    except FileNotFoundError:
+        print("ERROR: GitHub CLI (`gh`) not found. Please install it or set the GITHUB_REPOSITORY environment variable and provide an alternative method.")
+        return
+    except Exception as e:
+        print(f"ERROR querying GitHub issue: {e}")
+        return
 
 
 def query_azdo_workitem(work_item_id: str, args):
