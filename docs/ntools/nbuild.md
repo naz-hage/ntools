@@ -174,7 +174,7 @@ Key points:
   `install`, `uninstall`, `upload`) the command will short-circuit and print a
   concise action summary prefixed with `DRY-RUN:` (for example: `DRY-RUN: would
   upload asset X to release Y`).
-- For read-only commands (for example `list_release`) the default behaviour is to
+- For read-only commands (for example `list_release`) the default Behavior is to
   avoid network access in dry-run and print a short simulated message. If a
   project requires read-only network access during dry-run, it should be made
   explicit (for example `--dry-run=fetch`) in a follow-up PBI.

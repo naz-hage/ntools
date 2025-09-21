@@ -308,7 +308,7 @@ namespace NbuildTests
             json = json.Replace("versionToTest", VersionToTest);
 
             // Act
-            var result = Command.Install(json);
+            var result = Command.Install(json, verbose:true, dryRun:false);
 
             if (!result.IsSuccess() && result.Output.Count > 0)
             {
