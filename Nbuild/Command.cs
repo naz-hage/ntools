@@ -122,11 +122,12 @@ namespace Nbuild
         {
             Verbose = verbose;
             ResultHelper result = ResultHelper.New();
-            if (global::nb.Program.DryRun)
-            {
-                ConsoleHelper.WriteLine($"DRY-RUN: would install apps from json: {json ?? "<default>"}", ConsoleColor.Yellow);
-                return ResultHelper.Success();
-            }
+                if (global::nb.Program.DryRun)
+                {
+                    var msg = $"DRY-RUN: would install apps from json: {json ?? "<default>"}";
+                    ConsoleHelper.WriteLine(msg, ConsoleColor.Yellow);
+                    return ResultHelper.Success(msg);
+                }
             if (!CanRunCommand()) return ResultHelper.Fail(-1, $"You must run this command as an administrator");
 
             var apps = GetApps(json);
@@ -156,11 +157,12 @@ namespace Nbuild
         {
             Verbose = verbose;
             ResultHelper result = ResultHelper.New();
-            if (global::nb.Program.DryRun)
-            {
-                ConsoleHelper.WriteLine($"DRY-RUN: would uninstall apps from json: {json ?? "<default>"}", ConsoleColor.Yellow);
-                return ResultHelper.Success();
-            }
+                if (global::nb.Program.DryRun)
+                {
+                    var msg = $"DRY-RUN: would uninstall apps from json: {json ?? "<default>"}";
+                    ConsoleHelper.WriteLine(msg, ConsoleColor.Yellow);
+                    return ResultHelper.Success(msg);
+                }
             if (!CanRunCommand()) return ResultHelper.Fail(-1, $"You must run this command as an administrator");
 
             var apps = GetApps(json);
@@ -188,7 +190,6 @@ namespace Nbuild
             var apps = GetApps(json);
 
             if (apps == null) return ResultHelper.Fail(-1, $"Invalid json input");
-
             ConsoleHelper.WriteLine($"{apps.Count()} apps to list:", ConsoleColor.Yellow);
 
             // print header
@@ -213,13 +214,21 @@ namespace Nbuild
                 }
             }
 
-            Console.WriteLine();
-            return ResultHelper.Success();
+        Console.WriteLine();
+        return ResultHelper.Success();
         }
 
         public static ResultHelper Download(string? json, bool verbose = false)
         {
             Verbose = verbose;
+
+            // Respect global dry-run: do not perform downloads or print the downloads table.
+            if (global::nb.Program.DryRun)
+            {
+                var msg = $"DRY-RUN: would download after processing from {json ?? "<default>"}";
+                ConsoleHelper.WriteLine(msg, ConsoleColor.Yellow);
+                return ResultHelper.Success(msg);
+            }
 
             if (!CanRunCommand()) return ResultHelper.Fail(-1, $"You must run this command as an administrator");
 
@@ -292,9 +301,9 @@ namespace Nbuild
             
             // *** Important **
             // Set trusted Host and extension.  This assumes that due diligence has been done to ensure the file is safe to download
-            Nfile.SetTrustedHosts([new Uri(nbuildApp.WebDownloadFile).Host]);
+            Nfile.SetTrustedHosts(new List<string> { new Uri(nbuildApp.WebDownloadFile).Host });
             var extension = Path.GetExtension(new Uri(nbuildApp.WebDownloadFile).AbsolutePath);
-            Nfile.SetAllowedExtensions([extension]);
+            Nfile.SetAllowedExtensions(new List<string> { extension });
 
             if (Verbose)
             {
@@ -516,7 +525,6 @@ namespace Nbuild
                 // Update the filename to the full path of executable in the PATH environment variable
                 process.StartInfo.FileName = FileMappins.GetFullPathOfFile(process.StartInfo.FileName);
 
-                ConsoleHelper.WriteLine($" Installing {nbuildApp.Name} {nbuildApp.Version}", ConsoleColor.Yellow);
                 if (Verbose)
                 {
                     ConsoleHelper.WriteLine($" Working Directory: {process.StartInfo.WorkingDirectory}", ConsoleColor.Yellow);
@@ -535,20 +543,19 @@ namespace Nbuild
                     }
 
                     // Check if the app was installed successfully
-                    return SuccessfullInstall(nbuildApp, result);
+                    return SuccessfullInstall(nbuildApp, resultInstall);
                 }
                 else
                 {
-                    
-                    //ConsoleHelper.WriteLine($"X {appData.Name} {appData.Version} failed to install: {resultInstall.GetFirstOutput()}", ConsoleColor.Red);
-                    ConsoleHelper.WriteLine($"X {nbuildApp.Name} {nbuildApp.Version} failed to install: {process.ExitCode}", ConsoleColor.Red);
-                    if (Verbose) DisplayCodeAndOutput(result);
+                    // installer failed
+                    ConsoleHelper.WriteLine($"X {nbuildApp.Name} {nbuildApp.Version} failed to install: {resultInstall.Code}", ConsoleColor.Red);
+                    if (Verbose) DisplayCodeAndOutput(resultInstall);
                     // print resultInstall.Output
                     foreach (var item in resultInstall.Output)
                     {
                         ConsoleHelper.WriteLine(item.ToString());
                     }
-                    return ResultHelper.Fail(process.ExitCode, $"Failed to install {nbuildApp.Name} {nbuildApp.Version}");
+                    return ResultHelper.Fail(resultInstall.Code, $"Failed to install {nbuildApp.Name} {nbuildApp.Version}");
                 }
             }
             else
@@ -728,9 +735,9 @@ namespace Nbuild
             }
             else
             {
-                ConsoleHelper.WriteLine($"X {nbuildApp.Name} {nbuildApp.Version} failed to Uninstall: {process.ExitCode}", ConsoleColor.Red);
+                ConsoleHelper.WriteLine($"X {nbuildApp.Name} {nbuildApp.Version} failed to Uninstall: {result.Code}", ConsoleColor.Red);
                 DisplayCodeAndOutput(result);
-                return ResultHelper.Fail(process.ExitCode, $"Failed to Uninstall {nbuildApp.Name} {nbuildApp.Version}");
+                return ResultHelper.Fail(result.Code, $"Failed to Uninstall {nbuildApp.Name} {nbuildApp.Version}");
             }
         }
 
@@ -990,7 +997,7 @@ namespace Nbuild
         /// </remarks>
         private static List<string> PathToSegments(string path)
         {
-            return [.. path.Split(';', StringSplitOptions.RemoveEmptyEntries)];
+            return path.Split(';', StringSplitOptions.RemoveEmptyEntries).ToList();
         }
 
         /// <summary>
@@ -1159,6 +1166,12 @@ namespace Nbuild
         /// </remarks>
         public static ResultHelper Clone(string? url, string? path, bool verbose = false)
         {
+            if (global::nb.Program.DryRun)
+            {
+                var msg = $"DRY-RUN: would clone {url} to {path ?? Environment.CurrentDirectory}";
+                ConsoleHelper.WriteLine(msg, ConsoleColor.Yellow);
+                return ResultHelper.Success(msg);
+            }
             var gitWrapper = new GitWrapper(verbose: verbose);
             if (string.IsNullOrEmpty(url))
             {
@@ -1223,8 +1236,9 @@ namespace Nbuild
         {
             if (global::nb.Program.DryRun)
             {
-                ConsoleHelper.WriteLine($"DRY-RUN: would create {(preRelease ? "pre-release" : "release")} for {repo} with tag {tag} and asset {assetFileName}", ConsoleColor.Yellow);
-                return ResultHelper.Success();
+                var msg = $"DRY-RUN: would create {(preRelease ? "pre-release" : "release")} for {repo} with tag {tag} and asset {assetFileName}";
+                ConsoleHelper.WriteLine(msg, ConsoleColor.Yellow);
+                return ResultHelper.Success(msg);
             }
             var releaseService = new ReleaseService(repo);
 
@@ -1268,8 +1282,9 @@ namespace Nbuild
         {
             if (global::nb.Program.DryRun)
             {
-                ConsoleHelper.WriteLine($"DRY-RUN: would download asset for {repo} tag {tag} to path {assetPath}", ConsoleColor.Yellow);
-                return ResultHelper.Success();
+                var msg = $"DRY-RUN: would download asset for {repo} tag {tag} to path {assetPath}";
+                ConsoleHelper.WriteLine(msg, ConsoleColor.Yellow);
+                return ResultHelper.Success(msg);
             }
 
             // Ensure the assetPath is a directory
@@ -1338,8 +1353,9 @@ namespace Nbuild
 
             if (global::nb.Program.DryRun)
             {
-                ConsoleHelper.WriteLine($"DRY-RUN: would list releases for repository: {repo}", ConsoleColor.Yellow);
-                return ResultHelper.Success();
+                var msg = $"DRY-RUN: would list releases for repository: {repo}";
+                ConsoleHelper.WriteLine(msg, ConsoleColor.Yellow);
+                return ResultHelper.Success(msg);
             }
 
             var releaseService = new ReleaseService(repo);

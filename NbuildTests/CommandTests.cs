@@ -19,6 +19,85 @@ namespace NbuildTests
         // Local test mode flag
         private bool? LocalTestMode;
 
+        [TestMethod]
+        public async Task CreateRelease_DryRun_PrintsDryRunMessage()
+        {
+            global::nb.Program.DryRun = true;
+            var result = await Command.CreateRelease("repo", "v1.0.0", "main", "asset.zip", false);
+            Assert.IsTrue(result.IsSuccess());
+            Assert.IsTrue(result.Output.Any(x => x.Contains("DRY-RUN")));
+            global::nb.Program.DryRun = false;
+        }
+
+        [TestMethod]
+        public async Task DownloadAsset_DryRun_PrintsDryRunMessage()
+        {
+            global::nb.Program.DryRun = true;
+            var result = await Command.DownloadAsset("repo", "v1.0.0", "C:\\Temp");
+            Assert.IsTrue(result.IsSuccess());
+            Assert.IsTrue(result.Output.Any(x => x.Contains("DRY-RUN")));
+            global::nb.Program.DryRun = false;
+        }
+
+        [TestMethod]
+        public void Install_DryRun_PrintsDryRunMessage()
+        {
+            global::nb.Program.DryRun = true;
+            var result = Command.Install("{\"NbuildAppList\":[]}");
+            Assert.IsTrue(result.IsSuccess());
+            Assert.IsTrue(result.Output.Any(x => x.Contains("DRY-RUN")));
+            global::nb.Program.DryRun = false;
+        }
+
+        [TestMethod]
+        public void Uninstall_DryRun_PrintsDryRunMessage()
+        {
+            global::nb.Program.DryRun = true;
+            var result = Command.Uninstall("{\"NbuildAppList\":[]}");
+            Assert.IsTrue(result.IsSuccess());
+            Assert.IsTrue(result.Output.Any(x => x.Contains("DRY-RUN")));
+            global::nb.Program.DryRun = false;
+        }
+
+        [TestMethod]
+        public async Task ListReleases_DryRun_PrintsDryRunMessage()
+        {
+            global::nb.Program.DryRun = true;
+            var result = await Command.ListReleases("repo");
+            Assert.IsTrue(result.IsSuccess());
+            Assert.IsTrue(result.Output.Any(x => x.Contains("DRY-RUN")));
+            global::nb.Program.DryRun = false;
+        }
+
+        [TestMethod]
+        public void Clone_DryRun_PrintsDryRunMessage()
+        {
+            global::nb.Program.DryRun = true;
+            var result = Command.Clone("https://github.com/naz-hage/getting-started", "c:\\temp", false);
+            Assert.IsTrue(result.IsSuccess());
+            Assert.IsTrue(result.Output.Any(x => x.Contains("DRY-RUN")));
+            global::nb.Program.DryRun = false;
+        }
+
+        [TestMethod]
+        public void DownloadManifestFile_DryRun_ShouldNotPerformDownload()
+        {
+            // Reproduce the user's reported command:
+            // .\Nbuild\bin\Release\nb.exe download --json ".\dev-setup\ntools.json" --dry-run
+            global::nb.Program.DryRun = true;
+            var manifestPath = @"C:\source\ntools\dev-setup\ntools.json";
+            var result = Command.Download(manifestPath);
+
+            // Dry-run should be reported as successful and include a DRY-RUN marker
+            Assert.IsTrue(result.IsSuccess(), "Expected Download to succeed in dry-run mode.");
+            Assert.IsTrue(result.Output.Any(x => x.Contains("DRY-RUN")), "Expected DRY-RUN message in output.");
+
+            // It should NOT report actual downloads (e.g., 'apps to download' table header)
+            Assert.IsFalse(result.Output.Any(x => x.Contains("apps to download") || x.Contains("Downloaded file") || x.Contains("| App name")), "Dry-run should not list actual downloads or table output.");
+
+            global::nb.Program.DryRun = false;
+        }
+
 
         // Resource location for test setup
         private readonly string ResourceLocation = "Nbuild.ntools.json"; //"Nbuild.resources.ntools.json";

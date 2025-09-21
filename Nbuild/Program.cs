@@ -7,7 +7,7 @@ namespace nb
     public static class Program
     {
         // Global dry-run flag. Handlers and other code can check this to avoid performing side-effects.
-        public static bool DryRun { get; private set; } = false;
+        public static bool DryRun { get; set; } = false;
 
         public static int Main(params string[] args)
         {
