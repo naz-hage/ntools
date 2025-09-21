@@ -122,6 +122,11 @@ namespace Nbuild
         {
             Verbose = verbose;
             ResultHelper result = ResultHelper.New();
+            if (global::nb.Program.DryRun)
+            {
+                ConsoleHelper.WriteLine($"DRY-RUN: would install apps from json: {json ?? "<default>"}", ConsoleColor.Yellow);
+                return ResultHelper.Success();
+            }
             if (!CanRunCommand()) return ResultHelper.Fail(-1, $"You must run this command as an administrator");
 
             var apps = GetApps(json);
@@ -151,6 +156,11 @@ namespace Nbuild
         {
             Verbose = verbose;
             ResultHelper result = ResultHelper.New();
+            if (global::nb.Program.DryRun)
+            {
+                ConsoleHelper.WriteLine($"DRY-RUN: would uninstall apps from json: {json ?? "<default>"}", ConsoleColor.Yellow);
+                return ResultHelper.Success();
+            }
             if (!CanRunCommand()) return ResultHelper.Fail(-1, $"You must run this command as an administrator");
 
             var apps = GetApps(json);
@@ -1211,6 +1221,11 @@ namespace Nbuild
         /// </remarks>
         public static async Task<ResultHelper> CreateRelease(string repo, string tag, string branch, string assetFileName, bool preRelease = false)
         {
+            if (global::nb.Program.DryRun)
+            {
+                ConsoleHelper.WriteLine($"DRY-RUN: would create {(preRelease ? "pre-release" : "release")} for {repo} with tag {tag} and asset {assetFileName}", ConsoleColor.Yellow);
+                return ResultHelper.Success();
+            }
             var releaseService = new ReleaseService(repo);
 
             var release = new Release
@@ -1251,6 +1266,11 @@ namespace Nbuild
         /// </remarks>/// 
         public static async Task<ResultHelper> DownloadAsset(string repo, string tag, string assetPath)
         {
+            if (global::nb.Program.DryRun)
+            {
+                ConsoleHelper.WriteLine($"DRY-RUN: would download asset for {repo} tag {tag} to path {assetPath}", ConsoleColor.Yellow);
+                return ResultHelper.Success();
+            }
 
             // Ensure the assetPath is a directory
             if (!Directory.Exists(assetPath))
@@ -1314,6 +1334,12 @@ namespace Nbuild
             if (verbose)
             {
                 ConsoleHelper.WriteLine($"Verbose mode enabled", ConsoleColor.Yellow);
+            }
+
+            if (global::nb.Program.DryRun)
+            {
+                ConsoleHelper.WriteLine($"DRY-RUN: would list releases for repository: {repo}", ConsoleColor.Yellow);
+                return ResultHelper.Success();
             }
 
             var releaseService = new ReleaseService(repo);

@@ -6,10 +6,16 @@ namespace nb
 {
     public static class Program
     {
+        // Global dry-run flag. Handlers and other code can check this to avoid performing side-effects.
+        public static bool DryRun { get; private set; } = false;
+
         public static int Main(params string[] args)
         {
-            ConsoleHelper.WriteLine($"{Nversion.Get()}\n", ConsoleColor.Yellow);
+            ConsoleHelper.WriteLine($"{GetNversionString()}\n", ConsoleColor.Yellow);
             var rootCommand = new RootCommand("Nbuild - Build and DevOps Utility");
+            // Global dry-run option: add as a root-level/global option so it can be provided on any command.
+            var dryRunOption = new System.CommandLine.Option<bool>("--dry-run", "Perform a dry run: show actions but do not perform side effects") { IsRequired = false };
+            rootCommand.AddGlobalOption(dryRunOption);
             AddInstallCommand(rootCommand);
             AddUninstallCommand(rootCommand);
             AddListCommand(rootCommand);
@@ -43,7 +49,75 @@ namespace nb
                     Environment.ExitCode = 1;
                 }
             });
+            // Parse the provided args to capture global options (like --dry-run) before invoking handlers.
+            var parseResult = rootCommand.Parse(args);
+            try
+            {
+                DryRun = parseResult.GetValueForOption(dryRunOption);
+            }
+            catch
+            {
+                // If parsing fails here, fall back to false; invocation will surface errors normally.
+                DryRun = false;
+            }
+
+            if (DryRun)
+            {
+                ConsoleHelper.WriteLine("DRY-RUN: running in dry-run mode; no destructive actions will be performed.", ConsoleColor.Yellow);
+            }
+
             return rootCommand.Invoke(args);
+        }
+
+        // Try to call Nversion.Get in a compatibility-safe way. Some compiled binaries or older versions
+        // may expose a different overload (for example Get(string)). We prefer calling the parameterless
+        // overload when available, otherwise attempt to invoke any available Get method via reflection.
+        private static string GetNversionString()
+        {
+            try
+            {
+                // Try the straightforward call first
+                return Nversion.Get();
+            }
+            catch (System.MissingMethodException)
+            {
+                try
+                {
+                    var t = typeof(Nversion);
+                    // Try find parameterless 'Get' via reflection
+                    var m0 = t.GetMethod("Get", System.Type.EmptyTypes);
+                    if (m0 != null)
+                    {
+                        var r = m0.Invoke(null, null);
+                        return r?.ToString() ?? string.Empty;
+                    }
+
+                    // Try any 'Get' with a single parameter; pass an empty string or default value
+                    var candidates = t.GetMethods().Where(mi => mi.Name == "Get" && mi.GetParameters().Length == 1);
+                    foreach (var mi in candidates)
+                    {
+                        var p = mi.GetParameters()[0];
+                        object? arg = null;
+                        if (p.ParameterType == typeof(string)) arg = "";
+                        else
+                        {
+                            try { arg = Activator.CreateInstance(p.ParameterType); } catch { arg = null; }
+                        }
+                        var r = mi.Invoke(null, new object?[] { arg });
+                        return r?.ToString() ?? string.Empty;
+                    }
+                }
+                catch
+                {
+                    // swallow and fallback
+                }
+            }
+            catch
+            {
+                // any other exceptions - return a fallback
+            }
+
+            return "ntools (version unknown)";
         }
 
     private static void AddDownloadCommand(System.CommandLine.RootCommand rootCommand)
@@ -54,6 +128,7 @@ namespace nb
                 IsRequired = true
             };
             var verboseOption = new System.CommandLine.Option<bool>("--verbose", "Verbose output");
+
             downloadCommand.AddOption(jsonOption);
             downloadCommand.AddOption(verboseOption);
             downloadCommand.SetHandler((string json, bool verbose) => {

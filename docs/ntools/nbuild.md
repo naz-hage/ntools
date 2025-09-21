@@ -160,6 +160,29 @@ Additional Arguments:
   Arguments passed to the application that is being run.
 ```
 
+## Dry-run contract
+
+When `--dry-run` is supplied to `nb.exe` the CLI will not perform any state-changing
+operations. The intent of `--dry-run` is to provide a safe, predictable preview of
+what the CLI would do without modifying remote services, local files, system
+configuration, or registry state.
+
+Key points:
+- `--dry-run` must never upload files, create or modify GitHub releases, write to
+  Program Files, change PATH, edit the registry, or delete files.
+- For destructive commands (for example `release_create`, `pre_release_create`,
+  `install`, `uninstall`, `upload`) the command will short-circuit and print a
+  concise action summary prefixed with `DRY-RUN:` (for example: `DRY-RUN: would
+  upload asset X to release Y`).
+- For read-only commands (for example `list_release`) the default behaviour is to
+  avoid network access in dry-run and print a short simulated message. If a
+  project requires read-only network access during dry-run, it should be made
+  explicit (for example `--dry-run=fetch`) in a follow-up PBI.
+- `--dry-run` should be documented in `nb --help` and examples in `docs/ntools/nbuild.md`.
+
+This contract aims to make `--dry-run` safe for CI runs and local experimentation.
+
+
 > **Tip:** If the `--json` option is not specified, the default manifest file `C:\Program Files\NBuild\ntools.json` is used.
 
 ---
