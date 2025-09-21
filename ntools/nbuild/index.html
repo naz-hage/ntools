@@ -60,6 +60,8 @@
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dry-run-contract">Dry-run contract</a>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#nbuildtargets">nbuild.targets</a>
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#commontargets">common.targets</a>
@@ -345,6 +347,24 @@ Commands:
 Additional Arguments:
   Arguments passed to the application that is being run.
 </code></pre>
+<h2 id="dry-run-contract">Dry-run contract</h2>
+<p>When <code>--dry-run</code> is supplied to <code>nb.exe</code> the CLI will not perform any state-changing
+operations. The intent of <code>--dry-run</code> is to provide a safe, predictable preview of
+what the CLI would do without modifying remote services, local files, system
+configuration, or registry state.</p>
+<p>Key points:
+- <code>--dry-run</code> must never upload files, create or modify GitHub releases, write to
+  Program Files, change PATH, edit the registry, or delete files.
+- For destructive commands (for example <code>release_create</code>, <code>pre_release_create</code>,
+  <code>install</code>, <code>uninstall</code>, <code>upload</code>) the command will short-circuit and print a
+  concise action summary prefixed with <code>DRY-RUN:</code> (for example: <code>DRY-RUN: would
+  upload asset X to release Y</code>).
+- For read-only commands (for example <code>list_release</code>) the default behaviour is to
+  avoid network access in dry-run and print a short simulated message. If a
+  project requires read-only network access during dry-run, it should be made
+  explicit (for example <code>--dry-run=fetch</code>) in a follow-up PBI.
+- <code>--dry-run</code> should be documented in <code>nb --help</code> and examples in <code>docs/ntools/nbuild.md</code>.</p>
+<p>This contract aims to make <code>--dry-run</code> safe for CI runs and local experimentation.</p>
 <blockquote>
 <p><strong>Tip:</strong> If the <code>--json</code> option is not specified, the default manifest file <code>C:\Program Files\NBuild\ntools.json</code> is used.</p>
 </blockquote>
