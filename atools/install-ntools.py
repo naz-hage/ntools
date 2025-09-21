@@ -116,7 +116,7 @@ def safe_remove_deploy_path(path: Path):
 
     Safety checks:
     - Path must exist and be a directory
-    - Path must not be root (C:\ or /)
+    - Path must not be root (C:\\ or /)
     - Path must contain the expected app folder name 'Nbuild' or 'NTools' to reduce risk
     - Raise an exception if checks fail
     """
