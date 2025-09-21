@@ -23,6 +23,20 @@ import requests
 import zipfile
 import shutil
 
+# Tool identity/version - update __version__ when releasing a new tool version
+__version__ = '0.1.0'
+TOOL_NAME = Path(__file__).stem
+TOOL_VERSION = __version__
+def _print_header_local(tool_name: str, tool_version: str, start_year: int = 2020, owner: str = 'naz-ahmad'):
+    from datetime import datetime
+    start_year = int(start_year)
+    current_year = datetime.now().year
+    years = f"{start_year}-{current_year}" if current_year != start_year else f"{start_year}"
+    print(f"*** {tool_name} (experimental), Build automation, {owner}, {years} -  Version: {tool_version} ***")
+    print('')
+
+
+_print_header_local(TOOL_NAME, TOOL_VERSION)
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Install NTools from release ZIP (cross-platform)")
@@ -116,7 +130,7 @@ def safe_remove_deploy_path(path: Path):
 
     Safety checks:
     - Path must exist and be a directory
-    - Path must not be root (C:\ or /)
+    - Path must not be root (C:\\ or /)
     - Path must contain the expected app folder name 'Nbuild' or 'NTools' to reduce risk
     - Raise an exception if checks fail
     """
