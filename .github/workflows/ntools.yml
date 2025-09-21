@@ -261,6 +261,10 @@ jobs:
         run: |
           mkdir -p TestResults
           pytest --junitxml=./TestResults/pytest-results.xml
+
+      - name: Smoke dry-run of install-ntools
+        run: |
+          python atools/install-ntools.py --version 1.2.0 --downloads-dir $RUNNER_TEMP --json dev-setup/ntools.json --dry-run
           
       - name: Upload pytest results
         if: always()
