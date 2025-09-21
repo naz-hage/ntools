@@ -5,15 +5,15 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="naz-hage" />
       <link rel="shortcut icon" href="../../img/favicon.ico" />
-    <title>AzDO payloads - Ntools - Work in Progress</title>
+    <title>Add issue - Ntools - Work in Progress</title>
     <link rel="stylesheet" href="../../css/theme.css" />
     <link rel="stylesheet" href="../../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
     
       <script>
         // Current page data
-        var mkdocs_page_name = "AzDO payloads";
-        var mkdocs_page_input_path = "atools/azdo_payloads.md";
+        var mkdocs_page_name = "Add issue";
+        var mkdocs_page_input_path = "atools/add-issue.md";
         var mkdocs_page_url = null;
       </script>
     
@@ -98,25 +98,31 @@
               <ul class="current">
                   <li class="toctree-l1"><a class="reference internal" href="../">Overview</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" >List of tools</a>
-    <ul>
-                <li class="toctree-l2"><a class="reference internal" href="../add-issue/">Add issue</a>
+                  <li class="toctree-l1 current"><a class="reference internal current" >List of tools</a>
+    <ul class="current">
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Add issue</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#purpose">Purpose</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#prerequisites">Prerequisites</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#installation">Installation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#usage-examples">Usage examples</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#troubleshooting">Troubleshooting</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#running-the-tests">Running the tests</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#ci-safe-live-create-example">CI-safe live-create example</a>
+    </li>
+    </ul>
                 </li>
                 <li class="toctree-l2"><a class="reference internal" href="../install-ntools/">Install NTools</a>
                 </li>
     </ul>
                   </li>
-                  <li class="toctree-l1 current"><a class="reference internal current" href="#">AzDO payloads</a>
-    <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#create-work-item-json-patch-example">Create work item (JSON-Patch) example</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#example-success-response-201-created">Example success response (201 Created)</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#example-failure-responses">Example failure responses</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#troubleshooting">Troubleshooting</a>
-    </li>
-    </ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../azdo_payloads/">AzDO payloads</a>
                   </li>
               </ul>
       </div>
@@ -134,9 +140,10 @@
   <ul class="wy-breadcrumbs">
     <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
           <li class="breadcrumb-item">atools</li>
-      <li class="breadcrumb-item active">AzDO payloads</li>
+          <li class="breadcrumb-item">List of tools</li>
+      <li class="breadcrumb-item active">Add issue</li>
     <li class="wy-breadcrumbs-aside">
-          <a href="https://github.com/naz-hage/ntools/edit/main/docs/atools/azdo_payloads.md">Edit on ntools</a>
+          <a href="https://github.com/naz-hage/ntools/edit/main/docs/atools/add-issue.md">Edit on ntools</a>
     </li>
   </ul>
   <hr/>
@@ -144,64 +151,103 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="azure-devops-json-patch-examples">Azure DevOps JSON-Patch examples</h1>
-<p>This page contains example request payloads used by the AzDO writer in <code>atools/add_issue.py</code> and sample failure responses you may encounter.</p>
-<h2 id="create-work-item-json-patch-example">Create work item (JSON-Patch) example</h2>
-<p>Request (PATCH array) to create a work item via the AzDO REST API (POST to <code>https://dev.azure.com/{org}/{project}/_apis/wit/workitems/${type}?api-version=7.0</code>):</p>
-<pre><code class="language-json">[
-  { &quot;op&quot;: &quot;add&quot;, &quot;path&quot;: &quot;/fields/System.Title&quot;, &quot;value&quot;: &quot;Example issue title&quot; },
-  { &quot;op&quot;: &quot;add&quot;, &quot;path&quot;: &quot;/fields/System.Description&quot;, &quot;value&quot;: &quot;Full description with markdown or HTML&quot; },
-  { &quot;op&quot;: &quot;add&quot;, &quot;path&quot;: &quot;/fields/Microsoft.VSTS.Common.AcceptanceCriteria&quot;, &quot;value&quot;: &quot;- AC1\n- AC2&quot; },
-  { &quot;op&quot;: &quot;add&quot;, &quot;path&quot;: &quot;/relations/-&quot;, &quot;value&quot;: { &quot;rel&quot;: &quot;System.LinkTypes.Hierarchy-Reverse&quot;, &quot;url&quot;: &quot;https://dev.azure.com/.../workitems/123&quot;, &quot;attributes&quot;: { &quot;comment&quot;: &quot;Related work&quot; } } }
-]
-</code></pre>
-<p>Notes:
-- The <code>AcceptanceCriteria</code> field is optional and will only be included if the project defines a field with that reference name. The writer attempts to discover field reference names via the AzDO work item type schema.</p>
-<h2 id="example-success-response-201-created">Example success response (201 Created)</h2>
-<pre><code class="language-json">{
-  &quot;id&quot;: 456,
-  &quot;rev&quot;: 1,
-  &quot;fields&quot;: {
-    &quot;System.Title&quot;: &quot;Example issue title&quot;,
-    &quot;System.State&quot;: &quot;New&quot;,
-    &quot;System.WorkItemType&quot;: &quot;Task&quot;
-  },
-  &quot;url&quot;: &quot;https://dev.azure.com/myorg/_apis/wit/workItems/456&quot;
-}
-</code></pre>
-<h2 id="example-failure-responses">Example failure responses</h2>
+                <h1 id="add-issuepy">add-issue.py</h1>
+<p>This page documents the <code>add-issue.py</code> helper. Use this page for detailed prerequisites, installation, usage examples, troubleshooting, and testing.</p>
+<h2 id="purpose">Purpose</h2>
+<p><code>add-issue.py</code> parses backlog-style markdown files and creates GitHub issues or Azure DevOps work items. It supports dry-run previews and a file-first metadata policy.</p>
+<h2 id="prerequisites">Prerequisites</h2>
 <ul>
-<li>401 Unauthorized (invalid/missing PAT):</li>
+<li>Python 3.13+ installed and available on PATH.</li>
+<li>The <code>requests</code> library is required for Azure DevOps API calls. Install via pip (see Installation).</li>
+<li>For GitHub target:<ul>
+<li>The GitHub CLI (<code>gh</code>) is required when the tool uses the CLI-based flow to create issues. Install it from https://cli.github.com/ and ensure you have authenticated (<code>gh auth login</code>).</li>
 </ul>
-<pre><code class="language-json">{
-  &quot;message&quot;: &quot;TF400813: Resource not available for anonymous access. Client authentication required.&quot;
-}
+</li>
+<li>For Azure DevOps target:<ul>
+<li>Set an Azure DevOps Personal Access Token (PAT) in an environment variable named <code>AZURE_DEVOPS_EXT_PAT</code> or <code>AZURE_DEVOPS_PAT</code>.</li>
+<li>Set <code>AZURE_DEVOPS_ORG</code> in your environment (e.g., <code>myorg</code>).</li>
+</ul>
+</li>
+</ul>
+<h2 id="installation">Installation</h2>
+<ol>
+<li>(Optional) Create and activate a virtual environment:</li>
+</ol>
+<pre><code class="language-pwsh">python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+</code></pre>
+<ol>
+<li>Install runtime dependencies:</li>
+</ol>
+<pre><code class="language-pwsh">pip install -r atools/requirements.txt
+</code></pre>
+<ol>
+<li>
+<p>Install <code>gh</code> (GitHub CLI) if you plan to create GitHub issues.</p>
+</li>
+<li>
+<p>Authenticate <code>gh</code> (if creating GitHub issues interactively):</p>
+</li>
+</ol>
+<pre><code class="language-pwsh">gh auth login
+</code></pre>
+<ol>
+<li>Ensure your Azure DevOps PAT and org are exported in your shell (when using <code>azdo</code> target):</li>
+</ol>
+<pre><code class="language-pwsh">$env:AZURE_DEVOPS_EXT_PAT = '...your PAT...'
+$env:AZURE_DEVOPS_ORG = 'your-org'
+$env:AZURE_DEVOPS_PROJECT = '...your Project...'
+</code></pre>
+<h2 id="usage-examples">Usage examples</h2>
+<ul>
+<li>Preview (dry-run) a GitHub issue from a markdown file:</li>
+</ul>
+<pre><code class="language-pwsh">python atools/add-issue.py --file-path &quot;atools/issue-gh-example.md&quot; --target github --dry-run
 </code></pre>
 <ul>
-<li>400 Bad Request (invalid field or missing required fields):</li>
+<li>Create a GitHub issue (will use <code>gh</code> if available):</li>
 </ul>
-<pre><code class="language-json">{
-  &quot;errorCode&quot;: &quot;InvalidFieldValue&quot;,
-  &quot;message&quot;: &quot;The field 'Microsoft.VSTS.Common.AcceptanceCriteria' is not valid for work item type 'Task'.&quot;
-}
+<pre><code class="language-pwsh">python atools/add-issue.py --file-path &quot;atools/issue-gh-example.md&quot; --target github
 </code></pre>
 <ul>
-<li>404 Not Found (project or area path missing):</li>
+<li>Preview an Azure DevOps work item (dry-run):</li>
 </ul>
-<pre><code class="language-json">{
-  &quot;message&quot;: &quot;TF400898: The project 'MyProject' does not exist or you do not have permission to access it.&quot;
-}
+<pre><code class="language-pwsh">python atools/add-issue.py --file-path &quot;atools/issue-azdo-example.md&quot; --target azdo --dry-run
+</code></pre>
+<ul>
+<li>Create an Azure DevOps work item (requires PAT and org):</li>
+</ul>
+<pre><code class="language-pwsh">python atools/add-issue.py --file-path &quot;atools/issue-azdo-example.md&quot; --target azdo --project &quot;MyProject&quot;
 </code></pre>
 <h2 id="troubleshooting">Troubleshooting</h2>
 <ul>
-<li>Ensure PAT has 'Work Items (read and write)' scope and the token is provided via <code>AZURE_DEVOPS_EXT_PAT</code> or <code>AZURE_DEVOPS_PAT</code> environment variable.</li>
-<li>Ensure <code>AZURE_DEVOPS_ORG</code> and project name are correct.</li>
+<li>If the tool reports <code>requests</code> is missing, run <code>pip install -r atools/requirements.txt</code>.</li>
+<li>If GitHub operations fail, confirm <code>gh</code> is installed and authenticated (<code>gh auth status</code>).</li>
+<li>If Azure DevOps operations fail, confirm your PAT and <code>AZURE_DEVOPS_ORG</code> are set and the <code>--project</code> parameter matches an existing project.</li>
 </ul>
+<h2 id="running-the-tests">Running the tests</h2>
+<p>From the repository root (<code>./ntools</code>) you can run the tests with pytest. Example PowerShell commands:</p>
+<pre><code class="language-pwsh"># (optional) create &amp; activate a virtual environment
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+
+# install runtime + test deps (requests + pytest)
+python -m pip install -r atools/requirements-dev.txt
+
+# run the whole test file
+python -m pytest -q atools/tests/test_add_issue_file_only.py
+
+# or run just the GitHub dry-run test
+python -m pytest -q atools/tests/test_add_issue_file_only.py::test_github_happy_path_dry_run
+</code></pre>
+<h2 id="ci-safe-live-create-example">CI-safe live-create example</h2>
+<p>If you want CI to create work items automatically, gate the job and read secrets from the repo/organization secrets store. See the example in the original README for a guarded <code>create-issues</code> job snippet.</p>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../install-ntools/" class="btn btn-neutral float-left" title="Install NTools"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../" class="btn btn-neutral float-left" title="Overview"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../install-ntools/" class="btn btn-neutral float-right" title="Install NTools">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -228,8 +274,10 @@
         </span>
     
     
-      <span><a href="../install-ntools/" style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../" style="color: #fcfcfc">&laquo; Previous</a></span>
     
+    
+      <span><a href="../install-ntools/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>
