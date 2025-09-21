@@ -16,7 +16,9 @@ namespace Nbackup
 
         static int Main(string[] args)
         {
-            Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{Nversion.Get()}]\n");
+            string nv;
+            try { nv = Nversion.Get(); } catch { nv = "ntools (version unknown)"; }
+            Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{nv}]\n");
 
             if (!Parser.TryParse(args, out Cli options))
             {
