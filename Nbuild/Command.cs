@@ -118,11 +118,11 @@ namespace Nbuild
             }
         }
 
-        public static ResultHelper Install(string? json, bool verbose = false)
+        public static ResultHelper Install(string? json, bool verbose = false, bool dryRun = false)
         {
             Verbose = verbose;
             ResultHelper result = ResultHelper.New();
-                if (global::nb.Program.DryRun)
+                if (dryRun)
                 {
                     var msg = $"DRY-RUN: would install apps from json: {json ?? "<default>"}";
                     ConsoleHelper.WriteLine(msg, ConsoleColor.Yellow);
@@ -153,11 +153,11 @@ namespace Nbuild
             return result;
         }
 
-        public static ResultHelper Uninstall(string? json, bool verbose = false)
+        public static ResultHelper Uninstall(string? json, bool verbose = false, bool dryRun = false)
         {
             Verbose = verbose;
             ResultHelper result = ResultHelper.New();
-                if (global::nb.Program.DryRun)
+                if (dryRun)
                 {
                     var msg = $"DRY-RUN: would uninstall apps from json: {json ?? "<default>"}";
                     ConsoleHelper.WriteLine(msg, ConsoleColor.Yellow);
@@ -218,12 +218,12 @@ namespace Nbuild
         return ResultHelper.Success();
         }
 
-        public static ResultHelper Download(string? json, bool verbose = false)
+        public static ResultHelper Download(string? json, bool verbose = false, bool dryRun = false)
         {
             Verbose = verbose;
 
-            // Respect global dry-run: do not perform downloads or print the downloads table.
-            if (global::nb.Program.DryRun)
+            // Respect dry-run: do not perform downloads or print the downloads table.
+            if (dryRun)
             {
                 var msg = $"DRY-RUN: would download after processing from {json ?? "<default>"}";
                 ConsoleHelper.WriteLine(msg, ConsoleColor.Yellow);
@@ -1164,9 +1164,9 @@ namespace Nbuild
         /// If the URL is not provided in the options, an error message is displayed, and the operation fails.
         /// Upon successful cloning, the working directory is switched to the cloned repository's directory.
         /// </remarks>
-        public static ResultHelper Clone(string? url, string? path, bool verbose = false)
+        public static ResultHelper Clone(string? url, string? path, bool verbose = false, bool dryRun = false)
         {
-            if (global::nb.Program.DryRun)
+            if (dryRun)
             {
                 var msg = $"DRY-RUN: would clone {url} to {path ?? Environment.CurrentDirectory}";
                 ConsoleHelper.WriteLine(msg, ConsoleColor.Yellow);
@@ -1232,9 +1232,9 @@ namespace Nbuild
         /// It utilizes the ReleaseService to interact with the GitHub API.
         /// If the release creation is successful, it returns true; otherwise, it logs the error and returns false.
         /// </remarks>
-        public static async Task<ResultHelper> CreateRelease(string repo, string tag, string branch, string assetFileName, bool preRelease = false)
+        public static async Task<ResultHelper> CreateRelease(string repo, string tag, string branch, string assetFileName, bool preRelease = false, bool dryRun = false)
         {
-            if (global::nb.Program.DryRun)
+            if (dryRun)
             {
                 var msg = $"DRY-RUN: would create {(preRelease ? "pre-release" : "release")} for {repo} with tag {tag} and asset {assetFileName}";
                 ConsoleHelper.WriteLine(msg, ConsoleColor.Yellow);
@@ -1278,9 +1278,9 @@ namespace Nbuild
         /// <remarks>
         /// This method ensures that the assetPath includes a file name and that the download directory exists before attempting to download the asset.
         /// </remarks>/// 
-        public static async Task<ResultHelper> DownloadAsset(string repo, string tag, string assetPath)
+        public static async Task<ResultHelper> DownloadAsset(string repo, string tag, string assetPath, bool dryRun = false)
         {
-            if (global::nb.Program.DryRun)
+            if (dryRun)
             {
                 var msg = $"DRY-RUN: would download asset for {repo} tag {tag} to path {assetPath}";
                 ConsoleHelper.WriteLine(msg, ConsoleColor.Yellow);
@@ -1344,14 +1344,14 @@ namespace Nbuild
             throw new NotImplementedException();
         }
 
-        public static async Task<ResultHelper> ListReleases(string repo, bool verbose = false)
+        public static async Task<ResultHelper> ListReleases(string repo, bool verbose = false, bool dryRun = false)
         {
             if (verbose)
             {
                 ConsoleHelper.WriteLine($"Verbose mode enabled", ConsoleColor.Yellow);
             }
 
-            if (global::nb.Program.DryRun)
+            if (dryRun)
             {
                 var msg = $"DRY-RUN: would list releases for repository: {repo}";
                 ConsoleHelper.WriteLine(msg, ConsoleColor.Yellow);

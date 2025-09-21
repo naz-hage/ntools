@@ -6,9 +6,6 @@ namespace nb
 {
     public static class Program
     {
-        // Global dry-run flag. Handlers and other code can check this to avoid performing side-effects.
-        public static bool DryRun { get; set; } = false;
-
         public static int Main(params string[] args)
         {
             ConsoleHelper.WriteLine($"{GetNversionString()}\n", ConsoleColor.Yellow);
@@ -51,20 +48,6 @@ namespace nb
             });
             // Parse the provided args to capture global options (like --dry-run) before invoking handlers.
             var parseResult = rootCommand.Parse(args);
-            try
-            {
-                DryRun = parseResult.GetValueForOption(dryRunOption);
-            }
-            catch
-            {
-                // If parsing fails here, fall back to false; invocation will surface errors normally.
-                DryRun = false;
-            }
-
-            if (DryRun)
-            {
-                ConsoleHelper.WriteLine("DRY-RUN: running in dry-run mode; no destructive actions will be performed.", ConsoleColor.Yellow);
-            }
 
             return rootCommand.Invoke(args);
         }
@@ -131,10 +114,14 @@ namespace nb
 
             downloadCommand.AddOption(jsonOption);
             downloadCommand.AddOption(verboseOption);
-            downloadCommand.SetHandler((string json, bool verbose) => {
-                var exitCode = HandleDownloadCommand(json, verbose);
+            downloadCommand.SetHandler((string json, bool verbose, bool dryRun) => {
+                if (dryRun)
+                {
+                    ConsoleHelper.WriteLine("DRY-RUN: running in dry-run mode; no destructive actions will be performed.", ConsoleColor.Yellow);
+                }
+                var exitCode = HandleDownloadCommand(json, verbose, dryRun);
                 Environment.ExitCode = exitCode;
-            }, jsonOption, verboseOption);
+            }, jsonOption, verboseOption, ((System.CommandLine.RootCommand)rootCommand).Options.OfType<System.CommandLine.Option<bool>>().First(o => o.Name == "dry-run"));
             rootCommand.AddCommand(downloadCommand);
         }
 
@@ -286,11 +273,15 @@ namespace nb
             gitCloneCommand.AddOption(urlOption);
             gitCloneCommand.AddOption(pathOption);
             gitCloneCommand.AddOption(verboseOption);
-            gitCloneCommand.SetHandler((string url, string path, bool verbose) => {
+            gitCloneCommand.SetHandler((string url, string path, bool verbose, bool dryRun) => {
+                if (dryRun)
+                {
+                    ConsoleHelper.WriteLine("DRY-RUN: running in dry-run mode; no destructive actions will be performed.", ConsoleColor.Yellow);
+                }
                 if (verbose) ConsoleHelper.WriteLine($"[VERBOSE] Cloning repo: {url} to {path}", ConsoleColor.Gray);
-                var exitCode = HandleGitCloneCommand(url, path, verbose);
+                var exitCode = HandleGitCloneCommand(url, path, verbose, dryRun);
                 Environment.ExitCode = exitCode;
-            }, urlOption, pathOption, verboseOption);
+            }, urlOption, pathOption, verboseOption, ((System.CommandLine.RootCommand)rootCommand).Options.OfType<System.CommandLine.Option<bool>>().First(o => o.Name == "dry-run"));
             rootCommand.AddCommand(gitCloneCommand);
         }
 
@@ -356,17 +347,21 @@ namespace nb
             releaseCreateCommand.AddOption(branchOption);
             releaseCreateCommand.AddOption(fileOption);
             releaseCreateCommand.AddOption(verboseOption);
-            releaseCreateCommand.SetHandler(async (string repo, string tag, string branch, string file, bool verbose) =>
+            releaseCreateCommand.SetHandler(async (string repo, string tag, string branch, string file, bool verbose, bool dryRun) =>
             {
+                if (dryRun)
+                {
+                    ConsoleHelper.WriteLine("DRY-RUN: running in dry-run mode; no destructive actions will be performed.", ConsoleColor.Yellow);
+                }
                 if (verbose)
                 {
                     ConsoleHelper.WriteLine($"[VERBOSE] Creating release for repo: {repo}, tag: {tag}, branch: {branch}, file: {file}", ConsoleColor.Gray);
                     ConsoleHelper.WriteLine($"[VERBOSE] OWNER env: {Environment.GetEnvironmentVariable("OWNER")}", ConsoleColor.Gray);
                     ConsoleHelper.WriteLine($"[VERBOSE] API_GITHUB_KEY env: {(string.IsNullOrEmpty(Environment.GetEnvironmentVariable("API_GITHUB_KEY")) ? "(not set)" : "(set)")}", ConsoleColor.Gray);
                 }
-                var exitCode = await HandleReleaseCreateCommand(repo, tag, branch, file, false);
+                var exitCode = await HandleReleaseCreateCommand(repo, tag, branch, file, false, dryRun);
                 Environment.ExitCode = exitCode;
-            }, repoOption, tagOption, branchOption, fileOption, verboseOption);
+            }, repoOption, tagOption, branchOption, fileOption, verboseOption, ((System.CommandLine.RootCommand)rootCommand).Options.OfType<System.CommandLine.Option<bool>>().First(o => o.Name == "dry-run"));
             rootCommand.AddCommand(releaseCreateCommand);
         }
 
@@ -407,7 +402,11 @@ namespace nb
             preReleaseCreateCommand.AddOption(branchOption);
             preReleaseCreateCommand.AddOption(fileOption);
             preReleaseCreateCommand.AddOption(verboseOption);
-            preReleaseCreateCommand.SetHandler(async (string repo, string tag, string branch, string file, bool verbose) => {
+            preReleaseCreateCommand.SetHandler(async (string repo, string tag, string branch, string file, bool verbose, bool dryRun) => {
+                if (dryRun)
+                {
+                    ConsoleHelper.WriteLine("DRY-RUN: running in dry-run mode; no destructive actions will be performed.", ConsoleColor.Yellow);
+                }
                 if (verbose)
                 {
                     ConsoleHelper.WriteLine($"[VERBOSE] Creating pre-release for repo: {repo}, tag: {tag}, branch: {branch}, file: {file}", ConsoleColor.Gray);
@@ -426,9 +425,9 @@ namespace nb
                     }
                 }
 
-                var exitCode = await HandleReleaseCreateCommand(repo, tag, branch, file, true);
+                var exitCode = await HandleReleaseCreateCommand(repo, tag, branch, file, true, dryRun);
                 Environment.ExitCode = exitCode;
-            }, repoOption, tagOption, branchOption, fileOption, verboseOption);
+            }, repoOption, tagOption, branchOption, fileOption, verboseOption, ((System.CommandLine.RootCommand)rootCommand).Options.OfType<System.CommandLine.Option<bool>>().First(o => o.Name == "dry-run"));
             rootCommand.AddCommand(preReleaseCreateCommand);
         }
 
@@ -463,11 +462,15 @@ namespace nb
             releaseDownloadCommand.AddOption(tagOption);
             releaseDownloadCommand.AddOption(pathOption);
             releaseDownloadCommand.AddOption(verboseOption);
-            releaseDownloadCommand.SetHandler(async (string repo, string tag, string path, bool verbose) => {
+            releaseDownloadCommand.SetHandler(async (string repo, string tag, string path, bool verbose, bool dryRun) => {
+                if (dryRun)
+                {
+                    ConsoleHelper.WriteLine("DRY-RUN: running in dry-run mode; no destructive actions will be performed.", ConsoleColor.Yellow);
+                }
                 if (verbose) ConsoleHelper.WriteLine($"[VERBOSE] Downloading asset for repo: {repo}, tag: {tag}, path: {path}", ConsoleColor.Gray);
-                var exitCode = await HandleReleaseDownloadCommand(repo, tag, path);
+                var exitCode = await HandleReleaseDownloadCommand(repo, tag, path, dryRun);
                 Environment.ExitCode = exitCode;
-            }, repoOption, tagOption, pathOption, verboseOption);
+            }, repoOption, tagOption, pathOption, verboseOption, ((System.CommandLine.RootCommand)rootCommand).Options.OfType<System.CommandLine.Option<bool>>().First(o => o.Name == "dry-run"));
             rootCommand.AddCommand(releaseDownloadCommand);
         }
 
@@ -490,11 +493,15 @@ namespace nb
             var verboseOption = new System.CommandLine.Option<bool>("--verbose", "Verbose output");
             listReleaseCommand.AddOption(repoOption);
             listReleaseCommand.AddOption(verboseOption);
-            listReleaseCommand.SetHandler(async (string repo, bool verbose) => {
+            listReleaseCommand.SetHandler(async (string repo, bool verbose, bool dryRun) => {
+                if (dryRun)
+                {
+                    ConsoleHelper.WriteLine("DRY-RUN: running in dry-run mode; no destructive actions will be performed.", ConsoleColor.Yellow);
+                }
                 if (verbose) ConsoleHelper.WriteLine($"[VERBOSE] Listing releases for repo: {repo}", ConsoleColor.Gray);
-                var exitCode = await HandleListReleasesCommand(repo, verbose);
+                var exitCode = await HandleListReleasesCommand(repo, verbose, dryRun);
                 Environment.ExitCode = exitCode;
-            }, repoOption, verboseOption);
+            }, repoOption, verboseOption, ((System.CommandLine.RootCommand)rootCommand).Options.OfType<System.CommandLine.Option<bool>>().First(o => o.Name == "dry-run"));
             rootCommand.AddCommand(listReleaseCommand);
         }
 
@@ -531,10 +538,14 @@ namespace nb
             var verboseOption = new System.CommandLine.Option<bool>("--verbose", "Verbose output");
             installCommand.AddOption(jsonOption);
             installCommand.AddOption(verboseOption);
-            installCommand.SetHandler((string json, bool verbose) => {
-                var exitCode = HandleInstallCommand(json, verbose);
+            installCommand.SetHandler((string json, bool verbose, bool dryRun) => {
+                if (dryRun)
+                {
+                    ConsoleHelper.WriteLine("DRY-RUN: running in dry-run mode; no destructive actions will be performed.", ConsoleColor.Yellow);
+                }
+                var exitCode = HandleInstallCommand(json, verbose, dryRun);
                 Environment.ExitCode = exitCode;
-            }, jsonOption, verboseOption);
+            }, jsonOption, verboseOption, ((System.CommandLine.RootCommand)rootCommand).Options.OfType<System.CommandLine.Option<bool>>().First(o => o.Name == "dry-run"));
             rootCommand.AddCommand(installCommand);
         }
 
@@ -548,10 +559,14 @@ namespace nb
             var verboseOption = new System.CommandLine.Option<bool>("--verbose", "Verbose output");
             uninstallCommand.AddOption(jsonOption);
             uninstallCommand.AddOption(verboseOption);
-            uninstallCommand.SetHandler((string json, bool verbose) => {
-                var exitCode = HandleUninstallCommand(json, verbose);
+            uninstallCommand.SetHandler((string json, bool verbose, bool dryRun) => {
+                if (dryRun)
+                {
+                    ConsoleHelper.WriteLine("DRY-RUN: running in dry-run mode; no destructive actions will be performed.", ConsoleColor.Yellow);
+                }
+                var exitCode = HandleUninstallCommand(json, verbose, dryRun);
                 Environment.ExitCode = exitCode;
-            }, jsonOption, verboseOption);
+            }, jsonOption, verboseOption, ((System.CommandLine.RootCommand)rootCommand).Options.OfType<System.CommandLine.Option<bool>>().First(o => o.Name == "dry-run"));
             rootCommand.AddCommand(uninstallCommand);
         }
 
@@ -590,11 +605,11 @@ namespace nb
             }
         }
 
-    private static int HandleInstallCommand(string json, bool verbose)
+    private static int HandleInstallCommand(string json, bool verbose, bool dryRun)
         {
             try
             {
-                var result = Nbuild.Command.Install(json, verbose);
+                var result = Nbuild.Command.Install(json, verbose, dryRun);
                 return result.Code;
             }
             catch (Exception ex)
@@ -604,11 +619,11 @@ namespace nb
             }
         }
 
-    private static int HandleUninstallCommand(string json, bool verbose)
+    private static int HandleUninstallCommand(string json, bool verbose, bool dryRun)
         {
             try
             {
-                var result = Nbuild.Command.Uninstall(json, verbose);
+                var result = Nbuild.Command.Uninstall(json, verbose, dryRun);
                 return result.Code;
             }
             catch (Exception ex)
@@ -618,11 +633,11 @@ namespace nb
             }
         }
 
-    private static int HandleDownloadCommand(string json, bool verbose)
+    private static int HandleDownloadCommand(string json, bool verbose, bool dryRun)
         {
             try
             {
-                var result = Nbuild.Command.Download(json, verbose);
+                var result = Nbuild.Command.Download(json, verbose, dryRun);
                 return result.Code;
             }
             catch (Exception ex)
@@ -688,11 +703,11 @@ namespace nb
             }
         }
 
-    private static int HandleGitCloneCommand(string url, string path, bool verbose)
+    private static int HandleGitCloneCommand(string url, string path, bool verbose, bool dryRun)
         {
             try
             {
-                var result = Nbuild.Command.Clone(url, path, verbose);
+                var result = Nbuild.Command.Clone(url, path, verbose, dryRun);
                 return result.Code;
             }
             catch (Exception ex)
@@ -715,11 +730,11 @@ namespace nb
                 return -1;
             }
         }
-    private static async Task<int> HandleReleaseCreateCommand(string repo, string tag, string branch, string file, bool preRelease)
+    private static async Task<int> HandleReleaseCreateCommand(string repo, string tag, string branch, string file, bool preRelease, bool dryRun)
         {
             try
             {
-                var result = await Nbuild.Command.CreateRelease(repo, tag, branch, file, preRelease);
+                var result = await Nbuild.Command.CreateRelease(repo, tag, branch, file, preRelease, dryRun);
                 return result.Code;
             }
             catch (Exception ex)
@@ -728,11 +743,11 @@ namespace nb
                 return -1;
             }
         }
-    private static async Task<int> HandleReleaseDownloadCommand(string repo, string tag, string path)
+    private static async Task<int> HandleReleaseDownloadCommand(string repo, string tag, string path, bool dryRun)
         {
             try
             {
-                var result = await Nbuild.Command.DownloadAsset(repo, tag, path);
+                var result = await Nbuild.Command.DownloadAsset(repo, tag, path, dryRun);
                 return result.Code;
             }
             catch (Exception ex)
@@ -741,11 +756,11 @@ namespace nb
                 return -1;
             }
         }
-    private static async Task<int> HandleListReleasesCommand(string repo, bool verbose)
+    private static async Task<int> HandleListReleasesCommand(string repo, bool verbose, bool dryRun)
         {
             try
             {
-                var result = await Nbuild.Command.ListReleases(repo, verbose);
+                var result = await Nbuild.Command.ListReleases(repo, verbose, dryRun);
                 return result.Code;
             }
             catch (Exception ex)

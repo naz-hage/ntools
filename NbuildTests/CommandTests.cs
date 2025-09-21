@@ -22,61 +22,49 @@ namespace NbuildTests
         [TestMethod]
         public async Task CreateRelease_DryRun_PrintsDryRunMessage()
         {
-            global::nb.Program.DryRun = true;
-            var result = await Command.CreateRelease("repo", "v1.0.0", "main", "asset.zip", false);
+            var result = await Command.CreateRelease("repo", "v1.0.0", "main", "asset.zip", false, true);
             Assert.IsTrue(result.IsSuccess());
             Assert.IsTrue(result.Output.Any(x => x.Contains("DRY-RUN")));
-            global::nb.Program.DryRun = false;
         }
 
         [TestMethod]
         public async Task DownloadAsset_DryRun_PrintsDryRunMessage()
         {
-            global::nb.Program.DryRun = true;
-            var result = await Command.DownloadAsset("repo", "v1.0.0", "C:\\Temp");
+            var result = await Command.DownloadAsset("repo", "v1.0.0", "C:\\Temp", true);
             Assert.IsTrue(result.IsSuccess());
             Assert.IsTrue(result.Output.Any(x => x.Contains("DRY-RUN")));
-            global::nb.Program.DryRun = false;
         }
 
         [TestMethod]
         public void Install_DryRun_PrintsDryRunMessage()
         {
-            global::nb.Program.DryRun = true;
-            var result = Command.Install("{\"NbuildAppList\":[]}");
+            var result = Command.Install("{\"NbuildAppList\":[]}", false, true);
             Assert.IsTrue(result.IsSuccess());
             Assert.IsTrue(result.Output.Any(x => x.Contains("DRY-RUN")));
-            global::nb.Program.DryRun = false;
         }
 
         [TestMethod]
         public void Uninstall_DryRun_PrintsDryRunMessage()
         {
-            global::nb.Program.DryRun = true;
-            var result = Command.Uninstall("{\"NbuildAppList\":[]}");
+            var result = Command.Uninstall("{\"NbuildAppList\":[]}", false, true);
             Assert.IsTrue(result.IsSuccess());
             Assert.IsTrue(result.Output.Any(x => x.Contains("DRY-RUN")));
-            global::nb.Program.DryRun = false;
         }
 
         [TestMethod]
         public async Task ListReleases_DryRun_PrintsDryRunMessage()
         {
-            global::nb.Program.DryRun = true;
-            var result = await Command.ListReleases("repo");
+            var result = await Command.ListReleases("repo", false, true);
             Assert.IsTrue(result.IsSuccess());
             Assert.IsTrue(result.Output.Any(x => x.Contains("DRY-RUN")));
-            global::nb.Program.DryRun = false;
         }
 
         [TestMethod]
         public void Clone_DryRun_PrintsDryRunMessage()
         {
-            global::nb.Program.DryRun = true;
-            var result = Command.Clone("https://github.com/naz-hage/getting-started", "c:\\temp", false);
+            var result = Command.Clone("https://github.com/naz-hage/getting-started", "c:\\temp", false, true);
             Assert.IsTrue(result.IsSuccess());
             Assert.IsTrue(result.Output.Any(x => x.Contains("DRY-RUN")));
-            global::nb.Program.DryRun = false;
         }
 
         [TestMethod]
@@ -84,9 +72,8 @@ namespace NbuildTests
         {
             // Reproduce the user's reported command:
             // .\Nbuild\bin\Release\nb.exe download --json ".\dev-setup\ntools.json" --dry-run
-            global::nb.Program.DryRun = true;
             var manifestPath = @"C:\source\ntools\dev-setup\ntools.json";
-            var result = Command.Download(manifestPath);
+            var result = Command.Download(manifestPath, false, true);
 
             // Dry-run should be reported as successful and include a DRY-RUN marker
             Assert.IsTrue(result.IsSuccess(), "Expected Download to succeed in dry-run mode.");
@@ -94,8 +81,6 @@ namespace NbuildTests
 
             // It should NOT report actual downloads (e.g., 'apps to download' table header)
             Assert.IsFalse(result.Output.Any(x => x.Contains("apps to download") || x.Contains("Downloaded file") || x.Contains("| App name")), "Dry-run should not list actual downloads or table output.");
-
-            global::nb.Program.DryRun = false;
         }
 
 
