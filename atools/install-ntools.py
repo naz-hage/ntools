@@ -21,6 +21,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 import requests
 import zipfile
+import shutil
 
 
 def parse_args():
@@ -89,38 +90,54 @@ def expand_install_path(raw_path: str) -> Path:
 
 
 def verify_url_exists(url: str):
-    # Use HEAD if requests available else GET with range
-    if requests:
-        r = requests.head(url, allow_redirects=True, timeout=10)
-        return r.status_code == 200
-    else:
-        from urllib.request import Request, urlopen
-        req = Request(url, method='HEAD')
-        try:
-            with urlopen(req, timeout=10) as r:
-                return r.status == 200
-        except Exception:
-            return False
+    # Use HEAD request to verify asset presence
+    r = requests.head(url, allow_redirects=True, timeout=10)
+    return r.status_code == 200
 
 
 def download_file(url: str, dest: Path):
     dest.parent.mkdir(parents=True, exist_ok=True)
-    if requests:
-        with requests.get(url, stream=True) as r:
-            r.raise_for_status()
-            with dest.open('wb') as f:
-                for chunk in r.iter_content(chunk_size=8192):
-                    if chunk:
-                        f.write(chunk)
-    else:
-        from urllib.request import urlretrieve
-        urlretrieve(url, str(dest))
+    with requests.get(url, stream=True) as r:
+        r.raise_for_status()
+        with dest.open('wb') as f:
+            for chunk in r.iter_content(chunk_size=8192):
+                if chunk:
+                    f.write(chunk)
 
 
 def extract_zip(zip_path: Path, dest_dir: Path):
     dest_dir.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(str(zip_path), 'r') as zf:
         zf.extractall(str(dest_dir))
+
+
+def safe_remove_deploy_path(path: Path):
+    """Safely remove the deploy path before reinstalling.
+
+    Safety checks:
+    - Path must exist and be a directory
+    - Path must not be root (C:\ or /)
+    - Path must contain the expected app folder name 'Nbuild' or 'NTools' to reduce risk
+    - Raise an exception if checks fail
+    """
+    if not path.exists():
+        return
+    if not path.is_dir():
+        raise Exception(f"Deploy path exists but is not a directory: {path}")
+
+    # Avoid removing root or very short paths
+    resolved = path.resolve()
+    if resolved.drive == '' and str(resolved) in ('/',):
+        raise Exception(f"Refusing to remove root path: {resolved}")
+    if resolved.drive and (str(resolved).rstrip('\\/') in (resolved.drive + ':',)):
+        raise Exception(f"Refusing to remove drive root: {resolved}")
+
+    # Basic name check to reduce risk
+    if 'nbuild' not in str(resolved).lower() and 'ntools' not in str(resolved).lower():
+        raise Exception(f"Deploy path '{resolved}' does not look like ntools install path; refusing to remove")
+
+    # Perform removal
+    shutil.rmtree(str(resolved))
 
 
 def update_path(deploy_path: Path, no_update: bool = False):
@@ -217,6 +234,13 @@ def main():
         deploy_path = expand_install_path(app.get('InstallPath', ''))
         if not deploy_path or str(deploy_path) == '':
             deploy_path = Path('C:/Program Files/Nbuild') if os.name == 'nt' else Path('/usr/local/lib/ntools')
+
+    # Remove existing installation before extracting new one (explicit policy: always replace)
+    try:
+        safe_remove_deploy_path(deploy_path)
+    except Exception as ex:
+        print(f"Refusing to remove deploy path: {ex}")
+        return 3
 
     extract_zip(download_dest, deploy_path)
 
