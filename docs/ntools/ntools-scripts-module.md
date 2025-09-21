@@ -89,7 +89,7 @@ The module exports 36 functions organized by category:
 ### Setup Functions
 - `Set-DevelopmentEnvironment` - Set up development environment
 - `Install-DevelopmentApps` - Install development applications
-- `Install-NTools` - Install NTools from releases (with configurable ntools.json path)
+- `Install-NTools` - Install NTools from releases (with configurable ntools.json path)  **(deprecated: use atools/install-ntools.py)**
 - `Install-NToolsScriptsModule` - Install this module
 
 > Note: `Install-NTools` raises terminating errors on fatal failures (for example, download 404s or archive/extract errors). Callers that need to handle these failures gracefully should wrap the call in try/catch and handle exceptions accordingly.
@@ -148,7 +148,9 @@ Get-Command -Module ntools-scripts | Select-Object Name | Format-Table -AutoSize
 
 ### Install NTools with Custom Configuration
 ```powershell
-# Install using specific ntools.json file
+# Install using specific ntools.json file (PowerShell wrapper is deprecated)
+# Prefer the cross-platform Python script for CI and cross-platform installs:
+# python atools/install-ntools.py --version 1.32.0 --json dev-setup/ntools.json
 Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
 
 # Install specific version
@@ -216,7 +218,8 @@ This target performs:
 - name: Install ntools using ntools-scripts module
   run: |
     Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
-    Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
+  # Deprecated: prefer calling the Python installer from CI
+  python atools/install-ntools.py --version 1.32.0 --json dev-setup/ntools.json --downloads-dir ${{ runner.temp }} --dry-run
 ```
 
 ## Module Development

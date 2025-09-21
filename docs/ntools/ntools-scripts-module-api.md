@@ -19,7 +19,7 @@ This page lists the exported functions from the `ntools-scripts` PowerShell modu
 | Get-NToolsFileVersion | Helper to get NTools product version from binaries. Usage: `Get-NToolsFileVersion -FilePath C:\Artifacts\nb.exe` |
 | Add-DeploymentPathToEnvironment | Add deploy path to PATH for current process/user. Usage: `Add-DeploymentPathToEnvironment -Path C:\My\deploy\bin` |
 | Invoke-NToolsDownload | Download NTools release artifacts (zip/nuget). Usage: `Invoke-NToolsDownload -Version 1.2.3 -OutputDir C:\Downloads` |
-| Install-NTools | Install NTools packages based on an ntools.json config. Usage: `Install-NTools -NtoolsJsonPath ./dev-setup/ntools.json` |
+| Install-NTools | Install NTools packages based on an ntools.json config. Usage: `Install-NTools -NtoolsJsonPath ./dev-setup/ntools.json` (deprecated — prefer `python atools/install-ntools.py`) |
 | Invoke-VerifyArtifacts | Run artifact validation (hashes, versions). Usage: `Invoke-VerifyArtifacts -ArtifactsPath C:\Artifacts\MySolution\Release\1.2.3 -ProductVersion 1.2.3` |
 | Set-DevelopmentEnvironment | Set local dev env variables (DevDrive/MainDir). Usage: `Set-DevelopmentEnvironment -DevDrive 'D:' -MainDir 'source'` |
 | Test-IsAdministrator | Returns true if running elevated. Usage: `Test-IsAdministrator` |
