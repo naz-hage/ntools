@@ -98,28 +98,14 @@
               <ul class="current">
                   <li class="toctree-l1 current"><a class="reference internal current" href="#">Overview</a>
     <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#purpose">Purpose</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#experimental">Experimental</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#removing-the-virtual-environment">Removing the virtual environment</a>
-    </li>
-        </ul>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#usage-examples">Usage examples</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#example-markdown-files">Example markdown files</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#troubleshooting">Troubleshooting</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#running-the-tests">Running the tests</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#ci-safe-live-create-example">CI-safe live-create example</a>
-    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >List of tools</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="add-issue/">Add issue</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="install-ntools/">Install NTools</a>
+                </li>
     </ul>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="azdo_payloads/">AzDO payloads</a>
@@ -150,206 +136,20 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <!-- Full README content for atools/add-issue.py -->
-
-<h1 id="atools-issue-creation-helpers-add-issuepy">atools — Issue creation helpers (add-issue.py)</h1>
-<p>This folder contains a Python CLI tool, <code>add-issue.py</code>, that parses backlog markdown and
-creates or previews work items for GitHub and Azure DevOps.</p>
-<p>This README documents prerequisites, installation steps, the tool behavior and example usage.</p>
-<h2 id="purpose">Purpose</h2>
-<p><code>add-issue.py</code> is a convenience tool for converting human-friendly backlog markdown files into
-GitHub issues or Azure DevOps work items. It supports a dry-run mode that prints the parsed fields
-and a concise platform preview so you can review the output before creating items.</p>
-<h2 id="experimental">Experimental</h2>
+                <h1 id="atools-python-helper-tools-overview">atools — Python helper tools (overview)</h1>
+<p>This section gives a short overview of the small Python helper tools in the <code>atools/</code> folder. Each tool has its own
+reference page linked below with detailed usage, prerequisites, and examples.</p>
+<p>Tools</p>
 <ul>
-<li>This tool is experimental. It is functional but may change and currently lacks full API error handling,
-    retries for transient errors, and other production hardening.</li>
-<li>Contributions welcome: consider adding <code>--json</code> output for machine-readable dry-run previews, improved
-    retries/error-handling, or an interactive mode that confirms creation before calling <code>gh</code> or the Azure DevOps API.</li>
-</ul>
-<h2 id="prerequisites">Prerequisites</h2>
-<ul>
-<li>Python 3.13+ installed and available on PATH. The tool was developed and tested with Python 3.13 and
-    earlier 3.x versions; Python 3.13 is now the minimum supported runtime.</li>
-<li>The <code>requests</code> library is required for Azure DevOps API calls. Install via pip (see Installation).</li>
-<li>For GitHub target:<ul>
-<li>The GitHub CLI (<code>gh</code>) is required when the tool uses the CLI-based flow to create issues. Install it from
-    https://cli.github.com/ and ensure you have authenticated (<code>gh auth login</code>). The tool will show a
-    preview command when running <code>--dry-run</code> and will attempt to use <code>gh</code> for creation if present.</li>
-</ul>
-</li>
-<li>For Azure DevOps target:<ul>
-<li>The tool uses the Azure DevOps REST API. You must set an Azure DevOps Personal Access Token (PAT)
-    in an environment variable named <code>AZURE_DEVOPS_EXT_PAT</code> or <code>AZURE_DEVOPS_PAT</code>.</li>
-<li>The Azure DevOps organization should be available in the environment variable <code>AZURE_DEVOPS_ORG</code> (e.g., <code>myorg</code>).</li>
-<li>The <code>requests</code> library is required to talk to the Azure DevOps API.</li>
-</ul>
-</li>
-</ul>
-<h2 id="installation">Installation</h2>
-<ol>
-<li>(Optional) Create and activate a virtual environment:</li>
-</ol>
-<pre><code class="language-pwsh">python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-</code></pre>
-<ol>
-<li>Install runtime dependencies:</li>
-</ol>
-<pre><code class="language-pwsh">pip install -r requirements.txt
-</code></pre>
-<ol>
-<li>
-<p>Install <code>gh</code> (GitHub CLI) if you plan to create GitHub issues:</p>
-</li>
-<li>
-<p>Download from https://cli.github.com/ and follow the platform-specific steps, or use your package manager.</p>
-</li>
-<li>
-<p>Authenticate <code>gh</code> (if creating GitHub issues interactively):</p>
-</li>
-</ol>
-<pre><code class="language-pwsh">gh auth login
-</code></pre>
-<ol>
-<li>Ensure your Azure DevOps PAT and org are exported in your shell (when using <code>azdo</code> target):</li>
-</ol>
-<pre><code class="language-pwsh">$env:AZURE_DEVOPS_EXT_PAT = '...your PAT...'
-$env:AZURE_DEVOPS_ORG = 'your-org'
-$env:AZURE_DEVOPS_PROJECT = '...your Project...'
-</code></pre>
-<p>Note: For CI, configure secure pipeline variables/secrets for the PAT and set them in the environment.</p>
-<h3 id="removing-the-virtual-environment">Removing the virtual environment</h3>
-<p>If you created a <code>.venv</code> during testing and want to remove it, simply delete the folder.</p>
-<p>PowerShell (Windows):</p>
-<pre><code class="language-pwsh"># Deactivate first if active
-deactivate
-Remove-Item -Recurse -Force .venv
-</code></pre>
-<p>POSIX (macOS / Linux):</p>
-<pre><code class="language-bash"># Deactivate first if active
-deactivate
-rm -rf .venv
-</code></pre>
-<h2 id="usage-examples">Usage examples</h2>
-<ul>
-<li>Preview (dry-run) a GitHub issue from a markdown file:</li>
-</ul>
-<pre><code class="language-pwsh">python add-issue.py --file-path &quot;path\to\issue-gh-example.md&quot; --target github --dry-run
-</code></pre>
-<ul>
-<li>Create a GitHub issue (will use <code>gh</code> if available):</li>
-</ul>
-<pre><code class="language-pwsh">python add-issue.py --file-path &quot;path\to\issue-gh-example.md&quot; --target github
-</code></pre>
-<ul>
-<li>Preview an Azure DevOps work item (dry-run):</li>
-</ul>
-<pre><code class="language-pwsh">python add-issue.py --file-path &quot;path\to\issue-azdo-example.md&quot; --target azdo --dry-run
-</code></pre>
-<ul>
-<li>Create an Azure DevOps work item (requires <code>AZURE_DEVOPS_EXT_PAT</code> and <code>AZURE_DEVOPS_ORG</code>):</li>
-</ul>
-<pre><code class="language-pwsh">python add-issue.py --file-path &quot;path\to\issue-azdo-example.md&quot; --target azdo --project &quot;MyProject&quot;
-</code></pre>
-<h2 id="example-markdown-files">Example markdown files</h2>
-<p>The repository includes example markdown files you can use with <code>add-issue.py</code>. These are not copied into the docs — use the files directly from the <code>atools/</code> folder:</p>
-<ul>
-<li><a href="https://github.com/naz-hage/ntools/blob/main/atools/issue-gh-example.md">issue-gh-example.md</a> — GitHub issue example (contains <code>Repository:</code> heading)</li>
-<li>
-<p><a href="https://github.com/naz-hage/ntools/blob/main/atools/issue-azdo-example.md">issue-azdo-example.md</a> — Azure DevOps work item example (contains <code>Project:</code>, <code>Area:</code>, and <code>Iteration:</code> headings)</p>
-</li>
-<li>
-<p>In GitHub, labels are not created automatically. You must create any labels you want to use in the target repository before running the tool to create issues with those labels.</p>
-</li>
-</ul>
-<h2 id="troubleshooting">Troubleshooting</h2>
-<ul>
-<li>If the tool reports <code>requests</code> is missing, run <code>pip install -r requirements.txt</code>.</li>
-<li>If GitHub operations fail, confirm <code>gh</code> is installed and authenticated (<code>gh auth status</code>).</li>
-<li>If Azure DevOps operations fail, confirm:<ul>
-<li><code>AZURE_DEVOPS_EXT_PAT</code> (or <code>AZURE_DEVOPS_PAT</code>) is set and has enough scopes to create work items.</li>
-<li><code>AZURE_DEVOPS_ORG</code> is set.</li>
-<li>The <code>--project</code> parameter matches an existing Azure DevOps project when targeting <code>azdo</code>.</li>
-</ul>
-</li>
-</ul>
-<h2 id="running-the-tests">Running the tests</h2>
-<p>From the repository root (<code>./ntools</code>) you can run the new tests with Python's pytest. Example PowerShell commands:</p>
-<p>Note: avoid using <code>-q</code> twice (for example <code>-qq</code>) — that suppresses the final summary line. Use a single <code>-q</code> for concise output with the final summary.</p>
-<pre><code class="language-pwsh"># (optional) create &amp; activate a virtual environment
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-
-# install runtime + test deps (requests + pytest)
-python -m pip install -r atools/requirements-dev.txt
-
-# run the whole test file
-python -m pytest -q atools/tests/test_add_issue_file_only.py
-
-# or run just the GitHub dry-run test
-python -m pytest -q atools/tests/test_add_issue_file_only.py::test_github_happy_path_dry_run
-</code></pre>
-<h2 id="ci-safe-live-create-example">CI-safe live-create example</h2>
-<p>If you want CI to create work items (GitHub issues or AzDO work items) automatically, it's important to gate this capability and avoid exposing credentials to untrusted pull requests. The pattern below shows a guarded job that only runs on the default branch (or after manual approval) and reads secrets from the repository/organization secrets store.</p>
-<p>Example GitHub Actions job snippet (add to <code>.github/workflows/ntools.yml</code> as a guarded job):</p>
-<pre><code class="language-yaml">jobs:
-    create-issues:
-        name: Create Issues (gated)
-        runs-on: ubuntu-latest
-        if: github.ref == 'refs/heads/main' # only run on main branch; change per your policy
-        steps:
-            - uses: actions/checkout@v4
-            - name: Set up Python
-                uses: actions/setup-python@v5
-                with:
-                    python-version: '3.12'
-            - name: Install deps
-                run: |
-                    python -m pip install --upgrade pip
-                    pip install -r atools/requirements.txt
-            - name: Create issues (guarded)
-                env:
-                    AZURE_DEVOPS_EXT_PAT: ${{ secrets.AZURE_DEVOPS_EXT_PAT }}
-                    AZURE_DEVOPS_ORG: ${{ secrets.AZURE_DEVOPS_ORG }}
-                    API_GITHUB_KEY: ${{ secrets.API_GITHUB_KEY }}
-                run: |
-                    # Example: create a GitHub issue from a file
-                    python atools/add-issue.py --file-path atools/issue-gh-example.md --target github
-
-            # Secure practice: require manual approval using environments or GitHub Environments protection rules
-            # (set environment protection to require reviewers) to gate any job that exposes credentials.
-</code></pre>
-<p>Required secrets and PAT scopes</p>
-<ul>
-<li>
-<p>For Azure DevOps:</p>
-<ul>
-<li><code>AZURE_DEVOPS_EXT_PAT</code> or <code>AZURE_DEVOPS_PAT</code> (recommended secure secret)</li>
-<li>Required scopes: Work Items (read/write) and potentially Full Access if you need to add links/attachments. Prefer minimal scopes.</li>
-<li><code>AZURE_DEVOPS_ORG</code> — organization name (string)</li>
-</ul>
-</li>
-<li>
-<p>For GitHub:</p>
-<ul>
-<li><code>API_GITHUB_KEY</code> (personal access token) — if using <code>gh</code> for creation you can also rely on <code>GITHUB_TOKEN</code> provided by GitHub Actions but be aware <code>GITHUB_TOKEN</code> has repo-scoped permissions and may be fine for creating issues; use a PAT if you need broader scopes.</li>
-<li>Required scopes for creating issues: repo (or public_repo for public repos), and workflow if triggering workflows.</li>
-</ul>
-</li>
-</ul>
-<p>Guarded step guidance</p>
-<ul>
-<li>Use GitHub Environments with required reviewers to gate jobs that have access to secrets. This prevents PRs from untrusted forks from receiving secrets.</li>
-<li>Prefer running live-create jobs only on <code>main</code> or via manually triggered workflow_dispatch after a review.</li>
-<li>Avoid using <code>pull_request</code> events for live-create jobs unless you explicitly filter or require approvals.</li>
+<li><a href="add-issue/">add-issue.py</a> — Convert backlog-format markdown into GitHub issues or Azure DevOps work items. See the subpage for installation, examples, troubleshooting, and tests.</li>
+<li><a href="install-ntools/">install-ntools.py</a> — Cross-platform installer to download and extract NTools release ZIPs; supports <code>--dry-run</code> and includes safety checks.</li>
 </ul>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
         <a href="../ntools/nbuild-targets/" class="btn btn-neutral float-left" title="MSBuild Targets"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="azdo_payloads/" class="btn btn-neutral float-right" title="AzDO payloads">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="add-issue/" class="btn btn-neutral float-right" title="Add issue">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -379,7 +179,7 @@ python -m pytest -q atools/tests/test_add_issue_file_only.py::test_github_happy_
       <span><a href="../ntools/nbuild-targets/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
-      <span><a href="azdo_payloads/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="add-issue/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>
