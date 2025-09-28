@@ -31,13 +31,13 @@ namespace Nbuild
             AddPathCommand(rootCommand);
             AddGitInfoCommand(rootCommand, dryRunOption);
             AddGitSetTagCommand(rootCommand, dryRunOption);
-            AddGitAutoTagCommand(rootCommand);
-            AddGitPushAutoTagCommand(rootCommand);
+            AddGitAutoTagCommand(rootCommand, dryRunOption);
+            AddGitPushAutoTagCommand(rootCommand, dryRunOption);
             AddGitBranchCommand(rootCommand);
            
             // register git_clone command from dedicated class (pass global dry-run option and service)
             GitCloneCommand.Register(rootCommand, dryRunOption, new GitCloneService());
-            AddGitDeleteTagCommand(rootCommand);
+            AddGitDeleteTagCommand(rootCommand, dryRunOption);
             AddReleaseCreateCommand(rootCommand);
             AddPreReleaseCreateCommand(rootCommand);
             AddReleaseDownloadCommand(rootCommand);
@@ -424,7 +424,7 @@ namespace Nbuild
                 rootCommand.AddCommand(gitSetTagCommand);
             }
 
-        private static void AddGitAutoTagCommand(RootCommand rootCommand)
+        private static void AddGitAutoTagCommand(RootCommand rootCommand, Option<bool> dryRunOption)
             {
                 var gitAutoTagCommand = new System.CommandLine.Command("git_autotag",
                     "Automatically sets the next git tag based on build type.\n\n" +
@@ -442,15 +442,15 @@ namespace Nbuild
                 var verboseOption = new Option<bool>("--verbose", "Verbose output");
                 gitAutoTagCommand.AddOption(buildTypeOption);
                 gitAutoTagCommand.AddOption(verboseOption);
-                gitAutoTagCommand.SetHandler((buildType, verbose) => {
+                gitAutoTagCommand.SetHandler((buildType, verbose, dryRun) => {
                     if (verbose) ConsoleHelper.WriteLine($"[VERBOSE] Auto-tagging for build type: {buildType}", ConsoleColor.Gray);
-                    var exitCode = HandleGitAutoTagCommand(buildType, false);
+                    var exitCode = HandleGitAutoTagCommand(buildType, false, verbose, dryRun);
                     Environment.ExitCode = exitCode;
-                }, buildTypeOption, verboseOption);
+                }, buildTypeOption, verboseOption, dryRunOption);
                 rootCommand.AddCommand(gitAutoTagCommand);
             }
 
-        private static void AddGitPushAutoTagCommand(RootCommand rootCommand)
+        private static void AddGitPushAutoTagCommand(RootCommand rootCommand, Option<bool> dryRunOption)
             {
                 var gitPushAutoTagCommand = new System.CommandLine.Command("git_push_autotag",
                     "Sets the next git tag based on build type and pushes to remote.\n\n" +
@@ -467,11 +467,11 @@ namespace Nbuild
                 var verboseOption = new Option<bool>("--verbose", "Verbose output");
                 gitPushAutoTagCommand.AddOption(buildTypeOption);
                 gitPushAutoTagCommand.AddOption(verboseOption);
-                gitPushAutoTagCommand.SetHandler((buildType, verbose) => {
+                gitPushAutoTagCommand.SetHandler((buildType, verbose, dryRun) => {
                     if (verbose) ConsoleHelper.WriteLine($"[VERBOSE] Push auto-tag for build type: {buildType}", ConsoleColor.Gray);
-                    var exitCode = HandleGitAutoTagCommand(buildType, true);
+                    var exitCode = HandleGitAutoTagCommand(buildType, true, verbose, dryRun);
                     Environment.ExitCode = exitCode;
-                }, buildTypeOption, verboseOption);
+                }, buildTypeOption, verboseOption, dryRunOption);
                 rootCommand.AddCommand(gitPushAutoTagCommand);
             }
 
@@ -496,7 +496,7 @@ namespace Nbuild
 
         // git_clone is now registered in nb.Commands.GitCloneCommand
 
-        private static void AddGitDeleteTagCommand(RootCommand rootCommand)
+        private static void AddGitDeleteTagCommand(RootCommand rootCommand, Option<bool> dryRunOption)
             {
                 var gitDeleteTagCommand = new System.CommandLine.Command("git_deletetag",
                     "Deletes a git tag from the local repository.\n\n" +
@@ -513,11 +513,11 @@ namespace Nbuild
                 var verboseOption = new Option<bool>("--verbose", "Verbose output");
                 gitDeleteTagCommand.AddOption(tagOption);
                 gitDeleteTagCommand.AddOption(verboseOption);
-                gitDeleteTagCommand.SetHandler((tag, verbose) => {
+                gitDeleteTagCommand.SetHandler((tag, verbose, dryRun) => {
                     if (verbose) ConsoleHelper.WriteLine($"[VERBOSE] Deleting git tag: {tag}", ConsoleColor.Gray);
-                    var exitCode = HandleGitDeleteTagCommand(tag);
+                    var exitCode = HandleGitDeleteTagCommand(tag, verbose, dryRun);
                     Environment.ExitCode = exitCode;
-                }, tagOption, verboseOption);
+                }, tagOption, verboseOption, dryRunOption);
                 rootCommand.AddCommand(gitDeleteTagCommand);
             }
 
@@ -894,11 +894,11 @@ namespace Nbuild
                 }
             }
 
-        private static int HandleGitAutoTagCommand(string buildType, bool push)
+        private static int HandleGitAutoTagCommand(string buildType, bool push, bool verbose = false, bool dryRun = false)
             {
                 try
                 {
-                    var result = Command.SetAutoTag(buildType, push);
+                    var result = Command.SetAutoTag(buildType, push, verbose, dryRun);
                     return result.Code;
                 }
                 catch (Exception ex)
@@ -924,11 +924,11 @@ namespace Nbuild
 
         // Git clone logic moved to IGitCloneService; helper removed.
 
-        private static int HandleGitDeleteTagCommand(string tag)
+        private static int HandleGitDeleteTagCommand(string tag, bool verbose = false, bool dryRun = false)
             {
                 try
                 {
-                    var result = Command.DeleteTag(tag);
+                    var result = Command.DeleteTag(tag, verbose, dryRun);
                     return result.Code;
                 }
                 catch (Exception ex)

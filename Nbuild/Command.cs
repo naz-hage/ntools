@@ -1122,7 +1122,9 @@ namespace Nbuild
         /// </summary>
         /// <param name="buildType">The build type (string): STAGE | PROD.</param>
         /// <param name="push">A boolean flag indicating whether to push the tag after setting it. Default is false.</param>
-        public static ResultHelper SetAutoTag(string? buildType, bool push = false)
+        /// <param name="verbose">Whether to display verbose output.</param>
+        /// <param name="dryRun">Whether to perform a dry run without making actual changes.</param>
+        public static ResultHelper SetAutoTag(string? buildType, bool push = false, bool verbose = false, bool dryRun = false)
         {
             var gitWrapper = new GitWrapper();
 
@@ -1132,10 +1134,22 @@ namespace Nbuild
                 Parser.DisplayHelp<Cli>(HelpFormat.Full);
                 return ResultHelper.Fail(-1, "Build type is required");
             }
+            
             string? nextTag = gitWrapper.AutoTag(buildType);
             if (string.IsNullOrEmpty(nextTag))
             {
                 return ResultHelper.Fail(-1, "AutoTag failed");
+            }
+
+            if (dryRun)
+            {
+                ConsoleHelper.WriteLine($"DRY-RUN: Would compute and set git tag: {nextTag} (build type: {buildType})", ConsoleColor.Yellow);
+                if (push)
+                {
+                    ConsoleHelper.WriteLine($"DRY-RUN: Would push tag {nextTag} to remote repository", ConsoleColor.Yellow);
+                }
+                ConsoleHelper.WriteLine("DRY-RUN: No actual changes will be made to the repository or remote.", ConsoleColor.Yellow);
+                return ResultHelper.Success();
             }
 
             var result = gitWrapper.SetTag(nextTag) == true ? ResultHelper.Success() : ResultHelper.Fail(-1, "SetTag failed");
@@ -1216,8 +1230,10 @@ namespace Nbuild
         /// <summary>
         /// Deletes the specified tag.
         /// </summary>
-        /// <param name="tag">The string representing the tag to delete.</param>    
-        public static ResultHelper DeleteTag(string? tag)
+        /// <param name="tag">The string representing the tag to delete.</param>
+        /// <param name="verbose">Whether to display verbose output.</param>
+        /// <param name="dryRun">Whether to perform a dry run without making actual changes.</param>
+        public static ResultHelper DeleteTag(string? tag, bool verbose = false, bool dryRun = false)
         {
             var gitWrapper = new GitWrapper();
 
@@ -1227,6 +1243,34 @@ namespace Nbuild
                 Parser.DisplayHelp<Cli>(HelpFormat.Full);
                 return ResultHelper.Fail(-1, "Tag is required");
             }
+
+            if (dryRun)
+            {
+                // Check if tag exists locally or remotely to give accurate dry-run message
+                bool localExists = gitWrapper.LocalTagExists(tag);
+                bool remoteExists = gitWrapper.RemoteTagExists(tag);
+                
+                if (localExists && remoteExists)
+                {
+                    ConsoleHelper.WriteLine($"DRY-RUN: Would delete tag '{tag}' from both local and remote repository", ConsoleColor.Yellow);
+                }
+                else if (localExists)
+                {
+                    ConsoleHelper.WriteLine($"DRY-RUN: Would delete tag '{tag}' from local repository", ConsoleColor.Yellow);
+                }
+                else if (remoteExists)
+                {
+                    ConsoleHelper.WriteLine($"DRY-RUN: Would delete tag '{tag}' from remote repository", ConsoleColor.Yellow);
+                }
+                else
+                {
+                    ConsoleHelper.WriteLine($"DRY-RUN: Tag '{tag}' does not exist locally or remotely - no action needed", ConsoleColor.Yellow);
+                }
+                
+                ConsoleHelper.WriteLine("DRY-RUN: No actual changes will be made to the repository or remote.", ConsoleColor.Yellow);
+                return ResultHelper.Success();
+            }
+
             var result = gitWrapper.DeleteTag(tag) == true ? ResultHelper.Success() : ResultHelper.Fail(-1, "Delete tag failed");
             if (result.IsSuccess())
             {
