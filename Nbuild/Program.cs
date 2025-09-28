@@ -29,8 +29,8 @@ namespace Nbuild
             AddListCommand(rootCommand);
             AddDownloadCommand(rootCommand);
             AddPathCommand(rootCommand);
-            AddGitInfoCommand(rootCommand);
-            AddGitSetTagCommand(rootCommand);
+            AddGitInfoCommand(rootCommand, dryRunOption);
+            AddGitSetTagCommand(rootCommand, dryRunOption);
             AddGitAutoTagCommand(rootCommand);
             AddGitPushAutoTagCommand(rootCommand);
             AddGitBranchCommand(rootCommand);
@@ -378,7 +378,7 @@ namespace Nbuild
                 rootCommand.AddCommand(cmd);
             }
 
-        private static void AddGitInfoCommand(RootCommand rootCommand)
+        private static void AddGitInfoCommand(RootCommand rootCommand, Option<bool> dryRunOption)
             {
                 var gitInfoCommand = new System.CommandLine.Command(
                     "git_info",
@@ -390,16 +390,16 @@ namespace Nbuild
                 );
                 var verboseOption = new Option<bool>("--verbose", "Verbose output");
                 gitInfoCommand.AddOption(verboseOption);
-                gitInfoCommand.SetHandler((verbose) => {
+                gitInfoCommand.SetHandler((verbose, dryRun) => {
                     if (verbose) ConsoleHelper.WriteLine("[VERBOSE] Displaying git info.", ConsoleColor.Gray);
-                    var exitCode = HandleGitInfoCommand();
+                    var exitCode = HandleGitInfoCommand(verbose, dryRun);
                     Environment.ExitCode = exitCode;
-                }, verboseOption);
+                }, verboseOption, dryRunOption);
                 rootCommand.AddCommand(gitInfoCommand);
             }
 
 
-        private static void AddGitSetTagCommand(RootCommand rootCommand)
+        private static void AddGitSetTagCommand(RootCommand rootCommand, Option<bool> dryRunOption)
             {
                 var gitSetTagCommand = new System.CommandLine.Command("git_settag",
                     "Sets a git tag in the local repository.\n\n" +
@@ -416,11 +416,11 @@ namespace Nbuild
                 var verboseOption = new Option<bool>("--verbose", "Verbose output");
                 gitSetTagCommand.AddOption(tagOption);
                 gitSetTagCommand.AddOption(verboseOption);
-                gitSetTagCommand.SetHandler((tag, verbose) => {
+                gitSetTagCommand.SetHandler((tag, verbose, dryRun) => {
                     if (verbose) ConsoleHelper.WriteLine($"[VERBOSE] Setting git tag: {tag}", ConsoleColor.Gray);
-                    var exitCode = HandleGitSetTagCommand(tag);
+                    var exitCode = HandleGitSetTagCommand(tag, verbose, dryRun);
                     Environment.ExitCode = exitCode;
-                }, tagOption, verboseOption);
+                }, tagOption, verboseOption, dryRunOption);
                 rootCommand.AddCommand(gitSetTagCommand);
             }
 
@@ -866,11 +866,11 @@ namespace Nbuild
                 }
             }
 
-        private static int HandleGitInfoCommand(bool verbose = false)
+        private static int HandleGitInfoCommand(bool verbose = false, bool dryRun = false)
             {
                 try
                 {
-                    var result = Command.DisplayGitInfo();
+                    var result = Command.DisplayGitInfo(verbose, dryRun);
                     return result.Code;
                 }
                 catch (Exception ex)
@@ -880,11 +880,11 @@ namespace Nbuild
                 }
             }
 
-        private static int HandleGitSetTagCommand(string tag, bool verbose = false)
+        private static int HandleGitSetTagCommand(string tag, bool verbose = false, bool dryRun = false)
             {
                 try
                 {
-                    var result = Command.SetTag(tag, verbose);
+                    var result = Command.SetTag(tag, verbose, dryRun);
                     return result.Code;
                 }
                 catch (Exception ex)

@@ -1064,8 +1064,15 @@ namespace Nbuild
         /// <summary>
         /// Displays git information if git is configured and folder is git repository.
         /// </summary>
-        public static ResultHelper DisplayGitInfo()
+        /// <param name="verbose">Whether to display verbose output.</param>
+        /// <param name="dryRun">Whether to perform a dry run.</param>
+        public static ResultHelper DisplayGitInfo(bool verbose = false, bool dryRun = false)
         {
+            if (dryRun)
+            {
+                ConsoleHelper.WriteLine("DRY-RUN: Displaying git repository information (read-only operation).", ConsoleColor.Yellow);
+            }
+
             var project = Path.GetFileName(Directory.GetCurrentDirectory());
             var gitWrapper = new GitWrapper();
             if (string.IsNullOrEmpty(gitWrapper.Branch))
@@ -1082,7 +1089,9 @@ namespace Nbuild
         /// Sets a tag in the current git repository.
         /// </summary>
         /// <param name="tag">The string representing the tag to set.</param>    
-        public static ResultHelper SetTag(string? tag, bool verbose = false)
+        /// <param name="verbose">Whether to display verbose output.</param>
+        /// <param name="dryRun">Whether to perform a dry run without making actual changes.</param>
+        public static ResultHelper SetTag(string? tag, bool verbose = false, bool dryRun = false)
         {
             var gitWrapper = new GitWrapper();
             // Project and branch required
@@ -1091,6 +1100,13 @@ namespace Nbuild
                 ConsoleHelper.WriteLine($"Error: valid tag is required", ConsoleColor.Red);
                 Parser.DisplayHelp<Cli>(HelpFormat.Full);
                 return ResultHelper.Fail(-1, "Tag is required");
+            }
+
+            if (dryRun)
+            {
+                ConsoleHelper.WriteLine($"DRY-RUN: Would set git tag: {tag}", ConsoleColor.Yellow);
+                ConsoleHelper.WriteLine($"DRY-RUN: No actual changes will be made to the repository.", ConsoleColor.Yellow);
+                return ResultHelper.Success();
             }
 
             var result = gitWrapper.SetTag(tag) == true ? ResultHelper.Success() : ResultHelper.Fail(-1, "Set tag failed");
@@ -1353,9 +1369,8 @@ namespace Nbuild
 
             if (dryRun)
             {
-                var msg = $"DRY-RUN: would list releases for repository: {repo}";
-                ConsoleHelper.WriteLine(msg, ConsoleColor.Yellow);
-                return ResultHelper.Success(msg);
+                ConsoleHelper.WriteLine($"DRY-RUN: performing read-only fetch for repository: {repo}", ConsoleColor.Yellow);
+                ConsoleHelper.WriteLine($"DRY-RUN: no state-changing operations will be performed.", ConsoleColor.Yellow);
             }
 
             var releaseService = new ReleaseService(repo);
@@ -1398,7 +1413,12 @@ namespace Nbuild
                 }
             }
             ConsoleHelper.WriteLine($"----------------------------------------", ConsoleColor.Yellow);
-            return ResultHelper.Success();
+            
+            var successMessage = dryRun 
+                ? "DRY-RUN: successfully performed read-only fetch of releases"
+                : "Successfully listed releases";
+            
+            return ResultHelper.Success(successMessage);
         }
     }
 }

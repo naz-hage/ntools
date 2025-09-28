@@ -52,11 +52,15 @@ namespace NbuildTests
         }
 
         [TestMethod]
-        public async Task ListReleases_DryRun_PrintsDryRunMessage()
+        public async Task ListReleases_DryRun_PrintsDryRunMessageAndFetchesData()
         {
-            var result = await Command.ListReleases("repo", false, true);
-            Assert.IsTrue(result.IsSuccess());
-            Assert.IsTrue(result.Output.Any(x => x.Contains("DRY-RUN")));
+            // Use a real repository for testing since dry-run now performs read-only fetches
+            var result = await Command.ListReleases("naz-hage/ntools", false, true);
+            Assert.IsTrue(result.IsSuccess(), "Expected ListReleases to succeed in dry-run mode.");
+            Assert.IsTrue(result.Output.Any(x => x.Contains("DRY-RUN")), "Expected DRY-RUN message in output.");
+            
+            // In dry-run mode, list_release should still perform read-only network fetch per PBI-038 specs
+            // This is acceptable behavior as documented: "reads allowed"
         }
 
         [TestMethod]
