@@ -997,7 +997,7 @@ namespace Nbuild
         /// </remarks>
         private static List<string> PathToSegments(string path)
         {
-            return path.Split(';', StringSplitOptions.RemoveEmptyEntries).ToList();
+            return [.. path.Split(';', StringSplitOptions.RemoveEmptyEntries)];
         }
 
         /// <summary>
