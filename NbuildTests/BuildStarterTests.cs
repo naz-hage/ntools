@@ -236,7 +236,7 @@ namespace Nbuild.Tests
             var buildStarter = new BuildStarter();
 
             // Act
-            var msBuildPath = BuildStarter.FindMsBuild64BitPath(verbose:true);
+            var msBuildPath = BuildStarter.FindMsBuild64BitPath(verbose: true);
 
             Console.WriteLine($"MSBuild Path: {msBuildPath}");
 

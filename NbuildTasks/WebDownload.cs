@@ -1,7 +1,5 @@
 ﻿using Microsoft.Build.Framework;
 using Ntools;
-using System;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace NbuildTasks

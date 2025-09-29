@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Reflection;
 
 namespace NbuildTasks
-{ 
+{
     public enum AssemblyType
     {
         Entry,

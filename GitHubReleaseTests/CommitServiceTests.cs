@@ -155,7 +155,7 @@ namespace GitHubRelease.Tests
                 {
                     commitMessage = CommitService.GetCommitMessage(commit);
                 }
-                var commitDate = commit.GetProperty("commit").GetProperty("author").GetProperty("date").GetString();    
+                var commitDate = commit.GetProperty("commit").GetProperty("author").GetProperty("date").GetString();
 
                 Console.WriteLine($"{branchName} | {commitDate}");
             }
@@ -206,8 +206,8 @@ namespace GitHubRelease.Tests
             {
                 Console.WriteLine("[TestMode] Real mode detected");
                 var apiService = new ApiService();
-                var commitService = new CommitService(apiService,Repo);
-                var releaseService = new ReleaseService(Repo);   
+                var commitService = new CommitService(apiService, Repo);
+                var releaseService = new ReleaseService(Repo);
                 var (sinceLastPublished, sinceTag) = await releaseService.GetLatestReleasePublishedAtAndTagAsync(DefaultBranch);
                 commits = await commitService.GetCommits(DefaultBranch, sinceLastPublished);
             }
@@ -233,7 +233,7 @@ namespace GitHubRelease.Tests
             {
                 Console.WriteLine("[TestMode] Real mode detected");
                 var apiService = new ApiService();
-                var commitService = new CommitService(apiService,Repo);
+                var commitService = new CommitService(apiService, Repo);
                 tags = await commitService.GetReleaseTags();
             }
             Assert.IsNotNull(tags);

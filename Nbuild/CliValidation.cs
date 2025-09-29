@@ -205,21 +205,21 @@ namespace Nbuild
             return bestMatch;
         }
 
-    /// <summary>
-    /// Compute the Levenshtein edit distance between two strings.
-    /// </summary>
-    /// <param name="source">The source string.</param>
-    /// <param name="target">The target string.</param>
-    /// <returns>The number of single-character edits required to transform <c>source</c> into <c>target</c>.</returns>
-    /// <remarks>
-    /// The Levenshtein distance is the minimum number of single-character edits
-    /// (insertions, deletions or substitutions) required to change one string into another.
-    /// This method implements the classic dynamic programming approach.
-    ///
-    /// The algorithm was described by Vladimir Levenshtein (1965/1966). For background and
-    /// further reading see the Wikipedia entry:
-    /// https://en.wikipedia.org/wiki/Levenshtein_distance
-    /// </remarks>
+        /// <summary>
+        /// Compute the Levenshtein edit distance between two strings.
+        /// </summary>
+        /// <param name="source">The source string.</param>
+        /// <param name="target">The target string.</param>
+        /// <returns>The number of single-character edits required to transform <c>source</c> into <c>target</c>.</returns>
+        /// <remarks>
+        /// The Levenshtein distance is the minimum number of single-character edits
+        /// (insertions, deletions or substitutions) required to change one string into another.
+        /// This method implements the classic dynamic programming approach.
+        ///
+        /// The algorithm was described by Vladimir Levenshtein (1965/1966). For background and
+        /// further reading see the Wikipedia entry:
+        /// https://en.wikipedia.org/wiki/Levenshtein_distance
+        /// </remarks>
         private static int CalculateLevenshteinDistance(string source, string target)
         {
             if (string.IsNullOrEmpty(source)) return target?.Length ?? 0;

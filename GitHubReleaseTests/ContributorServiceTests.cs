@@ -1,12 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using GitHubRelease;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GitHubRelease.Tests
+﻿namespace GitHubRelease.Tests
 {
     [TestClass()]
     public class ContributorServiceTests : GitHubSetup

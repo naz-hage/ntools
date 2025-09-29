@@ -1,6 +1,5 @@
 ﻿using NbuildTasks;
 using Ntools;
-using OutputColorizer;
 using System.Diagnostics;
 using System.Text;
 using System.Xml;
@@ -42,7 +41,7 @@ public class BuildStarter
 
         ExtractBatchFile();
 
-        Console.WriteLine($"MSBuild started with Target: '{target ?? "Default"}' | verbose:{ verbose}");
+        Console.WriteLine($"MSBuild started with Target: '{target ?? "Default"}' | verbose:{verbose}");
 
         LogFile = Path.Combine(Environment.CurrentDirectory, LogFile);
         string cmd = string.IsNullOrEmpty(target)
@@ -118,7 +117,7 @@ public class BuildStarter
 
         // Add target files to TargetFiles list
         KnownTargetFiles.AddRange(targetFiles);
-        
+
         // Find list of *.targets files in current folder
         targetFiles = Directory.GetFiles(Environment.CurrentDirectory, "*.targets");
 
@@ -152,7 +151,7 @@ public class BuildStarter
 
         return found;
     }
-    
+
     ///<summary>
     /// Extracts the batch file from the embedded resource.
     /// </summary>
@@ -160,7 +159,7 @@ public class BuildStarter
     {
         // Always extract nbuild.bat common.targets.xml
         ResourceHelper.ExtractEmbeddedResourceFromCallingAssembly(ResourceLocation, Path.Combine(Environment.CurrentDirectory, NbuildBatchFile));
-        ConsoleHelper.WriteLine($"!Extracted '{NbuildBatchFile}' to {Environment.CurrentDirectory}\n",ConsoleColor.Yellow);
+        ConsoleHelper.WriteLine($"!Extracted '{NbuildBatchFile}' to {Environment.CurrentDirectory}\n", ConsoleColor.Yellow);
     }
 
     /// <summary>
@@ -377,57 +376,57 @@ public class BuildStarter
     /// <param name="filePath">The path to the target file.</param>
     /// <returns>A <see cref="ResultHelper"/> object representing the result of the operation.</returns>
     public static ResultHelper DisplayTargetsInFile(string filePath)
+    {
+        //replace $(BuildTools) with environment variable ProgramFiles/Nbuild
+        filePath = filePath.Replace("$(BuildTools)", $"{Environment.GetEnvironmentVariable("ProgramFiles")}\\nbuild");
+        try
         {
-            //replace $(BuildTools) with environment variable ProgramFiles/Nbuild
-            filePath = filePath.Replace("$(BuildTools)", $"{Environment.GetEnvironmentVariable("ProgramFiles")}\\nbuild");
-            try
+            using (StreamWriter writer = new(TargetsMd, true))
+            {
+                Console.WriteLine($"{filePath} Targets:");
+                writer.WriteLine($"- **{filePath} Targets**\n");
+                Console.WriteLine($"----------------------");
+                writer.WriteLine("| **Target Name** | **Description** |");
+                writer.WriteLine("| --- | --- |");
+
+                var targets = GetTargetsAndComments(filePath).ToList();
+                if (targets.Count > 0)
+                {
+                    foreach (var targetAndDescription in targets)
+                    {
+                        Console.WriteLine(targetAndDescription);
+                        writer.WriteLine($"| {targetAndDescription} |");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("No targets found.");
+                }
+                Console.WriteLine();
+                writer.WriteLine("\n");
+
+            }
+            var importItems = GetImportAttributes(filePath, "Project");
+            foreach (var item in importItems)
             {
                 using (StreamWriter writer = new(TargetsMd, true))
                 {
-                    Console.WriteLine($"{filePath} Targets:");
-                    writer.WriteLine($"- **{filePath} Targets**\n");
+                    Console.WriteLine($"Imported Targets:");
+                    //writer.WriteLine($"- Imported Targets: {importItem}\n");
                     Console.WriteLine($"----------------------");
-                    writer.WriteLine("| **Target Name** | **Description** |");
-                    writer.WriteLine("| --- | --- |");
-
-                    var targets = GetTargetsAndComments(filePath).ToList();
-                    if (targets.Count > 0)
-                    {
-                        foreach (var targetAndDescription in targets)
-                        {
-                            Console.WriteLine(targetAndDescription);
-                            writer.WriteLine($"| {targetAndDescription} |");
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("No targets found.");
-                    }
-                    Console.WriteLine();
-                    writer.WriteLine("\n");
-
                 }
-                var importItems = GetImportAttributes(filePath, "Project");
-                foreach (var item in importItems)
-                {
-                    using (StreamWriter writer = new(TargetsMd, true))
-                    {
-                        Console.WriteLine($"Imported Targets:");
-                        //writer.WriteLine($"- Imported Targets: {importItem}\n");
-                        Console.WriteLine($"----------------------");
-                    }
-                    // Recursive call for each imported target file
-                    DisplayTargetsInFile(item);
-                }
-
-            }
-            catch (Exception ex)
-            {
-                return ResultHelper.Fail(-1, $"Exception occurred: {ex.Message}");
+                // Recursive call for each imported target file
+                DisplayTargetsInFile(item);
             }
 
-            return ResultHelper.Success();
         }
+        catch (Exception ex)
+        {
+            return ResultHelper.Fail(-1, $"Exception occurred: {ex.Message}");
+        }
+
+        return ResultHelper.Success();
+    }
 
     /// <summary>
     /// Displays the targets in the specified directory.

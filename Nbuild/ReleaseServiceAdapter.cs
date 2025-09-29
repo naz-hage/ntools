@@ -1,6 +1,3 @@
-using System.Net.Http;
-using System.Threading.Tasks;
-
 namespace Nbuild
 {
     public delegate IReleaseService ReleaseServiceFactory(string repo);

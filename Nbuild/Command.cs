@@ -2,13 +2,8 @@
 using GitHubRelease;
 using NbuildTasks;
 using Ntools;
-using OutputColorizer;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.IO;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
@@ -33,9 +28,9 @@ namespace Nbuild
             }
         }
 
-    private static bool _testMode = IsTestMode();
-    // Factory for creating IReleaseService instances. Can be overridden in tests.
-    public static ReleaseServiceFactory? ReleaseServiceFactory { get; set; } = repo => new ReleaseServiceAdapter(repo);
+        private static bool _testMode = IsTestMode();
+        // Factory for creating IReleaseService instances. Can be overridden in tests.
+        public static ReleaseServiceFactory? ReleaseServiceFactory { get; set; } = repo => new ReleaseServiceAdapter(repo);
 
         static Command()
         {
@@ -122,12 +117,12 @@ namespace Nbuild
         {
             Verbose = verbose;
             ResultHelper result = ResultHelper.New();
-                if (dryRun)
-                {
-                    var msg = $"DRY-RUN: would install apps from json: {json ?? "<default>"}";
-                    ConsoleHelper.WriteLine(msg, ConsoleColor.Yellow);
-                    return ResultHelper.Success(msg);
-                }
+            if (dryRun)
+            {
+                var msg = $"DRY-RUN: would install apps from json: {json ?? "<default>"}";
+                ConsoleHelper.WriteLine(msg, ConsoleColor.Yellow);
+                return ResultHelper.Success(msg);
+            }
             if (!CanRunCommand()) return ResultHelper.Fail(-1, $"You must run this command as an administrator");
 
             var apps = GetApps(json);
@@ -157,12 +152,12 @@ namespace Nbuild
         {
             Verbose = verbose;
             ResultHelper result = ResultHelper.New();
-                if (dryRun)
-                {
-                    var msg = $"DRY-RUN: would uninstall apps from json: {json ?? "<default>"}";
-                    ConsoleHelper.WriteLine(msg, ConsoleColor.Yellow);
-                    return ResultHelper.Success(msg);
-                }
+            if (dryRun)
+            {
+                var msg = $"DRY-RUN: would uninstall apps from json: {json ?? "<default>"}";
+                ConsoleHelper.WriteLine(msg, ConsoleColor.Yellow);
+                return ResultHelper.Success(msg);
+            }
             if (!CanRunCommand()) return ResultHelper.Fail(-1, $"You must run this command as an administrator");
 
             var apps = GetApps(json);
@@ -182,7 +177,7 @@ namespace Nbuild
 
             return result;
         }
-        
+
         public static ResultHelper List(string? json, bool verbose = false)
         {
             Verbose = verbose;
@@ -214,8 +209,8 @@ namespace Nbuild
                 }
             }
 
-        Console.WriteLine();
-        return ResultHelper.Success();
+            Console.WriteLine();
+            return ResultHelper.Success();
         }
 
         public static ResultHelper Download(string? json, bool verbose = false, bool dryRun = false)
@@ -298,7 +293,7 @@ namespace Nbuild
             }
 
             var fileName = $"{DownloadsDirectory}\\{nbuildApp.DownloadedFile}";
-            
+
             // *** Important **
             // Set trusted Host and extension.  This assumes that due diligence has been done to ensure the file is safe to download
             Nfile.SetTrustedHosts(new List<string> { new Uri(nbuildApp.WebDownloadFile).Host });
@@ -346,7 +341,7 @@ namespace Nbuild
                             var token = Environment.GetEnvironmentVariable("API_GITHUB_KEY") ?? Environment.GetEnvironmentVariable("GITHUB_TOKEN");
                             if (!string.IsNullOrEmpty(token))
                             {
-                                var parts = uri.AbsolutePath.Split(new[] {'/'}, StringSplitOptions.RemoveEmptyEntries);
+                                var parts = uri.AbsolutePath.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
                                 if (parts.Length >= 5)
                                 {
                                     var owner = parts[0];
@@ -430,7 +425,7 @@ namespace Nbuild
                     if (string.IsNullOrEmpty(token)) return null;
 
                     // parse owner, repo, tag and asset name from the releases/download URL
-                    var parts = uri.AbsolutePath.Split(new[] {'/'}, StringSplitOptions.RemoveEmptyEntries);
+                    var parts = uri.AbsolutePath.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
                     if (parts.Length < 5) return null; // expected: owner/repo/releases/download/tag/asset
                     var owner = parts[0];
                     var repoName = parts[1];
@@ -475,7 +470,7 @@ namespace Nbuild
             // end of DownloadApp try/catch - result already returned or failure returned above
         }
 
-        private static ResultHelper Install(NbuildApp nbuildApp, bool verbose=false)
+        private static ResultHelper Install(NbuildApp nbuildApp, bool verbose = false)
         {
             Verbose = verbose;
             if (!CanRunCommand()) return ResultHelper.Fail(-1, $"You must run this command as an administrator");
@@ -1134,7 +1129,7 @@ namespace Nbuild
                 Parser.DisplayHelp<Cli>(HelpFormat.Full);
                 return ResultHelper.Fail(-1, "Build type is required");
             }
-            
+
             string? nextTag = gitWrapper.AutoTag(buildType);
             if (string.IsNullOrEmpty(nextTag))
             {
@@ -1249,7 +1244,7 @@ namespace Nbuild
                 // Check if tag exists locally or remotely to give accurate dry-run message
                 bool localExists = gitWrapper.LocalTagExists(tag);
                 bool remoteExists = gitWrapper.RemoteTagExists(tag);
-                
+
                 if (localExists && remoteExists)
                 {
                     ConsoleHelper.WriteLine($"DRY-RUN: Would delete tag '{tag}' from both local and remote repository", ConsoleColor.Yellow);
@@ -1266,7 +1261,7 @@ namespace Nbuild
                 {
                     ConsoleHelper.WriteLine($"DRY-RUN: Tag '{tag}' does not exist locally or remotely - no action needed", ConsoleColor.Yellow);
                 }
-                
+
                 ConsoleHelper.WriteLine("DRY-RUN: No actual changes will be made to the repository or remote.", ConsoleColor.Yellow);
                 return ResultHelper.Success();
             }
@@ -1457,11 +1452,11 @@ namespace Nbuild
                 }
             }
             ConsoleHelper.WriteLine($"----------------------------------------", ConsoleColor.Yellow);
-            
-            var successMessage = dryRun 
+
+            var successMessage = dryRun
                 ? "DRY-RUN: successfully performed read-only fetch of releases"
                 : "Successfully listed releases";
-            
+
             return ResultHelper.Success(successMessage);
         }
     }

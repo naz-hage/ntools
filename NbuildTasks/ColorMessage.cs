@@ -1,6 +1,6 @@
-﻿using System;
-using Microsoft.Build.Framework;
+﻿using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
+using System;
 
 public class ColorMessage : Task
 {

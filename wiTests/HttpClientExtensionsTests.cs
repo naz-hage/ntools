@@ -1,5 +1,4 @@
 using System.Net;
-using wi;
 
 [TestClass]
 public class HttpClientExtensionsTests

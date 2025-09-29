@@ -1,10 +1,7 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Runtime.InteropServices;
-using System.Security;
-using System.Text;
 using GitHubRelease;
+using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
+using System.Security;
 
 namespace GitHubReleaseTests
 {

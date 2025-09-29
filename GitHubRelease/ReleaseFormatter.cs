@@ -7,7 +7,7 @@ namespace GitHubRelease
     {
         private readonly CommitService CommitService = new(apiService, repo);
         private readonly ContributorService ContributorService = new(apiService, repo);
-         private readonly string Repo = repo;
+        private readonly string Repo = repo;
 
         /// <summary>
         /// Formats the release notes based on the commits.

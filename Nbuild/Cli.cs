@@ -1,7 +1,6 @@
 ﻿using CommandLine.Attributes;
 using GitHubRelease;
 using NbuildTasks;
-using System.IO;
 
 namespace Nbuild;
 
@@ -328,7 +327,7 @@ public class Cli
         }
 
         if (verbose) Console.WriteLine($"[VERBOSE] ValidateRepo: Final resolved Repo: {Repo}");
-        
+
         // Validate that the repository exists
         await ValidateRepositoryExists();
     }

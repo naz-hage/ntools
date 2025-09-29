@@ -20,9 +20,9 @@ using System.CommandLine;
 /// <summary>
 /// Entry point for the lf utility. Sets up the root command and subcommands for file and folder listing.
 /// </summary>
-            string nv;
-            try { nv = Nversion.Get(); } catch { nv = "ntools (version unknown)"; }
-            var rootCommand = new RootCommand($"File and folder listing utility {Environment.NewLine} {nv}");
+string nv;
+try { nv = Nversion.Get(); } catch { nv = "ntools (version unknown)"; }
+var rootCommand = new RootCommand($"File and folder listing utility {Environment.NewLine} {nv}");
 
 /// <summary>
 /// Command: files

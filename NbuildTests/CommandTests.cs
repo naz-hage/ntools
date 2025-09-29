@@ -58,7 +58,7 @@ namespace NbuildTests
             var result = await Command.ListReleases("naz-hage/ntools", false, true);
             Assert.IsTrue(result.IsSuccess(), "Expected ListReleases to succeed in dry-run mode.");
             Assert.IsTrue(result.Output.Any(x => x.Contains("DRY-RUN")), "Expected DRY-RUN message in output.");
-            
+
             // In dry-run mode, list_release should still perform read-only network fetch per PBI-038 specs
             // This is acceptable behavior as documented: "reads allowed"
         }
@@ -234,7 +234,7 @@ namespace NbuildTests
         // Test method for install from JSON file functionality
         [TestMethod()]
         public void InstallFromJsonFileTest()
-        {   
+        {
             SetupTestModeFlag();
             // Arrange read json from file from embedded resource
 
@@ -265,7 +265,7 @@ namespace NbuildTests
             // print json content to console as indented json
 
             Console.WriteLine(jsonContent);
-           
+
 
             // Act
             var result = Command.Install(jsonContent, true);
@@ -312,7 +312,7 @@ namespace NbuildTests
             json = json.Replace("versionToTest", VersionToTest);
 
             // Act
-            var result = Command.Install(json, verbose:true, dryRun:false);
+            var result = Command.Install(json, verbose: true, dryRun: false);
 
             if (!result.IsSuccess() && result.Output.Count > 0)
             {
@@ -344,7 +344,7 @@ namespace NbuildTests
             // }";
             // Use this json to test the install command in GitHub Actions because it doesn't have 7-Zip installed
             SetupTestModeFlag();
-            
+
             var json = @"{
                 ""Version"": ""1.2.0"",
                 ""NbuildAppList"": [

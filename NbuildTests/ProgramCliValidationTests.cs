@@ -1,6 +1,4 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.IO;
 using Nbuild;
 
 namespace NbuildTests
@@ -199,7 +197,7 @@ namespace NbuildTests
             var errorOutput = GetErrorOutput();
             Assert.IsTrue(errorOutput.Contains("Unknown option"), "Should show error for invalid options");
             // Should catch the first invalid option
-            Assert.IsTrue(errorOutput.Contains("--invalid1") || errorOutput.Contains("--invalid2"), 
+            Assert.IsTrue(errorOutput.Contains("--invalid1") || errorOutput.Contains("--invalid2"),
                 "Should mention at least one of the invalid options");
         }
 

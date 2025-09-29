@@ -1,9 +1,8 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NbuildTasks.Debug;
 using System;
 using System.IO;
 using System.Reflection;
-using NbuildTasks.Debug;
-using System.Text;
 
 namespace NbuildTasksTests
 {

@@ -1,5 +1,4 @@
-﻿using NbuildTasks;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
@@ -28,7 +27,7 @@ namespace GitHubRelease
     /// </summary>
     public class CommitService : Constants
     {
-        
+
         private readonly ApiService ApiService;
         private readonly string Repo;
 
@@ -50,7 +49,7 @@ namespace GitHubRelease
         private async Task<string?> GetTagFromCommitAsync(string commitSha)
         {
             var uri = $"{Constants.GitHubApiPrefix}/{Repo}/tags";
-            
+
             var response = await ApiService.GetAsync(uri);
             if (response.IsSuccessStatusCode)
             {
@@ -101,7 +100,7 @@ namespace GitHubRelease
 
                 var message = commit.GetProperty(CommitPropertyName).GetProperty("message").GetString() ?? string.Empty;
 
-      
+
                 var author = " ";
                 try
                 {
