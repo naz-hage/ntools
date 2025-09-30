@@ -178,11 +178,6 @@ Key points:
   avoid network access in dry-run and print a short simulated message. If a
   project requires read-only network access during dry-run, it should be made
   explicit (for example `--dry-run=fetch`) in a follow-up PBI.
-- `--dry-run` should be documented in `nb --help` and examples in `docs/ntools/nbuild.md`.
-
-This contract aims to make `--dry-run` safe for CI runs and local experimentation.
-
-
 > **Tip:** If the `--json` option is not specified, the default manifest file `C:\Program Files\NBuild\ntools.json` is used.
 
 ---
