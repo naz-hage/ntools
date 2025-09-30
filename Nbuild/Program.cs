@@ -263,7 +263,6 @@ namespace Nbuild
             rootCommand.AddCommand(gitBranchCommand);
         }
 
-        // git_clone is now registered in nb.Commands.GitCloneCommand
 
         private static void AddGitDeleteTagCommand(RootCommand rootCommand, Option<bool> dryRunOption)
         {
