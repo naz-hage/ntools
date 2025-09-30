@@ -75,6 +75,5 @@ namespace Nbuild.Commands
             rootCommand.AddCommand(gitCloneCommand);
         }
 
-        // Handler logic moved to IGitCloneService; local helper removed to avoid duplication.
     }
 }
