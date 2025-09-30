@@ -362,9 +362,7 @@ configuration, or registry state.</p>
 - For read-only commands (for example <code>list_release</code>) the default Behavior is to
   avoid network access in dry-run and print a short simulated message. If a
   project requires read-only network access during dry-run, it should be made
-  explicit (for example <code>--dry-run=fetch</code>) in a follow-up PBI.
-- <code>--dry-run</code> should be documented in <code>nb --help</code> and examples in <code>docs/ntools/nbuild.md</code>.</p>
-<p>This contract aims to make <code>--dry-run</code> safe for CI runs and local experimentation.</p>
+  explicit (for example <code>--dry-run=fetch</code>) in a follow-up PBI.</p>
 <blockquote>
 <p><strong>Tip:</strong> If the <code>--json</code> option is not specified, the default manifest file <code>C:\Program Files\NBuild\ntools.json</code> is used.</p>
 </blockquote>
