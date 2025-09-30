@@ -41,7 +41,7 @@ namespace NbuildTasks
         /// The working directory is set to the specified project directory or the current directory if no project is provided.
         /// </remarks>
         public GitWrapper(string project = null, bool verbose = false, bool testMode = false) : base(testMode)
-        { 
+        {
             Verbose = verbose;
 
             Process.StartInfo.WorkingDirectory = project == null ? Environment.CurrentDirectory : $@"{DevDrive}\{MainDir}\{project}";
@@ -85,7 +85,7 @@ namespace NbuildTasks
                 return false;
             }
 
-              // change to project directory
+            // change to project directory
             var projectDir = $@"{SourceDir}\{projectName}";
 
             Process.StartInfo.WorkingDirectory = string.IsNullOrEmpty(projectName) ? Environment.CurrentDirectory : projectDir;
@@ -299,7 +299,7 @@ namespace NbuildTasks
             // Return true only if the tag was deleted from at least one location
             return localTagDeleted || remoteTagDeleted;
         }
-        
+
         public List<string> ListLocalTags()
         {
             Process.StartInfo.Arguments = $"tag --list";
@@ -416,7 +416,7 @@ namespace NbuildTasks
 
             ResultHelper result;
             // change to project directory
-              var clonePath = $@"{SourceDir}\{projectName}";
+            var clonePath = $@"{SourceDir}\{projectName}";
             var dirExists = Directory.Exists(clonePath);
             if (!dirExists)
             {
@@ -668,7 +668,7 @@ namespace NbuildTasks
 
             return false;
         }
-        
+
         /// <summary>
         /// Get git global user.name configuration.
         /// </summary>
@@ -881,7 +881,7 @@ namespace NbuildTasks
             {
                 return null;
             }
-            
+
             // for backward compatibility, convert 4 digits tag to 3 digits tag
             if (IsValid4Tag(tag))
             {

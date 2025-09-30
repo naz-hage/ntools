@@ -1,12 +1,10 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Build.Framework;
-using Microsoft.Build.Utilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using NbuildTasks;
 using System;
 using System.IO;
-using System.Collections.Generic;
 using System.Text.Json;
-using NbuildTasks;
-using Moq;
 
 namespace NbuildTasksTests
 {

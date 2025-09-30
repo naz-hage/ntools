@@ -1,8 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Nbuild;
 using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace NbuildTests
 {

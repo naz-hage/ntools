@@ -13,7 +13,7 @@ namespace NbuildTasks
         public string Arguments { get; set; }
 
         public string WorkingDirectory { get; set; }
-        
+
         [Output]
         public int ExitCode { get; set; }
 

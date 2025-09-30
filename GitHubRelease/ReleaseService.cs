@@ -1,7 +1,5 @@
-using System;
 using System.Diagnostics;
 using System.Net;
-using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 
@@ -1062,7 +1060,7 @@ namespace GitHubRelease
                     // to avoid an exception if "uploader" is not found
                     Uploader = asset.TryGetProperty("uploader", out var uploader) &&
                               uploader.TryGetProperty("login", out var login)
-                              ? login.GetString():null
+                              ? login.GetString() : null
                 });
             }
 

@@ -2,13 +2,8 @@
 using GitHubRelease;
 using NbuildTasks;
 using Ntools;
-using OutputColorizer;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.IO;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
@@ -33,9 +28,9 @@ namespace Nbuild
             }
         }
 
-    private static bool _testMode = IsTestMode();
-    // Factory for creating IReleaseService instances. Can be overridden in tests.
-    public static ReleaseServiceFactory? ReleaseServiceFactory { get; set; } = repo => new ReleaseServiceAdapter(repo);
+        private static bool _testMode = IsTestMode();
+        // Factory for creating IReleaseService instances. Can be overridden in tests.
+        public static ReleaseServiceFactory? ReleaseServiceFactory { get; set; } = repo => new ReleaseServiceAdapter(repo);
 
         static Command()
         {
@@ -118,10 +113,16 @@ namespace Nbuild
             }
         }
 
-        public static ResultHelper Install(string? json, bool verbose = false)
+        public static ResultHelper Install(string? json, bool verbose = false, bool dryRun = false)
         {
             Verbose = verbose;
             ResultHelper result = ResultHelper.New();
+            if (dryRun)
+            {
+                var msg = $"DRY-RUN: would install apps from json: {json ?? "<default>"}";
+                ConsoleHelper.WriteLine(msg, ConsoleColor.Yellow);
+                return ResultHelper.Success(msg);
+            }
             if (!CanRunCommand()) return ResultHelper.Fail(-1, $"You must run this command as an administrator");
 
             var apps = GetApps(json);
@@ -147,10 +148,16 @@ namespace Nbuild
             return result;
         }
 
-        public static ResultHelper Uninstall(string? json, bool verbose = false)
+        public static ResultHelper Uninstall(string? json, bool verbose = false, bool dryRun = false)
         {
             Verbose = verbose;
             ResultHelper result = ResultHelper.New();
+            if (dryRun)
+            {
+                var msg = $"DRY-RUN: would uninstall apps from json: {json ?? "<default>"}";
+                ConsoleHelper.WriteLine(msg, ConsoleColor.Yellow);
+                return ResultHelper.Success(msg);
+            }
             if (!CanRunCommand()) return ResultHelper.Fail(-1, $"You must run this command as an administrator");
 
             var apps = GetApps(json);
@@ -170,7 +177,7 @@ namespace Nbuild
 
             return result;
         }
-        
+
         public static ResultHelper List(string? json, bool verbose = false)
         {
             Verbose = verbose;
@@ -178,7 +185,6 @@ namespace Nbuild
             var apps = GetApps(json);
 
             if (apps == null) return ResultHelper.Fail(-1, $"Invalid json input");
-
             ConsoleHelper.WriteLine($"{apps.Count()} apps to list:", ConsoleColor.Yellow);
 
             // print header
@@ -207,9 +213,17 @@ namespace Nbuild
             return ResultHelper.Success();
         }
 
-        public static ResultHelper Download(string? json, bool verbose = false)
+        public static ResultHelper Download(string? json, bool verbose = false, bool dryRun = false)
         {
             Verbose = verbose;
+
+            // Respect dry-run: do not perform downloads or print the downloads table.
+            if (dryRun)
+            {
+                var msg = $"DRY-RUN: would download after processing from {json ?? "<default>"}";
+                ConsoleHelper.WriteLine(msg, ConsoleColor.Yellow);
+                return ResultHelper.Success(msg);
+            }
 
             if (!CanRunCommand()) return ResultHelper.Fail(-1, $"You must run this command as an administrator");
 
@@ -279,12 +293,12 @@ namespace Nbuild
             }
 
             var fileName = $"{DownloadsDirectory}\\{nbuildApp.DownloadedFile}";
-            
+
             // *** Important **
             // Set trusted Host and extension.  This assumes that due diligence has been done to ensure the file is safe to download
-            Nfile.SetTrustedHosts([new Uri(nbuildApp.WebDownloadFile).Host]);
+            Nfile.SetTrustedHosts(new List<string> { new Uri(nbuildApp.WebDownloadFile).Host });
             var extension = Path.GetExtension(new Uri(nbuildApp.WebDownloadFile).AbsolutePath);
-            Nfile.SetAllowedExtensions([extension]);
+            Nfile.SetAllowedExtensions(new List<string> { extension });
 
             if (Verbose)
             {
@@ -327,7 +341,7 @@ namespace Nbuild
                             var token = Environment.GetEnvironmentVariable("API_GITHUB_KEY") ?? Environment.GetEnvironmentVariable("GITHUB_TOKEN");
                             if (!string.IsNullOrEmpty(token))
                             {
-                                var parts = uri.AbsolutePath.Split(new[] {'/'}, StringSplitOptions.RemoveEmptyEntries);
+                                var parts = uri.AbsolutePath.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
                                 if (parts.Length >= 5)
                                 {
                                     var owner = parts[0];
@@ -411,7 +425,7 @@ namespace Nbuild
                     if (string.IsNullOrEmpty(token)) return null;
 
                     // parse owner, repo, tag and asset name from the releases/download URL
-                    var parts = uri.AbsolutePath.Split(new[] {'/'}, StringSplitOptions.RemoveEmptyEntries);
+                    var parts = uri.AbsolutePath.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
                     if (parts.Length < 5) return null; // expected: owner/repo/releases/download/tag/asset
                     var owner = parts[0];
                     var repoName = parts[1];
@@ -456,7 +470,7 @@ namespace Nbuild
             // end of DownloadApp try/catch - result already returned or failure returned above
         }
 
-        private static ResultHelper Install(NbuildApp nbuildApp, bool verbose=false)
+        private static ResultHelper Install(NbuildApp nbuildApp, bool verbose = false)
         {
             Verbose = verbose;
             if (!CanRunCommand()) return ResultHelper.Fail(-1, $"You must run this command as an administrator");
@@ -506,7 +520,6 @@ namespace Nbuild
                 // Update the filename to the full path of executable in the PATH environment variable
                 process.StartInfo.FileName = FileMappins.GetFullPathOfFile(process.StartInfo.FileName);
 
-                ConsoleHelper.WriteLine($" Installing {nbuildApp.Name} {nbuildApp.Version}", ConsoleColor.Yellow);
                 if (Verbose)
                 {
                     ConsoleHelper.WriteLine($" Working Directory: {process.StartInfo.WorkingDirectory}", ConsoleColor.Yellow);
@@ -525,20 +538,19 @@ namespace Nbuild
                     }
 
                     // Check if the app was installed successfully
-                    return SuccessfullInstall(nbuildApp, result);
+                    return SuccessfullInstall(nbuildApp, resultInstall);
                 }
                 else
                 {
-                    
-                    //ConsoleHelper.WriteLine($"X {appData.Name} {appData.Version} failed to install: {resultInstall.GetFirstOutput()}", ConsoleColor.Red);
-                    ConsoleHelper.WriteLine($"X {nbuildApp.Name} {nbuildApp.Version} failed to install: {process.ExitCode}", ConsoleColor.Red);
-                    if (Verbose) DisplayCodeAndOutput(result);
+                    // installer failed
+                    ConsoleHelper.WriteLine($"X {nbuildApp.Name} {nbuildApp.Version} failed to install: {resultInstall.Code}", ConsoleColor.Red);
+                    if (Verbose) DisplayCodeAndOutput(resultInstall);
                     // print resultInstall.Output
                     foreach (var item in resultInstall.Output)
                     {
                         ConsoleHelper.WriteLine(item.ToString());
                     }
-                    return ResultHelper.Fail(process.ExitCode, $"Failed to install {nbuildApp.Name} {nbuildApp.Version}");
+                    return ResultHelper.Fail(resultInstall.Code, $"Failed to install {nbuildApp.Name} {nbuildApp.Version}");
                 }
             }
             else
@@ -718,9 +730,9 @@ namespace Nbuild
             }
             else
             {
-                ConsoleHelper.WriteLine($"X {nbuildApp.Name} {nbuildApp.Version} failed to Uninstall: {process.ExitCode}", ConsoleColor.Red);
+                ConsoleHelper.WriteLine($"X {nbuildApp.Name} {nbuildApp.Version} failed to Uninstall: {result.Code}", ConsoleColor.Red);
                 DisplayCodeAndOutput(result);
-                return ResultHelper.Fail(process.ExitCode, $"Failed to Uninstall {nbuildApp.Name} {nbuildApp.Version}");
+                return ResultHelper.Fail(result.Code, $"Failed to Uninstall {nbuildApp.Name} {nbuildApp.Version}");
             }
         }
 
@@ -1047,8 +1059,15 @@ namespace Nbuild
         /// <summary>
         /// Displays git information if git is configured and folder is git repository.
         /// </summary>
-        public static ResultHelper DisplayGitInfo()
+        /// <param name="verbose">Whether to display verbose output.</param>
+        /// <param name="dryRun">Whether to perform a dry run.</param>
+        public static ResultHelper DisplayGitInfo(bool verbose = false, bool dryRun = false)
         {
+            if (dryRun)
+            {
+                ConsoleHelper.WriteLine("DRY-RUN: Displaying git repository information (read-only operation).", ConsoleColor.Yellow);
+            }
+
             var project = Path.GetFileName(Directory.GetCurrentDirectory());
             var gitWrapper = new GitWrapper();
             if (string.IsNullOrEmpty(gitWrapper.Branch))
@@ -1065,7 +1084,9 @@ namespace Nbuild
         /// Sets a tag in the current git repository.
         /// </summary>
         /// <param name="tag">The string representing the tag to set.</param>    
-        public static ResultHelper SetTag(string? tag, bool verbose = false)
+        /// <param name="verbose">Whether to display verbose output.</param>
+        /// <param name="dryRun">Whether to perform a dry run without making actual changes.</param>
+        public static ResultHelper SetTag(string? tag, bool verbose = false, bool dryRun = false)
         {
             var gitWrapper = new GitWrapper();
             // Project and branch required
@@ -1074,6 +1095,13 @@ namespace Nbuild
                 ConsoleHelper.WriteLine($"Error: valid tag is required", ConsoleColor.Red);
                 Parser.DisplayHelp<Cli>(HelpFormat.Full);
                 return ResultHelper.Fail(-1, "Tag is required");
+            }
+
+            if (dryRun)
+            {
+                ConsoleHelper.WriteLine($"DRY-RUN: Would set git tag: {tag}", ConsoleColor.Yellow);
+                ConsoleHelper.WriteLine($"DRY-RUN: No actual changes will be made to the repository.", ConsoleColor.Yellow);
+                return ResultHelper.Success();
             }
 
             var result = gitWrapper.SetTag(tag) == true ? ResultHelper.Success() : ResultHelper.Fail(-1, "Set tag failed");
@@ -1089,7 +1117,9 @@ namespace Nbuild
         /// </summary>
         /// <param name="buildType">The build type (string): STAGE | PROD.</param>
         /// <param name="push">A boolean flag indicating whether to push the tag after setting it. Default is false.</param>
-        public static ResultHelper SetAutoTag(string? buildType, bool push = false)
+        /// <param name="verbose">Whether to display verbose output.</param>
+        /// <param name="dryRun">Whether to perform a dry run without making actual changes.</param>
+        public static ResultHelper SetAutoTag(string? buildType, bool push = false, bool verbose = false, bool dryRun = false)
         {
             var gitWrapper = new GitWrapper();
 
@@ -1099,10 +1129,22 @@ namespace Nbuild
                 Parser.DisplayHelp<Cli>(HelpFormat.Full);
                 return ResultHelper.Fail(-1, "Build type is required");
             }
+
             string? nextTag = gitWrapper.AutoTag(buildType);
             if (string.IsNullOrEmpty(nextTag))
             {
                 return ResultHelper.Fail(-1, "AutoTag failed");
+            }
+
+            if (dryRun)
+            {
+                ConsoleHelper.WriteLine($"DRY-RUN: Would compute and set git tag: {nextTag} (build type: {buildType})", ConsoleColor.Yellow);
+                if (push)
+                {
+                    ConsoleHelper.WriteLine($"DRY-RUN: Would push tag {nextTag} to remote repository", ConsoleColor.Yellow);
+                }
+                ConsoleHelper.WriteLine("DRY-RUN: No actual changes will be made to the repository or remote.", ConsoleColor.Yellow);
+                return ResultHelper.Success();
             }
 
             var result = gitWrapper.SetTag(nextTag) == true ? ResultHelper.Success() : ResultHelper.Fail(-1, "SetTag failed");
@@ -1147,8 +1189,14 @@ namespace Nbuild
         /// If the URL is not provided in the options, an error message is displayed, and the operation fails.
         /// Upon successful cloning, the working directory is switched to the cloned repository's directory.
         /// </remarks>
-        public static ResultHelper Clone(string? url, string? path, bool verbose = false)
+        public static ResultHelper Clone(string? url, string? path, bool verbose = false, bool dryRun = false)
         {
+            if (dryRun)
+            {
+                var msg = $"DRY-RUN: would clone {url} to {path ?? Environment.CurrentDirectory}";
+                ConsoleHelper.WriteLine(msg, ConsoleColor.Yellow);
+                return ResultHelper.Success(msg);
+            }
             var gitWrapper = new GitWrapper(verbose: verbose);
             if (string.IsNullOrEmpty(url))
             {
@@ -1177,8 +1225,10 @@ namespace Nbuild
         /// <summary>
         /// Deletes the specified tag.
         /// </summary>
-        /// <param name="tag">The string representing the tag to delete.</param>    
-        public static ResultHelper DeleteTag(string? tag)
+        /// <param name="tag">The string representing the tag to delete.</param>
+        /// <param name="verbose">Whether to display verbose output.</param>
+        /// <param name="dryRun">Whether to perform a dry run without making actual changes.</param>
+        public static ResultHelper DeleteTag(string? tag, bool verbose = false, bool dryRun = false)
         {
             var gitWrapper = new GitWrapper();
 
@@ -1188,6 +1238,34 @@ namespace Nbuild
                 Parser.DisplayHelp<Cli>(HelpFormat.Full);
                 return ResultHelper.Fail(-1, "Tag is required");
             }
+
+            if (dryRun)
+            {
+                // Check if tag exists locally or remotely to give accurate dry-run message
+                bool localExists = gitWrapper.LocalTagExists(tag);
+                bool remoteExists = gitWrapper.RemoteTagExists(tag);
+
+                if (localExists && remoteExists)
+                {
+                    ConsoleHelper.WriteLine($"DRY-RUN: Would delete tag '{tag}' from both local and remote repository", ConsoleColor.Yellow);
+                }
+                else if (localExists)
+                {
+                    ConsoleHelper.WriteLine($"DRY-RUN: Would delete tag '{tag}' from local repository", ConsoleColor.Yellow);
+                }
+                else if (remoteExists)
+                {
+                    ConsoleHelper.WriteLine($"DRY-RUN: Would delete tag '{tag}' from remote repository", ConsoleColor.Yellow);
+                }
+                else
+                {
+                    ConsoleHelper.WriteLine($"DRY-RUN: Tag '{tag}' does not exist locally or remotely - no action needed", ConsoleColor.Yellow);
+                }
+
+                ConsoleHelper.WriteLine("DRY-RUN: No actual changes will be made to the repository or remote.", ConsoleColor.Yellow);
+                return ResultHelper.Success();
+            }
+
             var result = gitWrapper.DeleteTag(tag) == true ? ResultHelper.Success() : ResultHelper.Fail(-1, "Delete tag failed");
             if (result.IsSuccess())
             {
@@ -1209,8 +1287,14 @@ namespace Nbuild
         /// It utilizes the ReleaseService to interact with the GitHub API.
         /// If the release creation is successful, it returns true; otherwise, it logs the error and returns false.
         /// </remarks>
-        public static async Task<ResultHelper> CreateRelease(string repo, string tag, string branch, string assetFileName, bool preRelease = false)
+        public static async Task<ResultHelper> CreateRelease(string repo, string tag, string branch, string assetFileName, bool preRelease = false, bool dryRun = false)
         {
+            if (dryRun)
+            {
+                var msg = $"DRY-RUN: would create {(preRelease ? "pre-release" : "release")} for {repo} with tag {tag} and asset {assetFileName}";
+                ConsoleHelper.WriteLine(msg, ConsoleColor.Yellow);
+                return ResultHelper.Success(msg);
+            }
             var releaseService = new ReleaseService(repo);
 
             var release = new Release
@@ -1249,8 +1333,14 @@ namespace Nbuild
         /// <remarks>
         /// This method ensures that the assetPath includes a file name and that the download directory exists before attempting to download the asset.
         /// </remarks>/// 
-        public static async Task<ResultHelper> DownloadAsset(string repo, string tag, string assetPath)
+        public static async Task<ResultHelper> DownloadAsset(string repo, string tag, string assetPath, bool dryRun = false)
         {
+            if (dryRun)
+            {
+                var msg = $"DRY-RUN: would download asset for {repo} tag {tag} to path {assetPath}";
+                ConsoleHelper.WriteLine(msg, ConsoleColor.Yellow);
+                return ResultHelper.Success(msg);
+            }
 
             // Ensure the assetPath is a directory
             if (!Directory.Exists(assetPath))
@@ -1309,11 +1399,17 @@ namespace Nbuild
             throw new NotImplementedException();
         }
 
-        public static async Task<ResultHelper> ListReleases(string repo, bool verbose = false)
+        public static async Task<ResultHelper> ListReleases(string repo, bool verbose = false, bool dryRun = false)
         {
             if (verbose)
             {
                 ConsoleHelper.WriteLine($"Verbose mode enabled", ConsoleColor.Yellow);
+            }
+
+            if (dryRun)
+            {
+                ConsoleHelper.WriteLine($"DRY-RUN: performing read-only fetch for repository: {repo}", ConsoleColor.Yellow);
+                ConsoleHelper.WriteLine($"DRY-RUN: no state-changing operations will be performed.", ConsoleColor.Yellow);
             }
 
             var releaseService = new ReleaseService(repo);
@@ -1356,7 +1452,12 @@ namespace Nbuild
                 }
             }
             ConsoleHelper.WriteLine($"----------------------------------------", ConsoleColor.Yellow);
-            return ResultHelper.Success();
+
+            var successMessage = dryRun
+                ? "DRY-RUN: successfully performed read-only fetch of releases"
+                : "Successfully listed releases";
+
+            return ResultHelper.Success(successMessage);
         }
     }
 }

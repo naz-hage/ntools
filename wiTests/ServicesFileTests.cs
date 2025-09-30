@@ -1,5 +1,3 @@
-using wi;
-
 [TestClass]
 public class ServicesFileTests
 {

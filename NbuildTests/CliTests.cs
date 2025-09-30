@@ -1,6 +1,4 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Threading.Tasks;
 
 namespace Nbuild.Tests
 {
@@ -236,7 +234,7 @@ namespace Nbuild.Tests
         public async Task ValidateRepo_ValidRepo_ShouldPass()
         {
             // Arrange
-            var cli = new Cli() 
+            var cli = new Cli()
             {
                 Repo = "naz-hage/ntools"
             };
@@ -289,7 +287,7 @@ namespace Nbuild.Tests
 
             // Verify the exception message is appropriate
             Assert.IsNotNull(exception, "Expected ArgumentException to be thrown");
-            Assert.IsTrue(exception.Message.Contains("invalid/repo"), 
+            Assert.IsTrue(exception.Message.Contains("invalid/repo"),
                 "Exception message should mention the invalid repository");
         }
 
@@ -301,14 +299,14 @@ namespace Nbuild.Tests
 
             // Get the current OWNER value (should be the original value restored by TestCleanup)
             var currentOwner = Environment.GetEnvironmentVariable("OWNER");
-            
+
             // Modify the OWNER environment variable
             Environment.SetEnvironmentVariable("OWNER", "test-owner-value");
-            
+
             // Verify the change
-            Assert.AreEqual("test-owner-value", Environment.GetEnvironmentVariable("OWNER"), 
+            Assert.AreEqual("test-owner-value", Environment.GetEnvironmentVariable("OWNER"),
                 "OWNER should be set to test value");
-                
+
             // Note: TestCleanup will automatically restore the original value
             // This test demonstrates that environment variables are properly managed
         }

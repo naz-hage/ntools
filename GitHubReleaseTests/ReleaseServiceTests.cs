@@ -1,8 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using GitHubRelease;
+﻿using System.Net;
 using System.Text.Json;
-using Newtonsoft.Json.Linq;
-using System.Net;
 
 namespace GitHubRelease.Tests
 {

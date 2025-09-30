@@ -1,4 +1,3 @@
-using System;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Security;
@@ -127,7 +126,7 @@ namespace GitHubRelease
             return ConvertToUnsecureString(GetSecureToken());
         }
 
-/// <summary>
+        /// <summary>
         /// Retrieves a token from the Windows Credential Manager.
         /// </summary>
         /// <param name="target">The target application name.</param>

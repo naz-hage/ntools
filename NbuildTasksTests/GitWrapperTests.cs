@@ -348,7 +348,7 @@ namespace NbuildTasks.Tests
             // reinitialize tag in case no tags are left
             Assert.IsNotNull(InitTag());
         }
-        
+
         [TestMethod()]
         public void ListBranchesTest()
         {
@@ -377,7 +377,7 @@ namespace NbuildTasks.Tests
             Assert.IsTrue(GitWrapper.SetTag(tag));
             // Arrange add a tag
             tag = GitWrapper.SetAutoTag(Enums.BuildType.STAGE.ToString());
-            
+
             Assert.IsNotNull(tag);
 
             // Act
@@ -438,7 +438,7 @@ namespace NbuildTasks.Tests
         public void SetWorkingDirTest()
         {
             // Arrange
-            var gitWrapper = new GitWrapper(project: null, verbose: true, testMode:true);
+            var gitWrapper = new GitWrapper(project: null, verbose: true, testMode: true);
 
             var workingDir = ProjectName;
             var solutionDir = $@"{gitWrapper.DevDrive}\{gitWrapper.MainDir}\{ProjectName}";
