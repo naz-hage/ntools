@@ -136,9 +136,9 @@ namespace Nbuild
             cmd.AddOption(verboseOption);
             cmd.SetHandler((verbose) =>
             {
-                var result = Command.DisplayPathSegments();
+                PathManager.DisplayPathSegments();
                 if (verbose) ConsoleHelper.WriteLine("[VERBOSE] Displaying PATH segments.", ConsoleColor.Gray);
-                Environment.ExitCode = result.Code;
+                Environment.ExitCode = 0;
             }, verboseOption);
             rootCommand.AddCommand(cmd);
         }

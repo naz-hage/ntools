@@ -4,6 +4,7 @@
 //          safe, testable, and consistent PATH manipulation.
 // -----------------------------------------------------------------------------
 using System;
+using Nbuild;
 
 namespace Nbuild.Services
 {
@@ -78,14 +79,17 @@ namespace Nbuild.Services
         /// <summary>
         /// Removes a path segment from the user PATH if it exists.
         /// </summary>
-        /// <param name="pathSegment">The path segment to remove. If null or empty, no action is taken.</param>
+        /// <param name="pathSegment">The path segment to remove.</param>
+        /// <exception cref="ArgumentNullException">Thrown when the path segment is null or empty.</exception>
         /// <remarks>
         /// This operation is idempotent - removing a non-existent path has no effect.
         /// </remarks>
-        public static void RemovePath(string? pathSegment)
+        public static void RemovePath(string pathSegment)
         {
             if (string.IsNullOrWhiteSpace(pathSegment))
-                return;
+            {
+                throw new ArgumentNullException(nameof(pathSegment));
+            }
 
             var currentPath = GetUserPath();
             var segments = GetPathSegments(currentPath);
@@ -99,6 +103,7 @@ namespace Nbuild.Services
             {
                 var newPath = string.Join(PathSeparator.ToString(), filteredSegments);
                 SetUserPath(newPath);
+                ConsoleHelper.WriteLine($"√ {pathSegment} removed from user PATH.", ConsoleColor.Green);
             }
         }
 
@@ -159,6 +164,57 @@ namespace Nbuild.Services
         }
 
         /// <summary>
+        /// Removes duplicate path segments from the PATH string and returns the unique segments.
+        /// </summary>
+        /// <param name="path">The PATH string to process.</param>
+        /// <returns>An array of unique path segments.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when the path is null or empty.</exception>
+        public static string[] RemoveDuplicatePathSegments(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+
+            var deduplicatedPath = DeduplicateAndRewrite(path);
+            return GetPathSegments(deduplicatedPath);
+        }
+
+        /// <summary>
+        /// Displays the current PATH segments to the console.
+        /// </summary>
+        public static void DisplayPathSegments()
+        {
+            var path = GetUserPath();
+            var pathSegments = RemoveDuplicatePathSegments(path);
+            ConsoleHelper.WriteLine($"PATH Segments:", ConsoleColor.Yellow);
+            foreach (var segment in pathSegments)
+            {
+                Console.WriteLine($" '{segment}'");
+            }
+        }
+
+        /// <summary>
+        /// Checks if a path segment is present in the user PATH environment variable.
+        /// </summary>
+        /// <param name="pathSegment">The path segment to check. If null or empty, returns false.</param>
+        /// <returns>True if the path segment is present in the PATH, otherwise false.</returns>
+        /// <remarks>
+        /// This method performs a case-insensitive comparison.
+        /// </remarks>
+        public static bool IsPathPresent(string? pathSegment)
+        {
+            if (string.IsNullOrWhiteSpace(pathSegment))
+                return false;
+
+            var currentPath = GetUserPath();
+            var segments = GetPathSegments(currentPath);
+
+            var normalizedSegment = pathSegment.Trim();
+            return segments.Any(s => string.Equals(s, normalizedSegment, StringComparison.OrdinalIgnoreCase));
+        }
+
+        /// <summary>
         /// Creates a snapshot of the current user PATH for later restoration.
         /// Useful for tests that need to temporarily modify PATH.
         /// </summary>
@@ -179,6 +235,32 @@ namespace Nbuild.Services
                 throw new ArgumentNullException(nameof(snapshot));
 
             SetUserPath(snapshot.OriginalPath);
+        }
+
+        /// <summary>
+        /// Adds the application's install path to the user PATH environment variable.
+        /// </summary>
+        /// <param name="installPath">The install path to add to the PATH.</param>
+        /// <exception cref="ArgumentNullException">Thrown when the install path is null or empty.</exception>
+        /// <remarks>
+        /// This method checks if the install path is already present in the user PATH environment variable.
+        /// If not, it adds the install path to the PATH. It also logs the action using the Colorizer.
+        /// </remarks>
+        public static void AddAppInstallPathToEnvironmentPath(string installPath)
+        {
+            if (string.IsNullOrEmpty(installPath))
+            {
+                throw new ArgumentNullException(nameof(installPath));
+            }
+
+            if (IsPathPresent(installPath))
+            {
+                ConsoleHelper.WriteLine($"{installPath} is already in PATH.", ConsoleColor.Yellow);
+                return;
+            }
+
+            AddPath(installPath);
+            ConsoleHelper.WriteLine($"√ {installPath} added to user PATH.", ConsoleColor.Green);
         }
     }
 
