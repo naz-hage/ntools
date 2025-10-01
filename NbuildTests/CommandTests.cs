@@ -1,5 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Nbuild;
+using Nbuild.Services;
 using NbuildTasks;
 using Ntools;
 using System.Collections;
@@ -700,18 +701,18 @@ namespace NbuildTests
             {
                 InstallPath = TestPath
             };
-            var originalPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User);
-            Environment.SetEnvironmentVariable("PATH", string.Empty, EnvironmentVariableTarget.User);
+            var snapshot = PathManager.CreateSnapshot();
+            PathManager.DeduplicateAndRewrite(string.Empty); // Set PATH to empty
 
             // Act
             Command.AddAppInstallPathToEnvironmentPath(nbuildApp);
-            var updatedPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User);
+            var updatedPath = PathManager.GetUserPath();
 
             // Assert
-            Assert.IsTrue(updatedPath!.Contains(nbuildApp.InstallPath));
+            Assert.IsTrue(updatedPath.Contains(nbuildApp.InstallPath));
 
             // Cleanup
-            Environment.SetEnvironmentVariable("PATH", originalPath, EnvironmentVariableTarget.User);
+            PathManager.RestoreSnapshot(snapshot);
         }
 
         [TestMethod]
@@ -729,26 +730,26 @@ namespace NbuildTests
             {
                 InstallPath = TestPath
             };
-            var originalPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User);
-            var originalPathCount = originalPath!.Split(';').Length;
+            var snapshot = PathManager.CreateSnapshot();
+            var originalPath = PathManager.GetUserPath();
+            var originalPathCount = PathManager.GetPathSegments(originalPath).Length;
             if (!Command.IsAppInstallPathInEnvironmentPath(nbuildApp))
             {
-                Environment.SetEnvironmentVariable("PATH", $"{nbuildApp.InstallPath};{originalPath}", EnvironmentVariableTarget.User);
+                PathManager.AddPath(nbuildApp.InstallPath);
             }
 
-            var updatedPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User);
+            var updatedPath = PathManager.GetUserPath();
 
             // Act
             Command.AddAppInstallPathToEnvironmentPath(nbuildApp);
-            updatedPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User);
+            updatedPath = PathManager.GetUserPath();
 
             // Assert
-            var pathCount = updatedPath!.Split(';').Length;
-            Assert.AreEqual(pathCount, originalPath!.Split(';').Length + 1);
+            var pathCount = PathManager.GetPathSegments(updatedPath).Length;
+            Assert.AreEqual(pathCount, originalPathCount + 1);
 
             // Cleanup
-            Environment.SetEnvironmentVariable("PATH", originalPath, EnvironmentVariableTarget.User);
-
+            PathManager.RestoreSnapshot(snapshot);
             Command.RemoveAppInstallPathFromEnvironmentPath(nbuildApp);
         }
 
@@ -815,18 +816,18 @@ namespace NbuildTests
             {
                 InstallPath = TestPath
             };
-            var originalPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User);
-            Environment.SetEnvironmentVariable("PATH", $"{TestPath};{originalPath}", EnvironmentVariableTarget.User);
+            var snapshot = PathManager.CreateSnapshot();
+            PathManager.AddPath(TestPath);
 
             // Act
             Command.RemoveAppInstallPathFromEnvironmentPath(nbuildApp);
-            var updatedPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User);
+            var updatedPath = PathManager.GetUserPath();
 
             // Assert
-            Assert.IsFalse(updatedPath!.Contains(nbuildApp.InstallPath));
+            Assert.IsFalse(updatedPath.Contains(nbuildApp.InstallPath));
 
             // Cleanup
-            Environment.SetEnvironmentVariable("PATH", originalPath, EnvironmentVariableTarget.User);
+            PathManager.RestoreSnapshot(snapshot);
         }
 
         [TestMethod]
@@ -849,18 +850,18 @@ namespace NbuildTests
                 Command.RemoveAppInstallPathFromEnvironmentPath(nbuildApp);
             }
 
-            var originalPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User);
-            Environment.SetEnvironmentVariable("PATH", originalPath, EnvironmentVariableTarget.User);
+            var snapshot = PathManager.CreateSnapshot();
+            var originalPath = PathManager.GetUserPath();
 
             // Act
             Command.RemoveAppInstallPathFromEnvironmentPath(nbuildApp);
-            var updatedPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User);
+            var updatedPath = PathManager.GetUserPath();
 
             // Assert
             Assert.AreEqual(originalPath, updatedPath);
 
             // Cleanup
-            Environment.SetEnvironmentVariable("PATH", originalPath, EnvironmentVariableTarget.User);
+            PathManager.RestoreSnapshot(snapshot);
         }
 
         [TestMethod]

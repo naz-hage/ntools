@@ -1,5 +1,6 @@
 ﻿using CommandLine;
 using GitHubRelease;
+using Nbuild.Services;
 using NbuildTasks;
 using Ntools;
 using System.ComponentModel.DataAnnotations;
@@ -580,22 +581,9 @@ namespace Nbuild
                 ConsoleHelper.WriteLine($"{nbuildApp.InstallPath} is already in PATH.", ConsoleColor.Yellow);
                 return;
             }
-            var path = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User) ?? string.Empty;
-            var pathCount = path.Split(";").Length;
-            if (!path.Split(';').Contains(nbuildApp.InstallPath, StringComparer.OrdinalIgnoreCase))
-            {
-                if (!path.Split(';').Contains(nbuildApp.InstallPath, StringComparer.OrdinalIgnoreCase))
-                {
-                    path = $"{nbuildApp.InstallPath};{path}";
-                }
-                pathCount = path.Split(";").Length;
-                Environment.SetEnvironmentVariable("PATH", path, EnvironmentVariableTarget.User);
-                ConsoleHelper.WriteLine($"√ {nbuildApp.InstallPath} added to user PATH.", ConsoleColor.Green);
-            }
-            else
-            {
-                ConsoleHelper.WriteLine($"{nbuildApp.InstallPath} is already in PATH.", ConsoleColor.Yellow);
-            }
+
+            PathManager.AddPath(nbuildApp.InstallPath);
+            ConsoleHelper.WriteLine($"√ {nbuildApp.InstallPath} added to user PATH.", ConsoleColor.Green);
         }
 
 
@@ -964,20 +952,8 @@ namespace Nbuild
                 throw new ArgumentNullException(nameof(nbuildApp.InstallPath));
             }
 
-            var path = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User) ?? string.Empty;
-            List<string> pathSegments = PathToSegments(path);
-
-            if (pathSegments.Contains(nbuildApp.InstallPath, StringComparer.OrdinalIgnoreCase))
-            {
-                pathSegments.RemoveAll(p => p.Equals(nbuildApp.InstallPath, StringComparison.OrdinalIgnoreCase));
-                var updatedPath = string.Join(';', pathSegments);
-                Environment.SetEnvironmentVariable("PATH", updatedPath, EnvironmentVariableTarget.User);
-                ConsoleHelper.WriteLine($"√ {nbuildApp.InstallPath} removed from user PATH.", ConsoleColor.Green);
-            }
-            else
-            {
-                ConsoleHelper.WriteLine($"{nbuildApp.InstallPath} is not in PATH.", ConsoleColor.Yellow);
-            }
+            PathManager.RemovePath(nbuildApp.InstallPath);
+            ConsoleHelper.WriteLine($"√ {nbuildApp.InstallPath} removed from user PATH.", ConsoleColor.Green);
         }
 
         /// <summary>
@@ -1047,13 +1023,8 @@ namespace Nbuild
                 throw new ArgumentNullException(nameof(path));
             }
 
-            var pathSegments = PathToSegments(path);
-            var uniqueSegments = pathSegments.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
-
-            // Add the renewed segments to the PATH environment variable
-            var renewedPath = string.Join(';', uniqueSegments);
-            Environment.SetEnvironmentVariable("PATH", renewedPath, EnvironmentVariableTarget.User);
-            return uniqueSegments;
+            var deduplicatedPath = PathManager.DeduplicateAndRewrite(path);
+            return PathToSegments(deduplicatedPath);
         }
 
         /// <summary>
