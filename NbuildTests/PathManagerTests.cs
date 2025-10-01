@@ -241,40 +241,40 @@ namespace NbuildTests
         }
 
         [TestMethod]
-        public void DeduplicateAndRewrite_PathWithDuplicates_RemovesDuplicates()
+        public void RemoveDuplicatePathSegments_PathWithDuplicates_RemovesDuplicates()
         {
             // Arrange
             var testPath = @"C:\Windows;C:\Program Files;C:\Windows;C:\Temp;C:\Program Files";
 
             // Act
-            var result = PathManager.DeduplicateAndRewrite(testPath);
+            var result = PathManager.RemoveDuplicatePathSegments(testPath);
 
             // Assert
             Assert.AreEqual(@"C:\Windows;C:\Program Files;C:\Temp", result);
         }
 
         [TestMethod]
-        public void DeduplicateAndRewrite_PathWithCaseDuplicates_RemovesDuplicates()
+        public void RemoveDuplicatePathSegments_PathWithCaseDuplicates_RemovesDuplicates()
         {
             // Arrange
             var testPath = @"C:\Windows;c:\windows;C:\Program Files";
 
             // Act
-            var result = PathManager.DeduplicateAndRewrite(testPath);
+            var result = PathManager.RemoveDuplicatePathSegments(testPath);
 
             // Assert
             Assert.AreEqual(@"C:\Windows;C:\Program Files", result);
         }
 
         [TestMethod]
-        public void DeduplicateAndRewrite_NullPath_UpdatesUserPath()
+        public void RemoveDuplicatePathSegments_NullPath_UpdatesUserPath()
         {
             // Arrange
             var originalPath = @"C:\Windows;C:\Program Files;C:\Windows";
             PathManager.SetUserPath(originalPath);
 
             // Act
-            var result = PathManager.DeduplicateAndRewrite();
+            var result = PathManager.RemoveDuplicatePathSegments();
 
             // Assert
             Assert.AreEqual(@"C:\Windows;C:\Program Files", result);
@@ -282,13 +282,13 @@ namespace NbuildTests
         }
 
         [TestMethod]
-        public void DeduplicateAndRewrite_NoDuplicates_ReturnsSamePath()
+        public void RemoveDuplicatePathSegments_NoDuplicates_ReturnsSamePath()
         {
             // Arrange
             var testPath = @"C:\Windows;C:\Program Files;C:\Temp";
 
             // Act
-            var result = PathManager.DeduplicateAndRewrite(testPath);
+            var result = PathManager.RemoveDuplicatePathSegments(testPath);
 
             // Assert
             Assert.AreEqual(testPath, result);

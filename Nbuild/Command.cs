@@ -855,7 +855,6 @@ namespace Nbuild
 
         }
 
-        // Update variables with $(...).  This should be called after validation of the appData
         private static void UpdateEnvironmentVariables(NbuildApp nbuildApp)
         {
             if (!ValidJson) throw new InvalidOperationException("Json is not valid");

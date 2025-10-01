@@ -135,7 +135,7 @@ namespace Nbuild.Services
         /// Input: "C:\a;C:\b;C:\a;C:\c"
         /// Output: "C:\a;C:\b;C:\c"
         /// </remarks>
-        public static string DeduplicateAndRewrite(string? path = null)
+        public static string RemoveDuplicatePathSegments(string? path = null)
         {
             var pathToProcess = path ?? GetUserPath();
             var segments = GetPathSegments(pathToProcess);
@@ -162,24 +162,7 @@ namespace Nbuild.Services
 
             return deduplicatedPath;
         }
-
-        /// <summary>
-        /// Removes duplicate path segments from the PATH string and returns the unique segments.
-        /// </summary>
-        /// <param name="path">The PATH string to process.</param>
-        /// <returns>An array of unique path segments.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when the path is null or empty.</exception>
-        public static string[] RemoveDuplicatePathSegments(string path)
-        {
-            if (string.IsNullOrEmpty(path))
-            {
-                throw new ArgumentNullException(nameof(path));
-            }
-
-            var deduplicatedPath = DeduplicateAndRewrite(path);
-            return GetPathSegments(deduplicatedPath);
-        }
-
+ 
         /// <summary>
         /// Displays the current PATH segments to the console.
         /// </summary>
