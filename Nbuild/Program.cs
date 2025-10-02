@@ -131,7 +131,7 @@ namespace Nbuild
 
         private static void AddPathCommand(RootCommand rootCommand)
         {
-            var cmd = new System.CommandLine.Command("path", "Display each segment of your PATH environment variable on a separate line. Similar to 'echo %PATH%'.");
+            var cmd = new System.CommandLine.Command("path", "Display each segment of the effective PATH environment variable on a separate line, with duplicates removed. Shows the complete PATH that processes actually use (Machine + User PATH combined).");
             var verboseOption = new Option<bool>("--verbose", "Verbose output");
             cmd.AddOption(verboseOption);
             cmd.SetHandler((verbose) =>
