@@ -165,7 +165,7 @@ namespace Nbuild.Services
         /// </summary>
         public static void DisplayPathSegments()
         {
-            var path = GetUserPath();
+            var path = Environment.GetEnvironmentVariable("PATH") ?? string.Empty;
             var pathSegments = RemoveDuplicatePathSegments(path);
             ConsoleHelper.WriteLine($"PATH Segments:", ConsoleColor.Yellow);
             foreach (var segment in GetPathSegments(pathSegments))
