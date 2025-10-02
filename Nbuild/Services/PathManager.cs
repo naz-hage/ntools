@@ -79,17 +79,14 @@ namespace Nbuild.Services
         /// <summary>
         /// Removes a path segment from the user PATH if it exists.
         /// </summary>
-        /// <param name="pathSegment">The path segment to remove.</param>
-        /// <exception cref="ArgumentNullException">Thrown when the path segment is null or empty.</exception>
+        /// <param name="pathSegment">The path segment to remove. If null or empty, no action is taken.</param>
         /// <remarks>
-        /// This operation is idempotent - removing a non-existent path has no effect.
+        /// This operation is idempotent - removing a non-existent or empty path has no effect.
         /// </remarks>
-        public static void RemovePath(string pathSegment)
+        public static void RemovePath(string? pathSegment)
         {
             if (string.IsNullOrWhiteSpace(pathSegment))
-            {
-                throw new ArgumentNullException(nameof(pathSegment));
-            }
+                return;
 
             var currentPath = GetUserPath();
             var segments = GetPathSegments(currentPath);
@@ -171,7 +168,7 @@ namespace Nbuild.Services
             var path = GetUserPath();
             var pathSegments = RemoveDuplicatePathSegments(path);
             ConsoleHelper.WriteLine($"PATH Segments:", ConsoleColor.Yellow);
-            foreach (var segment in pathSegments)
+            foreach (var segment in GetPathSegments(pathSegments))
             {
                 Console.WriteLine($" '{segment}'");
             }
@@ -223,18 +220,15 @@ namespace Nbuild.Services
         /// <summary>
         /// Adds the application's install path to the user PATH environment variable.
         /// </summary>
-        /// <param name="installPath">The install path to add to the PATH.</param>
-        /// <exception cref="ArgumentNullException">Thrown when the install path is null or empty.</exception>
+        /// <param name="installPath">The install path to add to the PATH. If null or empty, no action is taken.</param>
         /// <remarks>
         /// This method checks if the install path is already present in the user PATH environment variable.
         /// If not, it adds the install path to the PATH. It also logs the action using the Colorizer.
         /// </remarks>
-        public static void AddAppInstallPathToEnvironmentPath(string installPath)
+        public static void AddAppInstallPathToEnvironmentPath(string? installPath)
         {
-            if (string.IsNullOrEmpty(installPath))
-            {
-                throw new ArgumentNullException(nameof(installPath));
-            }
+            if (string.IsNullOrWhiteSpace(installPath))
+                return;
 
             if (IsPathPresent(installPath))
             {
@@ -250,7 +244,7 @@ namespace Nbuild.Services
     /// <summary>
     /// Represents a snapshot of the PATH environment variable for safe restoration.
     /// </summary>
-    public class PathSnapshot
+    public sealed class PathSnapshot
     {
         /// <summary>
         /// Gets the original PATH value captured in this snapshot.
@@ -261,7 +255,7 @@ namespace Nbuild.Services
         /// Initializes a new instance of the PathSnapshot class.
         /// </summary>
         /// <param name="originalPath">The original PATH value to store.</param>
-        public PathSnapshot(string originalPath)
+        public PathSnapshot(string? originalPath)
         {
             OriginalPath = originalPath ?? string.Empty;
         }

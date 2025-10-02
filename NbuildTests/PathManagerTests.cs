@@ -10,6 +10,7 @@ using System;
 namespace NbuildTests
 {
     [TestClass]
+    [DoNotParallelize]
     public class PathManagerTests
     {
         private PathSnapshot? _snapshot;
@@ -175,29 +176,47 @@ namespace NbuildTests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void RemovePath_EmptyPath_ThrowsException()
+        public void RemovePath_EmptyPath_NoAction()
         {
+            // Arrange
+            var originalPath = @"C:\Windows;C:\Program Files";
+            PathManager.SetUserPath(originalPath);
+
             // Act
             PathManager.RemovePath(string.Empty);
+
+            // Assert
+            Assert.AreEqual(originalPath, PathManager.GetUserPath());
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void RemovePath_NullPath_ThrowsException()
+        public void RemovePath_NullPath_NoAction()
         {
+            // Arrange
+            var originalPath = @"C:\Windows;C:\Program Files";
+            PathManager.SetUserPath(originalPath);
+
             // Act
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type
             PathManager.RemovePath(null);
 #pragma warning restore CS8625
+
+            // Assert
+            Assert.AreEqual(originalPath, PathManager.GetUserPath());
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void RemovePath_WhitespacePath_ThrowsException()
+        public void RemovePath_WhitespacePath_NoAction()
         {
+            // Arrange
+            var originalPath = @"C:\Windows;C:\Program Files";
+            PathManager.SetUserPath(originalPath);
+
             // Act
             PathManager.RemovePath("   ");
+
+            // Assert
+            Assert.AreEqual(originalPath, PathManager.GetUserPath());
         }
 
         [TestMethod]
@@ -505,25 +524,39 @@ namespace NbuildTests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void AddAppInstallPathToEnvironmentPath_ThrowsException_WhenInstallPathIsNull()
+        public void AddAppInstallPathToEnvironmentPath_NullPath_NoAction()
         {
+            // Arrange
+            var snapshot = PathManager.CreateSnapshot();
+            var originalPath = PathManager.GetUserPath();
+
             // Act
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type
             PathManager.AddAppInstallPathToEnvironmentPath(null);
 #pragma warning restore CS8625
 
-            // Assert is handled by ExpectedException
+            // Assert
+            Assert.AreEqual(originalPath, PathManager.GetUserPath());
+
+            // Cleanup
+            PathManager.RestoreSnapshot(snapshot);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void AddAppInstallPathToEnvironmentPath_ThrowsException_WhenInstallPathIsEmpty()
+        public void AddAppInstallPathToEnvironmentPath_EmptyPath_NoAction()
         {
+            // Arrange
+            var snapshot = PathManager.CreateSnapshot();
+            var originalPath = PathManager.GetUserPath();
+
             // Act
             PathManager.AddAppInstallPathToEnvironmentPath(string.Empty);
 
-            // Assert is handled by ExpectedException
+            // Assert
+            Assert.AreEqual(originalPath, PathManager.GetUserPath());
+
+            // Cleanup
+            PathManager.RestoreSnapshot(snapshot);
         }
     }
 }
