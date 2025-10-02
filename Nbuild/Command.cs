@@ -855,6 +855,11 @@ namespace Nbuild
 
         }
 
+        /// <summary>  
+        /// Updates the properties of the given NbuildApp instance by replacing placeholder variables  
+        /// (e.g., $(Version), $(ProgramFiles), $(AppFileName), etc.) with their actual values.  
+        /// This prepares the app configuration for use in the build process.  
+        /// </summary> 
         private static void UpdateEnvironmentVariables(NbuildApp nbuildApp)
         {
             if (!ValidJson) throw new InvalidOperationException("Json is not valid");
