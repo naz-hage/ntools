@@ -1,5 +1,6 @@
 ﻿using CommandLine;
 using GitHubRelease;
+using Nbuild.Services;
 using NbuildTasks;
 using Ntools;
 using System.ComponentModel.DataAnnotations;
@@ -534,7 +535,7 @@ namespace Nbuild
                 {
                     if (nbuildApp.AddToPath == true && !TestMode)
                     {
-                        AddAppInstallPathToEnvironmentPath(nbuildApp);
+                        PathManager.AddAppInstallPathToEnvironmentPath(nbuildApp.InstallPath);
                     }
 
                     // Check if the app was installed successfully
@@ -556,45 +557,6 @@ namespace Nbuild
             else
             {
                 return ResultHelper.Fail(-1, $"Failed to download {nbuildApp.WebDownloadFile} to {nbuildApp.DownloadedFile}. {result.GetFirstOutput()}");
-            }
-        }
-
-        /// <summary>
-        /// Adds the application's install path to the user PATH environment variable.
-        /// </summary>
-        /// <param name="nbuildApp">The application details containing the install path.</param>
-        /// <exception cref="ArgumentNullException">Thrown when the install path is null or empty.</exception>
-        /// <remarks>
-        /// This method checks if the install path is already present in the user PATH environment variable.
-        /// If not, it adds the install path to the PATH. It also logs the action using the Colorizer.
-        /// </remarks>
-        public static void AddAppInstallPathToEnvironmentPath(NbuildApp nbuildApp)
-        {
-            if (string.IsNullOrEmpty(nbuildApp.InstallPath))
-            {
-                throw new ArgumentNullException(nameof(nbuildApp.InstallPath));
-            }
-
-            if (IsAppInstallPathInEnvironmentPath(nbuildApp))
-            {
-                ConsoleHelper.WriteLine($"{nbuildApp.InstallPath} is already in PATH.", ConsoleColor.Yellow);
-                return;
-            }
-            var path = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User) ?? string.Empty;
-            var pathCount = path.Split(";").Length;
-            if (!path.Split(';').Contains(nbuildApp.InstallPath, StringComparer.OrdinalIgnoreCase))
-            {
-                if (!path.Split(';').Contains(nbuildApp.InstallPath, StringComparer.OrdinalIgnoreCase))
-                {
-                    path = $"{nbuildApp.InstallPath};{path}";
-                }
-                pathCount = path.Split(";").Length;
-                Environment.SetEnvironmentVariable("PATH", path, EnvironmentVariableTarget.User);
-                ConsoleHelper.WriteLine($"√ {nbuildApp.InstallPath} added to user PATH.", ConsoleColor.Green);
-            }
-            else
-            {
-                ConsoleHelper.WriteLine($"{nbuildApp.InstallPath} is already in PATH.", ConsoleColor.Yellow);
             }
         }
 
@@ -722,7 +684,7 @@ namespace Nbuild
                 // remove the app install path from the system PATH environment variable
                 if (nbuildApp.AddToPath == true)
                 {
-                    RemoveAppInstallPathFromEnvironmentPath(nbuildApp);
+                    PathManager.RemovePath(nbuildApp.InstallPath!);
                 }
 
                 ConsoleHelper.WriteLine($"√ {nbuildApp.Name} {nbuildApp.Version} Uninstalled.", ConsoleColor.Green);
@@ -893,7 +855,11 @@ namespace Nbuild
 
         }
 
-        // Update variables with $(...).  This should be called after validation of the appData
+        /// <summary>  
+        /// Updates the properties of the given NbuildApp instance by replacing placeholder variables  
+        /// (e.g., $(Version), $(ProgramFiles), $(AppFileName), etc.) with their actual values.  
+        /// This prepares the app configuration for use in the build process.  
+        /// </summary> 
         private static void UpdateEnvironmentVariables(NbuildApp nbuildApp)
         {
             if (!ValidJson) throw new InvalidOperationException("Json is not valid");
@@ -947,113 +913,6 @@ namespace Nbuild
 
 
             if (!Path.IsPathRooted(nbuildApp.InstallPath)) throw new ParserException($"App: {nbuildApp.Name}, InstallPath {nbuildApp.InstallPath} must be rooted. i.e. C:\\Program Files\\Nbuild", null);
-        }
-        /// <summary>
-        /// Removes the application's install path from the user PATH environment variable.
-        /// </summary>
-        /// <param name="nbuildApp">The application details containing the install path.</param>
-        /// <exception cref="ArgumentNullException">Thrown when the install path is null or empty.</exception>
-        /// <remarks>
-        /// This method checks if the install path is present in the user PATH environment variable.
-        /// If it is, it removes the install path from the PATH. It also logs the action using the Colorizer.
-        /// </remarks>
-        public static void RemoveAppInstallPathFromEnvironmentPath(NbuildApp nbuildApp)
-        {
-            if (string.IsNullOrEmpty(nbuildApp.InstallPath))
-            {
-                throw new ArgumentNullException(nameof(nbuildApp.InstallPath));
-            }
-
-            var path = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User) ?? string.Empty;
-            List<string> pathSegments = PathToSegments(path);
-
-            if (pathSegments.Contains(nbuildApp.InstallPath, StringComparer.OrdinalIgnoreCase))
-            {
-                pathSegments.RemoveAll(p => p.Equals(nbuildApp.InstallPath, StringComparison.OrdinalIgnoreCase));
-                var updatedPath = string.Join(';', pathSegments);
-                Environment.SetEnvironmentVariable("PATH", updatedPath, EnvironmentVariableTarget.User);
-                ConsoleHelper.WriteLine($"√ {nbuildApp.InstallPath} removed from user PATH.", ConsoleColor.Green);
-            }
-            else
-            {
-                ConsoleHelper.WriteLine($"{nbuildApp.InstallPath} is not in PATH.", ConsoleColor.Yellow);
-            }
-        }
-
-        /// <summary>
-        /// Converts a PATH environment variable string into a list of individual path segments.
-        /// </summary>
-        /// <param name="path">The PATH environment variable string.</param>
-        /// <returns>A list of individual path segments.</returns>
-        /// <remarks>
-        /// This method splits the PATH environment variable string into individual segments
-        /// using the semicolon (';') as a delimiter. It also removes any empty entries from the result.
-        /// The use of the coalescing operator ensures that the method handles null or empty input gracefully.
-        /// </remarks>
-        private static List<string> PathToSegments(string path)
-        {
-            return [.. path.Split(';', StringSplitOptions.RemoveEmptyEntries)];
-        }
-
-        /// <summary>
-        /// Checks if the application's install path is present in the user PATH environment variable.
-        /// </summary>
-        /// <param name="nbuildApp">The application details containing the install path.</param>
-        /// <returns>True if the install path is present in the PATH, otherwise false.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when the install path is null or empty.</exception>
-        /// <remarks>
-        /// This method checks if the install path is present in the user PATH environment variable.
-        /// It returns true if the path is found, otherwise false.
-        /// </remarks>
-        public static bool IsAppInstallPathInEnvironmentPath(NbuildApp nbuildApp)
-        {
-            if (string.IsNullOrEmpty(nbuildApp.InstallPath))
-            {
-                throw new ArgumentNullException(nameof(nbuildApp.InstallPath));
-            }
-
-            var path = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User) ?? string.Empty;
-            var pathSegments = path.Split(';', StringSplitOptions.RemoveEmptyEntries).ToList();
-
-            return pathSegments.Contains(nbuildApp.InstallPath, StringComparer.OrdinalIgnoreCase);
-        }
-
-        public static ResultHelper DisplayPathSegments()
-        {
-            var path = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User) ?? string.Empty;
-            var pathSegments = RemoveDuplicatePathSegments(path);
-            ConsoleHelper.WriteLine($"PATH Segments:", ConsoleColor.Yellow);
-            foreach (var segment in pathSegments)
-            {
-                Console.WriteLine($" '{segment}'");
-
-            }
-            return ResultHelper.Success();
-        }
-
-        /// <summary>
-        /// removes any duplicate entries, and returns a list of unique segments.
-        /// </remarks>
-        /// <example>
-        /// <code>
-        /// var uniqueSegments = Command.RemoveDuplicatePathSegments(Environment.GetEnvironmentVariable("PATH"));
-        /// </code>
-        /// </example>
-        /// <exception cref="ArgumentNullException">Thrown when the path is null or empty.</exception>
-        public static List<string> RemoveDuplicatePathSegments(string path)
-        {
-            if (string.IsNullOrEmpty(path))
-            {
-                throw new ArgumentNullException(nameof(path));
-            }
-
-            var pathSegments = PathToSegments(path);
-            var uniqueSegments = pathSegments.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
-
-            // Add the renewed segments to the PATH environment variable
-            var renewedPath = string.Join(';', uniqueSegments);
-            Environment.SetEnvironmentVariable("PATH", renewedPath, EnvironmentVariableTarget.User);
-            return uniqueSegments;
         }
 
         /// <summary>

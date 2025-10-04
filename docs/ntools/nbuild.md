@@ -37,8 +37,13 @@ Commands:
   list                   Display a formatted table of all tools and their versions.
                          Use this command to audit, compare, or document the state of your development environment.
   download               Download tools and applications specified in the manifest file.
-  path                   Display each segment of your PATH environment variable on a separate line. Similar to 'echo
-                         %PATH%'.
+  path                   Display each segment of the effective PATH environment variable on a separate line, with duplicates removed. Shows the complete PATH that processes actually use (Machine + User PATH combined).
+
+                         Optional option:
+                           --verbose   Verbose output
+
+                         Example:
+                           nb path --verbose
   git_info               Displays the current git information for the local repository, including branch, and latest
                          tag.
 
@@ -248,8 +253,9 @@ Downloads tools and applications specified in the manifest file.
 ### 5. Display Path Segments
 ```cmd
 nb.exe path
+nb.exe path --verbose
 ```
-Displays each segment of your PATH environment variable on a separate line.
+Displays each segment of the effective PATH environment variable on a separate line, with duplicates removed. Shows the complete PATH that processes actually use (Machine + User PATH combined). Use `--verbose` for additional output.
 
 ### 6. Display Git Information
 ```cmd
