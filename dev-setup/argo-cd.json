@@ -3,9 +3,9 @@
     "NbuildAppList": [
       {
         "Name": "Argo CD",
-        "Version": "2.14.11",
+        "Version": "3.2.0",
         "AppFileName": "$(InstallPath)\\argocd.exe",
-        "WebDownloadFile": "https://github.com/argoproj/argo-cd/releases/download/v$(Version)/argocd-windows-amd64.exe",
+        "WebDownloadFile": "https://github.com/argoproj/argo-cd/releases/download/v$(Version)-rc2/argocd-windows-amd64.exe",
         "DownloadedFile": "argocd.exe",
         "InstallCommand": "xcopy.exe",
         "InstallArgs": "$(DownloadedFile) \"$(InstallPath)\\\" /d /y",

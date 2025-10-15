@@ -15,7 +15,7 @@ Previously, these had to be updated manually, leading to inconsistencies and out
 ## 1. PowerShell Module Integration (v2.3.0+)
 
 - **Module**: `scripts/module-package/ntools-scripts.psm1`
-- **Function**: `Update-DocVersions` and `Get-VersionFromJson`
+- **Function**: `Get-VersionFromJson`
 - **Purpose**: Consolidated version management within the ntools-scripts module
 - **Integration**: Available in all build processes and CI/CD pipelines
 
@@ -25,7 +25,7 @@ Previously, these had to be updated manually, leading to inconsistencies and out
 Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
 
 # Update documentation with latest versions
-Update-DocVersions -JsonDirectory "./dev-setup" -MarkdownFile "./docs/ntools/ntools.md"
+# (Handled by MSBuild target)
 
 # Get version from specific JSON file  
 $version = Get-VersionFromJson -JsonFilePath "./dev-setup/ntools.json"

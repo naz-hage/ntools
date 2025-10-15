@@ -3,7 +3,7 @@
   "NbuildAppList": [
     {
       "Name": "MongoDB",
-      "Version": "8.0.5",
+      "Version": "8.2.1",
       "AppFileName": "$(InstallPath)\\bin\\mongod.exe",
       "WebDownloadFile": "https://fastdl.mongodb.org/windows/mongodb-windows-x86_64-$(Version)-signed.msi",
       "DownloadedFile": "mongodb-windows-x86_64-$(Version)-signed.msi",

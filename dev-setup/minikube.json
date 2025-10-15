@@ -3,7 +3,7 @@
     "NbuildAppList": [
       {
         "Name": "minikube",
-        "Version": "1.35.0",
+        "Version": "1.37.0",
         "AppFileName": "$(InstallPath)\\minikube.exe",
         "WebDownloadFile": "https://github.com/kubernetes/minikube/releases/latest/download/minikube-installer.exe",
         "DownloadedFile": "minikube-installer.exe",

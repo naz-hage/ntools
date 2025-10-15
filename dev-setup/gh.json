@@ -3,7 +3,7 @@
   "NbuildAppList": [
     {
       "Name": "GitHub CLI",
-      "Version": "2.74.2",
+      "Version": "2.81.0",
       "AppFileName": "$(InstallPath)\\gh.exe",
       "WebDownloadFile": "https://github.com/cli/cli/releases/download/v$(Version)/gh_$(Version)_windows_amd64.zip",
       "DownloadedFile": "gh_$(Version)_windows_amd64.zip",
@@ -12,7 +12,7 @@
       "InstallPath": "$(ProgramFiles)\\GitHub CLI",
       "UninstallCommand": "powershell.exe",
       "UninstallArgs": "-Command Remove-Item -Path '$(InstallPath)' -Recurse -Force",
-      "StoredHash": "2d047e7639d45b373f4262563799c391c3f27ff6b2afc5553685bfe6019020b1",
+      "StoredHash": "81c52b55dfa9fec0fc97a5bacedf7828f04a7b41617c286fb0776f6fa75eeed1",
       "AddToPath": true
     }
   ]
