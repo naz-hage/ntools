@@ -68,6 +68,27 @@ This PBI will enhance the markdown parser to support better metadata extraction 
 - [ ] Include UI, logic, error handling, and test coverage as needed
 '''
 
+AZDO_TASK_TEMPLATE = '''# TASK-001: Implement Unit Tests for Parser
+
+## Target: azdo
+## Project: YourProject
+## Area: YourProject\\YourArea
+## Iteration: YourProject\\Sprint 1
+## Parent ID: 123  # Required: ID of parent PBI or Feature work item
+## Assignee: developer@company.com
+## Labels: development, testing
+## Work Item Type: Task
+
+## Description
+
+Implement comprehensive unit tests for the markdown parser functionality.
+
+## Acceptance Criteria
+- [ ] Write unit tests for all parser functions
+- [ ] Achieve 80% code coverage
+- [ ] All tests pass in CI pipeline
+'''
+
 GITHUB_TEMPLATE = '''# PBI-001: Enhanced Markdown Parser for Copilot
 
 ## Target: github
@@ -86,6 +107,94 @@ This PBI will enhance the markdown parser to support better metadata extraction 
 - [ ] Use checkboxes for each criterion
 - [ ] Include UI, logic, error handling, and test coverage as needed
 '''
+
+
+def check_azdo_auth_and_connectivity(verbose: bool = False) -> bool:
+    """Check Azure DevOps authentication and connectivity.
+    
+    Returns True if all checks pass, False otherwise.
+    Checks for required environment variables and tests API connectivity.
+    """
+    if requests is None:
+        print('ERROR: requests library is required for Azure DevOps operations.')
+        print('Install with: pip install requests')
+        return False
+    
+    org = os.environ.get('AZURE_DEVOPS_ORG') or ''
+    pat = os.environ.get('AZURE_DEVOPS_EXT_PAT') or os.environ.get('AZURE_DEVOPS_PAT') or ''
+    project = os.environ.get('AZURE_DEVOPS_PROJECT') or ''
+    
+    if verbose:
+        print('Azure DevOps Configuration Check:')
+        print(f'  Org: {org}')
+        print(f'  Project env: {project}')
+        print(f'  Has PAT: {bool(pat)}')
+    
+    if not org:
+        print('ERROR: AZURE_DEVOPS_ORG environment variable is not set.')
+        print('Set it with: $env:AZURE_DEVOPS_ORG = "your-org-name"')
+        return False
+    
+    if not pat:
+        print('ERROR: Azure DevOps PAT not found.')
+        print('Set AZURE_DEVOPS_EXT_PAT or AZURE_DEVOPS_PAT environment variable.')
+        print('Get a PAT from: https://dev.azure.com/{org}/_usersSettings/tokens')
+        return False
+    
+    # Test API connectivity by listing projects
+    url = f'https://dev.azure.com/{org}/_apis/projects?api-version=7.0'
+    if verbose:
+        print(f'  Testing API connectivity: {url}')
+    
+    try:
+        r = requests.get(url, auth=HTTPBasicAuth('', pat), timeout=15)
+        if r.status_code != 200:
+            print(f'ERROR: Failed to connect to Azure DevOps API (HTTP {r.status_code})')
+            print(f'Response: {r.text[:500]}')
+            return False
+        
+        # Parse response to verify we got valid data
+        try:
+            j = r.json()
+            if 'value' in j:
+                project_count = len(j.get('value') or [])
+                if verbose:
+                    print(f'  Successfully connected. Found {project_count} projects.')
+            else:
+                print('ERROR: Unexpected API response format.')
+                return False
+        except Exception as e:
+            print(f'ERROR: Failed to parse API response: {e}')
+            return False
+            
+    except requests.exceptions.RequestException as e:
+        print(f'ERROR: Network request failed: {e}')
+        return False
+    except Exception as e:
+        print(f'ERROR: Unexpected error during API test: {e}')
+        return False
+    
+    # Optionally test project-specific access
+    if project:
+        url2 = f'https://dev.azure.com/{org}/{project}/_apis/wit/fields?api-version=7.0'
+        if verbose:
+            print(f'  Testing project access: {url2}')
+        
+        try:
+            r2 = requests.get(url2, auth=HTTPBasicAuth('', pat), timeout=15)
+            if r2.status_code != 200:
+                print(f'ERROR: Failed to access project "{project}" (HTTP {r2.status_code})')
+                print(f'Response: {r2.text[:500]}')
+                return False
+            if verbose:
+                print(f'  Project "{project}" access verified.')
+        except Exception as e:
+            print(f'ERROR: Failed to test project access: {e}')
+            return False
+    
+    if verbose:
+        print('  All Azure DevOps checks passed.')
+    return True
 
 
 def _collect_area_paths(node, out):
@@ -164,7 +273,8 @@ def parse_args():
         add_help=False,
         epilog='''
 Examples:
-    python add-issue.py --help-template azdo                              # Show Azure DevOps template
+    python add-issue.py --help-template azdo                              # Show Azure DevOps PBI template
+    python add-issue.py --help-template azdo-task                         # Show Azure DevOps Task template
     python add-issue.py --help-template github                            # Show GitHub template
     python add-issue.py backlog/pbi-007.md --dry-run                      # Parse and preview (target from file)
     python add-issue.py backlog/pbi-007.md                                # Create work item (all params from file)
@@ -185,7 +295,7 @@ Examples:
     parser.add_argument('--target', choices=['github', 'azdo'], default='github', help='Target platform to create the work item (default: github)')
     parser.add_argument('--dry-run', action='store_true', help='Parse and print the extracted fields but do not create anything')
     parser.add_argument('--query', '-q', help='Query an existing work item by ID and display its details')
-    parser.add_argument('--help-template', choices=['azdo', 'github'], help='Show example markdown template for the specified target')
+    parser.add_argument('--help-template', choices=['azdo', 'azdo-task', 'github'], help='Show example markdown template for the specified target')
     # Removed CLI overrides: the tool reads all configuration from the markdown file
     # supplied with --file-path. Removed flags: --work-item-type, --assignee,
     # --labels, --area, --iteration, --require-criteria, --repo, --config.
@@ -232,6 +342,7 @@ def extract_fields_from_markdown(path: Path):
         'assignee': None,
         'labels': None,
         'work_item_type': None,  # PBI, Bug, Task
+        'parent_id': None,   # Parent work item ID for Tasks
         'config': None,
     }
 
@@ -240,6 +351,8 @@ def extract_fields_from_markdown(path: Path):
         m = re.match(r'^#{1,2}\s+(.*)', line)
         if m:
             title = m.group(1).strip()
+            # Clean up common prefixes like "PBI-001: ", "TASK-002: ", etc.
+            title = re.sub(r'^(PBI|TASK|BUG|SPIKE)-\d+:\s*', '', title)
             title_line = i
             break
 
@@ -268,6 +381,7 @@ def extract_fields_from_markdown(path: Path):
         'assignee': r'^##\s*Assignee',
         'labels': r'^##\s*Labels?',
         'work_item_type': r'^##\s*(Work\s*Item\s*Type|Type)',
+        'parent_id': r'^##\s*(Parent\s*ID|Parent)',
         'config': r'^##\s*Config',
     }
 
@@ -598,8 +712,12 @@ def main():
     if args.help_template:
         if args.help_template == 'azdo':
             print("")
-            print("Azure DevOps markdown template:")
+            print("Azure DevOps PBI markdown template:")
             print(AZDO_TEMPLATE)
+        elif args.help_template == 'azdo-task':
+            print("")
+            print("Azure DevOps Task markdown template:")
+            print(AZDO_TASK_TEMPLATE)
         else:
             print("")
             print("GitHub markdown template:")
@@ -611,6 +729,16 @@ def main():
         if args.target == 'github':
             query_github_issue(args.query, args)
         else:
+            # Check Azure DevOps authentication before querying
+            print('Checking Azure DevOps authentication and connectivity...')
+            if not check_azdo_auth_and_connectivity(verbose=args.verbose):
+                print('\nAzure DevOps setup requirements:')
+                print('1. Set AZURE_DEVOPS_ORG environment variable to your organization name')
+                print('2. Set AZURE_DEVOPS_EXT_PAT or AZURE_DEVOPS_PAT with a Personal Access Token')
+                print('3. Ensure the PAT has Work Items (read) permissions')
+                print('4. Set AZURE_DEVOPS_PROJECT for project-specific queries')
+                print('\nGet a PAT from: https://dev.azure.com/{your-org}/_usersSettings/tokens')
+                sys.exit(1)
             query_azdo_workitem(args.query, args)
         return
 
@@ -657,12 +785,39 @@ def main():
         project = fields['metadata'].get('project')
         area = fields['metadata'].get('area')
         iteration = fields['metadata'].get('iteration')
+        work_item_type = fields['metadata'].get('work_item_type') or 'PBI'
+        parent_id = fields['metadata'].get('parent_id')
+        
         if not project:
             print('ERROR: ## Project in the markdown is required for Azure DevOps target.')
             sys.exit(2)
         if not area or not iteration:
             print('ERROR: ## Area and ## Iteration Path in the markdown are required for Azure DevOps target.')
             sys.exit(2)
+        
+        # Require parent ID for Tasks
+        if work_item_type.lower() == 'task':
+            if not parent_id:
+                print('ERROR: ## Parent ID in the markdown is required for Task work items.')
+                print('Tasks must be linked to a parent work item (PBI, User Story, etc.).')
+                sys.exit(2)
+            # Validate parent_id is numeric
+            try:
+                int(parent_id)
+            except (ValueError, TypeError):
+                print(f'ERROR: Parent ID must be a numeric work item ID, got: {parent_id}')
+                sys.exit(2)
+        
+        # Check Azure DevOps authentication and connectivity
+        print('Checking Azure DevOps authentication and connectivity...')
+        if not check_azdo_auth_and_connectivity(verbose=args.verbose):
+            print('\nAzure DevOps setup requirements:')
+            print('1. Set AZURE_DEVOPS_ORG environment variable to your organization name')
+            print('2. Set AZURE_DEVOPS_EXT_PAT or AZURE_DEVOPS_PAT with a Personal Access Token')
+            print('3. Ensure the PAT has Work Items (read/write) permissions')
+            print('4. Optionally set AZURE_DEVOPS_PROJECT for project-specific operations')
+            print('\nGet a PAT from: https://dev.azure.com/{your-org}/_usersSettings/tokens')
+            sys.exit(1)
 
     if args.dry_run:
         dry_run_print(fields, args)
@@ -812,6 +967,8 @@ def create_azdo_workitem(fields: dict, args, dry_run: bool = False) -> bool:
     work_item_type = fields.get('metadata', {}).get('work_item_type') or 'PBI'
     if work_item_type.lower() == 'pbi':
         work_item_type = 'Product Backlog Item'
+    elif work_item_type.lower() == 'task':
+        work_item_type = 'Task'
 
     if dry_run:
         # If the parsed-fields summary has already been printed, avoid
@@ -954,6 +1111,19 @@ def create_azdo_workitem(fields: dict, args, dry_run: bool = False) -> bool:
         else:
             # Do not append AC to Description or post a comment; only write AC when a dedicated field is present.
             print('Warning: Acceptance Criteria field not found; acceptance criteria will NOT be written to the work item.')
+
+    # Add parent relationship for Tasks
+    if work_item_type == 'Task' and meta.get('parent_id'):
+        parent_id = meta.get('parent_id')
+        parent_url = f"https://dev.azure.com/{org}/{project}/_apis/wit/workItems/{parent_id}"
+        payload.append({
+            "op": "add",
+            "path": "/relations/-",
+            "value": {
+                "rel": "System.LinkTypes.Hierarchy-Reverse",
+                "url": parent_url
+            }
+        })
 
     # Construct URL
     api_version = '7.0'
