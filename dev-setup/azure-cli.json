@@ -3,7 +3,7 @@
     "NbuildAppList": [
       {
         "Name": "AzureCLI",
-        "Version": "2.70.0",
+        "Version": "2.78.0",
         "AppFileName": "$(InstallPath)\\az.cmd",
         "WebDownloadFile": "https://azcliprod.blob.core.windows.net/msi/azure-cli-$(Version)-x64.msi",
         "DownloadedFile": "AzureCLI-$(Version)-win-x64.msi",

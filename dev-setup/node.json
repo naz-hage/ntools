@@ -3,7 +3,7 @@
   "NbuildAppList": [
     {
       "Name": "Node.js",
-      "Version": "22.12.0",
+      "Version": "22.21.0",
       "AppFileName": "$(InstallPath)\\node.exe",
       "WebDownloadFile": "https://nodejs.org/dist/v$(Version)/node-v$(Version)-win-x64.zip",
       "DownloadedFile": "node-v$(Version)-win-x64.zip",
