@@ -3,7 +3,7 @@
   "NbuildAppList": [
     {
       "Name": "pnpm",
-      "Version": "10.14.0",
+      "Version": "10.19.0",
       "AppFileName": "$(InstallPath)\\pnpm.exe",
       "WebDownloadFile": "https://github.com/pnpm/pnpm/releases/download/v$(Version)/pnpm-win-x64.exe",
       "DownloadedFile": "pnpm-win-x64.exe",
@@ -11,7 +11,7 @@
       "InstallArgs": "-Command if (!(Test-Path -Path '$(InstallPath)')) { New-Item -ItemType Directory -Path '$(InstallPath)' } ; Copy-Item -Path $(DownloadedFile) -Destination '$(InstallPath)\\pnpm.exe' -Force",
       "InstallPath": "$(ProgramFiles)\\pnpm",
       "UninstallCommand": "powershell.exe",
-      "UninstallArgs": "-Command Remove-Item -Path \u0027$(InstallPath)\u0027 -Recurse -Force",
+      "UninstallArgs": "-Command Remove-Item -Path '$(InstallPath)' -Recurse -Force",
       "AddToPath": true
     }
   ]

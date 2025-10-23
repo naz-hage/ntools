@@ -3,7 +3,7 @@
     "NbuildAppList": [
       {
         "Name": "Go Lang",
-        "Version": "1.24.0",
+        "Version": "1.25.3",
         "AppFileName": "$(InstallPath)\\bin\\go.exe",
         "WebDownloadFile": "https://go.dev/dl/go$(Version).windows-amd64.msi",
         "DownloadedFile": "go.msi",
