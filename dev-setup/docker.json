@@ -3,7 +3,7 @@
   "NbuildAppList": [
     {
       "Name": "Docker",
-      "Version": "4.38.0.0",
+      "Version": "4.48.0",
       "AppFileName": "$(InstallPath)\\Docker Desktop.exe",
       "WebDownloadFile": "https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe",
       "DownloadedFile": "Docker Desktop Installer.exe",
