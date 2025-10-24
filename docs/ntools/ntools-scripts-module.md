@@ -84,7 +84,6 @@ The module exports 36 functions organized by category:
 - `Add-WafAllowRule` - Add Azure WAF allow rule for an IP
 - `Remove-WafCustomRule` - Remove Azure WAF custom rule
 - `Get-VersionFromJson` - Extract version information from JSON files
-- `Update-DocVersions` - Update version tables in markdown documentation
 
 ### Setup Functions
 - `Set-DevelopmentEnvironment` - Set up development environment

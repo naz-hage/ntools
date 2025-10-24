@@ -16,7 +16,6 @@
         'Invoke-VerifyArtifacts',
         'Set-DevelopmentEnvironment',
         'Get-VersionFromJson',
-        'Update-DocVersions',
         'Write-TestResult',
         'Test-TargetExists',
         'Test-TargetDependencies',

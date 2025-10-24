@@ -126,38 +126,6 @@ function Get-VersionFromJson {
     }
 }
 
-function Update-DocVersions {
-    param(
-        [string]$DevSetupPath,
-        [hashtable]$DocsPath
-    )
-    
-    $content = Get-Content $DevSetupPath
-    $today = Get-Date -Format "dd-MMM-yy"
-    
-    for ($i = 0; $i -lt $content.Length; $i++) {
-        $line = $content[$i]
-        
-        # Check if this is a table row with a tool
-        if ($line -match '^\| \[([^\]]+)\]') {
-            $toolName = $matches[1]
-            
-            # Find matching version in our map
-            foreach ($key in $DocsPath.Keys) {
-                $versionInfo = $DocsPath[$key]
-                if ($versionInfo.Name -eq $toolName) {
-                    # Update the version and date in the line
-                    $content[$i] = $line -replace '\| [^|]+ \| [^|]+ \|', "| $($versionInfo.Version) | $today |"
-                    break
-                }
-            }
-        }
-    }
-    
-    Set-Content $DevSetupPath $content
-    Write-Info "Updated markdown table: $DevSetupPath"
-}
-
 # DevOps: get public IP and set pipeline variable
 function Get-AgentPublicIp {
     param(
@@ -1118,7 +1086,7 @@ function Set-CodeSigningTrust {
 
 #region Exports
 # Final export of public functions (including merged signing functions)
-Export-ModuleMember -Function Get-ntoolsScriptsVersion, Publish-AllProjects, Get-VersionFromJson, Update-DocVersions, Write-TestResult, Test-TargetExists, Test-TargetDependencies, Test-TargetDelegation, Get-FileHash256, Get-FileVersionInfo, Invoke-FastForward, Write-OutputMessage, Get-NToolsFileVersion, Add-DeploymentPathToEnvironment, Invoke-NToolsDownload, Install-NTools, Invoke-VerifyArtifacts, Set-DevelopmentEnvironment, Get-AgentPublicIp, Add-WafAllowRule, Remove-WafCustomRule, Test-IsAdministrator, Test-MicrosoftPowerShellSecurityModuleLoaded, Test-CertificateStore, New-SelfSignedCodeCertificate, Export-CertificateToPfx, Export-CertificateToCer, Import-CertificateToRoot, Import-CertificateToCurrentUser, Set-ScriptSignature, Get-ScriptSignature, Set-CodeSigningTrust
+Export-ModuleMember -Function Get-ntoolsScriptsVersion, Publish-AllProjects, Get-VersionFromJson, Write-TestResult, Test-TargetExists, Test-TargetDependencies, Test-TargetDelegation, Get-FileHash256, Get-FileVersionInfo, Invoke-FastForward, Write-OutputMessage, Get-NToolsFileVersion, Add-DeploymentPathToEnvironment, Invoke-NToolsDownload, Install-NTools, Invoke-VerifyArtifacts, Set-DevelopmentEnvironment, Get-AgentPublicIp, Add-WafAllowRule, Remove-WafCustomRule, Test-IsAdministrator, Test-MicrosoftPowerShellSecurityModuleLoaded, Test-CertificateStore, New-SelfSignedCodeCertificate, Export-CertificateToPfx, Export-CertificateToCer, Import-CertificateToRoot, Import-CertificateToCurrentUser, Set-ScriptSignature, Get-ScriptSignature, Set-CodeSigningTrust
 
 #endregion
 
