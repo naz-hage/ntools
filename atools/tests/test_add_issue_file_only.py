@@ -242,6 +242,6 @@ Implement comprehensive unit tests for the parser.
 
     captured = capsys.readouterr()
     # Should show Task in the dry-run output and URL
-    assert 'TASK-001: Implement Unit Tests' in captured.out
+    assert 'Title: Implement Unit Tests' in captured.out
     assert 'Acceptance Criteria' in captured.out
     assert '$Task' in captured.out
