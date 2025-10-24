@@ -194,3 +194,54 @@ No acceptance criteria present in this file.
     # parsed-fields summary prints Acceptance Criteria and shows '(none)'
     assert 'Acceptance Criteria' in captured.out
     assert '(none)' in captured.out
+
+
+def test_azdo_task_creation_dry_run(tmp_path, capsys, monkeypatch):
+    md = '''# TASK-001: Implement Unit Tests
+
+## Target: azdo
+## Project: Proto
+## Area: Proto\\Warriors
+## Iteration: Proto\\Sprint 1
+## Work Item Type: Task
+
+## Description
+
+Implement comprehensive unit tests for the parser.
+
+## Acceptance Criteria
+- [ ] Write unit tests
+- [ ] Achieve 80% coverage
+'''
+    p = write_md(md, tmp_path)
+
+    # Ensure AZURE_DEVOPS_ORG env is present for dry-run URL generation
+    monkeypatch.setenv('AZURE_DEVOPS_ORG', 'nazh')
+
+    import sys as _sys
+    _sys_argv_backup = _sys.argv
+    _sys.argv = ['add-issue.py']
+    try:
+        parser, args = ai.parse_args()
+    finally:
+        _sys_argv = _sys_argv_backup
+    args.file_path = str(p)
+    args.target = 'azdo'
+    args.dry_run = True
+
+    validated = ai.validate_file(args.file_path)
+    fields = ai.extract_fields_from_markdown(validated)
+
+    # Verify work item type is parsed correctly
+    assert fields['metadata']['work_item_type'] == 'Task'
+
+    # Print parsed fields first so the writer will show the concise payload/URL
+    ai.dry_run_print(fields, args)
+    res = ai.create_azdo_workitem(fields, args, dry_run=True)
+    assert res is True
+
+    captured = capsys.readouterr()
+    # Should show Task in the dry-run output and URL
+    assert 'Title: Implement Unit Tests' in captured.out
+    assert 'Acceptance Criteria' in captured.out
+    assert '$Task' in captured.out
