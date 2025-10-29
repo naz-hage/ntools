@@ -8,6 +8,7 @@ from typing import Optional
 
 from .exceptions import SDOError, ConfigurationError, ValidationError
 from .work_items import cmd_workitem_create
+from .version import __version__
 
 
 class ClickArgs:
@@ -38,7 +39,12 @@ def cli(ctx, verbose, version):
         AZURE_DEVOPS_PAT    - Personal Access Token (required)
         AZURE_DEVOPS_EXT_PAT - Alternative PAT variable
     """
-    # Ensure object exists for storing global options
+    # Handle version option
+    if version:
+        click.echo(f"SDO version {__version__}")
+        sys.exit(0)
+    
+    # Store global options in context
     ctx.ensure_object(dict)
     ctx.obj['verbose'] = verbose
     
@@ -99,6 +105,11 @@ def main(args=None):
     """Main entry point for the CLI."""
     if args is None:
         args = sys.argv[1:]
+    
+    # Handle version option early
+    if '--version' in args or '-v' in args:
+        click.echo(f"SDO version {__version__}")
+        sys.exit(0)
     
     # Handle the case where args is a list vs being called by Click
     if isinstance(args, list):
