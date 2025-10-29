@@ -4,7 +4,10 @@ SDO - Simple DevOps Operations Tool
 Main entry point for the command-line interface.
 """
 
-from sdo_package.cli import main as app
+from sdo_package.cli import main, cli
+
+# Expose the CLI app for tests
+app = cli
 
 if __name__ == "__main__":
-    app()
+    main()

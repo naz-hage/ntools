@@ -31,14 +31,15 @@ class TestWorkItemManager:
         verbose_manager = WorkItemManager(verbose=True)
         assert verbose_manager.verbose is True
     
+    @patch("sdo_package.work_items.os.path.exists", return_value=True)
     @patch("sdo_package.parsers.markdown_parser.MarkdownParser")
     @patch("sdo_package.parsers.metadata_parser.MetadataParser")
     @patch("sdo_package.platforms.azdo_platform.AzureDevOpsPlatform")
-    def test_create_work_item_success(self, mock_platform, mock_metadata_parser, mock_markdown_parser):
+    def test_create_work_item_success(self, mock_platform, mock_metadata_parser, mock_markdown_parser, mock_exists):
         """Test successful work item creation."""
         # Mock parser results
         mock_markdown_instance = mock_markdown_parser.return_value
-        mock_markdown_instance.parse.return_value = {
+        mock_markdown_instance.parse_file.return_value = {
             "title": "Test Issue",
             "description": "Test description",
             "acceptance_criteria": ["Criteria 1", "Criteria 2"]
@@ -51,13 +52,14 @@ class TestWorkItemManager:
             "project": "TestProject"
         }
         
-        # Mock platform creation
+        # Mock platform creation - return WorkItemResult instead of dict
         mock_platform_instance = mock_platform.return_value
-        mock_platform_instance.create_work_item.return_value = {
-            "id": "123",
-            "url": "https://example.com/123",
-            "status": "success"
-        }
+        mock_platform_instance.create_work_item.return_value = WorkItemResult(
+            success=True,
+            work_item_id="123",
+            url="https://example.com/123",
+            platform="azure_devops"
+        )
         
         # Test work item creation
         result = self.manager.create_work_item("test.md")
@@ -68,16 +70,17 @@ class TestWorkItemManager:
         assert result.url == "https://example.com/123"
         
         # Verify method calls
-        mock_markdown_instance.parse.assert_called_once_with("test.md")
+        mock_markdown_instance.parse_file.assert_called_once_with("test.md")
         mock_metadata_instance.parse.assert_called_once()
         mock_platform_instance.create_work_item.assert_called_once()
     
+    @patch("sdo_package.work_items.os.path.exists", return_value=True)
     @patch("sdo_package.parsers.markdown_parser.MarkdownParser")
-    def test_create_work_item_parsing_error(self, mock_markdown_parser):
+    def test_create_work_item_parsing_error(self, mock_markdown_parser, mock_exists):
         """Test work item creation with parsing error."""
         # Mock parsing error
         mock_markdown_instance = mock_markdown_parser.return_value
-        mock_markdown_instance.parse.side_effect = ParsingError("Invalid markdown")
+        mock_markdown_instance.parse_file.side_effect = ParsingError("Invalid markdown")
         
         # Test that parsing error is handled
         result = self.manager.create_work_item("test.md")
@@ -86,14 +89,15 @@ class TestWorkItemManager:
         assert result.success is False
         assert "Invalid markdown" in result.error_message
     
+    @patch("sdo_package.work_items.os.path.exists", return_value=True)
     @patch("sdo_package.parsers.markdown_parser.MarkdownParser")
     @patch("sdo_package.parsers.metadata_parser.MetadataParser")
     @patch("sdo_package.platforms.azdo_platform.AzureDevOpsPlatform")
-    def test_create_work_item_platform_error(self, mock_platform, mock_metadata_parser, mock_markdown_parser):
+    def test_create_work_item_platform_error(self, mock_platform, mock_metadata_parser, mock_markdown_parser, mock_exists):
         """Test work item creation with platform error."""
         # Mock successful parsing
         mock_markdown_instance = mock_markdown_parser.return_value
-        mock_markdown_instance.parse.return_value = {
+        mock_markdown_instance.parse_file.return_value = {
             "title": "Test Issue",
             "description": "Test description"
         }
@@ -123,13 +127,14 @@ class TestWorkItemManager:
         assert result.success is False
         assert "file" in result.error_message.lower() or "not found" in result.error_message.lower()
     
+    @patch("sdo_package.work_items.os.path.exists", return_value=True)
     @patch("sdo_package.parsers.markdown_parser.MarkdownParser")
     @patch("sdo_package.parsers.metadata_parser.MetadataParser")
-    def test_create_work_item_unknown_platform(self, mock_metadata_parser, mock_markdown_parser):
+    def test_create_work_item_unknown_platform(self, mock_metadata_parser, mock_markdown_parser, mock_exists):
         """Test work item creation with unknown platform."""
         # Mock parsing results with unknown platform
         mock_markdown_instance = mock_markdown_parser.return_value
-        mock_markdown_instance.parse.return_value = {
+        mock_markdown_instance.parse_file.return_value = {
             "title": "Test Issue",
             "description": "Test description"
         }

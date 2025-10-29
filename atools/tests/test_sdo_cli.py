@@ -27,11 +27,13 @@ class TestAddIssueCommand:
         """Test successful add-issue command execution."""
         # Mock successful work item creation
         mock_instance = mock_manager.return_value
-        mock_instance.create_work_item.return_value = {
-            "id": "123",
-            "url": "https://example.com/123",
-            "status": "success"
-        }
+        from sdo_package.work_items import WorkItemResult
+        mock_instance.create_work_item.return_value = WorkItemResult(
+            success=True,
+            work_item_id="123",
+            url="https://example.com/123",
+            platform="test"
+        )
         
         with self.runner.isolated_filesystem():
             # Create a test markdown file
@@ -48,11 +50,13 @@ class TestAddIssueCommand:
     def test_add_issue_with_verbose(self, mock_manager):
         """Test add-issue command with verbose flag."""
         mock_instance = mock_manager.return_value
-        mock_instance.create_work_item.return_value = {
-            "id": "123",
-            "url": "https://example.com/123",
-            "status": "success"
-        }
+        from sdo_package.work_items import WorkItemResult
+        mock_instance.create_work_item.return_value = WorkItemResult(
+            success=True,
+            work_item_id="123",
+            url="https://example.com/123",
+            platform="test"
+        )
         
         with self.runner.isolated_filesystem():
             with open("test.md", "w") as f:
@@ -75,7 +79,11 @@ class TestAddIssueCommand:
     def test_add_issue_platform_error(self, mock_manager):
         """Test add-issue command with platform error."""
         mock_instance = mock_manager.return_value
-        mock_instance.create_work_item.side_effect = SDOException("Platform error")
+        from sdo_package.work_items import WorkItemResult
+        mock_instance.create_work_item.return_value = WorkItemResult(
+            success=False,
+            error_message="Platform error"
+        )
         
         with self.runner.isolated_filesystem():
             with open("test.md", "w") as f:
@@ -133,12 +141,13 @@ class TestCLIIntegration:
     def test_full_workflow_azure_devops(self, mock_manager):
         """Test full workflow for Azure DevOps."""
         mock_instance = mock_manager.return_value
-        mock_instance.create_work_item.return_value = {
-            "id": "12345",
-            "url": "https://dev.azure.com/org/project/_workitems/edit/12345",
-            "status": "success",
-            "platform": "azure_devops"
-        }
+        from sdo_package.work_items import WorkItemResult
+        mock_instance.create_work_item.return_value = WorkItemResult(
+            success=True,
+            work_item_id="12345",
+            url="https://dev.azure.com/org/project/_workitems/edit/12345",
+            platform="azure_devops"
+        )
         
         with self.runner.isolated_filesystem():
             # Create Azure DevOps test file
@@ -167,12 +176,13 @@ WorkItemType: Bug
     def test_full_workflow_github(self, mock_manager):
         """Test full workflow for GitHub."""
         mock_instance = mock_manager.return_value
-        mock_instance.create_work_item.return_value = {
-            "id": "67890",
-            "url": "https://github.com/owner/repo/issues/67890",
-            "status": "success",
-            "platform": "github"
-        }
+        from sdo_package.work_items import WorkItemResult
+        mock_instance.create_work_item.return_value = WorkItemResult(
+            success=True,
+            work_item_id="67890",
+            url="https://github.com/owner/repo/issues/67890",
+            platform="github"
+        )
         
         with self.runner.isolated_filesystem():
             # Create GitHub test file

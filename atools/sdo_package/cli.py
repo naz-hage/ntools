@@ -106,6 +106,8 @@ def main(args=None):
     else:
         cli()
 
+# Set the CLI app name for tests
+cli.name = "sdo"
 
 # Add compatibility function for tests that expect add_issue
 @click.command()
@@ -115,6 +117,11 @@ def main(args=None):
 def add_issue(file_path, verbose, dry_run):
     """Create an issue from markdown file - compatibility function for tests."""
     from .work_items import WorkItemManager
+    
+    if dry_run:
+        click.echo("[dry-run] Would create work item from file: {}".format(file_path))
+        click.echo("[dry-run] Work item creation suppressed")
+        return
     
     manager = WorkItemManager(verbose=verbose)
     result = manager.create_work_item(file_path)

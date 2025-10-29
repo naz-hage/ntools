@@ -37,6 +37,11 @@ class WorkItemManager:
     def create_work_item(self, file_path: str) -> WorkItemResult:
         """Create a work item from markdown file."""
         try:
+            # Check if file exists first
+            import os
+            if not os.path.exists(file_path):
+                return WorkItemResult(False, error_message=f"File not found: {file_path}")
+            
             # Parse the markdown file
             parser = MarkdownParser()
             content = parser.parse_file(file_path)
@@ -64,13 +69,82 @@ class WorkItemManager:
     
     def _create_azdo_work_item(self, content: Dict[str, Any], metadata: Dict[str, Any]) -> WorkItemResult:
         """Create Azure DevOps work item."""
-        # Implementation placeholder
-        return WorkItemResult(False, error_message="Azure DevOps creation not implemented")
+        try:
+            # Extract required parameters
+            organization = metadata.get("organization", "")
+            project = metadata.get("project", "")
+            pat = metadata.get("pat", "")
+            
+            if not all([organization, project, pat]):
+                return WorkItemResult(False, error_message="Missing Azure DevOps configuration (organization, project, pat)")
+            
+            # Create platform instance and work item
+            platform = AzureDevOpsPlatform(organization, project, pat, verbose=self.verbose)
+            
+            # Extract content for work item creation
+            title = content.get("title", "")
+            description = content.get("description", "")
+            acceptance_criteria = content.get("acceptance_criteria", [])
+            work_item_type = metadata.get("work_item_type", "Task")
+            
+            result = platform.create_work_item(
+                title=title,
+                description=description,
+                acceptance_criteria=acceptance_criteria,
+                work_item_type=work_item_type,
+                metadata=metadata
+            )
+            
+            if result and result.get("id"):
+                return WorkItemResult(
+                    success=True,
+                    work_item_id=str(result["id"]),
+                    url=result.get("url", ""),
+                    platform="azure_devops"
+                )
+            else:
+                return WorkItemResult(False, error_message="Azure DevOps work item creation failed")
+                
+        except Exception as e:
+            return WorkItemResult(False, error_message=f"Azure DevOps error: {str(e)}")
     
     def _create_github_work_item(self, content: Dict[str, Any], metadata: Dict[str, Any]) -> WorkItemResult:
         """Create GitHub work item."""
-        # Implementation placeholder
-        return WorkItemResult(False, error_message="GitHub creation not implemented")
+        try:
+            # Extract required parameters
+            owner = metadata.get("owner", "")
+            repo = metadata.get("repo", metadata.get("repository", ""))
+            
+            if not all([owner, repo]):
+                return WorkItemResult(False, error_message="Missing GitHub configuration (owner, repo)")
+            
+            # Create platform instance and work item
+            platform = GitHubPlatform(owner, repo, verbose=self.verbose)
+            
+            # Extract content for work item creation
+            title = content.get("title", "")
+            description = content.get("description", "")
+            acceptance_criteria = content.get("acceptance_criteria", [])
+            
+            result = platform.create_work_item(
+                title=title,
+                description=description,
+                acceptance_criteria=acceptance_criteria,
+                metadata=metadata
+            )
+            
+            if result and result.get("id"):
+                return WorkItemResult(
+                    success=True,
+                    work_item_id=str(result["id"]),
+                    url=result.get("url", ""),
+                    platform="github"
+                )
+            else:
+                return WorkItemResult(False, error_message="GitHub work item creation failed")
+                
+        except Exception as e:
+            return WorkItemResult(False, error_message=f"GitHub error: {str(e)}")
 
 
 def cmd_workitem_create(args) -> Optional[Dict[str, Any]]:
