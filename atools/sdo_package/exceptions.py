@@ -16,6 +16,10 @@ class SDOError(Exception):
         return self.message
 
 
+# Alias for backward compatibility and test expectations
+SDOException = SDOError
+
+
 class ConfigurationError(SDOError):
     """Raised when there are configuration issues."""
     pass
@@ -28,6 +32,16 @@ class ValidationError(SDOError):
 
 class AuthenticationError(SDOError):
     """Raised when authentication fails."""
+    pass
+
+
+class PlatformError(SDOError):
+    """Raised when platform operations fail."""
+    pass
+
+
+class ParsingError(SDOError):
+    """Raised when parsing fails."""
     pass
 
 

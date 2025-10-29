@@ -107,5 +107,26 @@ def main(args=None):
         cli()
 
 
+# Add compatibility function for tests that expect add_issue
+@click.command()
+@click.argument('file_path', type=click.Path(exists=True))
+@click.option('--verbose', is_flag=True, help='Show verbose output')
+@click.option('--dry-run', is_flag=True, help='Dry run mode')
+def add_issue(file_path, verbose, dry_run):
+    """Create an issue from markdown file - compatibility function for tests."""
+    from .work_items import WorkItemManager
+    
+    manager = WorkItemManager(verbose=verbose)
+    result = manager.create_work_item(file_path)
+    
+    if result.success:
+        click.echo(f"Success: Created work item {result.work_item_id}")
+        if result.url:
+            click.echo(f"URL: {result.url}")
+    else:
+        click.echo(f"Error: {result.error_message}")
+        raise click.ClickException(result.error_message)
+
+
 if __name__ == '__main__':
     main()

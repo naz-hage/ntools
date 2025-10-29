@@ -2,12 +2,75 @@
 SDO Work Items - Business logic for work item operations.
 """
 
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 from .parsers.markdown_parser import MarkdownParser
 from .parsers.metadata_parser import MetadataParser
 from .platforms.azdo_platform import AzureDevOpsPlatform
 from .platforms.github_platform import GitHubPlatform
-from .exceptions import ValidationError, ConfigurationError
+from .exceptions import ValidationError, ConfigurationError, PlatformError, ParsingError
+
+
+class WorkItemResult:
+    """Result of work item creation operation."""
+    
+    def __init__(self, success: bool, work_item_id: str = None, url: str = None, 
+                 platform: str = None, error_message: str = None):
+        self.success = success
+        self.work_item_id = work_item_id
+        self.url = url
+        self.platform = platform
+        self.error_message = error_message
+    
+    def __str__(self):
+        if self.success:
+            return f"Success: Work item {self.work_item_id} created at {self.url}"
+        else:
+            return f"Error: {self.error_message}"
+
+
+class WorkItemManager:
+    """Manager for work item operations."""
+    
+    def __init__(self, verbose: bool = False):
+        self.verbose = verbose
+    
+    def create_work_item(self, file_path: str) -> WorkItemResult:
+        """Create a work item from markdown file."""
+        try:
+            # Parse the markdown file
+            parser = MarkdownParser()
+            content = parser.parse_file(file_path)
+            
+            # Parse metadata
+            metadata_parser = MetadataParser()
+            metadata = metadata_parser.parse(content)
+            
+            # Determine platform and create work item
+            platform = metadata.get("platform", "").lower()
+            
+            if platform == "azure_devops":
+                return self._create_azdo_work_item(content, metadata)
+            elif platform == "github":
+                return self._create_github_work_item(content, metadata)
+            else:
+                return WorkItemResult(False, error_message=f"Unknown platform: {platform}")
+                
+        except ParsingError as e:
+            return WorkItemResult(False, error_message=f"Parsing error: {str(e)}")
+        except PlatformError as e:
+            return WorkItemResult(False, error_message=f"Platform error: {str(e)}")
+        except Exception as e:
+            return WorkItemResult(False, error_message=f"Unexpected error: {str(e)}")
+    
+    def _create_azdo_work_item(self, content: Dict[str, Any], metadata: Dict[str, Any]) -> WorkItemResult:
+        """Create Azure DevOps work item."""
+        # Implementation placeholder
+        return WorkItemResult(False, error_message="Azure DevOps creation not implemented")
+    
+    def _create_github_work_item(self, content: Dict[str, Any], metadata: Dict[str, Any]) -> WorkItemResult:
+        """Create GitHub work item."""
+        # Implementation placeholder
+        return WorkItemResult(False, error_message="GitHub creation not implemented")
 
 
 def cmd_workitem_create(args) -> Optional[Dict[str, Any]]:
