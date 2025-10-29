@@ -27,19 +27,19 @@ class GitHubPlatform(WorkItemPlatform):
     def validate_auth(self) -> bool:
         """Validate GitHub CLI authentication."""
         try:
-            result = subprocess.run([\"gh\", \"auth\", \"status\"], 
+            result = subprocess.run(["gh", "auth", "status"], 
                                   capture_output=True, text=True, check=False)
             if result.returncode == 0:
                 if self.verbose:
-                    print(\"✓ GitHub CLI authenticated\")
+                    print("✓ GitHub CLI authenticated")
                 return True
             else:
-                print(\"❌ GitHub CLI not authenticated.\")
-                print(\"Please run gh auth login to authenticate.\")
+                print("❌ GitHub CLI not authenticated.")
+                print("Please run gh auth login to authenticate.")
                 return False
         except FileNotFoundError:
-            print(\"❌ GitHub CLI (gh) not found.\")
-            print(\"Please install GitHub CLI: https://cli.github.com/\")
+            print("❌ GitHub CLI (gh) not found.")
+            print("Please install GitHub CLI: https://cli.github.com/")
             return False
     
     def create_work_item(
@@ -54,15 +54,15 @@ class GitHubPlatform(WorkItemPlatform):
         if not self.validate_auth():
             return None
         
-        repo = metadata.get(\"repo\") or metadata.get(\"repository\")
+        repo = metadata.get("repo") or metadata.get("repository")
         if not repo:
-            print(\"❌ Repository not specified. Please add Repository: owner/repo to your markdown file.\")
+            print("❌ Repository not specified. Please add Repository: owner/repo to your markdown file.")
             return None
         
         if dry_run:
-            print(\"[dry-run] GitHub issue creation suppressed.\")
+            print("[dry-run] GitHub issue creation suppressed.")
             return None
         
-        print(\"GitHub issue creation not yet implemented\")
+        print("GitHub issue creation not yet implemented")
         return None
 

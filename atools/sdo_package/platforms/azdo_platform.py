@@ -26,9 +26,9 @@ class AzureDevOpsPlatform(WorkItemPlatform):
         if git_info:
             if self.verbose:
                 print("✓ Extracted Azure DevOps information from Git remote:")
-                print(f"  Organization: {git_info[\"organization\"]}")
-                print(f"  Project: {git_info[\"project\"]}")
-                print(f"  Repository: {git_info[\"repository\"]}")
+                print(f"  Organization: {git_info['organization']}")
+                print(f"  Project: {git_info['project']}")
+                print(f"  Repository: {git_info['repository']}")
             return git_info
         else:
             raise ConfigurationError(
