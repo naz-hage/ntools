@@ -19,15 +19,16 @@ class MetadataParser:
         Returns:
             Platform name ('azdo' or 'github')
         """
-        # Check explicit platform specification
-        platform = metadata.get('platform', '').lower()
-        if platform in ['azdo', 'azure', 'azure-devops']:
+        # Check explicit platform specification (both 'platform' and 'target' keys)
+        platform = metadata.get('platform', metadata.get('target', '')).lower()
+        if platform in ['azdo', 'azure', 'azure-devops', 'azure_devops']:
             return 'azdo'
         elif platform in ['github', 'gh']:
             return 'github'
         
         # Check for platform-specific indicators
-        if metadata.get('repo') and '/' in str(metadata.get('repo')):
+        repo = metadata.get('repo') or metadata.get('repository')
+        if repo and '/' in str(repo):
             return 'github'  # Format like "owner/repo"
         
         if metadata.get('organization') or metadata.get('project'):

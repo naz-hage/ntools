@@ -33,23 +33,21 @@ class TestWorkItemManager:
     
     @patch("sdo_package.work_items.os.path.exists", return_value=True)
     @patch("sdo_package.parsers.markdown_parser.MarkdownParser")
-    @patch("sdo_package.parsers.metadata_parser.MetadataParser")
     @patch("sdo_package.platforms.azdo_platform.AzureDevOpsPlatform")
-    def test_create_work_item_success(self, mock_platform, mock_metadata_parser, mock_markdown_parser, mock_exists):
+    def test_create_work_item_success(self, mock_platform, mock_markdown_parser, mock_exists):
         """Test successful work item creation."""
-        # Mock parser results
+        # Mock parser results - MarkdownParser now returns everything including metadata
         mock_markdown_instance = mock_markdown_parser.return_value
         mock_markdown_instance.parse_file.return_value = {
             "title": "Test Issue",
             "description": "Test description",
-            "acceptance_criteria": ["Criteria 1", "Criteria 2"]
-        }
-        
-        mock_metadata_instance = mock_metadata_parser.return_value
-        mock_metadata_instance.parse.return_value = {
-            "platform": "azure_devops",
-            "work_item_type": "Bug",
-            "project": "TestProject"
+            "acceptance_criteria": ["Criteria 1", "Criteria 2"],
+            "metadata": {
+                "target": "azdo",  # Use 'target' as it comes from MarkdownParser
+                "project": "TestProject",
+                "organization": "TestOrg",
+                "pat": "test_pat"
+            }
         }
         
         # Mock platform creation - return dict with id and url
@@ -69,7 +67,6 @@ class TestWorkItemManager:
         
         # Verify method calls
         mock_markdown_instance.parse_file.assert_called_once_with("test.md")
-        mock_metadata_instance.parse.assert_called_once()
         mock_platform_instance.create_work_item.assert_called_once()
     
     @patch("sdo_package.work_items.os.path.exists", return_value=True)
@@ -89,21 +86,21 @@ class TestWorkItemManager:
     
     @patch("sdo_package.work_items.os.path.exists", return_value=True)
     @patch("sdo_package.parsers.markdown_parser.MarkdownParser")
-    @patch("sdo_package.parsers.metadata_parser.MetadataParser")
     @patch("sdo_package.platforms.azdo_platform.AzureDevOpsPlatform")
-    def test_create_work_item_platform_error(self, mock_platform, mock_metadata_parser, mock_markdown_parser, mock_exists):
+    def test_create_work_item_platform_error(self, mock_platform, mock_markdown_parser, mock_exists):
         """Test work item creation with platform error."""
         # Mock successful parsing
         mock_markdown_instance = mock_markdown_parser.return_value
         mock_markdown_instance.parse_file.return_value = {
             "title": "Test Issue",
-            "description": "Test description"
-        }
-        
-        mock_metadata_instance = mock_metadata_parser.return_value
-        mock_metadata_instance.parse.return_value = {
-            "platform": "azure_devops",
-            "work_item_type": "Bug"
+            "description": "Test description",
+            "acceptance_criteria": ["Criteria 1"],
+            "metadata": {
+                "target": "azdo",
+                "project": "TestProject",
+                "organization": "TestOrg",
+                "pat": "test_pat"
+            }
         }
         
         # Mock platform error
@@ -127,28 +124,25 @@ class TestWorkItemManager:
     
     @patch("sdo_package.work_items.os.path.exists", return_value=True)
     @patch("sdo_package.parsers.markdown_parser.MarkdownParser")
-    @patch("sdo_package.parsers.metadata_parser.MetadataParser")
-    def test_create_work_item_unknown_platform(self, mock_metadata_parser, mock_markdown_parser, mock_exists):
-        """Test work item creation with unknown platform."""
-        # Mock parsing results with unknown platform
+    def test_create_work_item_unknown_platform(self, mock_markdown_parser, mock_exists):
+        """Test work item creation with unknown platform (defaults to Azure DevOps)."""
+        # Mock parsing results - unknown platform defaults to Azure DevOps
         mock_markdown_instance = mock_markdown_parser.return_value
         mock_markdown_instance.parse_file.return_value = {
             "title": "Test Issue",
-            "description": "Test description"
+            "description": "Test description",
+            "acceptance_criteria": ["Criteria 1"],
+            "metadata": {
+                "target": "unknown_platform"  # This defaults to Azure DevOps
+            }
         }
         
-        mock_metadata_instance = mock_metadata_parser.return_value
-        mock_metadata_instance.parse.return_value = {
-            "platform": "unknown_platform",
-            "work_item_type": "Bug"
-        }
-        
-        # Test that unknown platform is handled
+        # Test that it defaults to Azure DevOps but fails due to missing config
         result = self.manager.create_work_item("test.md")
         
         assert isinstance(result, WorkItemResult)
         assert result.success is False
-        assert "unknown" in result.error_message.lower() or "platform" in result.error_message.lower()
+        assert "azure devops configuration" in result.error_message.lower()
 
 
 class TestWorkItemResult:

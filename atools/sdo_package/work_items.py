@@ -2,6 +2,7 @@
 SDO Work Items - Business logic for work item operations.
 """
 
+import os
 from typing import Optional, Dict, Any, List
 from .exceptions import ValidationError, ConfigurationError, PlatformError, ParsingError
 
@@ -34,7 +35,6 @@ class WorkItemManager:
         """Create a work item from markdown file."""
         try:
             # Check if file exists first
-            import os
             if not os.path.exists(file_path):
                 return WorkItemResult(False, error_message=f"File not found: {file_path}")
             
@@ -44,14 +44,26 @@ class WorkItemManager:
             
             # Parse the markdown file
             parser = MarkdownParser()
-            content = parser.parse_file(file_path)
+            parsed_result = parser.parse_file(file_path)
             
-            # Parse metadata
-            metadata_parser = MetadataParser()
-            metadata = metadata_parser.parse(content)
+            # Extract content and metadata from parsed result
+            content = {
+                "title": parsed_result["title"],
+                "description": parsed_result["description"], 
+                "acceptance_criteria": parsed_result["acceptance_criteria"]
+            }
+            metadata = parsed_result["metadata"]
             
             # Determine platform and create work item
-            platform = metadata.get("platform", "").lower()
+            detected_platform = MetadataParser.detect_platform(metadata)
+            
+            # Map detected platform names to work_items expected names
+            if detected_platform == 'azdo':
+                platform = 'azure_devops'
+            elif detected_platform == 'github':
+                platform = 'github'
+            else:
+                platform = detected_platform
             
             if platform == "azure_devops":
                 return self._create_azdo_work_item(content, metadata)
