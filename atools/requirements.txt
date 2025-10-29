@@ -1,4 +1,5 @@
-# Python dependencies for atools/add-issue.py
+# Python dependencies for atools/add-issue.py and SDO package
 # Keep this minimal; requests is optional at runtime but listed here for convenience.
 requests==2.32.4
+click==8.1.7
 
