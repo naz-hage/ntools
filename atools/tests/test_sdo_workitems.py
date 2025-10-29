@@ -52,14 +52,12 @@ class TestWorkItemManager:
             "project": "TestProject"
         }
         
-        # Mock platform creation - return WorkItemResult instead of dict
+        # Mock platform creation - return dict with id and url
         mock_platform_instance = mock_platform.return_value
-        mock_platform_instance.create_work_item.return_value = WorkItemResult(
-            success=True,
-            work_item_id="123",
-            url="https://example.com/123",
-            platform="azure_devops"
-        )
+        mock_platform_instance.create_work_item.return_value = {
+            "id": 123,
+            "url": "https://example.com/123"
+        }
         
         # Test work item creation
         result = self.manager.create_work_item("test.md")
