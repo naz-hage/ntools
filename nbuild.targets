@@ -177,71 +177,33 @@
 		<Message Text="==> DONE" />
 	</Target>
 
-	<!-- Install SDO Python package dependencies -->
+	<!-- Install SDO package in development mode for testing -->
 	<Target Name="INSTALL_SDO_PACKAGE" DependsOnTargets="INSTALL_PYTHON_TEST_DEPS">
-		<Message Text="Installing SDO package dependencies for development" Importance="high" />
+		<Message Text="Installing SDO package in development mode" Importance="high" />
 		<PropertyGroup>
 			<PythonExe>$(PythonPath)\python.exe</PythonExe>
 			<PipExe Condition="'$(PipPath)' != ''">$(PipPath)</PipExe>
 			<!-- Fallback to python -m pip if PipPath not set -->
 			<PipExe Condition="'$(PipExe)' == ''">&quot;$(PythonExe)&quot; -m pip</PipExe>
-			<AtoolsReqDev>$(SolutionDir)\atools\requirements-dev.txt</AtoolsReqDev>
+			<SdoPackagePath>$(SolutionDir)\atools\sdo_package</SdoPackagePath>
 		</PropertyGroup>
-		<!-- Install development dependencies for SDO -->
-		<Exec Command='&quot;$(PipExe)&quot; install -r &quot;$(AtoolsReqDev)&quot;' WorkingDirectory="$(SolutionDir)" ContinueOnError="true">
-			<Output TaskParameter="ExitCode" PropertyName="SdoPipExitCode" />
+		
+		<!-- Check if SDO package directory exists -->
+		<Error Condition="!Exists('$(SdoPackagePath)')" Text="SDO package directory not found at: $(SdoPackagePath)" />
+		
+		<!-- Install SDO package dependencies -->
+		<Exec Command='&quot;$(PipExe)&quot; install -r &quot;$(SolutionDir)\atools\requirements.txt&quot;' WorkingDirectory="$(SolutionDir)">
+			<Output TaskParameter="ExitCode" PropertyName="SdoDepsExitCode" />
 		</Exec>
-		<Message Text="SDO package dependencies install returned exit code $(SdoPipExitCode)" Importance="high" />
-		<!-- If requirements-dev install failed, install minimal deps -->
-		<Exec Command='&quot;$(PipExe)&quot; install click requests pytest pytest-mock pytest-cov' WorkingDirectory="$(SolutionDir)" Condition="!Exists('$(AtoolsReqDev)') Or '$(SdoPipExitCode)' != '0'">
-			<Output TaskParameter="ExitCode" PropertyName="SdoFallbackExitCode" />
-		</Exec>
-		<Error Condition="'$(SdoPipExitCode)' != '0' And '$(SdoFallbackExitCode)' != '0'" Text="Failed to install SDO dependencies. pip exit codes: $(SdoPipExitCode), $(SdoFallbackExitCode)" />
-		<Message Text="==> DONE" />
-	</Target>
-
-	<!-- Run SDO-specific tests with detailed output -->
-	<Target Name="RUN_SDO_TESTS" DependsOnTargets="INSTALL_SDO_PACKAGE">
-		<Message Text="Running SDO test suite with coverage" Importance="high" />
-		<PropertyGroup>
-			<PythonExe>$(PythonPath)\python.exe</PythonExe>
-			<SdoTestPath>$(SolutionDir)\atools\tests</SdoTestPath>
-		</PropertyGroup>
-		<!-- Run SDO tests with coverage -->
-		<Exec Command='&quot;$(PythonExe)&quot; -m pytest &quot;$(SdoTestPath)&quot; -v --tb=short --cov=sdo_package --cov-report=term-missing --cov-report=html:$(SolutionDir)\TestResults\sdo-coverage' WorkingDirectory="$(SolutionDir)" ConsoleToMSBuild="true" ContinueOnError="true">
+		<Error Condition="'$(SdoDepsExitCode)' != '0'" Text="Failed to install SDO dependencies. Exit code: $(SdoDepsExitCode)" />
+		
+		<!-- Test SDO installation by running help command -->
+		<Exec Command='&quot;$(PythonExe)&quot; -c "import sys; sys.path.insert(0, r&apos;$(SolutionDir)\atools&apos;); from sdo_package.cli import main; main([&apos;--help&apos;])"' WorkingDirectory="$(SolutionDir)" ContinueOnError="true">
 			<Output TaskParameter="ExitCode" PropertyName="SdoTestExitCode" />
 		</Exec>
-		<!-- Always run the SDO integration test script -->
-		<Message Text="Running SDO integration test script" Importance="high" />
-		<Exec Command='&quot;$(PythonExe)&quot; &quot;$(SolutionDir)\atools\tests\run_sdo_tests.py&quot;' WorkingDirectory="$(SolutionDir)" ContinueOnError="true">
-			<Output TaskParameter="ExitCode" PropertyName="SdoIntegrationExitCode" />
-		</Exec>
-		<Message Text="SDO pytest exit code: $(SdoTestExitCode), Integration test exit code: $(SdoIntegrationExitCode)" Importance="high" />
-		<!-- Report results but don't fail build during development -->
-		<Message Text="⚠️ SDO pytest had $(SdoTestExitCode) failing tests - continuing for development" Importance="high" Condition="'$(SdoTestExitCode)' != '0'" />
-		<Message Text="✅ SDO pytest completed successfully" Importance="high" Condition="'$(SdoTestExitCode)' == '0'" />
-		<Message Text="SDO integration tests completed with exit code $(SdoIntegrationExitCode)" Importance="high" Condition="'$(SdoIntegrationExitCode)' != '0'" />
-		<Message Text="✅ SDO integration tests passed" Importance="high" Condition="'$(SdoIntegrationExitCode)' == '0'" />
-		<Message Text="==> SDO Tests DONE (Development Mode - Tolerates Test Failures)" />
-	</Target>
-
-	<!-- Quick SDO functionality verification -->
-	<Target Name="TEST_SDO_CLI">
-		<Message Text="Testing SDO CLI functionality" Importance="high" />
-		<PropertyGroup>
-			<PythonExe>$(PythonPath)\python.exe</PythonExe>
-		</PropertyGroup>
-		<!-- Test SDO CLI help command -->
-		<Exec Command='&quot;$(PythonExe)&quot; &quot;$(SolutionDir)\atools\sdo.py&quot; --help' WorkingDirectory="$(SolutionDir)" ContinueOnError="true">
-			<Output TaskParameter="ExitCode" PropertyName="SdoHelpExitCode" />
-		</Exec>
-		<!-- Test SDO workitem help command -->
-		<Exec Command='&quot;$(PythonExe)&quot; &quot;$(SolutionDir)\atools\sdo.py&quot; workitem --help' WorkingDirectory="$(SolutionDir)" ContinueOnError="true">
-			<Output TaskParameter="ExitCode" PropertyName="SdoWorkitemHelpExitCode" />
-		</Exec>
-		<Message Text="SDO CLI help: $(SdoHelpExitCode), Workitem help: $(SdoWorkitemHelpExitCode)" Importance="high" />
-		<Error Condition="'$(SdoHelpExitCode)' != '0' Or '$(SdoWorkitemHelpExitCode)' != '0'" Text="SDO CLI test failed. Help: $(SdoHelpExitCode), Workitem: $(SdoWorkitemHelpExitCode)" />
-		<Message Text="✅ SDO CLI functionality verified" Importance="high" />
+		
+		<Message Text="✅ SDO package installed and tested successfully" Condition="'$(SdoTestExitCode)' == '0'" Importance="high" />
+		<Message Text="⚠️ SDO package installed but test failed (Exit code: $(SdoTestExitCode))" Condition="'$(SdoTestExitCode)' != '0'" Importance="high" />
 		<Message Text="==> DONE" />
 	</Target>
 

@@ -3,10 +3,6 @@ SDO Work Items - Business logic for work item operations.
 """
 
 from typing import Optional, Dict, Any, List
-from .parsers.markdown_parser import MarkdownParser
-from .parsers.metadata_parser import MetadataParser
-from .platforms.azdo_platform import AzureDevOpsPlatform
-from .platforms.github_platform import GitHubPlatform
 from .exceptions import ValidationError, ConfigurationError, PlatformError, ParsingError
 
 
@@ -42,6 +38,10 @@ class WorkItemManager:
             if not os.path.exists(file_path):
                 return WorkItemResult(False, error_message=f"File not found: {file_path}")
             
+            # Lazy imports (available in later phases)
+            from .parsers.markdown_parser import MarkdownParser
+            from .parsers.metadata_parser import MetadataParser
+            
             # Parse the markdown file
             parser = MarkdownParser()
             content = parser.parse_file(file_path)
@@ -70,6 +70,9 @@ class WorkItemManager:
     def _create_azdo_work_item(self, content: Dict[str, Any], metadata: Dict[str, Any]) -> WorkItemResult:
         """Create Azure DevOps work item."""
         try:
+            # Lazy import (available in Phase 4)
+            from .platforms.azdo_platform import AzureDevOpsPlatform
+            
             # Extract required parameters
             organization = metadata.get("organization", "")
             project = metadata.get("project", "")
@@ -111,6 +114,9 @@ class WorkItemManager:
     def _create_github_work_item(self, content: Dict[str, Any], metadata: Dict[str, Any]) -> WorkItemResult:
         """Create GitHub work item."""
         try:
+            # Lazy import (available in Phase 4)
+            from .platforms.github_platform import GitHubPlatform
+            
             # Extract required parameters
             owner = metadata.get("owner", "")
             repo = metadata.get("repo", metadata.get("repository", ""))
@@ -161,6 +167,12 @@ def cmd_workitem_create(args) -> Optional[Dict[str, Any]]:
         Dictionary containing creation result or None if failed
     """
     try:
+        # Lazy imports (available in later phases)
+        from .parsers.markdown_parser import MarkdownParser
+        from .parsers.metadata_parser import MetadataParser
+        from .platforms.azdo_platform import AzureDevOpsPlatform
+        from .platforms.github_platform import GitHubPlatform
+        
         # Parse the markdown file
         parser = MarkdownParser()
         content = parser.parse_file(args.file_path)
