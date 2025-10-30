@@ -111,11 +111,23 @@ def main(args=None):
         click.echo(f"SDO version {__version__}")
         sys.exit(0)
     
-    # Handle the case where args is a list vs being called by Click
-    if isinstance(args, list):
-        cli(args, standalone_mode=False)
-    else:
-        cli()
+    try:
+        # Handle the case where args is a list vs being called by Click
+        if isinstance(args, list):
+            cli(args, standalone_mode=False)
+        else:
+            cli()
+    except click.exceptions.UsageError as e:
+        click.echo(f"❌ {str(e)}", err=True)
+        click.echo()
+        click.echo("Run 'sdo --help' for available commands.", err=True)
+        sys.exit(1)
+    except click.exceptions.ClickException as e:
+        click.echo(f"❌ {str(e)}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"❌ Unexpected error: {str(e)}", err=True)
+        sys.exit(1)
 
 # Set the CLI app name for tests
 cli.name = "sdo"
