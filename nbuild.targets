@@ -177,33 +177,19 @@
 		<Message Text="==> DONE" />
 	</Target>
 
-	<!-- Install SDO package in development mode for testing -->
-	<Target Name="INSTALL_SDO_PACKAGE" DependsOnTargets="INSTALL_PYTHON_TEST_DEPS">
-		<Message Text="Installing SDO package in development mode" Importance="high" />
+	<!-- Run SDO tests specifically -->
+	<Target Name="RUN_SDO_TESTS" DependsOnTargets="INSTALL_PYTHON_TEST_DEPS">
+		<Message Text="Running SDO tests" Importance="high" />
 		<PropertyGroup>
 			<PythonExe>$(PythonPath)\python.exe</PythonExe>
-			<PipExe Condition="'$(PipPath)' != ''">$(PipPath)</PipExe>
-			<!-- Fallback to python -m pip if PipPath not set -->
-			<PipExe Condition="'$(PipExe)' == ''">&quot;$(PythonExe)&quot; -m pip</PipExe>
-			<SdoPackagePath>$(SolutionDir)\atools\sdo_package</SdoPackagePath>
+			<!-- Allow overriding test path via TEST_PATH -->
+			<SdoTestPath Condition="'$(SdoTestPath)' == ''">$(SolutionDir)\atools\tests</SdoTestPath>
 		</PropertyGroup>
-		
-		<!-- Check if SDO package directory exists -->
-		<Error Condition="!Exists('$(SdoPackagePath)')" Text="SDO package directory not found at: $(SdoPackagePath)" />
-		
-		<!-- Install SDO package dependencies -->
-		<Exec Command='&quot;$(PipExe)&quot; install -r &quot;$(SolutionDir)\atools\requirements.txt&quot;' WorkingDirectory="$(SolutionDir)">
-			<Output TaskParameter="ExitCode" PropertyName="SdoDepsExitCode" />
+		<!-- Run pytest with very verbose output (-vv) on SDO tests -->
+		<Exec Command='&quot;$(PythonExe)&quot; -m pytest -vv &quot;$(SdoTestPath)&quot;' WorkingDirectory="$(SolutionDir)" ConsoleToMSBuild="true">
+			<Output TaskParameter="ExitCode" PropertyName="SdoPytestExitCode" />
 		</Exec>
-		<Error Condition="'$(SdoDepsExitCode)' != '0'" Text="Failed to install SDO dependencies. Exit code: $(SdoDepsExitCode)" />
-		
-		<!-- Test SDO installation by running help command -->
-		<Exec Command='&quot;$(PythonExe)&quot; -c "import sys; sys.path.insert(0, r&apos;$(SolutionDir)\atools&apos;); from sdo_package.cli import main; main([&apos;--help&apos;])"' WorkingDirectory="$(SolutionDir)" ContinueOnError="true">
-			<Output TaskParameter="ExitCode" PropertyName="SdoTestExitCode" />
-		</Exec>
-		
-		<Message Text="✅ SDO package installed and tested successfully" Condition="'$(SdoTestExitCode)' == '0'" Importance="high" />
-		<Message Text="⚠️ SDO package installed but test failed (Exit code: $(SdoTestExitCode))" Condition="'$(SdoTestExitCode)' != '0'" Importance="high" />
+		<Error Condition="'$(SdoPytestExitCode)' != '0'" Text="SDO tests failed with exit code $(SdoPytestExitCode). See output above." />
 		<Message Text="==> DONE" />
 	</Target>
 
