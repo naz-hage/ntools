@@ -55,8 +55,27 @@ class AzureDevOpsPlatform(WorkItemPlatform):
     ) -> Optional[Dict[str, Any]]:
         """Create an Azure DevOps work item."""
         if dry_run:
-            print("[dry-run] Azure DevOps work item creation suppressed.")
-            return None
+            print('[dry-run] Would create Azure DevOps work item with:')
+            print(f'  Title: {title}')
+            print(f'  Project: {metadata.get("project", "Not specified")}')
+            print(f'  Work Item Type: {metadata.get("work_item_type", "PBI")}')
+            if metadata.get('area'):
+                print(f'  Area: {metadata.get("area")}')
+            if metadata.get('iteration'):
+                print(f'  Iteration: {metadata.get("iteration")}')
+            if metadata.get('assignee'):
+                print(f'  Assignee: {metadata.get("assignee")}')
+            print('  Description:')
+            print(description)
+            if acceptance_criteria:
+                print('  Acceptance Criteria:')
+                for ac in acceptance_criteria:
+                    # Keep the checkboxes in the format they appear in the markdown
+                    if ac.strip().startswith('[ ]') or ac.strip().startswith('[x]'):
+                        print(f'  - {ac.strip()}')
+                    else:
+                        print(f'  - [ ] {ac.strip()}')
+            return {"dry_run": True, "title": title, "project": metadata.get("project")}
         
         print("Azure DevOps work item creation not yet implemented")
         return None
