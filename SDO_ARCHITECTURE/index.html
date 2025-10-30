@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="naz-hage" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>SDO Architecture Documentation - Ntools - Work in Progress</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "SDO Architecture Documentation";
+        var mkdocs_page_input_path = "SDO_ARCHITECTURE.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Ntools - Work in Progress
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../usage/">Practice</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../setup/">Setup your project</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buildtypes/">Build Types</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../versioning/">Versioning</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">List of Tools</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/nbuild/">Nbuild (nb.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/lf/">lf (lf.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/nbackup/">Nbackup (nbackup.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/wi/">wi (wi.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/github-release/">Github Release</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Custom Build Tasks</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/nbuildtasks/">Nbuild Tasks</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developer setup</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../version-automation-guide/">Version Automation Guide</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/ntools/">Development Tools</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >ntools-scripts module</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../ntools/ntools-scripts-module/">Module</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../ntools/ntools-scripts-module-api/">API</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Build System Features</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/code-coverage/">Code Coverage</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ntools/nbuild-targets/">MSBuild Targets</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">atools</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../atools/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >List of tools</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../atools/add-issue/">Add issue</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../atools/install-ntools/">Install NTools</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../atools/azdo_payloads/">AzDO payloads</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Ntools - Work in Progress</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">SDO Architecture Documentation</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/naz-hage/ntools/edit/main/docs/SDO_ARCHITECTURE.md">Edit on ntools</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="sdo-architecture-documentation">SDO Architecture Documentation</h1>
+<h2 id="overview">Overview</h2>
+<p>SDO (Simple DevOps Operations Tool) is a command-line interface tool designed to streamline work item creation across multiple DevOps platforms including Azure DevOps and GitHub. The tool follows a modular, extensible architecture that allows for easy addition of new platforms and work item types.</p>
+<h2 id="architecture-principles">Architecture Principles</h2>
+<h3 id="1-separation-of-concerns">1. <strong>Separation of Concerns</strong></h3>
+<ul>
+<li><strong>CLI Layer</strong>: User interaction and command handling</li>
+<li><strong>Business Logic</strong>: Work item orchestration and validation</li>
+<li><strong>Platform Layer</strong>: Platform-specific implementations</li>
+<li><strong>Parser Layer</strong>: Content extraction and metadata processing</li>
+<li><strong>Client Layer</strong>: API communication and authentication</li>
+</ul>
+<h3 id="2-strategy-pattern">2. <strong>Strategy Pattern</strong></h3>
+<ul>
+<li>Abstract platform interface allows seamless switching between DevOps platforms</li>
+<li>Platform-specific implementations handle unique API requirements</li>
+<li>Consistent interface across all supported platforms</li>
+</ul>
+<h3 id="3-extensibility">3. <strong>Extensibility</strong></h3>
+<ul>
+<li>Plugin-style architecture for adding new platforms</li>
+<li>Modular parser system for different content formats</li>
+<li>Configurable metadata extraction</li>
+</ul>
+<h2 id="system-architecture">System Architecture</h2>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│                         SDO CLI Tool                            │
+├─────────────────────────────────────────────────────────────────┤
+│  sdo.py (Main Entry Point)                                     │
+│  ├── Click CLI Framework                                       │
+│  ├── Command Registration                                      │
+│  └── Global Configuration                                      │
+└─────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    CLI Layer (cli.py)                          │
+├─────────────────────────────────────────────────────────────────┤
+│  ├── add-issue command implementation                          │
+│  ├── Command argument parsing and validation                   │
+│  ├── Verbose output management                                 │
+│  └── Error handling and user feedback                          │
+└─────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────┐
+│               Business Logic (work_items.py)                   │
+├─────────────────────────────────────────────────────────────────┤
+│  ├── WorkItemManager: Main orchestration class                 │
+│  ├── Content processing and validation                         │
+│  ├── Platform selection and routing                            │
+│  └── Result aggregation and reporting                          │
+└─────────────────────────────────────────────────────────────────┘
+                                    │
+                    ┌───────────────┼───────────────┐
+                    ▼               ▼               ▼
+    ┌─────────────────────┐ ┌─────────────────┐ ┌─────────────────┐
+    │   Parser Layer      │ │ Platform Layer  │ │  Client Layer   │
+    │   (parsers/)        │ │ (platforms/)    │ │   (client.py)   │
+    └─────────────────────┘ └─────────────────┘ └─────────────────┘
+</code></pre>
+<h2 id="component-details">Component Details</h2>
+<h3 id="1-main-entry-point-sdopy">1. Main Entry Point (sdo.py)</h3>
+<p><strong>Purpose</strong>: Application bootstrap and CLI framework setup
+<strong>Responsibilities</strong>:
+- Click application initialization
+- Global command registration
+- Environment setup and configuration
+- Version management</p>
+<p><strong>Key Features</strong>:
+- Supports <code>--verbose</code> flag for detailed output
+- Hierarchical command structure
+- Extensible command registration</p>
+<h3 id="2-cli-layer-clipy">2. CLI Layer (cli.py)</h3>
+<p><strong>Purpose</strong>: Command implementations and user interaction
+<strong>Responsibilities</strong>:
+- <code>add-issue</code> command implementation
+- Input validation and sanitization
+- User feedback and progress reporting
+- Error presentation to users</p>
+<p><strong>Key Features</strong>:
+- Rich command-line experience with Click
+- Comprehensive input validation
+- Detailed verbose output for debugging
+- Graceful error handling with helpful messages</p>
+<h3 id="3-business-logic-layer-work_itemspy">3. Business Logic Layer (work_items.py)</h3>
+<p><strong>Purpose</strong>: Core application logic and orchestration
+<strong>Responsibilities</strong>:
+- Content processing workflow coordination
+- Platform detection and selection
+- Work item creation orchestration
+- Result validation and reporting</p>
+<p><strong>Classes</strong>:
+- <code>WorkItemManager</code>: Main orchestration class
+- <code>WorkItemResult</code>: Result encapsulation
+- Various helper functions for content processing</p>
+<h3 id="4-parser-layer-parsers">4. Parser Layer (parsers/)</h3>
+<p><strong>Purpose</strong>: Content extraction and metadata processing</p>
+<h4 id="markdownparser-markdown_parserpy">MarkdownParser (markdown_parser.py)</h4>
+<p><strong>Responsibilities</strong>:
+- Markdown file parsing and content extraction
+- Section identification (title, description, acceptance criteria)
+- Content normalization and validation</p>
+<p><strong>Key Features</strong>:
+- Robust markdown parsing with error handling
+- Section-based content extraction
+- Support for various markdown formats</p>
+<h4 id="metadataparser-metadata_parserpy">MetadataParser (metadata_parser.py)</h4>
+<p><strong>Responsibilities</strong>:
+- Platform detection from file content
+- Metadata extraction and validation
+- Configuration parsing</p>
+<p><strong>Key Features</strong>:
+- Multiple platform detection strategies
+- Flexible metadata extraction
+- Validation and error reporting</p>
+<h3 id="5-platform-layer-platforms">5. Platform Layer (platforms/)</h3>
+<p><strong>Purpose</strong>: Platform-specific implementations</p>
+<h4 id="base-platform-basepy">Base Platform (base.py)</h4>
+<p><strong>Abstract Interface</strong>:</p>
+<pre><code class="language-python">class WorkItemPlatform(ABC):
+    @abstractmethod
+    def create_work_item(self, **kwargs) -&gt; Dict[str, Any]:
+        pass
+
+    @abstractmethod
+    def validate_connection(self) -&gt; bool:
+        pass
+</code></pre>
+<h4 id="azure-devops-platform-azdo_platformpy">Azure DevOps Platform (azdo_platform.py)</h4>
+<p><strong>Responsibilities</strong>:
+- Azure DevOps REST API integration
+- Work item creation via REST API
+- Authentication and authorization
+- Azure DevOps-specific field mapping</p>
+<p><strong>Key Features</strong>:
+- PAT (Personal Access Token) authentication
+- Support for multiple work item types
+- Rich error handling for API failures
+- Verbose logging for debugging</p>
+<h4 id="github-platform-github_platformpy">GitHub Platform (github_platform.py)</h4>
+<p><strong>Responsibilities</strong>:
+- GitHub CLI integration
+- Issue creation via GitHub CLI
+- Repository context detection
+- GitHub-specific field mapping</p>
+<p><strong>Key Features</strong>:
+- GitHub CLI command execution
+- Automatic repository detection
+- Label and milestone support
+- Error handling for CLI failures</p>
+<h3 id="6-client-layer-clientpy">6. Client Layer (client.py)</h3>
+<p><strong>Purpose</strong>: Low-level API communication</p>
+<h4 id="azuredevopsclient">AzureDevOpsClient</h4>
+<p><strong>Responsibilities</strong>:
+- HTTP request management for Azure DevOps API
+- Authentication handling
+- Request/response logging
+- Connection validation</p>
+<p><strong>Key Features</strong>:
+- Comprehensive verbose logging
+- Secure token handling with redaction
+- Retry logic for transient failures
+- Detailed error context</p>
+<h2 id="data-flow">Data Flow</h2>
+<h3 id="1-command-execution-flow">1. Command Execution Flow</h3>
+<pre><code>User Command → CLI Parser → WorkItemManager → Platform Selection
+     ↓
+Content Parsing ← MarkdownParser ← File Input
+     ↓
+Metadata Extraction ← MetadataParser ← Content Analysis
+     ↓
+Platform Creation ← PlatformFactory ← Platform Detection
+     ↓
+Work Item Creation ← Platform Implementation ← API/CLI Calls
+     ↓
+Result Reporting ← WorkItemResult ← Success/Error Aggregation
+</code></pre>
+<h3 id="2-error-handling-flow">2. Error Handling Flow</h3>
+<pre><code>Exception Occurrence → Platform-Specific Handler → SDOException
+     ↓
+Business Logic Error Handler → User-Friendly Message
+     ↓
+CLI Error Presenter → Console Output with Context
+</code></pre>
+<h2 id="security-considerations">Security Considerations</h2>
+<h3 id="1-authentication-management">1. <strong>Authentication Management</strong></h3>
+<ul>
+<li>PAT tokens stored securely in environment variables</li>
+<li>Token redaction in all logging output</li>
+<li>No credential storage in configuration files</li>
+</ul>
+<h3 id="2-input-validation">2. <strong>Input Validation</strong></h3>
+<ul>
+<li>All user inputs validated before processing</li>
+<li>File path validation to prevent directory traversal</li>
+<li>Content sanitization to prevent injection attacks</li>
+</ul>
+<h3 id="3-api-security">3. <strong>API Security</strong></h3>
+<ul>
+<li>HTTPS-only communication with external APIs</li>
+<li>Proper error handling to avoid information disclosure</li>
+<li>Request timeout handling to prevent hanging</li>
+</ul>
+<h2 id="configuration-management">Configuration Management</h2>
+<h3 id="1-environment-variables">1. <strong>Environment Variables</strong></h3>
+<ul>
+<li><code>AZURE_DEVOPS_PAT</code>: Azure DevOps Personal Access Token</li>
+<li><code>GITHUB_TOKEN</code>: GitHub authentication token (optional if using GitHub CLI)</li>
+<li><code>SDO_VERBOSE</code>: Global verbose mode setting</li>
+</ul>
+<h3 id="2-file-based-configuration">2. <strong>File-based Configuration</strong></h3>
+<ul>
+<li>Platform detection from markdown metadata</li>
+<li>Template-based work item creation</li>
+<li>Flexible field mapping configurations</li>
+</ul>
+<h2 id="testing-strategy">Testing Strategy</h2>
+<h3 id="1-unit-testing">1. <strong>Unit Testing</strong></h3>
+<ul>
+<li>Individual component testing with mocking</li>
+<li>Parser validation with various input formats</li>
+<li>Platform implementation testing with mock APIs</li>
+</ul>
+<h3 id="2-integration-testing">2. <strong>Integration Testing</strong></h3>
+<ul>
+<li>End-to-end workflow testing</li>
+<li>Real API integration testing (with test accounts)</li>
+<li>Cross-platform compatibility testing</li>
+</ul>
+<h3 id="3-performance-testing">3. <strong>Performance Testing</strong></h3>
+<ul>
+<li>Large file processing performance</li>
+<li>API response time testing</li>
+<li>Memory usage optimization</li>
+</ul>
+<h2 id="extensibility-points">Extensibility Points</h2>
+<h3 id="1-adding-new-platforms">1. <strong>Adding New Platforms</strong></h3>
+<ol>
+<li>Implement <code>WorkItemPlatform</code> abstract base class</li>
+<li>Add platform detection logic to <code>MetadataParser</code></li>
+<li>Register platform in platform factory</li>
+<li>Add platform-specific configuration options</li>
+</ol>
+<h3 id="2-adding-new-content-parsers">2. <strong>Adding New Content Parsers</strong></h3>
+<ol>
+<li>Create parser class with standardized interface</li>
+<li>Add content type detection logic</li>
+<li>Register parser in parser factory</li>
+<li>Add parser-specific configuration options</li>
+</ol>
+<h3 id="3-adding-new-work-item-types">3. <strong>Adding New Work Item Types</strong></h3>
+<ol>
+<li>Extend platform implementations with new type support</li>
+<li>Add type-specific field mappings</li>
+<li>Update validation logic for new types</li>
+<li>Add type-specific templates</li>
+</ol>
+<h2 id="performance-characteristics">Performance Characteristics</h2>
+<h3 id="1-scalability">1. <strong>Scalability</strong></h3>
+<ul>
+<li>Designed for single work item operations</li>
+<li>Efficient parsing for files up to 10MB</li>
+<li>Parallel processing capabilities for future enhancement</li>
+</ul>
+<h3 id="2-resource-usage">2. <strong>Resource Usage</strong></h3>
+<ul>
+<li>Minimal memory footprint</li>
+<li>Efficient file I/O operations</li>
+<li>Optimized API request patterns</li>
+</ul>
+<h3 id="3-response-times">3. <strong>Response Times</strong></h3>
+<ul>
+<li>Local file parsing: &lt; 100ms</li>
+<li>API operations: 1-5 seconds (depending on platform)</li>
+<li>Total operation time: typically &lt; 10 seconds</li>
+</ul>
+<h2 id="future-enhancements">Future Enhancements</h2>
+<h3 id="1-planned-features">1. <strong>Planned Features</strong></h3>
+<ul>
+<li>Bulk work item creation</li>
+<li>Template management system</li>
+<li>Advanced field mapping configurations</li>
+<li>Plugin system for custom platforms</li>
+</ul>
+<h3 id="2-architecture-evolution">2. <strong>Architecture Evolution</strong></h3>
+<ul>
+<li>Microservice decomposition for large-scale deployments</li>
+<li>Event-driven architecture for workflow automation</li>
+<li>Caching layer for improved performance</li>
+<li>Configuration management service</li>
+</ul>
+<h2 id="dependencies">Dependencies</h2>
+<h3 id="1-core-dependencies">1. <strong>Core Dependencies</strong></h3>
+<ul>
+<li><code>click</code>: CLI framework</li>
+<li><code>requests</code>: HTTP client for API calls</li>
+<li><code>typing</code>: Type hints and annotations</li>
+</ul>
+<h3 id="2-development-dependencies">2. <strong>Development Dependencies</strong></h3>
+<ul>
+<li><code>pytest</code>: Testing framework</li>
+<li><code>black</code>: Code formatting</li>
+<li><code>mypy</code>: Static type checking</li>
+<li><code>coverage</code>: Test coverage analysis</li>
+</ul>
+<h2 id="deployment-considerations">Deployment Considerations</h2>
+<h3 id="1-installation">1. <strong>Installation</strong></h3>
+<ul>
+<li>Python package installation via pip</li>
+<li>MSBuild integration for .NET projects</li>
+<li>Cross-platform compatibility (Windows, Linux, macOS)</li>
+</ul>
+<h3 id="2-environment-setup">2. <strong>Environment Setup</strong></h3>
+<ul>
+<li>Python 3.8+ requirement</li>
+<li>Platform-specific authentication setup</li>
+<li>Development vs. production configuration</li>
+</ul>
+<p>This architecture provides a solid foundation for the SDO tool while maintaining flexibility for future enhancements and platform additions.</p>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/naz-hage/ntools" class="fa fa-code-fork" style="color: #fcfcfc"> ntools</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
