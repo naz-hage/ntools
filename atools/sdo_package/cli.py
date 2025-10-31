@@ -4,7 +4,6 @@ SDO CLI - Click-based command line interface.
 
 import click
 import sys
-from typing import Optional
 
 from .exceptions import SDOError, ConfigurationError, ValidationError
 from .work_items import cmd_workitem_create

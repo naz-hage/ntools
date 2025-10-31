@@ -3,7 +3,7 @@ SDO Work Items - Business logic for work item operations.
 """
 
 import os
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any
 from .exceptions import ValidationError, ConfigurationError, PlatformError, ParsingError
 
 
@@ -227,7 +227,6 @@ def cmd_workitem_create(args) -> Optional[Dict[str, Any]]:
 
 def main():
     """For testing purposes."""
-    import sys
     print("SDO Work Items module loaded successfully")
     
 

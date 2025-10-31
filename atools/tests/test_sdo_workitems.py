@@ -3,7 +3,7 @@ Tests for SDO work items business logic.
 """
 
 import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 import sys
 from pathlib import Path
 
@@ -197,72 +197,6 @@ class TestWorkItemResult:
         result_str = str(failed_result)
         assert "error" in result_str.lower()
         assert "Test error" in result_str
-
-
-class TestWorkItemValidation:
-    """Test work item validation logic."""
-    
-    def setup_method(self):
-        """Set up test fixtures."""
-        self.manager = WorkItemManager(verbose=True)
-    
-    def test_validate_required_fields(self):
-        """Test validation of required fields."""
-        # Test with valid content
-        valid_content = {
-            "title": "Test Issue",
-            "description": "Test description"
-        }
-        
-        # This would test internal validation methods
-        # In the actual implementation, these would be private methods
-        pass
-    
-    def test_validate_content_structure(self):
-        """Test validation of content structure."""
-        # Test various content structures and validation rules
-        pass
-    
-    def test_sanitize_input(self):
-        """Test input sanitization."""
-        # Test that dangerous input is properly sanitized
-        pass
-
-
-class TestPlatformSelection:
-    """Test platform selection logic."""
-    
-    def setup_method(self):
-        """Set up test fixtures."""
-        self.manager = WorkItemManager()
-    
-    @patch("sdo_package.parsers.metadata_parser.MetadataParser")
-    def test_azure_devops_platform_selection(self, mock_metadata_parser):
-        """Test Azure DevOps platform selection."""
-        mock_metadata_instance = mock_metadata_parser.return_value
-        mock_metadata_instance.parse.return_value = {
-            "platform": "azure_devops",
-            "work_item_type": "Bug"
-        }
-        
-        # Test platform selection logic
-        pass
-    
-    @patch("sdo_package.parsers.metadata_parser.MetadataParser")
-    def test_github_platform_selection(self, mock_metadata_parser):
-        """Test GitHub platform selection."""
-        mock_metadata_instance = mock_metadata_parser.return_value
-        mock_metadata_instance.parse.return_value = {
-            "platform": "github"
-        }
-        
-        # Test platform selection logic
-        pass
-    
-    def test_auto_platform_detection(self):
-        """Test automatic platform detection."""
-        # Test git remote detection and other auto-detection methods
-        pass
 
 
 if __name__ == "__main__":

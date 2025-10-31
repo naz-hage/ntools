@@ -7,14 +7,18 @@ import re
 from typing import Dict, Any, Optional
 
 
-def extract_azure_devops_info_from_git() -> Optional[Dict[str, str]]:
+def extract_platform_info_from_git() -> Optional[Dict[str, str]]:
     """
-    Extract Azure DevOps info from git remote URLs.
+    Extract platform info from git remote URLs.
+    
+    Supports GitHub and Azure DevOps repositories.
     
     Returns None if:
     - Not a git repository
-    - No Azure DevOps remotes found
+    - No supported platform remotes found
     - Git command fails
+    
+    Returns dict with platform-specific info for supported platforms.
     """
     try:
         # Run git remote -v to get remote information
@@ -29,7 +33,7 @@ def extract_azure_devops_info_from_git() -> Optional[Dict[str, str]]:
             # Not a git repository or other git error
             return None
             
-        # Parse the output to find Azure DevOps remotes
+        # Parse the output to find supported platform remotes
         lines = result.stdout.strip().split('\n')
         for line in lines:
             if not line.strip():
@@ -41,11 +45,18 @@ def extract_azure_devops_info_from_git() -> Optional[Dict[str, str]]:
                 remote_url = parts[1].split()[0]  # Remove (fetch)/(push) suffix
                 remote_url = remote_url.strip()
                 
-                # Check if it's an Azure DevOps URL
-                # Patterns: https://dev.azure.com/org/project/_git/repo
-                # or https://org@dev.azure.com/org/project/_git/repo
-                # or git@ssh.dev.azure.com:v3/org/project/repo
+                # Check for GitHub URLs
+                github_match = re.match(r'https://github\.com/([^/]+)/([^/\s]+)', remote_url)
+                if github_match:
+                    owner, repo = github_match.groups()
+                    return {
+                        'platform': 'github',
+                        'owner': owner,
+                        'repo': repo,
+                        'remote_url': remote_url
+                    }
                 
+                # Check for Azure DevOps URLs
                 azure_patterns = [
                     r"https://(?:[^@]+@)?dev\.azure\.com/([^/]+)/([^/]+)/_git/([^/\s]+)",
                     r"git@ssh\.dev\.azure\.com:v3/([^/]+)/([^/]+)/([^/\s]+)"
@@ -56,13 +67,14 @@ def extract_azure_devops_info_from_git() -> Optional[Dict[str, str]]:
                     if match:
                         org, project, repo = match.groups()
                         return {
-                            "organization": org,
-                            "project": project, 
-                            "repository": repo,
-                            "remote_url": remote_url
+                            'platform': 'azdo',
+                            'organization': org,
+                            'project': project, 
+                            'repository': repo,
+                            'remote_url': remote_url
                         }
         
-        # No Azure DevOps remotes found
+        # No supported platform remotes found
         return None
         
     except (subprocess.SubprocessError, OSError):

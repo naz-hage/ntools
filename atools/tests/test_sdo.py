@@ -3,7 +3,7 @@ Tests for main SDO entry point.
 """
 
 import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 import sys
 from pathlib import Path
 

@@ -3,7 +3,7 @@ Markdown Parser for SDO work item files.
 """
 
 import re
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Any
 
 
 class MarkdownParser:

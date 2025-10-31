@@ -9,20 +9,36 @@ from typing import Dict, Any, Optional, List
 
 try:
     from .base import WorkItemPlatform
-    from ..exceptions import ConfigurationError, ValidationError
-    from ..parsers.metadata_parser import MetadataParser
+    from ..client import extract_platform_info_from_git
+    from ..exceptions import ConfigurationError
 except ImportError:
     from base import WorkItemPlatform
-    from exceptions import ConfigurationError, ValidationError
-    from parsers.metadata_parser import MetadataParser
+    from client import extract_platform_info_from_git
+    from exceptions import ConfigurationError
 
 
 class GitHubPlatform(WorkItemPlatform):
     """GitHub implementation of work item platform."""
     
     def get_config(self) -> Dict[str, str]:
-        """Get GitHub configuration from metadata or git remote."""
-        return {}
+        """Get GitHub configuration by extracting from Git remote."""
+        platform_info = extract_platform_info_from_git()
+        if platform_info and platform_info.get('platform') == 'github':
+            config = {
+                'owner': platform_info['owner'],
+                'repo': platform_info['repo'],
+                'remote_url': platform_info['remote_url']
+            }
+            if self.verbose:
+                print("✓ Extracted GitHub information from Git remote:")
+                print(f"  Owner: {config['owner']}")
+                print(f"  Repository: {config['repo']}")
+            return config
+        else:
+            raise ConfigurationError(
+                "Could not extract GitHub info from Git remote",
+                "Please ensure you are in a GitHub Git repository with properly configured remotes."
+            )
     
     def validate_auth(self) -> bool:
         """Validate GitHub CLI authentication."""

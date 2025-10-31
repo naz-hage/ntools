@@ -7,14 +7,12 @@ from typing import Dict, Any, Optional, List
 
 try:
     from .base import WorkItemPlatform
-    from ..client import AzureDevOpsClient, extract_azure_devops_info_from_git
-    from ..exceptions import ConfigurationError, ValidationError
-    from ..parsers.metadata_parser import MetadataParser
+    from ..client import extract_platform_info_from_git
+    from ..exceptions import ConfigurationError
 except ImportError:
     from base import WorkItemPlatform
-    from client import AzureDevOpsClient, extract_azure_devops_info_from_git
-    from exceptions import ConfigurationError, ValidationError
-    from parsers.metadata_parser import MetadataParser
+    from client import extract_platform_info_from_git
+    from exceptions import ConfigurationError
 
 
 class AzureDevOpsPlatform(WorkItemPlatform):
@@ -22,8 +20,14 @@ class AzureDevOpsPlatform(WorkItemPlatform):
     
     def get_config(self) -> Dict[str, str]:
         """Get Azure DevOps configuration by extracting from Git remote."""
-        git_info = extract_azure_devops_info_from_git()
-        if git_info:
+        platform_info = extract_platform_info_from_git()
+        if platform_info and platform_info.get('platform') == 'azdo':
+            git_info = {
+                'organization': platform_info['organization'],
+                'project': platform_info['project'],
+                'repository': platform_info['repository'],
+                'remote_url': platform_info['remote_url']
+            }
             if self.verbose:
                 print("✓ Extracted Azure DevOps information from Git remote:")
                 print(f"  Organization: {git_info['organization']}")

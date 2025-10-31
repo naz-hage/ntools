@@ -2,6 +2,7 @@
 Metadata Parser for SDO platform detection and validation.
 """
 
+import re
 from typing import Dict, Any, List, Optional
 
 
@@ -104,14 +105,14 @@ class MetadataParser:
         if not parent_str:
             return None
         
-        try:
-            # Handle formats like "#123", "123", "PBI-123"
-            import re
-            match = re.search(r'\d+', str(parent_str))
-            if match:
+        # Handle formats like "#123", "123", "PBI-123"
+        match = re.search(r'\d+', str(parent_str))
+        if match:
+            try:
                 return int(match.group())
-        except (ValueError, AttributeError):
-            pass
+            except ValueError:
+                # Invalid number format, return None
+                pass
         
         return None
     

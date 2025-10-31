@@ -3,7 +3,7 @@ Tests for SDO CLI commands.
 """
 
 import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from click.testing import CliRunner
 import sys
 from pathlib import Path
@@ -12,7 +12,6 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from sdo_package import cli
-from sdo_package.exceptions import SDOException
 
 
 class TestAddIssueCommand:
