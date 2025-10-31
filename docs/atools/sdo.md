@@ -229,14 +229,3 @@ SDO maintains high code quality standards:
 2. Add tests for new functionality
 3. Update documentation
 4. Run full test suite before submitting
-
-## Migration from add-issue.py
-
-SDO replaces the legacy `add-issue.py` tool with:
-- **Improved CLI**: Modern Click-based interface
-- **Better Error Handling**: Clear, actionable error messages
-- **Enhanced Testing**: Comprehensive test coverage
-- **Modular Design**: Easier maintenance and extension
-- **Platform Support**: Both Azure DevOps and GitHub
-
-All existing markdown file formats are supported.
