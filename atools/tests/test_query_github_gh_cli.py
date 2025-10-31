@@ -1,5 +1,4 @@
 import json
-import subprocess
 from unittest import mock
 from pathlib import Path
 
