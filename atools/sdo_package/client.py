@@ -2,15 +2,72 @@
 Azure DevOps API client for work item operations.
 """
 
-import requests
-import json
-import os
+import subprocess
+import re
 from typing import Dict, Any, Optional
 
 
-def extract_azure_devops_info_from_git():
-    """Extract Azure DevOps info from git remote - placeholder."""
-    return None
+def extract_azure_devops_info_from_git() -> Optional[Dict[str, str]]:
+    """
+    Extract Azure DevOps info from git remote URLs.
+    
+    Returns None if:
+    - Not a git repository
+    - No Azure DevOps remotes found
+    - Git command fails
+    """
+    try:
+        # Run git remote -v to get remote information
+        result = subprocess.run(
+            ["git", "remote", "-v"], 
+            capture_output=True, 
+            text=True, 
+            check=False
+        )
+        
+        if result.returncode != 0:
+            # Not a git repository or other git error
+            return None
+            
+        # Parse the output to find Azure DevOps remotes
+        lines = result.stdout.strip().split('\n')
+        for line in lines:
+            if not line.strip():
+                continue
+                
+            # Parse: remote_name\turl (fetch) or remote_name\turl (push)
+            parts = line.split('\t')
+            if len(parts) >= 2:
+                remote_url = parts[1].split()[0]  # Remove (fetch)/(push) suffix
+                remote_url = remote_url.strip()
+                
+                # Check if it's an Azure DevOps URL
+                # Patterns: https://dev.azure.com/org/project/_git/repo
+                # or https://org@dev.azure.com/org/project/_git/repo
+                # or git@ssh.dev.azure.com:v3/org/project/repo
+                
+                azure_patterns = [
+                    r"https://(?:[^@]+@)?dev\.azure\.com/([^/]+)/([^/]+)/_git/([^/\s]+)",
+                    r"git@ssh\.dev\.azure\.com:v3/([^/]+)/([^/]+)/([^/\s]+)"
+                ]
+                
+                for pattern in azure_patterns:
+                    match = re.match(pattern, remote_url)
+                    if match:
+                        org, project, repo = match.groups()
+                        return {
+                            "organization": org,
+                            "project": project, 
+                            "repository": repo,
+                            "remote_url": remote_url
+                        }
+        
+        # No Azure DevOps remotes found
+        return None
+        
+    except (subprocess.SubprocessError, OSError):
+        # git command not found or other system error
+        return None
 
 
 class AzureDevOpsClient:
