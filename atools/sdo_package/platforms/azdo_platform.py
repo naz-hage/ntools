@@ -17,7 +17,7 @@ except ImportError:
 
 class AzureDevOpsPlatform(WorkItemPlatform):
     """Azure DevOps implementation of work item platform."""
-    
+
     def get_config(self) -> Dict[str, str]:
         """Get Azure DevOps configuration by extracting from Git remote."""
         platform_info = extract_platform_info_from_git()
@@ -37,9 +37,10 @@ class AzureDevOpsPlatform(WorkItemPlatform):
         else:
             raise ConfigurationError(
                 "Could not extract Azure DevOps info from Git remote",
-                "Please ensure you are in an Azure DevOps Git repository with properly configured remotes."
+                "Please ensure you are in an Azure DevOps Git repository "
+                "with properly configured remotes."
             )
-    
+
     def validate_auth(self) -> bool:
         """Validate Azure DevOps authentication."""
         pat = os.environ.get("AZURE_DEVOPS_PAT") or os.environ.get("AZURE_DEVOPS_EXT_PAT")
@@ -48,7 +49,7 @@ class AzureDevOpsPlatform(WorkItemPlatform):
             print("Please set your Azure DevOps Personal Access Token.")
             return False
         return True
-    
+
     def create_work_item(
         self,
         title: str,
@@ -80,7 +81,6 @@ class AzureDevOpsPlatform(WorkItemPlatform):
                     else:
                         print(f'  - [ ] {ac.strip()}')
             return {"dry_run": True, "title": title, "project": metadata.get("project")}
-        
+
         print("Azure DevOps work item creation not yet implemented")
         return None
-
