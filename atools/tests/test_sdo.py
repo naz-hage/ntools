@@ -7,10 +7,10 @@ from unittest.mock import patch
 import sys
 from pathlib import Path
 
-import sdo
-
 # Add the atools directory to sys.path so we can import sdo
 sys.path.insert(0, str(Path(__file__).parent.parent))
+
+import sdo
 
 
 class TestSDOEntryPoint:

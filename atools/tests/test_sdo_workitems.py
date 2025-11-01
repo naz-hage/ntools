@@ -7,11 +7,11 @@ from unittest.mock import patch
 import sys
 from pathlib import Path
 
-from sdo_package.work_items import WorkItemManager, WorkItemResult
-from sdo_package.exceptions import PlatformError, ParsingError
-
 # Add the atools directory to sys.path
 sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from sdo_package.work_items import WorkItemManager, WorkItemResult
+from sdo_package.exceptions import PlatformError, ParsingError
 
 
 class TestWorkItemManager:
