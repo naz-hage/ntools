@@ -9,5 +9,5 @@ reference page linked below with detailed usage, prerequisites, and examples.
 
 Tools
 
-- [add-issue.py](add-issue.md) — Convert backlog-format markdown into GitHub issues or Azure DevOps work items. See the subpage for installation, examples, troubleshooting, and tests.
+- [sdo](sdo.md) — Simple DevOps Operations CLI tool for creating GitHub issues and Azure DevOps work items from markdown files. Supports dry-run previews and multiple platforms.
 - [install-ntools.py](install-ntools.md) — Cross-platform installer to download and extract NTools release ZIPs; supports `--dry-run` and includes safety checks.

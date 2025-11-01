@@ -14,7 +14,8 @@ def test_build_url_from_ntools_json(tmp_path, monkeypatch):
         "NbuildAppList": [
             {
                 "Name": "Ntools",
-                "WebDownloadFile": "https://example.com/releases/download/$(Version)/$(Version).zip",
+                "WebDownloadFile": ("https://example.com/releases/download/"
+                                   "$(Version)/$(Version).zip"),
                 "DownloadedFile": "$(Version).zip",
                 "InstallPath": "C:\\Nbuild"
             }
@@ -26,7 +27,8 @@ def test_build_url_from_ntools_json(tmp_path, monkeypatch):
     f.write_text(json.dumps(cfg))
 
     # Run script in dry-run mode and capture output
-    cmd = [sys.executable, str(SCRIPT), '--version', '2.0.0', '--json', str(f), '--downloads-dir', str(tmp_path), '--dry-run']
+    cmd = [sys.executable, str(SCRIPT), '--version', '2.0.0', '--json', str(f),
+           '--downloads-dir', str(tmp_path), '--dry-run']
     res = subprocess.run(cmd, capture_output=True, text=True)
     assert res.returncode == 0
     out = res.stdout

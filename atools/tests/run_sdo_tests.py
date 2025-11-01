@@ -10,7 +10,7 @@ from pathlib import Path
 def run_tests():
     """Run all SDO tests."""
     test_dir = Path(__file__).parent
-    
+
     # Run pytest with coverage
     cmd = [
         sys.executable, "-m", "pytest",
@@ -20,7 +20,7 @@ def run_tests():
         "--cov=sdo_package",
         "--cov-report=term-missing"
     ]
-    
+
     print("Running SDO test suite...")
     result = subprocess.run(cmd)
     return result.returncode
@@ -29,4 +29,3 @@ def run_tests():
 if __name__ == "__main__":
     exit_code = run_tests()
     sys.exit(exit_code)
-
