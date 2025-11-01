@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="naz-hage" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>SDO (Simple DevOps Operations) - Ntools - Work in Progress</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "SDO (Simple DevOps Operations)";
+        var mkdocs_page_input_path = "atools/sdo.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Ntools - Work in Progress
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../usage/">Practice</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../setup/">Setup your project</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../buildtypes/">Build Types</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../versioning/">Versioning</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">List of Tools</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ntools/nbuild/">Nbuild (nb.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ntools/lf/">lf (lf.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ntools/nbackup/">Nbackup (nbackup.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ntools/wi/">wi (wi.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ntools/github-release/">Github Release</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Custom Build Tasks</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ntools/nbuildtasks/">Nbuild Tasks</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developer setup</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../version-automation-guide/">Version Automation Guide</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ntools/ntools/">Development Tools</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >ntools-scripts module</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../ntools/ntools-scripts-module/">Module</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../ntools/ntools-scripts-module-api/">API</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Build System Features</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ntools/code-coverage/">Code Coverage</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ntools/nbuild-targets/">MSBuild Targets</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">atools</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../">Overview</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" >List of tools</a>
+    <ul class="current">
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">SDO (Simple DevOps Operations)</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#overview">Overview</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#prerequisites">Prerequisites</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#required-environment-variables">Required Environment Variables</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#python-requirements">Python Requirements</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#git-repository-context">Git Repository Context</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#installation">Installation</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#from-source">From Source</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#as-module">As Module</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#basic-command-structure">Basic Command Structure</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#global-options">Global Options</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#work-item-operations">Work Item Operations</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#markdown-file-format">Markdown File Format</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#required-metadata">Required Metadata</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#supported-platforms">Supported Platforms</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#azure-devops">Azure DevOps</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#github">GitHub</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#error-handling">Error Handling</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#testing">Testing</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#run-all-tests">Run All Tests</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#test-categories">Test Categories</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#test-coverage">Test Coverage</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#troubleshooting">Troubleshooting</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#common-issues">Common Issues</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#debug-mode">Debug Mode</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#architecture">Architecture</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#development">Development</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#code-quality">Code Quality</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#contributing">Contributing</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../install-ntools/">Install NTools</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../azdo_payloads/">AzDO payloads</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Ntools - Work in Progress</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">atools</li>
+          <li class="breadcrumb-item">List of tools</li>
+      <li class="breadcrumb-item active">SDO (Simple DevOps Operations)</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/naz-hage/ntools/edit/main/docs/atools/sdo.md">Edit on ntools</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="sdo-simple-devops-operations-tool">sdo - Simple DevOps Operations Tool</h1>
+<p>This page documents the <code>sdo</code> CLI tool. Use this page for detailed prerequisites, installation, usage examples, troubleshooting, and testing.</p>
+<h2 id="overview">Overview</h2>
+<p><code>sdo</code> (Simple DevOps Operations) is a modern CLI tool that parses backlog-style markdown files and creates GitHub issues or Azure DevOps work items (PBIs, Bugs, or Tasks). It supports dry-run previews and follows a file-first metadata policy.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<h3 id="required-environment-variables">Required Environment Variables</h3>
+<ul>
+<li><code>AZURE_DEVOPS_PAT</code> or <code>AZURE_DEVOPS_EXT_PAT</code> - Personal Access Token for Azure DevOps API access</li>
+<li><code>GITHUB_TOKEN</code> - GitHub Personal Access Token (for GitHub operations)</li>
+</ul>
+<h3 id="python-requirements">Python Requirements</h3>
+<ul>
+<li>Python 3.8+</li>
+<li>Dependencies listed in <code>requirements.txt</code></li>
+</ul>
+<h3 id="git-repository-context">Git Repository Context</h3>
+<p>The tool automatically detects Azure DevOps organization and project from the current Git remote configuration.</p>
+<h2 id="installation">Installation</h2>
+<h3 id="from-source">From Source</h3>
+<pre><code class="language-bash">cd atools
+pip install -r requirements.txt
+</code></pre>
+<h3 id="as-module">As Module</h3>
+<pre><code class="language-bash">python -m sdo_package.cli --help
+</code></pre>
+<h2 id="usage">Usage</h2>
+<h3 id="basic-command-structure">Basic Command Structure</h3>
+<pre><code class="language-bash">sdo [OPTIONS] COMMAND [ARGS]...
+</code></pre>
+<h3 id="global-options">Global Options</h3>
+<ul>
+<li><code>-v, --verbose</code> - Show detailed API error information</li>
+<li><code>--version</code> - Show version information</li>
+</ul>
+<h3 id="work-item-operations">Work Item Operations</h3>
+<h4 id="create-work-item">Create Work Item</h4>
+<pre><code class="language-bash">sdo workitem create --file-path FILE_PATH [OPTIONS]
+</code></pre>
+<p><strong>Options:</strong>
+- <code>-f, --file-path PATH</code> - Path to markdown file (required)
+- <code>--dry-run</code> - Parse and preview without creating</p>
+<h3 id="examples">Examples</h3>
+<h4 id="dry-run-preview">Dry Run (Preview)</h4>
+<pre><code class="language-bash">sdo workitem create --file-path &quot;atools/issue-azdo-example.md&quot; --dry-run
+</code></pre>
+<h4 id="create-azure-devops-work-item">Create Azure DevOps Work Item</h4>
+<pre><code class="language-bash">sdo workitem create --file-path &quot;atools/issue-azdo-example.md&quot;
+</code></pre>
+<h4 id="create-with-verbose-output">Create with Verbose Output</h4>
+<pre><code class="language-bash">sdo workitem create --file-path &quot;atools/issue-azdo-example.md&quot; --verbose
+</code></pre>
+<h2 id="markdown-file-format">Markdown File Format</h2>
+<p>SDO expects markdown files with specific metadata headers. See the example files:</p>
+<ul>
+<li><code>issue-azdo-example.md</code> - Azure DevOps work item format</li>
+<li><code>issue-gh-example.md</code> - GitHub issue format</li>
+</ul>
+<h3 id="required-metadata">Required Metadata</h3>
+<pre><code class="language-markdown"># Issue Title
+
+## Target: azdo|github
+## Type: PBI|Bug|Task|Issue
+## Project: ProjectName (for Azure DevOps)
+
+Description content here...
+</code></pre>
+<h2 id="supported-platforms">Supported Platforms</h2>
+<h3 id="azure-devops">Azure DevOps</h3>
+<ul>
+<li><strong>Work Item Types</strong>: Product Backlog Item (PBI), Bug, Task</li>
+<li><strong>Fields</strong>: Title, Description, Area Path, Iteration Path, Priority, Effort</li>
+<li><strong>Automatic</strong>: Organization/Project detection from Git remote</li>
+</ul>
+<h3 id="github">GitHub</h3>
+<ul>
+<li><strong>Issue Types</strong>: Issues</li>
+<li><strong>Fields</strong>: Title, Description, Labels, Assignees</li>
+<li><strong>Automatic</strong>: Repository detection from Git remote</li>
+</ul>
+<h2 id="error-handling">Error Handling</h2>
+<p>SDO provides clear error messages for common issues:</p>
+<ul>
+<li><strong>Authentication</strong>: Missing or invalid PAT tokens</li>
+<li><strong>File Access</strong>: Markdown file not found or unreadable</li>
+<li><strong>API Errors</strong>: Azure DevOps/GitHub API failures</li>
+<li><strong>Validation</strong>: Missing required metadata fields</li>
+</ul>
+<p>Use <code>--verbose</code> flag for detailed error information including API responses.</p>
+<h2 id="testing">Testing</h2>
+<h3 id="run-all-tests">Run All Tests</h3>
+<pre><code class="language-bash">cd atools
+python -m pytest tests/
+</code></pre>
+<h3 id="test-categories">Test Categories</h3>
+<ul>
+<li><strong>Unit Tests</strong>: Core functionality validation</li>
+<li><strong>Integration Tests</strong>: API interaction testing</li>
+<li><strong>CLI Tests</strong>: Command-line interface validation</li>
+<li><strong>Error Path Tests</strong>: Failure scenario handling</li>
+</ul>
+<h3 id="test-coverage">Test Coverage</h3>
+<p>All major functionality is tested with 34 test cases covering:
+- Work item creation workflows
+- Platform-specific operations
+- Error handling scenarios
+- CLI argument parsing</p>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<h3 id="common-issues">Common Issues</h3>
+<h4 id="authentication-failures">Authentication Failures</h4>
+<p><strong>Error:</strong> <code>Authentication failed. Check your AZURE_DEVOPS_PAT token.</code></p>
+<p><strong>Solution:</strong></p>
+<pre><code class="language-bash"># Set PAT token
+export AZURE_DEVOPS_PAT=&quot;your-token-here&quot;
+
+# Verify token has required permissions
+# Azure DevOps: Work Items (Read/Write), Project (Read)
+# GitHub: Issues (Read/Write), Repository (Read)
+</code></pre>
+<h4 id="git-remote-configuration">Git Remote Configuration</h4>
+<p><strong>Error:</strong> <code>Unable to detect Azure DevOps organization from Git remote</code></p>
+<p><strong>Solution:</strong></p>
+<pre><code class="language-bash"># Check current remote
+git remote -v
+
+# Should show Azure DevOps URL like:
+# origin  https://dev.azure.com/organization/project/_git/repo (fetch)
+</code></pre>
+<h4 id="file-format-issues">File Format Issues</h4>
+<p><strong>Error:</strong> <code>Missing required metadata: target</code></p>
+<p><strong>Solution:</strong> Ensure markdown file includes required headers:</p>
+<pre><code class="language-markdown">## Target: azdo
+## Type: PBI
+</code></pre>
+<h3 id="debug-mode">Debug Mode</h3>
+<p>Enable verbose output for detailed troubleshooting:</p>
+<pre><code class="language-bash">sdo --verbose workitem create --file-path file.md
+</code></pre>
+<p>This shows:
+- API request/response details
+- File parsing results
+- Authentication status
+- Full error stack traces</p>
+<h2 id="architecture">Architecture</h2>
+<p>SDO is built with a modular architecture:</p>
+<ul>
+<li><strong><code>cli.py</code></strong> - Click-based command interface</li>
+<li><strong><code>client.py</code></strong> - Azure DevOps REST API client</li>
+<li><strong><code>work_items.py</code></strong> - Business logic for work item operations</li>
+<li><strong><code>platforms/</code></strong> - Platform-specific implementations (GitHub, Azure DevOps)</li>
+<li><strong><code>parsers/</code></strong> - Markdown parsing and metadata extraction</li>
+</ul>
+<h2 id="development">Development</h2>
+<h3 id="code-quality">Code Quality</h3>
+<p>SDO maintains high code quality standards:
+- <strong>Linting</strong>: flake8 with comprehensive rules
+- <strong>Testing</strong>: 34 test cases with high coverage
+- <strong>Type Hints</strong>: Full type annotation support
+- <strong>Documentation</strong>: Comprehensive docstrings</p>
+<h3 id="contributing">Contributing</h3>
+<ol>
+<li>Follow existing code patterns</li>
+<li>Add tests for new functionality</li>
+<li>Update documentation</li>
+<li>Run full test suite before submitting</li>
+</ol>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../" class="btn btn-neutral float-left" title="Overview"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../install-ntools/" class="btn btn-neutral float-right" title="Install NTools">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/naz-hage/ntools" class="fa fa-code-fork" style="color: #fcfcfc"> ntools</a>
+        </span>
+    
+    
+      <span><a href="../" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../install-ntools/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
