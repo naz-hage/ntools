@@ -47,9 +47,38 @@
 								Exclude="
 								$(SolutionDir)\$(TargetRelease)\**\*.pdb"
 								/>
+
 		</ItemGroup>
 		
 		<Message Text="==> DONE"/>
+	</Target>
+		
+	<!-- Build SDO package for inclusion in NTools distribution -->
+	<Target Name="BUILD_SDO">
+		<Message Text="Building SDO package..." Importance="high" />
+		<PropertyGroup>
+			<SdoSourceDir>$(SolutionDir)\atools</SdoSourceDir>
+			<UserScriptsDir>$(USERPROFILE)\AppData\Roaming\Python\Python313\Scripts</UserScriptsDir>
+		</PropertyGroup>
+		
+		<!-- Install SDO package in development mode to generate console script -->
+		<Exec Command='"$(PythonPath)\python.exe" -m pip install -e "$(SdoSourceDir)"' WorkingDirectory="$(SolutionDir)" ContinueOnError="false">
+			<Output TaskParameter="ExitCode" PropertyName="SdoInstallExitCode" />
+		</Exec>
+		
+		<Error Condition="'$(SdoInstallExitCode)' != '0'" Text="SDO package installation failed with exit code $(SdoInstallExitCode)" />
+		
+		<!-- Copy SDO console script directly to artifacts folder -->
+		<Copy SourceFiles="$(UserScriptsDir)\sdo.exe" DestinationFolder="$(ArtifactsFolder)" Condition="Exists('$(UserScriptsDir)\sdo.exe')" />
+		
+		<!-- Copy SDO package directory to artifacts folder -->
+		<ItemGroup>
+			<SdoPackageFiles Include="$(SolutionDir)\atools\sdo_package\**\*.*" />
+		</ItemGroup>
+		<Copy SourceFiles="@(SdoPackageFiles)" DestinationFiles="@(SdoPackageFiles->'$(ArtifactsFolder)\sdo_package\%(RecursiveDir)%(Filename)%(Extension)')" />
+		
+		<Message Text="SDO package built successfully" Importance="high" />
+		<Message Text="==> BUILD_SDO DONE"/>
 	</Target>
 		
 	<!-- Test for FileVersion task and powershell file-version.ps1-->
@@ -558,14 +587,6 @@
 		<Message Text="==> DONE"/>
 	</Target>
 
-	<!-- Create a package for the solution default is a zip file of all artifacts -->
-	<Target Name="PACKAGE" DependsOnTargets="PROPERTIES">
-		<Exec Command='"$(ZipExe)" a -r -tzip $(ArtifactsFolder).zip $(ArtifactsFolder)\*'/>
-		
-		<RemoveDir Directories="$(ArtifactsFolder);"/> 
-		<Message Text="==> COMMON_DONE"/>
-	</Target>
-
     <!-- Comprehensive smoke test to verify published artifacts and build system integrity -->
     <Target Name="SMOKE_TEST" DependsOnTargets="ARTIFACTS">
         <Message Text="Running comprehensive smoke test for artifacts and build system..." />
@@ -715,6 +736,15 @@
 		<Exec Command='pwsh -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "Import-Module &apos;.\scripts\module-package\ntools-scripts.psm1&apos; -Force; $r = Invoke-VerifyArtifacts -ArtifactsPath &apos;$(ArtifactsFolder)&apos; -ProductVersion &apos;$(ProductVersion)&apos;; if ($r.Error -gt 0) { exit 1 } else { exit 0 }"' WorkingDirectory="$(SolutionDir)" />
 		<Message Text="VERIFY_ARTIFACTS completed" Importance="high" />
 	</Target>
-
-	<!-- PUBLISH target implemented in common.targets -->
+	<!-- Publish all non-test projects to artifacts folder -->
+	<Target Name="PUBLISH" DependsOnTargets="ARTIFACTS;TAG">
+		<RemoveDir Directories="$(ArtifactsFolder)"></RemoveDir>
+		<Message Text="Publishing all non-test projects using ntools-scripts module" Importance="high" />
+		<Exec Command='pwsh -NoProfile -ExecutionPolicy Bypass -Command "Import-Module &apos;$(BuildTools)\ntools-scripts.psm1&apos; -Force; Publish-AllProjects -OutputDir &apos;$(ArtifactsFolder)&apos; -Version &apos;$(ProductVersion)&apos; -RepositoryRoot &apos;$(SolutionDir)&apos;"' WorkingDirectory="$(SolutionDir)" />
+		<Message Text="All non-test projects published to $(ArtifactsFolder)" Importance="high" />
+		
+		<CallTarget Targets="BUILD_SDO" />
+		
+		<Message Text="==> PUBLISH DONE"/>
+	</Target>
 </Project>
