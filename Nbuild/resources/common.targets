@@ -67,6 +67,10 @@
 			<ArtifactsDir>$(DevDrive)\Artifacts</ArtifactsDir>
 			<TestFilesFolder>$(DevDrive)\Test</TestFilesFolder>
 			
+			<!-- Define dotnet tools path -->
+			<DotNetToolsPath>$(USERPROFILE)\.dotnet\tools</DotNetToolsPath>
+			<ReportGeneratorExe>$(DotNetToolsPath)\reportgenerator.exe</ReportGeneratorExe>
+			
 		</PropertyGroup>
 
 		<RedError Condition="'$(ProductVersion)' == ''" Message="Error: Version property is not defined. Type Nb.exe git_settag -tag 0.0.1" />
@@ -310,12 +314,6 @@
 		<Message Text="Debug: SolutionDir = $(SolutionDir)" />
 		<Message Text="Debug: CoverageFolder = $(CoverageFolder)" />
 		<Message Text="Debug: ArtifactsTestResultsFolder = $(ArtifactsTestResultsFolder)" />
-		
-		<!-- Define dotnet tools path -->
-		<PropertyGroup>
-			<DotNetToolsPath>$(USERPROFILE)\.dotnet\tools</DotNetToolsPath>
-			<ReportGeneratorExe>$(DotNetToolsPath)\reportgenerator.exe</ReportGeneratorExe>
-		</PropertyGroup>
 		
 		<!-- Ensure we have test results before generating coverage -->
 		<Error Condition="!Exists('$(ArtifactsTestResultsFolder)')" 

@@ -12,9 +12,6 @@
 		<PythonPath Condition="'$(GITHUB_ACTIONS)' == 'true'"></PythonPath>
 		<PipPath>$(PythonPath)\Scripts\pip.exe</PipPath>
 		<MkDocsExe>$(USERPROFILE)\AppData\Roaming\Python\Python313\Scripts\mkdocs.exe</MkDocsExe>
-		<!-- Dotnet tools paths -->
-		<DotNetToolsPath>$(USERPROFILE)\.dotnet\tools</DotNetToolsPath>
-		<ReportGeneratorExe>$(DotNetToolsPath)\reportgenerator.exe</ReportGeneratorExe>
 	</PropertyGroup>
 
 	<!--Setup the ARTIFACTS folders for binaries and test results - override -->
@@ -56,37 +53,7 @@
 		
 		<Message Text="==> DONE"/>
 	</Target>
-		
-	<!-- Build SDO package for inclusion in NTools distribution -->
-	<Target Name="BUILD_SDO">
-		<Message Text="Building SDO package..." Importance="high" />
-		<PropertyGroup>
-			<SdoSourceDir>$(SolutionDir)\atools</SdoSourceDir>
-			<UserScriptsDir>$(USERPROFILE)\AppData\Roaming\Python\Python313\Scripts</UserScriptsDir>
-		</PropertyGroup>
-		
-		<!-- Install SDO package in development mode to generate console script -->
-		<Exec Command="&quot;$(PythonPath)\python.exe&quot; -m pip install -e . --target &quot;$(ArtifactsFolder)\sdo&quot;" Condition="'$(GITHUB_ACTIONS)' != 'true'" WorkingDirectory="$(SdoSourceDir)" ContinueOnError="false">
-			<Output TaskParameter="ExitCode" PropertyName="SdoInstallExitCode" />
-		</Exec>
-		<Exec Command="python.exe -m pip install -e . --target &quot;$(ArtifactsFolder)\sdo&quot;" Condition="'$(GITHUB_ACTIONS)' == 'true'" WorkingDirectory="$(SdoSourceDir)" ContinueOnError="false">
-			<Output TaskParameter="ExitCode" PropertyName="SdoInstallExitCode" />
-		</Exec>
-		
-		<Error Condition="'$(SdoInstallExitCode)' != '0'" Text="SDO package installation failed with exit code $(SdoInstallExitCode)" />
-		
-		<!-- Copy SDO console script directly to artifacts folder -->
-		<Copy SourceFiles="$(UserScriptsDir)\sdo.exe" DestinationFolder="$(ArtifactsFolder)" Condition="Exists('$(UserScriptsDir)\sdo.exe')" />
-		
-		<!-- Copy SDO package directory to artifacts folder -->
-		<ItemGroup>
-			<SdoPackageFiles Include="$(SolutionDir)\atools\sdo_package\**\*.*" />
-		</ItemGroup>
-		<Copy SourceFiles="@(SdoPackageFiles)" DestinationFiles="@(SdoPackageFiles->'$(ArtifactsFolder)\sdo_package\%(RecursiveDir)%(Filename)%(Extension)')" />
-		
-		<Message Text="SDO package built successfully" Importance="high" />
-		<Message Text="==> BUILD_SDO DONE"/>
-	</Target>
+
 		
 	<!-- Test for FileVersion task and powershell file-version.ps1-->
 	<Target Name="FILE_VERSIONS"  DependsOnTargets="ARTIFACTS">
@@ -743,6 +710,38 @@
 		<Exec Command='pwsh -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "Import-Module &apos;.\scripts\module-package\ntools-scripts.psm1&apos; -Force; $r = Invoke-VerifyArtifacts -ArtifactsPath &apos;$(ArtifactsFolder)&apos; -ProductVersion &apos;$(ProductVersion)&apos;; if ($r.Error -gt 0) { exit 1 } else { exit 0 }"' WorkingDirectory="$(SolutionDir)" />
 		<Message Text="VERIFY_ARTIFACTS completed" Importance="high" />
 	</Target>
+		
+	<!-- Build SDO package for inclusion in NTools distribution -->
+	<Target Name="BUILD_SDO">
+		<Message Text="Building SDO package..." Importance="high" />
+		<PropertyGroup>
+			<SdoSourceDir>$(SolutionDir)\atools</SdoSourceDir>
+			<UserScriptsDir>$(USERPROFILE)\AppData\Roaming\Python\Python313\Scripts</UserScriptsDir>
+		</PropertyGroup>
+		
+		<!-- Install SDO package in development mode to generate console script -->
+		<Exec Command="&quot;$(PythonPath)\python.exe&quot; -m pip install -e . --target &quot;$(ArtifactsFolder)\sdo&quot;" Condition="'$(GITHUB_ACTIONS)' != 'true'" WorkingDirectory="$(SdoSourceDir)" ContinueOnError="false">
+			<Output TaskParameter="ExitCode" PropertyName="SdoInstallExitCode" />
+		</Exec>
+		<Exec Command="python.exe -m pip install -e . --target &quot;$(ArtifactsFolder)\sdo&quot;" Condition="'$(GITHUB_ACTIONS)' == 'true'" WorkingDirectory="$(SdoSourceDir)" ContinueOnError="false">
+			<Output TaskParameter="ExitCode" PropertyName="SdoInstallExitCode" />
+		</Exec>
+		
+		<Error Condition="'$(SdoInstallExitCode)' != '0'" Text="SDO package installation failed with exit code $(SdoInstallExitCode)" />
+		
+		<!-- Copy SDO console script directly to artifacts folder -->
+		<Copy SourceFiles="$(UserScriptsDir)\sdo.exe" DestinationFolder="$(ArtifactsFolder)" Condition="Exists('$(UserScriptsDir)\sdo.exe')" />
+		
+		<!-- Copy SDO package directory to artifacts folder -->
+		<ItemGroup>
+			<SdoPackageFiles Include="$(SolutionDir)\atools\sdo_package\**\*.*" />
+		</ItemGroup>
+		<Copy SourceFiles="@(SdoPackageFiles)" DestinationFiles="@(SdoPackageFiles->'$(ArtifactsFolder)\sdo_package\%(RecursiveDir)%(Filename)%(Extension)')" />
+		
+		<Message Text="SDO package built successfully" Importance="high" />
+		<Message Text="==> BUILD_SDO DONE"/>
+	</Target>
+
 	<!-- Publish all non-test projects to artifacts folder -->
 	<Target Name="PUBLISH" DependsOnTargets="ARTIFACTS;TAG">
 		<RemoveDir Directories="$(ArtifactsFolder)"></RemoveDir>
