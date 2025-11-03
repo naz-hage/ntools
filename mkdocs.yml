@@ -37,6 +37,6 @@ nav:
   - atools:
     - Overview: atools/index.md
     - List of tools:
-      - Add issue: atools/add-issue.md
+      - SDO (Simple DevOps Operations): atools/sdo.md
       - Install NTools: atools/install-ntools.md
     - AzDO payloads: atools/azdo_payloads.md
