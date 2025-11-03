@@ -63,6 +63,20 @@ jobs:
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
 
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13.3'
+
+    - name: Install Python dependencies for SDO
+      run: |
+        python -m pip install --upgrade pip
+        if (Test-Path "atools/requirements.txt") {
+          pip install -r atools/requirements.txt
+        }
+      shell: pwsh
+      working-directory: ${{ github.workspace }}
+
     - name: Install ntools using ntools-scripts module
       run: |
         # Import the consolidated ntools-scripts module using the repo-scoped env var

@@ -9,6 +9,7 @@
 		<DeploymentFolder>$(ProgramFiles)\Nbuild</DeploymentFolder>
 		<!--  Modify these paths to match your Python installation -->
 		<PythonPath>$(ProgramFiles)\Python\3.13.3</PythonPath>
+		<PythonPath Condition="'$(GITHUB_ACTIONS)' == 'true'"></PythonPath>
 		<PipPath>$(PythonPath)\Scripts\pip.exe</PipPath>
 		<MkDocsExe>$(USERPROFILE)\AppData\Roaming\Python\Python313\Scripts\mkdocs.exe</MkDocsExe>
 	</PropertyGroup>
@@ -62,7 +63,10 @@
 		</PropertyGroup>
 		
 		<!-- Install SDO package in development mode to generate console script -->
-		<Exec Command='"$(PythonPath)\python.exe" -m pip install -e "$(SdoSourceDir)"' WorkingDirectory="$(SolutionDir)" ContinueOnError="false">
+		<Exec Command="&quot;$(PythonPath)\python.exe&quot; -m pip install -e . --target &quot;$(ArtifactsFolder)\sdo&quot;" Condition="'$(GITHUB_ACTIONS)' != 'true'" WorkingDirectory="$(SdoSourceDir)" ContinueOnError="false">
+			<Output TaskParameter="ExitCode" PropertyName="SdoInstallExitCode" />
+		</Exec>
+		<Exec Command="python.exe -m pip install -e . --target &quot;$(ArtifactsFolder)\sdo&quot;" Condition="'$(GITHUB_ACTIONS)' == 'true'" WorkingDirectory="$(SdoSourceDir)" ContinueOnError="false">
 			<Output TaskParameter="ExitCode" PropertyName="SdoInstallExitCode" />
 		</Exec>
 		
