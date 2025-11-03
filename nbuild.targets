@@ -718,7 +718,6 @@
 		<Message Text="Building SDO package..." Importance="high" />
 		<PropertyGroup>
 			<SdoSourceDir>$(SolutionDir)\atools</SdoSourceDir>
-			<UserScriptsDir>$(USERPROFILE)\AppData\Roaming\Python\Python313\Scripts</UserScriptsDir>
 		</PropertyGroup>
 		
 		<!-- Install SDO package in development mode to generate console script -->
@@ -735,8 +734,8 @@
 		
 		<Error Condition="'$(SdoInstallExitCode)' != '0'" Text="SDO package installation failed with exit code $(SdoInstallExitCode)" />
 		
-		<!-- Copy SDO console script directly to artifacts folder -->
-		<Copy SourceFiles="$(UserScriptsDir)\sdo.exe" DestinationFolder="$(ArtifactsFolder)" Condition="Exists('$(UserScriptsDir)\sdo.exe')" />
+		<!-- Move SDO console script from the installed package bin directory to artifacts root -->
+		<Move SourceFiles="$(ArtifactsFolder)\sdo\bin\sdo.exe" DestinationFiles="$(ArtifactsFolder)\sdo.exe" />
 		
 		<!-- Copy SDO package directory to artifacts folder -->
 		<ItemGroup>
