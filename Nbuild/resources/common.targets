@@ -347,7 +347,7 @@
 		
 		<!-- Fallback: try with different coverage file pattern -->
 		<Exec Condition="'$(ReportGenExitCode)' != '0'" 
-			  Command='reportgenerator "-reports:$(ArtifactsTestResultsFolder)\**\*.xml" "-targetdir:$(CoverageFolder)" "-reporttypes:Html;Cobertura;TextSummary" "-assemblyfilters:$(CoverageAssemblyFilters)" "-classfilters:$(CoverageClassFilters)"' 
+			  Command='"$(ReportGeneratorExe)" "-reports:$(ArtifactsTestResultsFolder)\**\*.xml" "-targetdir:$(CoverageFolder)" "-reporttypes:Html;Cobertura;TextSummary" "-assemblyfilters:$(CoverageAssemblyFilters)" "-classfilters:$(CoverageClassFilters)"' 
 			  WorkingDirectory="$(SolutionDir)"
 			  ContinueOnError="true">
 			<Output TaskParameter="ExitCode" PropertyName="ReportGenFallbackExitCode" />

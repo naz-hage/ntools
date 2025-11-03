@@ -12,6 +12,9 @@
 		<PythonPath Condition="'$(GITHUB_ACTIONS)' == 'true'"></PythonPath>
 		<PipPath>$(PythonPath)\Scripts\pip.exe</PipPath>
 		<MkDocsExe>$(USERPROFILE)\AppData\Roaming\Python\Python313\Scripts\mkdocs.exe</MkDocsExe>
+		<!-- Dotnet tools paths -->
+		<DotNetToolsPath>$(USERPROFILE)\.dotnet\tools</DotNetToolsPath>
+		<ReportGeneratorExe>$(DotNetToolsPath)\reportgenerator.exe</ReportGeneratorExe>
 	</PropertyGroup>
 
 	<!--Setup the ARTIFACTS folders for binaries and test results - override -->
@@ -159,7 +162,7 @@
   <!-- Run nbTests and generate code coverage report -->
   <Target Name="RUN_NBTESTS_COVERAGE" DependsOnTargets="INSTALL_REPORTGENERATOR">
 	<Exec Command="dotnet test &quot;$(SolutionDir)\nbTests\nbTests.csproj&quot; --collect:\&quot;XPlat Code Coverage\&quot;" WorkingDirectory="$(SolutionDir)" />
-	<Exec Command="reportgenerator -reports:$(SolutionDir)\TestResults\**\coverage.cobertura.xml -targetdir:$(SolutionDir)\TestResults\CoverageReport" />
+	<Exec Command="&quot;$(ReportGeneratorExe)&quot; -reports:$(SolutionDir)\TestResults\**\coverage.cobertura.xml -targetdir:$(SolutionDir)\TestResults\CoverageReport" />
 	<Message Text="nbTests executed and code coverage report generated in TestResults\CoverageReport." />
 	<Message Text="==> DONE" />
   </Target>
