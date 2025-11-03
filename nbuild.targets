@@ -8,11 +8,8 @@
 		<!-- This is the folder where the *.sln resides-->
 		<DeploymentFolder>$(ProgramFiles)\Nbuild</DeploymentFolder>
 		<!--  Modify these paths to match your Python installation -->
-		<!-- Local builds: Use full Python path for consistent builds -->
-		<PythonPath>$(ProgramFiles)\Python\3.13.3</PythonPath>
-		<!-- CI builds: Clear PythonPath so python.exe from PATH is used (GitHub Actions sets up Python) -->
-		<PythonPath Condition="'$(GITHUB_ACTIONS)' == 'true'"></PythonPath>
-		<PipPath>$(PythonPath)\Scripts\pip.exe</PipPath>
+		<!-- Always use python.exe from PATH for portability -->
+		<PipPath>python.exe -m pip</PipPath>
 		<MkDocsExe>$(USERPROFILE)\AppData\Roaming\Python\Python313\Scripts\mkdocs.exe</MkDocsExe>
 	</PropertyGroup>
 
@@ -723,19 +720,25 @@
 		<!-- Install SDO package in development mode to generate console script -->
 		<Message Text="Building SDO package..." Importance="high" />
 		
-		<!-- Local builds: Use full Python path defined in project properties -->
-		<Exec Command="&quot;$(PythonPath)\python.exe&quot; -m pip install -e . --target &quot;$(ArtifactsFolder)\sdo&quot;" Condition="'$(GITHUB_ACTIONS)' != 'true'" WorkingDirectory="$(SdoSourceDir)" ContinueOnError="false">
-			<Output TaskParameter="ExitCode" PropertyName="SdoInstallExitCode" />
-		</Exec>
-		<!-- CI builds: Use python.exe from PATH (set up by GitHub Actions) -->
-		<Exec Command="python.exe -m pip install -e . --target &quot;$(ArtifactsFolder)\sdo&quot;" Condition="'$(GITHUB_ACTIONS)' == 'true'" WorkingDirectory="$(SdoSourceDir)" ContinueOnError="false">
+		<!-- Use python.exe from PATH for portability -->
+		<Exec Command="python.exe -m pip install -e . --force-reinstall" WorkingDirectory="$(SdoSourceDir)" ContinueOnError="false">
 			<Output TaskParameter="ExitCode" PropertyName="SdoInstallExitCode" />
 		</Exec>
 		
 		<Error Condition="'$(SdoInstallExitCode)' != '0'" Text="SDO package installation failed with exit code $(SdoInstallExitCode)" />
 		
-		<!-- Move SDO console script from the installed package bin directory to artifacts root -->
-		<Move SourceFiles="$(ArtifactsFolder)\sdo\bin\sdo.exe" DestinationFiles="$(ArtifactsFolder)\sdo.exe" />
+		<!-- Now install with target to get package files in artifacts -->
+		<Exec Command="python.exe -m pip install -e . --target &quot;$(ArtifactsFolder)\sdo&quot; --force-reinstall" WorkingDirectory="$(SdoSourceDir)" ContinueOnError="false">
+			<Output TaskParameter="ExitCode" PropertyName="SdoTargetInstallExitCode" />
+		</Exec>
+		
+		<Error Condition="'$(SdoTargetInstallExitCode)' != '0'" Text="SDO package target installation failed with exit code $(SdoTargetInstallExitCode)" />
+		
+		<!-- Copy SDO console script from Python Scripts directory to artifacts root -->
+		<Copy SourceFiles="$(USERPROFILE)\AppData\Roaming\Python\Python313\Scripts\sdo.exe" DestinationFiles="$(ArtifactsFolder)\sdo.exe" />
+		
+		<!-- Create a portable batch file wrapper that uses python.exe from PATH -->
+		<WriteLinesToFile File="$(ArtifactsFolder)\sdo.cmd" Lines="@echo off&#xD;&#xA;python.exe -m sdo_package.cli %*" Overwrite="true" />
 		
 		<!-- Copy SDO package directory to artifacts folder -->
 		<ItemGroup>

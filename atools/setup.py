@@ -39,7 +39,7 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "sdo=sdo_package.cli:main",
+            "sdo=sdo_package.cli:cli",
         ],
     },
     classifiers=[
