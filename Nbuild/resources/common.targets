@@ -311,6 +311,12 @@
 		<Message Text="Debug: CoverageFolder = $(CoverageFolder)" />
 		<Message Text="Debug: ArtifactsTestResultsFolder = $(ArtifactsTestResultsFolder)" />
 		
+		<!-- Define dotnet tools path -->
+		<PropertyGroup>
+			<DotNetToolsPath>$(USERPROFILE)\.dotnet\tools</DotNetToolsPath>
+			<ReportGeneratorExe>$(DotNetToolsPath)\reportgenerator.exe</ReportGeneratorExe>
+		</PropertyGroup>
+		
 		<!-- Ensure we have test results before generating coverage -->
 		<Error Condition="!Exists('$(ArtifactsTestResultsFolder)')" 
 			   Text="Test results folder not found at: $(ArtifactsTestResultsFolder). Please run tests first with 'nb STAGE' or 'nb TEST'." />
@@ -328,7 +334,7 @@
 		
 		<!-- Generate coverage report using ReportGenerator with configurable filters -->
 		<Message Text="Debug: Running ReportGenerator with targetdir: $(CoverageFolder)" />
-		<Exec Command='reportgenerator "-reports:$(ArtifactsTestResultsFolder)\**\coverage.cobertura.xml" "-targetdir:$(CoverageFolder)" "-reporttypes:Html;Cobertura;TextSummary" "-assemblyfilters:$(CoverageAssemblyFilters)" "-classfilters:$(CoverageClassFilters)"' 
+		<Exec Command='"$(ReportGeneratorExe)" "-reports:$(ArtifactsTestResultsFolder)\**\coverage.cobertura.xml" "-targetdir:$(CoverageFolder)" "-reporttypes:Html;Cobertura;TextSummary" "-assemblyfilters:$(CoverageAssemblyFilters)" "-classfilters:$(CoverageClassFilters)"' 
 			  WorkingDirectory="$(SolutionDir)"
 			  ContinueOnError="true">
 			<Output TaskParameter="ExitCode" PropertyName="ReportGenExitCode" />
