@@ -8,7 +8,9 @@
 		<!-- This is the folder where the *.sln resides-->
 		<DeploymentFolder>$(ProgramFiles)\Nbuild</DeploymentFolder>
 		<!--  Modify these paths to match your Python installation -->
+		<!-- Local builds: Use full Python path for consistent builds -->
 		<PythonPath>$(ProgramFiles)\Python\3.13.3</PythonPath>
+		<!-- CI builds: Clear PythonPath so python.exe from PATH is used (GitHub Actions sets up Python) -->
 		<PythonPath Condition="'$(GITHUB_ACTIONS)' == 'true'"></PythonPath>
 		<PipPath>$(PythonPath)\Scripts\pip.exe</PipPath>
 		<MkDocsExe>$(USERPROFILE)\AppData\Roaming\Python\Python313\Scripts\mkdocs.exe</MkDocsExe>
@@ -712,7 +714,7 @@
 	</Target>
 		
 	<!-- Build SDO package for inclusion in NTools distribution -->
-	<Target Name="BUILD_SDO">
+	<Target Name="BUILD_SDO" DependsOnTargets="ARTIFACTS">
 		<Message Text="Building SDO package..." Importance="high" />
 		<PropertyGroup>
 			<SdoSourceDir>$(SolutionDir)\atools</SdoSourceDir>
@@ -720,9 +722,13 @@
 		</PropertyGroup>
 		
 		<!-- Install SDO package in development mode to generate console script -->
+		<Message Text="Building SDO package..." Importance="high" />
+		
+		<!-- Local builds: Use full Python path defined in project properties -->
 		<Exec Command="&quot;$(PythonPath)\python.exe&quot; -m pip install -e . --target &quot;$(ArtifactsFolder)\sdo&quot;" Condition="'$(GITHUB_ACTIONS)' != 'true'" WorkingDirectory="$(SdoSourceDir)" ContinueOnError="false">
 			<Output TaskParameter="ExitCode" PropertyName="SdoInstallExitCode" />
 		</Exec>
+		<!-- CI builds: Use python.exe from PATH (set up by GitHub Actions) -->
 		<Exec Command="python.exe -m pip install -e . --target &quot;$(ArtifactsFolder)\sdo&quot;" Condition="'$(GITHUB_ACTIONS)' == 'true'" WorkingDirectory="$(SdoSourceDir)" ContinueOnError="false">
 			<Output TaskParameter="ExitCode" PropertyName="SdoInstallExitCode" />
 		</Exec>

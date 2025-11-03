@@ -10,6 +10,17 @@ from .work_items import cmd_workitem_create
 from .version import __version__
 
 
+# Define the CLI docstring with version
+CLI_DOCSTRING = f"""SDO {__version__} - Simple DevOps Operations Tool
+
+A modern CLI tool for Azure DevOps operations.
+
+Environment Variables:
+    AZURE_DEVOPS_PAT    - Personal Access Token (required)
+    AZURE_DEVOPS_EXT_PAT - Alternative PAT variable
+"""
+
+
 class ClickArgs:
     """Adapter to convert Click context to arguments object for compatibility."""
 
@@ -25,19 +36,11 @@ class ClickArgs:
         return None
 
 
-@click.group()
+@click.group(help=CLI_DOCSTRING)
 @click.option('--verbose', '-v', is_flag=True, help='Show detailed API error information')
 @click.option('--version', is_flag=True, help='Show version information')
 @click.pass_context
 def cli(ctx, verbose, version):
-    """SDO - Simple DevOps Operations Tool
-
-    A modern CLI tool for Azure DevOps operations.
-
-    Environment Variables:
-        AZURE_DEVOPS_PAT    - Personal Access Token (required)
-        AZURE_DEVOPS_EXT_PAT - Alternative PAT variable
-    """
     # Handle version option
     if version:
         click.echo(f"SDO version {__version__}")
@@ -47,11 +50,9 @@ def cli(ctx, verbose, version):
     ctx.ensure_object(dict)
     ctx.obj['verbose'] = verbose
 
-    if version:
-        from . import __version__, __author__
-        click.echo(f"*** sdo, Simple DevOps Operations Tool, {__author__}, 2024 - "
-                   f"Version: {__version__} ***")
-        sys.exit(0)
+
+# Set the docstring for the cli function
+cli.__doc__ = CLI_DOCSTRING
 
 
 @cli.group()
