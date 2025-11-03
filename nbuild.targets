@@ -718,7 +718,7 @@
 		</PropertyGroup>
 		
 		<!-- Install SDO package in development mode to generate console script -->
-		<Message Text="Building SDO package..." Importance="high" />
+		<Message Text="Installing SDO package in development mode..." Importance="high" />
 		
 		<!-- Use python.exe from PATH for portability -->
 		<Exec Command="python.exe -m pip install -e . --force-reinstall" WorkingDirectory="$(SdoSourceDir)" ContinueOnError="false">
@@ -734,11 +734,9 @@
 		
 		<Error Condition="'$(SdoTargetInstallExitCode)' != '0'" Text="SDO package target installation failed with exit code $(SdoTargetInstallExitCode)" />
 		
-		<!-- Copy SDO console script from Python Scripts directory to artifacts root -->
-		<Copy SourceFiles="$(USERPROFILE)\AppData\Roaming\Python\Python313\Scripts\sdo.exe" DestinationFiles="$(ArtifactsFolder)\sdo.exe" />
-		
-		<!-- Create a portable batch file wrapper that uses python.exe from PATH -->
-		<WriteLinesToFile File="$(ArtifactsFolder)\sdo.cmd" Lines="@echo off&#xD;&#xA;python.exe -m sdo_package.cli %*" Overwrite="true" />
+		<!-- Copy the portable batch file wrapper that uses python.exe from PATH -->
+		<!-- This replaces the problematic .exe launcher that has hardcoded Python paths -->
+		<Copy SourceFiles="$(SdoSourceDir)\sdo.cmd" DestinationFiles="$(ArtifactsFolder)\sdo.cmd" />
 		
 		<!-- Copy SDO package directory to artifacts folder -->
 		<ItemGroup>
@@ -746,7 +744,7 @@
 		</ItemGroup>
 		<Copy SourceFiles="@(SdoPackageFiles)" DestinationFiles="@(SdoPackageFiles->'$(ArtifactsFolder)\sdo_package\%(RecursiveDir)%(Filename)%(Extension)')" />
 		
-		<Message Text="SDO package built successfully" Importance="high" />
+		<Message Text="SDO package built successfully with portable launcher" Importance="high" />
 		<Message Text="==> BUILD_SDO DONE"/>
 	</Target>
 
