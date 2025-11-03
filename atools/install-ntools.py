@@ -345,7 +345,7 @@ def main():
                     print("ERROR: Installing to Program Files requires administrator privileges.")
                     print("Please run this script as Administrator (right-click -> Run as Administrator)")
                     return 1
-            except:
+            except Exception:
                 print("WARNING: Could not verify administrator privileges. Installation may fail.")
 
         success = install_sdo(sdo_source, deploy_path, args.dry_run)
@@ -362,8 +362,8 @@ def main():
             return 1
 
     # Original NTools installation logic
-    if not args.version:
-        print("ERROR: --version is required when installing NTools")
+    if not args.install_sdo and not args.uninstall_sdo and not args.version:
+        print("ERROR: Must specify --version for NTools or --install-sdo/--uninstall-sdo for SDO")
         return 1
 
     downloads_dir = Path(args.downloads_dir).expanduser().resolve()

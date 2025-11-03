@@ -51,10 +51,6 @@ def cli(ctx, verbose, version):
     ctx.obj['verbose'] = verbose
 
 
-# Set the docstring for the cli function
-cli.__doc__ = CLI_DOCSTRING
-
-
 @cli.group()
 @click.pass_context
 def workitem(ctx):
