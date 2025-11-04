@@ -5,15 +5,15 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="naz-hage" />
       <link rel="shortcut icon" href="../../img/favicon.ico" />
-    <title>Install NTools - Ntools - Work in Progress</title>
+    <title>SDO Installation - Ntools - Work in Progress</title>
     <link rel="stylesheet" href="../../css/theme.css" />
     <link rel="stylesheet" href="../../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
     
       <script>
         // Current page data
-        var mkdocs_page_name = "Install NTools";
-        var mkdocs_page_input_path = "atools/install-ntools.md";
+        var mkdocs_page_name = "SDO Installation";
+        var mkdocs_page_input_path = "atools/sdo-installation.md";
         var mkdocs_page_url = null;
       </script>
     
@@ -102,13 +102,45 @@
     <ul class="current">
                 <li class="toctree-l2"><a class="reference internal" href="../sdo/">SDO (Simple DevOps Operations)</a>
                 </li>
-                <li class="toctree-l2"><a class="reference internal" href="../sdo-installation/">SDO Installation</a>
-                </li>
-                <li class="toctree-l2 current"><a class="reference internal current" href="#">Install NTools</a>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">SDO Installation</a>
     <ul class="current">
-    <li class="toctree-l3"><a class="reference internal" href="#quick-usage">Quick usage</a>
+    <li class="toctree-l3"><a class="reference internal" href="#overview">Overview</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#prerequisites">Prerequisites</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#installation-steps">Installation Steps</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#1-ensure-ntools-is-installed">1. Ensure NTools is Installed</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#2-run-sdo-installation-script">2. Run SDO Installation Script</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#3-verify-installation">3. Verify Installation</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#what-the-installation-does">What the Installation Does</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#directory-structure-after-installation">Directory Structure After Installation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#troubleshooting">Troubleshooting</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#python-not-found">Python Not Found</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#permission-errors">Permission Errors</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#installation-fails">Installation Fails</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#sdo-command-not-found">SDO Command Not Found</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#benefits-of-virtual-environment-approach">Benefits of Virtual Environment Approach</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#uninstalling-sdo">Uninstalling SDO</a>
     </li>
     </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../install-ntools/">Install NTools</a>
                 </li>
     </ul>
                   </li>
@@ -131,9 +163,9 @@
     <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
           <li class="breadcrumb-item">atools</li>
           <li class="breadcrumb-item">List of tools</li>
-      <li class="breadcrumb-item active">Install NTools</li>
+      <li class="breadcrumb-item active">SDO Installation</li>
     <li class="wy-breadcrumbs-aside">
-          <a href="https://github.com/naz-hage/ntools/edit/main/docs/atools/install-ntools.md">Edit on ntools</a>
+          <a href="https://github.com/naz-hage/ntools/edit/main/docs/atools/sdo-installation.md">Edit on ntools</a>
     </li>
   </ul>
   <hr/>
@@ -141,22 +173,91 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="install-ntoolspy">install-ntools.py</h1>
-<p>A companion Python installer that downloads and extracts an NTools release ZIP.</p>
-<h2 id="quick-usage">Quick usage</h2>
-<p>Dry-run:</p>
-<pre><code class="language-pwsh">python atools/install-ntools.py --version 1.33.3 --dry-run
+                <h1 id="sdo-installation-instructions">SDO Installation Instructions</h1>
+<h2 id="overview">Overview</h2>
+<p>SDO (Simple DevOps) is now installed using an isolated virtual environment to prevent dependency conflicts with other Python tools.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<p>Before installing SDO, you must have NTools installed. See the main <a href="../../installation/">Installation</a> documentation for NTools setup instructions.</p>
+<h2 id="installation-steps">Installation Steps</h2>
+<h3 id="1-ensure-ntools-is-installed">1. Ensure NTools is Installed</h3>
+<p>Follow the <a href="../../installation/">NTools Installation</a> guide to install NTools to <code>C:\Program Files\NBuild</code> (or your preferred location).</p>
+<h3 id="2-run-sdo-installation-script">2. Run SDO Installation Script</h3>
+<p>Open a command prompt and navigate to the NTools directory:</p>
+<pre><code class="language-cmd">cd &quot;C:\Program Files\NBuild&quot;
+python atools\install-sdo.py
 </code></pre>
-<p>Install:</p>
-<pre><code class="language-pwsh">python atools/install-ntools.py --version 1.33.3
+<p><strong>Alternative: If NTools is already in PATH:</strong></p>
+<pre><code class="language-cmd">python install-sdo.py
 </code></pre>
-<p>See <code>docs/atools/index.md</code> for more background and notes on defaults and safety checks.</p>
+<h3 id="3-verify-installation">3. Verify Installation</h3>
+<p>Test that SDO is working:</p>
+<pre><code class="language-cmd">sdo --version
+sdo --help
+</code></pre>
+<h2 id="what-the-installation-does">What the Installation Does</h2>
+<ol>
+<li><strong>Creates Virtual Environment</strong>: <code>C:\Program Files\NBuild\venv\</code></li>
+<li><strong>Installs SDO</strong>: Installs SDO and dependencies in isolation</li>
+<li><strong>Creates Launcher</strong>: <code>sdo.cmd</code> script that activates venv and runs SDO</li>
+<li><strong>Maintains PATH</strong>: Since NBuild is in PATH, <code>sdo</code> works globally</li>
+</ol>
+<h2 id="directory-structure-after-installation">Directory Structure After Installation</h2>
+<pre><code>C:\Program Files\NBuild\
+├── nb.exe                    # NTools executable
+├── sdo.cmd                   # SDO launcher script (created by installer)
+├── venv\                     # Virtual environment
+│   ├── Scripts\             # Python executables
+│   ├── Lib\site-packages\   # Isolated SDO dependencies
+│   └── pyvenv.cfg
+├── atools\                   # SDO source code
+│   ├── sdo_package\
+│   └── install-sdo.py
+└── [other NTools files...]
+</code></pre>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<h3 id="python-not-found">Python Not Found</h3>
+<ul>
+<li>Ensure Python 3.8+ is installed and in PATH</li>
+<li>Run: <code>python --version</code> to verify</li>
+</ul>
+<h3 id="permission-errors">Permission Errors</h3>
+<ul>
+<li>Run command prompt as Administrator</li>
+<li>Or install to user directory: <code>python install-sdo.py --nbuild-path "%USERPROFILE%\NBuild"</code></li>
+</ul>
+<h3 id="installation-fails">Installation Fails</h3>
+<ul>
+<li>Check internet connection (pip downloads dependencies)</li>
+<li>Try dry-run first: <code>python install-sdo.py --dry-run</code></li>
+</ul>
+<h3 id="sdo-command-not-found">SDO Command Not Found</h3>
+<ul>
+<li>Ensure <code>C:\Program Files\NBuild</code> is in PATH</li>
+<li>Restart command prompt after installation</li>
+<li>Check that <code>sdo.cmd</code> exists in NBuild directory</li>
+</ul>
+<h2 id="benefits-of-virtual-environment-approach">Benefits of Virtual Environment Approach</h2>
+<ul>
+<li><strong>No Dependency Conflicts</strong>: SDO packages don't interfere with system Python</li>
+<li><strong>Isolated Environment</strong>: Each tool has its own dependencies</li>
+<li><strong>Easy Updates</strong>: Delete <code>venv\</code> folder to reset SDO installation</li>
+<li><strong>Professional Distribution</strong>: Follows Python best practices</li>
+</ul>
+<h2 id="uninstalling-sdo">Uninstalling SDO</h2>
+<p>To remove SDO completely:</p>
+<p>```cmd</p>
+<h1 id="remove-virtual-environment">Remove virtual environment</h1>
+<p>rm "C:\Program Files\NBuild\venv"</p>
+<h1 id="remove-launcher-script">Remove launcher script</h1>
+<p>del "C:\Program Files\NBuild\sdo.cmd"</p>
+<h1 id="remove-source-code-optional">Remove source code (optional)</h1>
+<p>rm "C:\Program Files\NBuild\atools"</p>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../sdo-installation/" class="btn btn-neutral float-left" title="SDO Installation"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../azdo_payloads/" class="btn btn-neutral float-right" title="AzDO payloads">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../sdo/" class="btn btn-neutral float-left" title="SDO (Simple DevOps Operations)"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../install-ntools/" class="btn btn-neutral float-right" title="Install NTools">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -183,10 +284,10 @@
         </span>
     
     
-      <span><a href="../sdo-installation/" style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../sdo/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
-      <span><a href="../azdo_payloads/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="../install-ntools/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>
