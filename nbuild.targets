@@ -719,8 +719,8 @@
 		
 		<!-- Copy SDO installation script and documentation -->
 		<Message Text="Copying SDO installation files..." Importance="high" />
-		<Copy SourceFiles="$(SdoSourceDir)\install_sdo.py" DestinationFiles="$(ArtifactsFolder)\install_sdo.py" />
-		<Copy SourceFiles="$(SdoSourceDir)\SDO_INSTALL_README.md" DestinationFiles="$(ArtifactsFolder)\SDO_INSTALL_README.md" />
+		<Copy SourceFiles="$(SdoSourceDir)\install-sdo.py" DestinationFiles="$(ArtifactsFolder)\install-sdo.py" />
+		<Copy SourceFiles="$(SolutionDir)\docs\atools\sdo-installation.md" DestinationFiles="$(ArtifactsFolder)\SDO_INSTALL_README.md" />
 		<Copy SourceFiles="$(SdoSourceDir)\pyproject.toml" DestinationFiles="$(ArtifactsFolder)\pyproject.toml" />
 		
 		<!-- Copy SDO package directory to artifacts folder -->

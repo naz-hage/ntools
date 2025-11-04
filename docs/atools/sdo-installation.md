@@ -4,11 +4,15 @@
 
 SDO (Simple DevOps) is now installed using an isolated virtual environment to prevent dependency conflicts with other Python tools.
 
+## Prerequisites
+
+Before installing SDO, you must have NTools installed. See the main [Installation](../installation.md) documentation for NTools setup instructions.
+
 ## Installation Steps
 
-### 1. Extract NTools Zip File
+### 1. Ensure NTools is Installed
 
-Extract the NTools zip file to `C:\Program Files\NBuild` (or your preferred location).
+Follow the [NTools Installation](../installation.md) guide to install NTools to `C:\Program Files\NBuild` (or your preferred location).
 
 ### 2. Run SDO Installation Script
 
@@ -16,13 +20,13 @@ Open a command prompt and navigate to the NTools directory:
 
 ```cmd
 cd "C:\Program Files\NBuild"
-python atools\install_sdo.py
+python atools\install-sdo.py
 ```
 
 **Alternative: If NTools is already in PATH:**
 
 ```cmd
-python install_sdo.py
+python install-sdo.py
 ```
 
 ### 3. Verify Installation
@@ -53,7 +57,7 @@ C:\Program Files\NBuild\
 │   └── pyvenv.cfg
 ├── atools\                   # SDO source code
 │   ├── sdo_package\
-│   └── install_sdo.py
+│   └── install-sdo.py
 └── [other NTools files...]
 ```
 
@@ -65,11 +69,11 @@ C:\Program Files\NBuild\
 
 ### Permission Errors
 - Run command prompt as Administrator
-- Or install to user directory: `python install_sdo.py --nbuild-path "%USERPROFILE%\NBuild"`
+- Or install to user directory: `python install-sdo.py --nbuild-path "%USERPROFILE%\NBuild"`
 
 ### Installation Fails
 - Check internet connection (pip downloads dependencies)
-- Try dry-run first: `python install_sdo.py --dry-run`
+- Try dry-run first: `python install-sdo.py --dry-run`
 
 ### SDO Command Not Found
 - Ensure `C:\Program Files\NBuild` is in PATH
@@ -89,11 +93,11 @@ To remove SDO completely:
 
 ```cmd
 # Remove virtual environment
-rmdir /s "C:\Program Files\NBuild\venv"
+rm -rf "C:\Program Files\NBuild\venv"
 
 # Remove launcher script
 del "C:\Program Files\NBuild\sdo.cmd"
 
 # Remove source code (optional)
-rmdir /s "C:\Program Files\NBuild\atools"
+rm -rf "C:\Program Files\NBuild\atools"
 ```
