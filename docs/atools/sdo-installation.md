@@ -2,7 +2,7 @@
 
 ## Overview
 
-SDO (Simple DevOps) is now installed using an isolated virtual environment to prevent dependency conflicts with other Python tools.
+SDO (Simple DevOps) is installed using an isolated virtual environment to prevent dependency conflicts with other Python tools. This approach keeps the NTools distribution smaller by shipping only source code rather than pre-compiled executables.
 
 ## Prerequisites
 
@@ -12,7 +12,7 @@ Before installing SDO, you must have NTools installed. See the main [Installatio
 
 ### 1. Ensure NTools is Installed
 
-Follow the [NTools Installation](../installation.md) guide to install NTools to `C:\Program Files\NBuild` (or your preferred location).
+Follow the [NTools Installation](../installation.md) guide to extract the NTools zip file to your preferred location (e.g., `C:\Program Files\NBuild`).
 
 ### 2. Run SDO Installation Script
 
@@ -20,7 +20,7 @@ Open a command prompt and navigate to the NTools directory:
 
 ```cmd
 cd "C:\Program Files\NBuild"
-python atools\install-sdo.py
+python install-sdo.py
 ```
 
 **Alternative: If NTools is already in PATH:**
@@ -55,11 +55,20 @@ C:\Program Files\NBuild\
 │   ├── Scripts\             # Python executables
 │   ├── Lib\site-packages\   # Isolated SDO dependencies
 │   └── pyvenv.cfg
-├── atools\                   # SDO source code
-│   ├── sdo_package\
-│   └── install-sdo.py
+├── install-sdo.py           # SDO installation script
+├── pyproject.toml           # SDO package configuration
+├── sdo_package\             # SDO source code
 └── [other NTools files...]
 ```
+
+## Benefits of Virtual Environment Approach
+
+- **Smaller Distribution**: NTools zip contains only source code, not compiled executables
+- **No Dependency Conflicts**: SDO packages don't interfere with system Python
+- **Isolated Environment**: Each tool has its own dependencies
+- **Easy Updates**: Delete `venv\` folder to reset SDO installation
+- **Flexible Deployment**: Works across different Python environments
+- **Professional Distribution**: Follows Python best practices
 
 ## Troubleshooting
 
@@ -80,23 +89,19 @@ C:\Program Files\NBuild\
 - Restart command prompt after installation
 - Check that `sdo.cmd` exists in NBuild directory
 
-## Benefits of Virtual Environment Approach
-
-- **No Dependency Conflicts**: SDO packages don't interfere with system Python
-- **Isolated Environment**: Each tool has its own dependencies
-- **Easy Updates**: Delete `venv\` folder to reset SDO installation
-- **Professional Distribution**: Follows Python best practices
-
 ## Uninstalling SDO
 
 To remove SDO completely:
 
 ```cmd
 # Remove virtual environment
-rm "C:\Program Files\NBuild\venv"
+rd /s "C:\Program Files\NBuild\venv"
 
 # Remove launcher script
 del "C:\Program Files\NBuild\sdo.cmd"
 
-# Remove source code (optional)
-rm "C:\Program Files\NBuild\atools"
+# Remove source files (optional)
+rd /s "C:\Program Files\NBuild\sdo_package"
+del "C:\Program Files\NBuild\install-sdo.py"
+del "C:\Program Files\NBuild\pyproject.toml"
+```
