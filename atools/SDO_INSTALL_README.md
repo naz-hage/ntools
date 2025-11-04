@@ -46,7 +46,7 @@ sdo --help
 ```
 C:\Program Files\NBuild\
 ├── nb.exe                    # NTools executable
-├── sdo.cmd                   # SDO launcher script
+├── sdo.cmd                   # SDO launcher script (created by installer)
 ├── venv\                     # Virtual environment
 │   ├── Scripts\             # Python executables
 │   ├── Lib\site-packages\   # Isolated SDO dependencies

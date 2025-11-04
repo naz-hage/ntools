@@ -35,8 +35,8 @@ Examples:
 
     parser.add_argument(
         '--source-path',
-        default='../atools',
-        help='Path to SDO source directory (default: ../atools)'
+        default=str(Path(__file__).resolve().parent),
+        help='Path to SDO source directory (default: script directory)'
     )
 
     parser.add_argument(
