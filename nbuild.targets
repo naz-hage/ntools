@@ -717,26 +717,11 @@
 			<SdoSourceDir>$(SolutionDir)\atools</SdoSourceDir>
 		</PropertyGroup>
 		
-		<!-- Install SDO package in development mode to generate console script -->
-		<Message Text="Installing SDO package in development mode..." Importance="high" />
-		
-		<!-- Use python.exe from PATH for portability -->
-		<Exec Command="python.exe -m pip install -e . --force-reinstall" WorkingDirectory="$(SdoSourceDir)" ContinueOnError="false">
-			<Output TaskParameter="ExitCode" PropertyName="SdoInstallExitCode" />
-		</Exec>
-		
-		<Error Condition="'$(SdoInstallExitCode)' != '0'" Text="SDO package installation failed with exit code $(SdoInstallExitCode)" />
-		
-		<!-- Now install with target to get package files in artifacts -->
-		<Exec Command="python.exe -m pip install -e . --target &quot;$(ArtifactsFolder)\sdo&quot; --force-reinstall" WorkingDirectory="$(SdoSourceDir)" ContinueOnError="false">
-			<Output TaskParameter="ExitCode" PropertyName="SdoTargetInstallExitCode" />
-		</Exec>
-		
-		<Error Condition="'$(SdoTargetInstallExitCode)' != '0'" Text="SDO package target installation failed with exit code $(SdoTargetInstallExitCode)" />
-		
-		<!-- Copy the portable batch file wrapper that uses python.exe from PATH -->
-		<!-- This replaces the problematic .exe launcher that has hardcoded Python paths -->
-		<Copy SourceFiles="$(SdoSourceDir)\sdo.cmd" DestinationFiles="$(ArtifactsFolder)\sdo.cmd" />
+		<!-- Copy SDO installation script and documentation -->
+		<Message Text="Copying SDO installation files..." Importance="high" />
+		<Copy SourceFiles="$(SdoSourceDir)\install_sdo.py" DestinationFiles="$(ArtifactsFolder)\install_sdo.py" />
+		<Copy SourceFiles="$(SdoSourceDir)\SDO_INSTALL_README.md" DestinationFiles="$(ArtifactsFolder)\SDO_INSTALL_README.md" />
+		<Copy SourceFiles="$(SdoSourceDir)\pyproject.toml" DestinationFiles="$(ArtifactsFolder)\pyproject.toml" />
 		
 		<!-- Copy SDO package directory to artifacts folder -->
 		<ItemGroup>
@@ -744,7 +729,7 @@
 		</ItemGroup>
 		<Copy SourceFiles="@(SdoPackageFiles)" DestinationFiles="@(SdoPackageFiles->'$(ArtifactsFolder)\sdo_package\%(RecursiveDir)%(Filename)%(Extension)')" />
 		
-		<Message Text="SDO package built successfully with portable launcher" Importance="high" />
+		<Message Text="SDO package built successfully with virtual environment installer" Importance="high" />
 		<Message Text="==> BUILD_SDO DONE"/>
 	</Target>
 

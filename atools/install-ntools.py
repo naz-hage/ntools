@@ -39,19 +39,14 @@ def _print_header_local(tool_name: str, tool_version: str, start_year: int = 202
 _print_header_local(TOOL_NAME, TOOL_VERSION)
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Install NTools from release ZIP or SDO package (cross-platform)")
-    parser.add_argument('--version', help='Release version to install for NTools (e.g. 1.32.0). Required when installing NTools.')
+    parser = argparse.ArgumentParser(description="Install NTools from release ZIP (cross-platform)")
+    parser.add_argument('--version', help='Release version to install (e.g. 1.32.0)')
     default_downloads = 'C:\\NToolsDownloads' if os.name == 'nt' else '/tmp/NToolsDownloads'
     parser.add_argument('--downloads-dir', default=default_downloads, help=f'Download directory (default: {default_downloads})')
     parser.add_argument('--json', '--ntools-json-path', dest='ntools_json_path', default=str(Path(__file__).resolve().parents[1] / 'dev-setup' / 'ntools.json'), help='Path to ntools.json (default: ./dev-setup/ntools.json)')
     parser.add_argument('--deploy-path', default=None, help='Deployment path (default from ntools.json InstallPath or platform default)')
     parser.add_argument('--dry-run', action='store_true', help='Do not perform network calls or write actions; print what would be done')
     parser.add_argument('--no-path-update', action='store_true', help='Do not attempt to update PATH; print instructions instead')
-
-    # SDO installation options
-    parser.add_argument('--install-sdo', action='store_true', help='Install SDO (Simple DevOps) package instead of NTools')
-    parser.add_argument('--uninstall-sdo', action='store_true', help='Uninstall SDO package')
-    parser.add_argument('--sdo-source', default=str(Path(__file__).resolve().parent), help='Source directory for SDO package (default: script directory)')
 
     return parser.parse_args()
 
@@ -201,169 +196,12 @@ def update_path(deploy_path: Path, no_update: bool = False):
         return False
 
 
-def install_sdo(sdo_source_path: Path, deploy_path: Path, dry_run: bool = False):
-    """Install SDO package using pip to the specified deployment path."""
-    import subprocess
-    import sys
-    import shutil
-
-    if dry_run:
-        print(f"Would install SDO from {sdo_source_path} to {deploy_path}")
-        return True
-
-    # Ensure deploy path exists
-    deploy_path.mkdir(parents=True, exist_ok=True)
-
-    # Install SDO package normally first to generate console script
-    print(f"Installing SDO package...")
-    cmd = [
-        sys.executable, "-m", "pip", "install",
-        "-e", str(sdo_source_path)
-    ]
-
-    result = subprocess.run(cmd, capture_output=True, text=True, check=False)
-    if result.returncode != 0:
-        print(f"SDO package installation failed: {result.stderr}")
-        return False
-
-    # Find where pip installed the console script (sdo.exe on Windows, sdo on Unix)
-    scripts_dir = Path(sys.executable).parent / "Scripts" if os.name == 'nt' else Path(sys.executable).parent / "bin"
-    sdo_exe = "sdo.exe" if os.name == 'nt' else "sdo"
-    sdo_script_path = scripts_dir / sdo_exe
-
-    if sdo_script_path.exists():
-        # Copy the console script directly to the deploy path
-        dest_script = deploy_path / sdo_exe
-        shutil.copy2(str(sdo_script_path), str(dest_script))
-        print(f"✓ Copied {sdo_exe} to {dest_script}")
-    else:
-        print(f"✗ Warning: {sdo_exe} not found at {sdo_script_path}")
-        print(f"  Searched in: {scripts_dir}")
-        # List what's in the Scripts directory for debugging
-        if scripts_dir.exists():
-            print(f"  Scripts directory contains:")
-            for item in scripts_dir.iterdir():
-                if 'sdo' in item.name.lower():
-                    print(f"    - {item.name}")
-
-    # Copy the sdo_package directory to deploy path (needed for editable install)
-    sdo_package_src = sdo_source_path / "sdo_package"
-    sdo_package_dest = deploy_path / "sdo_package"
-    
-    if sdo_package_src.exists():
-        if sdo_package_dest.exists():
-            shutil.rmtree(str(sdo_package_dest))
-        shutil.copytree(str(sdo_package_src), str(sdo_package_dest))
-        print(f"✓ Copied sdo_package to {sdo_package_dest}")
-
-    print("SDO installation completed successfully")
-    return True
-
-
-def uninstall_sdo(deploy_path: Path, dry_run: bool = False):
-    """Uninstall SDO package from the specified deployment path."""
-    import subprocess
-    import sys
-    import shutil
-
-    if dry_run:
-        print(f"Would uninstall SDO from {deploy_path}")
-        return True
-
-    print(f"Uninstalling SDO from {deploy_path}...")
-
-    # Remove sdo.exe (or sdo on Unix)
-    sdo_exe = "sdo.exe" if os.name == 'nt' else "sdo"
-    sdo_exe_path = deploy_path / sdo_exe
-    if sdo_exe_path.exists():
-        os.remove(str(sdo_exe_path))
-        print(f"✓ Removed {sdo_exe_path}")
-
-    # Remove sdo_package directory
-    sdo_package_path = deploy_path / "sdo_package"
-    if sdo_package_path.exists():
-        shutil.rmtree(str(sdo_package_path))
-        print(f"✓ Removed {sdo_package_path}")
-
-    # Remove sdo-1.0.0.dist-info directory
-    for item in deploy_path.glob("sdo-*.dist-info"):
-        if item.is_dir():
-            shutil.rmtree(str(item))
-            print(f"✓ Removed {item}")
-
-    # Uninstall from pip
-    print("Uninstalling SDO package from pip...")
-    cmd = [sys.executable, "-m", "pip", "uninstall", "-y", "sdo"]
-    result = subprocess.run(cmd, capture_output=True, text=True, check=False)
-    if result.returncode == 0:
-        print("✓ Uninstalled SDO package from pip")
-    else:
-        print("⚠ SDO package may not have been installed via pip")
-
-    print("SDO uninstallation completed successfully")
-    print(f"Note: You may need to manually remove {deploy_path} from your PATH if desired.")
-    return True
-
-
 def main():
     args = parse_args()
 
-    # Handle SDO uninstallation
-    if args.uninstall_sdo:
-        deploy_path = Path(args.deploy_path) if args.deploy_path else expand_install_path("$(ProgramFiles)\\Nbuild")
-
-        if args.dry_run:
-            print("DRY RUN: SDO uninstallation inputs:")
-            print(f" deploy_path: {deploy_path}")
-            print("Would uninstall SDO package")
-            return 0
-
-        success = uninstall_sdo(deploy_path, args.dry_run)
-        if success:
-            print(f"SDO uninstall complete from {deploy_path}.")
-            return 0
-        else:
-            return 1
-
-    # Handle SDO installation
-    if args.install_sdo:
-        sdo_source = Path(args.sdo_source).expanduser().resolve()
-        deploy_path = Path(args.deploy_path) if args.deploy_path else expand_install_path("$(ProgramFiles)\\Nbuild")
-
-        if args.dry_run:
-            print("DRY RUN: SDO installation inputs:")
-            print(f" sdo_source: {sdo_source}")
-            print(f" deploy_path: {deploy_path}")
-            print("Would install SDO package")
-            return 0
-
-        # Check if running as admin on Windows for Program Files
-        if os.name == 'nt' and 'program files' in str(deploy_path).lower():
-            try:
-                import ctypes
-                if not ctypes.windll.shell32.IsUserAnAdmin():
-                    print("ERROR: Installing to Program Files requires administrator privileges.")
-                    print("Please run this script as Administrator (right-click -> Run as Administrator)")
-                    return 1
-            except Exception:
-                print("WARNING: Could not verify administrator privileges. Installation may fail.")
-
-        success = install_sdo(sdo_source, deploy_path, args.dry_run)
-        if success:
-            # Update PATH to point to the deploy path where sdo.exe is located
-            updated = update_path(deploy_path, args.no_path_update)
-            if updated:
-                print(f"SDO install complete and PATH updated to include {deploy_path}.")
-                print(f"Run 'sdo --help' to verify installation.")
-            else:
-                print(f"SDO install complete. Please ensure {deploy_path} is on PATH to use sdo.")
-            return 0
-        else:
-            return 1
-
     # Original NTools installation logic
-    if not args.install_sdo and not args.uninstall_sdo and not args.version:
-        print("ERROR: Must specify --version for NTools or --install-sdo/--uninstall-sdo for SDO")
+    if not args.version:
+        print("ERROR: Must specify --version for NTools")
         return 1
 
     downloads_dir = Path(args.downloads_dir).expanduser().resolve()
