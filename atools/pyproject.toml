@@ -7,7 +7,7 @@ name = "sdo"
 dynamic = ["version"]
 description = "Simple DevOps CLI tool for Azure DevOps work item management"
 readme = "README.md"
-license = {text = "MIT"}
+license = "MIT"
 requires-python = ">=3.8"
 authors = [
     {name = "naz-hage", email = "naz-hage@example.com"},
@@ -19,7 +19,6 @@ keywords = ["azure", "devops", "cli", "work-items"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
@@ -46,4 +45,4 @@ sdo = "sdo_package.cli:cli"
 packages = ["sdo_package"]
 
 [tool.setuptools.dynamic]
-version = {file = "sdo_package/version.py"}
+version = {attr = "sdo_package.version.__version__"}
