@@ -44,6 +44,12 @@
                   <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
                   </li>
                   <li class="toctree-l1 current"><a class="reference internal current" href="#">Installation</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#option-1-full-development-environment-setup-recommended-for-contributors">Option 1: Full Development Environment Setup (Recommended for Contributors)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#option-2-ntools-only-installation-cross-platform">Option 2: NTools Only Installation (Cross-Platform)</a>
+    </li>
+    </ul>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../usage/">Practice</a>
                   </li>
@@ -144,27 +150,70 @@
 <pre><code class="language-powershell">cd c:\source
 git clone https://github.com/naz-hage/ntools
 </code></pre>
-<ul>
-<li>Change the PowerShell execution policy to allow the installation script to run. Run the following command:</li>
-</ul>
-<pre><code class="language-powershell">Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope Process
+<h2 id="installation-options">Installation Options</h2>
+<h3 id="option-1-full-development-environment-setup-recommended-for-contributors">Option 1: Full Development Environment Setup (Recommended for Contributors)</h3>
+<p>This installs the complete development environment including .NET runtime, NTools, and development tools:</p>
+<pre><code class="language-powershell">cd ./ntools
+# Change PowerShell execution policy (one-time setup)
+Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope Process
+
+# Run full development setup
+.\dev-setup\install.ps1
 </code></pre>
-<p>This command will allow the installation script to run. Once the installation is complete, the execution policy will revert to its original state.</p>
-<ul>
-<li>Run the following command to install the ntools:</li>
-</ul>
-<pre><code class="language-powershell">cd ./ntools\dev-setup
-.\install.ps1
-</code></pre>
-<p><strong>Or using the new ntools-scripts module (recommended):</strong></p>
+<p><strong>Or using the ntools-scripts module:</strong></p>
 <pre><code class="language-powershell">cd ./ntools
 Import-Module &quot;./scripts/module-package/ntools-scripts.psm1&quot; -Force
 Install-NTools -NtoolsJsonPath &quot;./dev-setup/ntools.json&quot;
+Install-DevelopmentApps -JsonPath &quot;./dev-setup/apps.json&quot;
 </code></pre>
-<ul>
-<li>This command will install the Dotnet Core Desktop runtime and download the <code>ntools</code> from GitHub, installs the ntools package in the <code>%ProgramFiles%\Nbuild</code> folder, sets up the nTools development environment, adds the <code>%ProgramFiles%\Nbuild</code> will be added to the system path.  </li>
-</ul>
+<h3 id="option-2-ntools-only-installation-cross-platform">Option 2: NTools Only Installation (Cross-Platform)</h3>
+<p>For users who just want to install NTools without the full development environment:</p>
+<pre><code class="language-powershell">cd ./ntools
+python atools/install-ntools.py --version 1.32.0
+</code></pre>
+<p><strong>Custom installation path:</strong></p>
+<pre><code class="language-powershell">python atools/install-ntools.py --version 1.32.0 --deploy-path &quot;C:\MyTools\Nbuild&quot;
+</code></pre>
+<h2 id="what-each-option-installs">What Each Option Installs</h2>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Development Setup</th>
+<th>NTools Only</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>.NET Runtime</td>
+<td>✅</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>NTools Core</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Development Apps</td>
+<td>✅</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>Cross-Platform</td>
+<td>⚠️ (Windows only)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Admin Required</td>
+<td>✅</td>
+<td>❌ (unless system paths)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="post-installation">Post-Installation</h2>
 <p>After the installation is complete, check out the <a href="../ntools/nbuild-targets/">nbuild.targets</a> for more all the available targets, and navigate to <a href="../usage/">Usage</a> to learn how to execute a build target.</p>
+<p>ntools is now installed on your machine, and you can start using it to learn how to build and run <a href="../usage/">additional targets</a>. If you have any questions or encounter any issues during the installation process, please don't hesitate to write an an <a href="https://github.com/naz-hage/NTools/issues">issue</a>. We're here to help!</p>
 <p>ntools is now installed on your machine, and you can start using it to learn how to build and run <a href="../usage/">additional targets</a>. If you have any questions or encounter any issues during the installation process, please don't hesitate to write an an <a href="https://github.com/naz-hage/NTools/issues">issue</a>. We're here to help!</p>
               
             </div>
