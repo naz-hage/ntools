@@ -93,11 +93,10 @@ To remove SDO completely:
 
 ```cmd
 # Remove virtual environment
-rm -rf "C:\Program Files\NBuild\venv"
+rm "C:\Program Files\NBuild\venv"
 
 # Remove launcher script
 del "C:\Program Files\NBuild\sdo.cmd"
 
 # Remove source code (optional)
-rm -rf "C:\Program Files\NBuild\atools"
-```
+rm "C:\Program Files\NBuild\atools"
