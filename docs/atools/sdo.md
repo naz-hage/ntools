@@ -24,18 +24,23 @@ The tool automatically detects Azure DevOps organization and project from the cu
 
 ## Installation
 
-### From Source
+For detailed installation instructions, see [SDO Installation](sdo-installation.md).
+
+### Quick Installation (Virtual Environment)
 
 ```bash
-cd atools
-pip install -r requirements.txt
+# Navigate to NTools directory
+cd "C:\Program Files\NBuild"
+
+# Run the installer
+python atools\install-sdo.py
 ```
 
-### As Module
+### Prerequisites
 
-```bash
-python -m sdo_package.cli --help
-```
+- Python 3.8+
+- Internet connection for dependency downloads
+- Administrative privileges (recommended)
 
 ## Usage
 

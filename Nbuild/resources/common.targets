@@ -67,6 +67,10 @@
 			<ArtifactsDir>$(DevDrive)\Artifacts</ArtifactsDir>
 			<TestFilesFolder>$(DevDrive)\Test</TestFilesFolder>
 			
+			<!-- Define dotnet tools path -->
+			<DotNetToolsPath>$(USERPROFILE)\.dotnet\tools</DotNetToolsPath>
+			<ReportGeneratorExe>$(DotNetToolsPath)\reportgenerator.exe</ReportGeneratorExe>
+			
 		</PropertyGroup>
 
 		<RedError Condition="'$(ProductVersion)' == ''" Message="Error: Version property is not defined. Type Nb.exe git_settag -tag 0.0.1" />
@@ -328,7 +332,7 @@
 		
 		<!-- Generate coverage report using ReportGenerator with configurable filters -->
 		<Message Text="Debug: Running ReportGenerator with targetdir: $(CoverageFolder)" />
-		<Exec Command='reportgenerator "-reports:$(ArtifactsTestResultsFolder)\**\coverage.cobertura.xml" "-targetdir:$(CoverageFolder)" "-reporttypes:Html;Cobertura;TextSummary" "-assemblyfilters:$(CoverageAssemblyFilters)" "-classfilters:$(CoverageClassFilters)"' 
+		<Exec Command='"$(ReportGeneratorExe)" "-reports:$(ArtifactsTestResultsFolder)\**\coverage.cobertura.xml" "-targetdir:$(CoverageFolder)" "-reporttypes:Html;Cobertura;TextSummary" "-assemblyfilters:$(CoverageAssemblyFilters)" "-classfilters:$(CoverageClassFilters)"' 
 			  WorkingDirectory="$(SolutionDir)"
 			  ContinueOnError="true">
 			<Output TaskParameter="ExitCode" PropertyName="ReportGenExitCode" />
@@ -341,7 +345,7 @@
 		
 		<!-- Fallback: try with different coverage file pattern -->
 		<Exec Condition="'$(ReportGenExitCode)' != '0'" 
-			  Command='reportgenerator "-reports:$(ArtifactsTestResultsFolder)\**\*.xml" "-targetdir:$(CoverageFolder)" "-reporttypes:Html;Cobertura;TextSummary" "-assemblyfilters:$(CoverageAssemblyFilters)" "-classfilters:$(CoverageClassFilters)"' 
+			  Command='"$(ReportGeneratorExe)" "-reports:$(ArtifactsTestResultsFolder)\**\*.xml" "-targetdir:$(CoverageFolder)" "-reporttypes:Html;Cobertura;TextSummary" "-assemblyfilters:$(CoverageAssemblyFilters)" "-classfilters:$(CoverageClassFilters)"' 
 			  WorkingDirectory="$(SolutionDir)"
 			  ContinueOnError="true">
 			<Output TaskParameter="ExitCode" PropertyName="ReportGenFallbackExitCode" />

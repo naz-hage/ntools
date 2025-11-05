@@ -8,8 +8,8 @@
 		<!-- This is the folder where the *.sln resides-->
 		<DeploymentFolder>$(ProgramFiles)\Nbuild</DeploymentFolder>
 		<!--  Modify these paths to match your Python installation -->
-		<PythonPath>$(ProgramFiles)\Python\3.13.3</PythonPath>
-		<PipPath>$(PythonPath)\Scripts\pip.exe</PipPath>
+		<!-- Always use python.exe from PATH for portability -->
+		<PipPath>python.exe -m pip</PipPath>
 		<MkDocsExe>$(USERPROFILE)\AppData\Roaming\Python\Python313\Scripts\mkdocs.exe</MkDocsExe>
 	</PropertyGroup>
 
@@ -47,10 +47,12 @@
 								Exclude="
 								$(SolutionDir)\$(TargetRelease)\**\*.pdb"
 								/>
+
 		</ItemGroup>
 		
 		<Message Text="==> DONE"/>
 	</Target>
+
 		
 	<!-- Test for FileVersion task and powershell file-version.ps1-->
 	<Target Name="FILE_VERSIONS"  DependsOnTargets="ARTIFACTS">
@@ -126,7 +128,7 @@
   <!-- Run nbTests and generate code coverage report -->
   <Target Name="RUN_NBTESTS_COVERAGE" DependsOnTargets="INSTALL_REPORTGENERATOR">
 	<Exec Command="dotnet test &quot;$(SolutionDir)\nbTests\nbTests.csproj&quot; --collect:\&quot;XPlat Code Coverage\&quot;" WorkingDirectory="$(SolutionDir)" />
-	<Exec Command="reportgenerator -reports:$(SolutionDir)\TestResults\**\coverage.cobertura.xml -targetdir:$(SolutionDir)\TestResults\CoverageReport" />
+	<Exec Command="&quot;$(ReportGeneratorExe)&quot; -reports:$(SolutionDir)\TestResults\**\coverage.cobertura.xml -targetdir:$(SolutionDir)\TestResults\CoverageReport" />
 	<Message Text="nbTests executed and code coverage report generated in TestResults\CoverageReport." />
 	<Message Text="==> DONE" />
   </Target>
@@ -558,14 +560,6 @@
 		<Message Text="==> DONE"/>
 	</Target>
 
-	<!-- Create a package for the solution default is a zip file of all artifacts -->
-	<Target Name="PACKAGE" DependsOnTargets="PROPERTIES">
-		<Exec Command='"$(ZipExe)" a -r -tzip $(ArtifactsFolder).zip $(ArtifactsFolder)\*'/>
-		
-		<RemoveDir Directories="$(ArtifactsFolder);"/> 
-		<Message Text="==> COMMON_DONE"/>
-	</Target>
-
     <!-- Comprehensive smoke test to verify published artifacts and build system integrity -->
     <Target Name="SMOKE_TEST" DependsOnTargets="ARTIFACTS">
         <Message Text="Running comprehensive smoke test for artifacts and build system..." />
@@ -715,6 +709,39 @@
 		<Exec Command='pwsh -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "Import-Module &apos;.\scripts\module-package\ntools-scripts.psm1&apos; -Force; $r = Invoke-VerifyArtifacts -ArtifactsPath &apos;$(ArtifactsFolder)&apos; -ProductVersion &apos;$(ProductVersion)&apos;; if ($r.Error -gt 0) { exit 1 } else { exit 0 }"' WorkingDirectory="$(SolutionDir)" />
 		<Message Text="VERIFY_ARTIFACTS completed" Importance="high" />
 	</Target>
+		
+	<!-- Build SDO package for inclusion in NTools distribution -->
+	<Target Name="BUILD_SDO" DependsOnTargets="ARTIFACTS">
+		<Message Text="Building SDO package..." Importance="high" />
+		<PropertyGroup>
+			<SdoSourceDir>$(SolutionDir)\atools</SdoSourceDir>
+		</PropertyGroup>
 
-	<!-- PUBLISH target implemented in common.targets -->
+		<!-- Copy SDO installation script and documentation -->
+		<Message Text="Copying SDO installation files..." Importance="high" />
+		<Copy SourceFiles="$(SdoSourceDir)\install-sdo.py" DestinationFiles="$(ArtifactsFolder)\install-sdo.py" />
+		<Copy SourceFiles="$(SolutionDir)\docs\atools\sdo-installation.md" DestinationFiles="$(ArtifactsFolder)\SDO_INSTALL_README.md" />
+		<Copy SourceFiles="$(SdoSourceDir)\pyproject.toml" DestinationFiles="$(ArtifactsFolder)\pyproject.toml" />
+
+		<!-- Copy SDO package directory to artifacts folder -->
+		<ItemGroup>
+			<SdoPackageFiles Include="$(SolutionDir)\atools\sdo_package\**\*.*" />
+		</ItemGroup>
+		<Copy SourceFiles="@(SdoPackageFiles)" DestinationFiles="@(SdoPackageFiles->'$(ArtifactsFolder)\sdo_package\%(RecursiveDir)%(Filename)%(Extension)')" />
+
+		<Message Text="SDO package built successfully with virtual environment installer" Importance="high" />
+		<Message Text="==> BUILD_SDO DONE"/>
+	</Target>
+
+	<!-- Publish all non-test projects to artifacts folder -->
+	<Target Name="PUBLISH" DependsOnTargets="ARTIFACTS;TAG">
+		<RemoveDir Directories="$(ArtifactsFolder)"></RemoveDir>
+		<Message Text="Publishing all non-test projects using ntools-scripts module" Importance="high" />
+		<Exec Command='pwsh -NoProfile -ExecutionPolicy Bypass -Command "Import-Module &apos;$(BuildTools)\ntools-scripts.psm1&apos; -Force; Publish-AllProjects -OutputDir &apos;$(ArtifactsFolder)&apos; -Version &apos;$(ProductVersion)&apos; -RepositoryRoot &apos;$(SolutionDir)&apos;"' WorkingDirectory="$(SolutionDir)" />
+		<Message Text="All non-test projects published to $(ArtifactsFolder)" Importance="high" />
+		
+		<CallTarget Targets="BUILD_SDO" />
+		
+		<Message Text="==> PUBLISH DONE"/>
+	</Target>
 </Project>

@@ -38,5 +38,6 @@ nav:
     - Overview: atools/index.md
     - List of tools:
       - SDO (Simple DevOps Operations): atools/sdo.md
+      - SDO Installation: atools/sdo-installation.md
       - Install NTools: atools/install-ntools.md
     - AzDO payloads: atools/azdo_payloads.md
