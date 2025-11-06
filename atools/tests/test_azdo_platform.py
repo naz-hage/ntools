@@ -332,10 +332,12 @@ class TestAzureDevOpsPlatform:
         assert desc_op is not None
         description = desc_op['value']
 
-        # Check that acceptance criteria are included
-        assert "## Acceptance Criteria" in description
+        # Check that acceptance criteria are included in HTML format
+        assert "<h3>Acceptance Criteria</h3>" in description
+        assert "<ul>" in description
+        assert "</ul>" in description
         for criteria in acceptance_criteria:
-            assert criteria in description
+            assert f"<li>{criteria}</li>" in description
 
 
 if __name__ == "__main__":
