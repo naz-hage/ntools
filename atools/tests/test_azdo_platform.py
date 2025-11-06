@@ -143,7 +143,7 @@ class TestAzureDevOpsPlatform:
         assert result is not None
         assert result["id"] == 12345
         assert "testorg/testproject" in result["url"]
-        assert result["type"] == "PBI"
+        assert result["type"] == "Product Backlog Item"
         assert result["title"] == "Test PBI"
 
         # Verify API call
@@ -154,7 +154,7 @@ class TestAzureDevOpsPlatform:
         headers = call_args[1]['headers']
 
         # Check URL contains correct work item type
-        assert "$PBI" in url
+        assert "$Product%20Backlog%20Item" in url
         assert "TestOrg" in url  # Uses capitalized version from metadata
         assert "TestProject" in url
 

@@ -9,10 +9,12 @@ try:
     from .base import WorkItemPlatform
     from ..client import extract_platform_info_from_git
     from ..exceptions import ConfigurationError
+    from ..parsers.metadata_parser import MetadataParser
 except ImportError:
     from base import WorkItemPlatform
     from client import extract_platform_info_from_git
     from exceptions import ConfigurationError
+    from parsers.metadata_parser import MetadataParser
 
 
 class AzureDevOpsPlatform(WorkItemPlatform):
@@ -65,11 +67,15 @@ class AzureDevOpsPlatform(WorkItemPlatform):
             print("❌ requests library not available. Install with: pip install requests")
             return None
 
+        # Normalize work item type early for dry-run display
+        work_item_type_raw = metadata.get('work_item_type', 'PBI')
+        work_item_type = MetadataParser.normalize_work_item_type(work_item_type_raw, 'azdo')
+
         if dry_run:
             print('[dry-run] Would create Azure DevOps work item with:')
             print(f'  Title: {title}')
             print(f'  Project: {metadata.get("project", "Not specified")}')
-            print(f'  Work Item Type: {metadata.get("work_item_type", "PBI")}')
+            print(f'  Work Item Type: {work_item_type_raw} (normalized: {work_item_type})')
             if metadata.get('area'):
                 print(f'  Area: {metadata.get("area")}')
             if metadata.get('iteration'):
@@ -80,12 +86,16 @@ class AzureDevOpsPlatform(WorkItemPlatform):
             print(description)
             if acceptance_criteria:
                 print('  Acceptance Criteria:')
-                for ac in acceptance_criteria:
-                    # Keep the checkboxes in the format they appear in the markdown
-                    if ac.strip().startswith('[ ]') or ac.strip().startswith('[x]'):
-                        print(f'  - {ac.strip()}')
-                    else:
-                        print(f'  - [ ] {ac.strip()}')
+                print(f'    {len(acceptance_criteria)} items (will be added via dedicated field or appended to description)')
+                if self.verbose:
+                    for i, ac in enumerate(acceptance_criteria, 1):
+                        print(f'    {i}. {ac}')
+            if self.verbose:
+                print(f'  Normalized Work Item Type: {work_item_type}')
+                print(f'  Organization: {metadata.get("organization", "Not specified")}')
+                print(f'  Area Path: {metadata.get("area", f"{metadata.get("project", "Project")}\\Area")}')
+                print(f'  Iteration Path: {metadata.get("iteration", f"{metadata.get("project", "Project")}\\Iteration")}')
+                print(f'  Acceptance Criteria Count: {len(acceptance_criteria) if acceptance_criteria else 0}')
             return {"dry_run": True, "title": title, "project": metadata.get("project")}
 
         # Get configuration - try Git remote first, then fall back to metadata
@@ -116,29 +126,75 @@ class AzureDevOpsPlatform(WorkItemPlatform):
         import base64
         auth_token = base64.b64encode(f":{pat}".encode('utf-8')).decode('utf-8')
 
-        # Prepare work item data
-        work_item_type = metadata.get('work_item_type', 'PBI')
         area_path = metadata.get('area', f"{project}\\Area")
         iteration_path = metadata.get('iteration', f"{project}\\Iteration")
         assignee = metadata.get('assignee')
 
+        # Initialize operations list for work item creation
+        operations = []
+
         # Build description with acceptance criteria
         full_description = description
         if acceptance_criteria:
-            full_description += "\n\n## Acceptance Criteria\n"
-            for ac in acceptance_criteria:
-                full_description += f"- {ac}\n"
+            # Handle Acceptance Criteria: prefer a dedicated work item field if available in the project
+            if self.verbose:
+                print(f"📋 Processing acceptance criteria for {work_item_type}")
+            ac_html = '<ul>' + '\n'.join([f'<li>{ac}</li>' for ac in acceptance_criteria]) + '</ul>'
+            
+            # Try to discover a field whose name/reference contains 'acceptance'
+            ac_field_ref = None
+            try:
+                fields_url = f"https://dev.azure.com/{organization}/{project}/_apis/wit/fields?api-version=7.1"
+                if self.verbose:
+                    print(f"🔍 Checking for acceptance criteria fields at: {fields_url}")
+                response = requests.get(fields_url, headers={'Authorization': f'Basic {auth_token}'}, timeout=30)
+                if response.status_code == 200:
+                    fields_data = response.json()
+                    if self.verbose:
+                        print(f"📊 Found {len(fields_data.get('value', []))} fields")
+                    for field in fields_data.get('value', []):
+                        field_name = field.get('name', '').lower()
+                        if 'acceptance' in field_name:
+                            ac_field_ref = field.get('referenceName')
+                            if self.verbose:
+                                print(f"✅ Found acceptance criteria field: {field.get('name')} -> {ac_field_ref}")
+                            break
+                    if not ac_field_ref and self.verbose:
+                        print("ℹ️  No dedicated acceptance criteria field found")
+                else:
+                    if self.verbose:
+                        print(f"⚠️  Failed to get fields, status: {response.status_code}")
+            except Exception as e:
+                if self.verbose:
+                    print(f"⚠️  Exception checking fields: {e}")
+
+            if ac_field_ref and work_item_type != 'Task':
+                # Use dedicated acceptance criteria field (for PBIs, Bugs, etc., but NOT Tasks)
+                operations.append({"op": "add", "path": f"/fields/{ac_field_ref}", "value": ac_html})
+                if self.verbose:
+                    print(f"📝 Using dedicated field {ac_field_ref} for acceptance criteria")
+            else:
+                # Append to description (for Tasks and other work item types without dedicated field)
+                if self.verbose:
+                    print(f"📝 Using description approach for {work_item_type}")
+                if full_description:
+                    full_description += f'\n\n<h3>Acceptance Criteria</h3>\n{ac_html}'
+                else:
+                    full_description = f'<h3>Acceptance Criteria</h3>\n{ac_html}'
 
         # Azure DevOps work item creation payload
-        url = f"https://dev.azure.com/{organization}/{project}/_apis/wit/workitems/${work_item_type}?api-version=7.1"
+        # URL encode the work item type for the API call
+        import urllib.parse
+        encoded_work_item_type = urllib.parse.quote(work_item_type)
+        url = f"https://dev.azure.com/{organization}/{project}/_apis/wit/workitems/${encoded_work_item_type}?api-version=7.1"
 
         headers = {
             'Content-Type': 'application/json-patch+json',
             'Authorization': f'Basic {auth_token}'
         }
 
-        # Build the operations array for work item creation
-        operations = [
+        # Add standard work item fields to operations
+        operations.extend([
             {
                 "op": "add",
                 "path": "/fields/System.Title",
@@ -159,7 +215,7 @@ class AzureDevOpsPlatform(WorkItemPlatform):
                 "path": "/fields/System.IterationPath",
                 "value": iteration_path
             }
-        ]
+        ])
 
         # Add assignee if provided
         if assignee:

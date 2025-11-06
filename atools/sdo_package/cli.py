@@ -64,8 +64,10 @@ def workitem(ctx):
               help='Path to markdown file containing work item details')
 @click.option('--dry-run', is_flag=True,
               help='Parse and preview work item creation without creating it')
+@click.option('--verbose', '-v', is_flag=True,
+              help='Show detailed API information and responses')
 @click.pass_context
-def create(ctx, file_path, dry_run):
+def create(ctx, file_path, dry_run, verbose):
     """Create a work item from markdown file.
 
     Examples:
@@ -78,6 +80,7 @@ def create(ctx, file_path, dry_run):
         args = ClickArgs(ctx)
         args.file_path = file_path
         args.dry_run = dry_run
+        args.verbose = verbose
 
         # Call the business logic
         result = cmd_workitem_create(args)
