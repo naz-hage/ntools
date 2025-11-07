@@ -82,6 +82,13 @@ class AzureDevOpsPlatform(WorkItemPlatform):
                 print(f'  Iteration: {metadata.get("iteration")}')
             if metadata.get('assignee'):
                 print(f'  Assignee: {metadata.get("assignee")}')
+            parent_str = metadata.get('parent') or metadata.get('parent_id')
+            if parent_str:
+                parent_id = MetadataParser.parse_parent_id(parent_str)
+                if parent_id:
+                    print(f'  Parent: #{parent_id} (from "{parent_str}")')
+                else:
+                    print(f'  Parent: Invalid parent reference "{parent_str}"')
             print('  Description:')
             print(description)
             if acceptance_criteria:
@@ -246,6 +253,23 @@ class AzureDevOpsPlatform(WorkItemPlatform):
                 "path": "/fields/System.Tags",
                 "value": tags_str
             })
+
+        # Add parent relationship if provided
+        parent_id = None
+        parent_str = metadata.get('parent') or metadata.get('parent_id')
+        if parent_str:
+            parent_id = MetadataParser.parse_parent_id(parent_str)
+            if parent_id:
+                operations.append({
+                    "op": "add",
+                    "path": "/relations/-",
+                    "value": {
+                        "rel": "System.LinkTypes.Hierarchy-Reverse",
+                        "url": f"https://dev.azure.com/{organization}/{project}/_apis/wit/workitems/{parent_id}",
+                    }
+                })
+                if self.verbose:
+                    print(f"📎 Linking to parent work item #{parent_id}")
 
         if self.verbose:
             print(f"📡 Creating {work_item_type} in {organization}/{project}")
