@@ -339,6 +339,200 @@ class TestAzureDevOpsPlatform:
         for criteria in acceptance_criteria:
             assert f"<li>{criteria}</li>" in description
 
+    @patch('requests.post')
+    def test_create_work_item_with_parent_relationship(self, mock_post):
+        """Test work item creation with parent relationship."""
+        # Mock successful API response
+        mock_response = Mock()
+        mock_response.status_code = 201
+        mock_response.json.return_value = {
+            'id': 45678,
+            '_links': {
+                'html': {
+                    'href': 'https://dev.azure.com/testorg/testproject/_workitems/edit/45678'
+                }
+            }
+        }
+        mock_post.return_value = mock_response
+
+        metadata = {
+            "work_item_type": "Task",
+            "project": "TestProject",
+            "organization": "TestOrg",
+            "parent": "211"
+        }
+
+        result = self.platform.create_work_item(
+            title="Implement Feature X",
+            description="Task to implement feature X.",
+            metadata=metadata,
+            dry_run=False
+        )
+
+        assert result is not None
+        assert result["id"] == 45678
+
+        # Verify API call includes parent relationship
+        mock_post.assert_called_once()
+        call_args = mock_post.call_args
+        operations = call_args[1]['json']
+
+        # Check that relations operation is included
+        relations_op = next((op for op in operations if op['path'] == '/relations/-'), None)
+        assert relations_op is not None
+        assert relations_op['op'] == 'add'
+        assert relations_op['value']['rel'] == 'System.LinkTypes.Hierarchy-Reverse'
+        assert relations_op['value']['url'] == 'https://dev.azure.com/TestOrg/TestProject/_apis/wit/workitems/211'
+
+    @patch('requests.post')
+    def test_create_work_item_with_parent_id_relationship(self, mock_post):
+        """Test work item creation with parent_id metadata field."""
+        # Mock successful API response
+        mock_response = Mock()
+        mock_response.status_code = 201
+        mock_response.json.return_value = {
+            'id': 56789,
+            '_links': {
+                'html': {
+                    'href': 'https://dev.azure.com/testorg/testproject/_workitems/edit/56789'
+                }
+            }
+        }
+        mock_post.return_value = mock_response
+
+        metadata = {
+            "work_item_type": "Task",
+            "project": "TestProject",
+            "organization": "TestOrg",
+            "parent_id": "#123"
+        }
+
+        result = self.platform.create_work_item(
+            title="Fix Bug Y",
+            description="Task to fix bug Y.",
+            metadata=metadata,
+            dry_run=False
+        )
+
+        assert result is not None
+        assert result["id"] == 56789
+
+        # Verify API call includes parent relationship
+        mock_post.assert_called_once()
+        call_args = mock_post.call_args
+        operations = call_args[1]['json']
+
+        # Check that relations operation is included
+        relations_op = next((op for op in operations if op['path'] == '/relations/-'), None)
+        assert relations_op is not None
+        assert relations_op['value']['url'] == 'https://dev.azure.com/TestOrg/TestProject/_apis/wit/workitems/123'
+
+    def test_create_work_item_dry_run_with_parent_relationship(self):
+        """Test dry run work item creation with parent relationship shows verbose output."""
+        import io
+        import sys
+        from contextlib import redirect_stdout
+
+        # Create verbose platform
+        verbose_platform = AzureDevOpsPlatform(verbose=True)
+
+        metadata = {
+            "work_item_type": "Task",
+            "project": "TestProject",
+            "organization": "TestOrg",
+            "parent": "211"
+        }
+
+        # Capture stdout
+        captured_output = io.StringIO()
+        with redirect_stdout(captured_output):
+            result = verbose_platform.create_work_item(
+                title="Test Task with Parent",
+                description="This is a test task with parent relationship.",
+                metadata=metadata,
+                dry_run=True
+            )
+
+        output = captured_output.getvalue()
+
+        # Verify parent relationship is shown in verbose output
+        assert "Parent: #211 (from \"211\")" in output
+        assert result == {"dry_run": True, "title": "Test Task with Parent", "project": "TestProject"}  # Dry run returns info dict
+
+    def test_create_work_item_dry_run_with_invalid_parent(self):
+        """Test dry run work item creation with invalid parent reference."""
+        import io
+        import sys
+        from contextlib import redirect_stdout
+
+        # Create verbose platform
+        verbose_platform = AzureDevOpsPlatform(verbose=True)
+
+        metadata = {
+            "work_item_type": "Task",
+            "project": "TestProject",
+            "organization": "TestOrg",
+            "parent": "invalid-parent-id"
+        }
+
+        # Capture stdout
+        captured_output = io.StringIO()
+        with redirect_stdout(captured_output):
+            result = verbose_platform.create_work_item(
+                title="Test Task with Invalid Parent",
+                description="This is a test task with invalid parent.",
+                metadata=metadata,
+                dry_run=True
+            )
+
+        output = captured_output.getvalue()
+
+        # Verify invalid parent is reported in verbose output
+        assert 'Parent: Invalid parent reference "invalid-parent-id"' in output
+        assert result == {"dry_run": True, "title": "Test Task with Invalid Parent", "project": "TestProject"}  # Dry run returns info dict
+
+    @patch('requests.post')
+    def test_create_work_item_without_parent_relationship(self, mock_post):
+        """Test work item creation without parent relationship (relations should not be included)."""
+        # Mock successful API response
+        mock_response = Mock()
+        mock_response.status_code = 201
+        mock_response.json.return_value = {
+            'id': 67890,
+            '_links': {
+                'html': {
+                    'href': 'https://dev.azure.com/testorg/testproject/_workitems/edit/67890'
+                }
+            }
+        }
+        mock_post.return_value = mock_response
+
+        metadata = {
+            "work_item_type": "Task",
+            "project": "TestProject",
+            "organization": "TestOrg"
+            # No parent field
+        }
+
+        result = self.platform.create_work_item(
+            title="Standalone Task",
+            description="Task without parent relationship.",
+            metadata=metadata,
+            dry_run=False
+        )
+
+        assert result is not None
+        assert result["id"] == 67890
+
+        # Verify API call does NOT include relations
+        mock_post.assert_called_once()
+        call_args = mock_post.call_args
+        operations = call_args[1]['json']
+
+        # Check that no relations operation is included
+        relations_ops = [op for op in operations if op['path'] == '/relations/-']
+        assert len(relations_ops) == 0
+
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
