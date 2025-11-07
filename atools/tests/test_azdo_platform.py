@@ -339,6 +339,7 @@ class TestAzureDevOpsPlatform:
         for criteria in acceptance_criteria:
             assert f"<li>{criteria}</li>" in description
 
+    @patch.dict(os.environ, {'AZURE_DEVOPS_PAT': 'test-pat-123'})
     @patch('requests.post')
     def test_create_work_item_with_parent_relationship(self, mock_post):
         """Test work item creation with parent relationship."""
@@ -384,6 +385,7 @@ class TestAzureDevOpsPlatform:
         assert relations_op['value']['rel'] == 'System.LinkTypes.Hierarchy-Reverse'
         assert relations_op['value']['url'] == 'https://dev.azure.com/TestOrg/TestProject/_apis/wit/workitems/211'
 
+    @patch.dict(os.environ, {'AZURE_DEVOPS_PAT': 'test-pat-123'})
     @patch('requests.post')
     def test_create_work_item_with_parent_id_relationship(self, mock_post):
         """Test work item creation with parent_id metadata field."""
@@ -491,6 +493,7 @@ class TestAzureDevOpsPlatform:
         assert 'Parent: Invalid parent reference "invalid-parent-id"' in output
         assert result == {"dry_run": True, "title": "Test Task with Invalid Parent", "project": "TestProject"}  # Dry run returns info dict
 
+    @patch.dict(os.environ, {'AZURE_DEVOPS_PAT': 'test-pat-123'})
     @patch('requests.post')
     def test_create_work_item_without_parent_relationship(self, mock_post):
         """Test work item creation without parent relationship (relations should not be included)."""
