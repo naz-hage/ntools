@@ -132,6 +132,9 @@ class GitHubPlatform(WorkItemPlatform):
                 # Execute the command
                 if self.verbose:
                     print(f"Creating GitHub issue in {repo}...")
+                    # Show equivalent gh CLI command
+                    print(f"   Equivalent gh CLI command:")
+                    print(f"   {' '.join(cmd)}")
                 result = subprocess.run(cmd, capture_output=True, text=True, check=True)
 
                 # Parse the issue URL from the output
