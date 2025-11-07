@@ -5,7 +5,6 @@ Tests for Azure DevOps platform work item creation.
 import pytest
 from unittest.mock import patch, Mock
 import os
-import base64
 import sys
 from pathlib import Path
 

@@ -1,8 +1,9 @@
 """
 Azure DevOps platform implementation for work item management.
 """
-
+import base64
 import os
+import urllib.parse
 from typing import Dict, Any, Optional, List
 
 try:
@@ -130,7 +131,7 @@ class AzureDevOpsPlatform(WorkItemPlatform):
             return None
 
         # Encode PAT for Basic authentication
-        import base64
+        
         auth_token = base64.b64encode(f":{pat}".encode('utf-8')).decode('utf-8')
 
         area_path = metadata.get('area', f"{project}\\Area")
@@ -191,7 +192,7 @@ class AzureDevOpsPlatform(WorkItemPlatform):
 
         # Azure DevOps work item creation payload
         # URL encode the work item type for the API call
-        import urllib.parse
+        
         encoded_work_item_type = urllib.parse.quote(work_item_type)
         url = f"https://dev.azure.com/{organization}/{project}/_apis/wit/workitems/${encoded_work_item_type}?api-version=7.1"
 
@@ -322,7 +323,7 @@ class AzureDevOpsPlatform(WorkItemPlatform):
                         error_msg += f": {error_details['message']}"
                     if self.verbose and 'detailedMessage' in error_details:
                         error_msg += f"\nDetails: {error_details['detailedMessage']}"
-                except:
+                except (ValueError, requests.exceptions.JSONDecodeError):
                     error_msg += f": {response.text[:200]}"
 
                 print(f"❌ {error_msg}")
