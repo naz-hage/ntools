@@ -30,15 +30,32 @@ namespace GitHubRelease
 
         private readonly ApiService ApiService;
         private readonly string Repo;
+        private readonly GitHubAuthService? AuthService;
 
         public CommitService(ApiService apiService, string repo)
         {
             ApiService = apiService;
             Repo = repo;
-            apiService.GetClient().DefaultRequestHeaders.Clear();
-            apiService.GetClient().DefaultRequestHeaders.Add("Authorization", $"Bearer {Credentials.GetToken()}");
-            apiService.GetClient().DefaultRequestHeaders.Add("User-Agent", "request");
-            apiService.GetClient().DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3+json");
+            AuthService = null;
+            // Setup authentication using legacy approach for backward compatibility
+            SetupAuthentication();
+        }
+
+        public CommitService(ApiService apiService, string repo, GitHubAuthService authService)
+        {
+            ApiService = apiService;
+            Repo = repo;
+            AuthService = authService;
+            // Setup authentication using new approach
+            SetupAuthentication();
+        }
+
+        private void SetupAuthentication()
+        {
+            ApiService.GetClient().DefaultRequestHeaders.Clear();
+            ApiService.GetClient().DefaultRequestHeaders.Add("Authorization", $"Bearer {Credentials.GetToken()}");
+            ApiService.GetClient().DefaultRequestHeaders.Add("User-Agent", "request");
+            ApiService.GetClient().DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3+json");
         }
 
         /// <summary>

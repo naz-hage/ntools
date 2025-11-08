@@ -18,12 +18,33 @@ namespace GitHubRelease
     /// <summary>
     /// Service class for creating GitHub releases and uploading assets.
     /// </summary>
-    public class ReleaseService(string repo) : Constants
+    public class ReleaseService : Constants
     {
-        private readonly ApiService ApiService = new();
-        public readonly string Repo = repo;
+        private readonly ApiService ApiService;
+        private readonly GitHubAuthService? AuthService;
+        public readonly string Repo;
         public readonly string FirstDate = "1970-01-01T00:00:00Z";
         private const string NoneFound = "N/A";
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReleaseService"/> class.
+        /// </summary>
+        public ReleaseService(string repo)
+        {
+            Repo = repo;
+            AuthService = null;
+            ApiService = new ApiService();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReleaseService"/> class with authentication service.
+        /// </summary>
+        public ReleaseService(string repo, GitHubAuthService authService)
+        {
+            Repo = repo;
+            AuthService = authService;
+            ApiService = new ApiService(authService);
+        }
 
         /// <summary>
         /// Creates a release with the specified release object and asset path.
@@ -315,7 +336,14 @@ namespace GitHubRelease
         /// </returns>
         public async Task<JsonDocument?> GetReleasesAsync(string branch)
         {
-            ApiService.SetupHeaders();
+            if (AuthService != null)
+            {
+                await ApiService.SetupHeadersAsync($"https://github.com/{Repo}", GitHubOperation.Read);
+            }
+            else
+            {
+                ApiService.SetupHeaders();
+            }
             var releases = await GetLatestReleaseRawAsync(branch);
             if (releases == null)
             {
