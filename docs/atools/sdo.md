@@ -39,7 +39,6 @@ python atools\install-sdo.py
 ### Prerequisites
 
 - Python 3.8+
-- Internet connection for dependency downloads
 - Administrative privileges (recommended)
 
 ## Usage
