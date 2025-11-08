@@ -481,6 +481,7 @@ namespace Nbuild
                 {
                     ConsoleHelper.WriteLine("DRY-RUN: running in dry-run mode; no destructive actions will be performed.", ConsoleColor.Yellow);
                 }
+                if (verbose) ConsoleHelper.WriteLine($"Verbose mode enabled", ConsoleColor.Yellow);
                 if (verbose) ConsoleHelper.WriteLine($"[VERBOSE] Listing releases for repo: {repo}", ConsoleColor.Gray);
                 var exitCode = await HandleListReleasesCommand(repo, verbose, dryRun);
                 Environment.ExitCode = exitCode;

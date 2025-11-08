@@ -135,10 +135,18 @@ namespace GitHubRelease
 
                     if (repoData.TryGetProperty("private", out var privateProp) && privateProp.GetBoolean())
                     {
+                        if (_verbose)
+                        {
+                            Console.WriteLine($"[VERBOSE] Repository {owner}/{repo} detected as private");
+                        }
                         return RepositoryVisibility.Private;
                     }
                     else
                     {
+                        if (_verbose)
+                        {
+                            Console.WriteLine($"[VERBOSE] Repository {owner}/{repo} detected as public");
+                        }
                         return RepositoryVisibility.Public;
                     }
                 }

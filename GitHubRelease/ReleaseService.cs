@@ -986,7 +986,7 @@ namespace GitHubRelease
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public async Task<List<Release>> ListReleasesAsync(bool verbose)
         {
-            ApiService.SetupHeaders();
+            await ApiService.SetupHeadersAsync($"https://github.com/{Repo}", GitHubOperation.Read);
             var uri = $"{Constants.GitHubApiPrefix}/{Repo}/releases";
             var response = await ApiService.GetAsync(uri);
 
