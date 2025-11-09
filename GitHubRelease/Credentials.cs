@@ -122,8 +122,23 @@ namespace GitHubRelease
         /// <returns>The GitHub API token.</returns>
         public static string GetToken()
         {
-
             return ConvertToUnsecureString(GetSecureToken());
+        }
+
+        /// <summary>
+        /// Gets the GitHub API token, or null if not available.
+        /// </summary>
+        /// <returns>The GitHub API token, or null if not available.</returns>
+        public static string? GetTokenOrDefault()
+        {
+            try
+            {
+                return ConvertToUnsecureString(GetSecureToken());
+            }
+            catch (InvalidOperationException)
+            {
+                return null;
+            }
         }
 
         /// <summary>

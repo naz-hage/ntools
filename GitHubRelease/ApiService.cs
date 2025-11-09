@@ -104,11 +104,22 @@ namespace GitHubRelease
             }
             else
             {
-                // Fallback to legacy behavior
-                Client.DefaultRequestHeaders.Add("Authorization", $"Bearer {Credentials.GetToken()}");
-                if (Verbose)
+                // Fallback to legacy behavior - use token if available
+                var token = Credentials.GetTokenOrDefault();
+                if (token != null)
                 {
-                    Console.WriteLine($"[VERBOSE] Using legacy authentication (no GitHubAuthService provided)");
+                    Client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+                    if (Verbose)
+                    {
+                        Console.WriteLine($"[VERBOSE] Using legacy authentication (no GitHubAuthService provided)");
+                    }
+                }
+                else
+                {
+                    if (Verbose)
+                    {
+                        Console.WriteLine($"[VERBOSE] No authentication token available, proceeding without authentication");
+                    }
                 }
             }
 
