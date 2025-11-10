@@ -30,15 +30,51 @@ namespace GitHubRelease
 
         private readonly ApiService ApiService;
         private readonly string Repo;
+        private readonly GitHubAuthService? AuthService;
+        private readonly string RepositoryUrl;
 
         public CommitService(ApiService apiService, string repo)
         {
             ApiService = apiService;
             Repo = repo;
-            apiService.GetClient().DefaultRequestHeaders.Clear();
-            apiService.GetClient().DefaultRequestHeaders.Add("Authorization", $"Bearer {Credentials.GetToken()}");
-            apiService.GetClient().DefaultRequestHeaders.Add("User-Agent", "request");
-            apiService.GetClient().DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3+json");
+            AuthService = null;
+            RepositoryUrl = $"https://github.com/{repo}";
+            // Authentication will be set up lazily when needed
+        }
+
+        public CommitService(ApiService apiService, string repo, GitHubAuthService authService)
+        {
+            ApiService = apiService;
+            Repo = repo;
+            AuthService = authService;
+            RepositoryUrl = $"https://github.com/{repo}";
+            // Authentication will be set up lazily when needed
+        }
+
+        private async Task SetupAuthenticationAsync()
+        {
+            ApiService.GetClient().DefaultRequestHeaders.Clear();
+            ApiService.GetClient().DefaultRequestHeaders.Add("User-Agent", "request");
+            ApiService.GetClient().DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3+json");
+
+            // Check if authentication is required for read operations on this repository
+            if (AuthService != null)
+            {
+                bool requiresAuth = await AuthService.RequiresAuthenticationAsync(RepositoryUrl, GitHubOperation.Read);
+                if (requiresAuth)
+                {
+                    ApiService.GetClient().DefaultRequestHeaders.Add("Authorization", $"Bearer {Credentials.GetToken()}");
+                }
+            }
+            else
+            {
+                // Fallback to legacy authentication - use token if available
+                var token = Credentials.GetTokenOrDefault();
+                if (token != null)
+                {
+                    ApiService.GetClient().DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+                }
+            }
         }
 
         /// <summary>
@@ -48,6 +84,9 @@ namespace GitHubRelease
         /// <returns>The tag associated with the commit, or null if not found.</returns>
         private async Task<string?> GetTagFromCommitAsync(string commitSha)
         {
+            // Setup authentication conditionally based on repository requirements
+            await SetupAuthenticationAsync();
+
             var uri = $"{Constants.GitHubApiPrefix}/{Repo}/tags";
 
             var response = await ApiService.GetAsync(uri);
@@ -168,6 +207,9 @@ namespace GitHubRelease
         /// <returns>A list of JsonElement objects representing the commits.</returns>
         public async Task<List<JsonElement>> GetCommits(string? branch = null, string? sinceLastPublished = null)
         {
+            // Setup authentication conditionally based on repository requirements
+            await SetupAuthenticationAsync();
+
             var uri = $"{Constants.GitHubApiPrefix}/{Repo}/commits";
             var queryParams = new List<string>();
             if (branch != null)
@@ -225,6 +267,9 @@ namespace GitHubRelease
         /// </remarks>
         public async Task<List<string>> GetReleaseTags(string? branch = null)
         {
+            // Setup authentication conditionally based on repository requirements
+            await SetupAuthenticationAsync();
+
             var uri = $"{Constants.GitHubApiPrefix}/{Repo}/tags";
             var response = await ApiService.GetAsync(uri);
             if (response.IsSuccessStatusCode)
@@ -250,6 +295,9 @@ namespace GitHubRelease
         /// </remarks>
         public async Task<List<JsonElement>> GetPullRequestCommits(string? sha = null)
         {
+            // Setup authentication conditionally based on repository requirements
+            await SetupAuthenticationAsync();
+
             var uri = $"{Constants.GitHubApiPrefix}/{Repo}/commits/pulls";
             if (sha != null)
             {

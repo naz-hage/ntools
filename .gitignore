@@ -417,3 +417,6 @@ FodyWeavers.xsd
 .commit-message
 /.vscode
 BuildToolsTest/
+
+# Documentation files that should not be tracked
+docs/todo.md

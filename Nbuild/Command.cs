@@ -1260,18 +1260,14 @@ namespace Nbuild
 
         public static async Task<ResultHelper> ListReleases(string repo, bool verbose = false, bool dryRun = false)
         {
-            if (verbose)
-            {
-                ConsoleHelper.WriteLine($"Verbose mode enabled", ConsoleColor.Yellow);
-            }
-
             if (dryRun)
             {
                 ConsoleHelper.WriteLine($"DRY-RUN: performing read-only fetch for repository: {repo}", ConsoleColor.Yellow);
                 ConsoleHelper.WriteLine($"DRY-RUN: no state-changing operations will be performed.", ConsoleColor.Yellow);
             }
 
-            var releaseService = new ReleaseService(repo);
+            var authService = new GitHubRelease.GitHubAuthService(verbose);
+            var releaseService = new ReleaseService(repo, authService);
             var releases = await releaseService.ListReleasesAsync(verbose);
 
             if (releases == null || !releases.Any())

@@ -16,13 +16,29 @@ namespace GitHubRelease
         /// <returns>A tuple containing the owner and token as SecureString objects.</returns>
         /// <remarks>
         /// The owner is retrieved from the OWNER environment variable.
-        /// The token is retrieved from the Windows Credential Manager if running on Windows, otherwise from the API_GITHUB_KEY environment variable.
+        /// The token is retrieved from the API_GITHUB_KEY environment variable, GitHub CLI authentication, or the Windows Credential Manager if running on Windows.
         /// </remarks>
         private static SecureString GetSecureToken()
         {
-            SecureString secureToken = GetTokenFromEnvironmentVariable();
+            SecureString? secureToken = null;
 
-            // If the token is not found in the environment variable and the OS is Windows, try to get it from the Credential Manager
+            // Try to get token from environment variable first
+            try
+            {
+                secureToken = GetTokenFromEnvironmentVariable();
+            }
+            catch (ArgumentNullException)
+            {
+                // API_GITHUB_KEY not set, try other methods
+            }
+
+            // If not found in environment variable, try GitHub CLI
+            if (secureToken == null || secureToken.Length == 0)
+            {
+                secureToken = GetTokenFromGitHubCli();
+            }
+
+            // If still not found and on Windows, try Credential Manager
             if ((secureToken == null || secureToken.Length == 0) && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 secureToken = GetToken("GitHubRelease", "API_GITHUB_KEY");
@@ -30,7 +46,7 @@ namespace GitHubRelease
 
             if (secureToken == null || secureToken.Length == 0)
             {
-                throw new InvalidOperationException("The API token could not be retrieved from the environment variable or the Credential Manager.");
+                throw new InvalidOperationException("The API token could not be retrieved from the environment variable, GitHub CLI, or the Credential Manager.");
             }
 
             return secureToken;
@@ -86,24 +102,69 @@ namespace GitHubRelease
         /// <summary>
         /// Retrieves a token from the API_GITHUB_KEY environment variable.
         /// </summary>
-        /// <returns>A SecureString containing the token.</returns>
-        /// <exception cref="ArgumentNullException">Thrown if the API_GITHUB_KEY environment variable is not set.</exception>
-        /// <exception cref="ArgumentException">Thrown if the API_GITHUB_KEY environment variable is empty.</exception>
-        private static SecureString GetTokenFromEnvironmentVariable()
+        /// <returns>A SecureString containing the token, or null if not available.</returns>
+        private static SecureString? GetTokenFromEnvironmentVariable()
         {
             string? token = Environment.GetEnvironmentVariable("API_GITHUB_KEY");
             if (string.IsNullOrEmpty(token))
             {
-                throw new ArgumentNullException("Environment variable 'API_GITHUB_KEY' is required");
+                return null;
             }
 
             SecureString secureToken = CreateSecureString(token);
             if (secureToken == null || secureToken.Length == 0)
             {
-                throw new ArgumentException("The API_GITHUB_KEY environment variable cannot be empty");
+                return null;
             }
 
             return secureToken;
+        }
+
+        /// <summary>
+        /// Retrieves a token from GitHub CLI authentication.
+        /// </summary>
+        /// <returns>A SecureString containing the token, or null if GitHub CLI is not available or not authenticated.</returns>
+        private static SecureString? GetTokenFromGitHubCli()
+        {
+            try
+            {
+                // Try to get token using 'gh auth token' command
+                var startInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "gh",
+                    Arguments = "auth token",
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                using var process = System.Diagnostics.Process.Start(startInfo);
+                if (process == null)
+                {
+                    return null;
+                }
+
+                string output = process.StandardOutput.ReadToEnd();
+                string error = process.StandardError.ReadToEnd();
+                process.WaitForExit();
+
+                if (process.ExitCode == 0 && !string.IsNullOrWhiteSpace(output))
+                {
+                    string token = output.Trim();
+                    if (!string.IsNullOrEmpty(token) && token.StartsWith("gho_"))
+                    {
+                        return CreateSecureString(token);
+                    }
+                }
+            }
+            catch
+            {
+                // GitHub CLI not available or not authenticated
+                return null;
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -122,8 +183,23 @@ namespace GitHubRelease
         /// <returns>The GitHub API token.</returns>
         public static string GetToken()
         {
-
             return ConvertToUnsecureString(GetSecureToken());
+        }
+
+        /// <summary>
+        /// Gets the GitHub API token, or null if not available.
+        /// </summary>
+        /// <returns>The GitHub API token, or null if not available.</returns>
+        public static string? GetTokenOrDefault()
+        {
+            try
+            {
+                return ConvertToUnsecureString(GetSecureToken());
+            }
+            catch (InvalidOperationException)
+            {
+                return null;
+            }
         }
 
         /// <summary>

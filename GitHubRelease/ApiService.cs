@@ -9,6 +9,7 @@ namespace GitHubRelease
     {
         private readonly HttpClient Client;
         private readonly bool Verbose;
+        private readonly GitHubAuthService? AuthService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiService"/> class.
@@ -17,6 +18,17 @@ namespace GitHubRelease
         {
             Verbose = verbose;
             Client = new HttpClient();
+            AuthService = null;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ApiService"/> class with authentication service.
+        /// </summary>
+        public ApiService(GitHubAuthService authService, bool verbose = false)
+        {
+            Verbose = verbose;
+            Client = new HttpClient();
+            AuthService = authService;
         }
 
         /// <summary>
@@ -35,13 +47,81 @@ namespace GitHubRelease
         /// <remarks>
         /// - If <paramref name="download"/> is true, the headers are configured for downloading files.
         /// - If <paramref name="download"/> is false, the headers are configured for standard API requests.
-        /// - The method uses the access token from <see cref="Credentials.GetToken()"/> for authentication.
+        /// - Authentication is added based on the GitHubAuthService if available, otherwise falls back to the legacy Credentials.GetToken() approach.
         /// </remarks>
         public void SetupHeaders(bool download = false)
         {
             Client.DefaultRequestHeaders.Clear();
             Client.DefaultRequestHeaders.Add("Authorization", $"Bearer {Credentials.GetToken()}");
             Client.DefaultRequestHeaders.Add("User-Agent", "request");
+
+            if (download)
+            {
+                Client.DefaultRequestHeaders.Add("Accept", "application/octet-stream");
+                Client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (compatible; GitHubRelease/1.0)");
+            }
+            else
+            {
+                Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github+json")); // Accept JSON for metadata
+            }
+        }
+
+        /// <summary>
+        /// Sets up the headers for making API requests to a specific GitHub repository.
+        /// </summary>
+        /// <param name="repositoryUrl">The GitHub repository URL.</param>
+        /// <param name="operation">The type of GitHub operation being performed.</param>
+        /// <param name="download">Indicates whether the request is for downloading content.</param>
+        /// <remarks>
+        /// - If <paramref name="download"/> is true, the headers are configured for downloading files.
+        /// - If <paramref name="download"/> is false, the headers are configured for standard API requests.
+        /// - Authentication is conditionally added based on repository visibility and operation type using GitHubAuthService.
+        /// </remarks>
+        public async Task SetupHeadersAsync(string repositoryUrl, GitHubOperation operation, bool download = false)
+        {
+            Client.DefaultRequestHeaders.Clear();
+            Client.DefaultRequestHeaders.Add("User-Agent", "request");
+
+            // Check if authentication is required
+            if (AuthService != null)
+            {
+                bool requiresAuth = await AuthService.RequiresAuthenticationAsync(repositoryUrl, operation);
+                if (requiresAuth)
+                {
+                    Client.DefaultRequestHeaders.Add("Authorization", $"Bearer {Credentials.GetToken()}");
+                    if (Verbose)
+                    {
+                        Console.WriteLine($"[VERBOSE] Authentication required for {operation} operation on {repositoryUrl}");
+                    }
+                }
+                else
+                {
+                    if (Verbose)
+                    {
+                        Console.WriteLine($"[VERBOSE] No authentication required for {operation} operation on {repositoryUrl}");
+                    }
+                }
+            }
+            else
+            {
+                // Fallback to legacy behavior - use token if available
+                var token = Credentials.GetTokenOrDefault();
+                if (token != null)
+                {
+                    Client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+                    if (Verbose)
+                    {
+                        Console.WriteLine($"[VERBOSE] Using legacy authentication (no GitHubAuthService provided)");
+                    }
+                }
+                else
+                {
+                    if (Verbose)
+                    {
+                        Console.WriteLine($"[VERBOSE] No authentication token available, proceeding without authentication");
+                    }
+                }
+            }
 
             if (download)
             {
