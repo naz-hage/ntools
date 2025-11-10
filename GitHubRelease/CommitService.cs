@@ -77,14 +77,6 @@ namespace GitHubRelease
             }
         }
 
-        private void SetupAuthentication()
-        {
-            ApiService.GetClient().DefaultRequestHeaders.Clear();
-            ApiService.GetClient().DefaultRequestHeaders.Add("Authorization", $"Bearer {Credentials.GetToken()}");
-            ApiService.GetClient().DefaultRequestHeaders.Add("User-Agent", "request");
-            ApiService.GetClient().DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3+json");
-        }
-
         /// <summary>
         /// Retrieves the tag associated with a given commit SHA.
         /// </summary>

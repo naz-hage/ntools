@@ -373,7 +373,14 @@ namespace GitHubRelease
         /// </returns>
         public async Task<List<string>> GetReleaseTagsAsync()
         {
-            ApiService.SetupHeaders();
+            if (AuthService != null)
+            {
+                await ApiService.SetupHeadersAsync($"https://github.com/{Repo}", GitHubOperation.Read);
+            }
+            else
+            {
+                ApiService.SetupHeaders();
+            }
             var uri = $"{Constants.GitHubApiPrefix}/{Repo}/releases";
             var response = await ApiService.GetAsync(uri);
 
@@ -415,7 +422,14 @@ namespace GitHubRelease
         /// </returns>
         public async Task<List<int>> GetReleaseIdsAsync()
         {
-            ApiService.SetupHeaders();
+            if (AuthService != null)
+            {
+                await ApiService.SetupHeadersAsync($"https://github.com/{Repo}", GitHubOperation.Read);
+            }
+            else
+            {
+                ApiService.SetupHeaders();
+            }
             var uri = $"{Constants.GitHubApiPrefix}/{Repo}/releases";
             var response = await ApiService.GetAsync(uri);
 
