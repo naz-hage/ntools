@@ -4,24 +4,20 @@ nb.exe is also designed to help you create and manage GitHub releases. It also e
 
 ### Repository Requirements
 - The repository must have:
-  - A GitHub token to create releases.
-  - A GitHub owner to create releases.
+  - A GitHub token to create releases (required for private repos and write operations).
+  - A GitHub owner to create releases (can be specified via command line).
   - A Git branch to create releases.
   - At least one Git tag prior to creating releases.
 
-### Environment Requirements
-- The GitHub API token (Required) and repository owner (Optional) are obtained from environment variables:
-  - **`OWNER`:** The GitHub repository owner's username.
-    - The owner is optional and can be specified in the command line with `-repo` option. Checkout usage below.
-  - **`API_GITHUB_KEY`:** The GitHub API token (personal access token).
-- **Local development with Windows Platforms:**
-  - For additional security, the GitHub API token should be saved in the Windows Credential Manager with:
-    - **Target Name:** `GitHubRelease`
-    - **Credential Name:** `API_GITHUB_KEY`
+### Authentication Requirements
+- **Public Repositories:** No authentication required for read operations
+- **Private Repositories:** Authentication required for all operations
+- **Write Operations:** Authentication always required (create releases, upload assets)
 
 ### GitHub Actions Workflow Example
-Here is an example of how to set up the required environment variables in a GitHub Actions workflow file:
+Here is an example of how to set up authentication in a GitHub Actions workflow file. You can use either a personal access token or GitHub CLI authentication:
 
+**Option 1: Personal Access Token (Recommended for CI/CD)**
 ```yml
 - name: Build using ntools
   run: |
@@ -32,7 +28,24 @@ Here is an example of how to set up the required environment variables in a GitH
     OWNER: ${{ github.repository_owner }}
     API_GITHUB_KEY: ${{ secrets.API_GITHUB_KEY }}
 ```
-The above action builds, test, and creates a release using the GitHubRelease tool and upload to GitHub.
+
+**Option 2: GitHub CLI Authentication**
+```yml
+- name: Authenticate with GitHub CLI
+  run: |
+    gh auth login --with-token <<< ${{ secrets.GITHUB_TOKEN }}
+  shell: bash
+
+- name: Build using ntools
+  run: |
+    & "$env:ProgramFilesPath/nbuild/nb.exe" ${{ env.Build_Type }} -v ${{ env.Enable_Logging }}
+  shell: pwsh
+  working-directory: ${{ github.workspace }}
+  env:
+    OWNER: ${{ github.repository_owner }}
+```
+
+The above actions build, test, and create releases using the GitHubRelease tool and upload to GitHub.
 
 ### Branch Checkout Example
 Before running the tool, you must checkout a branch. Here is an example of how to checkout a branch in a GitHub Actions workflow file:
@@ -47,7 +60,33 @@ Before running the tool, you must checkout a branch. Here is an example of how t
     repository: ${{ github.event.pull_request.head.repo.full_name }}
 ```
 
-## Release Process
+## Repository Visibility-Based Authentication
+
+**New Feature**: NTools now intelligently determines when authentication is required based on repository visibility and operation type.
+
+### How It Works
+- **Public Repositories:**
+  - Read operations (listing releases, downloading assets) work without authentication
+  - Write operations (creating releases, uploading assets) require authentication
+- **Private Repositories:**
+  - All operations require authentication
+- **Unknown Visibility:**
+  - The tool attempts to determine repository visibility via unauthenticated API calls
+  - If visibility cannot be determined, authentication is required for safety
+
+### Authentication Flow
+1. Tool determines if the operation requires authentication based on repository visibility
+2. If authentication is required, it tries available authentication methods in order:
+   - `API_GITHUB_KEY` environment variable
+   - GitHub CLI authentication (`gh auth token`)
+   - Windows Credential Manager
+3. If no valid authentication is found, clear error messages guide users to set up authentication
+
+### Benefits
+- **Simplified Usage:** Public repositories work without any authentication setup
+- **Security:** Private repositories still require proper authentication
+- **Flexibility:** Multiple authentication methods supported
+- **User-Friendly:** Clear error messages when authentication is needed
 
 ### Stage Release
 - When `nb stage` runs successfully:
@@ -91,17 +130,34 @@ See [nb.exe](../ntools/nbuild.md) for the command line options.
 - For private repositories, unauthenticated requests to the public `releases/download` URL will return 404. `nb` will attempt an authenticated fallback using the GitHub API when a token is available.
 
 How authentication is provided
-- Preferred: set `API_GITHUB_KEY` in the environment or in your CI secrets. `nb` and the `GitHubRelease` library will read the token from the environment or the Windows Credential Manager.
-- Example (PowerShell):
-
-```powershell
-$env:API_GITHUB_KEY = 'ghp_XXXX'
-.\Release\nb.exe install --json private-repo.json --verbose
-```
+- **Multiple authentication methods supported** (tried in order of preference):
+  1. `API_GITHUB_KEY` environment variable
+  2. GitHub CLI authentication (`gh auth token`)
+  3. Windows Credential Manager (`GitHubRelease`/`API_GITHUB_KEY`)
+- **For private repositories:** Authentication is required for all operations
+- **For public repositories:** Authentication is only required for write operations (creating releases)
+- **GitHub CLI Setup:**
+  ```bash
+  # Install GitHub CLI if not already installed
+  winget install --id GitHub.cli
+  
+  # Authenticate with GitHub
+  gh auth login
+  ```
+- **Environment Variable Setup:**
+  ```powershell
+  $env:API_GITHUB_KEY = 'ghp_XXXX'
+  .\Release\nb.exe install --json private-repo.json --verbose
+  ```
 
 Behavior
 - On download failure (404) for a GitHub release URL, `nb` will parse the owner/repo/tag and call into `GitHubRelease.ReleaseService.DownloadAssetByName(tag, assetName, dest)` which uses the GitHub API to find the asset and download it using the authenticated asset endpoint. This approach supports private repositories when the token has appropriate scopes (typically `repo` and `releases`).
 
 Notes and troubleshooting
-- Ensure the token has `repo` / `releases` scopes for private repositories.
-- For enterprise GitHub installations with custom hosts, the `GitHubRelease` helpers must be configured to use the appropriate API base URL.
+- **Authentication Methods:** The tool supports multiple authentication methods. If one method fails, it will try the next available method.
+- **Token Scopes:** Ensure your authentication method has appropriate scopes:
+  - For private repositories: `repo` scope (includes releases access)
+  - For public repositories: `public_repo` scope for write operations
+- **GitHub CLI:** If using `gh auth login`, ensure the token has the correct scopes by running `gh auth status` to verify.
+- **Environment Variables:** The `API_GITHUB_KEY` takes precedence over other methods when set.
+- **For enterprise GitHub installations with custom hosts:** The `GitHubRelease` helpers must be configured to use the appropriate API base URL.

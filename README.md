@@ -9,9 +9,14 @@
 - Don't hesitate to write an [issue](https://github.com/naz-hage/NTools/issues) if you have any questions or suggestions.
 
 - GitHubRelease is a tool that allows you to create and manage GitHub releases from the command line. It simplifies the process of creating and managing releases, making it easier to publish your software updates on GitHub.
-    - Must add a Repository secret token named `API_GITHUB_KEY` to the GitHub repository Secrets and variables
-    - Must add a Repository secret owner named `OWNER` to the GitHub repository Secrets and variables
-    - must add env in the GitHub actions workflow file
+    - **Authentication Methods** (choose one):
+        - Set `API_GITHUB_KEY` environment variable with your GitHub personal access token
+        - Use GitHub CLI: Run `gh auth login` to authenticate
+        - Windows Credential Manager (for additional security)
+    - **Smart Authentication**: Public repositories work without authentication for read operations, private repositories require authentication
+    - Must add a Repository secret token named `API_GITHUB_KEY` to the GitHub repository Secrets and variables (for CI/CD)
+    - Must add a Repository secret owner named `OWNER` to the GitHub repository Secrets and variables (optional)
+    - Example GitHub Actions workflow:
     ```yml
     - name: Build using ntools
       run: |

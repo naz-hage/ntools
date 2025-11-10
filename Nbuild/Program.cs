@@ -722,7 +722,16 @@ namespace Nbuild
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error: {ex.Message}");
+                // Provide better error messages for common authentication issues
+                if (ex.Message.Contains("API_GITHUB_KEY") || ex.Message.Contains("Environment variable") || ex.Message.Contains("GitHub"))
+                {
+                    NbuildTasks.ErrorHelper.WriteGitHubAuthError($"https://github.com/{repo}", "create release", false);
+                    Console.WriteLine("\nFor more information about GitHub authentication, see: https://docs.github.com/en/authentication");
+                }
+                else
+                {
+                    NbuildTasks.ErrorHelper.WriteError(ex.Message);
+                }
                 return -1;
             }
         }
@@ -735,7 +744,16 @@ namespace Nbuild
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error: {ex.Message}");
+                // Provide better error messages for common authentication issues
+                if (ex.Message.Contains("API_GITHUB_KEY") || ex.Message.Contains("Environment variable") || ex.Message.Contains("GitHub"))
+                {
+                    NbuildTasks.ErrorHelper.WriteGitHubAuthError($"https://github.com/{repo}", "download asset", true);
+                    Console.WriteLine("\nFor more information about GitHub authentication, see: https://docs.github.com/en/authentication");
+                }
+                else
+                {
+                    NbuildTasks.ErrorHelper.WriteError(ex.Message);
+                }
                 return -1;
             }
         }
@@ -748,7 +766,16 @@ namespace Nbuild
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error: {ex.Message}");
+                // Provide better error messages for common authentication issues
+                if (ex.Message.Contains("API_GITHUB_KEY") || ex.Message.Contains("Environment variable") || ex.Message.Contains("GitHub"))
+                {
+                    NbuildTasks.ErrorHelper.WriteGitHubAuthError($"https://github.com/{repo}", "list releases", true);
+                    Console.WriteLine("\nFor more information about GitHub authentication, see: https://docs.github.com/en/authentication");
+                }
+                else
+                {
+                    NbuildTasks.ErrorHelper.WriteError(ex.Message);
+                }
                 return -1;
             }
         }
