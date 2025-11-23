@@ -103,6 +103,10 @@
                 <li class="toctree-l2 current"><a class="reference internal current" href="#">SDO (Simple DevOps Operations)</a>
     <ul class="current">
     <li class="toctree-l3"><a class="reference internal" href="#overview">Overview</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#key-features">Key Features</a>
+    </li>
+        </ul>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#prerequisites">Prerequisites</a>
         <ul>
@@ -129,6 +133,8 @@
     <li class="toctree-l4"><a class="reference internal" href="#global-options">Global Options</a>
     </li>
     <li class="toctree-l4"><a class="reference internal" href="#work-item-operations">Work Item Operations</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#repository-operations">Repository Operations</a>
     </li>
     <li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a>
     </li>
@@ -186,6 +192,8 @@
                 </li>
     </ul>
                   </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../SDO_ARCHITECTURE/">SDO Architecture</a>
+                  </li>
                   <li class="toctree-l1"><a class="reference internal" href="../azdo_payloads/">AzDO payloads</a>
                   </li>
               </ul>
@@ -218,11 +226,19 @@
                 <h1 id="sdo-simple-devops-operations-tool">sdo - Simple DevOps Operations Tool</h1>
 <p>This page documents the <code>sdo</code> CLI tool. Use this page for detailed prerequisites, installation, usage examples, troubleshooting, and testing.</p>
 <h2 id="overview">Overview</h2>
-<p><code>sdo</code> (Simple DevOps Operations) is a modern CLI tool that parses backlog-style markdown files and creates GitHub issues or Azure DevOps work items (PBIs, Bugs, or Tasks). It supports dry-run previews and follows a file-first metadata policy.</p>
+<p><code>sdo</code> (Simple DevOps Operations) is a modern CLI tool that provides unified operations for both work items and repositories across Azure DevOps and GitHub platforms. It parses backlog-style markdown files to create work items and offers comprehensive repository management capabilities.</p>
+<h3 id="key-features">Key Features</h3>
+<ul>
+<li><strong>Work Item Creation</strong>: Parse markdown files and create GitHub issues or Azure DevOps work items (PBIs, Bugs, Tasks)</li>
+<li><strong>Repository Management</strong>: Create, list, show, and delete repositories on both platforms</li>
+<li><strong>Multi-Platform Support</strong>: Seamless operations across Azure DevOps and GitHub</li>
+<li><strong>Dry-Run Previews</strong>: Preview operations before execution</li>
+<li><strong>Automatic Platform Detection</strong>: Detects platform from Git remote configuration</li>
+</ul>
 <h2 id="prerequisites">Prerequisites</h2>
 <h3 id="required-environment-variables">Required Environment Variables</h3>
 <ul>
-<li><code>AZURE_DEVOPS_PAT</code> or <code>AZURE_DEVOPS_EXT_PAT</code> - Personal Access Token for Azure DevOps API access</li>
+<li><code>AZURE_DEVOPS_PAT</code> - Personal Access Token for Azure DevOps API access</li>
 <li><code>GITHUB_TOKEN</code> - GitHub Personal Access Token (for GitHub operations)</li>
 </ul>
 <h3 id="python-requirements">Python Requirements</h3>
@@ -262,15 +278,57 @@ python atools\install-sdo.py
 <p><strong>Options:</strong>
 - <code>-f, --file-path PATH</code> - Path to markdown file (required)
 - <code>--dry-run</code> - Parse and preview without creating</p>
+<h3 id="repository-operations">Repository Operations</h3>
+<h4 id="create-repository">Create Repository</h4>
+<pre><code class="language-bash">sdo repo create [OPTIONS]
+</code></pre>
+<p>Creates a new repository in the current project/organization.</p>
+<p><strong>Options:</strong>
+- <code>-v, --verbose</code> - Show detailed API information</p>
+<h4 id="list-repositories">List Repositories</h4>
+<pre><code class="language-bash">sdo repo ls [OPTIONS]
+</code></pre>
+<p>Lists all repositories in the current project/organization.</p>
+<p><strong>Options:</strong>
+- <code>-v, --verbose</code> - Show detailed API information</p>
+<h4 id="show-repository">Show Repository</h4>
+<pre><code class="language-bash">sdo repo show [OPTIONS]
+</code></pre>
+<p>Shows detailed information about the current repository.</p>
+<p><strong>Options:</strong>
+- <code>-v, --verbose</code> - Show detailed API information</p>
+<h4 id="delete-repository">Delete Repository</h4>
+<pre><code class="language-bash">sdo repo delete [OPTIONS]
+</code></pre>
+<p>Deletes the current repository (with confirmation prompt).</p>
+<p><strong>Options:</strong>
+- <code>-v, --verbose</code> - Show detailed API information</p>
 <h3 id="examples">Examples</h3>
-<h4 id="dry-run-preview">Dry Run (Preview)</h4>
+<h4 id="work-item-operations_1">Work Item Operations</h4>
+<h5 id="dry-run-preview">Dry Run (Preview)</h5>
 <pre><code class="language-bash">sdo workitem create --file-path &quot;atools/issue-azdo-example.md&quot; --dry-run
 </code></pre>
-<h4 id="create-azure-devops-work-item">Create Azure DevOps Work Item</h4>
+<h5 id="create-azure-devops-work-item">Create Azure DevOps Work Item</h5>
 <pre><code class="language-bash">sdo workitem create --file-path &quot;atools/issue-azdo-example.md&quot;
 </code></pre>
-<h4 id="create-with-verbose-output">Create with Verbose Output</h4>
+<h5 id="create-with-verbose-output">Create with Verbose Output</h5>
 <pre><code class="language-bash">sdo workitem create --file-path &quot;atools/issue-azdo-example.md&quot; --verbose
+</code></pre>
+<h4 id="repository-operations_1">Repository Operations</h4>
+<h5 id="create-repository_1">Create Repository</h5>
+<pre><code class="language-bash">sdo repo create
+sdo repo create --verbose
+</code></pre>
+<h5 id="list-repositories_1">List Repositories</h5>
+<pre><code class="language-bash">sdo repo ls
+sdo repo list  # Alternative command
+</code></pre>
+<h5 id="show-repository-details">Show Repository Details</h5>
+<pre><code class="language-bash">sdo repo show
+sdo repo show --verbose
+</code></pre>
+<h5 id="delete-repository_1">Delete Repository</h5>
+<pre><code class="language-bash">sdo repo delete  # Will prompt for confirmation
 </code></pre>
 <h2 id="markdown-file-format">Markdown File Format</h2>
 <p>SDO expects markdown files with specific metadata headers. See the example files:</p>
@@ -291,13 +349,19 @@ Description content here...
 <h3 id="azure-devops">Azure DevOps</h3>
 <ul>
 <li><strong>Work Item Types</strong>: Product Backlog Item (PBI), Bug, Task</li>
-<li><strong>Fields</strong>: Title, Description, Area Path, Iteration Path, Priority, Effort</li>
+<li><strong>Work Item Fields</strong>: Title, Description, Area Path, Iteration Path, Priority, Effort</li>
+<li><strong>Repository Operations</strong>: Create, List, Show, Delete repositories</li>
+<li><strong>Authentication</strong>: Personal Access Token (PAT)</li>
+<li><strong>API</strong>: REST API integration</li>
 <li><strong>Automatic</strong>: Organization/Project detection from Git remote</li>
 </ul>
 <h3 id="github">GitHub</h3>
 <ul>
-<li><strong>Issue Types</strong>: Issues</li>
-<li><strong>Fields</strong>: Title, Description, Labels, Assignees</li>
+<li><strong>Work Item Types</strong>: Issues</li>
+<li><strong>Work Item Fields</strong>: Title, Description, Labels, Assignees</li>
+<li><strong>Repository Operations</strong>: Create, List, Show, Delete repositories</li>
+<li><strong>Authentication</strong>: GitHub CLI (<code>gh</code>) or Personal Access Token</li>
+<li><strong>API</strong>: GitHub CLI integration for repositories, REST API for work items</li>
 <li><strong>Automatic</strong>: Repository detection from Git remote</li>
 </ul>
 <h2 id="error-handling">Error Handling</h2>
@@ -322,8 +386,13 @@ python -m pytest tests/
 <li><strong>Error Path Tests</strong>: Failure scenario handling</li>
 </ul>
 <h3 id="test-coverage">Test Coverage</h3>
-<p>All major functionality is tested with 34 test cases covering:
+<p>All major functionality is tested with 161 test cases covering:
 - Work item creation workflows
+- Repository management operations
+- Multi-platform API integrations
+- Error handling and validation
+- CLI command interfaces
+- Markdown parsing and metadata extraction
 - Platform-specific operations
 - Error handling scenarios
 - CLI argument parsing</p>

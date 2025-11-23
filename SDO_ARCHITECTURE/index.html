@@ -5,14 +5,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="naz-hage" />
       <link rel="shortcut icon" href="../img/favicon.ico" />
-    <title>SDO Architecture Documentation - Ntools - Work in Progress</title>
+    <title>SDO Architecture - Ntools - Work in Progress</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
     
       <script>
         // Current page data
-        var mkdocs_page_name = "SDO Architecture Documentation";
+        var mkdocs_page_name = "SDO Architecture";
         var mkdocs_page_input_path = "SDO_ARCHITECTURE.md";
         var mkdocs_page_url = null;
       </script>
@@ -95,7 +95,7 @@
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">atools</span></p>
-              <ul>
+              <ul class="current">
                   <li class="toctree-l1"><a class="reference internal" href="../atools/">Overview</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" >List of tools</a>
@@ -106,6 +106,138 @@
                 </li>
                 <li class="toctree-l2"><a class="reference internal" href="../atools/install-ntools/">Install NTools</a>
                 </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">SDO Architecture</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#file-structure">File Structure</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#architecture-principles">Architecture Principles</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#1-separation-of-concerns">1. Separation of Concerns</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-strategy-pattern">2. Strategy Pattern</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#3-extensibility">3. Extensibility</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#system-architecture">System Architecture</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#component-details">Component Details</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#1-main-entry-point-sdopy">1. Main Entry Point (sdo.py)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-cli-layer-clipy">2. CLI Layer (cli.py)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#3-business-logic-layer-work_itemspy-repositoriespy">3. Business Logic Layer (work_items.py &amp; repositories.py)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#4-parser-layer-parsers">4. Parser Layer (parsers/)</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#markdownparser-markdown_parserpy">MarkdownParser (markdown_parser.py)</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#metadataparser-metadata_parserpy">MetadataParser (metadata_parser.py)</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#5-platform-layer-platforms">5. Platform Layer (platforms/)</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#base-platform-basepy">Base Platform (base.py)</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#azure-devops-platform-azdo_platformpy">Azure DevOps Platform (azdo_platform.py)</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#github-platform-github_platformpy">GitHub Platform (github_platform.py)</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#7-repository-operations-repositoriespy">7. Repository Operations (repositories.py)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#6-client-layer-clientpy">6. Client Layer (client.py)</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#data-flow">Data Flow</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#1-command-execution-flow">1. Command Execution Flow</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-error-handling-flow">2. Error Handling Flow</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#security-considerations">Security Considerations</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#1-authentication-management">1. Authentication Management</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-input-validation">2. Input Validation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#3-api-security">3. API Security</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#configuration-management">Configuration Management</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#1-environment-variables">1. Environment Variables</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-file-based-configuration">2. File-based Configuration</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#testing-strategy">Testing Strategy</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#1-unit-testing">1. Unit Testing</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-integration-testing">2. Integration Testing</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#3-performance-testing">3. Performance Testing</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#extensibility-points">Extensibility Points</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#1-adding-new-platforms">1. Adding New Platforms</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-adding-new-content-parsers">2. Adding New Content Parsers</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#3-adding-new-work-item-types">3. Adding New Work Item Types</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#performance-characteristics">Performance Characteristics</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#1-scalability">1. Scalability</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-resource-usage">2. Resource Usage</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#3-response-times">3. Response Times</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#future-enhancements">Future Enhancements</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#1-planned-features">1. Planned Features</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-architecture-evolution">2. Architecture Evolution</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#1-core-dependencies">1. Core Dependencies</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-development-dependencies">2. Development Dependencies</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#deployment-considerations">Deployment Considerations</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#1-installation">1. Installation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-environment-setup">2. Environment Setup</a>
+    </li>
+        </ul>
+    </li>
     </ul>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../atools/azdo_payloads/">AzDO payloads</a>
@@ -125,7 +257,8 @@
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
-      <li class="breadcrumb-item active">SDO Architecture Documentation</li>
+          <li class="breadcrumb-item">atools</li>
+      <li class="breadcrumb-item active">SDO Architecture</li>
     <li class="wy-breadcrumbs-aside">
           <a href="https://github.com/naz-hage/ntools/edit/main/docs/SDO_ARCHITECTURE.md">Edit on ntools</a>
     </li>
@@ -137,7 +270,45 @@
               
                 <h1 id="sdo-architecture-documentation">SDO Architecture Documentation</h1>
 <h2 id="overview">Overview</h2>
-<p>SDO (Simple DevOps Operations Tool) is a command-line interface tool designed to streamline work item creation across multiple DevOps platforms including Azure DevOps and GitHub. The tool follows a modular, extensible architecture that allows for easy addition of new platforms and work item types.</p>
+<p>SDO (Simple DevOps Operations Tool) is a command-line interface tool designed to streamline work item creation and repository management across multiple DevOps platforms including Azure DevOps and GitHub. The tool follows a modular, extensible architecture that allows for easy addition of new platforms and operations.</p>
+<h2 id="file-structure">File Structure</h2>
+<pre><code>atools/
+├── sdo.py                          # Main entry point and CLI framework
+├── sdo_package/                    # Main package directory
+│   ├── __init__.py                 # Package initialization
+│   ├── cli.py                      # CLI command implementations
+│   ├── client.py                   # Azure DevOps REST API client
+│   ├── exceptions.py               # Custom exception classes
+│   ├── repositories.py             # Repository operations (multi-platform)
+│   ├── version.py                  # Version information
+│   ├── work_items.py               # Work item orchestration logic
+│   ├── parsers/                    # Content parsing modules
+│   │   ├── __init__.py
+│   │   ├── markdown_parser.py      # Markdown file parsing
+│   │   └── metadata_parser.py      # Metadata extraction and platform detection
+│   └── platforms/                  # Platform-specific implementations
+│       ├── __init__.py
+│       ├── base.py                 # Abstract base classes for platforms
+│       ├── azdo_platform.py        # Azure DevOps work item operations
+│       └── github_platform.py      # GitHub work item operations
+├── tests/                          # Test suite
+│   ├── run_sdo_tests.py            # Test runner script
+│   ├── test_azdo_platform.py       # Azure DevOps platform tests
+│   ├── test_client.py              # Client module tests
+│   ├── test_cli_comprehensive.py   # Comprehensive CLI tests
+│   ├── test_github_platform.py     # GitHub platform tests
+│   ├── test_markdown_parser.py     # Markdown parser tests
+│   ├── test_repositories.py        # Repository operations tests
+│   ├── test_sdo.py                 # Main module tests
+│   ├── test_sdo_cli.py             # CLI integration tests
+│   └── test_sdo_workitems.py       # Work item tests
+├── pyproject.toml                  # Python project configuration
+├── requirements.txt                # Production dependencies
+├── requirements-dev.txt            # Development dependencies
+├── issue-azdo-example.md           # Azure DevOps issue template
+├── issue-gh-example.md             # GitHub issue template
+└── install-sdo.py                  # Installation script
+</code></pre>
 <h2 id="architecture-principles">Architecture Principles</h2>
 <h3 id="1-separation-of-concerns">1. <strong>Separation of Concerns</strong></h3>
 <ul>
@@ -173,20 +344,11 @@
 ┌─────────────────────────────────────────────────────────────────┐
 │                    CLI Layer (cli.py)                          │
 ├─────────────────────────────────────────────────────────────────┤
-│  ├── add-issue command implementation                          │
+│  ├── workitem group: create                                    │
+│  ├── repo group: create, show, ls, delete                      │
 │  ├── Command argument parsing and validation                   │
 │  ├── Verbose output management                                 │
 │  └── Error handling and user feedback                          │
-└─────────────────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-┌─────────────────────────────────────────────────────────────────┐
-│               Business Logic (work_items.py)                   │
-├─────────────────────────────────────────────────────────────────┤
-│  ├── WorkItemManager: Main orchestration class                 │
-│  ├── Content processing and validation                         │
-│  ├── Platform selection and routing                            │
-│  └── Result aggregation and reporting                          │
 └─────────────────────────────────────────────────────────────────┘
                                     │
                     ┌───────────────┼───────────────┐
@@ -195,42 +357,68 @@
     │   Parser Layer      │ │ Platform Layer  │ │  Client Layer   │
     │   (parsers/)        │ │ (platforms/)    │ │   (client.py)   │
     └─────────────────────┘ └─────────────────┘ └─────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────┐
+│            Repository Operations (repositories.py)             │
+├─────────────────────────────────────────────────────────────────┤
+│  ├── RepositoryPlatform abstract base class                    │
+│  ├── AzureDevOpsRepositoryPlatform                             │
+│  ├── GitHubRepositoryPlatform                                  │
+│  └── Platform factory and orchestration                        │
+└─────────────────────────────────────────────────────────────────┘
 </code></pre>
 <h2 id="component-details">Component Details</h2>
 <h3 id="1-main-entry-point-sdopy">1. Main Entry Point (sdo.py)</h3>
-<p><strong>Purpose</strong>: Application bootstrap and CLI framework setup
+<p><strong>Purpose</strong>: Simple bootstrap and CLI delegation
 <strong>Responsibilities</strong>:
-- Click application initialization
-- Global command registration
-- Environment setup and configuration
-- Version management</p>
+- Import CLI components from sdo_package.cli
+- Provide backward compatibility for tests
+- Delegate execution to the main CLI function</p>
 <p><strong>Key Features</strong>:
-- Supports <code>--verbose</code> flag for detailed output
-- Hierarchical command structure
-- Extensible command registration</p>
+- Minimal bootstrap code
+- Exposes CLI app for testing
+- Simple delegation pattern</p>
 <h3 id="2-cli-layer-clipy">2. CLI Layer (cli.py)</h3>
 <p><strong>Purpose</strong>: Command implementations and user interaction
 <strong>Responsibilities</strong>:
-- <code>add-issue</code> command implementation
+- Hierarchical command structure with groups and subcommands
+- Work item operations (<code>sdo workitem create</code>)
+- Repository operations (<code>sdo repo create/show/ls/delete</code>)
 - Input validation and sanitization
 - User feedback and progress reporting
 - Error presentation to users</p>
+<p><strong>Command Structure</strong>:</p>
+<pre><code>sdo
+├── workitem
+│   └── create          # Create work items from markdown files
+├── repo
+│   ├── create          # Create repositories
+│   ├── show            # Show repository information
+│   ├── ls              # List repositories
+│   └── delete          # Delete repositories
+└── add-issue           # Legacy compatibility command
+</code></pre>
 <p><strong>Key Features</strong>:
 - Rich command-line experience with Click
 - Comprehensive input validation
 - Detailed verbose output for debugging
-- Graceful error handling with helpful messages</p>
-<h3 id="3-business-logic-layer-work_itemspy">3. Business Logic Layer (work_items.py)</h3>
+- Graceful error handling with helpful messages
+- Global <code>--verbose</code> flag support</p>
+<h3 id="3-business-logic-layer-work_itemspy-repositoriespy">3. Business Logic Layer (work_items.py &amp; repositories.py)</h3>
 <p><strong>Purpose</strong>: Core application logic and orchestration
 <strong>Responsibilities</strong>:
 - Content processing workflow coordination
 - Platform detection and selection
-- Work item creation orchestration
+- Work item creation orchestration (work_items.py)
+- Repository operations orchestration (repositories.py)
 - Result validation and reporting</p>
-<p><strong>Classes</strong>:
-- <code>WorkItemManager</code>: Main orchestration class
-- <code>WorkItemResult</code>: Result encapsulation
-- Various helper functions for content processing</p>
+<p><strong>Key Functions</strong>:
+- <code>cmd_workitem_create()</code>: Main work item creation workflow
+- <code>cmd_repo_create/show/ls/delete()</code>: Repository operation workflows
+- Platform factory functions for creating appropriate platform instances
+- Result handling and user feedback</p>
+<p><strong>Architecture Note</strong>: Unlike work items (which have separate platform files), repository operations are consolidated in a single file with platform-specific implementations, as the operations are more similar across platforms.</p>
 <h3 id="4-parser-layer-parsers">4. Parser Layer (parsers/)</h3>
 <p><strong>Purpose</strong>: Content extraction and metadata processing</p>
 <h4 id="markdownparser-markdown_parserpy">MarkdownParser (markdown_parser.py)</h4>
@@ -257,12 +445,41 @@
 <p><strong>Abstract Interface</strong>:</p>
 <pre><code class="language-python">class WorkItemPlatform(ABC):
     @abstractmethod
-    def create_work_item(self, **kwargs) -&gt; Dict[str, Any]:
-        pass
+    def get_config(self) -&gt; Dict[str, str]:
+        &quot;&quot;&quot;Get platform-specific configuration.&quot;&quot;&quot;
 
     @abstractmethod
-    def validate_connection(self) -&gt; bool:
-        pass
+    def validate_auth(self) -&gt; bool:
+        &quot;&quot;&quot;Validate authentication for the platform.&quot;&quot;&quot;
+
+    @abstractmethod
+    def create_work_item(
+        self,
+        title: str,
+        description: str,
+        metadata: Dict[str, Any],
+        acceptance_criteria: Optional[List[str]] = None,
+        dry_run: bool = False
+    ) -&gt; Optional[Dict[str, Any]]:
+        &quot;&quot;&quot;Create a work item on the platform.&quot;&quot;&quot;
+</code></pre>
+<p><strong>Repository Platform Interface</strong>:</p>
+<pre><code class="language-python">class RepositoryPlatform(ABC):
+    @abstractmethod
+    def create_repository(self, name: str, **kwargs) -&gt; Dict[str, Any]:
+        &quot;&quot;&quot;Create a repository.&quot;&quot;&quot;
+
+    @abstractmethod
+    def get_repository(self, name: str) -&gt; Optional[Dict[str, Any]]:
+        &quot;&quot;&quot;Get repository information.&quot;&quot;&quot;
+
+    @abstractmethod
+    def list_repositories(self) -&gt; List[Dict[str, Any]]:
+        &quot;&quot;&quot;List all repositories.&quot;&quot;&quot;
+
+    @abstractmethod
+    def delete_repository(self, name: str) -&gt; bool:
+        &quot;&quot;&quot;Delete a repository.&quot;&quot;&quot;
 </code></pre>
 <h4 id="azure-devops-platform-azdo_platformpy">Azure DevOps Platform (azdo_platform.py)</h4>
 <p><strong>Responsibilities</strong>:
@@ -286,32 +503,53 @@
 - Automatic repository detection
 - Label and milestone support
 - Error handling for CLI failures</p>
+<h3 id="7-repository-operations-repositoriespy">7. Repository Operations (repositories.py)</h3>
+<p><strong>Purpose</strong>: Multi-platform repository management
+<strong>Responsibilities</strong>:
+- Repository creation, listing, and deletion
+- Platform-specific repository operations
+- Git remote parsing for platform detection
+- Unified interface across platforms</p>
+<p><strong>Architecture</strong>:
+- <code>RepositoryPlatform</code>: Abstract base class for repository operations
+- <code>AzureDevOpsRepositoryPlatform</code>: Azure DevOps REST API implementation
+- <code>GitHubRepositoryPlatform</code>: GitHub CLI implementation
+- <code>create_repository_platform()</code>: Factory function for platform selection</p>
+<p><strong>Key Features</strong>:
+- Platform-agnostic repository operations
+- Automatic platform detection from Git remotes
+- Consistent error handling and logging
+- Support for both Azure DevOps and GitHub repositories</p>
 <h3 id="6-client-layer-clientpy">6. Client Layer (client.py)</h3>
-<p><strong>Purpose</strong>: Low-level API communication</p>
-<h4 id="azuredevopsclient">AzureDevOpsClient</h4>
-<p><strong>Responsibilities</strong>:
+<p><strong>Purpose</strong>: Low-level API communication and platform utilities
+<strong>Responsibilities</strong>:
 - HTTP request management for Azure DevOps API
-- Authentication handling
+- Authentication handling for both platforms
 - Request/response logging
-- Connection validation</p>
+- Connection validation
+- Platform detection from Git remotes
+- GitHub CLI command execution
+- Cross-platform utility functions</p>
+<p><strong>Key Components</strong>:
+- <code>AzureDevOpsClient</code>: REST API client for Azure DevOps
+- <code>extract_platform_info_from_git()</code>: Platform detection logic
+- GitHub CLI integration functions
+- Authentication validation functions
+- Comprehensive verbose logging with secure token redaction</p>
 <p><strong>Key Features</strong>:
 - Comprehensive verbose logging
 - Secure token handling with redaction
 - Retry logic for transient failures
+- Platform-agnostic utility functions
 - Detailed error context</p>
 <h2 id="data-flow">Data Flow</h2>
 <h3 id="1-command-execution-flow">1. Command Execution Flow</h3>
-<pre><code>User Command → CLI Parser → WorkItemManager → Platform Selection
+<pre><code>User Command → CLI Parser → Business Logic Layer
      ↓
-Content Parsing ← MarkdownParser ← File Input
+Work Items: Content Parsing → Platform Selection → Work Item Creation
+Repository: Git Remote Parsing → Platform Selection → Repository Operations
      ↓
-Metadata Extraction ← MetadataParser ← Content Analysis
-     ↓
-Platform Creation ← PlatformFactory ← Platform Detection
-     ↓
-Work Item Creation ← Platform Implementation ← API/CLI Calls
-     ↓
-Result Reporting ← WorkItemResult ← Success/Error Aggregation
+Result Reporting ← Success/Error Aggregation ← API/CLI Calls
 </code></pre>
 <h3 id="2-error-handling-flow">2. Error Handling Flow</h3>
 <pre><code>Exception Occurrence → Platform-Specific Handler → SDOException
@@ -415,10 +653,12 @@ CLI Error Presenter → Console Output with Context
 <h2 id="future-enhancements">Future Enhancements</h2>
 <h3 id="1-planned-features">1. <strong>Planned Features</strong></h3>
 <ul>
-<li>Bulk work item creation</li>
-<li>Template management system</li>
-<li>Advanced field mapping configurations</li>
-<li>Plugin system for custom platforms</li>
+<li>Bulk work item creation from multiple files</li>
+<li>Template management system for work items</li>
+<li>Advanced field mapping configurations for custom work item types</li>
+<li>Interactive mode for work item creation</li>
+<li>Repository cloning and initialization features</li>
+<li>Branch management operations</li>
 </ul>
 <h3 id="2-architecture-evolution">2. <strong>Architecture Evolution</strong></h3>
 <ul>
@@ -426,13 +666,14 @@ CLI Error Presenter → Console Output with Context
 <li>Event-driven architecture for workflow automation</li>
 <li>Caching layer for improved performance</li>
 <li>Configuration management service</li>
+<li>Plugin system for custom platforms</li>
 </ul>
 <h2 id="dependencies">Dependencies</h2>
 <h3 id="1-core-dependencies">1. <strong>Core Dependencies</strong></h3>
 <ul>
-<li><code>click</code>: CLI framework</li>
-<li><code>requests</code>: HTTP client for API calls</li>
-<li><code>typing</code>: Type hints and annotations</li>
+<li><code>click&gt;=8.0.0</code>: CLI framework for command-line interfaces</li>
+<li><code>requests&gt;=2.25.0</code>: HTTP client for API calls (Azure DevOps)</li>
+<li><code>pyyaml&gt;=6.0.0</code>: YAML parsing for configuration files</li>
 </ul>
 <h3 id="2-development-dependencies">2. <strong>Development Dependencies</strong></h3>
 <ul>
@@ -440,6 +681,8 @@ CLI Error Presenter → Console Output with Context
 <li><code>black</code>: Code formatting</li>
 <li><code>mypy</code>: Static type checking</li>
 <li><code>coverage</code>: Test coverage analysis</li>
+<li><code>isort</code>: Import sorting</li>
+<li><code>flake8</code>: Style guide enforcement</li>
 </ul>
 <h2 id="deployment-considerations">Deployment Considerations</h2>
 <h3 id="1-installation">1. <strong>Installation</strong></h3>
@@ -458,6 +701,10 @@ CLI Error Presenter → Console Output with Context
               
             </div>
           </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../atools/install-ntools/" class="btn btn-neutral float-left" title="Install NTools"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../atools/azdo_payloads/" class="btn btn-neutral float-right" title="AzDO payloads">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
 
   <hr/>
 
@@ -483,6 +730,10 @@ CLI Error Presenter → Console Output with Context
         </span>
     
     
+      <span><a href="../atools/install-ntools/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../atools/azdo_payloads/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>
