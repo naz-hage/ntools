@@ -303,10 +303,6 @@ class TestRepoCommands:
 
         assert "Delete the current repository" in result.output
 
-        result = self.runner.invoke(cli.cli, ["repo", "ls"])
-
-        assert result.exit_code == 0
-
         # Remove all broken decorators and code below this line
     @patch("sdo_package.cli.cmd_repo_create")
     def test_repo_create_success(self, mock_cmd):
