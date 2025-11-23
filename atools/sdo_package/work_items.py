@@ -1,5 +1,57 @@
 """
 SDO Work Items - Business logic for work item operations.
+
+ARCHITECTURAL DECISION: SEPARATE PLATFORM FILES
+
+WHY SEPARATE PLATFORM FILES FOR WORK ITEMS?
+Work items have significant platform differences that require separate implementations:
+
+AZURE DEVOPS WORK ITEMS:
+- Complex work item types: PBIs, Tasks, Bugs, Epics with different fields
+- Parent-child relationships and linking
+- Area/Iteration paths, priorities, tags
+- Acceptance criteria as separate field
+- REST API with complex payload structures
+
+GITHUB WORK ITEMS:
+- Simple issue/PR model with standard fields
+- Issue references instead of formal relationships
+- Labels, assignees, milestones
+- Body content with markdown formatting
+- CLI-based operations
+
+WHY NOT CONSOLIDATED LIKE REPOSITORIES?
+Work item operations are too different to share common code effectively.
+Each platform needs completely different field mappings, relationship handling,
+and API interactions. Attempting consolidation would create more complexity
+than separation.
+
+PLATFORM SUPPORT FOR WORK ITEMS:
+
+AZURE DEVOPS WORK ITEMS:
+- Product Backlog Items (PBIs)
+- Tasks
+- Bugs
+- Epics
+- Uses Azure DevOps REST APIs
+- Supports parent-child relationships and acceptance criteria
+
+GITHUB WORK ITEMS:
+- Issues
+- Pull Requests
+- Uses GitHub CLI (gh) commands
+- Supports issue templates and GitHub-specific metadata
+
+COMMON WORK ITEM FEATURES:
+- Markdown parsing for work item content
+- Metadata extraction (title, description, acceptance criteria)
+- Platform-agnostic result handling
+- Error handling and validation
+
+PLATFORM DIVERGENCE:
+- Work item types: Azure DevOps has structured types, GitHub uses issues/PRs
+- Relationships: Azure DevOps supports parent-child links, GitHub uses issue references
+- APIs: REST APIs (Azure DevOps) vs CLI commands (GitHub)
 """
 
 import os

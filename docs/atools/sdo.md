@@ -10,7 +10,7 @@ This page documents the `sdo` CLI tool. Use this page for detailed prerequisites
 
 ### Required Environment Variables
 
-- `AZURE_DEVOPS_PAT` or `AZURE_DEVOPS_EXT_PAT` - Personal Access Token for Azure DevOps API access
+- `AZURE_DEVOPS_PAT` - Personal Access Token for Azure DevOps API access
 - `GITHUB_TOKEN` - GitHub Personal Access Token (for GitHub operations)
 
 ### Python Requirements

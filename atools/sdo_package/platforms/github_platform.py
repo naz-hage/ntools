@@ -1,5 +1,18 @@
 """
-GitHub platform implementation for work item management.
+GitHub Platform Implementation - Work Item Management
+
+GITHUB WORK ITEM SUPPORT:
+- GitHubPlatform: Handles GitHub issues and pull requests
+- Inherits from WorkItemPlatform (common work item interface)
+- Uses GitHub CLI (gh) for issue/PR operations
+- Supports issue creation, status checking, and management
+
+NOTE: Repository operations are handled separately by GitHubRepositoryPlatform
+in repositories.py, not by this class.
+
+PLATFORM COMPARISON:
+- GitHubPlatform (this file): Work items (issues, PRs)
+- GitHubRepositoryPlatform (repositories.py): Repository management (create, list, delete)
 """
 
 import subprocess
@@ -20,8 +33,22 @@ except ImportError:
 class GitHubPlatform(WorkItemPlatform):
     """GitHub implementation of work item platform."""
 
+    def __init__(self, config: Optional[Dict[str, str]] = None, verbose: bool = False):
+        """Initialize GitHub platform.
+        
+        Args:
+            config: Optional configuration dict with 'owner' and 'repo' keys.
+                   If not provided, will extract from Git remote.
+            verbose: Whether to show verbose output
+        """
+        super().__init__(verbose)
+        self.config = config
+
     def get_config(self) -> Dict[str, str]:
-        """Get GitHub configuration by extracting from Git remote."""
+        """Get GitHub configuration by extracting from Git remote or using provided config."""
+        if self.config:
+            return self.config
+            
         platform_info = extract_platform_info_from_git()
         if platform_info and platform_info.get('platform') == 'github':
             config = {
@@ -56,6 +83,9 @@ class GitHubPlatform(WorkItemPlatform):
         except FileNotFoundError:
             print("❌ GitHub CLI (gh) not found.")
             print("Please install GitHub CLI: https://cli.github.com/")
+            return False
+        except Exception as e:
+            print(f"❌ Error validating GitHub authentication: {e}")
             return False
 
     def create_work_item(

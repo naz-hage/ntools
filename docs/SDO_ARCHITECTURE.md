@@ -2,7 +2,48 @@
 
 ## Overview
 
-SDO (Simple DevOps Operations Tool) is a command-line interface tool designed to streamline work item creation across multiple DevOps platforms including Azure DevOps and GitHub. The tool follows a modular, extensible architecture that allows for easy addition of new platforms and work item types.
+SDO (Simple DevOps Operations Tool) is a command-line interface tool designed to streamline work item creation and repository management across multiple DevOps platforms including Azure DevOps and GitHub. The tool follows a modular, extensible architecture that allows for easy addition of new platforms and operations.
+
+## File Structure
+
+```
+atools/
+├── sdo.py                          # Main entry point and CLI framework
+├── sdo_package/                    # Main package directory
+│   ├── __init__.py                 # Package initialization
+│   ├── cli.py                      # CLI command implementations
+│   ├── client.py                   # Azure DevOps REST API client
+│   ├── exceptions.py               # Custom exception classes
+│   ├── repositories.py             # Repository operations (multi-platform)
+│   ├── version.py                  # Version information
+│   ├── work_items.py               # Work item orchestration logic
+│   ├── parsers/                    # Content parsing modules
+│   │   ├── __init__.py
+│   │   ├── markdown_parser.py      # Markdown file parsing
+│   │   └── metadata_parser.py      # Metadata extraction and platform detection
+│   └── platforms/                  # Platform-specific implementations
+│       ├── __init__.py
+│       ├── base.py                 # Abstract base classes for platforms
+│       ├── azdo_platform.py        # Azure DevOps work item operations
+│       └── github_platform.py      # GitHub work item operations
+├── tests/                          # Test suite
+│   ├── run_sdo_tests.py            # Test runner script
+│   ├── test_azdo_platform.py       # Azure DevOps platform tests
+│   ├── test_client.py              # Client module tests
+│   ├── test_cli_comprehensive.py   # Comprehensive CLI tests
+│   ├── test_github_platform.py     # GitHub platform tests
+│   ├── test_markdown_parser.py     # Markdown parser tests
+│   ├── test_repositories.py        # Repository operations tests
+│   ├── test_sdo.py                 # Main module tests
+│   ├── test_sdo_cli.py             # CLI integration tests
+│   └── test_sdo_workitems.py       # Work item tests
+├── pyproject.toml                  # Python project configuration
+├── requirements.txt                # Production dependencies
+├── requirements-dev.txt            # Development dependencies
+├── issue-azdo-example.md           # Azure DevOps issue template
+├── issue-gh-example.md             # GitHub issue template
+└── install-sdo.py                  # Installation script
+```
 
 ## Architecture Principles
 
@@ -39,20 +80,11 @@ SDO (Simple DevOps Operations Tool) is a command-line interface tool designed to
 ┌─────────────────────────────────────────────────────────────────┐
 │                    CLI Layer (cli.py)                          │
 ├─────────────────────────────────────────────────────────────────┤
-│  ├── add-issue command implementation                          │
+│  ├── workitem group: create                                    │
+│  ├── repo group: create, show, ls, delete                      │
 │  ├── Command argument parsing and validation                   │
 │  ├── Verbose output management                                 │
 │  └── Error handling and user feedback                          │
-└─────────────────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-┌─────────────────────────────────────────────────────────────────┐
-│               Business Logic (work_items.py)                   │
-├─────────────────────────────────────────────────────────────────┤
-│  ├── WorkItemManager: Main orchestration class                 │
-│  ├── Content processing and validation                         │
-│  ├── Platform selection and routing                            │
-│  └── Result aggregation and reporting                          │
 └─────────────────────────────────────────────────────────────────┘
                                     │
                     ┌───────────────┼───────────────┐
@@ -61,49 +93,78 @@ SDO (Simple DevOps Operations Tool) is a command-line interface tool designed to
     │   Parser Layer      │ │ Platform Layer  │ │  Client Layer   │
     │   (parsers/)        │ │ (platforms/)    │ │   (client.py)   │
     └─────────────────────┘ └─────────────────┘ └─────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────┐
+│            Repository Operations (repositories.py)             │
+├─────────────────────────────────────────────────────────────────┤
+│  ├── RepositoryPlatform abstract base class                    │
+│  ├── AzureDevOpsRepositoryPlatform                             │
+│  ├── GitHubRepositoryPlatform                                  │
+│  └── Platform factory and orchestration                        │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 ## Component Details
 
 ### 1. Main Entry Point (sdo.py)
-**Purpose**: Application bootstrap and CLI framework setup
+**Purpose**: Simple bootstrap and CLI delegation
 **Responsibilities**:
-- Click application initialization
-- Global command registration
-- Environment setup and configuration
-- Version management
+- Import CLI components from sdo_package.cli
+- Provide backward compatibility for tests
+- Delegate execution to the main CLI function
 
 **Key Features**:
-- Supports `--verbose` flag for detailed output
-- Hierarchical command structure
-- Extensible command registration
+- Minimal bootstrap code
+- Exposes CLI app for testing
+- Simple delegation pattern
 
 ### 2. CLI Layer (cli.py)
 **Purpose**: Command implementations and user interaction
 **Responsibilities**:
-- `add-issue` command implementation
+- Hierarchical command structure with groups and subcommands
+- Work item operations (`sdo workitem create`)
+- Repository operations (`sdo repo create/show/ls/delete`)
 - Input validation and sanitization
 - User feedback and progress reporting
 - Error presentation to users
+
+**Command Structure**:
+```
+sdo
+├── workitem
+│   └── create          # Create work items from markdown files
+├── repo
+│   ├── create          # Create repositories
+│   ├── show            # Show repository information
+│   ├── ls              # List repositories
+│   └── delete          # Delete repositories
+└── add-issue           # Legacy compatibility command
+```
 
 **Key Features**:
 - Rich command-line experience with Click
 - Comprehensive input validation
 - Detailed verbose output for debugging
 - Graceful error handling with helpful messages
+- Global `--verbose` flag support
 
-### 3. Business Logic Layer (work_items.py)
+### 3. Business Logic Layer (work_items.py & repositories.py)
 **Purpose**: Core application logic and orchestration
 **Responsibilities**:
 - Content processing workflow coordination
 - Platform detection and selection
-- Work item creation orchestration
+- Work item creation orchestration (work_items.py)
+- Repository operations orchestration (repositories.py)
 - Result validation and reporting
 
-**Classes**:
-- `WorkItemManager`: Main orchestration class
-- `WorkItemResult`: Result encapsulation
-- Various helper functions for content processing
+**Key Functions**:
+- `cmd_workitem_create()`: Main work item creation workflow
+- `cmd_repo_create/show/ls/delete()`: Repository operation workflows
+- Platform factory functions for creating appropriate platform instances
+- Result handling and user feedback
+
+**Architecture Note**: Unlike work items (which have separate platform files), repository operations are consolidated in a single file with platform-specific implementations, as the operations are more similar across platforms.
 
 ### 4. Parser Layer (parsers/)
 **Purpose**: Content extraction and metadata processing
@@ -138,12 +199,43 @@ SDO (Simple DevOps Operations Tool) is a command-line interface tool designed to
 ```python
 class WorkItemPlatform(ABC):
     @abstractmethod
-    def create_work_item(self, **kwargs) -> Dict[str, Any]:
-        pass
-    
+    def get_config(self) -> Dict[str, str]:
+        """Get platform-specific configuration."""
+        
     @abstractmethod
-    def validate_connection(self) -> bool:
-        pass
+    def validate_auth(self) -> bool:
+        """Validate authentication for the platform."""
+        
+    @abstractmethod
+    def create_work_item(
+        self,
+        title: str,
+        description: str,
+        metadata: Dict[str, Any],
+        acceptance_criteria: Optional[List[str]] = None,
+        dry_run: bool = False
+    ) -> Optional[Dict[str, Any]]:
+        """Create a work item on the platform."""
+```
+
+**Repository Platform Interface**:
+```python
+class RepositoryPlatform(ABC):
+    @abstractmethod
+    def create_repository(self, name: str, **kwargs) -> Dict[str, Any]:
+        """Create a repository."""
+        
+    @abstractmethod
+    def get_repository(self, name: str) -> Optional[Dict[str, Any]]:
+        """Get repository information."""
+        
+    @abstractmethod
+    def list_repositories(self) -> List[Dict[str, Any]]:
+        """List all repositories."""
+        
+    @abstractmethod
+    def delete_repository(self, name: str) -> bool:
+        """Delete a repository."""
 ```
 
 #### Azure DevOps Platform (azdo_platform.py)
@@ -172,37 +264,61 @@ class WorkItemPlatform(ABC):
 - Label and milestone support
 - Error handling for CLI failures
 
-### 6. Client Layer (client.py)
-**Purpose**: Low-level API communication
+### 7. Repository Operations (repositories.py)
+**Purpose**: Multi-platform repository management
+**Responsibilities**:
+- Repository creation, listing, and deletion
+- Platform-specific repository operations
+- Git remote parsing for platform detection
+- Unified interface across platforms
 
-#### AzureDevOpsClient
+**Architecture**:
+- `RepositoryPlatform`: Abstract base class for repository operations
+- `AzureDevOpsRepositoryPlatform`: Azure DevOps REST API implementation
+- `GitHubRepositoryPlatform`: GitHub CLI implementation
+- `create_repository_platform()`: Factory function for platform selection
+
+**Key Features**:
+- Platform-agnostic repository operations
+- Automatic platform detection from Git remotes
+- Consistent error handling and logging
+- Support for both Azure DevOps and GitHub repositories
+
+### 6. Client Layer (client.py)
+**Purpose**: Low-level API communication and platform utilities
 **Responsibilities**:
 - HTTP request management for Azure DevOps API
-- Authentication handling
+- Authentication handling for both platforms
 - Request/response logging
 - Connection validation
+- Platform detection from Git remotes
+- GitHub CLI command execution
+- Cross-platform utility functions
+
+**Key Components**:
+- `AzureDevOpsClient`: REST API client for Azure DevOps
+- `extract_platform_info_from_git()`: Platform detection logic
+- GitHub CLI integration functions
+- Authentication validation functions
+- Comprehensive verbose logging with secure token redaction
 
 **Key Features**:
 - Comprehensive verbose logging
 - Secure token handling with redaction
 - Retry logic for transient failures
+- Platform-agnostic utility functions
 - Detailed error context
 
 ## Data Flow
 
 ### 1. Command Execution Flow
 ```
-User Command → CLI Parser → WorkItemManager → Platform Selection
+User Command → CLI Parser → Business Logic Layer
      ↓
-Content Parsing ← MarkdownParser ← File Input
+Work Items: Content Parsing → Platform Selection → Work Item Creation
+Repository: Git Remote Parsing → Platform Selection → Repository Operations
      ↓
-Metadata Extraction ← MetadataParser ← Content Analysis
-     ↓
-Platform Creation ← PlatformFactory ← Platform Detection
-     ↓
-Work Item Creation ← Platform Implementation ← API/CLI Calls
-     ↓
-Result Reporting ← WorkItemResult ← Success/Error Aggregation
+Result Reporting ← Success/Error Aggregation ← API/CLI Calls
 ```
 
 ### 2. Error Handling Flow
@@ -300,29 +416,34 @@ CLI Error Presenter → Console Output with Context
 ## Future Enhancements
 
 ### 1. **Planned Features**
-- Bulk work item creation
-- Template management system
-- Advanced field mapping configurations
-- Plugin system for custom platforms
+- Bulk work item creation from multiple files
+- Template management system for work items
+- Advanced field mapping configurations for custom work item types
+- Interactive mode for work item creation
+- Repository cloning and initialization features
+- Branch management operations
 
 ### 2. **Architecture Evolution**
 - Microservice decomposition for large-scale deployments
 - Event-driven architecture for workflow automation
 - Caching layer for improved performance
 - Configuration management service
+- Plugin system for custom platforms
 
 ## Dependencies
 
 ### 1. **Core Dependencies**
-- `click`: CLI framework
-- `requests`: HTTP client for API calls
-- `typing`: Type hints and annotations
+- `click>=8.0.0`: CLI framework for command-line interfaces
+- `requests>=2.25.0`: HTTP client for API calls (Azure DevOps)
+- `pyyaml>=6.0.0`: YAML parsing for configuration files
 
 ### 2. **Development Dependencies**
 - `pytest`: Testing framework
 - `black`: Code formatting
 - `mypy`: Static type checking
 - `coverage`: Test coverage analysis
+- `isort`: Import sorting
+- `flake8`: Style guide enforcement
 
 ## Deployment Considerations
 

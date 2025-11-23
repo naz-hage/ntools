@@ -66,5 +66,4 @@ Notes:
 
 ## Troubleshooting
 
-- Ensure PAT has 'Work Items (read and write)' scope and the token is provided via `AZURE_DEVOPS_EXT_PAT` or `AZURE_DEVOPS_PAT` environment variable.
-- Ensure `AZURE_DEVOPS_ORG` and project name are correct.
+- Ensure PAT has 'Work Items (read and write)' scope and the token is provided via `AZURE_DEVOPS_PAT` environment variable.

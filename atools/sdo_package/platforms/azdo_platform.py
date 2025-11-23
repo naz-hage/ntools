@@ -1,5 +1,18 @@
 """
-Azure DevOps platform implementation for work item management.
+Azure DevOps Platform Implementation - Work Item Management
+
+AZURE DEVOPS WORK ITEM SUPPORT:
+- AzureDevOpsPlatform: Handles Azure DevOps work items (PBIs, Tasks, Bugs, Epics)
+- Inherits from WorkItemPlatform (common work item interface)
+- Uses Azure DevOps REST APIs for work item operations
+- Supports work item creation, linking, and management
+
+NOTE: Repository operations are handled separately by AzureDevOpsRepositoryPlatform
+in repositories.py, not by this class.
+
+PLATFORM COMPARISON:
+- AzureDevOpsPlatform (this file): Work items (PBIs, Tasks, Bugs, Epics)
+- AzureDevOpsRepositoryPlatform (repositories.py): Repository management (create, list, delete)
 """
 import base64
 import os
@@ -46,7 +59,7 @@ class AzureDevOpsPlatform(WorkItemPlatform):
 
     def validate_auth(self) -> bool:
         """Validate Azure DevOps authentication."""
-        pat = os.environ.get("AZURE_DEVOPS_PAT") or os.environ.get("AZURE_DEVOPS_EXT_PAT")
+        pat = os.environ.get("AZURE_DEVOPS_PAT")
         if not pat:
             print("❌ AZURE_DEVOPS_PAT environment variable not set.")
             print("Please set your Azure DevOps Personal Access Token.")
@@ -125,7 +138,7 @@ class AzureDevOpsPlatform(WorkItemPlatform):
             return None
 
         # Get PAT from environment
-        pat = os.environ.get("AZURE_DEVOPS_PAT") or os.environ.get("AZURE_DEVOPS_EXT_PAT")
+        pat = os.environ.get("AZURE_DEVOPS_PAT")
         if not pat:
             print("❌ AZURE_DEVOPS_PAT environment variable not set")
             return None
