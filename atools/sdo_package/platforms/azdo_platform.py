@@ -25,10 +25,10 @@ try:
     from ..exceptions import ConfigurationError
     from ..parsers.metadata_parser import MetadataParser
 except ImportError:
-    from base import WorkItemPlatform
-    from client import extract_platform_info_from_git
-    from exceptions import ConfigurationError
-    from parsers.metadata_parser import MetadataParser
+    from .base import WorkItemPlatform
+    from ..client import extract_platform_info_from_git
+    from ..exceptions import ConfigurationError
+    from ..parsers.metadata_parser import MetadataParser
 
 
 class AzureDevOpsPlatform(WorkItemPlatform):
