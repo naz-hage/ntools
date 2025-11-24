@@ -24,8 +24,8 @@ CLI_DOCSTRING = f"""SDO {__version__} - Simple DevOps Operations Tool
 A modern CLI tool for Azure DevOps and GitHub operations.
 
 PLATFORM SUPPORT:
-- Azure DevOps: Work items (PBIs, Tasks, Bugs) and repository management
-- GitHub: Work items (Issues, Pull Requests) and repository management
+- Azure DevOps: Work items (PBIs, Tasks, Bugs, Epics) and repository management
+- GitHub: Work items (Issues) and repository management
 
 Environment Variables:
     AZURE_DEVOPS_PAT    - Personal Access Token for Azure DevOps (required for Azure DevOps operations)

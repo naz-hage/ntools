@@ -38,7 +38,6 @@ AZURE DEVOPS WORK ITEMS:
 
 GITHUB WORK ITEMS:
 - Issues
-- Pull Requests
 - Uses GitHub CLI (gh) commands
 - Supports issue templates and GitHub-specific metadata
 
