@@ -262,12 +262,23 @@ def cmd_workitem_create(args) -> Optional[Dict[str, Any]]:
         if not platform.validate_auth():
             return None
 
+        # Convert acceptance criteria to strings for platform compatibility
+        acceptance_criteria_strings = []
+        for ac in content['acceptance_criteria']:
+            if isinstance(ac, dict) and 'text' in ac:
+                # Format with checkbox based on completion status
+                checkbox = '[x]' if ac.get('completed', False) else '[ ]'
+                acceptance_criteria_strings.append(f"{checkbox} {ac['text']}")
+            else:
+                # Fallback for string format
+                acceptance_criteria_strings.append(str(ac))
+
         # Create the work item
         result = platform.create_work_item(
             title=content['title'],
             description=content['description'],
             metadata=content['metadata'],
-            acceptance_criteria=content['acceptance_criteria'],
+            acceptance_criteria=acceptance_criteria_strings,
             dry_run=args.dry_run
         )
 
