@@ -6,7 +6,6 @@ Tests GitHub CLI integration, repository operations, and error handling.
 import pytest
 from unittest.mock import patch, MagicMock, call
 import subprocess
-import json
 import sys
 from pathlib import Path
 

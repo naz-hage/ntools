@@ -3,9 +3,6 @@ Tests for markdown parser functionality.
 Tests parsing of work items, issues, and markdown content.
 """
 
-import pytest
-from unittest.mock import patch, MagicMock, mock_open
-import json
 import sys
 from pathlib import Path
 

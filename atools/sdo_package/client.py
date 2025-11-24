@@ -488,7 +488,7 @@ class AzureDevOpsClient:
                                     )
                     else:
                         print(f"API Error: {error_details.get('message', 'Unknown error')}")
-                except:
+                except Exception:
                     print(f"API Error Details: {response.text}")
                 return None
             response.raise_for_status()
@@ -934,32 +934,32 @@ class AzureDevOpsClient:
             )
 
         # Handle Acceptance Criteria: prefer a dedicated work item field if available in the project
-        print(f"DEBUG: Client received acceptance_criteria: {acceptance_criteria}")
+        logging.debug("Client received acceptance_criteria: {acceptance_criteria}")
         if acceptance_criteria:
-            print(f"DEBUG: Processing acceptance criteria for work_item_type: {work_item_type}")
+            logging.debug("Processing acceptance criteria for work_item_type: {work_item_type}")
             ac_html = '<ul>' + '\n'.join([f'<li>{ac}</li>' for ac in acceptance_criteria]) + '</ul>'
             
             # Try to discover a field whose name/reference contains 'acceptance'
             ac_field_ref = None
             try:
                 fields_url = f"https://dev.azure.com/{self.organization}/{self.project}/_apis/wit/fields?api-version={self.api_version}"
-                print(f"DEBUG: Checking for AC fields at: {fields_url}")
+                logging.debug("Checking for AC fields at: {fields_url}")
                 response = requests.get(fields_url, headers=self.headers)
                 if response.status_code == 200:
                     fields_data = response.json()
-                    print(f"DEBUG: Found {len(fields_data.get('value', []))} fields")
+                    logging.debug("Found {len(fields_data.get('value', []))} fields")
                     for field in fields_data.get('value', []):
                         field_name = field.get('name', '').lower()
                         if 'acceptance' in field_name:
                             ac_field_ref = field.get('referenceName')
-                            print(f"DEBUG: Found AC field: {field.get('name')} -> {ac_field_ref}")
+                            logging.debug("Found AC field: {field.get('name')} -> {ac_field_ref}")
                             break
                     if not ac_field_ref:
-                        print(f"DEBUG: No acceptance criteria field found")
+                        logging.debug("No acceptance criteria field found")
                 else:
-                    print(f"DEBUG: Failed to get fields, status: {response.status_code}")
+                    logging.debug("Failed to get fields, status: {response.status_code}")
             except Exception as e:
-                print(f"DEBUG: Exception checking fields: {e}")
+                logging.debug("Exception checking fields: {e}")
                 pass  # Continue without dedicated field
 
             if ac_field_ref and work_item_type != 'Task':
@@ -967,20 +967,20 @@ class AzureDevOpsClient:
                 patch_document.append({"op": "add", "path": f"/fields/{ac_field_ref}", "value": ac_html})
             else:
                 # Append to description (for Tasks and other work item types without dedicated field)
-                print(f"DEBUG: Using description approach for {work_item_type}")
+                logging.debug("Using description approach for {work_item_type}")
                 if description:
                     description += f'\n\n<h3>Acceptance Criteria</h3>\n{ac_html}'
                 else:
                     description = f'<h3>Acceptance Criteria</h3>\n{ac_html}'
                 # Update the description in the patch document
                 desc_patch = next((p for p in patch_document if p.get('path') == '/fields/System.Description'), None)
-                print(f"DEBUG: Found desc_patch: {desc_patch is not None}")
+                logging.debug("Found desc_patch: {desc_patch is not None}")
                 if desc_patch:
                     desc_patch['value'] = description
-                    print(f"DEBUG: Updated existing desc_patch")
+                    logging.debug("Updated existing desc_patch")
                 else:
                     patch_document.append({"op": "add", "path": "/fields/System.Description", "value": description})
-                    print(f"DEBUG: Added new desc_patch")
+                    logging.debug("Added new desc_patch")
 
         # JSON Patch requires specific content type
         headers = self.headers.copy()
@@ -1285,7 +1285,7 @@ class AzureDevOpsClient:
                 str(work_item_id),
             ]
 
-            result = subprocess.run(
+            subprocess.run(
                 cmd,
                 capture_output=True,
                 text=True,
@@ -1320,8 +1320,9 @@ class AzureDevOpsClient:
 class ConfigManager:
     """Manages YAML configuration files."""
 
-    def __init__(self, config_path: str = "input.yaml"):
+    def __init__(self, config_path: str = "input.yaml", verbose: bool = False):
         self.config_path = Path(config_path)
+        self.verbose = verbose
 
     def load_config(self) -> Dict[str, Any]:
         """Load configuration from YAML file."""
@@ -1516,7 +1517,6 @@ def extract_platform_info_from_git() -> Optional[Dict[str, str]]:
 
 
 def ensure_config_exists(config_filename: str = "input.yaml", command_type: str = "general"):
-    """Ensure config file exists, create sample if it doesn't."""
     """Ensure config file exists, create sample if it doesn't."""
     config_path = config_filename
     if not Path(config_path).exists():
