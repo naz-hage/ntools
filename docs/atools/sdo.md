@@ -175,8 +175,14 @@ sdo repo delete  # Will prompt for confirmation
 
 SDO expects markdown files with specific metadata headers. See the example files:
 
-- `issue-azdo-example.md` - Azure DevOps work item format
-- `issue-gh-example.md` - GitHub issue format
+**Azure DevOps Examples:**
+- [issue-azdo-bug-example.md](issue-azdo-bug-example.md) - Bug work item format
+- [issue-azdo-task-example.md](issue-azdo-task-example.md) - Task work item format
+- [issue-azdo-pbi-example.md](issue-azdo-pbi-example.md) - Product Backlog Item format
+- [issue-azdo-epic-example.md](issue-azdo-epic-example.md) - Epic work item format
+
+**GitHub Examples:**
+- [issue-gh-example.md](issue-gh-example.md) - GitHub issue format
 
 ### Required Metadata
 

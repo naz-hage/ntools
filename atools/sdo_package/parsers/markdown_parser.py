@@ -53,12 +53,15 @@ class MarkdownParser:
             'title': '',
             'description': '',
             'metadata': {},
-            'acceptance_criteria': []
+            'acceptance_criteria': [],
+            'repro_steps': ''
         }
 
         # State tracking
         in_acceptance_criteria = False
+        in_repro_steps = False
         description_lines = []
+        repro_lines = []
 
         for line in lines:
             line = line.strip()
@@ -92,11 +95,24 @@ class MarkdownParser:
                 result['metadata'][key] = value
                 continue
 
+            # Check for Steps to Reproduce
+            if 'steps to reproduce' in line.lower():
+                in_repro_steps = True
+                continue
+
             # Check for Acceptance Criteria section
             if line.lower() in ['## acceptance criteria', '## acceptance criteria:',
                                '### acceptance criteria', '### acceptance criteria:']:
                 in_acceptance_criteria = True
                 continue
+
+            # Extract repro steps
+            if in_repro_steps:
+                if line.startswith('**') or line.startswith('##'):
+                    in_repro_steps = False
+                else:
+                    repro_lines.append(line)
+                    continue
 
             # Extract acceptance criteria
             if in_acceptance_criteria:
@@ -132,6 +148,9 @@ class MarkdownParser:
 
         # Join description lines
         result['description'] = '\n'.join(description_lines).strip()
+
+        # Join repro steps
+        result['repro_steps'] = '\n'.join(repro_lines).strip()
 
         return result
 

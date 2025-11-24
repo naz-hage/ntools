@@ -3,7 +3,9 @@ SDO CLI - Click-based command line interface.
 """
 
 import click
+import os
 import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from .exceptions import SDOError, ConfigurationError, ValidationError
 from .work_items import cmd_workitem_create

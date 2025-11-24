@@ -102,8 +102,11 @@ class WorkItemManager:
             content = {
                 "title": parsed_result["title"],
                 "description": parsed_result["description"],
-                "acceptance_criteria": parsed_result["acceptance_criteria"]
+                "acceptance_criteria": parsed_result["acceptance_criteria"],
+                "repro_steps": parsed_result.get("repro_steps", "")
             }
+            if self.verbose:
+                print("DEBUG: repro_steps in content:", repr(content.get("repro_steps", "")))
             metadata = parsed_result["metadata"]
 
             # Determine platform and create work item
@@ -161,7 +164,7 @@ class WorkItemManager:
                 title=title,
                 description=description,
                 acceptance_criteria=acceptance_criteria,
-                work_item_type=work_item_type,
+                repro_steps=content.get("repro_steps", ""),
                 metadata=metadata
             )
 
@@ -279,6 +282,7 @@ def cmd_workitem_create(args) -> Optional[Dict[str, Any]]:
             description=content['description'],
             metadata=content['metadata'],
             acceptance_criteria=acceptance_criteria_strings,
+            repro_steps=content.get('repro_steps', ''),
             dry_run=args.dry_run
         )
 
