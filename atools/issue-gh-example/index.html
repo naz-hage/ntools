@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="naz-hage" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>PBI-001: Enhanced Markdown Parser for Copilot - Ntools - Work in Progress</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "PBI-001: Enhanced Markdown Parser for Copilot";
+        var mkdocs_page_input_path = "atools/issue-gh-example.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Ntools - Work in Progress
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../usage/">Practice</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../setup/">Setup your project</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../buildtypes/">Build Types</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../versioning/">Versioning</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">List of Tools</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ntools/nbuild/">Nbuild (nb.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ntools/lf/">lf (lf.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ntools/nbackup/">Nbackup (nbackup.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ntools/wi/">wi (wi.exe)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ntools/github-release/">Github Release</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Custom Build Tasks</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ntools/nbuildtasks/">Nbuild Tasks</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developer setup</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../version-automation-guide/">Version Automation Guide</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ntools/ntools/">Development Tools</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >ntools-scripts module</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../ntools/ntools-scripts-module/">Module</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../ntools/ntools-scripts-module-api/">API</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Build System Features</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ntools/code-coverage/">Code Coverage</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ntools/nbuild-targets/">MSBuild Targets</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">atools</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >List of tools</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../sdo/">SDO (Simple DevOps Operations)</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../sdo-installation/">SDO Installation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../install-ntools/">Install NTools</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../SDO_ARCHITECTURE/">SDO Architecture</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../azdo_payloads/">AzDO payloads</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Ntools - Work in Progress</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">PBI-001: Enhanced Markdown Parser for Copilot</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/naz-hage/ntools/edit/main/docs/atools/issue-gh-example.md">Edit on ntools</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="pbi-001-enhanced-markdown-parser-for-copilot">PBI-001: Enhanced Markdown Parser for Copilot</h1>
+<h2 id="target-github">Target: github</h2>
+<h2 id="repository-naz-hagenaz">Repository: naz-hage/naz</h2>
+<h2 id="assignee">Assignee:</h2>
+<h2 id="labels-backlog">Labels: backlog</h2>
+<h2 id="description">Description</h2>
+<p>Brief description of the problem, opportunity, or goal. State what will change and why.</p>
+<p>This PBI will enhance the markdown parser to support better metadata extraction for work item creation, improving the developer experience when creating issues from markdown files.</p>
+<h2 id="acceptance-criteria">Acceptance Criteria</h2>
+<ul>
+<li>[ ] List clear, testable requirements for completion</li>
+<li>[ ] Use checkboxes for each criterion</li>
+<li>[ ] Include UI, logic, error handling, and test coverage as needed</li>
+</ul>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/naz-hage/ntools" class="fa fa-code-fork" style="color: #fcfcfc"> ntools</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
