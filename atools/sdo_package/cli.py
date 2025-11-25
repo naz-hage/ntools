@@ -3,21 +3,35 @@ SDO CLI - Click-based command line interface.
 """
 
 import click
+import os
 import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from .exceptions import SDOError, ConfigurationError, ValidationError
 from .work_items import cmd_workitem_create
+from .repositories import (
+    cmd_repo_create,
+    cmd_repo_show,
+    cmd_repo_list,
+    cmd_repo_delete
+)
 from .version import __version__
 
 
 # Define the CLI docstring with version
 CLI_DOCSTRING = f"""SDO {__version__} - Simple DevOps Operations Tool
 
-A modern CLI tool for Azure DevOps operations.
+A modern CLI tool for Azure DevOps and GitHub operations.
+
+PLATFORM SUPPORT:
+- Azure DevOps: Work items (PBIs, Tasks, Bugs, Epics) and repository management
+- GitHub: Work items (Issues) and repository management
 
 Environment Variables:
-    AZURE_DEVOPS_PAT    - Personal Access Token (required)
-    AZURE_DEVOPS_EXT_PAT - Alternative PAT variable
+    AZURE_DEVOPS_PAT    - Personal Access Token for Azure DevOps (required for Azure DevOps operations)
+
+Requirements:
+    GitHub CLI (gh)     - Required for GitHub operations (install from https://cli.github.com/)
 """
 
 
@@ -38,14 +52,9 @@ class ClickArgs:
 
 @click.group(help=CLI_DOCSTRING)
 @click.option('--verbose', '-v', is_flag=True, help='Show detailed API error information')
-@click.option('--version', is_flag=True, help='Show version information')
+@click.version_option(version=__version__, prog_name='SDO')
 @click.pass_context
-def cli(ctx, verbose, version):
-    # Handle version option
-    if version:
-        click.echo(f"SDO version {__version__}")
-        sys.exit(0)
-
+def cli(ctx, verbose):
     # Store global options in context
     ctx.ensure_object(dict)
     ctx.obj['verbose'] = verbose
@@ -87,6 +96,155 @@ def create(ctx, file_path, dry_run, verbose):
 
         if not result and not dry_run:
             sys.exit(1)
+
+    except (SDOError, ConfigurationError, ValidationError) as e:
+        click.echo(f"❌ {str(e)}", err=True)
+        if ctx.obj.get('verbose'):
+            click.echo(f"   Error type: {type(e).__name__}", err=True)
+            if hasattr(e, 'details'):
+                click.echo(f"   Details: {e.details}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"❌ Unexpected error: {str(e)}", err=True)
+        if ctx.obj.get('verbose'):
+            import traceback
+            click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
+        sys.exit(1)
+
+
+@cli.group()
+@click.pass_context
+def repo(ctx):
+    """Repository operations."""
+    pass
+
+
+@repo.command()
+@click.option('--verbose', '-v', is_flag=True,
+              help='Show detailed API information and responses')
+@click.pass_context
+def create(ctx, verbose):
+    """Create a repository in the current project.
+
+    The repository name is extracted from the current Git remote.
+    If the repository already exists, no action is taken.
+
+    Examples:
+        sdo repo create
+        sdo repo create --verbose
+    """
+    try:
+        # Call the business logic
+        result = cmd_repo_create(verbose=verbose)
+
+        if result != 0:
+            sys.exit(result)
+
+    except (SDOError, ConfigurationError, ValidationError) as e:
+        click.echo(f"❌ {str(e)}", err=True)
+        if ctx.obj.get('verbose'):
+            click.echo(f"   Error type: {type(e).__name__}", err=True)
+            if hasattr(e, 'details'):
+                click.echo(f"   Details: {e.details}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"❌ Unexpected error: {str(e)}", err=True)
+        if ctx.obj.get('verbose'):
+            import traceback
+            click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
+        sys.exit(1)
+
+
+@repo.command()
+@click.option('--verbose', '-v', is_flag=True,
+              help='Show detailed API information and responses')
+@click.pass_context
+def show(ctx, verbose):
+    """Show information about the current repository.
+
+    The repository name is extracted from the current Git remote.
+
+    Examples:
+        sdo repo show
+        sdo repo show --verbose
+    """
+    try:
+        # Call the business logic
+        result = cmd_repo_show(verbose=verbose)
+
+        if result != 0:
+            sys.exit(result)
+
+    except (SDOError, ConfigurationError, ValidationError) as e:
+        click.echo(f"❌ {str(e)}", err=True)
+        if ctx.obj.get('verbose'):
+            click.echo(f"   Error type: {type(e).__name__}", err=True)
+            if hasattr(e, 'details'):
+                click.echo(f"   Details: {e.details}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"❌ Unexpected error: {str(e)}", err=True)
+        if ctx.obj.get('verbose'):
+            import traceback
+            click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
+        sys.exit(1)
+
+
+@repo.command()
+@click.option('--verbose', '-v', is_flag=True,
+              help='Show detailed API information and responses')
+@click.pass_context
+def ls(ctx, verbose):
+    """List all repositories in the current project.
+
+    Examples:
+        sdo repo ls
+        sdo repo ls --verbose
+    """
+    try:
+        # Call the business logic
+        result = cmd_repo_list(verbose=verbose)
+
+        if result != 0:
+            sys.exit(result)
+
+    except (SDOError, ConfigurationError, ValidationError) as e:
+        click.echo(f"❌ {str(e)}", err=True)
+        if ctx.obj.get('verbose'):
+            click.echo(f"   Error type: {type(e).__name__}", err=True)
+            if hasattr(e, 'details'):
+                click.echo(f"   Details: {e.details}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"❌ Unexpected error: {str(e)}", err=True)
+        if ctx.obj.get('verbose'):
+            import traceback
+            click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
+        sys.exit(1)
+
+
+@repo.command()
+@click.option('--verbose', '-v', is_flag=True,
+              help='Show detailed API information and responses')
+@click.pass_context
+def delete(ctx, verbose):
+    """Delete the current repository.
+
+    ⚠️  WARNING: This action cannot be undone!
+
+    The repository name is extracted from the current Git remote.
+    You will be prompted to confirm before deletion.
+
+    Examples:
+        sdo repo delete
+        sdo repo delete --verbose
+    """
+    try:
+        # Call the business logic
+        result = cmd_repo_delete(verbose=verbose)
+
+        if result != 0:
+            sys.exit(result)
 
     except (SDOError, ConfigurationError, ValidationError) as e:
         click.echo(f"❌ {str(e)}", err=True)

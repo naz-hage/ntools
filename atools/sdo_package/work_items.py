@@ -1,5 +1,56 @@
 """
 SDO Work Items - Business logic for work item operations.
+
+ARCHITECTURAL DECISION: SEPARATE PLATFORM FILES
+
+WHY SEPARATE PLATFORM FILES FOR WORK ITEMS?
+Work items have significant platform differences that require separate implementations:
+
+AZURE DEVOPS WORK ITEMS:
+- Complex work item types: PBIs, Tasks, Bugs, Epics with different fields
+- Parent-child relationships and linking
+- Area/Iteration paths, priorities, tags
+- Acceptance criteria as separate field
+- REST API with complex payload structures
+
+GITHUB WORK ITEMS:
+- Simple issue/PR model with standard fields
+- Issue references instead of formal relationships
+- Labels, assignees, milestones
+- Body content with markdown formatting
+- CLI-based operations
+
+WHY NOT CONSOLIDATED LIKE REPOSITORIES?
+Work item operations are too different to share common code effectively.
+Each platform needs completely different field mappings, relationship handling,
+and API interactions. Attempting consolidation would create more complexity
+than separation.
+
+PLATFORM SUPPORT FOR WORK ITEMS:
+
+AZURE DEVOPS WORK ITEMS:
+- Product Backlog Items (PBIs)
+- Tasks
+- Bugs
+- Epics
+- Uses Azure DevOps REST APIs
+- Supports parent-child relationships and acceptance criteria
+
+GITHUB WORK ITEMS:
+- Issues
+- Uses GitHub CLI (gh) commands
+- Supports issue templates and GitHub-specific metadata
+
+COMMON WORK ITEM FEATURES:
+- Markdown parsing for work item content
+- Metadata extraction (title, description, acceptance criteria)
+- Platform-agnostic result handling
+- Error handling and validation
+
+PLATFORM DIVERGENCE:
+- Work item types: Azure DevOps has structured types, GitHub uses issues/PRs
+- Relationships: Azure DevOps supports parent-child links, GitHub uses issue references
+- APIs: REST APIs (Azure DevOps) vs CLI commands (GitHub)
 """
 
 import os
@@ -50,8 +101,11 @@ class WorkItemManager:
             content = {
                 "title": parsed_result["title"],
                 "description": parsed_result["description"],
-                "acceptance_criteria": parsed_result["acceptance_criteria"]
+                "acceptance_criteria": parsed_result["acceptance_criteria"],
+                "repro_steps": parsed_result.get("repro_steps", "")
             }
+            if self.verbose:
+                print("DEBUG: repro_steps in content:", repr(content.get("repro_steps", "")))
             metadata = parsed_result["metadata"]
 
             # Determine platform and create work item
@@ -109,7 +163,7 @@ class WorkItemManager:
                 title=title,
                 description=description,
                 acceptance_criteria=acceptance_criteria,
-                work_item_type=work_item_type,
+                repro_steps=content.get("repro_steps", ""),
                 metadata=metadata
             )
 
@@ -210,12 +264,24 @@ def cmd_workitem_create(args) -> Optional[Dict[str, Any]]:
         if not platform.validate_auth():
             return None
 
+        # Convert acceptance criteria to strings for platform compatibility
+        acceptance_criteria_strings = []
+        for ac in content['acceptance_criteria']:
+            if isinstance(ac, dict) and 'text' in ac:
+                # Format with checkbox based on completion status
+                checkbox = '[x]' if ac.get('completed', False) else '[ ]'
+                acceptance_criteria_strings.append(f"{checkbox} {ac['text']}")
+            else:
+                # Fallback for string format
+                acceptance_criteria_strings.append(str(ac))
+
         # Create the work item
         result = platform.create_work_item(
             title=content['title'],
             description=content['description'],
             metadata=content['metadata'],
-            acceptance_criteria=content['acceptance_criteria'],
+            acceptance_criteria=acceptance_criteria_strings,
+            repro_steps=content.get('repro_steps', ''),
             dry_run=args.dry_run
         )
 

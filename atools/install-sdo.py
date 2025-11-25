@@ -26,11 +26,26 @@ def parse_args():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-    python install_sdo.py                                    # Install with defaults
+    python install_sdo.py --local                           # Install locally for development (.venv)
+    python install_sdo.py --local --uninstall               # Delete local .venv
+    python install_sdo.py                                   # Install system-wide to NBuild
+    python install_sdo.py --uninstall                       # Remove system-wide installation
     python install_sdo.py --dry-run                         # Show what would be done
     python install_sdo.py --source-path ../sdo-source       # Custom source location
     python install_sdo.py --nbuild-path "C:\\Program Files\\NBuild"  # Custom NBuild path
         """
+    )
+
+    parser.add_argument(
+        '--local',
+        action='store_true',
+        help='Install locally in .venv for development (instead of system-wide)'
+    )
+
+    parser.add_argument(
+        '--uninstall',
+        action='store_true',
+        help='Remove/delete the virtual environment'
     )
 
     parser.add_argument(
@@ -109,21 +124,48 @@ exec python -m sdo_package.cli "$@"
         return False
 
 
-def install_sdo(sdo_source_path: Path, nbuild_path: Path, dry_run: bool = False) -> bool:
+def uninstall_venv(venv_path: Path, dry_run: bool = False) -> bool:
+    """Remove virtual environment directory."""
+    
+    if not venv_path.exists():
+        print(f"⚠️  Virtual environment not found at {venv_path}")
+        return True
+    
+    if dry_run:
+        print(f"Would delete virtual environment at: {venv_path}")
+        return True
+    
+    try:
+        import shutil
+        print(f"Deleting virtual environment at {venv_path}...")
+        shutil.rmtree(venv_path)
+        print("✓ Virtual environment deleted successfully")
+        return True
+    except Exception as e:
+        print(f"❌ Failed to delete virtual environment: {e}")
+        return False
+
+
+def install_sdo(sdo_source_path: Path, target_path: Path, is_local: bool = False, dry_run: bool = False) -> bool:
     """Install SDO in isolated virtual environment."""
 
-    print(f"Installing SDO from {sdo_source_path} to {nbuild_path}")
+    print(f"Installing SDO from {sdo_source_path} to {target_path}")
 
-    # Ensure NBuild directory exists
-    if not nbuild_path.exists():
-        if dry_run:
-            print(f"Would create directory: {nbuild_path}")
-        else:
-            nbuild_path.mkdir(parents=True, exist_ok=True)
-            print(f"✓ Created directory: {nbuild_path}")
+    # For local install, venv_path IS target_path (.venv)
+    # For system install, venv_path is target_path/venv (NBuild/venv)
+    if is_local:
+        venv_path = target_path
+    else:
+        venv_path = target_path / "venv"
+        # Ensure target directory exists for system install
+        if not target_path.exists():
+            if dry_run:
+                print(f"Would create directory: {target_path}")
+            else:
+                target_path.mkdir(parents=True, exist_ok=True)
+                print(f"✓ Created directory: {target_path}")
 
     # Create virtual environment
-    venv_path = nbuild_path / "venv"
     if dry_run:
         print(f"Would create virtual environment at: {venv_path}")
     else:
@@ -161,9 +203,10 @@ def install_sdo(sdo_source_path: Path, nbuild_path: Path, dry_run: bool = False)
             return False
         print("✓ SDO installed successfully")
 
-    # Create launcher script
-    if not create_launcher_script(nbuild_path, venv_path, dry_run):
-        return False
+    # Create launcher script (only for system-wide install, not local)
+    if not is_local:
+        if not create_launcher_script(target_path, venv_path, dry_run):
+            return False
 
     return True
 
@@ -176,9 +219,46 @@ def main():
 
     # Resolve paths
     sdo_source_path = Path(args.source_path).resolve()
-    nbuild_path = Path(args.nbuild_path).resolve()
+    
+    # Determine target path based on --local flag
+    if args.local:
+        target_path = sdo_source_path / ".venv"
+        install_type = "local development"
+    else:
+        target_path = Path(args.nbuild_path).resolve()
+        install_type = "system-wide"
 
-    # Validate source path
+    print(f"Installation Type: {install_type}")
+    print(f"SDO Source: {sdo_source_path}")
+    print(f"Target Path: {target_path}")
+    print(f"Dry Run: {args.dry_run}")
+    print()
+
+    # Handle uninstall
+    if args.uninstall:
+        if args.local:
+            venv_path = sdo_source_path / ".venv"
+        else:
+            venv_path = target_path / "venv"
+            # Also remove launcher script
+            if sys.platform == 'win32':
+                launcher_path = target_path / "sdo.cmd"
+            else:
+                launcher_path = target_path / "sdo"
+            
+            if launcher_path.exists() and not args.dry_run:
+                try:
+                    launcher_path.unlink()
+                    print(f"✓ Removed launcher script: {launcher_path}")
+                except Exception as e:
+                    print(f"⚠️  Could not remove launcher script: {e}")
+        
+        success = uninstall_venv(venv_path, args.dry_run)
+        if success:
+            print(f"\n✅ SDO {install_type} environment removed successfully")
+        return 0 if success else 1
+
+    # Validate source path for installation
     if not sdo_source_path.exists():
         print(f"❌ SDO source path does not exist: {sdo_source_path}")
         print("Please specify the correct path with --source-path")
@@ -190,58 +270,59 @@ def main():
         print("Please ensure you're pointing to the directory containing sdo_package")
         return 1
 
-    # Try to find NBuild in PATH if default path doesn't exist
-    if not nbuild_path.exists():
+    # For system-wide install, try to find NBuild in PATH if default doesn't exist
+    if not args.local and not target_path.exists():
         found_nbuild = find_nbuild_in_path()
         if found_nbuild:
             print(f"Found NBuild in PATH: {found_nbuild}")
-            nbuild_path = found_nbuild
+            target_path = found_nbuild
         else:
-            print(f"⚠️  NBuild directory not found at {nbuild_path}")
-            print("Installation will proceed, but you may need to create the directory manually")
-
-    print(f"SDO Source: {sdo_source_path}")
-    print(f"NBuild Path: {nbuild_path}")
-    print(f"Dry Run: {args.dry_run}")
-    print()
+            print(f"⚠️  NBuild directory not found at {target_path}")
+            if not args.dry_run:
+                print("Installation will create the directory")
 
     # Perform installation
-    success = install_sdo(sdo_source_path, nbuild_path, args.dry_run)
+    success = install_sdo(sdo_source_path, target_path, args.local, args.dry_run)
 
     if success:
         if args.dry_run:
             print("\n✅ Dry run completed successfully")
             print("Run without --dry-run to perform actual installation")
         else:
-            print("\n✅ SDO installation completed successfully!")
-            print(f"You can now use 'sdo' command from any location")
-            print(f"Launcher script created at: {nbuild_path / ('sdo.cmd' if sys.platform == 'win32' else 'sdo')}")
-
-            # Test the installation
-            print("\nTesting SDO installation...")
-            try:
+            print(f"\n✅ SDO {install_type} installation completed successfully!")
+            if args.local:
+                print(f"To activate the virtual environment, run:")
                 if sys.platform == 'win32':
-                    launcher_path = nbuild_path / "sdo.cmd"
-                    # For Windows, we can't easily test the batch file, so just check it exists
-                    if launcher_path.exists():
-                        print("✓ Launcher script exists and is ready")
-                    else:
-                        print("⚠️  Launcher script not found")
+                    print(f"  .venv\\Scripts\\Activate.ps1")
                 else:
-                    # For Unix, test by running the launcher
-                    launcher_path = nbuild_path / "sdo"
-                    cmd = [str(launcher_path), "--help"]
-                    result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
-                    if result.returncode == 0:
-                        print("✓ SDO launcher works correctly")
+                    print(f"  source .venv/bin/activate")
+                print(f"Then use: sdo --help")
+            else:
+                print(f"You can now use 'sdo' command from any location")
+                launcher_path = target_path / ('sdo.cmd' if sys.platform == 'win32' else 'sdo')
+                print(f"Launcher script created at: {launcher_path}")
+
+                # Test the installation
+                print("\nTesting SDO installation...")
+                try:
+                    if sys.platform == 'win32':
+                        if launcher_path.exists():
+                            print("✓ Launcher script exists and is ready")
+                        else:
+                            print("⚠️  Launcher script not found")
                     else:
-                        print(f"⚠️  SDO launcher test failed: {result.stderr}")
-            except Exception as e:
-                print(f"⚠️  Could not test SDO launcher: {e}")
+                        cmd = [str(launcher_path), "--help"]
+                        result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
+                        if result.returncode == 0:
+                            print("✓ SDO launcher works correctly")
+                        else:
+                            print(f"⚠️  SDO launcher test failed: {result.stderr}")
+                except Exception as e:
+                    print(f"⚠️  Could not test SDO launcher: {e}")
 
         return 0
     else:
-        print("\n❌ SDO installation failed")
+        print(f"\n❌ SDO {install_type} installation failed")
         return 1
 
 

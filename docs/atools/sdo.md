@@ -4,13 +4,21 @@ This page documents the `sdo` CLI tool. Use this page for detailed prerequisites
 
 ## Overview
 
-`sdo` (Simple DevOps Operations) is a modern CLI tool that parses backlog-style markdown files and creates GitHub issues or Azure DevOps work items (PBIs, Bugs, or Tasks). It supports dry-run previews and follows a file-first metadata policy.
+`sdo` (Simple DevOps Operations) is a modern CLI tool that provides unified operations for both work items and repositories across Azure DevOps and GitHub platforms. It parses backlog-style markdown files to create work items and offers comprehensive repository management capabilities.
+
+### Key Features
+
+- **Work Item Creation**: Parse markdown files and create GitHub issues or Azure DevOps work items (PBIs, Bugs, Tasks)
+- **Repository Management**: Create, list, show, and delete repositories on both platforms
+- **Multi-Platform Support**: Seamless operations across Azure DevOps and GitHub
+- **Dry-Run Previews**: Preview operations before execution
+- **Automatic Platform Detection**: Detects platform from Git remote configuration
 
 ## Prerequisites
 
 ### Required Environment Variables
 
-- `AZURE_DEVOPS_PAT` or `AZURE_DEVOPS_EXT_PAT` - Personal Access Token for Azure DevOps API access
+- `AZURE_DEVOPS_PAT` - Personal Access Token for Azure DevOps API access
 - `GITHUB_TOKEN` - GitHub Personal Access Token (for GitHub operations)
 
 ### Python Requirements
@@ -66,32 +74,115 @@ sdo workitem create --file-path FILE_PATH [OPTIONS]
 - `-f, --file-path PATH` - Path to markdown file (required)
 - `--dry-run` - Parse and preview without creating
 
+### Repository Operations
+
+#### Create Repository
+
+```bash
+sdo repo create [OPTIONS]
+```
+
+Creates a new repository in the current project/organization.
+
+**Options:**
+- `-v, --verbose` - Show detailed API information
+
+#### List Repositories
+
+```bash
+sdo repo ls [OPTIONS]
+```
+
+Lists all repositories in the current project/organization.
+
+**Options:**
+- `-v, --verbose` - Show detailed API information
+
+#### Show Repository
+
+```bash
+sdo repo show [OPTIONS]
+```
+
+Shows detailed information about the current repository.
+
+**Options:**
+- `-v, --verbose` - Show detailed API information
+
+#### Delete Repository
+
+```bash
+sdo repo delete [OPTIONS]
+```
+
+Deletes the current repository (with confirmation prompt).
+
+**Options:**
+- `-v, --verbose` - Show detailed API information
+
 ### Examples
 
-#### Dry Run (Preview)
+#### Work Item Operations
+
+##### Dry Run (Preview)
 
 ```bash
 sdo workitem create --file-path "atools/issue-azdo-example.md" --dry-run
 ```
 
-#### Create Azure DevOps Work Item
+##### Create Azure DevOps Work Item
 
 ```bash
 sdo workitem create --file-path "atools/issue-azdo-example.md"
 ```
 
-#### Create with Verbose Output
+##### Create with Verbose Output
 
 ```bash
 sdo workitem create --file-path "atools/issue-azdo-example.md" --verbose
+```
+
+#### Repository Operations
+
+##### Create Repository
+
+```bash
+sdo repo create
+sdo repo create --verbose
+```
+
+##### List Repositories
+
+```bash
+sdo repo ls
+sdo repo list  # Alternative command
+```
+
+##### Show Repository Details
+
+```bash
+sdo repo show
+sdo repo show --verbose
+```
+
+##### Delete Repository
+
+```bash
+sdo repo delete  # Will prompt for confirmation
 ```
 
 ## Markdown File Format
 
 SDO expects markdown files with specific metadata headers. See the example files:
 
-- `issue-azdo-example.md` - Azure DevOps work item format
-- `issue-gh-example.md` - GitHub issue format
+**Azure DevOps Examples:**
+- [issue-azdo-bug-example.md](issue-azdo-bug-example.md) - Bug work item format
+- [issue-azdo-task-example.md](issue-azdo-task-example.md) - Task work item format
+- [issue-azdo-pbi-example.md](issue-azdo-pbi-example.md) - Product Backlog Item format
+- [issue-azdo-epic-example.md](issue-azdo-epic-example.md) - Epic work item format
+
+**GitHub Examples:**
+- [issue-gh-example.md](issue-gh-example.md) - GitHub issue format
 
 ### Required Metadata
 
@@ -109,12 +200,18 @@ Description content here...
 
 ### Azure DevOps
 - **Work Item Types**: Product Backlog Item (PBI), Bug, Task
-- **Fields**: Title, Description, Area Path, Iteration Path, Priority, Effort
+- **Work Item Fields**: Title, Description, Area Path, Iteration Path, Priority, Effort
+- **Repository Operations**: Create, List, Show, Delete repositories
+- **Authentication**: Personal Access Token (PAT)
+- **API**: REST API integration
 - **Automatic**: Organization/Project detection from Git remote
 
 ### GitHub
-- **Issue Types**: Issues
-- **Fields**: Title, Description, Labels, Assignees
+- **Work Item Types**: Issues
+- **Work Item Fields**: Title, Description, Labels, Assignees
+- **Repository Operations**: Create, List, Show, Delete repositories
+- **Authentication**: GitHub CLI (`gh`) or Personal Access Token
+- **API**: GitHub CLI integration for repositories, REST API for work items
 - **Automatic**: Repository detection from Git remote
 
 ## Error Handling
@@ -146,8 +243,13 @@ python -m pytest tests/
 
 ### Test Coverage
 
-All major functionality is tested with 34 test cases covering:
+All major functionality is tested with 161 test cases covering:
 - Work item creation workflows
+- Repository management operations
+- Multi-platform API integrations
+- Error handling and validation
+- CLI command interfaces
+- Markdown parsing and metadata extraction
 - Platform-specific operations
 - Error handling scenarios
 - CLI argument parsing

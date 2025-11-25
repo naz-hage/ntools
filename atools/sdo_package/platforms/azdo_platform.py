@@ -1,5 +1,18 @@
 """
-Azure DevOps platform implementation for work item management.
+Azure DevOps Platform Implementation - Work Item Management
+
+AZURE DEVOPS WORK ITEM SUPPORT:
+- AzureDevOpsPlatform: Handles Azure DevOps work items (PBIs, Tasks, Bugs, Epics)
+- Inherits from WorkItemPlatform (common work item interface)
+- Uses Azure DevOps REST APIs for work item operations
+- Supports work item creation, linking, and management
+
+NOTE: Repository operations are handled separately by AzureDevOpsRepositoryPlatform
+in repositories.py, not by this class.
+
+PLATFORM COMPARISON:
+- AzureDevOpsPlatform (this file): Work items (PBIs, Tasks, Bugs, Epics)
+- AzureDevOpsRepositoryPlatform (repositories.py): Repository management (create, list, delete)
 """
 import base64
 import os
@@ -12,10 +25,10 @@ try:
     from ..exceptions import ConfigurationError
     from ..parsers.metadata_parser import MetadataParser
 except ImportError:
-    from base import WorkItemPlatform
-    from client import extract_platform_info_from_git
-    from exceptions import ConfigurationError
-    from parsers.metadata_parser import MetadataParser
+    from .base import WorkItemPlatform
+    from ..client import extract_platform_info_from_git
+    from ..exceptions import ConfigurationError
+    from ..parsers.metadata_parser import MetadataParser
 
 
 class AzureDevOpsPlatform(WorkItemPlatform):
@@ -46,7 +59,7 @@ class AzureDevOpsPlatform(WorkItemPlatform):
 
     def validate_auth(self) -> bool:
         """Validate Azure DevOps authentication."""
-        pat = os.environ.get("AZURE_DEVOPS_PAT") or os.environ.get("AZURE_DEVOPS_EXT_PAT")
+        pat = os.environ.get("AZURE_DEVOPS_PAT")
         if not pat:
             print("❌ AZURE_DEVOPS_PAT environment variable not set.")
             print("Please set your Azure DevOps Personal Access Token.")
@@ -59,6 +72,7 @@ class AzureDevOpsPlatform(WorkItemPlatform):
         description: str,
         metadata: Dict[str, Any],
         acceptance_criteria: Optional[List[str]] = None,
+        repro_steps: Optional[str] = None,
         dry_run: bool = False
     ) -> Optional[Dict[str, Any]]:
         """Create an Azure DevOps work item."""
@@ -92,7 +106,12 @@ class AzureDevOpsPlatform(WorkItemPlatform):
                     print(f'  Parent: Invalid parent reference "{parent_str}"')
             print('  Description:')
             print(description)
+            if repro_steps:
+                print()
+                print('  Repro Steps:')
+                print(repro_steps)
             if acceptance_criteria:
+                print()
                 print('  Acceptance Criteria:')
                 print(f'    {len(acceptance_criteria)} items (will be added via dedicated field or appended to description)')
                 if self.verbose:
@@ -125,7 +144,7 @@ class AzureDevOpsPlatform(WorkItemPlatform):
             return None
 
         # Get PAT from environment
-        pat = os.environ.get("AZURE_DEVOPS_PAT") or os.environ.get("AZURE_DEVOPS_EXT_PAT")
+        pat = os.environ.get("AZURE_DEVOPS_PAT")
         if not pat:
             print("❌ AZURE_DEVOPS_PAT environment variable not set")
             return None
@@ -224,6 +243,20 @@ class AzureDevOpsPlatform(WorkItemPlatform):
                 "value": iteration_path
             }
         ])
+
+        # Add repro steps for Bug work items
+        if work_item_type == 'Bug' and repro_steps:
+            if self.verbose:
+                print(f"📝 Adding repro steps: {repr(repro_steps)}")
+            # Convert plain text repro steps to HTML format with proper line breaks
+            repro_steps_html = repro_steps.replace('\n', '<br/>')
+            operations.append({
+                "op": "add",
+                "path": "/fields/Microsoft.VSTS.TCM.ReproSteps",
+                "value": repro_steps_html
+            })
+        elif work_item_type == 'Bug' and self.verbose:
+            print(f"⚠️  No repro steps provided (repro_steps={repr(repro_steps)})")
 
         # Add assignee if provided
         if assignee:
