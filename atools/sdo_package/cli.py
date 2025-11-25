@@ -343,11 +343,13 @@ def show(ctx, pr_id, verbose):
         sdo pr show 123
         sdo pr show 123 --verbose
     """
-      try:
-          # Convert click context to args object for compatibility
-          args = ClickArgs(ctx)
-          args.pr_number = pr_id
-          args.verbose = verbose        # Call the business logic
+    try:
+        # Convert click context to args object for compatibility
+        args = ClickArgs(ctx)
+        args.pr_number = pr_id
+        args.verbose = verbose
+
+        # Call the business logic
         result = cmd_pr_show(args)
 
         if result != 0:
