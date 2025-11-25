@@ -50,7 +50,7 @@ class TestPRCommandHandlers:
         args.file = None
         args.source_branch = "feature/test"
         args.target_branch = "main"
-        args.work_item = None
+        args.work_item = 123
         args.draft = False
         args.dry_run = False
         args.verbose = False
@@ -65,13 +65,49 @@ class TestPRCommandHandlers:
             description="Test description",
             source_branch="feature/test",
             target_branch="main",
-            work_item_id=None,
+            work_item_id=123,
             draft=False
         )
 
         # Verify success message
         mock_print.assert_any_call("[OK] Pull request created successfully!")
         mock_print.assert_any_call("URL: https://github.com/test/repo/pull/123")
+
+    def test_cmd_pr_create_missing_work_item(self):
+        """Test PR creation fails when work item is missing."""
+        # Setup args without work item
+        args = MagicMock()
+        args.title = "Test PR"
+        args.description = "Test description"
+        args.file = None
+        args.source_branch = "feature/test"
+        args.target_branch = "main"
+        args.work_item = None
+        args.draft = False
+        args.dry_run = False
+        args.verbose = False
+
+        # Test that SystemExit is raised due to ValidationError
+        with pytest.raises(SystemExit):
+            cmd_pr_create(args)
+
+    def test_cmd_pr_create_invalid_work_item(self):
+        """Test PR creation fails when work item ID is invalid."""
+        # Setup args with invalid work item
+        args = MagicMock()
+        args.title = "Test PR"
+        args.description = "Test description"
+        args.file = None
+        args.source_branch = "feature/test"
+        args.target_branch = "main"
+        args.work_item = "invalid"
+        args.draft = False
+        args.dry_run = False
+        args.verbose = False
+
+        # Test that SystemExit is raised due to ValidationError
+        with pytest.raises(SystemExit):
+            cmd_pr_create(args)
 
     @patch("sdo_package.pull_requests.get_pr_platform")
     def test_cmd_pr_create_dry_run(self, mock_get_platform):

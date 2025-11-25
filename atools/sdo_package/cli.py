@@ -283,6 +283,8 @@ def pr(ctx):
               help='Source branch for the pull request')
 @click.option('--target-branch', '-t', default='main',
               help='Target branch for the pull request (default: main)')
+@click.option('--work-item', required=True, type=int,
+              help='Work item ID to link to the pull request')
 @click.option('--draft', is_flag=True,
               help='Create as draft pull request')
 @click.option('--dry-run', is_flag=True,
@@ -290,15 +292,15 @@ def pr(ctx):
 @click.option('--verbose', '-v', is_flag=True,
               help='Show detailed API information and responses')
 @click.pass_context
-def create(ctx, file, source_branch, target_branch, draft, dry_run, verbose):
+def create(ctx, file, source_branch, target_branch, work_item, draft, dry_run, verbose):
     """Create a pull request from markdown file.
 
     The markdown file should start with a title (# Title) followed by description.
 
     Examples:
-        sdo pr create --file pr.md --source-branch feature/branch
-        sdo pr create -f pr.md -s feature/branch -t develop --draft
-        sdo pr create -f pr.md -s feature/branch --dry-run --verbose
+        sdo pr create --file pr.md --source-branch feature/branch --work-item 123
+        sdo pr create -f pr.md -s feature/branch -t develop --work-item 123 --draft
+        sdo pr create -f pr.md -s feature/branch --work-item 123 --dry-run --verbose
     """
     try:
         # Convert click context to args object for compatibility
@@ -306,6 +308,7 @@ def create(ctx, file, source_branch, target_branch, draft, dry_run, verbose):
         args.file = file
         args.source_branch = source_branch
         args.target_branch = target_branch
+        args.work_item = work_item
         args.draft = draft
         args.dry_run = dry_run
         args.verbose = verbose

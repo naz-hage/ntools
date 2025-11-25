@@ -150,6 +150,18 @@ def cmd_pr_create(args: argparse.Namespace) -> None:
         draft = getattr(args, 'draft', False)
         dry_run = getattr(args, 'dry_run', False)
 
+        # Validate required work item
+        if not work_item_id:
+            raise ValidationError("Work item ID is required when creating a pull request")
+        
+        # Ensure work item ID is valid
+        try:
+            work_item_id = int(work_item_id)
+            if work_item_id <= 0:
+                raise ValueError()
+        except (ValueError, TypeError):
+            raise ValidationError(f"Invalid work item ID: {work_item_id}. Must be a positive integer.")
+
         if dry_run:
             print("[DRY RUN] Would create PR with:")
             print(f"  Title: {title}")
