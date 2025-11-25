@@ -30,6 +30,14 @@ class ValidationError(SDOError):
     pass
 
 
+class FileOperationError(SDOError):
+    """Raised when file operations fail."""
+
+    def __init__(self, message: str, file_path: str = None, details: str = None):
+        super().__init__(message, details)
+        self.file_path = file_path
+
+
 class AuthenticationError(SDOError):
     """Raised when authentication fails."""
     pass

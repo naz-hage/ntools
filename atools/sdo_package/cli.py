@@ -15,6 +15,14 @@ from .repositories import (
     cmd_repo_list,
     cmd_repo_delete
 )
+from .pull_requests import (
+    cmd_pr_create,
+    cmd_pr_show,
+    cmd_pr_list,
+    cmd_pr_update,
+    cmd_pr_merge,
+    cmd_pr_approve
+)
 from .version import __version__
 
 
@@ -24,8 +32,8 @@ CLI_DOCSTRING = f"""SDO {__version__} - Simple DevOps Operations Tool
 A modern CLI tool for Azure DevOps and GitHub operations.
 
 PLATFORM SUPPORT:
-- Azure DevOps: Work items (PBIs, Tasks, Bugs, Epics) and repository management
-- GitHub: Work items (Issues) and repository management
+- Azure DevOps: Work items (PBIs, Tasks, Bugs, Epics), repositories, and pull requests
+- GitHub: Work items (Issues), repositories, and pull requests
 
 Environment Variables:
     AZURE_DEVOPS_PAT    - Personal Access Token for Azure DevOps (required for Azure DevOps operations)
@@ -242,6 +250,315 @@ def delete(ctx, verbose):
     try:
         # Call the business logic
         result = cmd_repo_delete(verbose=verbose)
+
+        if result != 0:
+            sys.exit(result)
+
+    except (SDOError, ConfigurationError, ValidationError) as e:
+        click.echo(f"❌ {str(e)}", err=True)
+        if ctx.obj.get('verbose'):
+            click.echo(f"   Error type: {type(e).__name__}", err=True)
+            if hasattr(e, 'details'):
+                click.echo(f"   Details: {e.details}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"❌ Unexpected error: {str(e)}", err=True)
+        if ctx.obj.get('verbose'):
+            import traceback
+            click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
+        sys.exit(1)
+
+
+@cli.group()
+@click.pass_context
+def pr(ctx):
+    """Pull request operations."""
+
+
+@pr.command()
+@click.option('--file', '-f', type=click.Path(exists=True, readable=True),
+              required=True,
+              help='Path to markdown file containing PR details')
+@click.option('--source-branch', '-s', required=True,
+              help='Source branch for the pull request')
+@click.option('--target-branch', '-t', default='main',
+              help='Target branch for the pull request (default: main)')
+@click.option('--draft', is_flag=True,
+              help='Create as draft pull request')
+@click.option('--dry-run', is_flag=True,
+              help='Parse and preview PR creation without creating it')
+@click.option('--verbose', '-v', is_flag=True,
+              help='Show detailed API information and responses')
+@click.pass_context
+def create(ctx, file, source_branch, target_branch, draft, dry_run, verbose):
+    """Create a pull request from markdown file.
+
+    The markdown file should start with a title (# Title) followed by description.
+
+    Examples:
+        sdo pr create --file pr.md --source-branch feature/branch
+        sdo pr create -f pr.md -s feature/branch -t develop --draft
+        sdo pr create -f pr.md -s feature/branch --dry-run --verbose
+    """
+    try:
+        # Convert click context to args object for compatibility
+        args = ClickArgs(ctx)
+        args.file = file
+        args.source_branch = source_branch
+        args.target_branch = target_branch
+        args.draft = draft
+        args.dry_run = dry_run
+        args.verbose = verbose
+
+        # Call the business logic
+        result = cmd_pr_create(args)
+
+        if result != 0:
+            sys.exit(result)
+
+    except (SDOError, ConfigurationError, ValidationError) as e:
+        click.echo(f"❌ {str(e)}", err=True)
+        if ctx.obj.get('verbose'):
+            click.echo(f"   Error type: {type(e).__name__}", err=True)
+            if hasattr(e, 'details'):
+                click.echo(f"   Details: {e.details}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"❌ Unexpected error: {str(e)}", err=True)
+        if ctx.obj.get('verbose'):
+            import traceback
+            click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
+        sys.exit(1)
+
+
+@pr.command()
+@click.argument('pr_id', type=int)
+@click.option('--verbose', '-v', is_flag=True,
+              help='Show detailed API information and responses')
+@click.pass_context
+def show(ctx, pr_id, verbose):
+    """Show detailed information about a pull request.
+
+    Examples:
+        sdo pr show 123
+        sdo pr show 123 --verbose
+    """
+      try:
+          # Convert click context to args object for compatibility
+          args = ClickArgs(ctx)
+          args.pr_number = pr_id
+          args.verbose = verbose        # Call the business logic
+        result = cmd_pr_show(args)
+
+        if result != 0:
+            sys.exit(result)
+
+    except (SDOError, ConfigurationError, ValidationError) as e:
+        click.echo(f"❌ {str(e)}", err=True)
+        if ctx.obj.get('verbose'):
+            click.echo(f"   Error type: {type(e).__name__}", err=True)
+            if hasattr(e, 'details'):
+                click.echo(f"   Details: {e.details}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"❌ Unexpected error: {str(e)}", err=True)
+        if ctx.obj.get('verbose'):
+            import traceback
+            click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
+        sys.exit(1)
+
+
+@pr.command()
+@click.argument('pr_number', type=int)
+@click.option('--verbose', '-v', is_flag=True,
+              help='Show detailed API information and responses')
+@click.pass_context
+def status(ctx, pr_number, verbose):
+    """Show status of a pull request.
+
+    Examples:
+        sdo pr status 123
+        sdo pr status 123 --verbose
+    """
+    from .pull_requests import cmd_pr_status
+
+    args = ClickArgs(ctx)
+    args.pr_number = pr_number
+    args.verbose = verbose
+
+    result = cmd_pr_status(args)
+    if result != 0:
+        sys.exit(result)
+
+
+@pr.command()
+@click.option('--status', default='active',
+              type=click.Choice(['active', 'completed', 'abandoned']),
+              help='Filter PRs by status (default: active)')
+@click.option('--top', default=10, type=int,
+              help='Maximum number of PRs to show (default: 10)')
+@click.option('--verbose', '-v', is_flag=True,
+              help='Show detailed API information and responses')
+@click.pass_context
+def ls(ctx, status, top, verbose):
+    """List pull requests in the current repository.
+
+    Examples:
+        sdo pr ls
+        sdo pr ls --status completed --top 20
+        sdo pr ls --verbose
+    """
+    try:
+        # Convert click context to args object for compatibility
+        args = ClickArgs(ctx)
+        args.status = status
+        args.top = top
+        args.verbose = verbose
+
+        # Call the business logic
+        result = cmd_pr_list(args)
+
+        if result != 0:
+            sys.exit(result)
+
+    except (SDOError, ConfigurationError, ValidationError) as e:
+        click.echo(f"❌ {str(e)}", err=True)
+        if ctx.obj.get('verbose'):
+            click.echo(f"   Error type: {type(e).__name__}", err=True)
+            if hasattr(e, 'details'):
+                click.echo(f"   Details: {e.details}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"❌ Unexpected error: {str(e)}", err=True)
+        if ctx.obj.get('verbose'):
+            import traceback
+            click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
+        sys.exit(1)
+
+
+@pr.command()
+@click.option('--pr-id', required=True, type=int,
+              help='Pull request ID to update')
+@click.option('--file', '-f', type=click.Path(exists=True, readable=True),
+              help='Path to markdown file with updated PR details')
+@click.option('--title', '-t',
+              help='New title for the pull request')
+@click.option('--status',
+              type=click.Choice(['active', 'abandoned', 'completed']),
+              help='New status for the pull request')
+@click.option('--verbose', '-v', is_flag=True,
+              help='Show detailed API information and responses')
+@click.pass_context
+def update(ctx, pr_id, file, title, status, verbose):
+    """Update an existing pull request.
+
+    Examples:
+        sdo pr update --pr-id 123 --title "New Title"
+        sdo pr update --pr-id 123 --file updated-pr.md
+        sdo pr update --pr-id 123 --status completed
+    """
+    try:
+        # Convert click context to args object for compatibility
+        args = ClickArgs(ctx)
+        args.pr_id = pr_id
+        args.file = file
+        args.title = title
+        args.status = status
+        args.verbose = verbose
+
+        # Call the business logic
+        result = cmd_pr_update(args)
+
+        if result != 0:
+            sys.exit(result)
+
+    except (SDOError, ConfigurationError, ValidationError) as e:
+        click.echo(f"❌ {str(e)}", err=True)
+        if ctx.obj.get('verbose'):
+            click.echo(f"   Error type: {type(e).__name__}", err=True)
+            if hasattr(e, 'details'):
+                click.echo(f"   Details: {e.details}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"❌ Unexpected error: {str(e)}", err=True)
+        if ctx.obj.get('verbose'):
+            import traceback
+            click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
+        sys.exit(1)
+
+
+@pr.command()
+@click.argument('pr_id', type=int)
+@click.option('--strategy', default='merge',
+              type=click.Choice(['merge', 'squash', 'rebase', 'fast-forward']),
+              help='Merge strategy to use (default: merge)')
+@click.option('--delete-source', is_flag=True,
+              help='Delete the source branch after merging')
+@click.option('--verbose', '-v', is_flag=True,
+              help='Show detailed API information and responses')
+@click.pass_context
+def merge(ctx, pr_id, strategy, delete_source, verbose):
+    """Merge a pull request.
+
+    Examples:
+        sdo pr merge 123
+        sdo pr merge 123 --strategy squash --delete-source
+        sdo pr merge 123 --verbose
+    """
+    try:
+        # Convert click context to args object for compatibility
+        args = ClickArgs(ctx)
+        args.pr_id = pr_id
+        args.strategy = strategy
+        args.delete_source = delete_source
+        args.verbose = verbose
+
+        # Call the business logic
+        result = cmd_pr_merge(args)
+
+        if result != 0:
+            sys.exit(result)
+
+    except (SDOError, ConfigurationError, ValidationError) as e:
+        click.echo(f"❌ {str(e)}", err=True)
+        if ctx.obj.get('verbose'):
+            click.echo(f"   Error type: {type(e).__name__}", err=True)
+            if hasattr(e, 'details'):
+                click.echo(f"   Details: {e.details}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"❌ Unexpected error: {str(e)}", err=True)
+        if ctx.obj.get('verbose'):
+            import traceback
+            click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
+        sys.exit(1)
+
+
+@pr.command()
+@click.argument('pr_id', type=int)
+@click.option('--vote', default='approve',
+              type=click.Choice(['approve', 'reject', 'wait', 'reset']),
+              help='Vote type (default: approve)')
+@click.option('--verbose', '-v', is_flag=True,
+              help='Show detailed API information and responses')
+@click.pass_context
+def approve(ctx, pr_id, vote, verbose):
+    """Approve or vote on a pull request.
+
+    Examples:
+        sdo pr approve 123
+        sdo pr approve 123 --vote reject
+        sdo pr approve 123 --verbose
+    """
+    try:
+        # Convert click context to args object for compatibility
+        args = ClickArgs(ctx)
+        args.pr_id = pr_id
+        args.vote = vote
+        args.verbose = verbose
+
+        # Call the business logic
+        result = cmd_pr_approve(args)
 
         if result != 0:
             sys.exit(result)
