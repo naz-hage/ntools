@@ -280,7 +280,7 @@ class AzureDevOpsPullRequestPlatform(PRPlatform):
                 "author": pr_data.get("createdBy", {}).get("displayName"),
                 "source_branch": pr_data.get("sourceRefName", "").replace("refs/heads/", ""),
                 "target_branch": pr_data.get("targetRefName", "").replace("refs/heads/", ""),
-                "url": pr_data.get("url") or f"{self.client.base_url}/_git/{self._repository}/pullrequest/{pr_number}",
+                "url": f"{self.client.base_url}/_git/{self._repository}/pullrequest/{pr_number}",
                 "created_at": pr_data.get("creationDate"),
                 "updated_at": pr_data.get("creationDate"),  # Azure DevOps doesn't have updatedAt in basic response
                 "work_items": work_items

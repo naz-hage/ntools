@@ -252,6 +252,10 @@ def cmd_pr_show(args: argparse.Namespace) -> None:
         else:
             print("Work Items: None")
 
+        # Display URL
+        if pr_details.get('url'):
+            print(f"URL: {pr_details['url']}")
+
         if pr_details.get('description'):
             print(f"\nDescription:\n{pr_details['description']}")
 
@@ -423,6 +427,15 @@ def cmd_pr_update(args: argparse.Namespace) -> None:
                 if status:
                     updates.append(f"status: {status}")
                 print(f"Updated: {', '.join(updates)}")
+            
+            # Show the PR URL
+            try:
+                pr_details = platform.get_pull_request(pr_id)
+                if pr_details.get('url'):
+                    print(f"URL: {pr_details['url']}")
+            except Exception:
+                # If we can't get PR details, don't fail the update
+                pass
         else:
             print(f"[ERROR] Failed to update pull request #{pr_id}")
             sys.exit(1)
