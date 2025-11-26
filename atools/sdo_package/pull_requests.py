@@ -381,8 +381,70 @@ def cmd_pr_update(args: argparse.Namespace) -> None:
     Args:
         args: Parsed command line arguments
     """
-    # Placeholder implementation - PR update not yet implemented
-    print("[INFO] PR update functionality is not yet implemented.")
-    print("This feature will be added in a future release.")
+    try:
+        platform = get_pr_platform()
+
+        pr_id = getattr(args, 'pr_id', None)
+        if not pr_id:
+            raise ValidationError("Pull request ID is required")
+
+        # Get update parameters
+        title = getattr(args, 'title', None)
+        status = getattr(args, 'status', None)
+        description = None
+
+        # Read from file if provided
+        if hasattr(args, 'file') and args.file:
+            title_from_file, description = read_markdown_pr_file(args.file)
+            # Use title from file if not explicitly provided
+            if not title:
+                title = title_from_file
+
+        # Validate that at least one field is being updated
+        if not any([title, description, status]):
+            raise ValidationError("At least one field (title, description, or status) must be provided for update")
+
+        # Update the PR
+        success = platform.update_pull_request(
+            pr_number=pr_id,
+            title=title,
+            description=description,
+            status=status
+        )
+
+        if success:
+            print(f"[OK] Pull request #{pr_id} updated successfully!")
+            if getattr(args, 'verbose', False):
+                updates = []
+                if title:
+                    updates.append(f"title: '{title}'")
+                if description:
+                    updates.append("description")
+                if status:
+                    updates.append(f"status: {status}")
+                print(f"Updated: {', '.join(updates)}")
+        else:
+            print(f"[ERROR] Failed to update pull request #{pr_id}")
+            sys.exit(1)
+
+    except (PlatformError, AuthenticationError, ValidationError, FileOperationError) as e:
+        if getattr(args, 'verbose', False):
+            logger.error(f"Failed to update PR: {e}")
+            print(f"[ERROR] {e}")
+        else:
+            # Show simplified error message
+            error_str = str(e).lower()
+            if "not found" in error_str or "does not exist" in error_str:
+                print(f"[ERROR] Pull request #{pr_id} does not exist or is not accessible")
+            else:
+                print(f"[ERROR] Failed to update pull request: {e}")
+        sys.exit(1)
+    except Exception as e:
+        if getattr(args, 'verbose', False):
+            logger.error(f"Unexpected error updating PR: {e}")
+            print(f"[ERROR] An unexpected error occurred: {e}")
+        else:
+            print("[ERROR] Failed to update pull request: An unexpected error occurred")
+        sys.exit(1)
 
 

@@ -11,7 +11,7 @@ import subprocess
 import sys
 from typing import Any, Dict, List, Optional
 
-from ..exceptions import AuthenticationError, PlatformError
+from ..exceptions import AuthenticationError, PlatformError, ValidationError
 from .pr_base import PRPlatform
 
 logger = logging.getLogger(__name__)
@@ -208,3 +208,40 @@ class GitHubPullRequestPlatform(PRPlatform):
                 return False
             except:
                 return False
+
+    def update_pull_request(
+        self,
+        pr_number: int,
+        title: Optional[str] = None,
+        description: Optional[str] = None,
+        status: Optional[str] = None
+    ) -> bool:
+        """Update an existing pull request on GitHub."""
+        try:
+            args = ["pr", "edit", str(pr_number)]
+
+            if title is not None:
+                args.extend(["--title", title])
+
+            if description is not None:
+                args.extend(["--body", description])
+
+            if status is not None:
+                # Map status to GitHub state values
+                state_mapping = {
+                    "active": "open",
+                    "abandoned": "closed",
+                    "completed": "closed"
+                }
+                if status not in state_mapping:
+                    raise ValidationError(f"Invalid status: {status}. Must be one of: active, abandoned, completed")
+                args.extend(["--state", state_mapping[status]])
+
+            if len(args) == 2:  # Only ["pr", "edit", str(pr_number)]
+                raise ValidationError("At least one field (title, description, or status) must be provided for update")
+
+            self._run_gh_command(args)
+            return True
+
+        except subprocess.CalledProcessError as e:
+            raise PlatformError(f"Failed to update pull request: {e.stderr.decode() if e.stderr else str(e)}")

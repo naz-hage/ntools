@@ -176,6 +176,63 @@ class AzureDevOpsPullRequestPlatform(PRPlatform):
             logger.error(f"Network error creating PR: {e}")
             raise PlatformError(f"Network error creating pull request: {e}")
 
+    def update_pull_request(
+        self,
+        pr_number: int,
+        title: Optional[str] = None,
+        description: Optional[str] = None,
+        status: Optional[str] = None
+    ) -> bool:
+        """Update an existing pull request in Azure DevOps."""
+        self._ensure_client()
+
+        # Prepare update data
+        update_data = {}
+
+        if title is not None:
+            update_data["title"] = title
+
+        if description is not None:
+            update_data["description"] = description
+
+        if status is not None:
+            # Map status to Azure DevOps status values
+            status_mapping = {
+                "active": "active",
+                "abandoned": "abandoned",
+                "completed": "completed"
+            }
+            if status not in status_mapping:
+                raise ValidationError(f"Invalid status: {status}. Must be one of: active, abandoned, completed")
+            update_data["status"] = status_mapping[status]
+
+        if not update_data:
+            raise ValidationError("At least one field (title, description, or status) must be provided for update")
+
+        try:
+            url = f"{self.client.base_url}/_apis/git/repositories/{self._repository}/pullRequests/{pr_number}"
+            params = {
+                "api-version": self.client.api_version
+            }
+            response = self.client.session.patch(
+                url,
+                params=params,
+                json=update_data,
+                headers={"Content-Type": "application/json"}
+            )
+
+            if response.status_code not in (200, 201):
+                if self.client.verbose:
+                    logger.error(f"Failed to update PR: {response.status_code} - {response.text}")
+                raise PlatformError(f"Failed to update pull request: {response.text}")
+
+            return True
+
+        except requests.RequestException as e:
+            if self.client.verbose:
+                logger.error(f"Network error updating PR: {e}")
+            raise PlatformError(f"Network error updating pull request: {e}")
+
     def get_pull_request(self, pr_number: int) -> Dict[str, Any]:
         """Get details of an Azure DevOps pull request."""
         self._ensure_client()

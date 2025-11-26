@@ -118,7 +118,31 @@ class PRPlatform(ABC):
         pass
 
     @abstractmethod
-    def validate_auth(self) -> bool:
+    def update_pull_request(
+        self,
+        pr_number: int,
+        title: Optional[str] = None,
+        description: Optional[str] = None,
+        status: Optional[str] = None
+    ) -> bool:
+        """
+        Update an existing pull request.
+
+        Args:
+            pr_number: Pull request number/ID to update
+            title: New title (optional)
+            description: New description (optional)
+            status: New status - 'active', 'abandoned', 'completed' (optional)
+
+        Returns:
+            bool: True if update was successful
+
+        Raises:
+            AuthenticationError: If authentication fails
+            PlatformError: If platform operation fails
+            ValidationError: If parameters are invalid
+        """
+        pass
         """
         Validate that the platform is properly authenticated.
 
