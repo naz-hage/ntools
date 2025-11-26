@@ -155,7 +155,8 @@ class GitHubPullRequestPlatform(PRPlatform):
             "target_branch": data.get("baseRefName"),
             "url": data.get("url"),
             "created_at": data.get("createdAt"),
-            "updated_at": data.get("updatedAt")
+            "updated_at": data.get("updatedAt"),
+            "work_items": []  # GitHub doesn't have work items
         }
 
     def list_pull_requests(

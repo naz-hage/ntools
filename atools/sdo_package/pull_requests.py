@@ -222,6 +222,13 @@ def cmd_pr_show(args: argparse.Namespace) -> None:
         print(f"Source: {pr_details.get('source_branch', 'N/A')}")
         print(f"Target: {pr_details.get('target_branch', 'N/A')}")
 
+        # Display work items if present
+        work_items = pr_details.get('work_items', [])
+        if work_items:
+            print(f"Work Items: {', '.join(map(str, work_items))}")
+        else:
+            print("Work Items: None")
+
         if pr_details.get('description'):
             print(f"\nDescription:\n{pr_details['description']}")
 

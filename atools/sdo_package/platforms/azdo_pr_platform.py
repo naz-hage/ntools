@@ -182,7 +182,8 @@ class AzureDevOpsPullRequestPlatform(PRPlatform):
         try:
             url = f"{self.client.base_url}/_apis/git/repositories/{self._repository}/pullRequests/{pr_number}"
             params = {
-                "api-version": self.client.api_version
+                "api-version": self.client.api_version,
+                "$expand": "workItems"
             }
 
             response = self.client.session.get(url, params=params)
@@ -195,6 +196,24 @@ class AzureDevOpsPullRequestPlatform(PRPlatform):
 
             pr_data = response.json()
 
+            # Get work items linked to this PR using separate endpoint
+            work_items = []
+            try:
+                workitems_url = f"{self.client.base_url}/_apis/git/repositories/{self._repository}/pullRequests/{pr_number}/workitems"
+                workitems_params = {"api-version": self.client.api_version}
+                workitems_response = self.client.session.get(workitems_url, params=workitems_params)
+
+                if workitems_response.status_code == 200:
+                    workitems_data = workitems_response.json()
+                    if workitems_data.get("value"):
+                        for wi in workitems_data["value"]:
+                            if wi.get("id"):
+                                work_items.append(wi["id"])
+                else:
+                    logger.warning(f"Failed to get work items for PR {pr_number}: {workitems_response.status_code} - {workitems_response.text}")
+            except Exception as e:
+                logger.warning(f"Failed to get work items for PR {pr_number}: {e}")
+
             return {
                 "number": pr_data.get("pullRequestId"),
                 "title": pr_data.get("title"),
@@ -205,7 +224,8 @@ class AzureDevOpsPullRequestPlatform(PRPlatform):
                 "target_branch": pr_data.get("targetRefName", "").replace("refs/heads/", ""),
                 "url": pr_data.get("url") or f"{self.client.base_url}/_git/{self._repository}/pullrequest/{pr_number}",
                 "created_at": pr_data.get("creationDate"),
-                "updated_at": pr_data.get("creationDate")  # Azure DevOps doesn't have updatedAt in basic response
+                "updated_at": pr_data.get("creationDate"),  # Azure DevOps doesn't have updatedAt in basic response
+                "work_items": work_items
             }
 
         except requests.RequestException as e:

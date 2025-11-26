@@ -407,6 +407,7 @@ class TestGitHubPullRequestPlatform:
         assert pr["title"] == "Test PR"
         assert pr["status"] == "open"
         assert pr["author"] == "testuser"
+        assert pr["work_items"] == []
 
     @patch("sdo_package.platforms.github_pr_platform.subprocess.run")
     def test_approve_pull_request_success(self, mock_run):
@@ -506,13 +507,16 @@ class TestAzureDevOpsPullRequestPlatform:
         """Test successful Azure DevOps PR retrieval."""
         from sdo_package.platforms.azdo_pr_platform import AzureDevOpsPullRequestPlatform
 
-        # Mock client and response
+        # Mock client and responses
         mock_client = MagicMock()
         mock_client.project = "test-project"
         mock_client.base_url = "https://dev.azure.com/test-org"
-        mock_response = MagicMock()
-        mock_response.status_code = 200
-        mock_response.json.return_value = {
+        mock_client.api_version = "7.1"
+
+        # Mock PR response
+        mock_pr_response = MagicMock()
+        mock_pr_response.status_code = 200
+        mock_pr_response.json.return_value = {
             "pullRequestId": 123,
             "title": "Test PR",
             "description": "Test description",
@@ -521,7 +525,22 @@ class TestAzureDevOpsPullRequestPlatform:
             "sourceRefName": "refs/heads/feature/test",
             "targetRefName": "refs/heads/main"
         }
-        mock_client.session.get.return_value = mock_response
+
+        # Mock work items response
+        mock_wi_response = MagicMock()
+        mock_wi_response.status_code = 200
+        mock_wi_response.json.return_value = {
+            "value": [{"id": 456}]
+        }
+
+        # Configure session.get to return different responses based on URL
+        def mock_get(url, params=None):
+            if "workitems" in url:
+                return mock_wi_response
+            else:
+                return mock_pr_response
+
+        mock_client.session.get.side_effect = mock_get
         mock_client_class.return_value = mock_client
 
         platform = AzureDevOpsPullRequestPlatform()
@@ -533,6 +552,7 @@ class TestAzureDevOpsPullRequestPlatform:
         assert pr["number"] == 123
         assert pr["title"] == "Test PR"
         assert pr["status"] == "open"
+        assert pr["work_items"] == [456]
 
     @patch("sdo_package.platforms.azdo_pr_platform.AzureDevOpsClient")
     def test_approve_pull_request_success(self, mock_client_class):
