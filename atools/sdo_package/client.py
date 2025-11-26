@@ -859,10 +859,11 @@ class AzureDevOpsClient:
             return response.json()
         except requests.RequestException as e:
             if hasattr(e, "response") and e.response and e.response.status_code == 404:
-                if self.verbose:
-                    print(f"Work item #{work_item_id} not found or not accessible")
+                # Work item not found - return None silently for validation purposes
                 return None
-            self._handle_api_error(e, f"getting work item #{work_item_id}")
+            # For other errors, still handle them but don't print unless verbose
+            if self.verbose:
+                self._handle_api_error(e, f"getting work item #{work_item_id}")
             return None
 
     def create_work_item(

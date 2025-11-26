@@ -161,7 +161,8 @@ class AzureDevOpsPullRequestPlatform(PRPlatform):
             )
 
             if response.status_code not in (200, 201):
-                logger.error(f"Failed to create PR: {response.status_code} - {response.text}")
+                if self.client.verbose:
+                    logger.error(f"Failed to create PR: {response.status_code} - {response.text}")
                 raise PlatformError(f"Failed to create pull request: {response.text}")
 
             pr_result = response.json()
