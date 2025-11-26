@@ -26,7 +26,6 @@ from sdo_package.pull_requests import (
     cmd_pr_show,
     cmd_pr_status,
     cmd_pr_list,
-    cmd_pr_approve,
     get_pr_platform,
     read_markdown_pr_file,
 )
@@ -224,28 +223,6 @@ class TestPRCommandHandlers:
         mock_print.assert_any_call("Active Pull Requests (2 found):")
 
     @patch("sdo_package.pull_requests.get_pr_platform")
-    def test_cmd_pr_approve_success(self, mock_get_platform):
-        """Test successful PR approval."""
-        # Setup mock platform
-        mock_platform = MagicMock()
-        mock_platform.approve_pull_request.return_value = True
-        mock_get_platform.return_value = mock_platform
-
-        # Setup args
-        args = MagicMock()
-        args.pr_number = 123
-
-        # Mock stdout to capture output
-        with patch("builtins.print") as mock_print:
-            cmd_pr_approve(args)
-
-        # Verify platform was called correctly
-        mock_platform.approve_pull_request.assert_called_once_with(123)
-
-        # Verify success message
-        mock_print.assert_any_call("[OK] Pull request #123 approved successfully!")
-
-    @patch("sdo_package.pull_requests.get_pr_platform")
     def test_cmd_pr_status_success(self, mock_get_platform):
         """Test successful PR status check."""
         # Setup mock platform
@@ -409,22 +386,6 @@ class TestGitHubPullRequestPlatform:
         assert pr["author"] == "testuser"
         assert pr["work_items"] == []
 
-    @patch("sdo_package.platforms.github_pr_platform.subprocess.run")
-    def test_approve_pull_request_success(self, mock_run):
-        """Test successful GitHub PR approval."""
-        from sdo_package.platforms.github_pr_platform import GitHubPullRequestPlatform
-
-        # Mock successful approval
-        mock_run.return_value = MagicMock()
-
-        platform = GitHubPullRequestPlatform()
-        result = platform.approve_pull_request(123)
-
-        assert result is True
-        # Verify the approve command was called
-        assert any("review" in str(call) and "approve" in str(call) for call in mock_run.call_args_list)
-
-
 class TestAzureDevOpsPullRequestPlatform:
     """Test Azure DevOps PR platform implementation."""
 
@@ -553,33 +514,6 @@ class TestAzureDevOpsPullRequestPlatform:
         assert pr["title"] == "Test PR"
         assert pr["status"] == "open"
         assert pr["work_items"] == [456]
-
-    @patch("sdo_package.platforms.azdo_pr_platform.AzureDevOpsClient")
-    def test_approve_pull_request_success(self, mock_client_class):
-        """Test successful Azure DevOps PR approval."""
-        from sdo_package.platforms.azdo_pr_platform import AzureDevOpsPullRequestPlatform
-
-        # Mock client
-        mock_client = MagicMock()
-        mock_client.project = "test-project"
-        mock_client.base_url = "https://dev.azure.com/test-org"
-        mock_client.get_current_user_id.return_value = "user123"
-        mock_client.session.put.return_value = MagicMock(status_code=200)
-        mock_client_class.return_value = mock_client
-
-        platform = AzureDevOpsPullRequestPlatform()
-        platform.client = mock_client
-        platform._repository = "test-repo"
-
-        # Mock get_pull_request to avoid extra setup
-        with patch.object(platform, 'get_pull_request') as mock_get_pr:
-            mock_get_pr.return_value = {"number": 123}
-
-            result = platform.approve_pull_request(123)
-
-            assert result is True
-            mock_client.session.put.assert_called_once()
-
 
 class TestPRMarkdownParsing:
     """Test PR markdown parsing functionality."""

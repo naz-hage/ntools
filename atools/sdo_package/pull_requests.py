@@ -351,34 +351,6 @@ def cmd_pr_list(args: argparse.Namespace) -> None:
         sys.exit(1)
 
 
-def cmd_pr_approve(args: argparse.Namespace) -> None:
-    """
-    Approve a pull request.
-
-    Args:
-        args: Parsed command line arguments
-    """
-    try:
-        platform = get_pr_platform()
-
-        success = platform.approve_pull_request(args.pr_number)
-
-        if success:
-            print(f"[OK] Pull request #{args.pr_number} approved successfully!")
-        else:
-            print(f"[WARNING] Pull request #{args.pr_number} could not be approved.")
-            print("This may be because you are the author, or you don't have permission.")
-
-    except (PlatformError, AuthenticationError) as e:
-        logger.error(f"Failed to approve PR: {e}")
-        print(f"[ERROR] {e}")
-        sys.exit(1)
-    except Exception as e:
-        logger.error(f"Unexpected error approving PR: {e}")
-        print(f"[ERROR] An unexpected error occurred: {e}")
-        sys.exit(1)
-
-
 def cmd_pr_update(args: argparse.Namespace) -> None:
     """
     Update a pull request.
@@ -391,13 +363,3 @@ def cmd_pr_update(args: argparse.Namespace) -> None:
     print("This feature will be added in a future release.")
 
 
-def cmd_pr_merge(args: argparse.Namespace) -> None:
-    """
-    Merge a pull request.
-
-    Args:
-        args: Parsed command line arguments
-    """
-    # Placeholder implementation - PR merge not yet implemented
-    print("[INFO] PR merge functionality is not yet implemented.")
-    print("This feature will be added in a future release.")

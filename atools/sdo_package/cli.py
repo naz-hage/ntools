@@ -19,9 +19,7 @@ from .pull_requests import (
     cmd_pr_create,
     cmd_pr_show,
     cmd_pr_list,
-    cmd_pr_update,
-    cmd_pr_merge,
-    cmd_pr_approve
+    cmd_pr_update
 )
 from .version import __version__
 
@@ -491,96 +489,6 @@ def update(ctx, pr_id, file, title, status, verbose):
             click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
         sys.exit(1)
 
-
-@pr.command()
-@click.argument('pr_id', type=int)
-@click.option('--strategy', default='merge',
-              type=click.Choice(['merge', 'squash', 'rebase', 'fast-forward']),
-              help='Merge strategy to use (default: merge)')
-@click.option('--delete-source', is_flag=True,
-              help='Delete the source branch after merging')
-@click.option('--verbose', '-v', is_flag=True,
-              help='Show detailed API information and responses')
-@click.pass_context
-def merge(ctx, pr_id, strategy, delete_source, verbose):
-    """Merge a pull request.
-
-    Examples:
-        sdo pr merge 123
-        sdo pr merge 123 --strategy squash --delete-source
-        sdo pr merge 123 --verbose
-    """
-    try:
-        # Convert click context to args object for compatibility
-        args = ClickArgs(ctx)
-        args.pr_id = pr_id
-        args.strategy = strategy
-        args.delete_source = delete_source
-        args.verbose = verbose
-
-        # Call the business logic
-        result = cmd_pr_merge(args)
-
-        if result != 0:
-            sys.exit(result)
-
-    except (SDOError, ConfigurationError, ValidationError) as e:
-        click.echo(f"❌ {str(e)}", err=True)
-        if ctx.obj.get('verbose'):
-            click.echo(f"   Error type: {type(e).__name__}", err=True)
-            if hasattr(e, 'details'):
-                click.echo(f"   Details: {e.details}", err=True)
-        sys.exit(1)
-    except Exception as e:
-        click.echo(f"❌ Unexpected error: {str(e)}", err=True)
-        if ctx.obj.get('verbose'):
-            import traceback
-            click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
-        sys.exit(1)
-
-
-@pr.command()
-@click.argument('pr_id', type=int)
-@click.option('--vote', default='approve',
-              type=click.Choice(['approve', 'reject', 'wait', 'reset']),
-              help='Vote type (default: approve)')
-@click.option('--verbose', '-v', is_flag=True,
-              help='Show detailed API information and responses')
-@click.pass_context
-def approve(ctx, pr_id, vote, verbose):
-    """Approve or vote on a pull request.
-
-    Examples:
-        sdo pr approve 123
-        sdo pr approve 123 --vote reject
-        sdo pr approve 123 --verbose
-    """
-    try:
-        # Convert click context to args object for compatibility
-        args = ClickArgs(ctx)
-        args.pr_id = pr_id
-        args.vote = vote
-        args.verbose = verbose
-
-        # Call the business logic
-        result = cmd_pr_approve(args)
-
-        if result != 0:
-            sys.exit(result)
-
-    except (SDOError, ConfigurationError, ValidationError) as e:
-        click.echo(f"❌ {str(e)}", err=True)
-        if ctx.obj.get('verbose'):
-            click.echo(f"   Error type: {type(e).__name__}", err=True)
-            if hasattr(e, 'details'):
-                click.echo(f"   Details: {e.details}", err=True)
-        sys.exit(1)
-    except Exception as e:
-        click.echo(f"❌ Unexpected error: {str(e)}", err=True)
-        if ctx.obj.get('verbose'):
-            import traceback
-            click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
-        sys.exit(1)
 
 
 def main(args=None):
