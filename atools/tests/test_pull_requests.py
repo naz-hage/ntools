@@ -533,15 +533,18 @@ class TestPRMarkdownParsing:
 class TestGetPRPlatform:
     """Test the get_pr_platform function."""
 
+    @patch("sdo_package.platforms.github_pr_platform.subprocess.run")
     @patch("sdo_package.client.extract_platform_info_from_git")
     @patch("sdo_package.pull_requests.os.environ.get")
-    def test_get_pr_platform_github(self, mock_env_get, mock_extract_platform):
+    def test_get_pr_platform_github(self, mock_env_get, mock_extract_platform, mock_subprocess):
         """Test platform detection for GitHub."""
         from sdo_package.pull_requests import get_pr_platform
         from sdo_package.platforms.github_pr_platform import GitHubPullRequestPlatform
 
         # Setup mocks
         mock_extract_platform.return_value = {'platform': 'github'}
+        # Mock gh CLI validation
+        mock_subprocess.return_value = MagicMock(returncode=0, stdout="gh version 2.0.0")
 
         # Test
         platform = get_pr_platform()
