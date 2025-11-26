@@ -9,6 +9,7 @@ approve, and merge functionality.
 import argparse
 import json
 import logging
+import os
 import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -37,32 +38,34 @@ def get_pr_platform() -> PRPlatform:
     # Import here to avoid circular imports
     from .platforms.github_pr_platform import GitHubPullRequestPlatform
     from .platforms.azdo_pr_platform import AzureDevOpsPullRequestPlatform
+    from .client import extract_platform_info_from_git
 
-    # Check for GitHub remote
-    try:
-        import subprocess
-        result = subprocess.run(
-            ["git", "remote", "-v"],
-            capture_output=True,
-            text=True,
-            check=True,
-            cwd="."
+    # Use the same platform detection logic as repositories.py
+    config = extract_platform_info_from_git()
+    if not config:
+        raise PlatformError(
+            "Could not detect platform from Git remotes. "
+            "Ensure you're in a Git repository with a remote configured for GitHub or Azure DevOps."
         )
 
-        remotes = result.stdout.lower()
-        if "github.com" in remotes:
-            return GitHubPullRequestPlatform()
-        elif any(service in remotes for service in ["dev.azure.com", "visualstudio.com"]):
-            return AzureDevOpsPullRequestPlatform()
-        else:
+    platform = config.get('platform')
+    if platform == 'github':
+        return GitHubPullRequestPlatform()
+    elif platform == 'azdo':
+        # Check for required AZURE_DEVOPS_PAT environment variable
+        pat = os.environ.get('AZURE_DEVOPS_PAT')
+        if not pat:
             raise PlatformError(
-                "No supported Git hosting platform detected. "
-                "Supported platforms: GitHub, Azure DevOps"
+                "AZURE_DEVOPS_PAT environment variable not set. "
+                "Azure DevOps operations require authentication. Please set your Personal Access Token: "
+                "export AZURE_DEVOPS_PAT='your-token-here'"
             )
-    except subprocess.CalledProcessError as e:
-        raise PlatformError(f"Failed to detect Git remote: {e}")
-    except FileNotFoundError:
-        raise PlatformError("Git is not available or not in a Git repository")
+        return AzureDevOpsPullRequestPlatform()
+    else:
+        raise PlatformError(
+            f"Unsupported platform detected: {platform}. "
+            "Supported platforms: GitHub, Azure DevOps"
+        )
 
 
 def read_markdown_pr_file(file_path: str) -> Tuple[str, str]:

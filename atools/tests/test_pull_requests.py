@@ -528,3 +528,90 @@ class TestPRMarkdownParsing:
 
         assert title == "Test PR"
         assert description == "This is a test description."
+
+
+class TestGetPRPlatform:
+    """Test the get_pr_platform function."""
+
+    @patch("sdo_package.client.extract_platform_info_from_git")
+    @patch("sdo_package.pull_requests.os.environ.get")
+    def test_get_pr_platform_github(self, mock_env_get, mock_extract_platform):
+        """Test platform detection for GitHub."""
+        from sdo_package.pull_requests import get_pr_platform
+        from sdo_package.platforms.github_pr_platform import GitHubPullRequestPlatform
+
+        # Setup mocks
+        mock_extract_platform.return_value = {'platform': 'github'}
+
+        # Test
+        platform = get_pr_platform()
+
+        # Verify
+        assert isinstance(platform, GitHubPullRequestPlatform)
+        mock_extract_platform.assert_called_once()
+
+    @patch("sdo_package.client.extract_platform_info_from_git")
+    @patch("sdo_package.pull_requests.os.environ.get")
+    def test_get_pr_platform_azdo_with_pat(self, mock_env_get, mock_extract_platform):
+        """Test platform detection for Azure DevOps with PAT."""
+        from sdo_package.pull_requests import get_pr_platform
+        from sdo_package.platforms.azdo_pr_platform import AzureDevOpsPullRequestPlatform
+
+        # Setup mocks
+        mock_extract_platform.return_value = {'platform': 'azdo'}
+        mock_env_get.return_value = "test-pat"
+
+        # Test
+        platform = get_pr_platform()
+
+        # Verify
+        assert isinstance(platform, AzureDevOpsPullRequestPlatform)
+        mock_extract_platform.assert_called_once()
+        mock_env_get.assert_called_once_with('AZURE_DEVOPS_PAT')
+
+    @patch("sdo_package.client.extract_platform_info_from_git")
+    @patch("sdo_package.pull_requests.os.environ.get")
+    def test_get_pr_platform_azdo_without_pat(self, mock_env_get, mock_extract_platform):
+        """Test platform detection for Azure DevOps without PAT raises error."""
+        from sdo_package.pull_requests import get_pr_platform, PlatformError
+
+        # Setup mocks
+        mock_extract_platform.return_value = {'platform': 'azdo'}
+        mock_env_get.return_value = None
+
+        # Test
+        with pytest.raises(PlatformError) as exc_info:
+            get_pr_platform()
+
+        # Verify
+        assert "AZURE_DEVOPS_PAT environment variable not set" in str(exc_info.value)
+
+    @patch("sdo_package.client.extract_platform_info_from_git")
+    def test_get_pr_platform_unsupported_platform(self, mock_extract_platform):
+        """Test platform detection for unsupported platform raises error."""
+        from sdo_package.pull_requests import get_pr_platform, PlatformError
+
+        # Setup mocks
+        mock_extract_platform.return_value = {'platform': 'bitbucket'}
+
+        # Test
+        with pytest.raises(PlatformError) as exc_info:
+            get_pr_platform()
+
+        # Verify
+        assert "Unsupported platform detected: bitbucket" in str(exc_info.value)
+
+    @patch("sdo_package.client.extract_platform_info_from_git")
+    def test_get_pr_platform_no_platform_detected(self, mock_extract_platform):
+        """Test platform detection when no platform is detected raises error."""
+        from sdo_package.pull_requests import get_pr_platform, PlatformError
+
+        # Setup mocks
+        mock_extract_platform.return_value = None
+
+        # Test
+        with pytest.raises(PlatformError) as exc_info:
+            get_pr_platform()
+
+        # Verify
+        assert "Could not detect platform from Git remotes" in str(exc_info.value)

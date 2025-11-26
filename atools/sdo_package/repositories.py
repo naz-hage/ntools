@@ -370,6 +370,13 @@ def create_repository_platform(config: Dict[str, str], verbose: bool = False) ->
     """
     platform = config.get('platform')
     if platform == 'azdo':
+        # Check for required AZURE_DEVOPS_PAT environment variable
+        pat = os.environ.get('AZURE_DEVOPS_PAT')
+        if not pat:
+            print("❌ AZURE_DEVOPS_PAT environment variable not set")
+            print("Azure DevOps operations require authentication. Please set your Personal Access Token:")
+            print("export AZURE_DEVOPS_PAT='your-token-here'")
+            return None
         return AzureDevOpsRepositoryPlatform(config, verbose)
     elif platform == 'github':
         return GitHubRepositoryPlatform(config, verbose)
