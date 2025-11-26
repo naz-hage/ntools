@@ -10,6 +10,7 @@ This page documents the `sdo` CLI tool. Use this page for detailed prerequisites
 
 - **Work Item Creation**: Parse markdown files and create GitHub issues or Azure DevOps work items (PBIs, Bugs, Tasks)
 - **Repository Management**: Create, list, show, and delete repositories on both platforms
+- **Pull Request Management**: Create, list, show, and update pull requests with work item linking
 - **Multi-Platform Support**: Seamless operations across Azure DevOps and GitHub
 - **Dry-Run Previews**: Preview operations before execution
 - **Automatic Platform Detection**: Detects platform from Git remote configuration
@@ -171,6 +172,142 @@ sdo repo show --verbose
 sdo repo delete  # Will prompt for confirmation
 ```
 
+### Pull Request Operations
+
+#### Create Pull Request
+
+```bash
+sdo pr create [OPTIONS]
+```
+
+Creates a new pull request from a markdown file.
+
+**Options:**
+- `-f, --file PATH` - Path to markdown file containing PR details (required)
+- `--work-item INTEGER` - Work item ID to link to the pull request (required)
+- `--draft` - Create as draft pull request
+- `--dry-run` - Parse and preview PR creation without creating it
+- `-v, --verbose` - Show detailed API information and responses
+
+**Examples:**
+```bash
+# Create PR with dry-run preview
+sdo pr create -f pr-description.md --work-item 123 --dry-run
+
+# Create draft PR
+sdo pr create -f pr-description.md --work-item 123 --draft
+
+# Create PR with verbose output
+sdo pr create -f pr-description.md --work-item 123 --verbose
+```
+
+#### List Pull Requests
+
+```bash
+sdo pr list [OPTIONS]
+```
+
+Lists pull requests in the current repository.
+
+**Options:**
+- `--state STATE` - Filter by state (open, closed, all) [default: open]
+- `--author USER` - Filter by author
+- `--limit INTEGER` - Maximum number of PRs to show [default: 10]
+- `-v, --verbose` - Show detailed API information
+
+**Examples:**
+```bash
+# List open PRs
+sdo pr list
+
+# List all PRs by specific author
+sdo pr list --state all --author john-doe
+
+# List with limit
+sdo pr list --limit 20
+```
+
+#### Show Pull Request Details
+
+```bash
+sdo pr show PR_NUMBER [OPTIONS]
+```
+
+Shows detailed information about a specific pull request.
+
+**Options:**
+- `-v, --verbose` - Show detailed API information
+
+**Examples:**
+```bash
+# Show PR details
+sdo pr show 123
+
+# Show PR with verbose API details
+sdo pr show 123 --verbose
+```
+
+#### Update Pull Request
+
+```bash
+sdo pr update [OPTIONS]
+```
+
+Updates an existing pull request.
+
+**Options:**
+- `--pr-id INTEGER` - Pull request ID to update (required)
+- `--title TEXT` - New title for the PR
+- `--description TEXT` - New description for the PR
+- `--status TEXT` - New status (open, closed)
+- `-v, --verbose` - Show detailed API information
+
+**Examples:**
+```bash
+# Update PR title
+sdo pr update --pr-id 123 --title "Updated PR Title"
+
+# Update PR status to closed
+sdo pr update --pr-id 123 --status closed
+
+# Update both title and description
+sdo pr update --pr-id 123 --title "New Title" --description "New description"
+```
+
+### Examples
+
+#### Pull Request Operations
+
+##### Create Pull Request from Markdown
+
+```bash
+sdo pr create -f pr-description.md --work-item 208
+```
+
+##### Preview PR Creation
+
+```bash
+sdo pr create -f pr-description.md --work-item 208 --dry-run
+```
+
+##### List Recent Pull Requests
+
+```bash
+sdo pr list --limit 5
+```
+
+##### Show Pull Request Details
+
+```bash
+sdo pr show 211
+```
+
+##### Update Pull Request
+
+```bash
+sdo pr update --pr-id 211 --title "Updated: Implement PR Management"
+```
+
 ## Markdown File Format
 
 SDO expects markdown files with specific metadata headers. See the example files:
@@ -202,6 +339,7 @@ Description content here...
 - **Work Item Types**: Product Backlog Item (PBI), Bug, Task
 - **Work Item Fields**: Title, Description, Area Path, Iteration Path, Priority, Effort
 - **Repository Operations**: Create, List, Show, Delete repositories
+- **Pull Request Operations**: Create, List, Show, Update pull requests with work item linking
 - **Authentication**: Personal Access Token (PAT)
 - **API**: REST API integration
 - **Automatic**: Organization/Project detection from Git remote
@@ -210,8 +348,9 @@ Description content here...
 - **Work Item Types**: Issues
 - **Work Item Fields**: Title, Description, Labels, Assignees
 - **Repository Operations**: Create, List, Show, Delete repositories
+- **Pull Request Operations**: Create, List, Show, Update pull requests with issue references
 - **Authentication**: GitHub CLI (`gh`) or Personal Access Token
-- **API**: GitHub CLI integration for repositories, REST API for work items
+- **API**: GitHub CLI integration for repositories, REST API for work items and PRs
 - **Automatic**: Repository detection from Git remote
 
 ## Error Handling
@@ -243,9 +382,10 @@ python -m pytest tests/
 
 ### Test Coverage
 
-All major functionality is tested with 161 test cases covering:
+All major functionality is tested with comprehensive test cases covering:
 - Work item creation workflows
 - Repository management operations
+- Pull request management operations (create, list, show, update)
 - Multi-platform API integrations
 - Error handling and validation
 - CLI command interfaces
@@ -316,7 +456,10 @@ SDO is built with a modular architecture:
 - **`cli.py`** - Click-based command interface
 - **`client.py`** - Azure DevOps REST API client
 - **`work_items.py`** - Business logic for work item operations
+- **`pull_requests.py`** - Business logic for pull request operations
 - **`platforms/`** - Platform-specific implementations (GitHub, Azure DevOps)
+  - `github_pr_platform.py` - GitHub pull request operations
+  - `azdo_pr_platform.py` - Azure DevOps pull request operations
 - **`parsers/`** - Markdown parsing and metadata extraction
 
 ## Development
