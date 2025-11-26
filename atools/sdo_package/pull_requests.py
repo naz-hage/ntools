@@ -162,12 +162,15 @@ def cmd_pr_create(args: argparse.Namespace) -> None:
 
         # Validate work item exists
         try:
-            platform = get_pr_platform()
             # For Azure DevOps, we can check work item existence
-            if hasattr(platform, 'client') and platform.client:
-                work_item = platform.client.get_work_item(work_item_id)
-                if not work_item:
-                    raise ValidationError(f"Work item {work_item_id} does not exist or is not accessible.")
+            if hasattr(platform, 'client') or hasattr(platform, '_ensure_client'):
+                # Ensure client is initialized
+                if hasattr(platform, '_ensure_client'):
+                    platform._ensure_client()
+                if hasattr(platform, 'client') and platform.client:
+                    work_item = platform.client.get_work_item(work_item_id)
+                    if not work_item:
+                        raise ValidationError(f"Work item {work_item_id} does not exist or is not accessible.")
         except (PlatformError, AuthenticationError) as e:
             # If we can't validate (e.g., GitHub platform), log warning but continue
             logger.warning(f"Could not validate work item {work_item_id} existence: {e}")
