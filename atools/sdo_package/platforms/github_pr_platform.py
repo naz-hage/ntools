@@ -145,6 +145,34 @@ class GitHubPullRequestPlatform(PRPlatform):
         result = self._run_gh_command(args)
         data = json.loads(result.stdout)
 
+        # Parse issue references from PR body and title
+        work_items = []
+        body = data.get("body", "")
+        title = data.get("title", "")
+        text_to_search = f"{title}\n{body}"
+        
+        if text_to_search:
+            import re
+            # Remove code blocks (```...``` and `...`) to avoid matching demo/example code
+            text_no_code = re.sub(r'```.*?```', '', text_to_search, flags=re.DOTALL)
+            text_no_code = re.sub(r'`[^`]*`', '', text_no_code)
+            
+            # Look for issue references in the cleaned text
+            issue_patterns = [
+                r'#(\d+)',  # #123
+                r'closes?\s+#(\d+)',  # closes #123
+                r'fixes?\s+#(\d+)',  # fixes #123
+                r'resolves?\s+#(\d+)',  # resolves #123
+                r'related\s+(?:to\s+)?#(\d+)',  # related to #123
+            ]
+            
+            for pattern in issue_patterns:
+                matches = re.findall(pattern, text_no_code, re.IGNORECASE)
+                for match in matches:
+                    issue_num = int(match)
+                    if issue_num not in work_items:
+                        work_items.append(issue_num)
+
         return {
             "number": data.get("number"),
             "title": data.get("title"),
@@ -156,7 +184,7 @@ class GitHubPullRequestPlatform(PRPlatform):
             "url": data.get("url"),
             "created_at": data.get("createdAt"),
             "updated_at": data.get("updatedAt"),
-            "work_items": []  # GitHub doesn't have work items
+            "work_items": work_items  # Issue references for GitHub
         }
 
     def list_pull_requests(

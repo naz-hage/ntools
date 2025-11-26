@@ -100,7 +100,13 @@ def read_markdown_pr_file(file_path: str) -> Tuple[str, str]:
                 title = line[2:].strip()
                 description_lines = lines[i + 1:]
                 break
-            elif line:  # First non-empty line that's not a heading
+            elif line.startswith('<!-- Title:') and line.endswith('-->'):
+                # Parse HTML comment title format
+                title_part = line[12:-3].strip()  # Remove <!-- Title: and -->
+                title = title_part.strip()
+                description_lines = lines[i + 1:]
+                break
+            elif line:  # First non-empty line that's not a heading or comment
                 description_lines = lines[i:]
                 break
 
@@ -175,6 +181,13 @@ def cmd_pr_create(args: argparse.Namespace) -> None:
             # If we can't validate (e.g., GitHub platform), log warning but continue
             logger.warning(f"Could not validate work item {work_item_id} existence: {e}")
 
+        # Modify title to include work item (remove existing brackets and add work item number)
+        if work_item_id and title:
+            # Remove existing [PBI-XXX] or similar bracketed prefixes
+            import re
+            title = re.sub(r'^\s*\[[^\]]*\]\s*', '', title)
+            title = f"{work_item_id}: {title}"
+
         if dry_run:
             print("[DRY RUN] Would create PR with:")
             print(f"  Title: {title}")
@@ -245,12 +258,22 @@ def cmd_pr_show(args: argparse.Namespace) -> None:
         print(f"Source: {pr_details.get('source_branch', 'N/A')}")
         print(f"Target: {pr_details.get('target_branch', 'N/A')}")
 
-        # Display work items if present
+        # Display work items/issues if present
         work_items = pr_details.get('work_items', [])
         if work_items:
-            print(f"Work Items: {', '.join(map(str, work_items))}")
+            # Check if this is GitHub (which shows issue references) or Azure DevOps (work items)
+            platform_name = platform.__class__.__name__
+            if 'GitHub' in platform_name:
+                print(f"Linked Issues: {', '.join(f'#{item}' for item in work_items)}")
+            else:
+                print(f"Work Items: {', '.join(map(str, work_items))}")
         else:
-            print("Work Items: None")
+            # Check if this is GitHub (which shows issue references) or Azure DevOps (work items)
+            platform_name = platform.__class__.__name__
+            if 'GitHub' in platform_name:
+                print("Linked Issues: None")
+            else:
+                print("Work Items: None")
 
         # Display URL
         if pr_details.get('url'):
