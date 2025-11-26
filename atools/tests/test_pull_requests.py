@@ -58,7 +58,7 @@ class TestPRCommandHandlers:
 
         # Verify platform was called correctly
         mock_platform.create_pull_request.assert_called_once_with(
-            title="Test PR",
+            title="123: Test PR",
             description="Test description",
             work_item_id=123,
             draft=False
@@ -131,7 +131,7 @@ class TestPRCommandHandlers:
 
         # Verify dry run output
         mock_print.assert_any_call("[DRY RUN] Would create PR with:")
-        mock_print.assert_any_call("  Title: [123] Test PR")
+        mock_print.assert_any_call("  Title: 123: Test PR")
         mock_print.assert_any_call("  Description: Test description")
         mock_print.assert_any_call("  Source Branch: (current branch)")
         mock_print.assert_any_call("  Target Branch: main")
