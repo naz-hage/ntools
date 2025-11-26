@@ -6,8 +6,8 @@ including command handlers, platform implementations, and error handling.
 """
 
 import json
-import subprocess
 import sys
+
 from pathlib import Path
 from unittest.mock import MagicMock, patch, mock_open
 import pytest

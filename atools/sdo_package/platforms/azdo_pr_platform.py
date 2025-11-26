@@ -5,15 +5,13 @@ This module provides Azure DevOps-specific pull request operations using
 the Azure DevOps REST API with proper authentication and error handling.
 """
 
-import json
 import logging
-import os
 from typing import Any, Dict, List, Optional
 
 import requests
 
 from ..client import AzureDevOpsClient, extract_platform_info_from_git, get_personal_access_token
-from ..exceptions import AuthenticationError, PlatformError
+from ..exceptions import AuthenticationError, PlatformError, ValidationError
 from .pr_base import PRPlatform
 
 logger = logging.getLogger(__name__)
