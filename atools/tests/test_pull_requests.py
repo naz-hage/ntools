@@ -47,8 +47,6 @@ class TestPRCommandHandlers:
         args.title = "Test PR"
         args.description = "Test description"
         args.file = None
-        args.source_branch = "feature/test"
-        args.target_branch = "main"
         args.work_item = 123
         args.draft = False
         args.dry_run = False
@@ -62,8 +60,6 @@ class TestPRCommandHandlers:
         mock_platform.create_pull_request.assert_called_once_with(
             title="Test PR",
             description="Test description",
-            source_branch="feature/test",
-            target_branch="main",
             work_item_id=123,
             draft=False
         )
@@ -121,8 +117,6 @@ class TestPRCommandHandlers:
         args.title = "Test PR"
         args.description = "Test description"
         args.file = None
-        args.source_branch = "feature/test"
-        args.target_branch = "main"
         args.work_item = "123"
         args.draft = True
         args.dry_run = True
@@ -139,7 +133,7 @@ class TestPRCommandHandlers:
         mock_print.assert_any_call("[DRY RUN] Would create PR with:")
         mock_print.assert_any_call("  Title: Test PR")
         mock_print.assert_any_call("  Description: Test description")
-        mock_print.assert_any_call("  Source Branch: feature/test")
+        mock_print.assert_any_call("  Source Branch: (current branch)")
         mock_print.assert_any_call("  Target Branch: main")
         mock_print.assert_any_call("  Work Item: 123")
         mock_print.assert_any_call("  Draft: True")

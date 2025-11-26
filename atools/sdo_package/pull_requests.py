@@ -144,8 +144,6 @@ def cmd_pr_create(args: argparse.Namespace) -> None:
             raise ValidationError("Either --file or --title must be provided")
 
         # Get other parameters
-        source_branch = getattr(args, 'source_branch', None)
-        target_branch = getattr(args, 'target_branch', None)
         work_item_id = getattr(args, 'work_item', None)
         draft = getattr(args, 'draft', False)
         dry_run = getattr(args, 'dry_run', False)
@@ -162,14 +160,24 @@ def cmd_pr_create(args: argparse.Namespace) -> None:
         except (ValueError, TypeError):
             raise ValidationError(f"Invalid work item ID: {work_item_id}. Must be a positive integer.")
 
+        # Validate work item exists
+        try:
+            platform = get_pr_platform()
+            # For Azure DevOps, we can check work item existence
+            if hasattr(platform, 'client') and platform.client:
+                work_item = platform.client.get_work_item(work_item_id)
+                if not work_item:
+                    raise ValidationError(f"Work item {work_item_id} does not exist or is not accessible.")
+        except (PlatformError, AuthenticationError) as e:
+            # If we can't validate (e.g., GitHub platform), log warning but continue
+            logger.warning(f"Could not validate work item {work_item_id} existence: {e}")
+
         if dry_run:
             print("[DRY RUN] Would create PR with:")
             print(f"  Title: {title}")
             print(f"  Description: {description[:100]}{'...' if len(description) > 100 else ''}")
-            if source_branch:
-                print(f"  Source Branch: {source_branch}")
-            if target_branch:
-                print(f"  Target Branch: {target_branch}")
+            print(f"  Source Branch: (current branch)")
+            print(f"  Target Branch: main")
             if work_item_id:
                 print(f"  Work Item: {work_item_id}")
             print(f"  Draft: {draft}")
@@ -180,8 +188,6 @@ def cmd_pr_create(args: argparse.Namespace) -> None:
         pr_url = platform.create_pull_request(
             title=title,
             description=description,
-            source_branch=source_branch,
-            target_branch=target_branch,
             work_item_id=work_item_id,
             draft=draft
         )
