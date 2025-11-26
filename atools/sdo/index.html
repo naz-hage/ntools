@@ -388,6 +388,19 @@ sdo pr show 123
 # Show PR with verbose API details
 sdo pr show 123 --verbose
 </code></pre>
+<h4 id="check-pull-request-status">Check Pull Request Status</h4>
+<pre><code class="language-bash">sdo pr status PR_NUMBER [OPTIONS]
+</code></pre>
+<p>Shows the current status of a specific pull request (open, closed, merged, etc.).</p>
+<p><strong>Options:</strong>
+- <code>-v, --verbose</code> - Show detailed API information</p>
+<p><strong>Examples:</strong></p>
+<pre><code class="language-bash"># Check PR status
+sdo pr status 123
+
+# Check PR status with verbose details
+sdo pr status 123 --verbose
+</code></pre>
 <h4 id="update-pull-request">Update Pull Request</h4>
 <pre><code class="language-bash">sdo pr update [OPTIONS]
 </code></pre>
@@ -421,6 +434,9 @@ sdo pr update --pr-id 123 --title &quot;New Title&quot; --description &quot;New 
 </code></pre>
 <h5 id="show-pull-request-details_1">Show Pull Request Details</h5>
 <pre><code class="language-bash">sdo pr show 211
+</code></pre>
+<h5 id="check-pull-request-status_1">Check Pull Request Status</h5>
+<pre><code class="language-bash">sdo pr status 211
 </code></pre>
 <h5 id="update-pull-request_1">Update Pull Request</h5>
 <pre><code class="language-bash">sdo pr update --pr-id 211 --title &quot;Updated: Implement PR Management&quot;
