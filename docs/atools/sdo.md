@@ -247,6 +247,26 @@ sdo pr show 123
 sdo pr show 123 --verbose
 ```
 
+#### Check Pull Request Status
+
+```bash
+sdo pr status PR_NUMBER [OPTIONS]
+```
+
+Shows the current status of a specific pull request (open, closed, merged, etc.).
+
+**Options:**
+- `-v, --verbose` - Show detailed API information
+
+**Examples:**
+```bash
+# Check PR status
+sdo pr status 123
+
+# Check PR status with verbose details
+sdo pr status 123 --verbose
+```
+
 #### Update Pull Request
 
 ```bash
@@ -300,6 +320,12 @@ sdo pr list --limit 5
 
 ```bash
 sdo pr show 211
+```
+
+##### Check Pull Request Status
+
+```bash
+sdo pr status 211
 ```
 
 ##### Update Pull Request
