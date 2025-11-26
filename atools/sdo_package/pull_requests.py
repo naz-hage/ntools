@@ -203,11 +203,23 @@ def cmd_pr_create(args: argparse.Namespace) -> None:
 
     except (PlatformError, AuthenticationError, ValidationError, FileOperationError) as e:
         logger.error(f"Failed to create PR: {e}")
-        print(f"[ERROR] {e}")
+        if getattr(args, 'verbose', False):
+            print(f"[ERROR] {e}")
+        else:
+            # Show simplified error message for common cases
+            if "work item" in str(e).lower() and "not exist" in str(e).lower():
+                print("[ERROR] Failed to create PR: Work item does not exist or is not accessible")
+            elif "active pull request" in str(e).lower():
+                print("[ERROR] Failed to create PR: An active pull request already exists for this branch")
+            else:
+                print(f"[ERROR] Failed to create PR: {e}")
         sys.exit(1)
     except Exception as e:
         logger.error(f"Unexpected error creating PR: {e}")
-        print(f"[ERROR] An unexpected error occurred: {e}")
+        if getattr(args, 'verbose', False):
+            print(f"[ERROR] An unexpected error occurred: {e}")
+        else:
+            print("[ERROR] Failed to create PR: An unexpected error occurred")
         sys.exit(1)
 
 
