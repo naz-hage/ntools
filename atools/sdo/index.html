@@ -138,6 +138,10 @@
     </li>
     <li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a>
     </li>
+    <li class="toctree-l4"><a class="reference internal" href="#pull-request-operations">Pull Request Operations</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#examples_1">Examples</a>
+    </li>
         </ul>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#markdown-file-format">Markdown File Format</a>
@@ -231,6 +235,7 @@
 <ul>
 <li><strong>Work Item Creation</strong>: Parse markdown files and create GitHub issues or Azure DevOps work items (PBIs, Bugs, Tasks)</li>
 <li><strong>Repository Management</strong>: Create, list, show, and delete repositories on both platforms</li>
+<li><strong>Pull Request Management</strong>: Create, list, show, and update pull requests with work item linking</li>
 <li><strong>Multi-Platform Support</strong>: Seamless operations across Azure DevOps and GitHub</li>
 <li><strong>Dry-Run Previews</strong>: Preview operations before execution</li>
 <li><strong>Automatic Platform Detection</strong>: Detects platform from Git remote configuration</li>
@@ -330,6 +335,96 @@ sdo repo show --verbose
 <h5 id="delete-repository_1">Delete Repository</h5>
 <pre><code class="language-bash">sdo repo delete  # Will prompt for confirmation
 </code></pre>
+<h3 id="pull-request-operations">Pull Request Operations</h3>
+<h4 id="create-pull-request">Create Pull Request</h4>
+<pre><code class="language-bash">sdo pr create [OPTIONS]
+</code></pre>
+<p>Creates a new pull request from a markdown file.</p>
+<p><strong>Options:</strong>
+- <code>-f, --file PATH</code> - Path to markdown file containing PR details (required)
+- <code>--work-item INTEGER</code> - Work item ID to link to the pull request (required)
+- <code>--draft</code> - Create as draft pull request
+- <code>--dry-run</code> - Parse and preview PR creation without creating it
+- <code>-v, --verbose</code> - Show detailed API information and responses</p>
+<p><strong>Examples:</strong></p>
+<pre><code class="language-bash"># Create PR with dry-run preview
+sdo pr create -f pr-description.md --work-item 123 --dry-run
+
+# Create draft PR
+sdo pr create -f pr-description.md --work-item 123 --draft
+
+# Create PR with verbose output
+sdo pr create -f pr-description.md --work-item 123 --verbose
+</code></pre>
+<h4 id="list-pull-requests">List Pull Requests</h4>
+<pre><code class="language-bash">sdo pr list [OPTIONS]
+</code></pre>
+<p>Lists pull requests in the current repository.</p>
+<p><strong>Options:</strong>
+- <code>--state STATE</code> - Filter by state (open, closed, all) [default: open]
+- <code>--author USER</code> - Filter by author
+- <code>--limit INTEGER</code> - Maximum number of PRs to show [default: 10]
+- <code>-v, --verbose</code> - Show detailed API information</p>
+<p><strong>Examples:</strong></p>
+<pre><code class="language-bash"># List open PRs
+sdo pr list
+
+# List all PRs by specific author
+sdo pr list --state all --author john-doe
+
+# List with limit
+sdo pr list --limit 20
+</code></pre>
+<h4 id="show-pull-request-details">Show Pull Request Details</h4>
+<pre><code class="language-bash">sdo pr show PR_NUMBER [OPTIONS]
+</code></pre>
+<p>Shows detailed information about a specific pull request.</p>
+<p><strong>Options:</strong>
+- <code>-v, --verbose</code> - Show detailed API information</p>
+<p><strong>Examples:</strong></p>
+<pre><code class="language-bash"># Show PR details
+sdo pr show 123
+
+# Show PR with verbose API details
+sdo pr show 123 --verbose
+</code></pre>
+<h4 id="update-pull-request">Update Pull Request</h4>
+<pre><code class="language-bash">sdo pr update [OPTIONS]
+</code></pre>
+<p>Updates an existing pull request.</p>
+<p><strong>Options:</strong>
+- <code>--pr-id INTEGER</code> - Pull request ID to update (required)
+- <code>--title TEXT</code> - New title for the PR
+- <code>--description TEXT</code> - New description for the PR
+- <code>--status TEXT</code> - New status (open, closed)
+- <code>-v, --verbose</code> - Show detailed API information</p>
+<p><strong>Examples:</strong></p>
+<pre><code class="language-bash"># Update PR title
+sdo pr update --pr-id 123 --title &quot;Updated PR Title&quot;
+
+# Update PR status to closed
+sdo pr update --pr-id 123 --status closed
+
+# Update both title and description
+sdo pr update --pr-id 123 --title &quot;New Title&quot; --description &quot;New description&quot;
+</code></pre>
+<h3 id="examples_1">Examples</h3>
+<h4 id="pull-request-operations_1">Pull Request Operations</h4>
+<h5 id="create-pull-request-from-markdown">Create Pull Request from Markdown</h5>
+<pre><code class="language-bash">sdo pr create -f pr-description.md --work-item 208
+</code></pre>
+<h5 id="preview-pr-creation">Preview PR Creation</h5>
+<pre><code class="language-bash">sdo pr create -f pr-description.md --work-item 208 --dry-run
+</code></pre>
+<h5 id="list-recent-pull-requests">List Recent Pull Requests</h5>
+<pre><code class="language-bash">sdo pr list --limit 5
+</code></pre>
+<h5 id="show-pull-request-details_1">Show Pull Request Details</h5>
+<pre><code class="language-bash">sdo pr show 211
+</code></pre>
+<h5 id="update-pull-request_1">Update Pull Request</h5>
+<pre><code class="language-bash">sdo pr update --pr-id 211 --title &quot;Updated: Implement PR Management&quot;
+</code></pre>
 <h2 id="markdown-file-format">Markdown File Format</h2>
 <p>SDO expects markdown files with specific metadata headers. See the example files:</p>
 <p><strong>Azure DevOps Examples:</strong>
@@ -354,6 +449,7 @@ Description content here...
 <li><strong>Work Item Types</strong>: Product Backlog Item (PBI), Bug, Task</li>
 <li><strong>Work Item Fields</strong>: Title, Description, Area Path, Iteration Path, Priority, Effort</li>
 <li><strong>Repository Operations</strong>: Create, List, Show, Delete repositories</li>
+<li><strong>Pull Request Operations</strong>: Create, List, Show, Update pull requests with work item linking</li>
 <li><strong>Authentication</strong>: Personal Access Token (PAT)</li>
 <li><strong>API</strong>: REST API integration</li>
 <li><strong>Automatic</strong>: Organization/Project detection from Git remote</li>
@@ -363,8 +459,9 @@ Description content here...
 <li><strong>Work Item Types</strong>: Issues</li>
 <li><strong>Work Item Fields</strong>: Title, Description, Labels, Assignees</li>
 <li><strong>Repository Operations</strong>: Create, List, Show, Delete repositories</li>
+<li><strong>Pull Request Operations</strong>: Create, List, Show, Update pull requests with issue references</li>
 <li><strong>Authentication</strong>: GitHub CLI (<code>gh</code>) or Personal Access Token</li>
-<li><strong>API</strong>: GitHub CLI integration for repositories, REST API for work items</li>
+<li><strong>API</strong>: GitHub CLI integration for repositories, REST API for work items and PRs</li>
 <li><strong>Automatic</strong>: Repository detection from Git remote</li>
 </ul>
 <h2 id="error-handling">Error Handling</h2>
@@ -389,9 +486,10 @@ python -m pytest tests/
 <li><strong>Error Path Tests</strong>: Failure scenario handling</li>
 </ul>
 <h3 id="test-coverage">Test Coverage</h3>
-<p>All major functionality is tested with 161 test cases covering:
+<p>All major functionality is tested with comprehensive test cases covering:
 - Work item creation workflows
 - Repository management operations
+- Pull request management operations (create, list, show, update)
 - Multi-platform API integrations
 - Error handling and validation
 - CLI command interfaces
@@ -441,7 +539,10 @@ git remote -v
 <li><strong><code>cli.py</code></strong> - Click-based command interface</li>
 <li><strong><code>client.py</code></strong> - Azure DevOps REST API client</li>
 <li><strong><code>work_items.py</code></strong> - Business logic for work item operations</li>
+<li><strong><code>pull_requests.py</code></strong> - Business logic for pull request operations</li>
 <li><strong><code>platforms/</code></strong> - Platform-specific implementations (GitHub, Azure DevOps)</li>
+<li><code>github_pr_platform.py</code> - GitHub pull request operations</li>
+<li><code>azdo_pr_platform.py</code> - Azure DevOps pull request operations</li>
 <li><strong><code>parsers/</code></strong> - Markdown parsing and metadata extraction</li>
 </ul>
 <h2 id="development">Development</h2>
