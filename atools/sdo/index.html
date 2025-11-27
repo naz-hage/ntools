@@ -409,19 +409,19 @@ sdo pr status 123 --verbose
 <p>Updates an existing pull request.</p>
 <p><strong>Options:</strong>
 - <code>--pr-id INTEGER</code> - Pull request ID to update (required)
-- <code>--title TEXT</code> - New title for the PR
-- <code>--description TEXT</code> - New description for the PR
-- <code>--status TEXT</code> - New status (open, closed)
+- <code>-f, --file PATH</code> - Path to markdown file with updated PR details
+- <code>-t, --title TEXT</code> - New title for the PR
+- <code>--status STATUS</code> - New status (active, abandoned, completed)
 - <code>-v, --verbose</code> - Show detailed API information</p>
 <p><strong>Examples:</strong></p>
 <pre><code class="language-bash"># Update PR title
 sdo pr update --pr-id 123 --title &quot;Updated PR Title&quot;
 
-# Update PR status to closed
-sdo pr update --pr-id 123 --status closed
+# Update PR from markdown file
+sdo pr update --pr-id 123 --file updated-pr.md
 
-# Update both title and description
-sdo pr update --pr-id 123 --title &quot;New Title&quot; --description &quot;New description&quot;
+# Update PR status to completed
+sdo pr update --pr-id 123 --status completed
 </code></pre>
 <h3 id="examples_1">Examples</h3>
 <h4 id="pull-request-operations_1">Pull Request Operations</h4>
