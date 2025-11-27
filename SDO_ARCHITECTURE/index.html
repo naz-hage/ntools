@@ -132,7 +132,7 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#2-cli-layer-clipy">2. CLI Layer (cli.py)</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#3-business-logic-layer-work_itemspy-repositoriespy">3. Business Logic Layer (work_items.py &amp; repositories.py)</a>
+    <li class="toctree-l3"><a class="reference internal" href="#3-business-logic-layer-work_itemspy-repositoriespy-pull_requestspy">3. Business Logic Layer (work_items.py, repositories.py &amp; pull_requests.py)</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#4-parser-layer-parsers">4. Parser Layer (parsers/)</a>
         <ul>
@@ -149,6 +149,12 @@
     <li class="toctree-l4"><a class="reference internal" href="#azure-devops-platform-azdo_platformpy">Azure DevOps Platform (azdo_platform.py)</a>
     </li>
     <li class="toctree-l4"><a class="reference internal" href="#github-platform-github_platformpy">GitHub Platform (github_platform.py)</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#pull-request-platform-pr_basepy">Pull Request Platform (pr_base.py)</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#azure-devops-pr-platform-azdo_pr_platformpy">Azure DevOps PR Platform (azdo_pr_platform.py)</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#github-pr-platform-github_pr_platformpy">GitHub PR Platform (github_pr_platform.py)</a>
     </li>
         </ul>
     </li>
@@ -279,6 +285,7 @@
 │   ├── cli.py                      # CLI command implementations
 │   ├── client.py                   # Azure DevOps REST API client
 │   ├── exceptions.py               # Custom exception classes
+│   ├── pull_requests.py            # Pull request operations (multi-platform)
 │   ├── repositories.py             # Repository operations (multi-platform)
 │   ├── version.py                  # Version information
 │   ├── work_items.py               # Work item orchestration logic
@@ -289,8 +296,11 @@
 │   └── platforms/                  # Platform-specific implementations
 │       ├── __init__.py
 │       ├── base.py                 # Abstract base classes for platforms
+│       ├── pr_base.py              # Abstract base class for PR platforms
 │       ├── azdo_platform.py        # Azure DevOps work item operations
-│       └── github_platform.py      # GitHub work item operations
+│       ├── azdo_pr_platform.py     # Azure DevOps pull request operations
+│       ├── github_platform.py      # GitHub work item operations
+│       └── github_pr_platform.py   # GitHub pull request operations
 ├── tests/                          # Test suite
 │   ├── run_sdo_tests.py            # Test runner script
 │   ├── test_azdo_platform.py       # Azure DevOps platform tests
@@ -298,6 +308,7 @@
 │   ├── test_cli_comprehensive.py   # Comprehensive CLI tests
 │   ├── test_github_platform.py     # GitHub platform tests
 │   ├── test_markdown_parser.py     # Markdown parser tests
+│   ├── test_pull_requests.py       # Pull request operations tests
 │   ├── test_repositories.py        # Repository operations tests
 │   ├── test_sdo.py                 # Main module tests
 │   ├── test_sdo_cli.py             # CLI integration tests
@@ -385,6 +396,7 @@
 - Hierarchical command structure with groups and subcommands
 - Work item operations (<code>sdo workitem create</code>)
 - Repository operations (<code>sdo repo create/show/ls/delete</code>)
+- Pull request operations (<code>sdo pr create/show/status/ls/update</code>)
 - Input validation and sanitization
 - User feedback and progress reporting
 - Error presentation to users</p>
@@ -397,6 +409,12 @@
 │   ├── show            # Show repository information
 │   ├── ls              # List repositories
 │   └── delete          # Delete repositories
+├── pr
+│   ├── create          # Create pull requests from markdown files
+│   ├── show            # Show pull request details
+│   ├── status          # Check pull request status
+│   ├── ls              # List pull requests
+│   └── update          # Update pull request
 └── add-issue           # Legacy compatibility command
 </code></pre>
 <p><strong>Key Features</strong>:
@@ -405,20 +423,23 @@
 - Detailed verbose output for debugging
 - Graceful error handling with helpful messages
 - Global <code>--verbose</code> flag support</p>
-<h3 id="3-business-logic-layer-work_itemspy-repositoriespy">3. Business Logic Layer (work_items.py &amp; repositories.py)</h3>
+<h3 id="3-business-logic-layer-work_itemspy-repositoriespy-pull_requestspy">3. Business Logic Layer (work_items.py, repositories.py &amp; pull_requests.py)</h3>
 <p><strong>Purpose</strong>: Core application logic and orchestration
 <strong>Responsibilities</strong>:
 - Content processing workflow coordination
 - Platform detection and selection
 - Work item creation orchestration (work_items.py)
 - Repository operations orchestration (repositories.py)
+- Pull request operations orchestration (pull_requests.py)
 - Result validation and reporting</p>
 <p><strong>Key Functions</strong>:
 - <code>cmd_workitem_create()</code>: Main work item creation workflow
 - <code>cmd_repo_create/show/ls/delete()</code>: Repository operation workflows
+- <code>cmd_pr_create/show/status/ls/update()</code>: Pull request operation workflows
+- <code>get_pr_platform()</code>: Platform factory for pull request operations
 - Platform factory functions for creating appropriate platform instances
 - Result handling and user feedback</p>
-<p><strong>Architecture Note</strong>: Unlike work items (which have separate platform files), repository operations are consolidated in a single file with platform-specific implementations, as the operations are more similar across platforms.</p>
+<p><strong>Architecture Note</strong>: Repository and pull request operations use abstract base classes with platform-specific implementations, providing a consistent interface across Azure DevOps and GitHub.</p>
 <h3 id="4-parser-layer-parsers">4. Parser Layer (parsers/)</h3>
 <p><strong>Purpose</strong>: Content extraction and metadata processing</p>
 <h4 id="markdownparser-markdown_parserpy">MarkdownParser (markdown_parser.py)</h4>
@@ -503,6 +524,74 @@
 - Automatic repository detection
 - Label and milestone support
 - Error handling for CLI failures</p>
+<h4 id="pull-request-platform-pr_basepy">Pull Request Platform (pr_base.py)</h4>
+<p><strong>Abstract Interface</strong>:</p>
+<pre><code class="language-python">class PRPlatform(ABC):
+    @abstractmethod
+    def create_pull_request(
+        self,
+        title: str,
+        description: str,
+        source_branch: Optional[str] = None,
+        target_branch: Optional[str] = None,
+        work_item_id: Optional[int] = None,
+        draft: bool = False
+    ) -&gt; str:
+        &quot;&quot;&quot;Create a new pull request.&quot;&quot;&quot;
+
+    @abstractmethod
+    def get_pull_request(self, pr_number: int) -&gt; Dict[str, Any]:
+        &quot;&quot;&quot;Get details of a specific pull request.&quot;&quot;&quot;
+
+    @abstractmethod
+    def list_pull_requests(
+        self,
+        state: str = &quot;open&quot;,
+        author: Optional[str] = None,
+        limit: int = 10
+    ) -&gt; List[Dict[str, Any]]:
+        &quot;&quot;&quot;List pull requests with optional filtering.&quot;&quot;&quot;
+
+    @abstractmethod
+    def approve_pull_request(self, pr_number: int) -&gt; bool:
+        &quot;&quot;&quot;Approve a pull request.&quot;&quot;&quot;
+
+    @abstractmethod
+    def update_pull_request(
+        self,
+        pr_number: int,
+        title: Optional[str] = None,
+        description: Optional[str] = None,
+        status: Optional[str] = None
+    ) -&gt; bool:
+        &quot;&quot;&quot;Update an existing pull request.&quot;&quot;&quot;
+
+    @abstractmethod
+    def validate_auth(self) -&gt; bool:
+        &quot;&quot;&quot;Validate that the platform is properly authenticated.&quot;&quot;&quot;
+</code></pre>
+<h4 id="azure-devops-pr-platform-azdo_pr_platformpy">Azure DevOps PR Platform (azdo_pr_platform.py)</h4>
+<p><strong>Responsibilities</strong>:
+- Azure DevOps Pull Request REST API integration
+- PR creation with work item linking
+- PR status and review management
+- Work item reference validation</p>
+<p><strong>Key Features</strong>:
+- Work item linking and validation
+- Draft PR support
+- Branch auto-detection
+- Comprehensive error handling</p>
+<h4 id="github-pr-platform-github_pr_platformpy">GitHub PR Platform (github_pr_platform.py)</h4>
+<p><strong>Responsibilities</strong>:
+- GitHub CLI integration for PRs
+- PR creation with issue references
+- Issue linking extraction from PR description
+- PR management via gh CLI</p>
+<p><strong>Key Features</strong>:
+- GitHub CLI command execution
+- Automatic issue reference detection
+- Draft PR support
+- Repository context detection</p>
 <h3 id="7-repository-operations-repositoriespy">7. Repository Operations (repositories.py)</h3>
 <p><strong>Purpose</strong>: Multi-platform repository management
 <strong>Responsibilities</strong>:
@@ -548,6 +637,7 @@
      ↓
 Work Items: Content Parsing → Platform Selection → Work Item Creation
 Repository: Git Remote Parsing → Platform Selection → Repository Operations
+Pull Requests: Content Parsing → Platform Selection → PR Operations
      ↓
 Result Reporting ← Success/Error Aggregation ← API/CLI Calls
 </code></pre>
@@ -659,6 +749,8 @@ CLI Error Presenter → Console Output with Context
 <li>Interactive mode for work item creation</li>
 <li>Repository cloning and initialization features</li>
 <li>Branch management operations</li>
+<li>PR review and approval workflows</li>
+<li>PR merge operations with conflict resolution</li>
 </ul>
 <h3 id="2-architecture-evolution">2. <strong>Architecture Evolution</strong></h3>
 <ul>
