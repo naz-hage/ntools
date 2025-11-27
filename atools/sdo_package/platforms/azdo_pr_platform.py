@@ -35,8 +35,8 @@ class AzureDevOpsPullRequestPlatform(PRPlatform):
     def validate_auth(self) -> bool:
         """Validate Azure DevOps authentication."""
         try:
-            if not self.client:
-                self.client = AzureDevOpsClient()
+            # Ensure client is initialized before validation
+            self._ensure_client()
 
             # Try to get user profile to validate auth
             self.client.get_user_profile()
@@ -107,7 +107,7 @@ class AzureDevOpsPullRequestPlatform(PRPlatform):
         description: str,
         source_branch: Optional[str] = None,
         target_branch: Optional[str] = None,
-        work_item_id: Optional[str] = None,
+        work_item_id: Optional[int] = None,
         draft: bool = False
     ) -> str:
         """Create a pull request in Azure DevOps."""

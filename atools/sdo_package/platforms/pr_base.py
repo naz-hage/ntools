@@ -26,7 +26,7 @@ class PRPlatform(ABC):
         description: str,
         source_branch: Optional[str] = None,
         target_branch: Optional[str] = None,
-        work_item_id: Optional[str] = None,
+        work_item_id: Optional[int] = None,
         draft: bool = False
     ) -> str:
         """
@@ -143,6 +143,9 @@ class PRPlatform(ABC):
             ValidationError: If parameters are invalid
         """
         pass
+
+    @abstractmethod
+    def validate_auth(self) -> bool:
         """
         Validate that the platform is properly authenticated.
 

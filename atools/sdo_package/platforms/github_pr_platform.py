@@ -7,6 +7,7 @@ the GitHub CLI (gh) tool for reliable and authenticated API access.
 
 import json
 import logging
+import re
 import subprocess
 import sys
 from typing import Any, Dict, List, Optional
@@ -100,7 +101,7 @@ class GitHubPullRequestPlatform(PRPlatform):
         description: str,
         source_branch: Optional[str] = None,
         target_branch: Optional[str] = None,
-        work_item_id: Optional[str] = None,
+        work_item_id: Optional[int] = None,
         draft: bool = False
     ) -> str:
         """Create a pull request on GitHub."""
@@ -152,18 +153,19 @@ class GitHubPullRequestPlatform(PRPlatform):
         text_to_search = f"{title}\n{body}"
         
         if text_to_search:
-            import re
             # Remove code blocks (```...``` and `...`) to avoid matching demo/example code
             text_no_code = re.sub(r'```.*?```', '', text_to_search, flags=re.DOTALL)
             text_no_code = re.sub(r'`[^`]*`', '', text_no_code)
             
             # Look for issue references in the cleaned text
+            # Using specific GitHub linking keywords instead of generic #123 pattern
+            # to avoid duplicate matching
             issue_patterns = [
-                r'#(\d+)',  # #123
                 r'closes?\s+#(\d+)',  # closes #123
                 r'fixes?\s+#(\d+)',  # fixes #123
                 r'resolves?\s+#(\d+)',  # resolves #123
                 r'related\s+(?:to\s+)?#(\d+)',  # related to #123
+                r'(?:^|\s)#(\d+)',  # #123 at start or after whitespace (standalone references)
             ]
             
             for pattern in issue_patterns:
@@ -228,14 +230,7 @@ class GitHubPullRequestPlatform(PRPlatform):
             self._run_gh_command(args)
             return True
         except PlatformError:
-            # Check if it's because user can't approve their own PR
-            try:
-                pr_data = self.get_pull_request(pr_number)
-                current_user_result = self._run_gh_command(["auth", "status"])
-                # If we get here, the approval failed for other reasons
-                return False
-            except:
-                return False
+            return False
 
     def update_pull_request(
         self,

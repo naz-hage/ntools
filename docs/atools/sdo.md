@@ -204,27 +204,29 @@ sdo pr create -f pr-description.md --work-item 123 --verbose
 #### List Pull Requests
 
 ```bash
-sdo pr list [OPTIONS]
+sdo pr ls [OPTIONS]
 ```
 
 Lists pull requests in the current repository.
 
 **Options:**
-- `--state STATE` - Filter by state (open, closed, all) [default: open]
-- `--author USER` - Filter by author
-- `--limit INTEGER` - Maximum number of PRs to show [default: 10]
+- `--status STATUS` - Filter by status (active, completed, abandoned) [default: active]
+- `--top INTEGER` - Maximum number of PRs to show [default: 10]
 - `-v, --verbose` - Show detailed API information
 
 **Examples:**
 ```bash
-# List open PRs
-sdo pr list
+# List active PRs
+sdo pr ls
 
-# List all PRs by specific author
-sdo pr list --state all --author john-doe
+# List completed PRs
+sdo pr ls --status completed
 
-# List with limit
-sdo pr list --limit 20
+# List with custom limit
+sdo pr ls --top 20
+
+# List with verbose output
+sdo pr ls --verbose
 ```
 
 #### Show Pull Request Details
@@ -313,7 +315,7 @@ sdo pr create -f pr-description.md --work-item 208 --dry-run
 ##### List Recent Pull Requests
 
 ```bash
-sdo pr list --limit 5
+sdo pr ls --top 5
 ```
 
 ##### Show Pull Request Details

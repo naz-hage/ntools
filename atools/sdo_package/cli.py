@@ -306,10 +306,7 @@ def create(ctx, file, work_item, draft, dry_run, verbose):
         args.verbose = verbose
 
         # Call the business logic
-        result = cmd_pr_create(args)
-
-        if result != 0:
-            sys.exit(result)
+        cmd_pr_create(args)
 
     except (SDOError, ConfigurationError, ValidationError) as e:
         click.echo(f"❌ {str(e)}", err=True)
@@ -345,10 +342,7 @@ def show(ctx, pr_id, verbose):
         args.verbose = verbose
 
         # Call the business logic
-        result = cmd_pr_show(args)
-
-        if result != 0:
-            sys.exit(result)
+        cmd_pr_show(args)
 
     except (SDOError, ConfigurationError, ValidationError) as e:
         click.echo(f"❌ {str(e)}", err=True)
@@ -383,9 +377,7 @@ def status(ctx, pr_number, verbose):
     args.pr_number = pr_number
     args.verbose = verbose
 
-    result = cmd_pr_status(args)
-    if result != 0:
-        sys.exit(result)
+    cmd_pr_status(args)
 
 
 @pr.command()
@@ -413,10 +405,7 @@ def ls(ctx, status, top, verbose):
         args.verbose = verbose
 
         # Call the business logic
-        result = cmd_pr_list(args)
-
-        if result != 0:
-            sys.exit(result)
+        cmd_pr_list(args)
 
     except (SDOError, ConfigurationError, ValidationError) as e:
         click.echo(f"❌ {str(e)}", err=True)
@@ -464,10 +453,7 @@ def update(ctx, pr_id, file, title, status, verbose):
         args.verbose = verbose
 
         # Call the business logic
-        result = cmd_pr_update(args)
-
-        if result != 0:
-            sys.exit(result)
+        cmd_pr_update(args)
 
     except (SDOError, ConfigurationError, ValidationError) as e:
         click.echo(f"❌ {str(e)}", err=True)

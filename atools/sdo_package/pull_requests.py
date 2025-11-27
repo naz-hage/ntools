@@ -10,9 +10,10 @@ import argparse
 import json
 import logging
 import os
+import re
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Tuple
 
 from .exceptions import (
     AuthenticationError,
@@ -98,34 +99,28 @@ def read_markdown_pr_file(file_path: str) -> Tuple[str, str]:
         description_lines = []
 
         for i, line in enumerate(lines):
-            line = line.strip()
-            if line.startswith('# '):
-                title = line[2:].strip()
+            stripped_line = line.strip()
+            if stripped_line.startswith('# '):
+                title = stripped_line[2:].strip()
                 description_lines = lines[i + 1:]
                 break
-            elif line.startswith('<!-- Title:') and line.endswith('-->'):
+            elif stripped_line.startswith('<!-- Title:') and stripped_line.endswith('-->'):
                 # Parse HTML comment title format
-                title_part = line[12:-3].strip()  # Remove <!-- Title: and -->
-                title = title_part.strip()
+                title = stripped_line[12:-3].strip()  # Remove <!-- Title: and -->
                 description_lines = lines[i + 1:]
                 break
-            elif line:  # First non-empty line that's not a heading or comment
-                description_lines = lines[i:]
+            elif stripped_line:  # First non-empty line that's not a heading or comment
+                # Use this line as title
+                title = stripped_line
+                description_lines = lines[i + 1:]
                 break
 
-        if not title:
-            # Use first line as title if no heading found
-            title = lines[0].strip() if lines else ""
-
-        # Extract description (skip empty lines at start)
-        description = '\n'.join(description_lines).strip()
-        while description.startswith('\n'):
-            description = description[1:]
-        while description.endswith('\n'):
-            description = description[:-1]
-
+        # Validate title was found
         if not title:
             raise ValidationError("No title found in markdown file")
+
+        # Extract description (strip() removes leading/trailing whitespace including newlines)
+        description = '\n'.join(description_lines).strip()
 
         return title, description
 
@@ -166,7 +161,7 @@ def cmd_pr_create(args: argparse.Namespace) -> None:
             work_item_id = int(work_item_id)
             if work_item_id <= 0:
                 raise ValueError()
-        except (ValueError, TypeError):
+        except ValueError:
             raise ValidationError(f"Invalid work item ID: {work_item_id}. Must be a positive integer.")
 
         # Validate work item exists
@@ -187,7 +182,6 @@ def cmd_pr_create(args: argparse.Namespace) -> None:
         # Modify title to include work item (remove existing brackets and add work item number)
         if work_item_id and title:
             # Remove existing [PBI-XXX] or similar bracketed prefixes
-            import re
             title = re.sub(r'^\s*\[[^\]]*\]\s*', '', title)
             title = f"{work_item_id}: {title}"
 

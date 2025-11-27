@@ -9,24 +9,18 @@ import json
 import sys
 
 from pathlib import Path
-from unittest.mock import MagicMock, patch, mock_open
+from unittest.mock import MagicMock, patch
 import pytest
 
 # Add the atools directory to sys.path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from sdo_package.exceptions import (
-    AuthenticationError,
-    FileOperationError,
-    PlatformError,
-    ValidationError,
-)
+from sdo_package.exceptions import PlatformError
 from sdo_package.pull_requests import (
     cmd_pr_create,
     cmd_pr_show,
     cmd_pr_status,
     cmd_pr_list,
-    get_pr_platform,
     read_markdown_pr_file,
 )
 
@@ -117,7 +111,7 @@ class TestPRCommandHandlers:
         args.title = "Test PR"
         args.description = "Test description"
         args.file = None
-        args.work_item = "123"
+        args.work_item = 123
         args.draft = True
         args.dry_run = True
         args.verbose = False
@@ -576,7 +570,7 @@ class TestGetPRPlatform:
     @patch("sdo_package.pull_requests.os.environ.get")
     def test_get_pr_platform_azdo_without_pat(self, mock_env_get, mock_extract_platform):
         """Test platform detection for Azure DevOps without PAT raises error."""
-        from sdo_package.pull_requests import get_pr_platform, PlatformError
+        from sdo_package.pull_requests import get_pr_platform
 
         # Setup mocks
         mock_extract_platform.return_value = {'platform': 'azdo'}
@@ -592,7 +586,7 @@ class TestGetPRPlatform:
     @patch("sdo_package.client.extract_platform_info_from_git")
     def test_get_pr_platform_unsupported_platform(self, mock_extract_platform):
         """Test platform detection for unsupported platform raises error."""
-        from sdo_package.pull_requests import get_pr_platform, PlatformError
+        from sdo_package.pull_requests import get_pr_platform
 
         # Setup mocks
         mock_extract_platform.return_value = {'platform': 'bitbucket'}
@@ -607,7 +601,7 @@ class TestGetPRPlatform:
     @patch("sdo_package.client.extract_platform_info_from_git")
     def test_get_pr_platform_no_platform_detected(self, mock_extract_platform):
         """Test platform detection when no platform is detected raises error."""
-        from sdo_package.pull_requests import get_pr_platform, PlatformError
+        from sdo_package.pull_requests import get_pr_platform
 
         # Setup mocks
         mock_extract_platform.return_value = None
