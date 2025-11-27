@@ -279,9 +279,9 @@ Updates an existing pull request.
 
 **Options:**
 - `--pr-id INTEGER` - Pull request ID to update (required)
-- `--title TEXT` - New title for the PR
-- `--description TEXT` - New description for the PR
-- `--status TEXT` - New status (open, closed)
+- `-f, --file PATH` - Path to markdown file with updated PR details
+- `-t, --title TEXT` - New title for the PR
+- `--status STATUS` - New status (active, abandoned, completed)
 - `-v, --verbose` - Show detailed API information
 
 **Examples:**
@@ -289,11 +289,11 @@ Updates an existing pull request.
 # Update PR title
 sdo pr update --pr-id 123 --title "Updated PR Title"
 
-# Update PR status to closed
-sdo pr update --pr-id 123 --status closed
+# Update PR from markdown file
+sdo pr update --pr-id 123 --file updated-pr.md
 
-# Update both title and description
-sdo pr update --pr-id 123 --title "New Title" --description "New description"
+# Update PR status to completed
+sdo pr update --pr-id 123 --status completed
 ```
 
 ### Examples
