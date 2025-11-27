@@ -357,23 +357,25 @@ sdo pr create -f pr-description.md --work-item 123 --draft
 sdo pr create -f pr-description.md --work-item 123 --verbose
 </code></pre>
 <h4 id="list-pull-requests">List Pull Requests</h4>
-<pre><code class="language-bash">sdo pr list [OPTIONS]
+<pre><code class="language-bash">sdo pr ls [OPTIONS]
 </code></pre>
 <p>Lists pull requests in the current repository.</p>
 <p><strong>Options:</strong>
-- <code>--state STATE</code> - Filter by state (open, closed, all) [default: open]
-- <code>--author USER</code> - Filter by author
-- <code>--limit INTEGER</code> - Maximum number of PRs to show [default: 10]
+- <code>--status STATUS</code> - Filter by status (active, completed, abandoned) [default: active]
+- <code>--top INTEGER</code> - Maximum number of PRs to show [default: 10]
 - <code>-v, --verbose</code> - Show detailed API information</p>
 <p><strong>Examples:</strong></p>
-<pre><code class="language-bash"># List open PRs
-sdo pr list
+<pre><code class="language-bash"># List active PRs
+sdo pr ls
 
-# List all PRs by specific author
-sdo pr list --state all --author john-doe
+# List completed PRs
+sdo pr ls --status completed
 
-# List with limit
-sdo pr list --limit 20
+# List with custom limit
+sdo pr ls --top 20
+
+# List with verbose output
+sdo pr ls --verbose
 </code></pre>
 <h4 id="show-pull-request-details">Show Pull Request Details</h4>
 <pre><code class="language-bash">sdo pr show PR_NUMBER [OPTIONS]
@@ -430,7 +432,7 @@ sdo pr update --pr-id 123 --title &quot;New Title&quot; --description &quot;New 
 <pre><code class="language-bash">sdo pr create -f pr-description.md --work-item 208 --dry-run
 </code></pre>
 <h5 id="list-recent-pull-requests">List Recent Pull Requests</h5>
-<pre><code class="language-bash">sdo pr list --limit 5
+<pre><code class="language-bash">sdo pr ls --top 5
 </code></pre>
 <h5 id="show-pull-request-details_1">Show Pull Request Details</h5>
 <pre><code class="language-bash">sdo pr show 211
