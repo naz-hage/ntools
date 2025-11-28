@@ -11,10 +11,12 @@ import json
 import logging
 import os
 import re
+import subprocess
 import sys
 from pathlib import Path
 from typing import Tuple
 
+from .client import extract_platform_info_from_git
 from .exceptions import (
     AuthenticationError,
     FileOperationError,
@@ -325,6 +327,81 @@ def cmd_pr_status(args: argparse.Namespace) -> None:
             reviewers = pr_details['reviewers']
             approved = sum(1 for r in reviewers if r.get('vote') == 'approve')
             print(f"Reviews: {approved}/{len(reviewers)} approved")
+
+        # Show CI/CD checks status
+        platform_info = extract_platform_info_from_git()
+        if platform_info:
+            if platform_info.get('platform') == 'github':
+                try:
+                    result = subprocess.run(
+                        ['gh', 'pr', 'checks', str(args.pr_number)],
+                        capture_output=True,
+                        text=True,
+                        encoding='utf-8',
+                        errors='replace',
+                        check=False
+                    )
+                    # Show checks regardless of status (returncode may be 1 if checks failed)
+                    if result.stdout.strip():
+                        print("\nCI/CD Checks:")
+                        print(result.stdout.strip())
+                except FileNotFoundError:
+                    pass  # gh CLI not available
+                except Exception as e:
+                    logger.debug(f"Could not fetch PR checks: {e}")
+            elif platform_info.get('platform') == 'azdo':
+                # Get build statuses for Azure DevOps PR
+                try:
+                    from .client import AzureDevOpsClient, get_personal_access_token
+                    
+                    organization = platform_info.get('organization')
+                    project = platform_info.get('project')
+                    repository = platform_info.get('repository')
+                    pat = get_personal_access_token()
+                    
+                    if organization and project and pat:
+                        client = AzureDevOpsClient(organization, project, pat)
+                        
+                        # Get PR status checks using Azure DevOps API
+                        url = f"{client.base_url}/_apis/git/repositories/{repository}/pullRequests/{args.pr_number}/statuses"
+                        params = {"api-version": "7.1-preview.1"}
+                        response = client.session.get(url, params=params)
+                        
+                        if response.status_code == 200:
+                            statuses_data = response.json()
+                            statuses = statuses_data.get('value', [])
+                            
+                            if statuses:
+                                print("\nCI/CD Checks:")
+                                for status in statuses:
+                                    context_name = status.get('context', {}).get('name', 'Unknown')
+                                    state = status.get('state', 'unknown')
+                                    description = status.get('description', '')
+                                    target_url = status.get('targetUrl', '')
+                                    
+                                    # Map state to icon
+                                    state_icon = {
+                                        'succeeded': '✓',
+                                        'failed': 'X',
+                                        'error': 'X',
+                                        'pending': '○',
+                                        'notApplicable': '-',
+                                        'notSet': '?'
+                                    }.get(state.lower(), '?')
+                                    
+                                    # Format state for display
+                                    state_display = {
+                                        'succeeded': 'pass',
+                                        'failed': 'fail',
+                                        'error': 'fail',
+                                        'pending': 'pending',
+                                        'notApplicable': 'skipping',
+                                        'notSet': 'unknown'
+                                    }.get(state.lower(), state)
+                                    
+                                    print(f"{state_icon}  {context_name:<40} {state_display:<12} {target_url}")
+                except Exception as e:
+                    logger.debug(f"Could not fetch Azure DevOps PR checks: {e}")
 
         if getattr(args, 'verbose', False):
             print(f"\nFull Status Details:")
