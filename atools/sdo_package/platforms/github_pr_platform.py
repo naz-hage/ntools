@@ -37,6 +37,8 @@ class GitHubPullRequestPlatform(PRPlatform):
                 ["gh", "--version"],
                 capture_output=True,
                 text=True,
+                encoding='utf-8',
+                errors='replace',
                 check=True
             )
             logger.debug(f"GitHub CLI version: {result.stdout.strip()}")
@@ -53,6 +55,8 @@ class GitHubPullRequestPlatform(PRPlatform):
                 ["gh", "auth", "status"],
                 capture_output=True,
                 text=True,
+                encoding='utf-8',
+                errors='replace',
                 check=True
             )
             return "Logged in to github.com" in result.stdout
@@ -78,6 +82,8 @@ class GitHubPullRequestPlatform(PRPlatform):
                 cmd,
                 capture_output=True,
                 text=True,
+                encoding='utf-8',
+                errors='replace',
                 check=check
             )
 

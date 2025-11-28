@@ -263,6 +263,8 @@ class TestGitHubPullRequestPlatform:
                 ["gh", "--version"],
                 capture_output=True,
                 text=True,
+                encoding='utf-8',
+                errors='replace',
                 check=True
             )
 

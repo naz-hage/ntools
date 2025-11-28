@@ -360,6 +360,7 @@ class TestWorkItemCommands:
 
     @patch('sdo_package.client.extract_platform_info_from_git')
     @patch('sdo_package.client.AzureDevOpsClient')
+    @patch.dict('os.environ', {'AZURE_DEVOPS_PAT': 'fake-pat-token'})
     def test_cmd_workitem_update_azdo(self, mock_client_class, mock_extract):
         """Test workitem update command for Azure DevOps."""
         # Mock platform detection
