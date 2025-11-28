@@ -1124,6 +1124,35 @@ class AzureDevOpsClient:
             self._handle_api_error(e, f"adding comment to work item #{work_item_id}")
             return None
 
+    def get_work_item_comments(self, work_item_id: int) -> Optional[Dict[str, Any]]:
+        """Get all comments for a work item.
+
+        Args:
+            work_item_id: ID of work item
+
+        Returns:
+            Dict with comments list or None on failure
+        """
+        # Comments API requires preview version
+        url = f"https://dev.azure.com/{self.organization}/{self.project}/_apis/wit/workitems/{work_item_id}/comments?api-version={self.api_version}-preview"
+
+        try:
+            if self.verbose:
+                print(f"Fetching comments for work item #{work_item_id}")
+
+            response = requests.get(url, headers=self.headers)
+            response.raise_for_status()
+
+            comments_data = response.json()
+            if self.verbose:
+                comment_count = len(comments_data.get('comments', []))
+                print(f"Found {comment_count} comments for work item #{work_item_id}")
+
+            return comments_data
+        except requests.RequestException as e:
+            self._handle_api_error(e, f"getting comments for work item #{work_item_id}")
+            return None
+
     def query_work_items(self, wiql: str) -> Optional[Dict[str, Any]]:
         """Execute a WIQL (Work Item Query Language) query.
 
@@ -1245,6 +1274,136 @@ class AzureDevOpsClient:
         except requests.RequestException as e:
             self._handle_api_error(e, "getting work items batch")
             return None
+
+    def get_current_user(self) -> Optional[str]:
+        """Get the currently authenticated user's email address.
+
+        Returns:
+            User email address or None on failure
+        """
+        # Use the Azure DevOps Profile API to get current user
+        url = f"https://app.vssps.visualstudio.com/_apis/profile/profiles/me?api-version={self.api_version}"
+
+        try:
+            response = requests.get(url, headers=self.headers)
+            response.raise_for_status()
+
+            profile = response.json()
+            # Prefer emailAddress which is present for AAD/Work accounts; fallback to publicAlias (display name)
+            email = profile.get("emailAddress") or profile.get("publicAlias") or profile.get("displayName")
+
+            if email and self.verbose:
+                print(f"Current user (Profile API): {email}")
+
+            if email:
+                return email
+        except requests.RequestException:
+            # Try other approaches below
+            if self.verbose:
+                print("Profile API lookup failed; trying connection data...")
+
+        # Fallback 1: Try connectionData to get authenticatedUser uniqueName or id
+        try:
+            conn_url = f"https://dev.azure.com/{self.organization}/_apis/connectionData?api-version={self.api_version}"
+            resp = requests.get(conn_url, headers=self.headers)
+            resp.raise_for_status()
+            connection_data = resp.json()
+            auth_user = connection_data.get("authenticatedUser", {})
+            # Try uniqueName or descriptor
+            unique_name = auth_user.get("uniqueName") or auth_user.get("displayName") or auth_user.get("properties", {}).get("mail")
+            if unique_name:
+                if self.verbose:
+                    print(f"Current user (connectionData): {unique_name}")
+                return unique_name
+        except requests.RequestException:
+            if self.verbose:
+                print("Connection data lookup failed; trying Azure CLI...")
+
+        # Fallback 2: try to extract from Azure CLI if available
+        try:
+            import subprocess
+            result = subprocess.run(
+                ["az", "account", "show", "--query", "user.name", "-o", "tsv"],
+                capture_output=True,
+                text=True,
+                check=True
+            )
+            email = result.stdout.strip()
+            if email and self.verbose:
+                print(f"Current user (Azure CLI): {email}")
+            return email if email else None
+        except Exception:
+            if self.verbose:
+                print("Could not determine current user")
+            return None
+
+    def get_child_work_items(self, parent_id: int) -> Optional[List[Dict[str, Any]]]:
+        """Get all child work items for a given parent work item.
+
+        Args:
+            parent_id: ID of the parent work item
+
+        Returns:
+            List of child work items or None on failure
+        """
+        # Query for child work items using parent relationship
+        wiql = f"""
+        SELECT [System.Id], [System.Title], [System.State], [System.WorkItemType]
+        FROM WorkItemLinks
+        WHERE (Source.[System.Id] = {parent_id})
+        AND ([System.Links.LinkType] = 'System.LinkTypes.Hierarchy-Forward')
+        MODE (MustContain)
+        """
+
+        result = self.query_work_items(wiql)
+        if not result:
+            return None
+
+        # Get work item relations
+        relations = result.get("workItemRelations", [])
+        if not relations:
+            return []
+
+        # Extract target work item IDs (skip the first one which is the source)
+        child_ids = [rel["target"]["id"] for rel in relations if rel.get("target")]
+
+        if not child_ids:
+            return []
+
+        # Batch get work item details
+        ids_str = ",".join(map(str, child_ids))
+        url = f"https://dev.azure.com/{self.organization}/{self.project}/_apis/wit/workitems?ids={ids_str}&api-version={self.api_version}"
+
+        try:
+            response = requests.get(url, headers=self.headers)
+            response.raise_for_status()
+
+            batch_result = response.json()
+            children = batch_result.get("value", [])
+
+            if self.verbose:
+                print(f"Found {len(children)} child work items for #{parent_id}")
+
+            return children
+        except requests.RequestException as e:
+            self._handle_api_error(e, f"getting child work items for #{parent_id}")
+            return None
+
+    def update_work_item_iteration(
+        self, work_item_id: int, iteration_path: str
+    ) -> Optional[Dict[str, Any]]:
+        """Update a work item's iteration path (sprint).
+
+        Args:
+            work_item_id: ID of work item to update
+            iteration_path: New iteration path (e.g., "ProjectName\\Sprint 03")
+
+        Returns:
+            Dict with updated work item information or None on failure
+        """
+        return self.update_work_item(
+            work_item_id=work_item_id, iteration_path=iteration_path
+        )
 
     def link_work_item_to_pr(self, repository_name: str, pr_id: int, work_item_id: int) -> bool:
         """Link a work item to a pull request.

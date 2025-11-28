@@ -8,7 +8,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from .exceptions import SDOError, ConfigurationError, ValidationError
-from .work_items import cmd_workitem_create
+from .work_items import cmd_workitem_create, cmd_workitem_list, cmd_workitem_show, cmd_workitem_update, cmd_workitem_comment
 from .repositories import (
     cmd_repo_create,
     cmd_repo_show,
@@ -109,6 +109,173 @@ def create(ctx, file_path, dry_run, verbose):
             click.echo(f"   Error type: {type(e).__name__}", err=True)
             if hasattr(e, 'details'):
                 click.echo(f"   Details: {e.details}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"❌ Unexpected error: {str(e)}", err=True)
+        if ctx.obj.get('verbose'):
+            import traceback
+            click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
+        sys.exit(1)
+
+
+@workitem.command()
+@click.option('--type', type=click.Choice(['PBI', 'Bug', 'Task', 'Spike', 'Epic'], case_sensitive=False),
+              help='Filter by work item type')
+@click.option('--state', type=click.Choice(['New', 'Approved', 'Committed', 'Done', 'To Do', 'In Progress'], case_sensitive=False),
+              help='Filter by state')
+@click.option('--assigned-to', help='Filter by assigned user (email or display name)')
+@click.option('--assigned-to-me', is_flag=True, help='Filter by work items assigned to current user')
+@click.option('--top', type=int, default=50, help='Maximum number of items to return (default: 50)')
+@click.option('--verbose', '-v', is_flag=True, help='Show detailed API information and URLs')
+@click.pass_context
+def list(ctx, type, state, assigned_to, assigned_to_me, top, verbose):
+    """List work items with optional filtering.
+
+    Examples:
+        sdo workitem list
+        sdo workitem list --type Task --state "In Progress"
+        sdo workitem list --assigned-to-me
+        sdo workitem list --type PBI --state New --top 10
+    """
+    try:
+        # Convert click context to args object for compatibility
+        args = ClickArgs(ctx)
+        args.type = type
+        args.state = state
+        args.assigned_to = assigned_to
+        args.assigned_to_me = assigned_to_me
+        args.top = top
+        args.verbose = verbose
+
+        # Call the business logic
+        result = cmd_workitem_list(args)
+        if result != 0:
+            sys.exit(result)
+
+    except (SDOError, ConfigurationError, ValidationError) as e:
+        click.echo(f"❌ {str(e)}", err=True)
+        if ctx.obj.get('verbose'):
+            click.echo(f"   Error type: {type(e).__name__}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"❌ Unexpected error: {str(e)}", err=True)
+        if ctx.obj.get('verbose'):
+            import traceback
+            click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
+        sys.exit(1)
+
+
+@workitem.command()
+@click.option('--id', required=True, type=int, help='Work item ID')
+@click.option('--comments', '-c', is_flag=True, help='Show comments/discussion')
+@click.option('--verbose', '-v', is_flag=True, help='Show full API response')
+@click.pass_context
+def show(ctx, id, comments, verbose):
+    """Show detailed work item information.
+
+    Examples:
+        sdo workitem show --id 123
+        sdo workitem show --id 123 --comments
+        sdo workitem show --id 123 --verbose
+    """
+    try:
+        # Convert click context to args object for compatibility
+        args = ClickArgs(ctx)
+        args.id = id
+        args.comments = comments
+        args.verbose = verbose
+
+        # Call the business logic
+        result = cmd_workitem_show(args)
+        if result != 0:
+            sys.exit(result)
+
+    except (SDOError, ConfigurationError, ValidationError) as e:
+        click.echo(f"❌ {str(e)}", err=True)
+        if ctx.obj.get('verbose'):
+            click.echo(f"   Error type: {type(e).__name__}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"❌ Unexpected error: {str(e)}", err=True)
+        if ctx.obj.get('verbose'):
+            import traceback
+            click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
+        sys.exit(1)
+
+
+@workitem.command()
+@click.option('--id', required=True, type=int, help='Work item ID')
+@click.option('--title', help='Update title')
+@click.option('--description', help='Update description')
+@click.option('--assigned-to', help='Update assigned user (email or display name)')
+@click.option('--state', type=click.Choice(['New', 'Approved', 'Committed', 'Done', 'To Do', 'In Progress'], case_sensitive=False),
+              help='Update state')
+@click.option('--verbose', '-v', is_flag=True, help='Show full API response')
+@click.pass_context
+def update(ctx, id, title, description, assigned_to, state, verbose):
+    """Update work item fields.
+
+    Examples:
+        sdo workitem update --id 123 --title "New Title" --state Done
+        sdo workitem update --id 123 --assigned-to "user@company.com"
+        sdo workitem update --id 123 --description "Updated description" --state "In Progress"
+    """
+    try:
+        # Convert click context to args object for compatibility
+        args = ClickArgs(ctx)
+        args.id = id
+        args.title = title
+        args.description = description
+        args.assigned_to = assigned_to
+        args.state = state
+        args.verbose = verbose
+
+        # Call the business logic
+        result = cmd_workitem_update(args)
+        if result != 0:
+            sys.exit(result)
+
+    except (SDOError, ConfigurationError, ValidationError) as e:
+        click.echo(f"❌ {str(e)}", err=True)
+        if ctx.obj.get('verbose'):
+            click.echo(f"   Error type: {type(e).__name__}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"❌ Unexpected error: {str(e)}", err=True)
+        if ctx.obj.get('verbose'):
+            import traceback
+            click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
+        sys.exit(1)
+
+
+@workitem.command()
+@click.option('--id', required=True, type=int, help='Work item ID')
+@click.option('--text', required=True, help='Comment text')
+@click.option('--verbose', '-v', is_flag=True, help='Show full API response')
+@click.pass_context
+def comment(ctx, id, text, verbose):
+    """Add comment to work item.
+
+    Examples:
+        sdo workitem comment --id 123 --text "Fixed the issue"
+        sdo workitem comment --id 123 --text "Work completed successfully" --verbose
+    """
+    try:
+        # Convert click context to args object for compatibility
+        args = ClickArgs(ctx)
+        args.id = id
+        args.text = text
+        args.verbose = verbose
+
+        # Call the business logic
+        result = cmd_workitem_comment(args)
+        if result != 0:
+            sys.exit(result)
+
+    except (SDOError, ConfigurationError, ValidationError) as e:
+        click.echo(f"❌ {str(e)}", err=True)
+        if ctx.obj.get('verbose'):
+            click.echo(f"   Error type: {type(e).__name__}", err=True)
         sys.exit(1)
     except Exception as e:
         click.echo(f"❌ Unexpected error: {str(e)}", err=True)
@@ -496,7 +663,10 @@ def main(args=None):
         click.echo(f"❌ {str(e)}", err=True)
         sys.exit(1)
     except Exception as e:
+        import traceback
         click.echo(f"❌ Unexpected error: {str(e)}", err=True)
+        if '--verbose' in args or '-v' in args or 'VERBOSE' in os.environ:
+            traceback.print_exc()
         sys.exit(1)
 
 
