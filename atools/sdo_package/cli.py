@@ -640,6 +640,8 @@ def update(ctx, pr_id, file, title, status, verbose):
 
 def main(args=None):
     """Main entry point for the CLI."""
+    import builtins  # Import builtins to access the original list type
+    
     if args is None:
         args = sys.argv[1:]
 
@@ -650,7 +652,8 @@ def main(args=None):
 
     try:
         # Handle the case where args is a list vs being called by Click
-        if isinstance(args, list):
+        # Use builtins.list to avoid conflict with our list() function
+        if isinstance(args, builtins.list):
             cli(args, standalone_mode=False)
         else:
             cli()
