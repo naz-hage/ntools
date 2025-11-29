@@ -10,8 +10,8 @@ from pathlib import Path
 # Add the atools directory to sys.path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from sdo_package.work_items import WorkItemManager, WorkItemResult
-from sdo_package.exceptions import PlatformError, ParsingError
+from sdo_package.work_items import WorkItemManager, WorkItemResult  # noqa: E402
+from sdo_package.exceptions import PlatformError, ParsingError  # noqa: E402
 
 
 class TestWorkItemManager:

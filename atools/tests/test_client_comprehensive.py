@@ -4,17 +4,16 @@ Tests API calls, authentication, error handling, and core operations.
 """
 
 import pytest
-from unittest.mock import patch, MagicMock, mock_open
+from unittest.mock import patch, MagicMock
 import requests
-import json
 from pathlib import Path
 import sys
 
 # Add the atools directory to sys.path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from sdo_package.client import AzureDevOpsClient, extract_platform_info_from_git
-from sdo_package.exceptions import AuthenticationError, NetworkError, ConfigurationError
+from sdo_package.client import AzureDevOpsClient, extract_platform_info_from_git  # noqa: E402
+from sdo_package.exceptions import AuthenticationError, NetworkError  # noqa: E402
 
 
 class TestAzureDevOpsClientInit:

@@ -50,8 +50,6 @@ from typing import Dict, Any, Optional, List
 # Import from package
 from .client import (
     AzureDevOpsClient,
-    ConfigManager,
-    ensure_config_exists,
     get_personal_access_token,
     extract_platform_info_from_git,
 )

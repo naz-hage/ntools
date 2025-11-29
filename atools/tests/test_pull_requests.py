@@ -15,8 +15,8 @@ import pytest
 # Add the atools directory to sys.path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from sdo_package.exceptions import PlatformError
-from sdo_package.pull_requests import (
+from sdo_package.exceptions import PlatformError  # noqa: E402
+from sdo_package.pull_requests import (  # noqa: E402
     cmd_pr_create,
     cmd_pr_show,
     cmd_pr_status,

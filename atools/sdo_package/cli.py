@@ -8,17 +8,27 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-from .exceptions import SDOError, ConfigurationError, ValidationError
-from .work_items import (
+from .exceptions import SDOError, ConfigurationError, ValidationError  # noqa: E402
+from .work_items import (  # noqa: E402
     cmd_workitem_create,
     cmd_workitem_list,
     cmd_workitem_show,
     cmd_workitem_update,
     cmd_workitem_comment,
 )
-from .repositories import cmd_repo_create, cmd_repo_show, cmd_repo_list, cmd_repo_delete
-from .pull_requests import cmd_pr_create, cmd_pr_show, cmd_pr_list, cmd_pr_update
-from .version import __version__
+from .repositories import (  # noqa: E402
+    cmd_repo_create,
+    cmd_repo_show,
+    cmd_repo_list,
+    cmd_repo_delete,
+)
+from .pull_requests import (  # noqa: E402
+    cmd_pr_create,
+    cmd_pr_show,
+    cmd_pr_list,
+    cmd_pr_update,
+)
+from .version import __version__  # noqa: E402
 
 
 # Define the CLI docstring with version

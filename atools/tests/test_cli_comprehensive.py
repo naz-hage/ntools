@@ -6,8 +6,6 @@ Tests command parsing, validation, error handling, and integration.
 
 """
 
-import pytest
-
 from unittest.mock import patch, MagicMock
 
 from click.testing import CliRunner
@@ -20,9 +18,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from sdo_package import cli
+from sdo_package import cli  # noqa: E402
 
-from sdo_package.exceptions import SDOError, ConfigurationError, ValidationError
+from sdo_package.exceptions import SDOError  # noqa: E402
 
 
 class TestCLIBasics:

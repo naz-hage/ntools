@@ -3,17 +3,16 @@ Tests for GitHub platform functionality.
 Tests GitHub CLI integration, repository operations, and error handling.
 """
 
-import pytest
-from unittest.mock import patch, MagicMock, call
-import subprocess
+from unittest.mock import patch, MagicMock
+import subprocess  # noqa: F401 - used in @patch("subprocess.run") decorators
 import sys
 from pathlib import Path
 
 # Add the atools directory to sys.path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from sdo_package.platforms.github_platform import GitHubPlatform
-from sdo_package.repositories import GitHubRepositoryPlatform
+from sdo_package.platforms.github_platform import GitHubPlatform  # noqa: E402
+from sdo_package.repositories import GitHubRepositoryPlatform  # noqa: E402
 
 
 class TestGitHubPlatformInit:

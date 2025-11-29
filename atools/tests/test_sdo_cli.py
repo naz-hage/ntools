@@ -11,7 +11,7 @@ from pathlib import Path
 # Add the atools directory to sys.path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from sdo_package import cli
+from sdo_package import cli  # noqa: E402
 
 
 class TestAddIssueCommand:

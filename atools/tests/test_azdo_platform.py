@@ -11,7 +11,7 @@ from pathlib import Path
 # Add the atools directory to sys.path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from sdo_package.platforms.azdo_platform import AzureDevOpsPlatform
+from sdo_package.platforms.azdo_platform import AzureDevOpsPlatform  # noqa: E402
 
 
 class TestAzureDevOpsPlatform:
@@ -407,7 +407,6 @@ class TestAzureDevOpsPlatform:
     def test_create_work_item_dry_run_with_parent_relationship(self):
         """Test dry run work item creation with parent relationship shows verbose output."""
         import io
-        import sys
         from contextlib import redirect_stdout
 
         # Create verbose platform
@@ -443,7 +442,6 @@ class TestAzureDevOpsPlatform:
     def test_create_work_item_dry_run_with_invalid_parent(self):
         """Test dry run work item creation with invalid parent reference."""
         import io
-        import sys
         from contextlib import redirect_stdout
 
         # Create verbose platform

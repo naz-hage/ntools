@@ -9,7 +9,7 @@ import sys
 # Add the atools directory to sys.path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from sdo_package.client import extract_platform_info_from_git
+from sdo_package.client import extract_platform_info_from_git  # noqa: E402
 
 
 class TestExtractPlatformInfoFromGit:

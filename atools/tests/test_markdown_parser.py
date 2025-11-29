@@ -9,7 +9,7 @@ from pathlib import Path
 # Add the atools directory to sys.path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from sdo_package.parsers.markdown_parser import MarkdownParser
+from sdo_package.parsers.markdown_parser import MarkdownParser  # noqa: E402
 
 
 class TestMarkdownParserInit:

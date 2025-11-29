@@ -32,7 +32,6 @@ import json
 import logging
 import os
 import requests
-import subprocess
 import time
 from pathlib import Path
 from typing import Dict, Any, Optional, List
