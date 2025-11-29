@@ -478,11 +478,16 @@ sdo pr show 123 --verbose
 <h4 id="check-pull-request-status">Check Pull Request Status</h4>
 <pre><code class="language-bash">sdo pr status PR_NUMBER [OPTIONS]
 </code></pre>
-<p>Shows the current status of a specific pull request (open, closed, merged, etc.).</p>
+<p>Shows the current status of a specific pull request including CI/CD check results.</p>
+<p>Displays:
+- PR status (open, closed, merged, etc.)
+- Title, author, and branch information
+- CI/CD checks status (GitHub and Azure DevOps)
+- Check results with pass/fail indicators and URLs</p>
 <p><strong>Options:</strong>
 - <code>-v, --verbose</code> - Show detailed API information</p>
 <p><strong>Examples:</strong></p>
-<pre><code class="language-bash"># Check PR status
+<pre><code class="language-bash"># Check PR status with CI/CD checks
 sdo pr status 123
 
 # Check PR status with verbose details
@@ -524,6 +529,17 @@ sdo pr update --pr-id 123 --status completed
 </code></pre>
 <h5 id="check-pull-request-status_1">Check Pull Request Status</h5>
 <pre><code class="language-bash">sdo pr status 211
+</code></pre>
+<p><strong>Output includes CI/CD checks:</strong></p>
+<pre><code>✅ PR #211: MERGED
+Title: [208] Implement Comprehensive Pull Request Management for SDO CLI
+Author: naz-hage
+Branch: gh-208 → main
+
+CI/CD Checks:
+Python Tests    pass    27s     https://github.com/naz-hage/ntools/actions/runs/...
+Publish Docs    pass    13s     https://github.com/naz-hage/ntools/actions/runs/...
+Running a workflow (Release)    pass    3m24s   https://github.com/naz-hage/ntools/actions/runs/...
 </code></pre>
 <h5 id="update-pull-request_1">Update Pull Request</h5>
 <pre><code class="language-bash">sdo pr update --pr-id 211 --title &quot;Updated: Implement PR Management&quot;
