@@ -326,7 +326,7 @@ def repo(ctx):
 @repo.command()
 @click.option("--verbose", "-v", is_flag=True, help="Show detailed API information and responses")
 @click.pass_context
-def create(ctx, verbose):
+def create(ctx, verbose):  # noqa: F811
     """Create a repository in the current project.
 
     The repository name is extracted from the current Git remote.
@@ -362,7 +362,7 @@ def create(ctx, verbose):
 @repo.command()
 @click.option("--verbose", "-v", is_flag=True, help="Show detailed API information and responses")
 @click.pass_context
-def show(ctx, verbose):
+def show(ctx, verbose):  # noqa: F811
     """Show information about the current repository.
 
     The repository name is extracted from the current Git remote.
@@ -486,7 +486,7 @@ def pr(ctx):
 @click.option("--dry-run", is_flag=True, help="Parse and preview PR creation without creating it")
 @click.option("--verbose", "-v", is_flag=True, help="Show detailed API information and responses")
 @click.pass_context
-def create(ctx, file, work_item, draft, dry_run, verbose):
+def create(ctx, file, work_item, draft, dry_run, verbose):  # noqa: F811
     """Create a pull request from markdown file.
 
     The markdown file should start with a title (# Title) followed by description.
@@ -528,7 +528,7 @@ def create(ctx, file, work_item, draft, dry_run, verbose):
 @click.argument("pr_id", type=int)
 @click.option("--verbose", "-v", is_flag=True, help="Show detailed API information and responses")
 @click.pass_context
-def show(ctx, pr_id, verbose):
+def show(ctx, pr_id, verbose):  # noqa: F811
     """Show detailed information about a pull request.
 
     Examples:
@@ -590,7 +590,7 @@ def status(ctx, pr_number, verbose):
 @click.option("--top", default=10, type=int, help="Maximum number of PRs to show (default: 10)")
 @click.option("--verbose", "-v", is_flag=True, help="Show detailed API information and responses")
 @click.pass_context
-def ls(ctx, status, top, verbose):
+def ls(ctx, status, top, verbose):  # noqa: F811
     """List pull requests in the current repository.
 
     Examples:
@@ -640,7 +640,7 @@ def ls(ctx, status, top, verbose):
 )
 @click.option("--verbose", "-v", is_flag=True, help="Show detailed API information and responses")
 @click.pass_context
-def update(ctx, pr_id, file, title, status, verbose):
+def update(ctx, pr_id, file, title, status, verbose):  # noqa: F811
     """Update an existing pull request.
 
     Examples:

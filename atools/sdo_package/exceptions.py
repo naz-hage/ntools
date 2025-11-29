@@ -77,21 +77,3 @@ class NetworkError(SDOError):
     """Raised when network operations fail."""
 
     pass
-
-
-class AuthenticationError(SDOError):
-    """Raised when authentication fails."""
-
-    pass
-
-
-class ConfigurationError(SDOError):
-    """Raised when configuration issues occur."""
-
-    pass
-
-
-class ValidationError(SDOError):
-    """Raised when validation fails."""
-
-    pass
