@@ -283,6 +283,44 @@ python atools\install-sdo.py
 <p><strong>Options:</strong>
 - <code>-f, --file-path PATH</code> - Path to markdown file (required)
 - <code>--dry-run</code> - Parse and preview without creating</p>
+<h4 id="list-work-items">List Work Items</h4>
+<pre><code class="language-bash">sdo workitem list [OPTIONS]
+</code></pre>
+<p>Lists work items with optional filtering. Works with both Azure DevOps and GitHub.</p>
+<p><strong>Options:</strong>
+- <code>--type TYPE</code> - Filter by work item type (PBI, Bug, Task, Spike, Epic)
+- <code>--state STATE</code> - Filter by state (New, Approved, Committed, Done, To Do, In Progress)
+- <code>--assigned-to EMAIL</code> - Filter by assigned user (email or display name)
+- <code>--assigned-to-me</code> - Filter by work items assigned to current user
+- <code>--top INTEGER</code> - Maximum number of items to return (default: 50)
+- <code>-v, --verbose</code> - Show detailed API information and URLs</p>
+<h4 id="show-work-item">Show Work Item</h4>
+<pre><code class="language-bash">sdo workitem show --id ID [OPTIONS]
+</code></pre>
+<p>Shows detailed work item information including acceptance criteria.</p>
+<p><strong>Options:</strong>
+- <code>--id INTEGER</code> - Work item ID (required)
+- <code>-c, --comments</code> - Show comments/discussion
+- <code>-v, --verbose</code> - Show full API response</p>
+<h4 id="update-work-item">Update Work Item</h4>
+<pre><code class="language-bash">sdo workitem update --id ID [OPTIONS]
+</code></pre>
+<p>Updates work item fields.</p>
+<p><strong>Options:</strong>
+- <code>--id INTEGER</code> - Work item ID (required)
+- <code>--title TEXT</code> - Update title
+- <code>--description TEXT</code> - Update description
+- <code>--assigned-to EMAIL</code> - Update assigned user (email or display name)
+- <code>--state STATE</code> - Update state (New, Approved, Committed, Done, To Do, In Progress)
+- <code>-v, --verbose</code> - Show full API response</p>
+<h4 id="add-comment-to-work-item">Add Comment to Work Item</h4>
+<pre><code class="language-bash">sdo workitem comment --id ID --text TEXT [OPTIONS]
+</code></pre>
+<p>Adds a comment to a work item or issue.</p>
+<p><strong>Options:</strong>
+- <code>--id INTEGER</code> - Work item ID (required)
+- <code>--text TEXT</code> - Comment text (required)
+- <code>-v, --verbose</code> - Show full API response</p>
 <h3 id="repository-operations">Repository Operations</h3>
 <h4 id="create-repository">Create Repository</h4>
 <pre><code class="language-bash">sdo repo create [OPTIONS]
@@ -310,14 +348,61 @@ python atools\install-sdo.py
 - <code>-v, --verbose</code> - Show detailed API information</p>
 <h3 id="examples">Examples</h3>
 <h4 id="work-item-operations_1">Work Item Operations</h4>
-<h5 id="dry-run-preview">Dry Run (Preview)</h5>
+<h5 id="create-work-item_1">Create Work Item</h5>
+<h6 id="dry-run-preview">Dry Run (Preview)</h6>
 <pre><code class="language-bash">sdo workitem create --file-path &quot;atools/issue-azdo-example.md&quot; --dry-run
 </code></pre>
-<h5 id="create-azure-devops-work-item">Create Azure DevOps Work Item</h5>
+<h6 id="create-azure-devops-work-item">Create Azure DevOps Work Item</h6>
 <pre><code class="language-bash">sdo workitem create --file-path &quot;atools/issue-azdo-example.md&quot;
 </code></pre>
-<h5 id="create-with-verbose-output">Create with Verbose Output</h5>
+<h6 id="create-with-verbose-output">Create with Verbose Output</h6>
 <pre><code class="language-bash">sdo workitem create --file-path &quot;atools/issue-azdo-example.md&quot; --verbose
+</code></pre>
+<h5 id="list-work-items_1">List Work Items</h5>
+<pre><code class="language-bash"># List all work items
+sdo workitem list
+
+# List only PBIs in &quot;New&quot; state
+sdo workitem list --type PBI --state New
+
+# List work items assigned to you
+sdo workitem list --assigned-to-me
+
+# List tasks in progress with verbose output
+sdo workitem list --type Task --state &quot;In Progress&quot; --verbose
+
+# List top 10 work items
+sdo workitem list --top 10
+</code></pre>
+<h5 id="show-work-item_1">Show Work Item</h5>
+<pre><code class="language-bash"># Show work item details
+sdo workitem show --id 123
+
+# Show work item with comments
+sdo workitem show --id 123 --comments
+
+# Show with verbose API response
+sdo workitem show --id 123 --verbose
+</code></pre>
+<h5 id="update-work-item_1">Update Work Item</h5>
+<pre><code class="language-bash"># Update work item state
+sdo workitem update --id 123 --state &quot;In Progress&quot;
+
+# Update title and description
+sdo workitem update --id 123 --title &quot;New Title&quot; --description &quot;Updated description&quot;
+
+# Assign work item to user
+sdo workitem update --id 123 --assigned-to &quot;user@example.com&quot;
+
+# Update multiple fields
+sdo workitem update --id 123 --state Done --assigned-to &quot;user@example.com&quot; --verbose
+</code></pre>
+<h5 id="add-comment">Add Comment</h5>
+<pre><code class="language-bash"># Add a comment to work item
+sdo workitem comment --id 123 --text &quot;This is a test comment&quot;
+
+# Add comment with verbose output
+sdo workitem comment --id 123 --text &quot;Completed testing&quot; --verbose
 </code></pre>
 <h4 id="repository-operations_1">Repository Operations</h4>
 <h5 id="create-repository_1">Create Repository</h5>
