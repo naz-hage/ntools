@@ -35,7 +35,7 @@ class WorkItemPlatform(ABC):
         description: str,
         metadata: Dict[str, Any],
         acceptance_criteria: Optional[List[str]] = None,
-        dry_run: bool = False
+        dry_run: bool = False,
     ) -> Optional[Dict[str, Any]]:
         """Create a work item on the platform."""
         pass

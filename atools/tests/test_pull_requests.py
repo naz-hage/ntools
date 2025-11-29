@@ -15,8 +15,8 @@ import pytest
 # Add the atools directory to sys.path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from sdo_package.exceptions import PlatformError
-from sdo_package.pull_requests import (
+from sdo_package.exceptions import PlatformError  # noqa: E402
+from sdo_package.pull_requests import (  # noqa: E402
     cmd_pr_create,
     cmd_pr_show,
     cmd_pr_status,
@@ -52,10 +52,7 @@ class TestPRCommandHandlers:
 
         # Verify platform was called correctly
         mock_platform.create_pull_request.assert_called_once_with(
-            title="123: Test PR",
-            description="Test description",
-            work_item_id=123,
-            draft=False
+            title="123: Test PR", description="Test description", work_item_id=123, draft=False
         )
 
         # Verify success message
@@ -144,7 +141,7 @@ class TestPRCommandHandlers:
             "author": "testuser",
             "source_branch": "feature/test",
             "target_branch": "main",
-            "description": "Test description"
+            "description": "Test description",
         }
         mock_get_platform.return_value = mock_platform
 
@@ -177,15 +174,15 @@ class TestPRCommandHandlers:
                 "title": "Test PR 1",
                 "status": "open",
                 "author": "testuser",
-                "url": "https://github.com/test/repo/pull/123"
+                "url": "https://github.com/test/repo/pull/123",
             },
             {
                 "number": 124,
                 "title": "Test PR 2",
                 "status": "open",
                 "author": "testuser2",
-                "url": "https://github.com/test/repo/pull/124"
-            }
+                "url": "https://github.com/test/repo/pull/124",
+            },
         ]
         mock_get_platform.return_value = mock_platform
 
@@ -202,9 +199,7 @@ class TestPRCommandHandlers:
 
         # Verify platform was called correctly
         mock_platform.list_pull_requests.assert_called_once_with(
-            state="open",  # Should be mapped from 'active' to 'open'
-            author=None,
-            limit=10
+            state="open", author=None, limit=10  # Should be mapped from 'active' to 'open'
         )
 
         # Verify output
@@ -216,13 +211,13 @@ class TestPRCommandHandlers:
         # Setup mock platform
         mock_platform = MagicMock()
         mock_pr_data = {
-            'title': 'Test PR',
-            'status': 'active',
-            'author': 'testuser',
-            'source_branch': 'feature/test',
-            'target_branch': 'main',
-            'merge_status': 'ready',
-            'reviewers': [{'vote': 'approve'}, {'vote': 'none'}]
+            "title": "Test PR",
+            "status": "active",
+            "author": "testuser",
+            "source_branch": "feature/test",
+            "target_branch": "main",
+            "merge_status": "ready",
+            "reviewers": [{"vote": "approve"}, {"vote": "none"}],
         }
         mock_platform.get_pull_request.return_value = mock_pr_data
         mock_get_platform.return_value = mock_platform
@@ -263,7 +258,9 @@ class TestGitHubPullRequestPlatform:
                 ["gh", "--version"],
                 capture_output=True,
                 text=True,
-                check=True
+                encoding="utf-8",
+                errors="replace",
+                check=True,
             )
 
     @patch("subprocess.run")
@@ -273,6 +270,7 @@ class TestGitHubPullRequestPlatform:
         mock_run.return_value = MagicMock(stdout="https://github.com/test/repo.git\n")
 
         from sdo_package.platforms.github_pr_platform import GitHubPullRequestPlatform
+
         platform = GitHubPullRequestPlatform()
 
         # This would normally be tested through get_pr_platform, but testing the logic
@@ -298,7 +296,7 @@ class TestGitHubPullRequestPlatform:
             title="Test PR",
             description="Test description",
             source_branch="feature/test",
-            target_branch="main"
+            target_branch="main",
         )
 
         assert url == "https://github.com/test/repo/pull/123"
@@ -313,7 +311,7 @@ class TestGitHubPullRequestPlatform:
         platform = GitHubPullRequestPlatform()
 
         # This should not call subprocess
-        with patch("builtins.print") as mock_print:
+        with patch("builtins.print") as _mock_print:  # noqa: F841
             # We can't actually test dry run here since it's handled at command level
             # But we can verify the platform exists
             assert platform is not None
@@ -325,17 +323,19 @@ class TestGitHubPullRequestPlatform:
 
         # Mock gh command returning JSON
         mock_result = MagicMock()
-        mock_result.stdout = json.dumps([
-            {
-                "number": 123,
-                "title": "Test PR",
-                "state": "open",
-                "author": {"login": "testuser"},
-                "headRefName": "feature/test",
-                "baseRefName": "main",
-                "url": "https://github.com/test/repo/pull/123"
-            }
-        ])
+        mock_result.stdout = json.dumps(
+            [
+                {
+                    "number": 123,
+                    "title": "Test PR",
+                    "state": "open",
+                    "author": {"login": "testuser"},
+                    "headRefName": "feature/test",
+                    "baseRefName": "main",
+                    "url": "https://github.com/test/repo/pull/123",
+                }
+            ]
+        )
         mock_run.return_value = mock_result
 
         platform = GitHubPullRequestPlatform()
@@ -353,16 +353,18 @@ class TestGitHubPullRequestPlatform:
 
         # Mock gh command returning JSON
         mock_result = MagicMock()
-        mock_result.stdout = json.dumps({
-            "number": 123,
-            "title": "Test PR",
-            "body": "Test description",
-            "state": "open",
-            "author": {"login": "testuser"},
-            "headRefName": "feature/test",
-            "baseRefName": "main",
-            "url": "https://github.com/test/repo/pull/123"
-        })
+        mock_result.stdout = json.dumps(
+            {
+                "number": 123,
+                "title": "Test PR",
+                "body": "Test description",
+                "state": "open",
+                "author": {"login": "testuser"},
+                "headRefName": "feature/test",
+                "baseRefName": "main",
+                "url": "https://github.com/test/repo/pull/123",
+            }
+        )
         mock_run.return_value = mock_result
 
         platform = GitHubPullRequestPlatform()
@@ -373,6 +375,7 @@ class TestGitHubPullRequestPlatform:
         assert pr["status"] == "open"
         assert pr["author"] == "testuser"
         assert pr["work_items"] == []
+
 
 class TestAzureDevOpsPullRequestPlatform:
     """Test Azure DevOps PR platform implementation."""
@@ -394,8 +397,7 @@ class TestAzureDevOpsPullRequestPlatform:
         mock_client.project = "test-project"
         mock_client.base_url = "https://dev.azure.com/test-org"
         mock_client.session.post.return_value = MagicMock(
-            status_code=201,
-            json=MagicMock(return_value={"pullRequestId": 123})
+            status_code=201, json=MagicMock(return_value={"pullRequestId": 123})
         )
         mock_client_class.return_value = mock_client
 
@@ -407,10 +409,7 @@ class TestAzureDevOpsPullRequestPlatform:
             platform.client = mock_client
             platform._repository = "test-repo"
 
-            url = platform.create_pull_request(
-                title="Test PR",
-                description="Test description"
-            )
+            url = platform.create_pull_request(title="Test PR", description="Test description")
 
             assert "pullrequest/123" in url
             mock_client.session.post.assert_called_once()
@@ -434,7 +433,7 @@ class TestAzureDevOpsPullRequestPlatform:
                     "status": "active",
                     "createdBy": {"displayName": "testuser"},
                     "sourceRefName": "refs/heads/feature/test",
-                    "targetRefName": "refs/heads/main"
+                    "targetRefName": "refs/heads/main",
                 }
             ]
         }
@@ -472,15 +471,13 @@ class TestAzureDevOpsPullRequestPlatform:
             "status": "active",
             "createdBy": {"displayName": "testuser"},
             "sourceRefName": "refs/heads/feature/test",
-            "targetRefName": "refs/heads/main"
+            "targetRefName": "refs/heads/main",
         }
 
         # Mock work items response
         mock_wi_response = MagicMock()
         mock_wi_response.status_code = 200
-        mock_wi_response.json.return_value = {
-            "value": [{"id": 456}]
-        }
+        mock_wi_response.json.return_value = {"value": [{"id": 456}]}
 
         # Configure session.get to return different responses based on URL
         def mock_get(url, params=None):
@@ -503,6 +500,7 @@ class TestAzureDevOpsPullRequestPlatform:
         assert pr["status"] == "open"
         assert pr["work_items"] == [456]
 
+
 class TestPRMarkdownParsing:
     """Test PR markdown parsing functionality."""
 
@@ -518,7 +516,7 @@ class TestPRMarkdownParsing:
         mock_stat.return_value = MagicMock(st_mode=0o644)  # Read permission
         mock_read_text.return_value = "# Test PR\n\nThis is a test description."
 
-        title, description = read_markdown_pr_file('test.md')
+        title, description = read_markdown_pr_file("test.md")
 
         assert title == "Test PR"
         assert description == "This is a test description."
@@ -536,7 +534,7 @@ class TestGetPRPlatform:
         from sdo_package.platforms.github_pr_platform import GitHubPullRequestPlatform
 
         # Setup mocks
-        mock_extract_platform.return_value = {'platform': 'github'}
+        mock_extract_platform.return_value = {"platform": "github"}
         # Mock gh CLI validation
         mock_subprocess.return_value = MagicMock(returncode=0, stdout="gh version 2.0.0")
 
@@ -555,7 +553,7 @@ class TestGetPRPlatform:
         from sdo_package.platforms.azdo_pr_platform import AzureDevOpsPullRequestPlatform
 
         # Setup mocks
-        mock_extract_platform.return_value = {'platform': 'azdo'}
+        mock_extract_platform.return_value = {"platform": "azdo"}
         mock_env_get.return_value = "test-pat"
 
         # Test
@@ -564,7 +562,7 @@ class TestGetPRPlatform:
         # Verify
         assert isinstance(platform, AzureDevOpsPullRequestPlatform)
         mock_extract_platform.assert_called_once()
-        mock_env_get.assert_called_once_with('AZURE_DEVOPS_PAT')
+        mock_env_get.assert_called_once_with("AZURE_DEVOPS_PAT")
 
     @patch("sdo_package.client.extract_platform_info_from_git")
     @patch("sdo_package.pull_requests.os.environ.get")
@@ -573,7 +571,7 @@ class TestGetPRPlatform:
         from sdo_package.pull_requests import get_pr_platform
 
         # Setup mocks
-        mock_extract_platform.return_value = {'platform': 'azdo'}
+        mock_extract_platform.return_value = {"platform": "azdo"}
         mock_env_get.return_value = None
 
         # Test
@@ -589,7 +587,7 @@ class TestGetPRPlatform:
         from sdo_package.pull_requests import get_pr_platform
 
         # Setup mocks
-        mock_extract_platform.return_value = {'platform': 'bitbucket'}
+        mock_extract_platform.return_value = {"platform": "bitbucket"}
 
         # Test
         with pytest.raises(PlatformError) as exc_info:

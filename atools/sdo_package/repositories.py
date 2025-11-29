@@ -48,10 +48,14 @@ from abc import ABC, abstractmethod
 from typing import Dict, Any, Optional, List
 
 # Import from package
-from .client import AzureDevOpsClient, ConfigManager, ensure_config_exists, get_personal_access_token, extract_platform_info_from_git
+from .client import (
+    AzureDevOpsClient,
+    get_personal_access_token,
+    extract_platform_info_from_git,
+)
 
 # Constants for error messages
-MISSING_PAT_MSG = 'AZURE_DEVOPS_PAT environment variable'
+MISSING_PAT_MSG = "AZURE_DEVOPS_PAT environment variable"
 MISSING_CONFIG_MSG = "Please set AZURE_DEVOPS_PAT environment variable."
 
 
@@ -123,10 +127,7 @@ class AzureDevOpsRepositoryPlatform(RepositoryPlatform):
         try:
             pat = get_personal_access_token()
             client = AzureDevOpsClient(
-                self.config['organization'],
-                self.config['project'],
-                pat,
-                verbose=self.verbose
+                self.config["organization"], self.config["project"], pat, verbose=self.verbose
             )
             return client.create_repository(name)
         except Exception as e:
@@ -138,10 +139,7 @@ class AzureDevOpsRepositoryPlatform(RepositoryPlatform):
         try:
             pat = get_personal_access_token()
             client = AzureDevOpsClient(
-                self.config['organization'],
-                self.config['project'],
-                pat,
-                verbose=self.verbose
+                self.config["organization"], self.config["project"], pat, verbose=self.verbose
             )
             return client.get_repository(name)
         except Exception as e:
@@ -153,10 +151,7 @@ class AzureDevOpsRepositoryPlatform(RepositoryPlatform):
         try:
             pat = get_personal_access_token()
             client = AzureDevOpsClient(
-                self.config['organization'],
-                self.config['project'],
-                pat,
-                verbose=self.verbose
+                self.config["organization"], self.config["project"], pat, verbose=self.verbose
             )
             return client.list_repositories()
         except Exception as e:
@@ -168,10 +163,7 @@ class AzureDevOpsRepositoryPlatform(RepositoryPlatform):
         try:
             pat = get_personal_access_token()
             client = AzureDevOpsClient(
-                self.config['organization'],
-                self.config['project'],
-                pat,
-                verbose=self.verbose
+                self.config["organization"], self.config["project"], pat, verbose=self.verbose
             )
             return client.delete_repository(name)
         except Exception as e:
@@ -194,11 +186,8 @@ class GitHubRepositoryPlatform(RepositoryPlatform):
         """Validate GitHub authentication."""
         try:
             import subprocess
-            result = subprocess.run(
-                ["gh", "auth", "status"],
-                capture_output=True,
-                text=True
-            )
+
+            result = subprocess.run(["gh", "auth", "status"], capture_output=True, text=True)
             if result.returncode == 0:
                 return True
             else:
@@ -220,10 +209,13 @@ class GitHubRepositoryPlatform(RepositoryPlatform):
 
             # Use gh repo create command
             cmd = [
-                "gh", "repo", "create",
+                "gh",
+                "repo",
+                "create",
                 f"{self.config['owner']}/{name}",
                 "--public",  # Default to public, could be made configurable
-                "--description", f"Repository {name}"
+                "--description",
+                f"Repository {name}",
             ]
 
             if self.verbose:
@@ -250,9 +242,12 @@ class GitHubRepositoryPlatform(RepositoryPlatform):
 
             # Use gh repo view command
             cmd = [
-                "gh", "repo", "view",
+                "gh",
+                "repo",
+                "view",
                 f"{self.config['owner']}/{name}",
-                "--json", "name,description,url,createdAt,updatedAt,defaultBranchRef,isPrivate"
+                "--json",
+                "name,description,url,createdAt,updatedAt,defaultBranchRef,isPrivate",
             ]
 
             if self.verbose:
@@ -263,13 +258,13 @@ class GitHubRepositoryPlatform(RepositoryPlatform):
             if result.returncode == 0:
                 repo_data = json.loads(result.stdout)
                 return {
-                    'name': repo_data['name'],
-                    'description': repo_data.get('description', ''),
-                    'webUrl': repo_data['url'],
-                    'defaultBranch': repo_data.get('defaultBranchRef', {}).get('name', 'main'),
-                    'isPrivate': repo_data.get('isPrivate', False),
-                    'createdDate': repo_data.get('createdAt'),
-                    'lastUpdated': repo_data.get('updatedAt')
+                    "name": repo_data["name"],
+                    "description": repo_data.get("description", ""),
+                    "webUrl": repo_data["url"],
+                    "defaultBranch": repo_data.get("defaultBranchRef", {}).get("name", "main"),
+                    "isPrivate": repo_data.get("isPrivate", False),
+                    "createdDate": repo_data.get("createdAt"),
+                    "lastUpdated": repo_data.get("updatedAt"),
                 }
             else:
                 if "Not Found" in result.stderr or "404" in result.stderr:
@@ -290,9 +285,12 @@ class GitHubRepositoryPlatform(RepositoryPlatform):
 
             # Use gh repo list command
             cmd = [
-                "gh", "repo", "list",
-                self.config['owner'],
-                "--json", "name,description,url,createdAt,updatedAt,defaultBranchRef,isPrivate"
+                "gh",
+                "repo",
+                "list",
+                self.config["owner"],
+                "--json",
+                "name,description,url,createdAt,updatedAt,defaultBranchRef,isPrivate",
             ]
 
             if self.verbose:
@@ -304,15 +302,19 @@ class GitHubRepositoryPlatform(RepositoryPlatform):
                 repos_data = json.loads(result.stdout)
                 repos = []
                 for repo_data in repos_data:
-                    repos.append({
-                        'name': repo_data['name'],
-                        'description': repo_data.get('description', ''),
-                        'webUrl': repo_data['url'],
-                        'defaultBranch': repo_data.get('defaultBranchRef', {}).get('name', 'main'),
-                        'isPrivate': repo_data.get('isPrivate', False),
-                        'createdDate': repo_data.get('createdAt'),
-                        'lastUpdated': repo_data.get('updatedAt')
-                    })
+                    repos.append(
+                        {
+                            "name": repo_data["name"],
+                            "description": repo_data.get("description", ""),
+                            "webUrl": repo_data["url"],
+                            "defaultBranch": repo_data.get("defaultBranchRef", {}).get(
+                                "name", "main"
+                            ),
+                            "isPrivate": repo_data.get("isPrivate", False),
+                            "createdDate": repo_data.get("createdAt"),
+                            "lastUpdated": repo_data.get("updatedAt"),
+                        }
+                    )
                 return repos
             else:
                 print(f"❌ Failed to list repositories: {result.stderr.strip()}")
@@ -329,9 +331,11 @@ class GitHubRepositoryPlatform(RepositoryPlatform):
 
             # Use gh repo delete command
             cmd = [
-                "gh", "repo", "delete",
+                "gh",
+                "repo",
+                "delete",
                 f"{self.config['owner']}/{name}",
-                "--yes"  # Skip confirmation prompt
+                "--yes",  # Skip confirmation prompt
             ]
 
             if self.verbose:
@@ -356,7 +360,9 @@ def get_repo_config() -> Optional[Dict[str, str]]:
     return extract_platform_info_from_git()
 
 
-def create_repository_platform(config: Dict[str, str], verbose: bool = False) -> Optional[RepositoryPlatform]:
+def create_repository_platform(
+    config: Dict[str, str], verbose: bool = False
+) -> Optional[RepositoryPlatform]:
     """
     Create the appropriate repository platform instance based on configuration.
 
@@ -368,17 +374,19 @@ def create_repository_platform(config: Dict[str, str], verbose: bool = False) ->
 
     COMMON ENTRY POINT: This function provides unified access to platform-specific implementations
     """
-    platform = config.get('platform')
-    if platform == 'azdo':
+    platform = config.get("platform")
+    if platform == "azdo":
         # Check for required AZURE_DEVOPS_PAT environment variable
-        pat = os.environ.get('AZURE_DEVOPS_PAT')
+        pat = os.environ.get("AZURE_DEVOPS_PAT")
         if not pat:
             print("❌ AZURE_DEVOPS_PAT environment variable not set")
-            print("Azure DevOps operations require authentication. Please set your Personal Access Token:")
+            print(
+                "Azure DevOps operations require authentication. Please set your Personal Access Token:"
+            )
             print("export AZURE_DEVOPS_PAT='your-token-here'")
             return None
         return AzureDevOpsRepositoryPlatform(config, verbose)
-    elif platform == 'github':
+    elif platform == "github":
         return GitHubRepositoryPlatform(config, verbose)
     else:
         print(f"❌ Unsupported platform: {platform}")
@@ -401,7 +409,7 @@ def cmd_repo_create(verbose=False):
         return 1
 
     # Get repository name from config (GitHub uses 'repo', Azure DevOps uses 'repository')
-    repo_name = config.get('repository') or config.get('repo')
+    repo_name = config.get("repository") or config.get("repo")
     if not repo_name:
         print("❌ Could not determine repository name from Git remote")
         return 1
@@ -435,7 +443,7 @@ def cmd_repo_show(verbose=False):
         return 1
 
     # Get repository name from config (GitHub uses 'repo', Azure DevOps uses 'repository')
-    repo_name = config.get('repository') or config.get('repo')
+    repo_name = config.get("repository") or config.get("repo")
     if not repo_name:
         print("❌ Could not determine repository name from Git remote")
         return 1
@@ -447,11 +455,11 @@ def cmd_repo_show(verbose=False):
         print("Repository Information:")
         print(f"  Name: {repo['name']}")
         print(f"  URL: {repo['webUrl']}")
-        if 'defaultBranch' in repo:
+        if "defaultBranch" in repo:
             print(f"  Default Branch: {repo['defaultBranch']}")
-        if 'isPrivate' in repo:
+        if "isPrivate" in repo:
             print(f"  Private: {repo['isPrivate']}")
-        if 'description' in repo and repo['description']:
+        if "description" in repo and repo["description"]:
             print(f"  Description: {repo['description']}")
         return 0
     else:
@@ -482,23 +490,23 @@ def cmd_repo_list(verbose=False):
             print("No repositories found.")
             return 0
 
-        platform_name = config.get('platform', 'unknown').upper()
+        platform_name = config.get("platform", "unknown").upper()
         location = ""
-        if config.get('platform') == 'azdo':
+        if config.get("platform") == "azdo":
             location = f"project '{config.get('project', 'unknown')}'"
-        elif config.get('platform') == 'github':
+        elif config.get("platform") == "github":
             location = f"account '{config.get('owner', 'unknown')}'"
 
         print(f"Repositories in {platform_name} {location} ({len(repos)} total):")
         print("-" * 80)
         for repo in repos:
             print(f"  {repo['name']}")
-            if 'webUrl' in repo:
+            if "webUrl" in repo:
                 print(f"    URL: {repo['webUrl']}")
-            if 'defaultBranch' in repo:
+            if "defaultBranch" in repo:
                 print(f"    Default Branch: {repo['defaultBranch']}")
-            if 'isPrivate' in repo:
-                privacy = "Private" if repo['isPrivate'] else "Public"
+            if "isPrivate" in repo:
+                privacy = "Private" if repo["isPrivate"] else "Public"
                 print(f"    Visibility: {privacy}")
             print()
         return 0
@@ -523,15 +531,17 @@ def cmd_repo_delete(verbose=False):
         return 1
 
     # Get repository name from config (always available from Git extraction)
-    repo_name = config['repository']
+    repo_name = config["repository"]
 
     # Confirm deletion
-    platform_name = config.get('platform', 'unknown').upper()
-    print(f"⚠️  WARNING: This will permanently delete the repository '{repo_name}' from {platform_name}!")
+    platform_name = config.get("platform", "unknown").upper()
+    print(
+        f"⚠️  WARNING: This will permanently delete the repository '{repo_name}' from {platform_name}!"
+    )
     print("This action cannot be undone.")
     try:
         confirm = input("Are you sure you want to continue? (yes/no): ").strip().lower()
-        if confirm not in ['yes', 'y']:
+        if confirm not in ["yes", "y"]:
             print("Repository deletion cancelled.")
             return 0
     except KeyboardInterrupt:

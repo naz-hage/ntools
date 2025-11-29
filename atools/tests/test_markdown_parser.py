@@ -9,7 +9,7 @@ from pathlib import Path
 # Add the atools directory to sys.path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from sdo_package.parsers.markdown_parser import MarkdownParser
+from sdo_package.parsers.markdown_parser import MarkdownParser  # noqa: E402
 
 
 class TestMarkdownParserInit:
@@ -20,15 +20,15 @@ class TestMarkdownParserInit:
         parser = MarkdownParser()
 
         assert parser is not None
-        assert hasattr(parser, 'parse_workitem')
-        assert hasattr(parser, 'parse_issue')
-        assert hasattr(parser, 'validate_markdown')
+        assert hasattr(parser, "parse_workitem")
+        assert hasattr(parser, "parse_issue")
+        assert hasattr(parser, "validate_markdown")
 
     def test_parser_initialization_verbose(self):
         """Test parser initialization with verbose mode."""
         parser = MarkdownParser(verbose=True)
 
-        assert parser.verbose == True
+        assert parser.verbose is True
 
 
 class TestMarkdownParserWorkitemParsing:
@@ -40,7 +40,7 @@ class TestMarkdownParserWorkitemParsing:
 
     def test_parse_workitem_basic(self):
         """Test parsing basic workitem markdown."""
-        markdown_content = """# Product Backlog Item: Implement User Authentication
+        markdown_content = r"""# Product Backlog Item: Implement User Authentication
 
 ## Description
 Implement secure user authentication system with OAuth2 support.
@@ -66,8 +66,8 @@ Implement secure user authentication system with OAuth2 support.
         assert len(result["acceptance_criteria"]) == 4
         assert result["target"] == "azdo"
         assert result["project"] == "TestProject"
-        assert result["area"] == "TestProject\\Development"
-        assert result["iteration"] == "TestProject\\Sprint 1"
+        assert result["area"] == r"TestProject\Development"
+        assert result["iteration"] == r"TestProject\Sprint 1"
         assert "authentication" in result["labels"]
 
     def test_parse_workitem_minimal(self):
@@ -90,7 +90,7 @@ Simple bug fix.
 
     def test_parse_workitem_complex(self):
         """Test parsing complex workitem with all fields."""
-        markdown_content = """# Epic: Complete System Redesign
+        markdown_content = r"""# Epic: Complete System Redesign
 
 ## Description
 This epic covers the complete redesign of our system architecture to improve scalability and maintainability.
@@ -119,8 +119,8 @@ This is a high-impact change that requires careful planning and testing.
         assert "scalability and maintainability" in result["description"]
         assert len(result["acceptance_criteria"]) == 5
         assert result["acceptance_criteria"][0]["text"] == "Database schema redesigned"
-        assert result["acceptance_criteria"][0]["completed"] == True
-        assert result["acceptance_criteria"][1]["completed"] == False
+        assert result["acceptance_criteria"][0]["completed"] is True
+        assert result["acceptance_criteria"][1]["completed"] is False
         assert result["target"] == "azdo"
         assert result["project"] == "TestProject"
         assert len(result["labels"]) == 4
@@ -266,7 +266,7 @@ class TestMarkdownParserValidation:
 
     def test_validate_markdown_valid_workitem(self):
         """Test validation of valid workitem markdown."""
-        markdown_content = """# Task: Valid Workitem
+        markdown_content = r"""# Task: Valid Workitem
 
 ## Target: azdo
 ## Project: TestProject
@@ -284,7 +284,7 @@ This is a valid workitem.
 
         result = self.parser.validate_markdown(markdown_content, "workitem")
 
-        assert result["valid"] == True
+        assert result["valid"] is True
         assert result["type"] == "workitem"
         assert len(result["errors"]) == 0
         assert len(result["warnings"]) == 0
@@ -295,7 +295,7 @@ This is a valid workitem.
 
         result = self.parser.validate_markdown(markdown_content, "workitem")
 
-        assert result["valid"] == False
+        assert result["valid"] is False
         assert result["type"] == "workitem"
         assert len(result["errors"]) > 0
 
@@ -323,7 +323,7 @@ Actual result.
 
         result = self.parser.validate_markdown(markdown_content, "issue")
 
-        assert result["valid"] == True
+        assert result["valid"] is True
         assert result["type"] == "issue"
         assert len(result["errors"]) == 0
 
@@ -333,7 +333,7 @@ Actual result.
 
         result = self.parser.validate_markdown(markdown_content, "issue")
 
-        assert result["valid"] == False
+        assert result["valid"] is False
         assert result["type"] == "issue"
         assert len(result["errors"]) > 0
 
@@ -347,14 +347,14 @@ Some content.
 
         result = self.parser.validate_markdown(markdown_content, "unknown")
 
-        assert result["valid"] == False
+        assert result["valid"] is False
         assert "Unsupported type" in str(result["errors"])
 
     def test_validate_markdown_empty_content(self):
         """Test validation of empty content."""
         result = self.parser.validate_markdown("", "workitem")
 
-        assert result["valid"] == False
+        assert result["valid"] is False
         assert len(result["errors"]) > 0
 
 
@@ -383,4 +383,4 @@ class TestMarkdownParserErrorHandling:
         """Test validation with exception."""
         result = self.parser.validate_markdown(None, "workitem")
 
-        assert result["valid"] == False
+        assert result["valid"] is False

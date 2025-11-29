@@ -75,6 +75,64 @@ sdo workitem create --file-path FILE_PATH [OPTIONS]
 - `-f, --file-path PATH` - Path to markdown file (required)
 - `--dry-run` - Parse and preview without creating
 
+#### List Work Items
+
+```bash
+sdo workitem list [OPTIONS]
+```
+
+Lists work items with optional filtering. Works with both Azure DevOps and GitHub.
+
+**Options:**
+- `--type TYPE` - Filter by work item type (PBI, Bug, Task, Spike, Epic)
+- `--state STATE` - Filter by state (New, Approved, Committed, Done, To Do, In Progress)
+- `--assigned-to EMAIL` - Filter by assigned user (email or display name)
+- `--assigned-to-me` - Filter by work items assigned to current user
+- `--top INTEGER` - Maximum number of items to return (default: 50)
+- `-v, --verbose` - Show detailed API information and URLs
+
+#### Show Work Item
+
+```bash
+sdo workitem show --id ID [OPTIONS]
+```
+
+Shows detailed work item information including acceptance criteria.
+
+**Options:**
+- `--id INTEGER` - Work item ID (required)
+- `-c, --comments` - Show comments/discussion
+- `-v, --verbose` - Show full API response
+
+#### Update Work Item
+
+```bash
+sdo workitem update --id ID [OPTIONS]
+```
+
+Updates work item fields.
+
+**Options:**
+- `--id INTEGER` - Work item ID (required)
+- `--title TEXT` - Update title
+- `--description TEXT` - Update description
+- `--assigned-to EMAIL` - Update assigned user (email or display name)
+- `--state STATE` - Update state (New, Approved, Committed, Done, To Do, In Progress)
+- `-v, --verbose` - Show full API response
+
+#### Add Comment to Work Item
+
+```bash
+sdo workitem comment --id ID --text TEXT [OPTIONS]
+```
+
+Adds a comment to a work item or issue.
+
+**Options:**
+- `--id INTEGER` - Work item ID (required)
+- `--text TEXT` - Comment text (required)
+- `-v, --verbose` - Show full API response
+
 ### Repository Operations
 
 #### Create Repository
@@ -125,22 +183,82 @@ Deletes the current repository (with confirmation prompt).
 
 #### Work Item Operations
 
-##### Dry Run (Preview)
+##### Create Work Item
+
+###### Dry Run (Preview)
 
 ```bash
 sdo workitem create --file-path "atools/issue-azdo-example.md" --dry-run
 ```
 
-##### Create Azure DevOps Work Item
+###### Create Azure DevOps Work Item
 
 ```bash
 sdo workitem create --file-path "atools/issue-azdo-example.md"
 ```
 
-##### Create with Verbose Output
+###### Create with Verbose Output
 
 ```bash
 sdo workitem create --file-path "atools/issue-azdo-example.md" --verbose
+```
+
+##### List Work Items
+
+```bash
+# List all work items
+sdo workitem list
+
+# List only PBIs in "New" state
+sdo workitem list --type PBI --state New
+
+# List work items assigned to you
+sdo workitem list --assigned-to-me
+
+# List tasks in progress with verbose output
+sdo workitem list --type Task --state "In Progress" --verbose
+
+# List top 10 work items
+sdo workitem list --top 10
+```
+
+##### Show Work Item
+
+```bash
+# Show work item details
+sdo workitem show --id 123
+
+# Show work item with comments
+sdo workitem show --id 123 --comments
+
+# Show with verbose API response
+sdo workitem show --id 123 --verbose
+```
+
+##### Update Work Item
+
+```bash
+# Update work item state
+sdo workitem update --id 123 --state "In Progress"
+
+# Update title and description
+sdo workitem update --id 123 --title "New Title" --description "Updated description"
+
+# Assign work item to user
+sdo workitem update --id 123 --assigned-to "user@example.com"
+
+# Update multiple fields
+sdo workitem update --id 123 --state Done --assigned-to "user@example.com" --verbose
+```
+
+##### Add Comment
+
+```bash
+# Add a comment to work item
+sdo workitem comment --id 123 --text "This is a test comment"
+
+# Add comment with verbose output
+sdo workitem comment --id 123 --text "Completed testing" --verbose
 ```
 
 #### Repository Operations
@@ -255,14 +373,20 @@ sdo pr show 123 --verbose
 sdo pr status PR_NUMBER [OPTIONS]
 ```
 
-Shows the current status of a specific pull request (open, closed, merged, etc.).
+Shows the current status of a specific pull request including CI/CD check results.
+
+Displays:
+- PR status (open, closed, merged, etc.)
+- Title, author, and branch information
+- CI/CD checks status (GitHub and Azure DevOps)
+- Check results with pass/fail indicators and URLs
 
 **Options:**
 - `-v, --verbose` - Show detailed API information
 
 **Examples:**
 ```bash
-# Check PR status
+# Check PR status with CI/CD checks
 sdo pr status 123
 
 # Check PR status with verbose details
@@ -328,6 +452,19 @@ sdo pr show 211
 
 ```bash
 sdo pr status 211
+```
+
+**Output includes CI/CD checks:**
+```
+✅ PR #211: MERGED
+Title: [208] Implement Comprehensive Pull Request Management for SDO CLI
+Author: naz-hage
+Branch: gh-208 → main
+
+CI/CD Checks:
+Python Tests    pass    27s     https://github.com/naz-hage/ntools/actions/runs/...
+Publish Docs    pass    13s     https://github.com/naz-hage/ntools/actions/runs/...
+Running a workflow (Release)    pass    3m24s   https://github.com/naz-hage/ntools/actions/runs/...
 ```
 
 ##### Update Pull Request

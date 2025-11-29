@@ -10,7 +10,7 @@ from pathlib import Path
 # Add the atools directory to sys.path so we can import sdo
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-import sdo
+import sdo  # noqa: E402
 
 
 class TestSDOEntryPoint:

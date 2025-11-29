@@ -9,7 +9,6 @@ import json
 import logging
 import re
 import subprocess
-import sys
 from typing import Any, Dict, List, Optional
 
 from ..exceptions import AuthenticationError, PlatformError, ValidationError
@@ -37,7 +36,9 @@ class GitHubPullRequestPlatform(PRPlatform):
                 ["gh", "--version"],
                 capture_output=True,
                 text=True,
-                check=True
+                encoding="utf-8",
+                errors="replace",
+                check=True,
             )
             logger.debug(f"GitHub CLI version: {result.stdout.strip()}")
         except (subprocess.CalledProcessError, FileNotFoundError):
@@ -53,7 +54,9 @@ class GitHubPullRequestPlatform(PRPlatform):
                 ["gh", "auth", "status"],
                 capture_output=True,
                 text=True,
-                check=True
+                encoding="utf-8",
+                errors="replace",
+                check=True,
             )
             return "Logged in to github.com" in result.stdout
         except subprocess.CalledProcessError:
@@ -75,10 +78,7 @@ class GitHubPullRequestPlatform(PRPlatform):
             logger.debug(f"Running command: {' '.join(cmd)}")
 
             result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                check=check
+                cmd, capture_output=True, text=True, encoding="utf-8", errors="replace", check=check
             )
 
             if result.stderr and logger.isEnabledFor(logging.DEBUG):
@@ -102,7 +102,7 @@ class GitHubPullRequestPlatform(PRPlatform):
         source_branch: Optional[str] = None,
         target_branch: Optional[str] = None,
         work_item_id: Optional[int] = None,
-        draft: bool = False
+        draft: bool = False,
     ) -> str:
         """Create a pull request on GitHub."""
         # Build command arguments
@@ -140,8 +140,13 @@ class GitHubPullRequestPlatform(PRPlatform):
 
     def get_pull_request(self, pr_number: int) -> Dict[str, Any]:
         """Get details of a GitHub pull request."""
-        args = ["pr", "view", str(pr_number), "--json",
-                "number,title,body,state,author,headRefName,baseRefName,url,createdAt,updatedAt"]
+        args = [
+            "pr",
+            "view",
+            str(pr_number),
+            "--json",
+            "number,title,body,state,author,headRefName,baseRefName,url,createdAt,updatedAt",
+        ]
 
         result = self._run_gh_command(args)
         data = json.loads(result.stdout)
@@ -151,23 +156,23 @@ class GitHubPullRequestPlatform(PRPlatform):
         body = data.get("body", "")
         title = data.get("title", "")
         text_to_search = f"{title}\n{body}"
-        
+
         if text_to_search:
             # Remove code blocks (```...``` and `...`) to avoid matching demo/example code
-            text_no_code = re.sub(r'```.*?```', '', text_to_search, flags=re.DOTALL)
-            text_no_code = re.sub(r'`[^`]*`', '', text_no_code)
-            
+            text_no_code = re.sub(r"```.*?```", "", text_to_search, flags=re.DOTALL)
+            text_no_code = re.sub(r"`[^`]*`", "", text_no_code)
+
             # Look for issue references in the cleaned text
             # Using specific GitHub linking keywords instead of generic #123 pattern
             # to avoid duplicate matching
             issue_patterns = [
-                r'closes?\s+#(\d+)',  # closes #123
-                r'fixes?\s+#(\d+)',  # fixes #123
-                r'resolves?\s+#(\d+)',  # resolves #123
-                r'related\s+(?:to\s+)?#(\d+)',  # related to #123
-                r'(?:^|\s)#(\d+)',  # #123 at start or after whitespace (standalone references)
+                r"closes?\s+#(\d+)",  # closes #123
+                r"fixes?\s+#(\d+)",  # fixes #123
+                r"resolves?\s+#(\d+)",  # resolves #123
+                r"related\s+(?:to\s+)?#(\d+)",  # related to #123
+                r"(?:^|\s)#(\d+)",  # #123 at start or after whitespace (standalone references)
             ]
-            
+
             for pattern in issue_patterns:
                 matches = re.findall(pattern, text_no_code, re.IGNORECASE)
                 for match in matches:
@@ -186,18 +191,19 @@ class GitHubPullRequestPlatform(PRPlatform):
             "url": data.get("url"),
             "created_at": data.get("createdAt"),
             "updated_at": data.get("updatedAt"),
-            "work_items": work_items  # Issue references for GitHub
+            "work_items": work_items,  # Issue references for GitHub
         }
 
     def list_pull_requests(
-        self,
-        state: str = "open",
-        author: Optional[str] = None,
-        limit: int = 10
+        self, state: str = "open", author: Optional[str] = None, limit: int = 10
     ) -> List[Dict[str, Any]]:
         """List GitHub pull requests."""
-        args = ["pr", "list", "--json",
-                "number,title,body,state,author,headRefName,baseRefName,url,createdAt,updatedAt"]
+        args = [
+            "pr",
+            "list",
+            "--json",
+            "number,title,body,state,author,headRefName,baseRefName,url,createdAt,updatedAt",
+        ]
 
         if state != "all":
             args.extend(["--state", state])
@@ -210,18 +216,21 @@ class GitHubPullRequestPlatform(PRPlatform):
         result = self._run_gh_command(args)
         prs_data = json.loads(result.stdout)
 
-        return [{
-            "number": pr.get("number"),
-            "title": pr.get("title"),
-            "description": pr.get("body"),
-            "status": pr.get("state", "").lower(),
-            "author": pr.get("author", {}).get("login"),
-            "source_branch": pr.get("headRefName"),
-            "target_branch": pr.get("baseRefName"),
-            "url": pr.get("url"),
-            "created_at": pr.get("createdAt"),
-            "updated_at": pr.get("updatedAt")
-        } for pr in prs_data]
+        return [
+            {
+                "number": pr.get("number"),
+                "title": pr.get("title"),
+                "description": pr.get("body"),
+                "status": pr.get("state", "").lower(),
+                "author": pr.get("author", {}).get("login"),
+                "source_branch": pr.get("headRefName"),
+                "target_branch": pr.get("baseRefName"),
+                "url": pr.get("url"),
+                "created_at": pr.get("createdAt"),
+                "updated_at": pr.get("updatedAt"),
+            }
+            for pr in prs_data
+        ]
 
     def approve_pull_request(self, pr_number: int) -> bool:
         """Approve a GitHub pull request."""
@@ -237,7 +246,7 @@ class GitHubPullRequestPlatform(PRPlatform):
         pr_number: int,
         title: Optional[str] = None,
         description: Optional[str] = None,
-        status: Optional[str] = None
+        status: Optional[str] = None,
     ) -> bool:
         """Update an existing pull request on GitHub."""
         try:
@@ -251,20 +260,22 @@ class GitHubPullRequestPlatform(PRPlatform):
 
             if status is not None:
                 # Map status to GitHub state values
-                state_mapping = {
-                    "active": "open",
-                    "abandoned": "closed",
-                    "completed": "closed"
-                }
+                state_mapping = {"active": "open", "abandoned": "closed", "completed": "closed"}
                 if status not in state_mapping:
-                    raise ValidationError(f"Invalid status: {status}. Must be one of: active, abandoned, completed")
+                    raise ValidationError(
+                        f"Invalid status: {status}. Must be one of: active, abandoned, completed"
+                    )
                 args.extend(["--state", state_mapping[status]])
 
             if len(args) == 2:  # Only ["pr", "edit", str(pr_number)]
-                raise ValidationError("At least one field (title, description, or status) must be provided for update")
+                raise ValidationError(
+                    "At least one field (title, description, or status) must be provided for update"
+                )
 
             self._run_gh_command(args)
             return True
 
         except subprocess.CalledProcessError as e:
-            raise PlatformError(f"Failed to update pull request: {e.stderr.decode() if e.stderr else str(e)}")
+            raise PlatformError(
+                f"Failed to update pull request: {e.stderr.decode() if e.stderr else str(e)}"
+            )

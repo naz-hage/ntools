@@ -11,7 +11,7 @@ class MarkdownParser:
 
     def __init__(self, verbose: bool = False):
         """Initialize the MarkdownParser.
-        
+
         Args:
             verbose: Enable verbose output for debugging
         """
@@ -31,7 +31,7 @@ class MarkdownParser:
             - metadata: Dictionary of metadata fields
             - acceptance_criteria: List of acceptance criteria
         """
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             content = f.read()
 
         return self.parse_content(content)
@@ -46,15 +46,15 @@ class MarkdownParser:
         Returns:
             Dictionary with parsed information
         """
-        lines = content.split('\n')
+        lines = content.split("\n")
 
         # Initialize result
         result = {
-            'title': '',
-            'description': '',
-            'metadata': {},
-            'acceptance_criteria': [],
-            'repro_steps': ''
+            "title": "",
+            "description": "",
+            "metadata": {},
+            "acceptance_criteria": [],
+            "repro_steps": "",
         }
 
         # State tracking
@@ -69,46 +69,61 @@ class MarkdownParser:
             # Skip empty lines
             if not line:
                 if description_lines and not in_acceptance_criteria:
-                    description_lines.append('')
+                    description_lines.append("")
                 continue
 
             # Extract title (first # heading)
-            if line.startswith('# ') and not result['title']:
+            if line.startswith("# ") and not result["title"]:
                 title = line[2:].strip()
                 # Strip common work item type prefixes
                 prefixes_to_strip = [
-                    'product backlog item:', 'pbi:', 'task:', 'bug:', 'issue:', 'epic:', 'feature request:',
-                    'user story:', 'feature:', 'enhancement:', 'bug report:', 'question:', 'discussion:'
+                    "product backlog item:",
+                    "pbi:",
+                    "task:",
+                    "bug:",
+                    "issue:",
+                    "epic:",
+                    "feature request:",
+                    "user story:",
+                    "feature:",
+                    "enhancement:",
+                    "bug report:",
+                    "question:",
+                    "discussion:",
                 ]
                 for prefix in prefixes_to_strip:
                     if title.lower().startswith(prefix):
-                        title = title[len(prefix):].strip()
+                        title = title[len(prefix) :].strip()
                         break
-                result['title'] = title
+                result["title"] = title
                 continue
 
             # Extract metadata (## Key: Value format)
-            metadata_match = re.match(r'^##\s*([^:]+):\s*(.*)$', line)
+            metadata_match = re.match(r"^##\s*([^:]+):\s*(.*)$", line)
             if metadata_match:
-                key = metadata_match.group(1).strip().lower().replace(' ', '_')
+                key = metadata_match.group(1).strip().lower().replace(" ", "_")
                 value = metadata_match.group(2).strip()
-                result['metadata'][key] = value
+                result["metadata"][key] = value
                 continue
 
             # Check for Steps to Reproduce
-            if 'steps to reproduce' in line.lower():
+            if "steps to reproduce" in line.lower():
                 in_repro_steps = True
                 continue
 
             # Check for Acceptance Criteria section
-            if line.lower() in ['## acceptance criteria', '## acceptance criteria:',
-                               '### acceptance criteria', '### acceptance criteria:']:
+            if line.lower() in [
+                "## acceptance criteria",
+                "## acceptance criteria:",
+                "### acceptance criteria",
+                "### acceptance criteria:",
+            ]:
                 in_acceptance_criteria = True
                 continue
 
             # Extract repro steps
             if in_repro_steps:
-                if line.startswith('**') or line.startswith('##'):
+                if line.startswith("**") or line.startswith("##"):
                     in_repro_steps = False
                 else:
                     repro_lines.append(line)
@@ -117,40 +132,36 @@ class MarkdownParser:
             # Extract acceptance criteria
             if in_acceptance_criteria:
                 # Check for new section starting
-                if line.startswith('#'):
+                if line.startswith("#"):
                     in_acceptance_criteria = False
                     description_lines.append(line)
                     continue
 
                 # Extract criteria items (both checked and unchecked)
-                criteria_match = re.match(r'^[-*]\s*\[\s*([xX\s]?)\s*\]\s*(.+)$', line)
+                criteria_match = re.match(r"^[-*]\s*\[\s*([xX\s]?)\s*\]\s*(.+)$", line)
                 if criteria_match:
-                    completed = criteria_match.group(1).strip().lower() in ['x']
+                    completed = criteria_match.group(1).strip().lower() in ["x"]
                     text = criteria_match.group(2).strip()
-                    result['acceptance_criteria'].append({
-                        'text': text,
-                        'completed': completed
-                    })
+                    result["acceptance_criteria"].append({"text": text, "completed": completed})
                     continue
 
                 # Handle numbered criteria
-                numbered_match = re.match(r'^\d+\.\s*(.+)$', line)
+                numbered_match = re.match(r"^\d+\.\s*(.+)$", line)
                 if numbered_match:
-                    result['acceptance_criteria'].append({
-                        'text': numbered_match.group(1).strip(),
-                        'completed': False
-                    })
+                    result["acceptance_criteria"].append(
+                        {"text": numbered_match.group(1).strip(), "completed": False}
+                    )
                     continue
 
             # Add to description if not in special sections
-            if not in_acceptance_criteria and not line.startswith('#'):
+            if not in_acceptance_criteria and not line.startswith("#"):
                 description_lines.append(line)
 
         # Join description lines
-        result['description'] = '\n'.join(description_lines).strip()
+        result["description"] = "\n".join(description_lines).strip()
 
         # Join repro steps
-        result['repro_steps'] = '\n'.join(repro_lines).strip()
+        result["repro_steps"] = "\n".join(repro_lines).strip()
 
         return result
 
@@ -166,57 +177,66 @@ class MarkdownParser:
         """
         errors = []
 
-        if not parsed_content.get('title'):
+        if not parsed_content.get("title"):
             errors.append("Missing title (no # heading found)")
 
-        if not parsed_content.get('metadata'):
+        if not parsed_content.get("metadata"):
             errors.append("No metadata found (no ## Key: Value pairs)")
 
         return errors
 
     def parse_workitem(self, content: str) -> Optional[Dict[str, Any]]:
         """Parse workitem-specific markdown content.
-        
+
         Args:
             content: Markdown content for a work item
-            
+
         Returns:
             Parsed work item data or None on error/invalid content
         """
         try:
             parsed = self.parse_content(content)
-            
+
             # Return None if no title
-            if not parsed.get('title'):
+            if not parsed.get("title"):
                 return None
-            
+
             # Flatten metadata into top level for easier access
             result = {
-                'title': parsed['title'],
-                'description': parsed['description'],
-                'acceptance_criteria': parsed['acceptance_criteria'],
+                "title": parsed["title"],
+                "description": parsed["description"],
+                "acceptance_criteria": parsed["acceptance_criteria"],
             }
-            
+
             # Add metadata fields, setting missing ones to appropriate defaults
-            common_metadata_fields = ['target', 'project', 'area', 'iteration', 'assignee', 'labels', 'work_item_type', 'repository']
+            common_metadata_fields = [
+                "target",
+                "project",
+                "area",
+                "iteration",
+                "assignee",
+                "labels",
+                "work_item_type",
+                "repository",
+            ]
             for field in common_metadata_fields:
-                value = parsed['metadata'].get(field, None)
-                if field == 'labels' and value is not None:
+                value = parsed["metadata"].get(field, None)
+                if field == "labels" and value is not None:
                     # Split comma-separated labels into list
                     if isinstance(value, str):
-                        value = [label.strip() for label in value.split(',') if label.strip()]
+                        value = [label.strip() for label in value.split(",") if label.strip()]
                     elif not isinstance(value, list):
                         value = [value]
-                elif field == 'labels' and value is None:
+                elif field == "labels" and value is None:
                     value = []  # Default labels to empty list
                 result[field] = value
-            
+
             # Add any additional metadata fields
-            for key, value in parsed['metadata'].items():
-                normalized_key = key.replace('_', ' ')
+            for key, value in parsed["metadata"].items():
+                normalized_key = key.replace("_", " ")
                 if normalized_key not in common_metadata_fields:
                     result[key] = value
-            
+
             return result
         except Exception as e:
             if self.verbose:
@@ -225,41 +245,41 @@ class MarkdownParser:
 
     def parse_issue(self, content: str) -> Optional[Dict[str, Any]]:
         """Parse issue-specific markdown content.
-        
+
         Args:
             content: Markdown content for an issue
-            
+
         Returns:
             Parsed issue data or None on error/invalid content
         """
         try:
             parsed = self.parse_content(content)
-            
+
             # Return None if no title
-            if not parsed.get('title'):
+            if not parsed.get("title"):
                 return None
-            
+
             # Flatten metadata into top level for easier access
             result = {
-                'title': parsed['title'],
-                'description': parsed['description'],
-                'acceptance_criteria': parsed['acceptance_criteria'],
+                "title": parsed["title"],
+                "description": parsed["description"],
+                "acceptance_criteria": parsed["acceptance_criteria"],
             }
-            
+
             # Add metadata fields, setting missing ones to appropriate defaults
-            common_metadata_fields = ['target', 'repository', 'assignee', 'labels']
+            common_metadata_fields = ["target", "repository", "assignee", "labels"]
             for field in common_metadata_fields:
-                value = parsed['metadata'].get(field, None)
-                if field == 'labels' and value is not None:
+                value = parsed["metadata"].get(field, None)
+                if field == "labels" and value is not None:
                     # Split comma-separated labels into list
                     if isinstance(value, str):
-                        value = [label.strip() for label in value.split(',') if label.strip()]
+                        value = [label.strip() for label in value.split(",") if label.strip()]
                     elif not isinstance(value, list):
                         value = [value]
-                elif field == 'labels' and value is None:
+                elif field == "labels" and value is None:
                     value = []  # Default labels to empty list
                 result[field] = value
-            
+
             return result
         except Exception as e:
             if self.verbose:
@@ -268,39 +288,33 @@ class MarkdownParser:
 
     def validate_markdown(self, content: str, doc_type: str) -> Dict[str, Any]:
         """Validate markdown content for a specific document type.
-        
+
         Args:
             content: Markdown content to validate
             doc_type: Type of document ('workitem' or 'issue')
-            
+
         Returns:
             Dict with validation results containing 'valid', 'type', 'errors', 'warnings'
         """
         # Check if doc_type is supported
-        if doc_type not in ['workitem', 'issue']:
+        if doc_type not in ["workitem", "issue"]:
             return {
-                'valid': False,
-                'type': doc_type,
-                'errors': ['Unsupported type'],
-                'warnings': []
+                "valid": False,
+                "type": doc_type,
+                "errors": ["Unsupported type"],
+                "warnings": [],
             }
-        
+
         try:
             parsed = self.parse_content(content)
             errors = self.validate_structure(parsed)
             return {
-                'valid': len(errors) == 0,
-                'type': doc_type,
-                'errors': errors,
-                'warnings': []  # No warnings implemented yet
+                "valid": len(errors) == 0,
+                "type": doc_type,
+                "errors": errors,
+                "warnings": [],  # No warnings implemented yet
             }
         except Exception as e:
             if self.verbose:
                 print(f"Error validating markdown: {e}")
-            return {
-                'valid': False,
-                'type': doc_type,
-                'errors': [str(e)],
-                'warnings': []
-            }
-
+            return {"valid": False, "type": doc_type, "errors": [str(e)], "warnings": []}

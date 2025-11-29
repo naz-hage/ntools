@@ -4,17 +4,16 @@ Tests API calls, authentication, error handling, and core operations.
 """
 
 import pytest
-from unittest.mock import patch, MagicMock, mock_open
+from unittest.mock import patch, MagicMock
 import requests
-import json
 from pathlib import Path
 import sys
 
 # Add the atools directory to sys.path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from sdo_package.client import AzureDevOpsClient, extract_platform_info_from_git
-from sdo_package.exceptions import AuthenticationError, NetworkError, ConfigurationError
+from sdo_package.client import AzureDevOpsClient, extract_platform_info_from_git  # noqa: E402
+from sdo_package.exceptions import AuthenticationError, NetworkError  # noqa: E402
 
 
 class TestAzureDevOpsClientInit:
@@ -22,11 +21,7 @@ class TestAzureDevOpsClientInit:
 
     def test_client_initialization(self):
         """Test basic client initialization."""
-        client = AzureDevOpsClient(
-            organization="test-org",
-            project="test-project",
-            pat="test-pat"
-        )
+        client = AzureDevOpsClient(organization="test-org", project="test-project", pat="test-pat")
 
         assert client.organization == "test-org"
         assert client.project == "test-project"
@@ -37,10 +32,7 @@ class TestAzureDevOpsClientInit:
     def test_client_initialization_with_timeout(self):
         """Test client initialization with custom timeout."""
         client = AzureDevOpsClient(
-            organization="test-org",
-            project="test-project",
-            pat="test-pat",
-            timeout=60
+            organization="test-org", project="test-project", pat="test-pat", timeout=60
         )
 
         assert client.timeout == 60
@@ -48,13 +40,10 @@ class TestAzureDevOpsClientInit:
     def test_client_initialization_with_verbose(self):
         """Test client initialization with verbose mode."""
         client = AzureDevOpsClient(
-            organization="test-org",
-            project="test-project",
-            pat="test-pat",
-            verbose=True
+            organization="test-org", project="test-project", pat="test-pat", verbose=True
         )
 
-        assert client.verbose == True
+        assert client.verbose is True
 
 
 class TestAzureDevOpsClientAuthentication:
@@ -62,11 +51,7 @@ class TestAzureDevOpsClientAuthentication:
 
     def test_auth_header_setup(self):
         """Test authentication header is properly set up."""
-        client = AzureDevOpsClient(
-            organization="test-org",
-            project="test-project",
-            pat="test-pat"
-        )
+        client = AzureDevOpsClient(organization="test-org", project="test-project", pat="test-pat")
 
         # Check that authorization header is set
         assert "Authorization" in client.headers
@@ -75,11 +60,7 @@ class TestAzureDevOpsClientAuthentication:
     def test_missing_pat_error(self):
         """Test error when PAT is missing."""
         with pytest.raises(AuthenticationError):
-            client = AzureDevOpsClient(
-                organization="test-org",
-                project="test-project",
-                pat=None
-            )
+            _client = AzureDevOpsClient(organization="test-org", project="test-project", pat=None)  # noqa: F841
 
 
 class TestAzureDevOpsClientAPICalls:
@@ -88,10 +69,7 @@ class TestAzureDevOpsClientAPICalls:
     def setup_method(self):
         """Set up test fixtures."""
         self.client = AzureDevOpsClient(
-            organization="test-org",
-            project="test-project",
-            pat="test-pat",
-            verbose=True
+            organization="test-org", project="test-project", pat="test-pat", verbose=True
         )
 
     @patch("requests.Session.request")
@@ -104,7 +82,9 @@ class TestAzureDevOpsClientAPICalls:
         mock_response.json.return_value = {"test": "data"}
         mock_request.return_value = mock_response
 
-        result = self.client._make_request("GET", "https://dev.azure.com/test-org/test-project/_apis/test", "test operation")
+        result = self.client._make_request(
+            "GET", "https://dev.azure.com/test-org/test-project/_apis/test", "test operation"
+        )
 
         assert result.status_code == 200
         mock_request.assert_called_once()
@@ -119,7 +99,9 @@ class TestAzureDevOpsClientAPICalls:
         mock_request.return_value = mock_response
 
         with pytest.raises(AuthenticationError):
-            self.client._make_request("GET", "https://dev.azure.com/test-org/test-project/_apis/test", "test operation")
+            self.client._make_request(
+                "GET", "https://dev.azure.com/test-org/test-project/_apis/test", "test operation"
+            )
 
     @patch("requests.Session.request")
     def test_api_call_403_error(self, mock_request):
@@ -131,7 +113,9 @@ class TestAzureDevOpsClientAPICalls:
         mock_request.return_value = mock_response
 
         with pytest.raises(AuthenticationError):
-            self.client._make_request("GET", "https://dev.azure.com/test-org/test-project/_apis/test", "test operation")
+            self.client._make_request(
+                "GET", "https://dev.azure.com/test-org/test-project/_apis/test", "test operation"
+            )
 
     @patch("requests.Session.request")
     def test_api_call_404_error(self, mock_request):
@@ -143,7 +127,9 @@ class TestAzureDevOpsClientAPICalls:
         mock_request.return_value = mock_response
 
         with pytest.raises(requests.exceptions.HTTPError):
-            self.client._make_request("GET", "https://dev.azure.com/test-org/test-project/_apis/test", "test operation")
+            self.client._make_request(
+                "GET", "https://dev.azure.com/test-org/test-project/_apis/test", "test operation"
+            )
 
     @patch("requests.Session.request")
     def test_api_call_network_error(self, mock_request):
@@ -151,7 +137,9 @@ class TestAzureDevOpsClientAPICalls:
         mock_request.side_effect = requests.exceptions.ConnectionError("Network error")
 
         with pytest.raises(NetworkError):
-            self.client._make_request("GET", "https://dev.azure.com/test-org/test-project/_apis/test", "test operation")
+            self.client._make_request(
+                "GET", "https://dev.azure.com/test-org/test-project/_apis/test", "test operation"
+            )
 
     @patch("requests.Session.request")
     def test_api_call_timeout_error(self, mock_request):
@@ -159,7 +147,9 @@ class TestAzureDevOpsClientAPICalls:
         mock_request.side_effect = requests.exceptions.Timeout("Timeout")
 
         with pytest.raises(NetworkError):
-            self.client._make_request("GET", "https://dev.azure.com/test-org/test-project/_apis/test", "test operation")
+            self.client._make_request(
+                "GET", "https://dev.azure.com/test-org/test-project/_apis/test", "test operation"
+            )
 
 
 class TestRepositoryOperations:
@@ -169,9 +159,7 @@ class TestRepositoryOperations:
         """Set up test fixtures."""
         with patch("sdo_package.client.get_personal_access_token", return_value="test-pat"):
             self.client = AzureDevOpsClient(
-                organization="test-org",
-                project="test-project",
-                pat="test-pat"
+                organization="test-org", project="test-project", pat="test-pat"
             )
 
     @patch("requests.get")
@@ -184,14 +172,14 @@ class TestRepositoryOperations:
                     "id": "repo1",
                     "name": "Repository 1",
                     "webUrl": "https://dev.azure.com/test-org/test-project/_git/repo1",
-                    "defaultBranch": "refs/heads/main"
+                    "defaultBranch": "refs/heads/main",
                 },
                 {
                     "id": "repo2",
                     "name": "Repository 2",
                     "webUrl": "https://dev.azure.com/test-org/test-project/_git/repo2",
-                    "defaultBranch": "refs/heads/develop"
-                }
+                    "defaultBranch": "refs/heads/develop",
+                },
             ]
         }
         mock_response.raise_for_status = MagicMock()
@@ -222,13 +210,15 @@ class TestRepositoryOperations:
         """Test successful repository retrieval."""
         mock_response = MagicMock()
         mock_response.json.return_value = {
-            "value": [{
-                "id": "repo1",
-                "name": "Repository 1",
-                "webUrl": "https://dev.azure.com/test-org/test-project/_git/repo1",
-                "defaultBranch": "refs/heads/main",
-                "size": 1024
-            }]
+            "value": [
+                {
+                    "id": "repo1",
+                    "name": "Repository 1",
+                    "webUrl": "https://dev.azure.com/test-org/test-project/_git/repo1",
+                    "defaultBranch": "refs/heads/main",
+                    "size": 1024,
+                }
+            ]
         }
         mock_response.raise_for_status = MagicMock()
         mock_get.return_value = mock_response
@@ -258,7 +248,9 @@ class TestRepositoryOperations:
         """Test successful repository creation."""
         # Mock the GET request for projects
         mock_get_response = MagicMock()
-        mock_get_response.json.return_value = {"value": [{"id": "project-id", "name": "test-project"}]}
+        mock_get_response.json.return_value = {
+            "value": [{"id": "project-id", "name": "test-project"}]
+        }
         mock_get_response.raise_for_status = MagicMock()
         mock_get.return_value = mock_get_response
 
@@ -267,7 +259,7 @@ class TestRepositoryOperations:
         expected_repo_data = {
             "id": "new-repo",
             "name": "New Repository",
-            "webUrl": "https://dev.azure.com/test-org/test-project/_git/new-repo"
+            "webUrl": "https://dev.azure.com/test-org/test-project/_git/new-repo",
         }
         mock_post_response.json.return_value = expected_repo_data
         mock_post_response.raise_for_status = MagicMock()
@@ -286,10 +278,7 @@ class TestRepositoryOperations:
         # Mock get_repository call
         mock_get_response = MagicMock()
         mock_get_response.json.return_value = {
-            "value": [{
-                "id": "repo-to-delete-id",
-                "name": "repo-to-delete"
-            }]
+            "value": [{"id": "repo-to-delete-id", "name": "repo-to-delete"}]
         }
         mock_get_response.raise_for_status = MagicMock()
         mock_get.return_value = mock_get_response
@@ -301,7 +290,7 @@ class TestRepositoryOperations:
 
         result = self.client.delete_repository("repo-to-delete")
 
-        assert result == True
+        assert result is True
         mock_get.assert_called_once()
         mock_delete.assert_called_once()
 
@@ -313,8 +302,7 @@ class TestPlatformDetection:
     def test_github_platform_detection(self, mock_run):
         """Test GitHub platform detection."""
         mock_run.return_value = MagicMock(
-            returncode=0,
-            stdout="origin\thttps://github.com/testuser/testrepo.git (fetch)\n"
+            returncode=0, stdout="origin\thttps://github.com/testuser/testrepo.git (fetch)\n"
         )
 
         result = extract_platform_info_from_git()
@@ -330,7 +318,7 @@ class TestPlatformDetection:
         """Test Azure DevOps HTTPS platform detection."""
         mock_run.return_value = MagicMock(
             returncode=0,
-            stdout="origin\thttps://dev.azure.com/testorg/testproject/_git/testrepo (fetch)\n"
+            stdout="origin\thttps://dev.azure.com/testorg/testproject/_git/testrepo (fetch)\n",
         )
 
         result = extract_platform_info_from_git()
@@ -346,7 +334,7 @@ class TestPlatformDetection:
         """Test Azure DevOps SSH platform detection."""
         mock_run.return_value = MagicMock(
             returncode=0,
-            stdout="origin\tgit@ssh.dev.azure.com:v3/testorg/testproject/testrepo (fetch)\n"
+            stdout="origin\tgit@ssh.dev.azure.com:v3/testorg/testproject/testrepo (fetch)\n",
         )
 
         result = extract_platform_info_from_git()
@@ -361,8 +349,7 @@ class TestPlatformDetection:
     def test_unsupported_platform(self, mock_run):
         """Test unsupported platform detection."""
         mock_run.return_value = MagicMock(
-            returncode=0,
-            stdout="origin\thttps://gitlab.com/testuser/testrepo.git (fetch)\n"
+            returncode=0, stdout="origin\thttps://gitlab.com/testuser/testrepo.git (fetch)\n"
         )
 
         result = extract_platform_info_from_git()
@@ -392,7 +379,7 @@ class TestPlatformDetection:
         """Test that azure remote is preferred over origin."""
         mock_run.return_value = MagicMock(
             returncode=0,
-            stdout="azure\thttps://dev.azure.com/testorg/testproject/_git/testrepo (fetch)\norigin\thttps://github.com/testuser/testrepo.git (fetch)\n"
+            stdout="azure\thttps://dev.azure.com/testorg/testproject/_git/testrepo (fetch)\norigin\thttps://github.com/testuser/testrepo.git (fetch)\n",
         )
 
         result = extract_platform_info_from_git()

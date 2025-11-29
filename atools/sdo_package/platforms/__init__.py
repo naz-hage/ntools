@@ -7,4 +7,4 @@ from .base import WorkItemPlatform
 from .azdo_platform import AzureDevOpsPlatform
 from .github_platform import GitHubPlatform
 
-__all__ = ['WorkItemPlatform', 'AzureDevOpsPlatform', 'GitHubPlatform']
+__all__ = ["WorkItemPlatform", "AzureDevOpsPlatform", "GitHubPlatform"]

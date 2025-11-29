@@ -32,7 +32,6 @@ import json
 import logging
 import os
 import requests
-import subprocess
 import time
 from pathlib import Path
 from typing import Dict, Any, Optional, List
@@ -938,8 +937,8 @@ class AzureDevOpsClient:
         logging.debug("Client received acceptance_criteria: {acceptance_criteria}")
         if acceptance_criteria:
             logging.debug("Processing acceptance criteria for work_item_type: {work_item_type}")
-            ac_html = '<ul>' + '\n'.join([f'<li>{ac}</li>' for ac in acceptance_criteria]) + '</ul>'
-            
+            ac_html = "<ul>" + "\n".join([f"<li>{ac}</li>" for ac in acceptance_criteria]) + "</ul>"
+
             # Try to discover a field whose name/reference contains 'acceptance'
             ac_field_ref = None
             try:
@@ -949,10 +948,10 @@ class AzureDevOpsClient:
                 if response.status_code == 200:
                     fields_data = response.json()
                     logging.debug("Found {len(fields_data.get('value', []))} fields")
-                    for field in fields_data.get('value', []):
-                        field_name = field.get('name', '').lower()
-                        if 'acceptance' in field_name:
-                            ac_field_ref = field.get('referenceName')
+                    for field in fields_data.get("value", []):
+                        field_name = field.get("name", "").lower()
+                        if "acceptance" in field_name:
+                            ac_field_ref = field.get("referenceName")
                             logging.debug("Found AC field: {field.get('name')} -> {ac_field_ref}")
                             break
                     if not ac_field_ref:
@@ -960,27 +959,34 @@ class AzureDevOpsClient:
                 else:
                     logging.debug("Failed to get fields, status: {response.status_code}")
             except Exception as e:
-                logging.debug("Exception checking fields: {e}")
+                logging.debug(f"Exception checking fields: {e}")
                 pass  # Continue without dedicated field
 
-            if ac_field_ref and work_item_type != 'Task':
+            if ac_field_ref and work_item_type != "Task":
                 # Use dedicated acceptance criteria field (for PBIs, Bugs, etc., but NOT Tasks)
-                patch_document.append({"op": "add", "path": f"/fields/{ac_field_ref}", "value": ac_html})
+                patch_document.append(
+                    {"op": "add", "path": f"/fields/{ac_field_ref}", "value": ac_html}
+                )
             else:
                 # Append to description (for Tasks and other work item types without dedicated field)
                 logging.debug("Using description approach for {work_item_type}")
                 if description:
-                    description += f'\n\n<h3>Acceptance Criteria</h3>\n{ac_html}'
+                    description += f"\n\n<h3>Acceptance Criteria</h3>\n{ac_html}"
                 else:
-                    description = f'<h3>Acceptance Criteria</h3>\n{ac_html}'
+                    description = f"<h3>Acceptance Criteria</h3>\n{ac_html}"
                 # Update the description in the patch document
-                desc_patch = next((p for p in patch_document if p.get('path') == '/fields/System.Description'), None)
+                desc_patch = next(
+                    (p for p in patch_document if p.get("path") == "/fields/System.Description"),
+                    None,
+                )
                 logging.debug("Found desc_patch: {desc_patch is not None}")
                 if desc_patch:
-                    desc_patch['value'] = description
+                    desc_patch["value"] = description
                     logging.debug("Updated existing desc_patch")
                 else:
-                    patch_document.append({"op": "add", "path": "/fields/System.Description", "value": description})
+                    patch_document.append(
+                        {"op": "add", "path": "/fields/System.Description", "value": description}
+                    )
                     logging.debug("Added new desc_patch")
 
         # JSON Patch requires specific content type
@@ -1124,6 +1130,35 @@ class AzureDevOpsClient:
             self._handle_api_error(e, f"adding comment to work item #{work_item_id}")
             return None
 
+    def get_work_item_comments(self, work_item_id: int) -> Optional[Dict[str, Any]]:
+        """Get all comments for a work item.
+
+        Args:
+            work_item_id: ID of work item
+
+        Returns:
+            Dict with comments list or None on failure
+        """
+        # Comments API requires preview version
+        url = f"https://dev.azure.com/{self.organization}/{self.project}/_apis/wit/workitems/{work_item_id}/comments?api-version={self.api_version}-preview"
+
+        try:
+            if self.verbose:
+                print(f"Fetching comments for work item #{work_item_id}")
+
+            response = requests.get(url, headers=self.headers)
+            response.raise_for_status()
+
+            comments_data = response.json()
+            if self.verbose:
+                comment_count = len(comments_data.get("comments", []))
+                print(f"Found {comment_count} comments for work item #{work_item_id}")
+
+            return comments_data
+        except requests.RequestException as e:
+            self._handle_api_error(e, f"getting comments for work item #{work_item_id}")
+            return None
+
     def query_work_items(self, wiql: str) -> Optional[Dict[str, Any]]:
         """Execute a WIQL (Work Item Query Language) query.
 
@@ -1164,17 +1199,17 @@ class AzureDevOpsClient:
             Full work item type name used in Azure DevOps
         """
         type_mapping = {
-            'PBI': 'Product Backlog Item',
-            'Bug': 'Bug',
-            'Task': 'Task',
-            'Spike': 'Spike',
-            'Epic': 'Epic',
-            'Feature': 'Feature',
-            'User Story': 'User Story',
-            'Issue': 'Issue',
-            'Test Case': 'Test Case',
-            'Test Plan': 'Test Plan',
-            'Test Suite': 'Test Suite'
+            "PBI": "Product Backlog Item",
+            "Bug": "Bug",
+            "Task": "Task",
+            "Spike": "Spike",
+            "Epic": "Epic",
+            "Feature": "Feature",
+            "User Story": "User Story",
+            "Issue": "Issue",
+            "Test Case": "Test Case",
+            "Test Plan": "Test Plan",
+            "Test Suite": "Test Suite",
         }
         return type_mapping.get(work_item_type, work_item_type)
 
@@ -1219,7 +1254,7 @@ class AzureDevOpsClient:
         if where_clause:
             wiql = f"SELECT [System.Id], [System.Title], [System.State], [System.WorkItemType], [System.AreaPath] FROM WorkItems WHERE {where_clause} ORDER BY [System.ChangedDate] DESC"
         else:
-            wiql = f"SELECT [System.Id], [System.Title], [System.State], [System.WorkItemType], [System.AreaPath] FROM WorkItems ORDER BY [System.ChangedDate] DESC"
+            wiql = "SELECT [System.Id], [System.Title], [System.State], [System.WorkItemType], [System.AreaPath] FROM WorkItems ORDER BY [System.ChangedDate] DESC"
 
         result = self.query_work_items(wiql)
         if not result:
@@ -1245,6 +1280,143 @@ class AzureDevOpsClient:
         except requests.RequestException as e:
             self._handle_api_error(e, "getting work items batch")
             return None
+
+    def get_current_user(self) -> Optional[str]:
+        """Get the currently authenticated user's email address.
+
+        Returns:
+            User email address or None on failure
+        """
+        # Use the Azure DevOps Profile API to get current user
+        url = f"https://app.vssps.visualstudio.com/_apis/profile/profiles/me?api-version={self.api_version}"
+
+        try:
+            response = requests.get(url, headers=self.headers)
+            response.raise_for_status()
+
+            profile = response.json()
+            # Prefer emailAddress which is present for AAD/Work accounts; fallback to publicAlias (display name)
+            email = (
+                profile.get("emailAddress")
+                or profile.get("publicAlias")
+                or profile.get("displayName")
+            )
+
+            if email and self.verbose:
+                print(f"Current user (Profile API): {email}")
+
+            if email:
+                return email
+        except requests.RequestException:
+            # Try other approaches below
+            if self.verbose:
+                print("Profile API lookup failed; trying connection data...")
+
+        # Fallback 1: Try connectionData to get authenticatedUser uniqueName or id
+        try:
+            conn_url = f"https://dev.azure.com/{self.organization}/_apis/connectionData?api-version={self.api_version}"
+            resp = requests.get(conn_url, headers=self.headers)
+            resp.raise_for_status()
+            connection_data = resp.json()
+            auth_user = connection_data.get("authenticatedUser", {})
+            # Try uniqueName or descriptor
+            unique_name = (
+                auth_user.get("uniqueName")
+                or auth_user.get("displayName")
+                or auth_user.get("properties", {}).get("mail")
+            )
+            if unique_name:
+                if self.verbose:
+                    print(f"Current user (connectionData): {unique_name}")
+                return unique_name
+        except requests.RequestException:
+            if self.verbose:
+                print("Connection data lookup failed; trying Azure CLI...")
+
+        # Fallback 2: try to extract from Azure CLI if available
+        try:
+            import subprocess
+
+            result = subprocess.run(
+                ["az", "account", "show", "--query", "user.name", "-o", "tsv"],
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+            email = result.stdout.strip()
+            if email and self.verbose:
+                print(f"Current user (Azure CLI): {email}")
+            return email if email else None
+        except Exception:
+            if self.verbose:
+                print("Could not determine current user")
+            return None
+
+    def get_child_work_items(self, parent_id: int) -> Optional[List[Dict[str, Any]]]:
+        """Get all child work items for a given parent work item.
+
+        Args:
+            parent_id: ID of the parent work item
+
+        Returns:
+            List of child work items or None on failure
+        """
+        # Query for child work items using parent relationship
+        wiql = f"""
+        SELECT [System.Id], [System.Title], [System.State], [System.WorkItemType]
+        FROM WorkItemLinks
+        WHERE (Source.[System.Id] = {parent_id})
+        AND ([System.Links.LinkType] = 'System.LinkTypes.Hierarchy-Forward')
+        MODE (MustContain)
+        """
+
+        result = self.query_work_items(wiql)
+        if not result:
+            return None
+
+        # Get work item relations
+        relations = result.get("workItemRelations", [])
+        if not relations:
+            return []
+
+        # Extract target work item IDs (skip the first one which is the source)
+        child_ids = [rel["target"]["id"] for rel in relations if rel.get("target")]
+
+        if not child_ids:
+            return []
+
+        # Batch get work item details
+        ids_str = ",".join(map(str, child_ids))
+        url = f"https://dev.azure.com/{self.organization}/{self.project}/_apis/wit/workitems?ids={ids_str}&api-version={self.api_version}"
+
+        try:
+            response = requests.get(url, headers=self.headers)
+            response.raise_for_status()
+
+            batch_result = response.json()
+            children = batch_result.get("value", [])
+
+            if self.verbose:
+                print(f"Found {len(children)} child work items for #{parent_id}")
+
+            return children
+        except requests.RequestException as e:
+            self._handle_api_error(e, f"getting child work items for #{parent_id}")
+            return None
+
+    def update_work_item_iteration(
+        self, work_item_id: int, iteration_path: str
+    ) -> Optional[Dict[str, Any]]:
+        """Update a work item's iteration path (sprint).
+
+        Args:
+            work_item_id: ID of work item to update
+            iteration_path: New iteration path (e.g., "ProjectName\\Sprint 03")
+
+        Returns:
+            Dict with updated work item information or None on failure
+        """
+        return self.update_work_item(work_item_id=work_item_id, iteration_path=iteration_path)
 
     def link_work_item_to_pr(self, repository_name: str, pr_id: int, work_item_id: int) -> bool:
         """Link a work item to a pull request.
@@ -1371,14 +1543,13 @@ def extract_azure_devops_info_from_git() -> Optional[Dict[str, str]]:
         import subprocess
 
         # Get the remote URL - prefer 'azure' remote, fallback to 'origin'
-        remote_name = "azure"
+        remote_name = "azure"  # noqa: F841
         result = subprocess.run(
             ["git", "remote", "get-url", "azure"], capture_output=True, text=True, cwd=os.getcwd()
         )
 
         # If azure remote doesn't exist, try origin
         if result.returncode != 0:
-            remote_name = "origin"
             result = subprocess.run(
                 ["git", "remote", "get-url", "origin"],
                 capture_output=True,
@@ -1437,10 +1608,7 @@ def extract_platform_info_from_git() -> Optional[Dict[str, str]]:
         # Get the remote information - prefer 'azure' remote, fallback to 'origin'
         remote_name = "azure"
         result = subprocess.run(
-            ["git", "remote", "-v"],
-            capture_output=True,
-            text=True,
-            cwd=os.getcwd()
+            ["git", "remote", "-v"], capture_output=True, text=True, cwd=os.getcwd()
         )
 
         if result.returncode != 0:
@@ -1450,23 +1618,23 @@ def extract_platform_info_from_git() -> Optional[Dict[str, str]]:
 
         # Parse the remote output to find the fetch URL for the preferred remote
         remote_url = None
-        lines = remote_output.split('\n')
+        lines = remote_output.split("\n")
         for line in lines:
-            if line.startswith(f'{remote_name}\t') and '(fetch)' in line:
+            if line.startswith(f"{remote_name}\t") and "(fetch)" in line:
                 # Extract URL from "remote_name<TAB>url (fetch)" format
-                parts = line.split('\t')
+                parts = line.split("\t")
                 if len(parts) >= 2:
-                    remote_url = parts[1].split(' ')[0]  # Remove (fetch) part
+                    remote_url = parts[1].split(" ")[0]  # Remove (fetch) part
                     break
 
         # If azure remote not found, try origin
         if not remote_url:
             remote_name = "origin"
             for line in lines:
-                if line.startswith(f'{remote_name}\t') and '(fetch)' in line:
-                    parts = line.split('\t')
+                if line.startswith(f"{remote_name}\t") and "(fetch)" in line:
+                    parts = line.split("\t")
                     if len(parts) >= 2:
-                        remote_url = parts[1].split(' ')[0]  # Remove (fetch) part
+                        remote_url = parts[1].split(" ")[0]  # Remove (fetch) part
                         break
 
         if not remote_url:
@@ -1477,12 +1645,7 @@ def extract_platform_info_from_git() -> Optional[Dict[str, str]]:
         match = re.search(github_pattern, remote_url)
         if match:
             owner, repo = match.groups()
-            return {
-                'platform': 'github',
-                'owner': owner,
-                'repo': repo,
-                'remote_url': remote_url
-            }
+            return {"platform": "github", "owner": owner, "repo": repo, "remote_url": remote_url}
 
         # Check for Azure DevOps HTTPS URLs
         azdo_https_pattern = r"https://(?:[^@]+@)?dev\.azure\.com/([^/]+)/([^/]+)/_git/([^/\s]+)"
@@ -1490,11 +1653,11 @@ def extract_platform_info_from_git() -> Optional[Dict[str, str]]:
         if match:
             org, project, repo = match.groups()
             return {
-                'platform': 'azdo',
-                'organization': org,
-                'project': project,
-                'repository': repo,
-                'remote_url': remote_url
+                "platform": "azdo",
+                "organization": org,
+                "project": project,
+                "repository": repo,
+                "remote_url": remote_url,
             }
 
         # Check for Azure DevOps SSH URLs
@@ -1503,11 +1666,11 @@ def extract_platform_info_from_git() -> Optional[Dict[str, str]]:
         if match:
             org, project, repo = match.groups()
             return {
-                'platform': 'azdo',
-                'organization': org,
-                'project': project,
-                'repository': repo,
-                'remote_url': remote_url
+                "platform": "azdo",
+                "organization": org,
+                "project": project,
+                "repository": repo,
+                "remote_url": remote_url,
             }
 
         # Unsupported platform

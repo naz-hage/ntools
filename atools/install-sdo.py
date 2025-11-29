@@ -177,26 +177,30 @@ def install_sdo(sdo_source_path: Path, target_path: Path, is_local: bool = False
             return False
         print("✓ Virtual environment created")
 
-    # Get venv pip path
+    # Get venv python and pip paths
     if sys.platform == 'win32':
+        venv_python = venv_path / "Scripts" / "python.exe"
         venv_pip = venv_path / "Scripts" / "pip.exe"
     else:
+        venv_python = venv_path / "bin" / "python"
         venv_pip = venv_path / "bin" / "pip"
 
-    # Upgrade pip in venv
+    # Upgrade pip in venv using the venv's python (as pip recommends)
     if not dry_run:
         print("Upgrading pip in virtual environment...")
-        cmd = [str(venv_pip), "install", "--upgrade", "pip"]
+        cmd = [str(venv_python), "-m", "pip", "install", "--upgrade", "pip"]
         result = subprocess.run(cmd, capture_output=True, text=True, check=False)
         if result.returncode != 0:
             print(f"⚠️  Warning: Failed to upgrade pip: {result.stderr}")
+        else:
+            print("✓ Pip upgraded successfully")
 
     # Install SDO in virtual environment
     if dry_run:
-        print(f"Would install SDO from {sdo_source_path} using {venv_pip}")
+        print(f"Would install SDO from {sdo_source_path} using {venv_python}")
     else:
         print(f"Installing SDO from {sdo_source_path}...")
-        cmd = [str(venv_pip), "install", "-e", str(sdo_source_path)]
+        cmd = [str(venv_python), "-m", "pip", "install", "-e", str(sdo_source_path)]
         result = subprocess.run(cmd, capture_output=True, text=True, check=False)
         if result.returncode != 0:
             print(f"❌ SDO installation failed: {result.stderr}")
