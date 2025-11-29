@@ -959,7 +959,7 @@ class AzureDevOpsClient:
                 else:
                     logging.debug("Failed to get fields, status: {response.status_code}")
             except Exception as e:
-                logging.debug("Exception checking fields: {e}")
+                logging.debug(f"Exception checking fields: {e}")
                 pass  # Continue without dedicated field
 
             if ac_field_ref and work_item_type != "Task":
@@ -1543,14 +1543,13 @@ def extract_azure_devops_info_from_git() -> Optional[Dict[str, str]]:
         import subprocess
 
         # Get the remote URL - prefer 'azure' remote, fallback to 'origin'
-        remote_name = "azure"
+        remote_name = "azure"  # noqa: F841
         result = subprocess.run(
             ["git", "remote", "get-url", "azure"], capture_output=True, text=True, cwd=os.getcwd()
         )
 
         # If azure remote doesn't exist, try origin
         if result.returncode != 0:
-            remote_name = "origin"
             result = subprocess.run(
                 ["git", "remote", "get-url", "origin"],
                 capture_output=True,

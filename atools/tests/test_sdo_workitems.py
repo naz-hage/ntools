@@ -519,7 +519,7 @@ class TestWorkItemCommands:
         }
 
         # Mock client
-        mock_client = mock_client_class.return_value
+        _mock_client = mock_client_class.return_value  # noqa: F841
 
         # Import and test
         from sdo_package.work_items import get_work_item_platform

@@ -311,7 +311,7 @@ class TestGitHubPullRequestPlatform:
         platform = GitHubPullRequestPlatform()
 
         # This should not call subprocess
-        with patch("builtins.print") as mock_print:
+        with patch("builtins.print") as _mock_print:  # noqa: F841
             # We can't actually test dry run here since it's handled at command level
             # But we can verify the platform exists
             assert platform is not None

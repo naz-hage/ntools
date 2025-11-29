@@ -384,7 +384,6 @@ def cmd_pr_status(args: argparse.Namespace) -> None:
                                 for status in statuses:
                                     context_name = status.get("context", {}).get("name", "Unknown")
                                     state = status.get("state", "unknown")
-                                    description = status.get("description", "")
                                     target_url = status.get("targetUrl", "")
 
                                     # Map state to icon

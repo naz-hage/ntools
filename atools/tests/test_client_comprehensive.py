@@ -60,7 +60,7 @@ class TestAzureDevOpsClientAuthentication:
     def test_missing_pat_error(self):
         """Test error when PAT is missing."""
         with pytest.raises(AuthenticationError):
-            client = AzureDevOpsClient(organization="test-org", project="test-project", pat=None)
+            _client = AzureDevOpsClient(organization="test-org", project="test-project", pat=None)  # noqa: F841
 
 
 class TestAzureDevOpsClientAPICalls:

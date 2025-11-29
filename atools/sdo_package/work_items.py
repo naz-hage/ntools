@@ -207,7 +207,6 @@ class WorkItemManager:
             title = content.get("title", "")
             description = content.get("description", "")
             acceptance_criteria = content.get("acceptance_criteria", [])
-            work_item_type = metadata.get("work_item_type", "Task")
 
             result = platform.create_work_item(
                 title=title,
@@ -844,7 +843,7 @@ def _cmd_workitem_update_github(args, config):
             cmd.append("--reopen")
 
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        _result = subprocess.run(cmd, capture_output=True, text=True, check=True)  # noqa: F841
         print(f"✅ Issue #{args.id} updated successfully")
         if getattr(args, "verbose", False):
             print(f"   URL: https://github.com/{config['owner']}/{config['repo']}/issues/{args.id}")
@@ -925,7 +924,7 @@ def _cmd_workitem_comment_github(args, config):
     ]
 
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        _result = subprocess.run(cmd, capture_output=True, text=True, check=True)  # noqa: F841
         print(f"✅ Comment added to issue #{args.id}")
         return 0
 
