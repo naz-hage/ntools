@@ -310,7 +310,10 @@ def cmd_pr_status(args: argparse.Namespace) -> None:
         status = pr_details.get('status', 'Unknown')
         status_icon = {
             'active': '🟢',
+            'open': '🟢',
             'completed': '✅',
+            'merged': '✅',
+            'closed': '✅',
             'abandoned': '❌',
             'draft': '📝'
         }.get(status.lower(), '❓')

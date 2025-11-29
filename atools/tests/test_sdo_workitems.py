@@ -437,6 +437,7 @@ class TestWorkItemCommands:
 
     @patch('sdo_package.client.extract_platform_info_from_git')
     @patch('sdo_package.client.AzureDevOpsClient')
+    @patch.dict('os.environ', {'AZURE_DEVOPS_PAT': 'fake-pat-token'})
     def test_cmd_workitem_comment_azdo(self, mock_client_class, mock_extract):
         """Test workitem comment command for Azure DevOps."""
         # Mock platform detection
@@ -501,6 +502,7 @@ class TestWorkItemCommands:
 
     @patch('sdo_package.client.extract_platform_info_from_git')
     @patch('sdo_package.client.AzureDevOpsClient')
+    @patch.dict('os.environ', {'AZURE_DEVOPS_PAT': 'fake-pat-token'})
     def test_get_work_item_platform_azdo(self, mock_client_class, mock_extract):
         """Test get_work_item_platform for Azure DevOps."""
         # Mock platform detection
