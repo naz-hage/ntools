@@ -373,14 +373,20 @@ sdo pr show 123 --verbose
 sdo pr status PR_NUMBER [OPTIONS]
 ```
 
-Shows the current status of a specific pull request (open, closed, merged, etc.).
+Shows the current status of a specific pull request including CI/CD check results.
+
+Displays:
+- PR status (open, closed, merged, etc.)
+- Title, author, and branch information
+- CI/CD checks status (GitHub and Azure DevOps)
+- Check results with pass/fail indicators and URLs
 
 **Options:**
 - `-v, --verbose` - Show detailed API information
 
 **Examples:**
 ```bash
-# Check PR status
+# Check PR status with CI/CD checks
 sdo pr status 123
 
 # Check PR status with verbose details
@@ -446,6 +452,19 @@ sdo pr show 211
 
 ```bash
 sdo pr status 211
+```
+
+**Output includes CI/CD checks:**
+```
+✅ PR #211: MERGED
+Title: [208] Implement Comprehensive Pull Request Management for SDO CLI
+Author: naz-hage
+Branch: gh-208 → main
+
+CI/CD Checks:
+Python Tests    pass    27s     https://github.com/naz-hage/ntools/actions/runs/...
+Publish Docs    pass    13s     https://github.com/naz-hage/ntools/actions/runs/...
+Running a workflow (Release)    pass    3m24s   https://github.com/naz-hage/ntools/actions/runs/...
 ```
 
 ##### Update Pull Request
