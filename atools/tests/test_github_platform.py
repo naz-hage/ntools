@@ -21,18 +21,14 @@ class TestGitHubPlatformInit:
 
     def test_platform_initialization(self):
         """Test basic platform initialization."""
-        config = {
-            'platform': 'github',
-            'owner': 'testuser',
-            'repo': 'testrepo'
-        }
+        config = {"platform": "github", "owner": "testuser", "repo": "testrepo"}
 
         platform = GitHubPlatform(config)
 
         assert platform.config == config
         assert platform.verbose == False
-        assert platform.config['owner'] == 'testuser'
-        assert platform.config['repo'] == 'testrepo'
+        assert platform.config["owner"] == "testuser"
+        assert platform.config["repo"] == "testrepo"
 
     def test_platform_initialization_verbose(self):
         """Test platform initialization with verbose mode."""
@@ -52,9 +48,7 @@ class TestGitHubPlatformAuthentication:
     def test_validate_auth_success(self, mock_run):
         """Test successful authentication validation."""
         mock_run.return_value = MagicMock(
-            returncode=0,
-            stdout="✓ Logged in to github.com as testuser",
-            stderr=""
+            returncode=0, stdout="✓ Logged in to github.com as testuser", stderr=""
         )
 
         result = self.platform.validate_auth()
@@ -71,9 +65,7 @@ class TestGitHubPlatformAuthentication:
     def test_validate_auth_failure(self, mock_run):
         """Test authentication validation failure."""
         mock_run.return_value = MagicMock(
-            returncode=1,
-            stdout="",
-            stderr="You are not logged in to any GitHub hosts"
+            returncode=1, stdout="", stderr="You are not logged in to any GitHub hosts"
         )
 
         result = self.platform.validate_auth()
@@ -104,22 +96,18 @@ class TestGitHubRepositoryPlatformInit:
 
     def test_platform_initialization(self):
         """Test basic platform initialization."""
-        config = {
-            'platform': 'github',
-            'owner': 'testuser',
-            'repo': 'testrepo'
-        }
+        config = {"platform": "github", "owner": "testuser", "repo": "testrepo"}
 
         platform = GitHubRepositoryPlatform(config)
 
         assert platform.config == config
         assert platform.verbose == False
-        assert platform.config['owner'] == 'testuser'
-        assert platform.config['repo'] == 'testrepo'
+        assert platform.config["owner"] == "testuser"
+        assert platform.config["repo"] == "testrepo"
 
     def test_platform_initialization_verbose(self):
         """Test platform initialization with verbose mode."""
-        config = {'platform': 'github', 'owner': 'testuser'}
+        config = {"platform": "github", "owner": "testuser"}
         platform = GitHubRepositoryPlatform(config, verbose=True)
 
         assert platform.verbose == True
@@ -130,7 +118,7 @@ class TestGitHubRepositoryPlatformAuth:
 
     def setup_method(self):
         """Set up test fixtures."""
-        self.config = {'platform': 'github', 'owner': 'testuser'}
+        self.config = {"platform": "github", "owner": "testuser"}
         self.platform = GitHubRepositoryPlatform(self.config)
 
     @patch("subprocess.run")
@@ -141,11 +129,7 @@ class TestGitHubRepositoryPlatformAuth:
         result = self.platform.validate_auth()
 
         assert result == True
-        mock_run.assert_called_once_with(
-            ["gh", "auth", "status"],
-            capture_output=True,
-            text=True
-        )
+        mock_run.assert_called_once_with(["gh", "auth", "status"], capture_output=True, text=True)
 
     @patch("subprocess.run")
     def test_validate_auth_failure(self, mock_run):
@@ -176,7 +160,7 @@ class TestGitHubRepositoryPlatformOperations:
 
     def setup_method(self):
         """Set up test fixtures."""
-        self.config = {'platform': 'github', 'owner': 'testuser'}
+        self.config = {"platform": "github", "owner": "testuser"}
         self.platform = GitHubRepositoryPlatform(self.config)
 
     @patch("subprocess.run")
@@ -188,9 +172,17 @@ class TestGitHubRepositoryPlatformOperations:
 
         assert result == True
         mock_run.assert_called_once_with(
-            ["gh", "repo", "create", "testuser/new-repo", "--public", "--description", "Repository new-repo"],
+            [
+                "gh",
+                "repo",
+                "create",
+                "testuser/new-repo",
+                "--public",
+                "--description",
+                "Repository new-repo",
+            ],
             capture_output=True,
-            text=True
+            text=True,
         )
 
     @patch("subprocess.run")
@@ -206,7 +198,9 @@ class TestGitHubRepositoryPlatformOperations:
     @patch("subprocess.run")
     def test_create_repository_failure(self, mock_run):
         """Test repository creation failure."""
-        mock_run.return_value = MagicMock(returncode=1, stdout="", stderr="Repository already exists")
+        mock_run.return_value = MagicMock(
+            returncode=1, stdout="", stderr="Repository already exists"
+        )
 
         result = self.platform.create_repository("existing-repo")
 
@@ -232,7 +226,7 @@ class TestGitHubRepositoryPlatformOperations:
             "createdAt": "2023-01-01T00:00:00Z",
             "updatedAt": "2023-01-02T00:00:00Z",
             "defaultBranchRef": {"name": "main"},
-            "isPrivate": False
+            "isPrivate": False,
         }
         mock_run.return_value = MagicMock(returncode=0, stdout='{"name": "test-repo"}', stderr="")
         mock_json_loads.return_value = mock_repo_data
@@ -276,7 +270,7 @@ class TestGitHubRepositoryPlatformOperations:
                 "createdAt": "2023-01-01T00:00:00Z",
                 "updatedAt": "2023-01-02T00:00:00Z",
                 "defaultBranchRef": {"name": "main"},
-                "isPrivate": False
+                "isPrivate": False,
             },
             {
                 "name": "repo2",
@@ -285,10 +279,12 @@ class TestGitHubRepositoryPlatformOperations:
                 "createdAt": "2023-01-03T00:00:00Z",
                 "updatedAt": "2023-01-04T00:00:00Z",
                 "defaultBranchRef": {"name": "develop"},
-                "isPrivate": True
-            }
+                "isPrivate": True,
+            },
         ]
-        mock_run.return_value = MagicMock(returncode=0, stdout='[{"name": "repo1"}, {"name": "repo2"}]', stderr="")
+        mock_run.return_value = MagicMock(
+            returncode=0, stdout='[{"name": "repo1"}, {"name": "repo2"}]', stderr=""
+        )
         mock_json_loads.return_value = mock_repos_data
 
         result = self.platform.list_repositories()
@@ -318,9 +314,7 @@ class TestGitHubRepositoryPlatformOperations:
 
         assert result == True
         mock_run.assert_called_once_with(
-            ["gh", "repo", "delete", "testuser/old-repo", "--yes"],
-            capture_output=True,
-            text=True
+            ["gh", "repo", "delete", "testuser/old-repo", "--yes"], capture_output=True, text=True
         )
 
     @patch("subprocess.run")
@@ -340,5 +334,3 @@ class TestGitHubRepositoryPlatformOperations:
         result = self.platform.delete_repository("test-repo")
 
         assert result == False
-
-

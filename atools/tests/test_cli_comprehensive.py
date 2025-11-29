@@ -24,18 +24,16 @@ from sdo_package import cli
 
 from sdo_package.exceptions import SDOError, ConfigurationError, ValidationError
 
-class TestCLIBasics:
 
+class TestCLIBasics:
     """Test basic CLI functionality."""
 
     def setup_method(self):
-
         """Set up test fixtures."""
 
         self.runner = CliRunner()
 
     def test_cli_help_command(self):
-
         """Test that CLI help command works."""
 
         result = self.runner.invoke(cli.cli, ["--help"])
@@ -58,7 +56,6 @@ class TestCLIBasics:
         assert "SDO" in result.output
 
     def test_cli_verbose_flag(self):
-
         """Test that verbose flag is accepted."""
 
         result = self.runner.invoke(cli.cli, ["--verbose", "--help"])
@@ -66,7 +63,6 @@ class TestCLIBasics:
         assert result.exit_code == 0
 
     def test_cli_unknown_command(self):
-
         """Test that unknown commands show appropriate error."""
 
         result = self.runner.invoke(cli.cli, ["unknown-command"])
@@ -76,7 +72,6 @@ class TestCLIBasics:
         assert "No such command" in result.output
 
     def test_cli_no_command(self):
-
         """Test that running CLI without command shows help."""
 
         result = self.runner.invoke(cli.cli, [])
@@ -85,18 +80,16 @@ class TestCLIBasics:
 
         assert "SDO" in result.output
 
-class TestWorkitemCommands:
 
+class TestWorkitemCommands:
     """Test workitem command group."""
 
     def setup_method(self):
-
         """Set up test fixtures."""
 
         self.runner = CliRunner()
 
     def test_workitem_help(self):
-
         """Test workitem command help."""
 
         result = self.runner.invoke(cli.cli, ["workitem", "--help"])
@@ -108,7 +101,6 @@ class TestWorkitemCommands:
         assert "create" in result.output
 
     def test_workitem_create_help(self):
-
         """Test workitem create command help."""
 
         result = self.runner.invoke(cli.cli, ["workitem", "create", "--help"])
@@ -122,9 +114,7 @@ class TestWorkitemCommands:
         assert "--dry-run" in result.output
 
     @patch("sdo_package.cli.cmd_workitem_create")
-
     def test_workitem_create_success(self, mock_cmd):
-
         """Test successful workitem create command."""
 
         mock_cmd.return_value = True
@@ -144,21 +134,19 @@ class TestWorkitemCommands:
             mock_cmd.assert_called_once()
 
     @patch("sdo_package.cli.cmd_workitem_create")
-
     def test_workitem_create_missing_file(self, mock_cmd):
-
         """Test workitem create with missing file."""
 
-        result = self.runner.invoke(cli.cli, ["workitem", "create", "--file-path", "nonexistent.md"])
+        result = self.runner.invoke(
+            cli.cli, ["workitem", "create", "--file-path", "nonexistent.md"]
+        )
 
         assert result.exit_code == 2  # Click validation error
 
         assert "does not exist" in result.output.lower()
 
     @patch("sdo_package.cli.cmd_workitem_create")
-
     def test_workitem_create_dry_run(self, mock_cmd):
-
         """Test workitem create with dry-run flag."""
 
         mock_cmd.return_value = True
@@ -169,16 +157,16 @@ class TestWorkitemCommands:
 
                 f.write("# Test Work Item\n\nDescription here")
 
-            result = self.runner.invoke(cli.cli, ["workitem", "create", "--file-path", "test.md", "--dry-run"])
+            result = self.runner.invoke(
+                cli.cli, ["workitem", "create", "--file-path", "test.md", "--dry-run"]
+            )
 
             assert result.exit_code == 0
 
             mock_cmd.assert_called_once()
 
     @patch("sdo_package.cli.cmd_workitem_create")
-
     def test_workitem_create_business_logic_error(self, mock_cmd):
-
         """Test workitem create when business logic returns error."""
 
         mock_cmd.return_value = False
@@ -194,9 +182,7 @@ class TestWorkitemCommands:
             assert result.exit_code == 1
 
     @patch("sdo_package.cli.cmd_workitem_create")
-
     def test_workitem_create_sdo_error(self, mock_cmd):
-
         """Test workitem create with SDO error."""
 
         mock_cmd.side_effect = SDOError("Test error")
@@ -214,9 +200,7 @@ class TestWorkitemCommands:
             assert "❌ Test error" in result.output
 
     @patch("sdo_package.cli.cmd_workitem_create")
-
     def test_workitem_create_sdo_error_verbose(self, mock_cmd):
-
         """Test workitem create with SDO error in verbose mode."""
 
         mock_cmd.side_effect = SDOError("Test error")
@@ -227,7 +211,9 @@ class TestWorkitemCommands:
 
                 f.write("# Test Work Item\n\nDescription here")
 
-            result = self.runner.invoke(cli.cli, ["--verbose", "workitem", "create", "--file-path", "test.md"])
+            result = self.runner.invoke(
+                cli.cli, ["--verbose", "workitem", "create", "--file-path", "test.md"]
+            )
 
             assert result.exit_code == 1
 
@@ -235,18 +221,16 @@ class TestWorkitemCommands:
 
             assert "Error type:" in result.output
 
-class TestRepoCommands:
 
+class TestRepoCommands:
     """Test repository command group."""
 
     def setup_method(self):
-
         """Set up test fixtures."""
 
         self.runner = CliRunner()
 
     def test_repo_help(self):
-
         """Test repo command help."""
 
         result = self.runner.invoke(cli.cli, ["repo", "--help"])
@@ -264,7 +248,6 @@ class TestRepoCommands:
         assert "delete" in result.output
 
     def test_repo_create_help(self):
-
         """Test repo create command help."""
 
         result = self.runner.invoke(cli.cli, ["repo", "create", "--help"])
@@ -274,7 +257,6 @@ class TestRepoCommands:
         assert "Create a repository in the current project" in result.output
 
     def test_repo_show_help(self):
-
         """Test repo show command help."""
 
         result = self.runner.invoke(cli.cli, ["repo", "show", "--help"])
@@ -284,7 +266,6 @@ class TestRepoCommands:
         assert "Show information about the current repository" in result.output
 
     def test_repo_ls_help(self):
-
         """Test repo ls command help."""
 
         result = self.runner.invoke(cli.cli, ["repo", "ls", "--help"])
@@ -294,7 +275,6 @@ class TestRepoCommands:
         assert "List all repositories" in result.output
 
     def test_repo_delete_help(self):
-
         """Test repo delete command help."""
 
         result = self.runner.invoke(cli.cli, ["repo", "delete", "--help"])
@@ -304,6 +284,7 @@ class TestRepoCommands:
         assert "Delete the current repository" in result.output
 
         # Remove all broken decorators and code below this line
+
     @patch("sdo_package.cli.cmd_repo_create")
     def test_repo_create_success(self, mock_cmd):
         """Test successful repo create command."""
@@ -351,28 +332,26 @@ class TestRepoCommands:
         assert result.exit_code == 0
         mock_cmd.assert_called_once_with(verbose=False)
 
-class TestClickArgsAdapter:
 
+class TestClickArgsAdapter:
     """Test the ClickArgs adapter class."""
 
     def test_click_args_creation(self):
-
         """Test ClickArgs adapter creation."""
 
         mock_ctx = MagicMock()
 
-        mock_ctx.obj = {'verbose': True}
+        mock_ctx.obj = {"verbose": True}
 
-        mock_ctx.params = {'test_param': 'test_value'}
+        mock_ctx.params = {"test_param": "test_value"}
 
         args = cli.ClickArgs(mock_ctx)
 
         assert args.verbose == True
 
-        assert args.test_param == 'test_value'
+        assert args.test_param == "test_value"
 
     def test_click_args_missing_attribute(self):
-
         """Test ClickArgs handles missing attributes."""
 
         mock_ctx = MagicMock()
@@ -387,16 +366,13 @@ class TestClickArgsAdapter:
 
         assert args.verbose == False
 
-class TestMainFunction:
 
+class TestMainFunction:
     """Test the main entry point function."""
 
     @patch("sys.argv", ["sdo", "--version"])
-
     @patch("sdo_package.cli.cli")
-
     def test_main_version_handling(self, mock_cli):
-
         """Test main function handles version option."""
 
         with patch("sys.exit") as mock_exit:
@@ -406,19 +382,15 @@ class TestMainFunction:
             mock_exit.assert_called_once_with(0)
 
     @patch("sdo_package.cli.cli")
-
     def test_main_with_args_list(self, mock_cli):
-
         """Test main function with args as list."""
 
         cli.main(["--help"])
 
         mock_cli.assert_called_once_with(["--help"], standalone_mode=False)
 
-
     @patch("sdo_package.cli.cli")
     def test_main_without_args(self, mock_cli):
         """Test main function without args."""
         cli.main([])
         mock_cli.assert_called_once_with([], standalone_mode=False)
-

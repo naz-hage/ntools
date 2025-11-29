@@ -21,22 +21,22 @@ class MetadataParser:
             Platform name ('azdo' or 'github')
         """
         # Check explicit platform specification (both 'platform' and 'target' keys)
-        platform = metadata.get('platform', metadata.get('target', '')).lower()
-        if platform in ['azdo', 'azure', 'azure-devops', 'azure_devops']:
-            return 'azdo'
-        elif platform in ['github', 'gh']:
-            return 'github'
+        platform = metadata.get("platform", metadata.get("target", "")).lower()
+        if platform in ["azdo", "azure", "azure-devops", "azure_devops"]:
+            return "azdo"
+        elif platform in ["github", "gh"]:
+            return "github"
 
         # Check for platform-specific indicators
-        repo = metadata.get('repo') or metadata.get('repository')
-        if repo and '/' in str(repo):
-            return 'github'  # Format like "owner/repo"
+        repo = metadata.get("repo") or metadata.get("repository")
+        if repo and "/" in str(repo):
+            return "github"  # Format like "owner/repo"
 
-        if metadata.get('organization') or metadata.get('project'):
-            return 'azdo'
+        if metadata.get("organization") or metadata.get("project"):
+            return "azdo"
 
         # Default fallback
-        return 'azdo'
+        return "azdo"
 
     @staticmethod
     def normalize_work_item_type(work_item_type: Optional[str], platform: str) -> str:
@@ -51,29 +51,29 @@ class MetadataParser:
             Normalized work item type
         """
         if not work_item_type:
-            return 'Task' if platform == 'azdo' else 'issue'
+            return "Task" if platform == "azdo" else "issue"
 
         wit = work_item_type.lower().strip()
 
-        if platform == 'azdo':
+        if platform == "azdo":
             # Azure DevOps work item types
             type_mapping = {
-                'pbi': 'Product Backlog Item',
-                'product backlog item': 'Product Backlog Item',
-                'backlog item': 'Product Backlog Item',
-                'user story': 'User Story',
-                'story': 'User Story',
-                'task': 'Task',
-                'bug': 'Bug',
-                'issue': 'Issue',
-                'epic': 'Epic',
-                'feature': 'Feature'
+                "pbi": "Product Backlog Item",
+                "product backlog item": "Product Backlog Item",
+                "backlog item": "Product Backlog Item",
+                "user story": "User Story",
+                "story": "User Story",
+                "task": "Task",
+                "bug": "Bug",
+                "issue": "Issue",
+                "epic": "Epic",
+                "feature": "Feature",
             }
-            return type_mapping.get(wit, 'Task')
+            return type_mapping.get(wit, "Task")
 
         else:  # GitHub
             # GitHub only has issues, but we can use labels
-            return 'issue'
+            return "issue"
 
     @staticmethod
     def parse_labels(labels_str: Optional[str]) -> List[str]:
@@ -89,7 +89,7 @@ class MetadataParser:
         if not labels_str:
             return []
 
-        return [label.strip() for label in labels_str.split(',') if label.strip()]
+        return [label.strip() for label in labels_str.split(",") if label.strip()]
 
     @staticmethod
     def parse_parent_id(parent_str: Optional[str]) -> Optional[int]:
@@ -106,7 +106,7 @@ class MetadataParser:
             return None
 
         # Handle formats like "#123", "123", "PBI-123"
-        match = re.search(r'\d+', str(parent_str))
+        match = re.search(r"\d+", str(parent_str))
         if match:
             try:
                 return int(match.group())
@@ -130,11 +130,11 @@ class MetadataParser:
         """
         errors = []
 
-        if platform == 'github':
-            if not metadata.get('repo') and not metadata.get('repository'):
+        if platform == "github":
+            if not metadata.get("repo") and not metadata.get("repository"):
                 errors.append("GitHub platform requires 'repo' or 'repository' field")
 
-        elif platform == 'azdo':
+        elif platform == "azdo":
             # Azure DevOps validation can be more flexible as it can detect from git remote
             pass
 

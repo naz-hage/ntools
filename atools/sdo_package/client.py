@@ -938,8 +938,8 @@ class AzureDevOpsClient:
         logging.debug("Client received acceptance_criteria: {acceptance_criteria}")
         if acceptance_criteria:
             logging.debug("Processing acceptance criteria for work_item_type: {work_item_type}")
-            ac_html = '<ul>' + '\n'.join([f'<li>{ac}</li>' for ac in acceptance_criteria]) + '</ul>'
-            
+            ac_html = "<ul>" + "\n".join([f"<li>{ac}</li>" for ac in acceptance_criteria]) + "</ul>"
+
             # Try to discover a field whose name/reference contains 'acceptance'
             ac_field_ref = None
             try:
@@ -949,10 +949,10 @@ class AzureDevOpsClient:
                 if response.status_code == 200:
                     fields_data = response.json()
                     logging.debug("Found {len(fields_data.get('value', []))} fields")
-                    for field in fields_data.get('value', []):
-                        field_name = field.get('name', '').lower()
-                        if 'acceptance' in field_name:
-                            ac_field_ref = field.get('referenceName')
+                    for field in fields_data.get("value", []):
+                        field_name = field.get("name", "").lower()
+                        if "acceptance" in field_name:
+                            ac_field_ref = field.get("referenceName")
                             logging.debug("Found AC field: {field.get('name')} -> {ac_field_ref}")
                             break
                     if not ac_field_ref:
@@ -963,24 +963,31 @@ class AzureDevOpsClient:
                 logging.debug("Exception checking fields: {e}")
                 pass  # Continue without dedicated field
 
-            if ac_field_ref and work_item_type != 'Task':
+            if ac_field_ref and work_item_type != "Task":
                 # Use dedicated acceptance criteria field (for PBIs, Bugs, etc., but NOT Tasks)
-                patch_document.append({"op": "add", "path": f"/fields/{ac_field_ref}", "value": ac_html})
+                patch_document.append(
+                    {"op": "add", "path": f"/fields/{ac_field_ref}", "value": ac_html}
+                )
             else:
                 # Append to description (for Tasks and other work item types without dedicated field)
                 logging.debug("Using description approach for {work_item_type}")
                 if description:
-                    description += f'\n\n<h3>Acceptance Criteria</h3>\n{ac_html}'
+                    description += f"\n\n<h3>Acceptance Criteria</h3>\n{ac_html}"
                 else:
-                    description = f'<h3>Acceptance Criteria</h3>\n{ac_html}'
+                    description = f"<h3>Acceptance Criteria</h3>\n{ac_html}"
                 # Update the description in the patch document
-                desc_patch = next((p for p in patch_document if p.get('path') == '/fields/System.Description'), None)
+                desc_patch = next(
+                    (p for p in patch_document if p.get("path") == "/fields/System.Description"),
+                    None,
+                )
                 logging.debug("Found desc_patch: {desc_patch is not None}")
                 if desc_patch:
-                    desc_patch['value'] = description
+                    desc_patch["value"] = description
                     logging.debug("Updated existing desc_patch")
                 else:
-                    patch_document.append({"op": "add", "path": "/fields/System.Description", "value": description})
+                    patch_document.append(
+                        {"op": "add", "path": "/fields/System.Description", "value": description}
+                    )
                     logging.debug("Added new desc_patch")
 
         # JSON Patch requires specific content type
@@ -1145,7 +1152,7 @@ class AzureDevOpsClient:
 
             comments_data = response.json()
             if self.verbose:
-                comment_count = len(comments_data.get('comments', []))
+                comment_count = len(comments_data.get("comments", []))
                 print(f"Found {comment_count} comments for work item #{work_item_id}")
 
             return comments_data
@@ -1193,17 +1200,17 @@ class AzureDevOpsClient:
             Full work item type name used in Azure DevOps
         """
         type_mapping = {
-            'PBI': 'Product Backlog Item',
-            'Bug': 'Bug',
-            'Task': 'Task',
-            'Spike': 'Spike',
-            'Epic': 'Epic',
-            'Feature': 'Feature',
-            'User Story': 'User Story',
-            'Issue': 'Issue',
-            'Test Case': 'Test Case',
-            'Test Plan': 'Test Plan',
-            'Test Suite': 'Test Suite'
+            "PBI": "Product Backlog Item",
+            "Bug": "Bug",
+            "Task": "Task",
+            "Spike": "Spike",
+            "Epic": "Epic",
+            "Feature": "Feature",
+            "User Story": "User Story",
+            "Issue": "Issue",
+            "Test Case": "Test Case",
+            "Test Plan": "Test Plan",
+            "Test Suite": "Test Suite",
         }
         return type_mapping.get(work_item_type, work_item_type)
 
@@ -1290,7 +1297,11 @@ class AzureDevOpsClient:
 
             profile = response.json()
             # Prefer emailAddress which is present for AAD/Work accounts; fallback to publicAlias (display name)
-            email = profile.get("emailAddress") or profile.get("publicAlias") or profile.get("displayName")
+            email = (
+                profile.get("emailAddress")
+                or profile.get("publicAlias")
+                or profile.get("displayName")
+            )
 
             if email and self.verbose:
                 print(f"Current user (Profile API): {email}")
@@ -1310,7 +1321,11 @@ class AzureDevOpsClient:
             connection_data = resp.json()
             auth_user = connection_data.get("authenticatedUser", {})
             # Try uniqueName or descriptor
-            unique_name = auth_user.get("uniqueName") or auth_user.get("displayName") or auth_user.get("properties", {}).get("mail")
+            unique_name = (
+                auth_user.get("uniqueName")
+                or auth_user.get("displayName")
+                or auth_user.get("properties", {}).get("mail")
+            )
             if unique_name:
                 if self.verbose:
                     print(f"Current user (connectionData): {unique_name}")
@@ -1322,11 +1337,12 @@ class AzureDevOpsClient:
         # Fallback 2: try to extract from Azure CLI if available
         try:
             import subprocess
+
             result = subprocess.run(
                 ["az", "account", "show", "--query", "user.name", "-o", "tsv"],
                 capture_output=True,
                 text=True,
-                check=True
+                check=True,
             )
             email = result.stdout.strip()
             if email and self.verbose:
@@ -1401,9 +1417,7 @@ class AzureDevOpsClient:
         Returns:
             Dict with updated work item information or None on failure
         """
-        return self.update_work_item(
-            work_item_id=work_item_id, iteration_path=iteration_path
-        )
+        return self.update_work_item(work_item_id=work_item_id, iteration_path=iteration_path)
 
     def link_work_item_to_pr(self, repository_name: str, pr_id: int, work_item_id: int) -> bool:
         """Link a work item to a pull request.
@@ -1596,10 +1610,7 @@ def extract_platform_info_from_git() -> Optional[Dict[str, str]]:
         # Get the remote information - prefer 'azure' remote, fallback to 'origin'
         remote_name = "azure"
         result = subprocess.run(
-            ["git", "remote", "-v"],
-            capture_output=True,
-            text=True,
-            cwd=os.getcwd()
+            ["git", "remote", "-v"], capture_output=True, text=True, cwd=os.getcwd()
         )
 
         if result.returncode != 0:
@@ -1609,23 +1620,23 @@ def extract_platform_info_from_git() -> Optional[Dict[str, str]]:
 
         # Parse the remote output to find the fetch URL for the preferred remote
         remote_url = None
-        lines = remote_output.split('\n')
+        lines = remote_output.split("\n")
         for line in lines:
-            if line.startswith(f'{remote_name}\t') and '(fetch)' in line:
+            if line.startswith(f"{remote_name}\t") and "(fetch)" in line:
                 # Extract URL from "remote_name<TAB>url (fetch)" format
-                parts = line.split('\t')
+                parts = line.split("\t")
                 if len(parts) >= 2:
-                    remote_url = parts[1].split(' ')[0]  # Remove (fetch) part
+                    remote_url = parts[1].split(" ")[0]  # Remove (fetch) part
                     break
 
         # If azure remote not found, try origin
         if not remote_url:
             remote_name = "origin"
             for line in lines:
-                if line.startswith(f'{remote_name}\t') and '(fetch)' in line:
-                    parts = line.split('\t')
+                if line.startswith(f"{remote_name}\t") and "(fetch)" in line:
+                    parts = line.split("\t")
                     if len(parts) >= 2:
-                        remote_url = parts[1].split(' ')[0]  # Remove (fetch) part
+                        remote_url = parts[1].split(" ")[0]  # Remove (fetch) part
                         break
 
         if not remote_url:
@@ -1636,12 +1647,7 @@ def extract_platform_info_from_git() -> Optional[Dict[str, str]]:
         match = re.search(github_pattern, remote_url)
         if match:
             owner, repo = match.groups()
-            return {
-                'platform': 'github',
-                'owner': owner,
-                'repo': repo,
-                'remote_url': remote_url
-            }
+            return {"platform": "github", "owner": owner, "repo": repo, "remote_url": remote_url}
 
         # Check for Azure DevOps HTTPS URLs
         azdo_https_pattern = r"https://(?:[^@]+@)?dev\.azure\.com/([^/]+)/([^/]+)/_git/([^/\s]+)"
@@ -1649,11 +1655,11 @@ def extract_platform_info_from_git() -> Optional[Dict[str, str]]:
         if match:
             org, project, repo = match.groups()
             return {
-                'platform': 'azdo',
-                'organization': org,
-                'project': project,
-                'repository': repo,
-                'remote_url': remote_url
+                "platform": "azdo",
+                "organization": org,
+                "project": project,
+                "repository": repo,
+                "remote_url": remote_url,
             }
 
         # Check for Azure DevOps SSH URLs
@@ -1662,11 +1668,11 @@ def extract_platform_info_from_git() -> Optional[Dict[str, str]]:
         if match:
             org, project, repo = match.groups()
             return {
-                'platform': 'azdo',
-                'organization': org,
-                'project': project,
-                'repository': repo,
-                'remote_url': remote_url
+                "platform": "azdo",
+                "organization": org,
+                "project": project,
+                "repository": repo,
+                "remote_url": remote_url,
             }
 
         # Unsupported platform

@@ -3,4 +3,4 @@ SDO Version Information
 """
 
 __version__ = "1.50.0"
-__version_info__ = tuple(map(int, __version__.split('.')))
+__version_info__ = tuple(map(int, __version__.split(".")))

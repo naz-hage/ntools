@@ -20,9 +20,9 @@ class TestMarkdownParserInit:
         parser = MarkdownParser()
 
         assert parser is not None
-        assert hasattr(parser, 'parse_workitem')
-        assert hasattr(parser, 'parse_issue')
-        assert hasattr(parser, 'validate_markdown')
+        assert hasattr(parser, "parse_workitem")
+        assert hasattr(parser, "parse_issue")
+        assert hasattr(parser, "validate_markdown")
 
     def test_parser_initialization_verbose(self):
         """Test parser initialization with verbose mode."""
@@ -40,7 +40,7 @@ class TestMarkdownParserWorkitemParsing:
 
     def test_parse_workitem_basic(self):
         """Test parsing basic workitem markdown."""
-        markdown_content = """# Product Backlog Item: Implement User Authentication
+        markdown_content = r"""# Product Backlog Item: Implement User Authentication
 
 ## Description
 Implement secure user authentication system with OAuth2 support.
@@ -66,8 +66,8 @@ Implement secure user authentication system with OAuth2 support.
         assert len(result["acceptance_criteria"]) == 4
         assert result["target"] == "azdo"
         assert result["project"] == "TestProject"
-        assert result["area"] == "TestProject\\Development"
-        assert result["iteration"] == "TestProject\\Sprint 1"
+        assert result["area"] == r"TestProject\Development"
+        assert result["iteration"] == r"TestProject\Sprint 1"
         assert "authentication" in result["labels"]
 
     def test_parse_workitem_minimal(self):
@@ -90,7 +90,7 @@ Simple bug fix.
 
     def test_parse_workitem_complex(self):
         """Test parsing complex workitem with all fields."""
-        markdown_content = """# Epic: Complete System Redesign
+        markdown_content = r"""# Epic: Complete System Redesign
 
 ## Description
 This epic covers the complete redesign of our system architecture to improve scalability and maintainability.
@@ -266,7 +266,7 @@ class TestMarkdownParserValidation:
 
     def test_validate_markdown_valid_workitem(self):
         """Test validation of valid workitem markdown."""
-        markdown_content = """# Task: Valid Workitem
+        markdown_content = r"""# Task: Valid Workitem
 
 ## Target: azdo
 ## Project: TestProject

@@ -22,11 +22,13 @@ SDOException = SDOError
 
 class ConfigurationError(SDOError):
     """Raised when there are configuration issues."""
+
     pass
 
 
 class ValidationError(SDOError):
     """Raised when validation fails."""
+
     pass
 
 
@@ -40,16 +42,19 @@ class FileOperationError(SDOError):
 
 class AuthenticationError(SDOError):
     """Raised when authentication fails."""
+
     pass
 
 
 class PlatformError(SDOError):
     """Raised when platform operations fail."""
+
     pass
 
 
 class ParsingError(SDOError):
     """Raised when parsing fails."""
+
     pass
 
 
@@ -60,7 +65,9 @@ class APIError(SDOError):
 class AzureDevOpsAPIError(SDOError):
     """Raised when Azure DevOps API calls fail."""
 
-    def __init__(self, message: str, status_code: int = None, response_body: str = None, details: str = None):
+    def __init__(
+        self, message: str, status_code: int = None, response_body: str = None, details: str = None
+    ):
         super().__init__(message, details)
         self.status_code = status_code
         self.response_body = response_body
@@ -68,19 +75,23 @@ class AzureDevOpsAPIError(SDOError):
 
 class NetworkError(SDOError):
     """Raised when network operations fail."""
+
     pass
 
 
 class AuthenticationError(SDOError):
     """Raised when authentication fails."""
+
     pass
 
 
 class ConfigurationError(SDOError):
     """Raised when configuration issues occur."""
+
     pass
 
 
 class ValidationError(SDOError):
     """Raised when validation fails."""
+
     pass

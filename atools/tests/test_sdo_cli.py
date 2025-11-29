@@ -27,11 +27,9 @@ class TestAddIssueCommand:
         # Mock successful work item creation
         mock_instance = mock_manager.return_value
         from sdo_package.work_items import WorkItemResult
+
         mock_instance.create_work_item.return_value = WorkItemResult(
-            success=True,
-            work_item_id="123",
-            url="https://example.com/123",
-            platform="test"
+            success=True, work_item_id="123", url="https://example.com/123", platform="test"
         )
 
         with self.runner.isolated_filesystem():
@@ -50,11 +48,9 @@ class TestAddIssueCommand:
         """Test add-issue command with verbose flag."""
         mock_instance = mock_manager.return_value
         from sdo_package.work_items import WorkItemResult
+
         mock_instance.create_work_item.return_value = WorkItemResult(
-            success=True,
-            work_item_id="123",
-            url="https://example.com/123",
-            platform="test"
+            success=True, work_item_id="123", url="https://example.com/123", platform="test"
         )
 
         with self.runner.isolated_filesystem():
@@ -79,9 +75,9 @@ class TestAddIssueCommand:
         """Test add-issue command with platform error."""
         mock_instance = mock_manager.return_value
         from sdo_package.work_items import WorkItemResult
+
         mock_instance.create_work_item.return_value = WorkItemResult(
-            success=False,
-            error_message="Platform error"
+            success=False, error_message="Platform error"
         )
 
         with self.runner.isolated_filesystem():
@@ -141,17 +137,19 @@ class TestCLIIntegration:
         """Test full workflow for Azure DevOps."""
         mock_instance = mock_manager.return_value
         from sdo_package.work_items import WorkItemResult
+
         mock_instance.create_work_item.return_value = WorkItemResult(
             success=True,
             work_item_id="12345",
             url="https://dev.azure.com/org/project/_workitems/edit/12345",
-            platform="azure_devops"
+            platform="azure_devops",
         )
 
         with self.runner.isolated_filesystem():
             # Create Azure DevOps test file
             with open("azdo_issue.md", "w") as f:
-                f.write("""# Bug: Sample Issue
+                f.write(
+                    """# Bug: Sample Issue
 
 ## Description
 This is a test issue for Azure DevOps.
@@ -163,7 +161,8 @@ This is a test issue for Azure DevOps.
 ## Metadata
 Platform: azure_devops
 WorkItemType: Bug
-""")
+"""
+                )
 
             result = self.runner.invoke(cli.add_issue, ["azdo_issue.md"])
 
@@ -176,17 +175,19 @@ WorkItemType: Bug
         """Test full workflow for GitHub."""
         mock_instance = mock_manager.return_value
         from sdo_package.work_items import WorkItemResult
+
         mock_instance.create_work_item.return_value = WorkItemResult(
             success=True,
             work_item_id="67890",
             url="https://github.com/owner/repo/issues/67890",
-            platform="github"
+            platform="github",
         )
 
         with self.runner.isolated_filesystem():
             # Create GitHub test file
             with open("github_issue.md", "w") as f:
-                f.write("""# Feature: Sample Feature
+                f.write(
+                    """# Feature: Sample Feature
 
 ## Description
 This is a test feature for GitHub.
@@ -197,7 +198,8 @@ This is a test feature for GitHub.
 
 ## Metadata
 Platform: github
-""")
+"""
+                )
 
             result = self.runner.invoke(cli.add_issue, ["github_issue.md"])
 

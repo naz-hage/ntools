@@ -27,7 +27,7 @@ class PRPlatform(ABC):
         source_branch: Optional[str] = None,
         target_branch: Optional[str] = None,
         work_item_id: Optional[int] = None,
-        draft: bool = False
+        draft: bool = False,
     ) -> str:
         """
         Create a new pull request.
@@ -78,10 +78,7 @@ class PRPlatform(ABC):
 
     @abstractmethod
     def list_pull_requests(
-        self,
-        state: str = "open",
-        author: Optional[str] = None,
-        limit: int = 10
+        self, state: str = "open", author: Optional[str] = None, limit: int = 10
     ) -> List[Dict[str, Any]]:
         """
         List pull requests with optional filtering.
@@ -123,7 +120,7 @@ class PRPlatform(ABC):
         pr_number: int,
         title: Optional[str] = None,
         description: Optional[str] = None,
-        status: Optional[str] = None
+        status: Optional[str] = None,
     ) -> bool:
         """
         Update an existing pull request.

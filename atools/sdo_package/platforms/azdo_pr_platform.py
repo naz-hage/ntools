@@ -50,16 +50,18 @@ class AzureDevOpsPullRequestPlatform(PRPlatform):
         if not self.client:
             # Extract platform information from Git remote
             platform_info = extract_platform_info_from_git()
-            if not platform_info or platform_info.get('platform') != 'azdo':
+            if not platform_info or platform_info.get("platform") != "azdo":
                 raise PlatformError("Not in an Azure DevOps repository")
 
-            organization = platform_info.get('organization')
-            project = platform_info.get('project')
-            repository = platform_info.get('repository')
+            organization = platform_info.get("organization")
+            project = platform_info.get("project")
+            repository = platform_info.get("repository")
             pat = get_personal_access_token()
 
             if not organization or not project or not pat:
-                raise AuthenticationError("Missing Azure DevOps configuration (organization, project, or PAT)")
+                raise AuthenticationError(
+                    "Missing Azure DevOps configuration (organization, project, or PAT)"
+                )
 
             self.client = AzureDevOpsClient(organization, project, pat)
             self._organization = organization
@@ -70,11 +72,9 @@ class AzureDevOpsPullRequestPlatform(PRPlatform):
         """Get the repository name from Git remote."""
         try:
             import subprocess
+
             result = subprocess.run(
-                ["git", "remote", "get-url", "origin"],
-                capture_output=True,
-                text=True,
-                check=True
+                ["git", "remote", "get-url", "origin"], capture_output=True, text=True, check=True
             )
 
             url = result.stdout.strip()
@@ -89,7 +89,7 @@ class AzureDevOpsPullRequestPlatform(PRPlatform):
                     ["git", "config", "--get", "remote.origin.url"],
                     capture_output=True,
                     text=True,
-                    check=True
+                    check=True,
                 )
                 url = result.stdout.strip()
                 if "_git/" in url:
@@ -108,7 +108,7 @@ class AzureDevOpsPullRequestPlatform(PRPlatform):
         source_branch: Optional[str] = None,
         target_branch: Optional[str] = None,
         work_item_id: Optional[int] = None,
-        draft: bool = False
+        draft: bool = False,
     ) -> str:
         """Create a pull request in Azure DevOps."""
         self._ensure_client()
@@ -117,15 +117,15 @@ class AzureDevOpsPullRequestPlatform(PRPlatform):
         if not source_branch:
             try:
                 import subprocess
+
                 result = subprocess.run(
-                    ["git", "branch", "--show-current"],
-                    capture_output=True,
-                    text=True,
-                    check=True
+                    ["git", "branch", "--show-current"], capture_output=True, text=True, check=True
                 )
                 source_branch = result.stdout.strip()
             except subprocess.CalledProcessError:
-                raise PlatformError("Could not determine current branch and no source branch specified")
+                raise PlatformError(
+                    "Could not determine current branch and no source branch specified"
+                )
 
         # Default target branch
         if not target_branch:
@@ -137,25 +137,18 @@ class AzureDevOpsPullRequestPlatform(PRPlatform):
             "targetRefName": f"refs/heads/{target_branch}",
             "title": title,
             "description": description,
-            "isDraft": draft
+            "isDraft": draft,
         }
 
         # Add work item if specified
         if work_item_id:
-            pr_data["workItemRefs"] = [{
-                "id": str(work_item_id)
-            }]
+            pr_data["workItemRefs"] = [{"id": str(work_item_id)}]
 
         try:
             url = f"{self.client.base_url}/_apis/git/repositories/{self._repository}/pullRequests"
-            params = {
-                "api-version": self.client.api_version
-            }
+            params = {"api-version": self.client.api_version}
             response = self.client.session.post(
-                url,
-                params=params,
-                json=pr_data,
-                headers={"Content-Type": "application/json"}
+                url, params=params, json=pr_data, headers={"Content-Type": "application/json"}
             )
 
             if response.status_code not in (200, 201):
@@ -179,7 +172,7 @@ class AzureDevOpsPullRequestPlatform(PRPlatform):
         pr_number: int,
         title: Optional[str] = None,
         description: Optional[str] = None,
-        status: Optional[str] = None
+        status: Optional[str] = None,
     ) -> bool:
         """Update an existing pull request in Azure DevOps."""
         self._ensure_client()
@@ -198,25 +191,24 @@ class AzureDevOpsPullRequestPlatform(PRPlatform):
             status_mapping = {
                 "active": "active",
                 "abandoned": "abandoned",
-                "completed": "completed"
+                "completed": "completed",
             }
             if status not in status_mapping:
-                raise ValidationError(f"Invalid status: {status}. Must be one of: active, abandoned, completed")
+                raise ValidationError(
+                    f"Invalid status: {status}. Must be one of: active, abandoned, completed"
+                )
             update_data["status"] = status_mapping[status]
 
         if not update_data:
-            raise ValidationError("At least one field (title, description, or status) must be provided for update")
+            raise ValidationError(
+                "At least one field (title, description, or status) must be provided for update"
+            )
 
         try:
             url = f"{self.client.base_url}/_apis/git/repositories/{self._repository}/pullRequests/{pr_number}"
-            params = {
-                "api-version": self.client.api_version
-            }
+            params = {"api-version": self.client.api_version}
             response = self.client.session.patch(
-                url,
-                params=params,
-                json=update_data,
-                headers={"Content-Type": "application/json"}
+                url, params=params, json=update_data, headers={"Content-Type": "application/json"}
             )
 
             if response.status_code not in (200, 201):
@@ -237,10 +229,7 @@ class AzureDevOpsPullRequestPlatform(PRPlatform):
 
         try:
             url = f"{self.client.base_url}/_apis/git/repositories/{self._repository}/pullRequests/{pr_number}"
-            params = {
-                "api-version": self.client.api_version,
-                "$expand": "workItems"
-            }
+            params = {"api-version": self.client.api_version, "$expand": "workItems"}
 
             response = self.client.session.get(url, params=params)
 
@@ -266,7 +255,9 @@ class AzureDevOpsPullRequestPlatform(PRPlatform):
                             if wi.get("id"):
                                 work_items.append(wi["id"])
                 else:
-                    logger.warning(f"Failed to get work items for PR {pr_number}: {workitems_response.status_code} - {workitems_response.text}")
+                    logger.warning(
+                        f"Failed to get work items for PR {pr_number}: {workitems_response.status_code} - {workitems_response.text}"
+                    )
             except Exception as e:
                 logger.warning(f"Failed to get work items for PR {pr_number}: {e}")
 
@@ -280,8 +271,10 @@ class AzureDevOpsPullRequestPlatform(PRPlatform):
                 "target_branch": pr_data.get("targetRefName", "").replace("refs/heads/", ""),
                 "url": f"{self.client.base_url}/_git/{self._repository}/pullrequest/{pr_number}",
                 "created_at": pr_data.get("creationDate"),
-                "updated_at": pr_data.get("creationDate"),  # Azure DevOps doesn't have updatedAt in basic response
-                "work_items": work_items
+                "updated_at": pr_data.get(
+                    "creationDate"
+                ),  # Azure DevOps doesn't have updatedAt in basic response
+                "work_items": work_items,
             }
 
         except requests.RequestException as e:
@@ -289,20 +282,14 @@ class AzureDevOpsPullRequestPlatform(PRPlatform):
             raise PlatformError(f"Network error getting pull request: {e}")
 
     def list_pull_requests(
-        self,
-        state: str = "open",
-        author: Optional[str] = None,
-        limit: int = 10
+        self, state: str = "open", author: Optional[str] = None, limit: int = 10
     ) -> List[Dict[str, Any]]:
         """List Azure DevOps pull requests."""
         self._ensure_client()
 
         try:
             url = f"{self.client.base_url}/_apis/git/repositories/{self._repository}/pullRequests"
-            params = {
-                "api-version": self.client.api_version,
-                "$top": limit
-            }
+            params = {"api-version": self.client.api_version, "$top": limit}
 
             # Map state parameter
             if state == "open":
@@ -322,18 +309,22 @@ class AzureDevOpsPullRequestPlatform(PRPlatform):
 
             prs_data = response.json().get("value", [])
 
-            return [{
-                "number": pr.get("pullRequestId"),
-                "title": pr.get("title"),
-                "description": pr.get("description"),
-                "status": self._map_pr_status(pr.get("status")),
-                "author": pr.get("createdBy", {}).get("displayName"),
-                "source_branch": pr.get("sourceRefName", "").replace("refs/heads/", ""),
-                "target_branch": pr.get("targetRefName", "").replace("refs/heads/", ""),
-                "url": pr.get("url") or f"{self.client.base_url}/_git/{self._repository}/pullrequest/{pr.get('pullRequestId')}",
-                "created_at": pr.get("creationDate"),
-                "updated_at": pr.get("creationDate")
-            } for pr in prs_data]
+            return [
+                {
+                    "number": pr.get("pullRequestId"),
+                    "title": pr.get("title"),
+                    "description": pr.get("description"),
+                    "status": self._map_pr_status(pr.get("status")),
+                    "author": pr.get("createdBy", {}).get("displayName"),
+                    "source_branch": pr.get("sourceRefName", "").replace("refs/heads/", ""),
+                    "target_branch": pr.get("targetRefName", "").replace("refs/heads/", ""),
+                    "url": pr.get("url")
+                    or f"{self.client.base_url}/_git/{self._repository}/pullrequest/{pr.get('pullRequestId')}",
+                    "created_at": pr.get("creationDate"),
+                    "updated_at": pr.get("creationDate"),
+                }
+                for pr in prs_data
+            ]
 
         except requests.RequestException as e:
             logger.error(f"Network error listing PRs: {e}")
@@ -347,18 +338,11 @@ class AzureDevOpsPullRequestPlatform(PRPlatform):
             # Use "me" as reviewer ID (Azure DevOps resolves this to current user)
             reviewer_id = "me"
             url = f"{self.client.base_url}/_apis/git/repositories/{self._repository}/pullRequests/{pr_number}/reviewers/{reviewer_id}"
-            params = {
-                "api-version": self.client.api_version
-            }
-            vote_data = {
-                "vote": 10  # 10 = approved
-            }
+            params = {"api-version": self.client.api_version}
+            vote_data = {"vote": 10}  # 10 = approved
 
             response = self.client.session.put(
-                url,
-                params=params,
-                json=vote_data,
-                headers={"Content-Type": "application/json"}
+                url, params=params, json=vote_data, headers={"Content-Type": "application/json"}
             )
 
             if response.status_code in (200, 201):
@@ -373,9 +357,5 @@ class AzureDevOpsPullRequestPlatform(PRPlatform):
 
     def _map_pr_status(self, azdo_status: str) -> str:
         """Map Azure DevOps PR status to standard status."""
-        status_map = {
-            "active": "open",
-            "completed": "closed",
-            "abandoned": "closed"
-        }
+        status_map = {"active": "open", "completed": "closed", "abandoned": "closed"}
         return status_map.get(azdo_status.lower(), "unknown")
