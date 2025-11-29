@@ -534,7 +534,7 @@ def _cmd_workitem_list_github(args, config):
             number = f"#{issue['number']}"
             title = issue["title"][:47] + "..." if len(issue["title"]) > 50 else issue["title"]
             state = issue["state"]
-            labels = ", ".join([l["name"] for l in issue["labels"][:2]]) if issue["labels"] else ""
+            labels = ", ".join([label["name"] for label in issue["labels"][:2]]) if issue["labels"] else ""
             labels = labels[:27] + "..." if len(labels) > 30 else labels
             assignee = issue["assignees"][0]["login"] if issue["assignees"] else "Unassigned"
             assignee = assignee[:17] + "..." if len(assignee) > 20 else assignee
@@ -617,7 +617,7 @@ def _cmd_workitem_show_azdo(args, config):
         print(f"Changed:     {fields.get('System.ChangedDate', 'N/A')}")
 
         if fields.get("System.Description"):
-            print(f"\nDescription:")
+            print("\nDescription:")
             print(f"{fields['System.Description']}")
 
         # Show iteration path (sprint)
@@ -652,7 +652,7 @@ def _cmd_workitem_show_azdo(args, config):
                         ac_content = ac_part.strip()
 
         if ac_content:
-            print(f"\nAcceptance Criteria:")
+            print("\nAcceptance Criteria:")
             # Clean up HTML for display
             import re
 
@@ -718,11 +718,11 @@ def _cmd_workitem_show_github(args, config):
         print(f"Updated:     {issue['updatedAt']}")
 
         if issue["labels"]:
-            labels = ", ".join([l["name"] for l in issue["labels"]])
+            labels = ", ".join([label["name"] for label in issue["labels"]])
             print(f"Labels:      {labels}")
 
         if issue.get("body"):
-            print(f"\nDescription:")
+            print("\nDescription:")
             print(f"{issue['body']}")
 
         # Show comments if requested

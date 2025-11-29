@@ -43,7 +43,7 @@ class TestAzureDevOpsClientInit:
             organization="test-org", project="test-project", pat="test-pat", verbose=True
         )
 
-        assert client.verbose == True
+        assert client.verbose is True
 
 
 class TestAzureDevOpsClientAuthentication:
@@ -290,7 +290,7 @@ class TestRepositoryOperations:
 
         result = self.client.delete_repository("repo-to-delete")
 
-        assert result == True
+        assert result is True
         mock_get.assert_called_once()
         mock_delete.assert_called_once()
 

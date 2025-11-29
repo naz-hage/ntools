@@ -312,7 +312,7 @@ class AzureDevOpsPlatform(WorkItemPlatform):
             print(f"   Operations: {len(operations)}")
 
             # Show equivalent az CLI command (without sensitive auth info)
-            print(f"   Equivalent az CLI command:")
+            print("   Equivalent az CLI command:")
             az_cmd = f'az boards work-item create --title "{title}" --type "{work_item_type}"'
             az_cmd += (
                 f' --project "{project}" --organization "https://dev.azure.com/{organization}"'
@@ -331,7 +331,7 @@ class AzureDevOpsPlatform(WorkItemPlatform):
                 az_cmd += f' --description "{escaped_desc}"'
             # Note: Authentication is handled via AZURE_DEVOPS_PAT environment variable or az login
             print(f"   {az_cmd}")
-            print(f"   (Note: Requires AZURE_DEVOPS_PAT environment variable or 'az login')")
+            print("   (Note: Requires AZURE_DEVOPS_PAT environment variable or 'az login')")
 
         try:
             response = requests.post(url, json=operations, headers=headers, timeout=30)

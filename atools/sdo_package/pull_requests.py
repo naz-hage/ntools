@@ -195,8 +195,8 @@ def cmd_pr_create(args: argparse.Namespace) -> None:
             print("[DRY RUN] Would create PR with:")
             print(f"  Title: {title}")
             print(f"  Description: {description[:100]}{'...' if len(description) > 100 else ''}")
-            print(f"  Source Branch: (current branch)")
-            print(f"  Target Branch: main")
+            print("  Source Branch: (current branch)")
+            print("  Target Branch: main")
             if work_item_id:
                 print(f"  Work Item: {work_item_id}")
             print(f"  Draft: {draft}")
@@ -208,7 +208,7 @@ def cmd_pr_create(args: argparse.Namespace) -> None:
             title=title, description=description, work_item_id=work_item_id, draft=draft
         )
 
-        print(f"[OK] Pull request created successfully!")
+        print("[OK] Pull request created successfully!")
         print(f"URL: {pr_url}")
 
         if getattr(args, "verbose", False):
@@ -285,7 +285,7 @@ def cmd_pr_show(args: argparse.Namespace) -> None:
             print(f"\nDescription:\n{pr_details['description']}")
 
         if getattr(args, "verbose", False):
-            print(f"\nFull Details:")
+            print("\nFull Details:")
             print(json.dumps(pr_details, indent=2, default=str))
 
     except (PlatformError, AuthenticationError) as e:
@@ -413,7 +413,7 @@ def cmd_pr_status(args: argparse.Namespace) -> None:
                     logger.debug(f"Could not fetch Azure DevOps PR checks: {e}")
 
         if getattr(args, "verbose", False):
-            print(f"\nFull Status Details:")
+            print("\nFull Status Details:")
             print(json.dumps(pr_details, indent=2, default=str))
 
     except (PlatformError, AuthenticationError) as e:

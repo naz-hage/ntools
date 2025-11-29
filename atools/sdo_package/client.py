@@ -1254,7 +1254,7 @@ class AzureDevOpsClient:
         if where_clause:
             wiql = f"SELECT [System.Id], [System.Title], [System.State], [System.WorkItemType], [System.AreaPath] FROM WorkItems WHERE {where_clause} ORDER BY [System.ChangedDate] DESC"
         else:
-            wiql = f"SELECT [System.Id], [System.Title], [System.State], [System.WorkItemType], [System.AreaPath] FROM WorkItems ORDER BY [System.ChangedDate] DESC"
+            wiql = "SELECT [System.Id], [System.Title], [System.State], [System.WorkItemType], [System.AreaPath] FROM WorkItems ORDER BY [System.ChangedDate] DESC"
 
         result = self.query_work_items(wiql)
         if not result:

@@ -25,7 +25,7 @@ class TestGitHubPlatformInit:
         platform = GitHubPlatform(config)
 
         assert platform.config == config
-        assert platform.verbose == False
+        assert platform.verbose is False
         assert platform.config["owner"] == "testuser"
         assert platform.config["repo"] == "testrepo"
 
@@ -33,7 +33,7 @@ class TestGitHubPlatformInit:
         """Test platform initialization with verbose mode."""
         platform = GitHubPlatform(verbose=True)
 
-        assert platform.verbose == True
+        assert platform.verbose is True
 
 
 class TestGitHubPlatformAuthentication:
@@ -52,13 +52,13 @@ class TestGitHubPlatformAuthentication:
 
         result = self.platform.validate_auth()
 
-        assert result == True
+        assert result is True
         # The implementation calls subprocess.run with check=False
         mock_run.assert_called_once()
         call_args = mock_run.call_args
         assert call_args[0][0] == ["gh", "auth", "status"]
-        assert call_args[1]["capture_output"] == True
-        assert call_args[1]["text"] == True
+        assert call_args[1]["capture_output"] is True
+        assert call_args[1]["text"] is True
 
     @patch("subprocess.run")
     def test_validate_auth_failure(self, mock_run):
@@ -69,7 +69,7 @@ class TestGitHubPlatformAuthentication:
 
         result = self.platform.validate_auth()
 
-        assert result == False
+        assert result is False
 
     @patch("subprocess.run")
     def test_validate_auth_gh_not_installed(self, mock_run):
@@ -78,7 +78,7 @@ class TestGitHubPlatformAuthentication:
 
         result = self.platform.validate_auth()
 
-        assert result == False
+        assert result is False
 
     @patch("subprocess.run")
     def test_validate_auth_unexpected_error(self, mock_run):
@@ -87,7 +87,7 @@ class TestGitHubPlatformAuthentication:
 
         result = self.platform.validate_auth()
 
-        assert result == False
+        assert result is False
 
 
 class TestGitHubRepositoryPlatformInit:
@@ -100,7 +100,7 @@ class TestGitHubRepositoryPlatformInit:
         platform = GitHubRepositoryPlatform(config)
 
         assert platform.config == config
-        assert platform.verbose == False
+        assert platform.verbose is False
         assert platform.config["owner"] == "testuser"
         assert platform.config["repo"] == "testrepo"
 
@@ -109,7 +109,7 @@ class TestGitHubRepositoryPlatformInit:
         config = {"platform": "github", "owner": "testuser"}
         platform = GitHubRepositoryPlatform(config, verbose=True)
 
-        assert platform.verbose == True
+        assert platform.verbose is True
 
 
 class TestGitHubRepositoryPlatformAuth:
@@ -127,7 +127,7 @@ class TestGitHubRepositoryPlatformAuth:
 
         result = self.platform.validate_auth()
 
-        assert result == True
+        assert result is True
         mock_run.assert_called_once_with(["gh", "auth", "status"], capture_output=True, text=True)
 
     @patch("subprocess.run")
@@ -137,21 +137,21 @@ class TestGitHubRepositoryPlatformAuth:
 
         result = self.platform.validate_auth()
 
-        assert result == False
+        assert result is False
 
     @patch("subprocess.run", side_effect=FileNotFoundError("gh: command not found"))
     def test_validate_auth_gh_not_installed(self, mock_run):
         """Test authentication validation when gh CLI is not installed."""
         result = self.platform.validate_auth()
 
-        assert result == False
+        assert result is False
 
     @patch("subprocess.run", side_effect=Exception("Unexpected error"))
     def test_validate_auth_unexpected_error(self, mock_run):
         """Test authentication validation with unexpected error."""
         result = self.platform.validate_auth()
 
-        assert result == False
+        assert result is False
 
 
 class TestGitHubRepositoryPlatformOperations:
@@ -169,7 +169,7 @@ class TestGitHubRepositoryPlatformOperations:
 
         result = self.platform.create_repository("new-repo")
 
-        assert result == True
+        assert result is True
         mock_run.assert_called_once_with(
             [
                 "gh",
@@ -192,7 +192,7 @@ class TestGitHubRepositoryPlatformOperations:
 
         result = self.platform.create_repository("new-repo")
 
-        assert result == True
+        assert result is True
 
     @patch("subprocess.run")
     def test_create_repository_failure(self, mock_run):
@@ -203,7 +203,7 @@ class TestGitHubRepositoryPlatformOperations:
 
         result = self.platform.create_repository("existing-repo")
 
-        assert result == False
+        assert result is False
 
     @patch("subprocess.run")
     def test_create_repository_subprocess_error(self, mock_run):
@@ -212,7 +212,7 @@ class TestGitHubRepositoryPlatformOperations:
 
         result = self.platform.create_repository("test-repo")
 
-        assert result == False
+        assert result is False
 
     @patch("subprocess.run")
     @patch("json.loads")
@@ -237,7 +237,7 @@ class TestGitHubRepositoryPlatformOperations:
         assert result["description"] == "Test repository"
         assert result["webUrl"] == "https://github.com/testuser/test-repo"
         assert result["defaultBranch"] == "main"
-        assert result["isPrivate"] == False
+        assert result["isPrivate"] is False
 
     @patch("subprocess.run")
     def test_get_repository_not_found(self, mock_run):
@@ -291,9 +291,9 @@ class TestGitHubRepositoryPlatformOperations:
         assert result is not None
         assert len(result) == 2
         assert result[0]["name"] == "repo1"
-        assert result[0]["isPrivate"] == False
+        assert result[0]["isPrivate"] is False
         assert result[1]["name"] == "repo2"
-        assert result[1]["isPrivate"] == True
+        assert result[1]["isPrivate"] is True
 
     @patch("subprocess.run")
     def test_list_repositories_failure(self, mock_run):
@@ -311,7 +311,7 @@ class TestGitHubRepositoryPlatformOperations:
 
         result = self.platform.delete_repository("old-repo")
 
-        assert result == True
+        assert result is True
         mock_run.assert_called_once_with(
             ["gh", "repo", "delete", "testuser/old-repo", "--yes"], capture_output=True, text=True
         )
@@ -323,7 +323,7 @@ class TestGitHubRepositoryPlatformOperations:
 
         result = self.platform.delete_repository("nonexistent-repo")
 
-        assert result == False
+        assert result is False
 
     @patch("subprocess.run")
     def test_delete_repository_subprocess_error(self, mock_run):
@@ -332,4 +332,4 @@ class TestGitHubRepositoryPlatformOperations:
 
         result = self.platform.delete_repository("test-repo")
 
-        assert result == False
+        assert result is False

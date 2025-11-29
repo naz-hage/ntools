@@ -28,7 +28,7 @@ class TestMarkdownParserInit:
         """Test parser initialization with verbose mode."""
         parser = MarkdownParser(verbose=True)
 
-        assert parser.verbose == True
+        assert parser.verbose is True
 
 
 class TestMarkdownParserWorkitemParsing:
@@ -119,8 +119,8 @@ This is a high-impact change that requires careful planning and testing.
         assert "scalability and maintainability" in result["description"]
         assert len(result["acceptance_criteria"]) == 5
         assert result["acceptance_criteria"][0]["text"] == "Database schema redesigned"
-        assert result["acceptance_criteria"][0]["completed"] == True
-        assert result["acceptance_criteria"][1]["completed"] == False
+        assert result["acceptance_criteria"][0]["completed"] is True
+        assert result["acceptance_criteria"][1]["completed"] is False
         assert result["target"] == "azdo"
         assert result["project"] == "TestProject"
         assert len(result["labels"]) == 4
@@ -284,7 +284,7 @@ This is a valid workitem.
 
         result = self.parser.validate_markdown(markdown_content, "workitem")
 
-        assert result["valid"] == True
+        assert result["valid"] is True
         assert result["type"] == "workitem"
         assert len(result["errors"]) == 0
         assert len(result["warnings"]) == 0
@@ -295,7 +295,7 @@ This is a valid workitem.
 
         result = self.parser.validate_markdown(markdown_content, "workitem")
 
-        assert result["valid"] == False
+        assert result["valid"] is False
         assert result["type"] == "workitem"
         assert len(result["errors"]) > 0
 
@@ -323,7 +323,7 @@ Actual result.
 
         result = self.parser.validate_markdown(markdown_content, "issue")
 
-        assert result["valid"] == True
+        assert result["valid"] is True
         assert result["type"] == "issue"
         assert len(result["errors"]) == 0
 
@@ -333,7 +333,7 @@ Actual result.
 
         result = self.parser.validate_markdown(markdown_content, "issue")
 
-        assert result["valid"] == False
+        assert result["valid"] is False
         assert result["type"] == "issue"
         assert len(result["errors"]) > 0
 
@@ -347,14 +347,14 @@ Some content.
 
         result = self.parser.validate_markdown(markdown_content, "unknown")
 
-        assert result["valid"] == False
+        assert result["valid"] is False
         assert "Unsupported type" in str(result["errors"])
 
     def test_validate_markdown_empty_content(self):
         """Test validation of empty content."""
         result = self.parser.validate_markdown("", "workitem")
 
-        assert result["valid"] == False
+        assert result["valid"] is False
         assert len(result["errors"]) > 0
 
 
@@ -383,4 +383,4 @@ class TestMarkdownParserErrorHandling:
         """Test validation with exception."""
         result = self.parser.validate_markdown(None, "workitem")
 
-        assert result["valid"] == False
+        assert result["valid"] is False

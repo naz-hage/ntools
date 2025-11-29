@@ -345,7 +345,7 @@ class TestClickArgsAdapter:
 
         args = cli.ClickArgs(mock_ctx)
 
-        assert args.verbose == True
+        assert args.verbose is True
 
         assert args.test_param == "test_value"
 
@@ -362,7 +362,7 @@ class TestClickArgsAdapter:
 
         assert args.missing_attr is None
 
-        assert args.verbose == False
+        assert args.verbose is False
 
 
 class TestMainFunction:
