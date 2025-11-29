@@ -28,7 +28,24 @@ from .pull_requests import (  # noqa: E402
     cmd_pr_list,
     cmd_pr_update,
 )
-from .version import __version__  # noqa: E402
+from .pipelines import (  # noqa: E402
+    cmd_pipeline_create,
+    cmd_pipeline_show,
+    cmd_pipeline_list,
+    cmd_pipeline_delete,
+    cmd_pipeline_run,
+    cmd_pipeline_status,
+    cmd_pipeline_logs,
+    cmd_pipeline_lastbuild,
+    cmd_pipeline_update,
+)
+import importlib.metadata
+
+try:
+    __version__ = importlib.metadata.version("sdo")
+except importlib.metadata.PackageNotFoundError:
+    # Fallback for development
+    __version__ = "0.0.0"
 
 
 # Define the CLI docstring with version
@@ -37,7 +54,7 @@ CLI_DOCSTRING = f"""SDO {__version__} - Simple DevOps Operations Tool
 A modern CLI tool for Azure DevOps and GitHub operations.
 
 PLATFORM SUPPORT:
-- Azure DevOps: Work items (PBIs, Tasks, Bugs, Epics), repositories, and pull requests
+- Azure DevOps: Work items (PBIs, Tasks, Bugs, Epics), repositories, pipelines, and pull requests
 - GitHub: Work items (Issues), repositories, and pull requests
 
 Environment Variables:
@@ -659,6 +676,327 @@ def update(ctx, pr_id, file, title, status, verbose):  # noqa: F811
 
         # Call the business logic
         cmd_pr_update(args)
+
+    except (SDOError, ConfigurationError, ValidationError) as e:
+        click.echo(f"❌ {str(e)}", err=True)
+        if ctx.obj.get("verbose"):
+            click.echo(f"   Error type: {type(e).__name__}", err=True)
+            if hasattr(e, "details"):
+                click.echo(f"   Details: {e.details}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"❌ Unexpected error: {str(e)}", err=True)
+        if ctx.obj.get("verbose"):
+            import traceback
+
+            click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
+        sys.exit(1)
+
+
+@cli.group()
+@click.pass_context
+def pipeline(ctx):
+    """Pipeline operations."""
+
+
+@pipeline.command()
+@click.option("--verbose", "-v", is_flag=True, help="Show detailed API information and responses")
+@click.pass_context
+def create(ctx, verbose):
+    """Create a pipeline in the current project.
+
+    The pipeline name and configuration are extracted from the current Git remote.
+    If the pipeline already exists, no action is taken.
+
+    Examples:
+        sdo pipeline create
+        sdo pipeline create --verbose
+    """
+    try:
+        # Call the business logic
+        result = cmd_pipeline_create(verbose=verbose)
+
+        if result != 0:
+            sys.exit(result)
+
+    except (SDOError, ConfigurationError, ValidationError) as e:
+        click.echo(f"❌ {str(e)}", err=True)
+        if ctx.obj.get("verbose"):
+            click.echo(f"   Error type: {type(e).__name__}", err=True)
+            if hasattr(e, "details"):
+                click.echo(f"   Details: {e.details}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"❌ Unexpected error: {str(e)}", err=True)
+        if ctx.obj.get("verbose"):
+            import traceback
+
+            click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
+        sys.exit(1)
+
+
+@pipeline.command()
+@click.option("--verbose", "-v", is_flag=True, help="Show detailed API information and responses")
+@click.pass_context
+def show(ctx, verbose):
+    """Show information about the current pipeline.
+
+    The pipeline name is extracted from the current Git remote.
+
+    Examples:
+        sdo pipeline show
+        sdo pipeline show --verbose
+    """
+    try:
+        # Call the business logic
+        result = cmd_pipeline_show(verbose=verbose)
+
+        if result != 0:
+            sys.exit(result)
+
+    except (SDOError, ConfigurationError, ValidationError) as e:
+        click.echo(f"❌ {str(e)}", err=True)
+        if ctx.obj.get("verbose"):
+            click.echo(f"   Error type: {type(e).__name__}", err=True)
+            if hasattr(e, "details"):
+                click.echo(f"   Details: {e.details}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"❌ Unexpected error: {str(e)}", err=True)
+        if ctx.obj.get("verbose"):
+            import traceback
+
+            click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
+        sys.exit(1)
+
+
+@pipeline.command()
+@click.option("--verbose", "-v", is_flag=True, help="Show detailed API information and responses")
+@click.pass_context
+def ls(ctx, verbose):
+    """List all pipelines in the current project.
+
+    Examples:
+        sdo pipeline ls
+        sdo pipeline ls --verbose
+    """
+    try:
+        # Call the business logic
+        result = cmd_pipeline_list(verbose=verbose)
+
+        if result != 0:
+            sys.exit(result)
+
+    except (SDOError, ConfigurationError, ValidationError) as e:
+        click.echo(f"❌ {str(e)}", err=True)
+        if ctx.obj.get("verbose"):
+            click.echo(f"   Error type: {type(e).__name__}", err=True)
+            if hasattr(e, "details"):
+                click.echo(f"   Details: {e.details}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"❌ Unexpected error: {str(e)}", err=True)
+        if ctx.obj.get("verbose"):
+            import traceback
+
+            click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
+        sys.exit(1)
+
+
+@pipeline.command()
+@click.option("--verbose", "-v", is_flag=True, help="Show detailed API information and responses")
+@click.pass_context
+def delete(ctx, verbose):
+    """Delete the current pipeline.
+
+    ⚠️  WARNING: This action cannot be undone!
+
+    The pipeline name is extracted from the current Git remote.
+    You will be prompted to confirm before deletion.
+
+    Examples:
+        sdo pipeline delete
+        sdo pipeline delete --verbose
+    """
+    try:
+        # Call the business logic
+        result = cmd_pipeline_delete(verbose=verbose)
+
+        if result != 0:
+            sys.exit(result)
+
+    except (SDOError, ConfigurationError, ValidationError) as e:
+        click.echo(f"❌ {str(e)}", err=True)
+        if ctx.obj.get("verbose"):
+            click.echo(f"   Error type: {type(e).__name__}", err=True)
+            if hasattr(e, "details"):
+                click.echo(f"   Details: {e.details}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"❌ Unexpected error: {str(e)}", err=True)
+        if ctx.obj.get("verbose"):
+            import traceback
+
+            click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
+        sys.exit(1)
+
+
+@pipeline.command()
+@click.option("--verbose", "-v", is_flag=True, help="Show detailed API information and responses")
+@click.pass_context
+def run(ctx, verbose):
+    """Run the current pipeline.
+
+    The pipeline name is extracted from the current Git remote.
+    Runs the pipeline on the default branch (main).
+
+    Examples:
+        sdo pipeline run
+        sdo pipeline run --verbose
+    """
+    try:
+        # Call the business logic
+        result = cmd_pipeline_run(verbose=verbose)
+
+        if result != 0:
+            sys.exit(result)
+
+    except (SDOError, ConfigurationError, ValidationError) as e:
+        click.echo(f"❌ {str(e)}", err=True)
+        if ctx.obj.get("verbose"):
+            click.echo(f"   Error type: {type(e).__name__}", err=True)
+            if hasattr(e, "details"):
+                click.echo(f"   Details: {e.details}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"❌ Unexpected error: {str(e)}", err=True)
+        if ctx.obj.get("verbose"):
+            import traceback
+
+            click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
+        sys.exit(1)
+
+
+@pipeline.command()
+@click.argument("build_id", type=int)
+@click.option("--verbose", "-v", is_flag=True, help="Show detailed API information and responses")
+@click.pass_context
+def status(ctx, build_id, verbose):
+    """Show status of a pipeline build.
+
+    Examples:
+        sdo pipeline status 12345
+        sdo pipeline status 12345 --verbose
+    """
+    try:
+        # Call the business logic
+        result = cmd_pipeline_status(build_id, verbose=verbose)
+
+        if result != 0:
+            sys.exit(result)
+
+    except (SDOError, ConfigurationError, ValidationError) as e:
+        click.echo(f"❌ {str(e)}", err=True)
+        if ctx.obj.get("verbose"):
+            click.echo(f"   Error type: {type(e).__name__}", err=True)
+            if hasattr(e, "details"):
+                click.echo(f"   Details: {e.details}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"❌ Unexpected error: {str(e)}", err=True)
+        if ctx.obj.get("verbose"):
+            import traceback
+
+            click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
+        sys.exit(1)
+
+
+@pipeline.command()
+@click.argument("build_id", type=int)
+@click.option("--verbose", "-v", is_flag=True, help="Show detailed API information and responses")
+@click.pass_context
+def logs(ctx, build_id, verbose):
+    """Show logs for a pipeline build.
+
+    Examples:
+        sdo pipeline logs 12345
+        sdo pipeline logs 12345 --verbose
+    """
+    try:
+        # Call the business logic
+        result = cmd_pipeline_logs(build_id, verbose=verbose)
+
+        if result != 0:
+            sys.exit(result)
+
+    except (SDOError, ConfigurationError, ValidationError) as e:
+        click.echo(f"❌ {str(e)}", err=True)
+        if ctx.obj.get("verbose"):
+            click.echo(f"   Error type: {type(e).__name__}", err=True)
+            if hasattr(e, "details"):
+                click.echo(f"   Details: {e.details}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"❌ Unexpected error: {str(e)}", err=True)
+        if ctx.obj.get("verbose"):
+            import traceback
+
+            click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
+        sys.exit(1)
+
+
+@pipeline.command()
+@click.option("--verbose", "-v", is_flag=True, help="Show detailed API information and responses")
+@click.pass_context
+def lastbuild(ctx, verbose):
+    """Show information about the last build of the current pipeline.
+
+    Examples:
+        sdo pipeline lastbuild
+        sdo pipeline lastbuild --verbose
+    """
+    try:
+        # Call the business logic
+        result = cmd_pipeline_lastbuild(verbose=verbose)
+
+        if result != 0:
+            sys.exit(result)
+
+    except (SDOError, ConfigurationError, ValidationError) as e:
+        click.echo(f"❌ {str(e)}", err=True)
+        if ctx.obj.get("verbose"):
+            click.echo(f"   Error type: {type(e).__name__}", err=True)
+            if hasattr(e, "details"):
+                click.echo(f"   Details: {e.details}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"❌ Unexpected error: {str(e)}", err=True)
+        if ctx.obj.get("verbose"):
+            import traceback
+
+            click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
+        sys.exit(1)
+
+
+@pipeline.command()
+@click.option("--verbose", "-v", is_flag=True, help="Show detailed API information and responses")
+@click.pass_context
+def update(ctx, verbose):
+    """Update the current pipeline configuration.
+
+    Checks if the pipeline configuration needs to be updated and provides
+    guidance on how to update it if necessary.
+
+    Examples:
+        sdo pipeline update
+        sdo pipeline update --verbose
+    """
+    try:
+        # Call the business logic
+        result = cmd_pipeline_update(verbose=verbose)
+
+        if result != 0:
+            sys.exit(result)
 
     except (SDOError, ConfigurationError, ValidationError) as e:
         click.echo(f"❌ {str(e)}", err=True)
