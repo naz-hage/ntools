@@ -1,38 +1,24 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
+requires = [ "setuptools>=61.0", "wheel",]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "sdo"
-dynamic = ["version"]
+version = "1.50.0"
 description = "Simple DevOps CLI tool for Azure DevOps work item management"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.8"
-authors = [
-    {name = "naz-hage", email = "naz-hage@example.com"},
-]
-maintainers = [
-    {name = "naz-hage", email = "naz-hage@example.com"},
-]
-keywords = ["azure", "devops", "cli", "work-items"]
-classifiers = [
-    "Development Status :: 4 - Beta",
-    "Intended Audience :: Developers",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Operating System :: OS Independent",
-    "Topic :: Software Development :: Libraries :: Python Modules",
-]
-dependencies = [
-    "requests>=2.25.0",
-    "click>=8.0.0",
-    "pyyaml>=6.0.0",
-]
+keywords = [ "azure", "devops", "cli", "work-items",]
+classifiers = [ "Development Status :: 4 - Beta", "Intended Audience :: Developers", "Programming Language :: Python :: 3", "Programming Language :: Python :: 3.8", "Programming Language :: Python :: 3.9", "Programming Language :: Python :: 3.10", "Programming Language :: Python :: 3.11", "Programming Language :: Python :: 3.12", "Operating System :: OS Independent", "Topic :: Software Development :: Libraries :: Python Modules",]
+dependencies = [ "requests>=2.25.0", "click>=8.0.0", "pyyaml>=6.0.0",]
+[[project.authors]]
+name = "naz-hage"
+email = "naz-hage@example.com"
+
+[[project.maintainers]]
+name = "naz-hage"
+email = "naz-hage@example.com"
 
 [project.urls]
 Homepage = "https://github.com/naz-hage/ntools"
@@ -43,7 +29,4 @@ Issues = "https://github.com/naz-hage/ntools/issues"
 sdo = "sdo_package.cli:cli"
 
 [tool.setuptools]
-packages = ["sdo_package"]
-
-[tool.setuptools.dynamic]
-version = {attr = "sdo_package.version.__version__"}
+packages = [ "sdo_package",]

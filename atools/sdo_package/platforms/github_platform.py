@@ -95,6 +95,7 @@ class GitHubPlatform(WorkItemPlatform):
         description: str,
         metadata: Dict[str, Any],
         acceptance_criteria: Optional[List[str]] = None,
+        repro_steps: Optional[str] = None,
         dry_run: bool = False,
     ) -> Optional[Dict[str, Any]]:
         """Create a GitHub issue."""
