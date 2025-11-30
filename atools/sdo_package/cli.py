@@ -973,18 +973,24 @@ def logs(ctx, build_id, build_id_option, verbose):
 
 
 @pipeline.command()
+@click.argument("pipeline_name", required=False)
 @click.option("--verbose", "-v", is_flag=True, help="Show detailed API information and responses")
 @click.pass_context
-def lastbuild(ctx, verbose):
-    """Show information about the last build of the current pipeline.
+def lastbuild(ctx, pipeline_name, verbose):
+    """Show information about the last build(s).
+
+    If PIPELINE_NAME is not provided, shows the last build for all pipelines
+    in the current repository. If PIPELINE_NAME is provided, shows the last
+    build for that specific pipeline.
 
     Examples:
-        sdo pipeline lastbuild
-        sdo pipeline lastbuild --verbose
+        sdo pipeline lastbuild                    # Show all pipelines in current repo
+        sdo pipeline lastbuild approach-authserver  # Show specific pipeline
+        sdo pipeline lastbuild --verbose          # Show all with details
     """
     try:
         # Call the business logic
-        result = cmd_pipeline_lastbuild(verbose=verbose)
+        result = cmd_pipeline_lastbuild(pipeline_name, verbose=verbose)
 
         if result != 0:
             sys.exit(result)
