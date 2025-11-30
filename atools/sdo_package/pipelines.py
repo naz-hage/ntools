@@ -1411,47 +1411,41 @@ def cmd_pipeline_create(verbose: bool = False) -> int:
     if platform == "azdo":
         return cmd_azdo_pipeline_create(verbose)
     elif platform == "github":
-        # Find the repository root directory
-        try:
-            import subprocess
-            result = subprocess.run(
-                ["git", "rev-parse", "--show-toplevel"],
-                capture_output=True,
-                text=True,
-                check=True
-            )
-            repo_root = result.stdout.strip()
-        except (subprocess.CalledProcessError, FileNotFoundError):
-            print("❌ Could not determine Git repository root directory.")
-            print("Please ensure you're in a Git repository.")
+        # Check if GitHub CLI is available
+        if not _check_gh_cli():
+            print(f"❌ {MISSING_GH_MSG}")
+            print("GitHub CLI is required to check for existing workflows.")
             return 1
 
-        # Check if .github/workflows directory exists and has files relative to repo root
-        workflows_dir = os.path.join(repo_root, ".github", "workflows")
-        has_workflows = False
-        existing_workflows = []
+        # Check if workflows exist using the same logic as pipeline list
+        result = _find_default_workflow_name(verbose)
+        if result is not None:
+            # Workflows exist - show existing workflows message
+            workflow_name, workflow_path = result
+            
+            # Get all workflows for display
+            returncode, stdout, stderr = _run_gh_command(["workflow", "list", "--json", "name,path"], verbose)
+            existing_workflows = []
+            if returncode == 0:
+                try:
+                    import json
+                    workflows = json.loads(stdout)
+                    existing_workflows = [w['name'] for w in workflows]
+                except (json.JSONDecodeError, KeyError):
+                    existing_workflows = [workflow_name]  # Fallback to just the default
 
-        if os.path.isdir(workflows_dir):
-            try:
-                workflow_files = [f for f in os.listdir(workflows_dir) if f.endswith(('.yml', '.yaml'))]
-                if workflow_files:
-                    has_workflows = True
-                    existing_workflows = workflow_files
-            except OSError:
-                pass  # Directory exists but can't read it
-
-        if has_workflows:
             print("GitHub Actions workflows found in your repository:")
             for workflow in existing_workflows[:5]:  # Show first 5
                 print(f"  • {workflow}")
             if len(existing_workflows) > 5:
                 print(f"  ... and {len(existing_workflows) - 5} more")
             print()
-            print("Your repository already has workflow files.")
+            print("Your repository already has workflow files deployed to GitHub Actions.")
             print("To create additional workflows, add more YAML files to .github/workflows/")
             print("and commit/push them to trigger GitHub Actions.")
             return 0
         else:
+            # No workflows found - show creation instructions
             print("GitHub Actions workflows are created by adding YAML files to .github/workflows/")
             print("SDO does not create workflow files automatically.")
             print()
