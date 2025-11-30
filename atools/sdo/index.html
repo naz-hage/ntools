@@ -142,6 +142,26 @@
     </li>
     <li class="toctree-l4"><a class="reference internal" href="#examples_1">Examples</a>
     </li>
+    <li class="toctree-l4"><a class="reference internal" href="#pipeline-operations">Pipeline Operations</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#how-pipeline-creation-works">How Pipeline Creation Works</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#azure-devops-pipeline-creation">Azure DevOps Pipeline Creation</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#github-actions-workflow-creation">GitHub Actions Workflow Creation</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#platform-detection">Platform Detection</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#common-issues">Common Issues</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#pipeline-naming-convention">Pipeline Naming Convention</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#security-considerations">Security Considerations</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#examples_2">Examples</a>
+    </li>
         </ul>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#markdown-file-format">Markdown File Format</a>
@@ -172,7 +192,7 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#troubleshooting">Troubleshooting</a>
         <ul>
-    <li class="toctree-l4"><a class="reference internal" href="#common-issues">Common Issues</a>
+    <li class="toctree-l4"><a class="reference internal" href="#common-issues_1">Common Issues</a>
     </li>
     <li class="toctree-l4"><a class="reference internal" href="#debug-mode">Debug Mode</a>
     </li>
@@ -236,6 +256,7 @@
 <li><strong>Work Item Creation</strong>: Parse markdown files and create GitHub issues or Azure DevOps work items (PBIs, Bugs, Tasks)</li>
 <li><strong>Repository Management</strong>: Create, list, show, and delete repositories on both platforms</li>
 <li><strong>Pull Request Management</strong>: Create, list, show, and update pull requests with work item linking</li>
+<li><strong>Pipeline Management</strong>: Create, run, monitor, and manage CI/CD pipelines across platforms</li>
 <li><strong>Multi-Platform Support</strong>: Seamless operations across Azure DevOps and GitHub</li>
 <li><strong>Dry-Run Previews</strong>: Preview operations before execution</li>
 <li><strong>Automatic Platform Detection</strong>: Detects platform from Git remote configuration</li>
@@ -544,6 +565,338 @@ Running a workflow (Release)    pass    3m24s   https://github.com/naz-hage/ntoo
 <h5 id="update-pull-request_1">Update Pull Request</h5>
 <pre><code class="language-bash">sdo pr update --pr-id 211 --title &quot;Updated: Implement PR Management&quot;
 </code></pre>
+<h3 id="pipeline-operations">Pipeline Operations</h3>
+<h4 id="create-pipeline">Create Pipeline</h4>
+<pre><code class="language-bash">sdo pipeline create [OPTIONS]
+</code></pre>
+<p>Creates a new pipeline/workflow in the current project.</p>
+<p><strong>Options:</strong>
+- <code>-v, --verbose</code> - Show detailed API information</p>
+<p><strong>Examples:</strong></p>
+<pre><code class="language-bash">sdo pipeline create
+sdo pipeline create --verbose
+</code></pre>
+<h2 id="how-pipeline-creation-works">How Pipeline Creation Works</h2>
+<p>The <code>sdo pipeline create</code> command automatically detects your platform and creates pipelines differently for each:</p>
+<h3 id="azure-devops-pipeline-creation">Azure DevOps Pipeline Creation</h3>
+<p><strong>What it does:</strong>
+1. <strong>Validates YAML file exists locally</strong> - Checks that the pipeline YAML file exists before creating the pipeline definition
+2. <strong>Auto-detects configuration</strong> from your Git remote:
+   - Organization: <code>your-org</code>
+   - Project: <code>your-project</code> 
+   - Repository: <code>your-repo</code>
+   - Pipeline Name: <code>your-repo</code> (same as repository name)
+   - YAML Path: <code>.azure-pipelines/azurepipeline.yml</code>
+   - Folder: <code>\</code> (root folder)</p>
+<ol>
+<li><strong>Creates the pipeline</strong> using Azure DevOps REST API</li>
+<li><strong>Links to existing YAML file</strong> in your repository</li>
+</ol>
+<p><strong>Prerequisites:</strong>
+- Repository must contain a pipeline YAML file at <code>.azure-pipelines/azurepipeline.yml</code>
+- <code>AZURE_DEVOPS_PAT</code> environment variable must be set
+- User must have "Edit build pipeline" permissions</p>
+<p><strong>What happens during creation:</strong></p>
+<pre><code>✅ Detected Azure DevOps repository:
+   Organization: contoso
+   Project: my-project
+   Repository: my-app
+   Pipeline Name: my-app
+   Pipeline YAML Path: .azure-pipelines/azurepipeline.yml
+   Pipeline Folder: \
+
+✅ Pipeline YAML file found: .azure-pipelines/azurepipeline.yml
+Creating pipeline 'my-app'...
+✅ Pipeline created successfully!
+   ID: 12345
+   Name: my-app
+   URL: https://dev.azure.com/contoso/my-project/_build?definitionId=12345
+   Folder: \
+</code></pre>
+<p><strong>Error if YAML file missing:</strong></p>
+<pre><code>❌ Pipeline YAML file not found: .azure-pipelines/azurepipeline.yml
+Please create the pipeline YAML file before creating the pipeline definition.
+
+Example YAML file structure:
+  .azure-pipelines/azurepipeline.yml
+  trigger:
+  - main
+
+  pool:
+    vmImage: 'ubuntu-latest'
+
+  steps:
+  - script: echo Hello, world!
+    displayName: 'Run a one-line script'
+</code></pre>
+<h3 id="github-actions-workflow-creation">GitHub Actions Workflow Creation</h3>
+<p><strong>Important:</strong> SDO does <strong>not</strong> create GitHub workflow files automatically.</p>
+<p><strong>What it does:</strong>
+- <strong>Checks for existing workflows</strong> in <code>.github/workflows/</code> directory
+- <strong>Lists existing workflow files</strong> if any are found
+- <strong>Provides guidance</strong> for manual workflow creation</p>
+<p><strong>Manual creation steps:</strong>
+1. Create the workflows directory:
+   <code>bash
+   mkdir -p .github/workflows</code></p>
+<ol>
+<li>Create a workflow YAML file (e.g., <code>ci.yml</code>):
+   ```yaml
+   # .github/workflows/ci.yml
+   name: CI</li>
+</ol>
+<p>on:
+     push:
+       branches: [ main ]
+     pull_request:
+       branches: [ main ]</p>
+<p>jobs:
+     build:
+       runs-on: ubuntu-latest</p>
+<pre><code>   steps:
+   - uses: actions/checkout@v4
+   - name: Run a one-line script
+     run: echo Hello, world!
+</code></pre>
+<p>```</p>
+<ol>
+<li>Commit and push the workflow file:
+   <code>bash
+   git add .github/workflows/ci.yml
+   git commit -m "Add CI workflow"
+   git push</code></li>
+</ol>
+<p><strong>SDO output for GitHub (no existing workflows):</strong></p>
+<pre><code>GitHub Actions workflows are created by adding YAML files to .github/workflows/
+SDO does not create workflow files automatically.
+
+To create a workflow:
+1. Create the directory: mkdir -p .github/workflows
+2. Add a workflow YAML file (e.g., ci.yml)
+3. Commit and push the changes
+
+Example workflow file (.github/workflows/ci.yml):
+  name: CI
+  on:
+    push:
+      branches: [ main ]
+    pull_request:
+      branches: [ main ]
+  jobs:
+    build:
+      runs-on: ubuntu-latest
+      steps:
+      - uses: actions/checkout@v4
+      - name: Run tests
+        run: echo 'Add your test commands here'
+</code></pre>
+<p><strong>SDO output for GitHub (with existing workflows):</strong></p>
+<pre><code>GitHub Actions workflows found in your repository:
+  • ntools.yml
+  • ci.yml
+
+Your repository already has workflow files.
+To create additional workflows, add more YAML files to .github/workflows/
+and commit/push them to trigger GitHub Actions.
+</code></pre>
+<p><strong>SDO output for GitHub (no existing workflows):</strong></p>
+<pre><code>GitHub Actions workflows are created by adding YAML files to .github/workflows/
+SDO does not create workflow files automatically.
+
+To create a workflow:
+1. Create the directory: mkdir -p .github/workflows
+2. Add a workflow YAML file (e.g., ci.yml)
+3. Commit and push the changes
+
+Example workflow file (.github/workflows/ci.yml):
+  name: CI
+  on:
+    push:
+      branches: [ main ]
+    pull_request:
+      branches: [ main ]
+  jobs:
+    build:
+      runs-on: ubuntu-latest
+      steps:
+      - uses: actions/checkout@v4
+      - name: Run tests
+        run: echo 'Add your test commands here'
+</code></pre>
+<h3 id="platform-detection">Platform Detection</h3>
+<p>SDO automatically detects your platform from Git remote URLs:</p>
+<p><strong>Azure DevOps URLs:</strong>
+- <code>https://dev.azure.com/organization/project/_git/repository</code>
+- <code>https://organization@dev.azure.com/organization/project/_git/repository</code></p>
+<p><strong>GitHub URLs:</strong>
+- <code>https://github.com/owner/repository.git</code>
+- <code>git@github.com:owner/repository.git</code></p>
+<h3 id="common-issues">Common Issues</h3>
+<p><strong>Azure DevOps Issues:</strong>
+- <strong>"YAML file not found"</strong>: Ensure <code>.azure-pipelines/azurepipeline.yml</code> exists in your repository
+- <strong>"Access denied"</strong>: Check PAT permissions include "Build (Read &amp; execute)"
+- <strong>"Pipeline already exists"</strong>: Pipeline with that name already exists (command exits successfully)</p>
+<p><strong>GitHub Issues:</strong>
+- <strong>Manual process required</strong>: GitHub workflows cannot be created via API
+- <strong>File naming</strong>: Use lowercase with hyphens (e.g., <code>ci.yml</code>, not <code>CI.yml</code>)</p>
+<h3 id="pipeline-naming-convention">Pipeline Naming Convention</h3>
+<p><strong>Azure DevOps:</strong> Pipeline name defaults to repository name
+<strong>GitHub:</strong> Workflow name comes from the <code>name:</code> field in YAML or filename</p>
+<h3 id="security-considerations">Security Considerations</h3>
+<ul>
+<li><strong>Azure DevOps PAT</strong> requires appropriate permissions</li>
+<li><strong>GitHub workflows</strong> run with repository permissions</li>
+<li><strong>YAML files</strong> should be reviewed before committing</li>
+</ul>
+<h4 id="list-pipelines">List Pipelines</h4>
+<pre><code class="language-bash">sdo pipeline ls [OPTIONS]
+</code></pre>
+<p>Lists pipelines in the current project or repository.</p>
+<p><strong>Options:</strong>
+- <code>--repo REPO</code> - Filter pipelines by repository name
+- <code>--all</code> - Show all pipelines in the project (default: current repository only)
+- <code>-v, --verbose</code> - Show detailed API information</p>
+<p><strong>Examples:</strong></p>
+<pre><code class="language-bash"># List pipelines for current repository
+sdo pipeline ls
+
+# List pipelines for specific repository
+sdo pipeline ls --repo my-repo
+
+# List all pipelines in project
+sdo pipeline ls --all
+
+# List with verbose output
+sdo pipeline ls --verbose
+</code></pre>
+<h4 id="show-pipeline">Show Pipeline</h4>
+<pre><code class="language-bash">sdo pipeline show [OPTIONS]
+</code></pre>
+<p>Shows detailed information about the current pipeline.</p>
+<p><strong>Options:</strong>
+- <code>-v, --verbose</code> - Show detailed API information</p>
+<p><strong>Examples:</strong></p>
+<pre><code class="language-bash">sdo pipeline show
+sdo pipeline show --verbose
+</code></pre>
+<h4 id="delete-pipeline">Delete Pipeline</h4>
+<pre><code class="language-bash">sdo pipeline delete [OPTIONS]
+</code></pre>
+<p>Deletes the current pipeline (with confirmation prompt).</p>
+<p><strong>Options:</strong>
+- <code>-v, --verbose</code> - Show detailed API information</p>
+<p><strong>Examples:</strong></p>
+<pre><code class="language-bash">sdo pipeline delete  # Will prompt for confirmation
+</code></pre>
+<h4 id="run-pipeline">Run Pipeline</h4>
+<pre><code class="language-bash">sdo pipeline run [PIPELINE_NAME] --branch BRANCH [OPTIONS]
+</code></pre>
+<p>Runs a pipeline on the specified branch.</p>
+<p><strong>Arguments:</strong>
+- <code>PIPELINE_NAME</code> - Name of pipeline to run (optional, uses current repository pipeline if not specified)</p>
+<p><strong>Options:</strong>
+- <code>-b, --branch BRANCH</code> - Branch to run pipeline on (required)
+- <code>-v, --verbose</code> - Show detailed API information</p>
+<p><strong>Examples:</strong></p>
+<pre><code class="language-bash"># Run current repository pipeline on main branch
+sdo pipeline run --branch main
+
+# Run specific pipeline on develop branch
+sdo pipeline run my-pipeline --branch develop
+
+# Run with verbose output
+sdo pipeline run --branch main --verbose
+</code></pre>
+<h4 id="check-pipeline-status">Check Pipeline Status</h4>
+<pre><code class="language-bash">sdo pipeline status [BUILD_ID] [OPTIONS]
+</code></pre>
+<p>Shows the status of a pipeline build/run.</p>
+<p><strong>Arguments:</strong>
+- <code>BUILD_ID</code> - Specific build ID to check (optional, shows latest if not specified)</p>
+<p><strong>Options:</strong>
+- <code>-v, --verbose</code> - Show detailed API information</p>
+<p><strong>Examples:</strong></p>
+<pre><code class="language-bash"># Show latest build status
+sdo pipeline status
+
+# Show specific build status
+sdo pipeline status 12345
+
+# Show with verbose API details
+sdo pipeline status 12345 --verbose
+</code></pre>
+<h4 id="show-pipeline-logs">Show Pipeline Logs</h4>
+<pre><code class="language-bash">sdo pipeline logs [BUILD_ID] [OPTIONS]
+</code></pre>
+<p>Shows logs for a pipeline build/run.</p>
+<p><strong>Arguments:</strong>
+- <code>BUILD_ID</code> - Build ID to get logs for (required)</p>
+<p><strong>Options:</strong>
+- <code>--build-id BUILD_ID</code> - Alternative way to specify build ID
+- <code>-v, --verbose</code> - Show detailed API information</p>
+<p><strong>Examples:</strong></p>
+<pre><code class="language-bash"># Show logs for build ID 12345
+sdo pipeline logs 12345
+
+# Alternative syntax
+sdo pipeline logs --build-id 12345
+
+# Show with verbose output
+sdo pipeline logs 12345 --verbose
+</code></pre>
+<h4 id="show-last-build">Show Last Build</h4>
+<pre><code class="language-bash">sdo pipeline lastbuild [OPTIONS]
+</code></pre>
+<p>Shows information about the last build of the current pipeline.</p>
+<p><strong>Options:</strong>
+- <code>-v, --verbose</code> - Show detailed API information</p>
+<p><strong>Examples:</strong></p>
+<pre><code class="language-bash">sdo pipeline lastbuild
+sdo pipeline lastbuild --verbose
+</code></pre>
+<h4 id="update-pipeline">Update Pipeline</h4>
+<pre><code class="language-bash">sdo pipeline update [OPTIONS]
+</code></pre>
+<p>Checks if the pipeline configuration needs updating and provides guidance.</p>
+<p><strong>Options:</strong>
+- <code>-v, --verbose</code> - Show detailed API information</p>
+<p><strong>Examples:</strong></p>
+<pre><code class="language-bash">sdo pipeline update
+sdo pipeline update --verbose
+</code></pre>
+<h3 id="examples_2">Examples</h3>
+<h4 id="pipeline-operations_1">Pipeline Operations</h4>
+<h5 id="create-pipeline_1">Create Pipeline</h5>
+<pre><code class="language-bash">sdo pipeline create
+</code></pre>
+<h5 id="list-pipelines_1">List Pipelines</h5>
+<pre><code class="language-bash"># List all pipelines for current repository
+sdo pipeline ls
+
+# List all pipelines in project
+sdo pipeline ls --all
+</code></pre>
+<h5 id="run-pipeline_1">Run Pipeline</h5>
+<pre><code class="language-bash"># Run pipeline on main branch
+sdo pipeline run --branch main
+
+# Run specific pipeline
+sdo pipeline run ci-pipeline --branch feature-branch
+</code></pre>
+<h5 id="check-pipeline-status_1">Check Pipeline Status</h5>
+<pre><code class="language-bash"># Check latest build status
+sdo pipeline status
+
+# Check specific build
+sdo pipeline status 12345
+</code></pre>
+<h5 id="view-pipeline-logs">View Pipeline Logs</h5>
+<pre><code class="language-bash"># View logs for build 12345
+sdo pipeline logs 12345
+</code></pre>
+<h5 id="show-last-build-information">Show Last Build Information</h5>
+<pre><code class="language-bash">sdo pipeline lastbuild
+</code></pre>
 <h2 id="markdown-file-format">Markdown File Format</h2>
 <p>SDO expects markdown files with specific metadata headers. See the example files:</p>
 <p><strong>Azure DevOps Examples:</strong>
@@ -569,6 +922,7 @@ Description content here...
 <li><strong>Work Item Fields</strong>: Title, Description, Area Path, Iteration Path, Priority, Effort</li>
 <li><strong>Repository Operations</strong>: Create, List, Show, Delete repositories</li>
 <li><strong>Pull Request Operations</strong>: Create, List, Show, Update pull requests with work item linking</li>
+<li><strong>Pipeline Operations</strong>: Create, Run, Monitor, Update CI/CD pipelines</li>
 <li><strong>Authentication</strong>: Personal Access Token (PAT)</li>
 <li><strong>API</strong>: REST API integration</li>
 <li><strong>Automatic</strong>: Organization/Project detection from Git remote</li>
@@ -579,6 +933,7 @@ Description content here...
 <li><strong>Work Item Fields</strong>: Title, Description, Labels, Assignees</li>
 <li><strong>Repository Operations</strong>: Create, List, Show, Delete repositories</li>
 <li><strong>Pull Request Operations</strong>: Create, List, Show, Update pull requests with issue references</li>
+<li><strong>Pipeline Operations</strong>: Run, Monitor GitHub Actions workflows</li>
 <li><strong>Authentication</strong>: GitHub CLI (<code>gh</code>) or Personal Access Token</li>
 <li><strong>API</strong>: GitHub CLI integration for repositories, REST API for work items and PRs</li>
 <li><strong>Automatic</strong>: Repository detection from Git remote</li>
@@ -609,6 +964,7 @@ python -m pytest tests/
 - Work item creation workflows
 - Repository management operations
 - Pull request management operations (create, list, show, update)
+- Pipeline management operations (create, run, monitor, update)
 - Multi-platform API integrations
 - Error handling and validation
 - CLI command interfaces
@@ -617,7 +973,7 @@ python -m pytest tests/
 - Error handling scenarios
 - CLI argument parsing</p>
 <h2 id="troubleshooting">Troubleshooting</h2>
-<h3 id="common-issues">Common Issues</h3>
+<h3 id="common-issues_1">Common Issues</h3>
 <h4 id="authentication-failures">Authentication Failures</h4>
 <p><strong>Error:</strong> <code>Authentication failed. Check your AZURE_DEVOPS_PAT token.</code></p>
 <p><strong>Solution:</strong></p>
@@ -659,6 +1015,7 @@ git remote -v
 <li><strong><code>client.py</code></strong> - Azure DevOps REST API client</li>
 <li><strong><code>work_items.py</code></strong> - Business logic for work item operations</li>
 <li><strong><code>pull_requests.py</code></strong> - Business logic for pull request operations</li>
+<li><strong><code>pipelines.py</code></strong> - Business logic for pipeline operations</li>
 <li><strong><code>platforms/</code></strong> - Platform-specific implementations (GitHub, Azure DevOps)</li>
 <li><code>github_pr_platform.py</code> - GitHub pull request operations</li>
 <li><code>azdo_pr_platform.py</code> - Azure DevOps pull request operations</li>

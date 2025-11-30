@@ -132,7 +132,7 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#2-cli-layer-clipy">2. CLI Layer (cli.py)</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#3-business-logic-layer-work_itemspy-repositoriespy-pull_requestspy">3. Business Logic Layer (work_items.py, repositories.py &amp; pull_requests.py)</a>
+    <li class="toctree-l3"><a class="reference internal" href="#3-business-logic-layer-work_itemspy-repositoriespy-pull_requestspy-pipelinespy">3. Business Logic Layer (work_items.py, repositories.py, pull_requests.py &amp; pipelines.py)</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#4-parser-layer-parsers">4. Parser Layer (parsers/)</a>
         <ul>
@@ -156,9 +156,15 @@
     </li>
     <li class="toctree-l4"><a class="reference internal" href="#github-pr-platform-github_pr_platformpy">GitHub PR Platform (github_pr_platform.py)</a>
     </li>
+    <li class="toctree-l4"><a class="reference internal" href="#pipeline-platform-interface">Pipeline Platform Interface</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#azure-devops-pipeline-platform-azdo_pipeline_platformpy">Azure DevOps Pipeline Platform (azdo_pipeline_platform.py)</a>
+    </li>
         </ul>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#7-repository-operations-repositoriespy">7. Repository Operations (repositories.py)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#8-pipeline-operations-pipelinespy">8. Pipeline Operations (pipelines.py)</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#6-client-layer-clientpy">6. Client Layer (client.py)</a>
     </li>
@@ -286,6 +292,7 @@
 │   ├── client.py                   # Azure DevOps REST API client
 │   ├── exceptions.py               # Custom exception classes
 │   ├── pull_requests.py            # Pull request operations (multi-platform)
+│   ├── pipelines.py                # Pipeline operations (multi-platform)
 │   ├── repositories.py             # Repository operations (multi-platform)
 │   ├── version.py                  # Version information
 │   ├── work_items.py               # Work item orchestration logic
@@ -299,6 +306,7 @@
 │       ├── pr_base.py              # Abstract base class for PR platforms
 │       ├── azdo_platform.py        # Azure DevOps work item operations
 │       ├── azdo_pr_platform.py     # Azure DevOps pull request operations
+│       ├── azdo_pipeline_platform.py # Azure DevOps pipeline operations
 │       ├── github_platform.py      # GitHub work item operations
 │       └── github_pr_platform.py   # GitHub pull request operations
 ├── tests/                          # Test suite
@@ -309,10 +317,12 @@
 │   ├── test_github_platform.py     # GitHub platform tests
 │   ├── test_markdown_parser.py     # Markdown parser tests
 │   ├── test_pull_requests.py       # Pull request operations tests
+│   ├── test_pipelines.py           # Pipeline operations tests
 │   ├── test_repositories.py        # Repository operations tests
 │   ├── test_sdo.py                 # Main module tests
 │   ├── test_sdo_cli.py             # CLI integration tests
-│   └── test_sdo_workitems.py       # Work item tests
+│   ├── test_sdo_workitems.py       # Work item tests
+│   └── test_sdo_pipelines.py       # Pipeline tests
 ├── pyproject.toml                  # Python project configuration
 ├── requirements.txt                # Production dependencies
 ├── requirements-dev.txt            # Development dependencies
@@ -403,7 +413,11 @@
 <p><strong>Command Structure</strong>:</p>
 <pre><code>sdo
 ├── workitem
-│   └── create          # Create work items from markdown files
+│   ├── create          # Create work items from markdown files
+│   ├── list            # List work items with filtering
+│   ├── show            # Show work item details
+│   ├── update          # Update work item fields
+│   └── comment         # Add comments to work items
 ├── repo
 │   ├── create          # Create repositories
 │   ├── show            # Show repository information
@@ -415,6 +429,16 @@
 │   ├── status          # Check pull request status
 │   ├── ls              # List pull requests
 │   └── update          # Update pull request
+├── pipeline
+│   ├── create          # Create pipelines
+│   ├── show            # Show pipeline information
+│   ├── ls              # List pipelines
+│   ├── run             # Run pipelines
+│   ├── status          # Check pipeline status
+│   ├── logs            # View pipeline logs
+│   ├── lastbuild       # Show last build information
+│   ├── update          # Update pipeline configuration
+│   └── delete          # Delete pipelines
 └── add-issue           # Legacy compatibility command
 </code></pre>
 <p><strong>Key Features</strong>:
@@ -423,7 +447,7 @@
 - Detailed verbose output for debugging
 - Graceful error handling with helpful messages
 - Global <code>--verbose</code> flag support</p>
-<h3 id="3-business-logic-layer-work_itemspy-repositoriespy-pull_requestspy">3. Business Logic Layer (work_items.py, repositories.py &amp; pull_requests.py)</h3>
+<h3 id="3-business-logic-layer-work_itemspy-repositoriespy-pull_requestspy-pipelinespy">3. Business Logic Layer (work_items.py, repositories.py, pull_requests.py &amp; pipelines.py)</h3>
 <p><strong>Purpose</strong>: Core application logic and orchestration
 <strong>Responsibilities</strong>:
 - Content processing workflow coordination
@@ -431,15 +455,18 @@
 - Work item creation orchestration (work_items.py)
 - Repository operations orchestration (repositories.py)
 - Pull request operations orchestration (pull_requests.py)
+- Pipeline operations orchestration (pipelines.py)
 - Result validation and reporting</p>
 <p><strong>Key Functions</strong>:
-- <code>cmd_workitem_create()</code>: Main work item creation workflow
+- <code>cmd_workitem_create/list/show/update/comment()</code>: Work item operation workflows
 - <code>cmd_repo_create/show/ls/delete()</code>: Repository operation workflows
 - <code>cmd_pr_create/show/status/ls/update()</code>: Pull request operation workflows
+- <code>cmd_pipeline_create/show/ls/run/status/logs/lastbuild/update/delete()</code>: Pipeline operation workflows
 - <code>get_pr_platform()</code>: Platform factory for pull request operations
+- <code>get_pipeline_platform()</code>: Platform factory for pipeline operations
 - Platform factory functions for creating appropriate platform instances
 - Result handling and user feedback</p>
-<p><strong>Architecture Note</strong>: Repository and pull request operations use abstract base classes with platform-specific implementations, providing a consistent interface across Azure DevOps and GitHub.</p>
+<p><strong>Architecture Note</strong>: Repository, pull request, and pipeline operations use abstract base classes with platform-specific implementations, providing a consistent interface across Azure DevOps and GitHub.</p>
 <h3 id="4-parser-layer-parsers">4. Parser Layer (parsers/)</h3>
 <p><strong>Purpose</strong>: Content extraction and metadata processing</p>
 <h4 id="markdownparser-markdown_parserpy">MarkdownParser (markdown_parser.py)</h4>
@@ -592,6 +619,48 @@
 - Automatic issue reference detection
 - Draft PR support
 - Repository context detection</p>
+<h4 id="pipeline-platform-interface">Pipeline Platform Interface</h4>
+<p><strong>Abstract Interface</strong>:</p>
+<pre><code class="language-python">class PipelinePlatform(ABC):
+    @abstractmethod
+    def create_pipeline(self, name: str, **kwargs) -&gt; Dict[str, Any]:
+        &quot;&quot;&quot;Create a new pipeline.&quot;&quot;&quot;
+
+    @abstractmethod
+    def get_pipeline(self, name: str) -&gt; Optional[Dict[str, Any]]:
+        &quot;&quot;&quot;Get pipeline information.&quot;&quot;&quot;
+
+    @abstractmethod
+    def list_pipelines(self, repo_filter: Optional[str] = None) -&gt; List[Dict[str, Any]]:
+        &quot;&quot;&quot;List pipelines with optional repository filtering.&quot;&quot;&quot;
+
+    @abstractmethod
+    def run_pipeline(self, name: str, branch: str) -&gt; Dict[str, Any]:
+        &quot;&quot;&quot;Run a pipeline on specified branch.&quot;&quot;&quot;
+
+    @abstractmethod
+    def get_pipeline_status(self, build_id: Optional[int] = None) -&gt; Dict[str, Any]:
+        &quot;&quot;&quot;Get pipeline build status.&quot;&quot;&quot;
+
+    @abstractmethod
+    def get_pipeline_logs(self, build_id: int) -&gt; str:
+        &quot;&quot;&quot;Get logs for a pipeline build.&quot;&quot;&quot;
+
+    @abstractmethod
+    def delete_pipeline(self, name: str) -&gt; bool:
+        &quot;&quot;&quot;Delete a pipeline.&quot;&quot;&quot;
+</code></pre>
+<h4 id="azure-devops-pipeline-platform-azdo_pipeline_platformpy">Azure DevOps Pipeline Platform (azdo_pipeline_platform.py)</h4>
+<p><strong>Responsibilities</strong>:
+- Azure DevOps Pipeline REST API integration
+- Pipeline creation, execution, and monitoring
+- Build status and log retrieval
+- Pipeline configuration management</p>
+<p><strong>Key Features</strong>:
+- Full pipeline lifecycle management
+- Build queue and execution tracking
+- Comprehensive logging and status reporting
+- Integration with Azure DevOps build system</p>
 <h3 id="7-repository-operations-repositoriespy">7. Repository Operations (repositories.py)</h3>
 <p><strong>Purpose</strong>: Multi-platform repository management
 <strong>Responsibilities</strong>:
@@ -609,6 +678,22 @@
 - Automatic platform detection from Git remotes
 - Consistent error handling and logging
 - Support for both Azure DevOps and GitHub repositories</p>
+<h3 id="8-pipeline-operations-pipelinespy">8. Pipeline Operations (pipelines.py)</h3>
+<p><strong>Purpose</strong>: Multi-platform CI/CD pipeline management
+<strong>Responsibilities</strong>:
+- Pipeline creation, execution, monitoring, and management
+- Platform-specific pipeline operations
+- Build status tracking and log retrieval
+- Unified interface across platforms</p>
+<p><strong>Architecture</strong>:
+- <code>PipelinePlatform</code>: Abstract base class for pipeline operations
+- <code>AzureDevOpsPipelinePlatform</code>: Azure DevOps REST API implementation
+- <code>create_pipeline_platform()</code>: Factory function for platform selection</p>
+<p><strong>Key Features</strong>:
+- Platform-agnostic pipeline operations
+- Automatic platform detection from Git remotes
+- Comprehensive build monitoring and logging
+- Support for both Azure DevOps and GitHub Actions pipelines</p>
 <h3 id="6-client-layer-clientpy">6. Client Layer (client.py)</h3>
 <p><strong>Purpose</strong>: Low-level API communication and platform utilities
 <strong>Responsibilities</strong>:
@@ -638,6 +723,7 @@
 Work Items: Content Parsing → Platform Selection → Work Item Creation
 Repository: Git Remote Parsing → Platform Selection → Repository Operations
 Pull Requests: Content Parsing → Platform Selection → PR Operations
+Pipelines: Git Remote Parsing → Platform Selection → Pipeline Operations
      ↓
 Result Reporting ← Success/Error Aggregation ← API/CLI Calls
 </code></pre>
@@ -751,6 +837,9 @@ CLI Error Presenter → Console Output with Context
 <li>Branch management operations</li>
 <li>PR review and approval workflows</li>
 <li>PR merge operations with conflict resolution</li>
+<li>Enhanced pipeline monitoring and alerting</li>
+<li>Pipeline template management</li>
+<li>Cross-platform pipeline migration tools</li>
 </ul>
 <h3 id="2-architecture-evolution">2. <strong>Architecture Evolution</strong></h3>
 <ul>
