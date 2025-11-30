@@ -724,28 +724,47 @@ def cmd_azdo_pipeline_logs(build_id: int, verbose: bool = False) -> int:
             log_name = log_entry.get('name', 'Unknown')
             if log_url:
                 print(f"📄 Log: {log_name}")
-                print(f"   URL: https://dev.azure.com/{config['organization']}/{config['project']}/_build/results?buildId={build_id}&view=logs&j={log_entry.get('id', '')}")
+                print(f"{'-'*40}")
 
-                # Try to download and show first 20 lines of the log for quick diagnosis
-                if verbose:
-                    try:
-                        log_response = requests.get(log_url, headers=client.headers)
-                        if log_response.status_code == 200:
-                            log_content = log_response.text
-                            lines = log_content.split('\n')[:20]  # First 20 lines
-                            print("   Preview (first 20 lines):")
-                            for i, line in enumerate(lines, 1):
-                                if line.strip():  # Only show non-empty lines
-                                    print(f"     {i:2d}: {line}")
-                                    if i >= 20:
-                                        break
-                            if len(lines) == 20 and len(log_content.split('\n')) > 20:
-                                print("     ... (truncated - use URL above for full log)")
+                # Download and display the full log content
+                try:
+                    log_response = requests.get(log_url, headers=client.headers, timeout=30)
+                    if log_response.status_code == 200:
+                        log_content = log_response.text
+
+                        # Display the log content
+                        if log_content.strip():
+                            # For very large logs, show a reasonable preview with truncation warning
+                            lines = log_content.split('\n')
+                            max_lines = 500  # Show up to 500 lines per log
+
+                            if len(lines) > max_lines:
+                                # Show first 200 lines, then a truncation message, then last 100 lines
+                                preview_lines = lines[:200] + [f"\n... ({len(lines) - 300} lines truncated) ...\n"] + lines[-100:]
+                                display_content = '\n'.join(preview_lines)
+                                print(display_content)
+                                print(f"\n⚠️  Log truncated - showing first 200 and last 100 of {len(lines)} total lines")
+                                print(f"   Full log available at: https://dev.azure.com/{config['organization']}/{config['project']}/_build/results?buildId={build_id}&view=logs&j={log_entry.get('id', '')}")
+                            else:
+                                # Show full log content
+                                print(log_content)
                         else:
-                            print("   Could not download log preview")
-                    except Exception as e:
-                        print(f"   Could not download log preview: {e}")
-                print()
+                            print("(Log is empty)")
+                    else:
+                        print(f"❌ Failed to download log (HTTP {log_response.status_code})")
+                        print(f"   URL: https://dev.azure.com/{config['organization']}/{config['project']}/_build/results?buildId={build_id}&view=logs&j={log_entry.get('id', '')}")
+
+                except requests.exceptions.Timeout:
+                    print("❌ Log download timed out (30 second limit)")
+                    print(f"   URL: https://dev.azure.com/{config['organization']}/{config['project']}/_build/results?buildId={build_id}&view=logs&j={log_entry.get('id', '')}")
+                except requests.exceptions.RequestException as e:
+                    print(f"❌ Failed to download log: {e}")
+                    print(f"   URL: https://dev.azure.com/{config['organization']}/{config['project']}/_build/results?buildId={build_id}&view=logs&j={log_entry.get('id', '')}")
+                except Exception as e:
+                    print(f"❌ Unexpected error displaying log: {e}")
+                    print(f"   URL: https://dev.azure.com/{config['organization']}/{config['project']}/_build/results?buildId={build_id}&view=logs&j={log_entry.get('id', '')}")
+
+                print()  # Add blank line between logs
     else:
         print("No logs found for this build.")
 
@@ -910,6 +929,8 @@ def _run_gh_command(cmd: list, verbose: bool = False) -> tuple[int, str, str]:
             ["gh"] + cmd,
             capture_output=True,
             text=True,
+            encoding='utf-8',
+            errors='replace',
             check=False
         )
 

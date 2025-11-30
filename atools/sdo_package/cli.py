@@ -917,19 +917,32 @@ def status(ctx, build_id, verbose):
 
 
 @pipeline.command()
-@click.argument("build_id", type=int)
+@click.argument("build_id", type=int, required=False)
+@click.option("--build-id", "build_id_option", type=int, help="Build ID to get logs for (alternative to positional argument)")
 @click.option("--verbose", "-v", is_flag=True, help="Show detailed API information and responses")
 @click.pass_context
-def logs(ctx, build_id, verbose):
+def logs(ctx, build_id, build_id_option, verbose):
     """Show logs for a pipeline build.
 
     Examples:
         sdo pipeline logs 12345
+        sdo pipeline logs --build-id 12345
         sdo pipeline logs 12345 --verbose
     """
+    # Use build_id_option if provided, otherwise use positional build_id
+    final_build_id = build_id_option if build_id_option is not None else build_id
+
+    if final_build_id is None:
+        click.echo("❌ Build ID is required. Use 'sdo pipeline logs <build_id>' or 'sdo pipeline logs --build-id <build_id>'")
+        click.echo()
+        click.echo("Examples:")
+        click.echo("  sdo pipeline logs 12345")
+        click.echo("  sdo pipeline logs --build-id 12345")
+        sys.exit(1)
+
     try:
         # Call the business logic
-        result = cmd_pipeline_logs(build_id, verbose=verbose)
+        result = cmd_pipeline_logs(final_build_id, verbose=verbose)
 
         if result != 0:
             sys.exit(result)
