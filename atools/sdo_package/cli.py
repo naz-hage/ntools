@@ -771,18 +771,26 @@ def show(ctx, verbose):
 
 
 @pipeline.command()
+@click.option("--repo", help="Filter pipelines by repository name (shows only pipelines for this repo)")
+@click.option("--all", "show_all", is_flag=True, help="Show all pipelines in the project")
 @click.option("--verbose", "-v", is_flag=True, help="Show detailed API information and responses")
 @click.pass_context
-def ls(ctx, verbose):
-    """List all pipelines in the current project.
+def ls(ctx, repo, show_all, verbose):
+    """List pipelines for the current repository.
+
+    By default, shows only pipelines associated with the current repository
+    (detected from git remote). Use --repo to filter by a different repository,
+    or --all to show all pipelines in the project.
 
     Examples:
-        sdo pipeline ls
-        sdo pipeline ls --verbose
+        sdo pipeline ls                    # Show current repo pipelines
+        sdo pipeline ls --repo other-repo  # Show pipelines for other-repo
+        sdo pipeline ls --all              # Show all pipelines in project
+        sdo pipeline ls --verbose          # Show API details
     """
     try:
         # Call the business logic
-        result = cmd_pipeline_list(verbose=verbose)
+        result = cmd_pipeline_list(repo_filter=repo, show_all=show_all, verbose=verbose)
 
         if result != 0:
             sys.exit(result)
@@ -842,23 +850,24 @@ def delete(ctx, verbose):
 
 
 @pipeline.command()
+@click.argument("pipeline_name", required=False)
 @click.option("--branch", "-b", required=True, help="Branch to run the pipeline on")
 @click.option("--verbose", "-v", is_flag=True, help="Show detailed API information and responses")
 @click.pass_context
-def run(ctx, branch, verbose):
-    """Run the current pipeline.
+def run(ctx, pipeline_name, branch, verbose):
+    """Run a pipeline.
 
-    The pipeline name is extracted from the current Git remote.
+    If PIPELINE_NAME is not provided, runs the pipeline for the current repository.
     Runs the pipeline on the specified branch.
 
     Examples:
         sdo pipeline run --branch main
-        sdo pipeline run -b develop --verbose
-        sdo pipeline run --branch feature/my-feature
+        sdo pipeline run ai-question-api-precheck -b main
+        sdo pipeline run my-pipeline -b develop --verbose
     """
     try:
         # Call the business logic
-        result = cmd_pipeline_run(branch, verbose=verbose)
+        result = cmd_pipeline_run(pipeline_name, branch, verbose=verbose)
 
         if result != 0:
             sys.exit(result)

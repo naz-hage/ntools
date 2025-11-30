@@ -224,11 +224,12 @@ def cmd_azdo_pipeline_show(verbose: bool = False) -> int:
         return 1
 
 
-def cmd_azdo_pipeline_list(verbose: bool = False) -> int:
+def cmd_azdo_pipeline_list(config: dict = None, repo_filter: str = None, show_all: bool = False, verbose: bool = False) -> int:
     """Handle 'sdo pipeline list' command for Azure DevOps."""
-    config = get_pipeline_config()
     if config is None:
-        return 1
+        config = get_pipeline_config()
+        if config is None:
+            return 1
 
     # Get personal access token from environment
     pat = get_personal_access_token()
@@ -261,14 +262,68 @@ def cmd_azdo_pipeline_list(verbose: bool = False) -> int:
             print("No pipelines found in this project.")
             return 0
 
-        print(f"Pipelines in project '{config['project']}' ({len(pipelines)} total):")
-        print("-" * 80)
-        for pipeline in pipelines:
-            print(f"  {pipeline['name']}")
-            print(f"    ID: {pipeline['id']}")
-            print(f"    URL: https://dev.azure.com/{config['organization']}/{config['project']}/_build?definitionId={pipeline['id']}")
-            print(f"    Folder: {pipeline.get('folder', '\\')}")
+        # Filter pipelines by repository (use current repo if no filter specified and not show_all)
+        current_repo = config.get('repository')
+        if show_all:
+            target_repo = None  # Don't filter
+        else:
+            target_repo = repo_filter if repo_filter is not None else current_repo
+        
+        if target_repo:
+            filtered_pipelines = []
+            for pipeline in pipelines:
+                pipeline_name = pipeline['name']
+                
+                # Filter by pipeline name prefix (fast, no API calls needed)
+                # This assumes pipelines follow naming convention: {repo}-{pipeline-type}
+                if pipeline_name.startswith(f"{target_repo}-") or pipeline_name == target_repo:
+                    filtered_pipelines.append(pipeline)
+            pipelines = filtered_pipelines
+
+        if not pipelines:
+            if target_repo:
+                print(f"No pipelines found for repository '{target_repo}' in project '{config['project']}'.")
+            else:
+                print("No pipelines found in this project.")
+            return 0
+
+        if target_repo:
+            if repo_filter:
+                print(f"Pipelines for repository '{target_repo}' in project '{config['project']}' ({len(pipelines)} total):")
+            else:
+                print(f"Pipelines for current repository '{target_repo}' in project '{config['project']}' ({len(pipelines)} total):")
+        else:
+            print(f"Pipelines in project '{config['project']}' ({len(pipelines)} total):")
+        
+        if pipelines:
             print()
+            # Display in a more compact format
+            for i, pipeline in enumerate(pipelines, 1):
+                name = pipeline['name']
+                pipeline_id = pipeline['id']
+                folder = pipeline.get('folder', '\\')
+                full_url = f"https://dev.azure.com/{config['organization']}/{config['project']}/_build?definitionId={pipeline_id}"
+                
+                # Color the pipeline name based on type
+                if '-prebuild' in name or '-precheck' in name:
+                    name_colored = colorize(name, Fore.YELLOW)
+                elif '-authserver' in name or '-api' in name or '-httpapi' in name:
+                    name_colored = colorize(name, Fore.GREEN)
+                elif '-web' in name:
+                    name_colored = colorize(name, Fore.BLUE)
+                elif '-dbmigrator' in name or '-migrator' in name:
+                    name_colored = colorize(name, Fore.MAGENTA)
+                elif '-data-warehouse' in name or '-image-promotion' in name:
+                    name_colored = colorize(name, Fore.CYAN)
+                else:
+                    name_colored = colorize(name, Fore.WHITE)
+                
+                # Compact single-line format
+                print(f"{i:2d}. {name_colored} (ID: {pipeline_id}, Folder: {folder})")
+                print(f"    {full_url}")
+                print()
+            
+            print(colorize("💡 Tip: Use 'sdo pipeline run <name>' to trigger a pipeline", Fore.CYAN))
         return 0
     else:
         print("❌ Failed to list pipelines")
@@ -331,12 +386,16 @@ def cmd_azdo_pipeline_delete(verbose: bool = False) -> int:
         return 1
 
 
-def cmd_azdo_pipeline_run(branch: str, verbose: bool = False) -> int:
+def cmd_azdo_pipeline_run(config: dict = None, pipeline_name: str = None, branch: str = None, verbose: bool = False) -> int:
     """Handle 'sdo pipeline run' command for Azure DevOps."""
-    # Get configuration (auto-extract from Git if needed)
-    config = get_pipeline_config()
-    if not config:
-        return 1
+    if config is None:
+        config = get_pipeline_config()
+        if not config:
+            return 1
+
+    # If pipeline_name is provided, override the default pipeline name
+    if pipeline_name:
+        config['pipelineName'] = pipeline_name
 
     # Get personal access token from environment
     pat = get_personal_access_token()
@@ -1338,7 +1397,7 @@ def cmd_pipeline_show(verbose: bool = False) -> int:
         return 1
 
 
-def cmd_pipeline_list(verbose: bool = False) -> int:
+def cmd_pipeline_list(repo_filter: str = None, show_all: bool = False, verbose: bool = False) -> int:
     """Handle 'sdo pipeline list' command."""
     config = get_pipeline_config()
     if config is None:
@@ -1347,7 +1406,7 @@ def cmd_pipeline_list(verbose: bool = False) -> int:
     platform = config.get("platform")
 
     if platform == "azdo":
-        return cmd_azdo_pipeline_list(verbose)
+        return cmd_azdo_pipeline_list(config=config, repo_filter=repo_filter, show_all=show_all, verbose=verbose)
     elif platform == "github":
         return cmd_github_workflow_list(verbose)
     else:
@@ -1374,7 +1433,7 @@ def cmd_pipeline_delete(verbose: bool = False) -> int:
         return 1
 
 
-def cmd_pipeline_run(branch: str, verbose: bool = False) -> int:
+def cmd_pipeline_run(pipeline_name: str = None, branch: str = None, verbose: bool = False) -> int:
     """Handle 'sdo pipeline run' command."""
     config = get_pipeline_config()
     if config is None:
@@ -1383,7 +1442,7 @@ def cmd_pipeline_run(branch: str, verbose: bool = False) -> int:
     platform = config.get("platform")
 
     if platform == "azdo":
-        return cmd_azdo_pipeline_run(branch, verbose)
+        return cmd_azdo_pipeline_run(config=config, pipeline_name=pipeline_name, branch=branch, verbose=verbose)
     elif platform == "github":
         workflow_name = config.get("workflowName")
         return cmd_github_workflow_run(workflow_name, branch, verbose)

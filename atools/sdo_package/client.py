@@ -332,6 +332,18 @@ class AzureDevOpsClient:
             self._handle_api_error(e, "fetching pipeline")
             return None
 
+    def get_pipeline_details(self, pipeline_id: int) -> Optional[Dict[str, Any]]:
+        """Get detailed pipeline information including configuration."""
+        url = f"{self.base_url}/_apis/pipelines/{pipeline_id}?api-version={self.api_version}"
+
+        try:
+            response = requests.get(url, headers=self.headers)
+            response.raise_for_status()
+            return response.json()
+        except requests.RequestException as e:
+            self._handle_api_error(e, f"fetching pipeline details for ID {pipeline_id}")
+            return None
+
     def list_pipelines(self) -> Optional[list]:
         """List all pipelines in the project."""
         url = f"{self.base_url}/_apis/pipelines?api-version={self.api_version}"
