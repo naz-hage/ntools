@@ -887,6 +887,7 @@ def cmd_azdo_pipeline_lastbuild(verbose: bool = False) -> int:
     print(f"   Queued: {latest_build.get('queueTime', 'N/A')}")
     print(f"   Started: {latest_build.get('startTime', 'N/A')}")
     print(f"   Finished: {latest_build.get('finishTime', 'N/A')}")
+    print(f"   URL: https://dev.azure.com/{config['organization']}/{config['project']}/_build/results?buildId={build_id}")
 
     # Save to config for easy access
     print(f"\n💡 Use 'sdo pipeline status {build_id}' to check progress.")
@@ -1054,6 +1055,11 @@ def cmd_github_workflow_list(verbose: bool = False) -> int:
         print(f"❌ {MISSING_GH_MSG}")
         return 1
 
+    # Get configuration to access owner/repo
+    config = get_pipeline_config()
+    if config is None:
+        return 1
+
     print("Fetching GitHub Actions workflows...")
     returncode, stdout, stderr = _run_gh_command(["workflow", "list"], verbose)
 
@@ -1077,6 +1083,7 @@ def cmd_github_workflow_list(verbose: bool = False) -> int:
                 print(f"  {name}")
                 print(f"    State: {state}")
                 print(f"    ID: {id}")
+                print(f"    URL: https://github.com/{config['owner']}/{config['repo']}/actions/workflows/{name.replace(' ', '%20')}")
                 print()
 
     return 0
@@ -1111,6 +1118,12 @@ def cmd_github_workflow_run(workflow_name: str = None, branch: str = None, verbo
     print("✓ Workflow run initiated successfully!")
     if stdout:
         print(f"Output: {stdout}")
+    
+    # Get configuration to show URL
+    config = get_pipeline_config()
+    if config:
+        print(f"💡 View workflow runs at: https://github.com/{config['owner']}/{config['repo']}/actions")
+        print(f"💡 Use 'sdo pipeline status' to check progress.")
 
     return 0
 
@@ -1147,6 +1160,11 @@ def cmd_github_run_list(verbose: bool = False) -> int:
         print(f"❌ {MISSING_GH_MSG}")
         return 1
 
+    # Get configuration to access owner/repo
+    config = get_pipeline_config()
+    if config is None:
+        return 1
+
     print("Fetching recent GitHub Actions runs...")
     returncode, stdout, stderr = _run_gh_command(["run", "list"], verbose)
 
@@ -1163,6 +1181,7 @@ def cmd_github_run_list(verbose: bool = False) -> int:
     # Replace cryptic symbols with clear text for better readability
     readable_output = stdout.replace("âœ“", "PASSED").replace("✓", "PASSED").replace("❌", "FAILED").replace("✗", "FAILED")
     print(readable_output)
+    print(f"\n💡 View all runs at: https://github.com/{config['owner']}/{config['repo']}/actions")
     return 0
 
 
@@ -1211,7 +1230,6 @@ def cmd_github_run_view(run_id: str, verbose: bool = False) -> int:
 
                 print(f"\n* {branch} {name} naz-hage/ntools")
                 print(f"Status: {status}" + (f" - {conclusion}" if conclusion else ""))
-                print(f"View this run on GitHub: {run_url}")
                 print()
             except json.JSONDecodeError:
                 pass
@@ -1312,6 +1330,7 @@ def cmd_github_run_view(run_id: str, verbose: bool = False) -> int:
                 # Artifacts not available in this GitHub CLI version
                 pass
 
+            print(f"View this run on GitHub: {run_url}")
             print(f"For more information about a job, try: gh run view --job=<job-id> (see job IDs above)")
             # URL already shown above
         else:
@@ -1343,6 +1362,11 @@ def cmd_github_run_logs(run_id: str, verbose: bool = False) -> int:
         print("❌ Run ID is required")
         return 1
 
+    # Get configuration to show URL
+    config = get_pipeline_config()
+    if config is None:
+        return 1
+
     print(f"Fetching logs for run ID: {run_id}...")
     returncode, stdout, stderr = _run_gh_command(["run", "view", run_id, "--log"], verbose)
 
@@ -1351,6 +1375,7 @@ def cmd_github_run_logs(run_id: str, verbose: bool = False) -> int:
         return 1
 
     print(stdout)
+    print(f"\n💡 View this run on GitHub: https://github.com/{config['owner']}/{config['repo']}/actions/runs/{run_id}")
     return 0
 
 
