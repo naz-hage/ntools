@@ -842,21 +842,23 @@ def delete(ctx, verbose):
 
 
 @pipeline.command()
+@click.option("--branch", "-b", required=True, help="Branch to run the pipeline on")
 @click.option("--verbose", "-v", is_flag=True, help="Show detailed API information and responses")
 @click.pass_context
-def run(ctx, verbose):
+def run(ctx, branch, verbose):
     """Run the current pipeline.
 
     The pipeline name is extracted from the current Git remote.
-    Runs the pipeline on the default branch (main).
+    Runs the pipeline on the specified branch.
 
     Examples:
-        sdo pipeline run
-        sdo pipeline run --verbose
+        sdo pipeline run --branch main
+        sdo pipeline run -b develop --verbose
+        sdo pipeline run --branch feature/my-feature
     """
     try:
         # Call the business logic
-        result = cmd_pipeline_run(verbose=verbose)
+        result = cmd_pipeline_run(branch, verbose=verbose)
 
         if result != 0:
             sys.exit(result)
@@ -878,14 +880,17 @@ def run(ctx, verbose):
 
 
 @pipeline.command()
-@click.argument("build_id", type=int)
+@click.argument("build_id", type=int, required=False)
 @click.option("--verbose", "-v", is_flag=True, help="Show detailed API information and responses")
 @click.pass_context
 def status(ctx, build_id, verbose):
     """Show status of a pipeline build.
 
+    If BUILD_ID is not provided, shows the status of the latest build/run.
+
     Examples:
-        sdo pipeline status 12345
+        sdo pipeline status              # Show latest build/run status
+        sdo pipeline status 12345        # Show specific build/run status
         sdo pipeline status 12345 --verbose
     """
     try:

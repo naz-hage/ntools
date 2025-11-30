@@ -26,6 +26,31 @@ except ImportError:
         extract_platform_info_from_git
     )
 
+# Import colorama for cross-platform colored output
+try:
+    from colorama import init, Fore, Style
+    # Initialize colorama for cross-platform support
+    init(autoreset=True, strip=False)
+    COLORS_SUPPORTED = True
+except ImportError:
+    # Fallback if colorama is not available
+    COLORS_SUPPORTED = False
+    class Fore:
+        GREEN = ""
+        RED = ""
+        YELLOW = ""
+        CYAN = ""
+        WHITE = ""
+    class Style:
+        RESET_ALL = ""
+
+# Function to apply color only if supported
+def colorize(text, color_code):
+    """Apply color to text if colors are supported, otherwise return plain text."""
+    if COLORS_SUPPORTED:
+        return f"{color_code}{text}{Style.RESET_ALL}"
+    return text
+
 # Constants for error messages
 MISSING_PAT_MSG = 'AZURE_DEVOPS_PAT environment variable'
 MISSING_CONFIG_MSG = "Please set AZURE_DEVOPS_PAT environment variable."
@@ -44,7 +69,7 @@ def get_pipeline_config() -> Optional[dict]:
     platform = platform_info.get("platform")
 
     if platform == "azdo":
-        print("✓ Detected Azure DevOps repository:")
+        print("[OK] Detected Azure DevOps repository:")
         print(f"  Organization: {platform_info['organization']}")
         print(f"  Project: {platform_info['project']}")
         print(f"  Repository: {platform_info['repository']}")
@@ -65,21 +90,22 @@ def get_pipeline_config() -> Optional[dict]:
         return config
 
     elif platform == "github":
-        print("✓ Detected GitHub repository:")
+        print("[OK] Detected GitHub repository:")
         print(f"  Owner: {platform_info['owner']}")
         print(f"  Repository: {platform_info['repo']}")
 
         # Set extracted values
         config = platform_info.copy()
 
-        # Find the default workflow name dynamically
-        default_workflow = _find_default_workflow_name()
-        if default_workflow:
-            config['workflowName'] = default_workflow
+        # Find the default workflow name and path dynamically
+        result = _find_default_workflow_name()
+        if result is not None:
+            workflow_name, workflow_path = result
+            config['workflowName'] = workflow_name
+            config['workflowYamlPath'] = workflow_path
         else:
             config['workflowName'] = 'ci'  # Fallback
-
-        config['workflowYamlPath'] = f".github/workflows/{config['workflowName'].lower().replace(' ', '-')}.yml"
+            config['workflowYamlPath'] = '.github/workflows/ci.yml'  # Fallback
 
         print(f"  Default Workflow: {config['workflowName']}")
         print(f"  Workflow YAML Path: {config['workflowYamlPath']}")
@@ -305,7 +331,7 @@ def cmd_azdo_pipeline_delete(verbose: bool = False) -> int:
         return 1
 
 
-def cmd_azdo_pipeline_run(verbose: bool = False) -> int:
+def cmd_azdo_pipeline_run(branch: str, verbose: bool = False) -> int:
     """Handle 'sdo pipeline run' command for Azure DevOps."""
     # Get configuration (auto-extract from Git if needed)
     config = get_pipeline_config()
@@ -331,7 +357,6 @@ def cmd_azdo_pipeline_run(verbose: bool = False) -> int:
     pipeline_name = config['pipelineName']
 
     # Get optional parameters
-    branch = config.get('branch', 'main')
     parameters = config.get('parameters', {})
 
     # Initialize Azure DevOps client
@@ -899,10 +924,10 @@ def _run_gh_command(cmd: list, verbose: bool = False) -> tuple[int, str, str]:
         return 1, "", str(e)
 
 
-def _find_default_workflow_name(verbose: bool = False) -> str:
-    """Find the most appropriate default workflow name."""
+def _find_default_workflow_name(verbose: bool = False) -> tuple[str, str] | None:
+    """Find the most appropriate default workflow name and return (name, path)."""
     returncode, stdout, stderr = _run_gh_command(
-        ["workflow", "list", "--json", "name,state"],
+        ["workflow", "list", "--json", "name,path"],
         verbose
     )
     if returncode != 0:
@@ -923,22 +948,24 @@ def _find_default_workflow_name(verbose: bool = False) -> str:
             lambda w: 'build' in w.get('name', '').lower() and 'pages' not in w.get('name', '').lower(),
             lambda w: 'test' in w.get('name', '').lower(),
             lambda w: 'workflow' in w.get('name', '').lower() and 'pages' not in w.get('name', '').lower(),
-            lambda w: w.get('state') == 'active' and 'pages' not in w.get('name', '').lower(),
-            lambda w: 'ci' in w.get('name', '').lower(),
-            lambda w: 'build' in w.get('name', '').lower(),
-            lambda w: w.get('state') == 'active',  # Any active workflow
+            lambda w: w.get('name', '').lower() != 'pages-build-deployment',  # Prefer non-pages workflows
+            lambda w: True,  # Any workflow
         ]
 
         for priority_func in priorities:
             for workflow in workflows:
                 if priority_func(workflow):
-                    return workflow['name']
+                    return workflow['name'], workflow['path']
 
         # If no priority match, return the first workflow
-        return workflows[0]['name']
+        if workflows:
+            workflow = workflows[0]
+            return workflow['name'], workflow['path']
 
     except (json.JSONDecodeError, KeyError, IndexError):
         return None
+
+    return None
 
 
 def cmd_github_workflow_list(verbose: bool = False) -> int:
@@ -983,11 +1010,12 @@ def cmd_github_workflow_run(workflow_name: str = None, branch: str = None, verbo
 
     # If no workflow name provided, try to find a default
     if not workflow_name:
-        workflow_name = _find_default_workflow_name(verbose)
-        if not workflow_name:
+        result = _find_default_workflow_name(verbose)
+        if result is None:
             print("❌ No workflow name provided and could not find a default workflow.")
             print("Please specify a workflow name or ensure you have a workflow file.")
             return 1
+        workflow_name, _ = result
 
     cmd = ["workflow", "run", workflow_name]
     if branch:
@@ -1015,11 +1043,12 @@ def cmd_github_workflow_view(workflow_name: str = None, verbose: bool = False) -
 
     if not workflow_name:
         # Try to find the most appropriate workflow
-        workflow_name = _find_default_workflow_name(verbose)
-        if not workflow_name:
+        result = _find_default_workflow_name(verbose)
+        if result is None:
             print("❌ No workflow name provided and could not find a default workflow.")
             print("Please specify a workflow name or ensure you have workflow files.")
             return 1
+        workflow_name, _ = result
 
     print(f"Viewing workflow '{workflow_name}'...")
     returncode, stdout, stderr = _run_gh_command(["workflow", "view", workflow_name], verbose)
@@ -1051,7 +1080,9 @@ def cmd_github_run_list(verbose: bool = False) -> int:
 
     print("Recent GitHub Actions Runs:")
     print("-" * 80)
-    print(stdout)
+    # Replace cryptic symbols with clear text for better readability
+    readable_output = stdout.replace("âœ“", "PASSED").replace("✓", "PASSED").replace("❌", "FAILED").replace("✗", "FAILED")
+    print(readable_output)
     return 0
 
 
@@ -1066,13 +1097,159 @@ def cmd_github_run_view(run_id: str, verbose: bool = False) -> int:
         return 1
 
     print(f"Viewing run details for ID: {run_id}...")
-    returncode, stdout, stderr = _run_gh_command(["run", "view", run_id], verbose)
+
+    # Get detailed job information (suppress raw output in verbose mode)
+    returncode, job_stdout, stderr = _run_gh_command(["run", "view", run_id, "--json", "jobs"], False)
 
     if returncode != 0:
-        print(f"❌ Failed to view run: {stderr}")
-        return 1
+        # Fallback to regular view if JSON fails
+        returncode, stdout, stderr = _run_gh_command(["run", "view", run_id], verbose)
+        if returncode != 0:
+            print(f"❌ Failed to view run: {stderr}")
+            return 1
 
-    print(stdout)
+        # Replace cryptic symbols with clear text for better readability
+        readable_output = stdout.replace("âœ“", "PASSED").replace("✓", "PASSED").replace("❌", "FAILED").replace("✗", "FAILED")
+        print(readable_output)
+        return 0
+
+    # Parse job information for clearer display
+    try:
+        import json
+        job_data = json.loads(job_stdout)
+
+        # Get basic run info (suppress raw output in verbose mode)
+        returncode, run_stdout, stderr = _run_gh_command(["run", "view", run_id, "--json", "status,conclusion,name,headSha,headBranch,url"], False)
+        if returncode == 0:
+            try:
+                run_data = json.loads(run_stdout)
+                status = run_data.get('status', 'unknown')
+                conclusion = run_data.get('conclusion', '')
+                name = run_data.get('name', 'Unknown')
+                branch = run_data.get('headBranch', 'unknown')
+                run_url = run_data.get('url', f'https://github.com/naz-hage/ntools/actions/runs/{run_id}')
+
+                print(f"\n* {branch} {name} naz-hage/ntools")
+                print(f"Status: {status}" + (f" - {conclusion}" if conclusion else ""))
+                print(f"View this run on GitHub: {run_url}")
+                print()
+            except json.JSONDecodeError:
+                pass
+
+        # Display jobs with clear status
+        if 'jobs' in job_data and job_data['jobs']:
+            print("JOBS")
+            print("-" * 6)  # Add separator line below JOBS
+            for job in job_data['jobs']:
+                job_name = job.get('name', 'Unknown')
+                job_status = job.get('status', 'unknown')
+                job_conclusion = job.get('conclusion', '')
+                duration = job.get('completedAt', '')
+
+                if duration and job.get('startedAt'):
+                    # Calculate duration if available
+                    try:
+                        from datetime import datetime
+                        start = datetime.fromisoformat(job['startedAt'].replace('Z', '+00:00'))
+                        end = datetime.fromisoformat(duration.replace('Z', '+00:00'))
+                        duration_seconds = int((end - start).total_seconds())
+                        if duration_seconds < 60:
+                            duration_str = f"{duration_seconds}s"
+                        elif duration_seconds < 3600:
+                            minutes = duration_seconds // 60
+                            seconds = duration_seconds % 60
+                            duration_str = f"{minutes}m{seconds}s"
+                        else:
+                            hours = duration_seconds // 3600
+                            minutes = (duration_seconds % 3600) // 60
+                            duration_str = f"{hours}h{minutes}m"
+                    except Exception as e:
+                        if verbose:
+                            print(f"DEBUG: Duration calculation failed: {e}")
+                        duration_str = "completed"
+                else:
+                    duration_str = "completed"
+
+                # Determine clear status with colors (if supported)
+                if job_conclusion == 'success':
+                    status_text = colorize("PASSED", Fore.GREEN)
+                elif job_conclusion == 'failure':
+                    status_text = colorize("FAILED", Fore.RED)
+                elif job_status == 'in_progress':
+                    status_text = colorize("RUNNING", Fore.YELLOW)
+                elif job_status == 'queued':
+                    status_text = colorize("QUEUED", Fore.CYAN)
+                else:
+                    status_text = job_status.upper() if job_status else "UNKNOWN"
+
+                print(f"{status_text} {job_name} in {duration_str} (ID {job.get('databaseId', 'N/A')})")
+
+                # Show job steps in verbose mode
+                if verbose and 'steps' in job:
+                    for step in job['steps']:
+                        step_name = step.get('name', 'Unknown')
+                        step_status = step.get('conclusion', step.get('status', 'unknown'))
+
+                        # Determine step status symbol with colors (if supported)
+                        if step_status == 'success':
+                            step_symbol = colorize("✓", Fore.GREEN)
+                        elif step_status == 'failure':
+                            step_symbol = colorize("✗", Fore.RED)
+                        elif step_status == 'skipped':
+                            step_symbol = colorize("○", Fore.YELLOW)
+                        elif step_status == 'in_progress':
+                            step_symbol = colorize("●", Fore.CYAN)
+                        else:
+                            step_symbol = colorize("?", Fore.WHITE)
+
+                        print(f"  {step_symbol} {step_name}")
+
+                # No blank line after each job for more compact output
+            artifacts = []
+            for job in job_data['jobs']:
+                if 'steps' in job:
+                    for step in job['steps']:
+                        if step.get('name', '').lower().startswith('upload') or 'artifact' in step.get('name', '').lower():
+                            # This is a rough heuristic - could be improved
+                            pass
+
+            # Try to get artifacts - this might not be available in all GitHub CLI versions
+            try:
+                returncode, artifacts_stdout, stderr = _run_gh_command(["run", "view", run_id, "--json", "artifacts"], False)
+                if returncode == 0:
+                    try:
+                        artifacts_data = json.loads(artifacts_stdout)
+                        if artifacts_data.get('artifacts'):
+                            print("\nARTIFACTS")
+                            for artifact in artifacts_data['artifacts'][:5]:  # Show first 5
+                                print(f"{artifact.get('name', 'Unknown')}")
+                            if len(artifacts_data['artifacts']) > 5:
+                                print(f"... and {len(artifacts_data['artifacts']) - 5} more")
+                            print()
+                    except json.JSONDecodeError:
+                        pass
+            except:
+                # Artifacts not available in this GitHub CLI version
+                pass
+
+            print(f"For more information about a job, try: gh run view --job=<job-id> (see job IDs above)")
+            # URL already shown above
+        else:
+            # Fallback to regular view
+            returncode, stdout, stderr = _run_gh_command(["run", "view", run_id], verbose)
+            if returncode == 0:
+                readable_output = stdout.replace("âœ“", "PASSED").replace("✓", "PASSED").replace("❌", "FAILED").replace("✗", "FAILED")
+                print(readable_output)
+
+    except (json.JSONDecodeError, KeyError, Exception) as e:
+        if verbose:
+            print(f"DEBUG: Failed to parse job data: {e}")
+        # Fallback to regular view
+        returncode, stdout, stderr = _run_gh_command(["run", "view", run_id], verbose)
+        if returncode == 0:
+            readable_output = stdout.replace("âœ“", "PASSED").replace("✓", "PASSED").replace("❌", "FAILED").replace("✗", "FAILED")
+            print(readable_output)
+
     return 0
 
 
@@ -1176,7 +1353,7 @@ def cmd_pipeline_delete(verbose: bool = False) -> int:
         return 1
 
 
-def cmd_pipeline_run(verbose: bool = False) -> int:
+def cmd_pipeline_run(branch: str, verbose: bool = False) -> int:
     """Handle 'sdo pipeline run' command."""
     config = get_pipeline_config()
     if config is None:
@@ -1185,23 +1362,100 @@ def cmd_pipeline_run(verbose: bool = False) -> int:
     platform = config.get("platform")
 
     if platform == "azdo":
-        return cmd_azdo_pipeline_run(verbose)
+        return cmd_azdo_pipeline_run(branch, verbose)
     elif platform == "github":
         workflow_name = config.get("workflowName")
-        branch = config.get("branch", "main")
         return cmd_github_workflow_run(workflow_name, branch, verbose)
     else:
         print(f"❌ Unsupported platform: {platform}")
         return 1
 
 
-def cmd_pipeline_status(build_id: int, verbose: bool = False) -> int:
+def cmd_pipeline_status(build_id: int = None, verbose: bool = False) -> int:
     """Handle 'sdo pipeline status' command."""
     config = get_pipeline_config()
     if config is None:
         return 1
 
     platform = config.get("platform")
+
+    # If no build_id provided, get the latest build
+    if build_id is None:
+        if platform == "azdo":
+            # Get the latest build ID for Azure DevOps
+            pat = get_personal_access_token()
+            if not pat:
+                print("Missing required configuration: AZURE_DEVOPS_PAT environment variable")
+                print("Please set AZURE_DEVOPS_PAT environment variable.")
+                return 1
+
+            client = AzureDevOpsClient(
+                config['organization'],
+                config['project'],
+                pat
+            )
+
+            pipeline_name = config['pipelineName']
+            builds = client.list_builds(pipeline_name=pipeline_name, top=1)
+
+            if not builds:
+                print("❌ No builds found")
+                return 1
+
+            build_id = builds[0]['id']
+            print(f"Getting status for latest build (ID: {build_id})...")
+
+        elif platform == "github":
+            # For GitHub, get the latest run for the default workflow and show its details
+            if not _check_gh_cli():
+                print(f"❌ {MISSING_GH_MSG}")
+                return 1
+
+            # Get the workflow filename from the path
+            workflow_path = config.get('workflowYamlPath', '')
+            if workflow_path:
+                # Extract filename from path (e.g., ".github/workflows/ntools.yml" -> "ntools.yml")
+                workflow_filename = workflow_path.split('/')[-1]
+                workflow_filter = workflow_filename
+            else:
+                # Fallback to workflow name
+                workflow_filter = config.get('workflowName', 'ci')
+
+            print(f"Getting status for latest '{workflow_filter}' workflow run...")
+            returncode, stdout, stderr = _run_gh_command([
+                "run", "list", 
+                "--workflow", workflow_filter,
+                "--limit", "1", 
+                "--json", "databaseId,status,name,conclusion"
+            ], False)
+
+            if returncode != 0:
+                print(f"❌ Failed to get latest run: {stderr}")
+                return 1
+
+            try:
+                import json
+                runs = json.loads(stdout)
+                if not runs:
+                    print(f"No workflow runs found for '{workflow_filter}'.")
+                    return 0
+
+                latest_run = runs[0]
+                run_id = str(latest_run['databaseId'])
+                status = latest_run.get('status', 'unknown')
+                conclusion = latest_run.get('conclusion', '')
+                name = latest_run.get('name', 'Unknown')
+                
+                print(f"Latest run: {name} (ID: {run_id})")
+                print(f"Status: {status}" + (f" - {conclusion}" if conclusion else ""))
+                
+                return cmd_github_run_view(run_id, verbose)
+            except (json.JSONDecodeError, KeyError, IndexError) as e:
+                print(f"❌ Failed to parse run data: {e}")
+                return 1
+        else:
+            print(f"❌ Unsupported platform: {platform}")
+            return 1
 
     if platform == "azdo":
         return cmd_azdo_pipeline_status(build_id, verbose)
@@ -1240,7 +1494,68 @@ def cmd_pipeline_lastbuild(verbose: bool = False) -> int:
     if platform == "azdo":
         return cmd_azdo_pipeline_lastbuild(verbose)
     elif platform == "github":
-        return cmd_github_run_list(verbose)
+        # For GitHub, show details about the most recent run
+        if not _check_gh_cli():
+            print(f"❌ {MISSING_GH_MSG}")
+            return 1
+
+        # Get the workflow filename from the path
+        workflow_path = config.get('workflowYamlPath', '')
+        if workflow_path:
+            # Extract filename from path (e.g., ".github/workflows/ntools.yml" -> "ntools.yml")
+            workflow_filename = workflow_path.split('/')[-1]
+            workflow_filter = workflow_filename
+        else:
+            # Fallback to workflow name
+            workflow_filter = config.get('workflowName', 'ci')
+
+        print(f"Getting information about the last '{workflow_filter}' workflow run...")
+        returncode, stdout, stderr = _run_gh_command([
+            "run", "list",
+            "--workflow", workflow_filter,
+            "--limit", "1",
+            "--json", "databaseId,status,conclusion,name,headBranch,headSha,createdAt,updatedAt,event"
+        ], False)
+
+        if returncode != 0:
+            print(f"❌ Failed to get last run: {stderr}")
+            return 1
+
+        try:
+            import json
+            runs = json.loads(stdout)
+            if not runs:
+                print(f"No workflow runs found for '{workflow_filter}'.")
+                return 0
+
+            latest_run = runs[0]
+            run_id = str(latest_run['databaseId'])
+            status = latest_run.get('status', 'unknown')
+            conclusion = latest_run.get('conclusion', '')
+            name = latest_run.get('name', 'Unknown')
+            branch = latest_run.get('headBranch', 'unknown')
+            sha = latest_run.get('headSha', 'unknown')[:8]  # Short SHA
+            created_at = latest_run.get('createdAt', 'unknown')
+            updated_at = latest_run.get('updatedAt', 'unknown')
+            event = latest_run.get('event', 'unknown')
+
+            print(f"✅ Last Run ID: {run_id}")
+            print(f"   Name: {name}")
+            print(f"   Status: {status}" + (f" - {conclusion}" if conclusion else ""))
+            print(f"   Branch: {branch}")
+            print(f"   Commit: {sha}")
+            print(f"   Trigger: {event}")
+            print(f"   Created: {created_at}")
+            print(f"   Updated: {updated_at}")
+            print(f"   URL: https://github.com/{config['owner']}/{config['repo']}/actions/runs/{run_id}")
+
+            # Use 'sdo pipeline status <run_id>' to check progress
+            print(f"\n💡 Use 'sdo pipeline status {run_id}' to check progress.")
+
+            return 0
+        except (json.JSONDecodeError, KeyError, IndexError) as e:
+            print(f"❌ Failed to parse run data: {e}")
+            return 1
     else:
         print(f"❌ Unsupported platform: {platform}")
         return 1

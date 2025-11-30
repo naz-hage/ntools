@@ -176,50 +176,50 @@ class TestWorkflowNameDetection:
     @patch('sdo_package.pipelines._run_gh_command')
     def test_find_default_workflow_name_ci_exact(self, mock_run):
         """Test finding workflow with exact 'ci' name."""
-        mock_run.return_value = (0, '[{"name": "ci", "state": "active"}]', '')
+        mock_run.return_value = (0, '[{"name": "ci", "state": "active", "path": ".github/workflows/ci.yml"}]', '')
 
         result = _find_default_workflow_name()
 
-        assert result == 'ci'
+        assert result == ('ci', '.github/workflows/ci.yml')
 
     @patch('sdo_package.pipelines._run_gh_command')
     def test_find_default_workflow_name_contains_ci(self, mock_run):
         """Test finding workflow containing 'ci'."""
         workflows = [
-            {"name": "pages-build-deployment", "state": "active"},
-            {"name": "ntools Workflow", "state": "active"}
+            {"name": "pages-build-deployment", "state": "active", "path": ".github/workflows/pages-build-deployment.yml"},
+            {"name": "ntools Workflow", "state": "active", "path": ".github/workflows/ntools.yml"}
         ]
         mock_run.return_value = (0, json.dumps(workflows), '')
 
         result = _find_default_workflow_name()
 
-        assert result == 'ntools Workflow'
+        assert result == ('ntools Workflow', '.github/workflows/ntools.yml')
 
     @patch('sdo_package.pipelines._run_gh_command')
     def test_find_default_workflow_name_workflow_priority(self, mock_run):
         """Test workflow name priority selection."""
         workflows = [
-            {"name": "pages-build-deployment", "state": "active"},
-            {"name": "my-workflow", "state": "active"}
+            {"name": "pages-build-deployment", "state": "active", "path": ".github/workflows/pages-build-deployment.yml"},
+            {"name": "my-workflow", "state": "active", "path": ".github/workflows/my-workflow.yml"}
         ]
         mock_run.return_value = (0, json.dumps(workflows), '')
 
         result = _find_default_workflow_name()
 
-        assert result == 'my-workflow'
+        assert result == ('my-workflow', '.github/workflows/my-workflow.yml')
 
     @patch('sdo_package.pipelines._run_gh_command')
     def test_find_default_workflow_name_fallback(self, mock_run):
         """Test fallback to first workflow when no priority matches."""
         workflows = [
-            {"name": "random-workflow", "state": "active"},
-            {"name": "another-workflow", "state": "active"}
+            {"name": "random-workflow", "state": "active", "path": ".github/workflows/random-workflow.yml"},
+            {"name": "another-workflow", "state": "active", "path": ".github/workflows/another-workflow.yml"}
         ]
         mock_run.return_value = (0, json.dumps(workflows), '')
 
         result = _find_default_workflow_name()
 
-        assert result == 'random-workflow'
+        assert result == ('random-workflow', '.github/workflows/random-workflow.yml')
 
     @patch('sdo_package.pipelines._run_gh_command')
     def test_find_default_workflow_name_command_failure(self, mock_run):
@@ -280,7 +280,7 @@ class TestGitHubWorkflowCommands:
     def test_cmd_github_workflow_run_auto_detect(self, mock_find, mock_run, mock_check):
         """Test workflow run command with auto-detection."""
         mock_check.return_value = True
-        mock_find.return_value = 'auto-detected-workflow'
+        mock_find.return_value = ('auto-detected-workflow', '.github/workflows/auto-detected-workflow.yml')
         mock_run.return_value = (0, 'Workflow run initiated', '')
 
         result = cmd_github_workflow_run()
@@ -305,7 +305,7 @@ class TestGitHubWorkflowCommands:
     def test_cmd_github_workflow_view_auto_detect(self, mock_find, mock_run, mock_check):
         """Test workflow view command with auto-detection."""
         mock_check.return_value = True
-        mock_find.return_value = 'auto-detected-workflow'
+        mock_find.return_value = ('auto-detected-workflow', '.github/workflows/auto-detected-workflow.yml')
         mock_run.return_value = (0, 'Workflow details...', '')
 
         result = cmd_github_workflow_view()
@@ -390,7 +390,7 @@ class TestUnifiedCommandHandlers:
 
         with patch('sdo_package.pipelines.cmd_github_workflow_run') as mock_cmd:
             mock_cmd.return_value = 0
-            result = cmd_pipeline_run()
+            result = cmd_pipeline_run('main')  # Add the required branch argument
             assert result == 0
 
     @patch('sdo_package.pipelines.get_pipeline_config')
@@ -402,6 +402,34 @@ class TestUnifiedCommandHandlers:
             mock_cmd.return_value = 0
             result = cmd_pipeline_status(123)
             assert result == 0
+
+    @patch('sdo_package.pipelines.get_pipeline_config')
+    def test_cmd_pipeline_status_github_no_build_id(self, mock_config):
+        """Test pipeline status command for GitHub with no build_id (shows latest run details for default workflow)."""
+        mock_config.return_value = {
+            'platform': 'github',
+            'workflowYamlPath': '.github/workflows/ntools.yml',
+            'workflowName': 'ntools Workflow'
+        }
+
+        with patch('sdo_package.pipelines._check_gh_cli', return_value=True), \
+             patch('sdo_package.pipelines._run_gh_command') as mock_run_cmd, \
+             patch('sdo_package.pipelines.cmd_github_run_view') as mock_view:
+
+            # Mock the run list command to return a latest run for the specific workflow
+            mock_run_cmd.return_value = (0, '[{"databaseId": 12345, "status": "completed", "name": "ntools Workflow", "conclusion": "success"}]', '')
+            mock_view.return_value = 0
+
+            result = cmd_pipeline_status()
+
+            assert result == 0
+            mock_run_cmd.assert_called_with([
+                "run", "list", 
+                "--workflow", "ntools.yml",
+                "--limit", "1", 
+                "--json", "databaseId,status,name,conclusion"
+            ], False)
+            mock_view.assert_called_with("12345", False)
 
     @patch('sdo_package.pipelines.get_pipeline_config')
     def test_cmd_pipeline_logs_github(self, mock_config):
@@ -416,12 +444,30 @@ class TestUnifiedCommandHandlers:
     @patch('sdo_package.pipelines.get_pipeline_config')
     def test_cmd_pipeline_lastbuild_github(self, mock_config):
         """Test pipeline lastbuild command for GitHub."""
-        mock_config.return_value = {'platform': 'github'}
+        mock_config.return_value = {
+            'platform': 'github',
+            'workflowYamlPath': '.github/workflows/ci.yml',
+            'workflowName': 'ci',
+            'owner': 'test-owner',
+            'repo': 'test-repo'
+        }
 
-        with patch('sdo_package.pipelines.cmd_github_run_list') as mock_cmd:
-            mock_cmd.return_value = 0
+        with patch('sdo_package.pipelines._check_gh_cli', return_value=True), \
+             patch('sdo_package.pipelines._run_gh_command') as mock_run_cmd:
+
+            # Mock the run list command to return a latest run
+            mock_run_cmd.return_value = (0, '[{"databaseId": 12345, "status": "completed", "conclusion": "success", "name": "CI Workflow", "headBranch": "main", "headSha": "abc123", "createdAt": "2023-01-01T00:00:00Z", "updatedAt": "2023-01-01T00:05:00Z", "event": "push"}]', '')
+
             result = cmd_pipeline_lastbuild()
+
             assert result == 0
+            # Verify the correct command was called
+            mock_run_cmd.assert_called_with([
+                "run", "list",
+                "--workflow", "ci.yml",
+                "--limit", "1",
+                "--json", "databaseId,status,conclusion,name,headBranch,headSha,createdAt,updatedAt,event"
+            ], False)
 
     @patch('sdo_package.pipelines.get_pipeline_config')
     def test_cmd_pipeline_delete_github(self, mock_config):
