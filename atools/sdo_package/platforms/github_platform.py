@@ -166,6 +166,12 @@ class GitHubPlatform(WorkItemPlatform):
                 # Add labels if specified (split comma-separated and trim)
                 if labels:
                     label_list = [label.strip() for label in labels.split(",") if label.strip()]
+                    
+                    # Ensure all labels exist before creating the issue
+                    if not self._ensure_labels_exist(repo, label_list):
+                        print("❌ Failed to ensure labels exist")
+                        return None
+                    
                     for label in label_list:
                         cmd.extend(["--label", label])
 
@@ -211,3 +217,45 @@ class GitHubPlatform(WorkItemPlatform):
         except Exception as e:
             print(f"❌ Error creating GitHub issue: {e}")
             return None
+
+    def _ensure_labels_exist(self, repo: str, label_list: list[str]) -> bool:
+        """Ensure all labels in the list exist in the repository, creating them if necessary."""
+        if not label_list:
+            return True
+
+        try:
+            # Get existing labels
+            cmd = ["gh", "label", "list", "--repo", repo, "--json", "name"]
+            result = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8', errors='replace', check=True)
+            
+            existing_labels = []
+            if result.stdout.strip():
+                import json
+                labels_data = json.loads(result.stdout)
+                existing_labels = [label["name"] for label in labels_data]
+
+            # Create missing labels
+            for label in label_list:
+                if label not in existing_labels:
+                    if self.verbose:
+                        print(f"Creating missing label '{label}' in {repo}...")
+                    
+                    # Create the label with default color
+                    create_cmd = ["gh", "label", "create", label, "--repo", repo, "--color", "0366d6", "--force"]
+                    create_result = subprocess.run(create_cmd, capture_output=True, text=True, encoding='utf-8', errors='replace')
+                    
+                    if create_result.returncode != 0:
+                        print(f"⚠️  Warning: Could not create label '{label}': {create_result.stderr}")
+                        # Continue anyway - the issue creation might still work if the label was created by another process
+                    
+            return True
+            
+        except subprocess.CalledProcessError as e:
+            print(f"⚠️  Warning: Could not check/create labels: {e}")
+            if self.verbose and e.stderr:
+                print(f"stderr: {e.stderr}")
+            # Don't fail the entire operation for label issues
+            return True
+        except Exception as e:
+            print(f"⚠️  Warning: Unexpected error checking labels: {e}")
+            return True
