@@ -71,7 +71,7 @@ class GitHubPlatform(WorkItemPlatform):
         """Validate GitHub CLI authentication."""
         try:
             result = subprocess.run(
-                ["gh", "auth", "status"], capture_output=True, text=True, check=False
+                ["gh", "auth", "status"], capture_output=True, text=True, encoding='utf-8', errors='replace', check=False
             )
             if result.returncode == 0:
                 if self.verbose:
@@ -178,7 +178,7 @@ class GitHubPlatform(WorkItemPlatform):
                     # Show equivalent gh CLI command
                     print("   Equivalent gh CLI command:")
                     print(f"   {' '.join(cmd)}")
-                result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+                result = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8', errors='replace', check=True)
 
                 # Parse the issue URL from the output
                 issue_url = result.stdout.strip()
