@@ -323,22 +323,8 @@ def cmd_azdo_pipeline_list(config: dict = None, repo_filter: str = None, show_al
                 folder = pipeline.get('folder', '\\')
                 full_url = f"https://dev.azure.com/{config['organization']}/{config['project']}/_build?definitionId={pipeline_id}"
                 
-                # Color the pipeline name based on type
-                if '-prebuild' in name or '-precheck' in name:
-                    name_colored = colorize(name, Fore.YELLOW)
-                elif '-authserver' in name or '-api' in name or '-httpapi' in name:
-                    name_colored = colorize(name, Fore.GREEN)
-                elif '-web' in name:
-                    name_colored = colorize(name, Fore.BLUE)
-                elif '-dbmigrator' in name or '-migrator' in name:
-                    name_colored = colorize(name, Fore.MAGENTA)
-                elif '-data-warehouse' in name or '-image-promotion' in name:
-                    name_colored = colorize(name, Fore.CYAN)
-                else:
-                    name_colored = colorize(name, Fore.WHITE)
-                
                 # Compact single-line format
-                print(f"{i:2d}. {name_colored} (ID: {pipeline_id}, Folder: {folder})")
+                print(f"{i:2d}. {name} (ID: {pipeline_id}, Folder: {folder})")
                 print(f"    {full_url}")
                 print()
             
