@@ -497,7 +497,7 @@ class AzureDevOpsClient:
             print(f"Build ID: {build['id']}")
             print(f"Build Number: {build['buildNumber']}")
             print(f"Status: {build['status']}")
-            print(f"URL: {build['url']}")
+            print(f"URL: https://dev.azure.com/{self.organization}/{self.project}/_build/results?buildId={build['id']}")
             return build
         except requests.RequestException as e:
             self._handle_api_error(e, "running pipeline")
@@ -570,6 +570,19 @@ class AzureDevOpsClient:
             return response.json()
         except requests.RequestException as e:
             self._handle_api_error(e, "getting build timeline")
+            return None
+
+    def get_build_issues(self, build_id: int) -> Optional[Dict[str, Any]]:
+        """Get issues/errors for a specific build."""
+        url = f"{self.base_url}/_apis/build/builds/{build_id}?api-version={self.api_version}&$expand=issues"
+
+        try:
+            response = requests.get(url, headers=self.headers)
+            response.raise_for_status()
+            build_data = response.json()
+            return build_data.get("issues", {})
+        except requests.RequestException as e:
+            self._handle_api_error(e, "getting build issues")
             return None
 
     def list_builds(self, pipeline_name: Optional[str] = None, top: int = 10) -> Optional[list]:

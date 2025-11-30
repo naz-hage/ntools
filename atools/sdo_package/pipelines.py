@@ -6,6 +6,8 @@ Contains command handlers for Azure DevOps pipeline and GitHub Actions workflow 
 import os
 import sys
 import subprocess
+import requests
+import re
 from typing import Optional
 
 # Handle imports for both module and script execution
@@ -124,7 +126,7 @@ def cmd_azdo_pipeline_create(verbose: bool = False) -> int:
     if existing_pipeline:
         print(f"Pipeline '{config['pipelineName']}' already exists!")
         print(f"ID: {existing_pipeline['id']}")
-        print(f"URL: {existing_pipeline['url']}")
+        print(f"URL: https://dev.azure.com/{config['organization']}/{config['project']}/_build?definitionId={existing_pipeline['id']}")
         return 0
 
     # Create pipeline
@@ -140,7 +142,7 @@ def cmd_azdo_pipeline_create(verbose: bool = False) -> int:
         print("✓ Pipeline created successfully!")
         print(f"ID: {pipeline['id']}")
         print(f"Name: {pipeline['name']}")
-        print(f"URL: {pipeline['url']}")
+        print(f"URL: https://dev.azure.com/{config['organization']}/{config['project']}/_build?definitionId={pipeline['id']}")
         print(f"Folder: {pipeline['folder']}")
         return 0
     else:
@@ -187,7 +189,7 @@ def cmd_azdo_pipeline_show(verbose: bool = False) -> int:
         print(f"Pipeline Information:")
         print(f"  ID: {pipeline['id']}")
         print(f"  Name: {pipeline['name']}")
-        print(f"  URL: {pipeline['url']}")
+        print(f"  URL: https://dev.azure.com/{config['organization']}/{config['project']}/_build?definitionId={pipeline['id']}")
         print(f"  Folder: {pipeline.get('folder', 'Unknown')}")
         print(f"  Revision: {pipeline.get('revision', 'Unknown')}")
         return 0
@@ -238,7 +240,7 @@ def cmd_azdo_pipeline_list(verbose: bool = False) -> int:
         for pipeline in pipelines:
             print(f"  {pipeline['name']}")
             print(f"    ID: {pipeline['id']}")
-            print(f"    URL: {pipeline['url']}")
+            print(f"    URL: https://dev.azure.com/{config['organization']}/{config['project']}/_build?definitionId={pipeline['id']}")
             print(f"    Folder: {pipeline.get('folder', '\\')}")
             print()
         return 0
@@ -352,6 +354,70 @@ def cmd_azdo_pipeline_run(verbose: bool = False) -> int:
         return 1
 
 
+def check_build_logs_for_errors(client: AzureDevOpsClient, build_id: int, verbose: bool = False) -> list[str]:
+    """Check build logs for common error patterns and return a list of error messages."""
+    errors = []
+
+    try:
+        logs = client.get_build_logs(build_id)
+        if not logs or 'value' not in logs:
+            return errors
+
+        # Common error patterns to look for
+        error_patterns = [
+            (r"No hosted parallelism has been purchased or granted", "Parallelism limit exceeded - no hosted agents available"),
+            (r"##\[error\]", "Build task error detected"),
+            (r"Authentication failed", "Authentication error"),
+            (r"Access denied", "Access denied error"),
+            (r"not found", "Resource not found error"),
+            (r"(?<!TimeoutInMinutes: )\btimeout\b", "Timeout error"),  # Negative lookbehind to avoid matching "TimeoutInMinutes: 60"
+            (r"out of memory", "Out of memory error"),
+            (r"disk space", "Disk space error"),
+            (r"exceeded.*limit", "Resource limit exceeded"),
+            (r"queue.*full", "Build queue full"),
+            (r"no agents", "No available agents"),
+            (r"parallelism.*grant", "Parallelism grant required"),
+            (r"free parallelism grant", "Free parallelism grant needed"),
+        ]
+
+        for log_entry in logs['value']:
+            log_url = log_entry.get('url')
+            if log_url:
+                try:
+                    log_response = requests.get(log_url, headers=client.headers, timeout=10)
+                    if log_response.status_code == 200:
+                        log_content = log_response.text
+
+                        if verbose:
+                            print(f"DEBUG: Checking log from {log_url}")
+                            print(f"DEBUG: Log content length: {len(log_content)} characters")
+                            # Show first 500 characters for debugging
+                            print(f"DEBUG: Log preview: {log_content[:500]}...")
+
+                        # Check for each error pattern
+                        for pattern, description in error_patterns:
+                            if re.search(pattern, log_content, re.IGNORECASE):
+                                if verbose:
+                                    print(f"DEBUG: Matched pattern '{pattern}' -> {description}")
+                                if description not in errors:  # Avoid duplicates
+                                    errors.append(description)
+                                break  # Only add one error per log entry
+
+                except (requests.RequestException, Exception) as e:
+                    if verbose:
+                        print(f"DEBUG: Failed to download log from {log_url}: {e}")
+                    # Skip logs that can't be downloaded
+                    continue
+
+    except Exception as e:
+        if verbose:
+            print(f"DEBUG: Exception in check_build_logs_for_errors: {e}")
+        # If log checking fails, return empty list
+        pass
+
+    return errors
+
+
 def cmd_azdo_pipeline_status(build_id: int, verbose: bool = False) -> int:
     """Handle 'sdo pipeline status' command for Azure DevOps."""
     # Get configuration (auto-extract from Git if needed)
@@ -395,6 +461,18 @@ def cmd_azdo_pipeline_status(build_id: int, verbose: bool = False) -> int:
         print(f"❌ Build {build_id} not found or access denied")
         return 1
 
+    if verbose:
+        print(f"DEBUG: Full build response keys: {list(build.keys())}")
+        print(f"DEBUG: Build status: {build.get('status')}")
+        print(f"DEBUG: Build result: {build.get('result')}")
+        print(f"DEBUG: Build queue status: {build.get('queue', {}).get('status') if build.get('queue') else 'N/A'}")
+        print(f"DEBUG: Build properties: {build.get('properties', {})}")
+        validation_results = build.get('validationResults', [])
+        if validation_results:
+            print(f"DEBUG: Validation results: {validation_results}")
+        else:
+            print("DEBUG: No validation results found")
+
     # Display build information
     print("\n" + "="*60)
     print(f"Build Information - ID: {build['id']}")
@@ -417,20 +495,85 @@ def cmd_azdo_pipeline_status(build_id: int, verbose: bool = False) -> int:
     print(f"Triggered By: {build['requestedBy']['displayName']}")
     print(f"Start Time: {build.get('startTime', 'N/A')}")
     print(f"Finish Time: {build.get('finishTime', 'N/A')}")
-    print(f"URL: {build['url']}")
+    print(f"URL: https://dev.azure.com/{config['organization']}/{config['project']}/_build/results?buildId={build_id}")
 
-    # Show build duration if completed
-    if build.get('startTime') and build.get('finishTime'):
-        from datetime import datetime
-        start = datetime.fromisoformat(build['startTime'].replace('Z', '+00:00'))
-        finish = datetime.fromisoformat(build['finishTime'].replace('Z', '+00:00'))
-        duration = finish - start
-        print(f"Duration: {duration}")
+    # Get timeline information for failure analysis and job details
+    timeline = client.get_build_timeline(build_id)
 
-    # Get and display timeline information
+    # Check if build failed and provide detailed diagnostics
+    if build.get('result') == 'failed':
+        print("\n🔍 FAILURE ANALYSIS:")
+        print("-" * 40)
+
+        # Check for parallelism issues specifically
+        parallelism_error = False
+
+        # Check validation results for parallelism errors
+        validation_results = build.get('validationResults', [])
+        parallelism_validation_errors = []
+        for validation in validation_results:
+            message = validation.get('message', '').lower()
+            if 'parallelism' in message or 'hosted' in message and 'purchased' in message:
+                parallelism_validation_errors.append(validation)
+                parallelism_error = True
+
+        if parallelism_validation_errors:
+            print(f"🚫 PARALLELISM ERROR DETECTED:")
+            for validation in parallelism_validation_errors:
+                result = validation.get('result', 'Unknown')
+                message = validation.get('message', 'No message')
+                print(f"  • {result}: {message}")
+            print(f"  💡 SOLUTION: Request a free parallelism grant at https://aka.ms/azpipelines-parallelism-request")
+            print()
+
+        # Check for validation results (includes parallelism errors)
+        if validation_results and not parallelism_error:
+            print(f"Found {len(validation_results)} validation error(s):")
+            for validation in validation_results:
+                result = validation.get('result', 'Unknown')
+                message = validation.get('message', 'No message')
+                print(f"  • {result}: {message}")
+        elif not parallelism_error:
+            print("No validation errors found.")
+
+        # Try to get more detailed error information
+        issues = client.get_build_issues(build_id)
+        if issues and 'value' in issues:
+            print(f"Found {len(issues['value'])} issue(s):")
+            for issue in issues['value'][:5]:  # Show first 5 issues
+                issue_type = issue.get('type', 'Unknown')
+                category = issue.get('category', 'Unknown')
+                message = issue.get('message', 'No message')
+                print(f"  • {issue_type} ({category}): {message}")
+        else:
+            print("No detailed issues found in API response.")
+
+        # Check build logs for common error patterns
+        print("\n🔎 Checking build logs for common errors...")
+        log_errors = check_build_logs_for_errors(client, build_id, verbose)
+        if log_errors:
+            print("Found error(s) in build logs:")
+            for error in log_errors[:3]:  # Show first 3 errors
+                print(f"  • {error}")
+        else:
+            print("No common errors detected in logs.")
+
+        # Show timeline errors
+        if timeline and 'records' in timeline:
+            failed_tasks = [record for record in timeline['records']
+                          if record.get('type') == 'Task' and record.get('result') == 'failed']
+            if failed_tasks:
+                print(f"\nFailed task(s): {len(failed_tasks)}")
+                for task in failed_tasks[:3]:  # Show first 3 failed tasks
+                    name = task.get('name', 'Unknown')
+                    print(f"  • Task: {name}")
+
+        print(f"\n💡 Quick troubleshooting:")
+        print(f"   • Check the build logs: sdo pipeline logs {build_id}")
+        print(f"   • View in browser: https://dev.azure.com/{config['organization']}/{config['project']}/_build/results?buildId={build_id}")
+        print(f"   • Common issues: YAML syntax, missing dependencies, test failures")    # Get and display timeline information
     print(f"\nJob/Step Details:")
     print("-"*40)
-    timeline = client.get_build_timeline(build_id)
     if timeline and 'records' in timeline:
         for record in timeline['records']:
             if record.get('type') == 'Job':
@@ -446,6 +589,57 @@ def cmd_azdo_pipeline_status(build_id: int, verbose: bool = False) -> int:
 
     print(f"\nTo view detailed logs in Azure DevOps:")
     print(f"https://dev.azure.com/{config['organization']}/{config['project']}/_build/results?buildId={build_id}")
+
+    # Add failure summary at the end
+    if build.get('result') == 'failed':
+        print(f"\n" + "="*60)
+        print(f"📋 FAILURE SUMMARY - Build {build_id}")
+        print(f"="*60)
+
+        total_failures = 0
+        failure_sources = []
+
+        # Count validation errors
+        validation_results = build.get('validationResults', [])
+        if validation_results:
+            total_failures += len(validation_results)
+            failure_sources.append(f"Validation: {len(validation_results)} error(s)")
+
+        # Count API issues
+        issues = client.get_build_issues(build_id)
+        if issues and 'value' in issues:
+            total_failures += len(issues['value'])
+            failure_sources.append(f"API Issues: {len(issues['value'])} issue(s)")
+
+        # Count log errors
+        log_errors = check_build_logs_for_errors(client, build_id)
+        if log_errors:
+            total_failures += len(log_errors)
+            failure_sources.append(f"Log Errors: {len(log_errors)} error(s)")
+
+        # Count timeline failures
+        timeline = client.get_build_timeline(build_id)
+        timeline_failures = 0
+        if timeline and 'records' in timeline:
+            failed_tasks = [record for record in timeline['records']
+                          if record.get('type') == 'Task' and record.get('result') == 'failed']
+            timeline_failures = len(failed_tasks)
+            if timeline_failures > 0:
+                total_failures += timeline_failures
+                failure_sources.append(f"Timeline: {timeline_failures} failed task(s)")
+
+        if total_failures > 0:
+            print(f"❌ Total Failures Found: {total_failures}")
+            print(f"Failure Sources:")
+            for source in failure_sources:
+                print(f"  • {source}")
+        else:
+            print(f"❌ Build Failed: No specific errors detected")
+            print(f"   This may indicate a system-level failure or parallelism issue")
+
+        print(f"\n🔗 Click here for full details:")
+        print(f"https://dev.azure.com/{config['organization']}/{config['project']}/_build/results?buildId={build_id}")
+        print(f"="*60)
 
     return 0
 
@@ -502,10 +696,33 @@ def cmd_azdo_pipeline_logs(build_id: int, verbose: bool = False) -> int:
     if 'value' in logs:
         for log_entry in logs['value']:
             log_url = log_entry.get('url')
+            log_name = log_entry.get('name', 'Unknown')
             if log_url:
-                print(f"📄 Log: {log_entry.get('name', 'Unknown')}")
-                print(f"   URL: {log_url}")
+                print(f"📄 Log: {log_name}")
+                print(f"   URL: https://dev.azure.com/{config['organization']}/{config['project']}/_build/results?buildId={build_id}&view=logs&j={log_entry.get('id', '')}")
+
+                # Try to download and show first 20 lines of the log for quick diagnosis
+                if verbose:
+                    try:
+                        log_response = requests.get(log_url, headers=client.headers)
+                        if log_response.status_code == 200:
+                            log_content = log_response.text
+                            lines = log_content.split('\n')[:20]  # First 20 lines
+                            print("   Preview (first 20 lines):")
+                            for i, line in enumerate(lines, 1):
+                                if line.strip():  # Only show non-empty lines
+                                    print(f"     {i:2d}: {line}")
+                                    if i >= 20:
+                                        break
+                            if len(lines) == 20 and len(log_content.split('\n')) > 20:
+                                print("     ... (truncated - use URL above for full log)")
+                        else:
+                            print("   Could not download log preview")
+                    except Exception as e:
+                        print(f"   Could not download log preview: {e}")
                 print()
+    else:
+        print("No logs found for this build.")
 
     print("💡 To view detailed logs in Azure DevOps:")
     print(f"https://dev.azure.com/{config['organization']}/{config['project']}/_build/results?buildId={build_id}")
