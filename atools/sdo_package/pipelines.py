@@ -852,7 +852,7 @@ def cmd_azdo_pipeline_logs(build_id: int, verbose: bool = False) -> int:
     return 0
 
 
-def cmd_azdo_pipeline_lastbuild(verbose: bool = False) -> int:
+def cmd_azdo_pipeline_lastbuild(pipeline_name: str = None, verbose: bool = False) -> int:
     """Handle 'sdo pipeline lastbuild' command for Azure DevOps."""
     # Get configuration (auto-extract from Git if needed)
     config = get_pipeline_config()
@@ -874,9 +874,6 @@ def cmd_azdo_pipeline_lastbuild(verbose: bool = False) -> int:
         print("Please set AZURE_DEVOPS_PAT environment variable.")
         return 1
 
-    # Get pipeline name from config (always available from Git extraction)
-    pipeline_name = config['pipelineName']
-
     # Initialize Azure DevOps client
     client = AzureDevOpsClient(
         config['organization'],
@@ -884,34 +881,89 @@ def cmd_azdo_pipeline_lastbuild(verbose: bool = False) -> int:
         pat
     )
 
-    print(f"Getting last build ID for pipeline: {pipeline_name}...")
+    # If a specific pipeline name is provided, show just that one
+    if pipeline_name:
+        print(f"Getting last build for pipeline: {pipeline_name}...")
+        
+        # List builds (most recent first)
+        builds = client.list_builds(pipeline_name=pipeline_name, top=1)
 
-    # List builds (most recent first)
-    builds = client.list_builds(pipeline_name=pipeline_name, top=1)
+        if not builds:
+            print(f"❌ No builds found for pipeline '{pipeline_name}'")
+            return 1
 
-    if not builds:
-        print("❌ No builds found")
+        # Get the most recent build
+        latest_build = builds[0]
+        display_build_info(latest_build, config, verbose)
+        return 0
+    
+    # No specific pipeline provided - show last build for all pipelines in current repository
+    repo_name = config['repository']
+    print(f"Getting last builds for all pipelines in repository '{repo_name}'...")
+    
+    # Get all pipelines first, then filter by repository
+    all_pipelines = client.list_pipelines()
+    if not all_pipelines:
+        print("❌ No pipelines found in project")
         return 1
-
-    # Get the most recent build
-    latest_build = builds[0]
-    build_id = latest_build['id']
-    status = latest_build.get('status', 'Unknown')
-    result = latest_build.get('result', 'Unknown')
-
-    print(f"✅ Last Build ID: {build_id}")
-    print(f"   Status: {status}")
-    print(f"   Result: {result}")
-    print(f"   Build Number: {latest_build.get('buildNumber', 'N/A')}")
-    print(f"   Queued: {latest_build.get('queueTime', 'N/A')}")
-    print(f"   Started: {latest_build.get('startTime', 'N/A')}")
-    print(f"   Finished: {latest_build.get('finishTime', 'N/A')}")
-    print(f"   URL: https://dev.azure.com/{config['organization']}/{config['project']}/_build/results?buildId={build_id}")
-
-    # Save to config for easy access
-    print(f"\n💡 Use 'sdo pipeline status {build_id}' to check progress.")
-
+    
+    # Find pipelines that belong to this repository (name starts with repo_name + '-')
+    repo_pipelines = []
+    for pipeline in all_pipelines:
+        if pipeline['name'].startswith(f"{repo_name}-"):
+            repo_pipelines.append(pipeline)
+    
+    if not repo_pipelines:
+        print(f"❌ No pipelines found for repository '{repo_name}'")
+        return 1
+    
+    print(f"Found {len(repo_pipelines)} pipelines for repository '{repo_name}':")
+    print()
+    
+    # Get the last build for each pipeline
+    for pipeline in repo_pipelines:
+        pipeline_name = pipeline['name']
+        builds = client.list_builds(pipeline_name=pipeline_name, top=1)
+        
+        if builds:
+            latest_build = builds[0]
+            print(f"📋 Pipeline: {pipeline_name}")
+            display_build_info(latest_build, config, verbose, compact=True)
+            print()
+        else:
+            print(f"📋 Pipeline: {pipeline_name}")
+            print("   No builds found")
+            print()
+    
     return 0
+
+
+def display_build_info(build: dict, config: dict, verbose: bool = False, compact: bool = False) -> None:
+    """Display information about a build."""
+    build_id = build['id']
+    status = build.get('status', 'Unknown')
+    result = build.get('result', 'Unknown')
+    
+    if compact:
+        # Compact format for multiple pipelines
+        print(f"   ✅ Last Build ID: {build_id}")
+        print(f"      Status: {status} - {result}")
+        print(f"      Build Number: {build.get('buildNumber', 'N/A')}")
+        print(f"      Finished: {build.get('finishTime', 'N/A')}")
+        print(f"      URL: https://dev.azure.com/{config['organization']}/{config['project']}/_build/results?buildId={build_id}")
+    else:
+        # Full format for single pipeline
+        print(f"✅ Last Build ID: {build_id}")
+        print(f"   Status: {status}")
+        print(f"   Result: {result}")
+        print(f"   Build Number: {build.get('buildNumber', 'N/A')}")
+        print(f"   Queued: {build.get('queueTime', 'N/A')}")
+        print(f"   Started: {build.get('startTime', 'N/A')}")
+        print(f"   Finished: {build.get('finishTime', 'N/A')}")
+        print(f"   URL: https://dev.azure.com/{config['organization']}/{config['project']}/_build/results?buildId={build_id}")
+
+        # Save to config for easy access
+        print(f"\n💡 Use 'sdo pipeline status {build_id}' to check progress.")
 
 
 def cmd_azdo_pipeline_update(verbose: bool = False) -> int:
@@ -1557,7 +1609,7 @@ def cmd_pipeline_status(build_id: int = None, verbose: bool = False) -> int:
     # If no build_id provided, get the latest build
     if build_id is None:
         if platform == "azdo":
-            # Get the latest build ID for Azure DevOps
+            # Get the latest build ID for Azure DevOps - find most recent build for pipelines matching this repo
             pat = get_personal_access_token()
             if not pat:
                 print("Missing required configuration: AZURE_DEVOPS_PAT environment variable")
@@ -1570,15 +1622,64 @@ def cmd_pipeline_status(build_id: int = None, verbose: bool = False) -> int:
                 pat
             )
 
-            pipeline_name = config['pipelineName']
-            builds = client.list_builds(pipeline_name=pipeline_name, top=1)
-
-            if not builds:
-                print("❌ No builds found")
+            repo_name = config['repository']
+            
+            # Get recent builds across all pipelines, then filter by repository
+            # This is much more efficient than querying each pipeline individually
+            all_recent_builds = client.list_builds(top=100)  # Get last 100 builds across all pipelines
+            
+            if not all_recent_builds:
+                print(f"❌ No recent builds found in project")
                 return 1
-
-            build_id = builds[0]['id']
-            print(f"Getting status for latest build (ID: {build_id})...")
+            
+            # Filter builds to only those from pipelines matching this repository
+            repo_builds = []
+            for build in all_recent_builds:
+                definition = build.get('definition', {})
+                pipeline_name = definition.get('name', '') if isinstance(definition, dict) else str(definition)
+                
+                if pipeline_name.startswith(f"{repo_name}-"):
+                    repo_builds.append(build)
+            
+            # If no recent builds found for this repo, fall back to querying each pipeline individually
+            if not repo_builds:
+                # Get all pipelines first, then filter by repository
+                all_pipelines = client.list_pipelines()
+                if not all_pipelines:
+                    print("❌ No pipelines found in project")
+                    return 1
+                
+                # Find pipelines that belong to this repository (name starts with repo_name + '-')
+                repo_pipelines = []
+                for pipeline in all_pipelines:
+                    if pipeline['name'].startswith(f"{repo_name}-"):
+                        repo_pipelines.append(pipeline)
+                
+                if not repo_pipelines:
+                    print(f"❌ No pipelines found for repository '{repo_name}'")
+                    return 1
+                
+                # Get builds for all matching pipelines and find the most recent one
+                all_builds = []
+                for pipeline in repo_pipelines:
+                    builds = client.list_builds(pipeline_name=pipeline['name'], top=5)  # Get last 5 builds per pipeline
+                    if builds:
+                        all_builds.extend(builds)
+                
+                if not all_builds:
+                    print(f"❌ No builds found for pipelines in repository '{repo_name}'")
+                    return 1
+                
+                # Sort by finish time (most recent first) and get the latest
+                all_builds.sort(key=lambda b: b.get('finishTime', b.get('startTime', '')), reverse=True)
+                latest_build = all_builds[0]
+                build_id = latest_build['id']
+                print(f"Getting status for latest build (ID: {build_id})...")
+            else:
+                # Get the most recent build from the filtered list
+                latest_build = max(repo_builds, key=lambda b: b.get('finishTime', b.get('startTime', '')))
+                build_id = latest_build['id']
+                print(f"Getting status for latest build (ID: {build_id})...")
 
         elif platform == "github":
             # For GitHub, get the latest run for the default workflow and show its details
@@ -1658,7 +1759,7 @@ def cmd_pipeline_logs(build_id: int, verbose: bool = False) -> int:
         return 1
 
 
-def cmd_pipeline_lastbuild(verbose: bool = False) -> int:
+def cmd_pipeline_lastbuild(pipeline_name: str = None, verbose: bool = False) -> int:
     """Handle 'sdo pipeline lastbuild' command."""
     config = get_pipeline_config()
     if config is None:
@@ -1667,7 +1768,7 @@ def cmd_pipeline_lastbuild(verbose: bool = False) -> int:
     platform = config.get("platform")
 
     if platform == "azdo":
-        return cmd_azdo_pipeline_lastbuild(verbose)
+        return cmd_azdo_pipeline_lastbuild(pipeline_name, verbose)
     elif platform == "github":
         # For GitHub, show details about the most recent run
         if not _check_gh_cli():
