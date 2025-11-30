@@ -994,7 +994,7 @@ class AzureDevOpsClient:
                 )
             else:
                 # Append to description (for Tasks and other work item types without dedicated field)
-                logging.debug("Using description approach for {work_item_type}")
+                logging.debug(f"Using description field for acceptance criteria in {work_item_type}")
                 if description:
                     description += f"\n\n<h3>Acceptance Criteria</h3>\n{ac_html}"
                 else:
@@ -1004,7 +1004,7 @@ class AzureDevOpsClient:
                     (p for p in patch_document if p.get("path") == "/fields/System.Description"),
                     None,
                 )
-                logging.debug("Found desc_patch: {desc_patch is not None}")
+                logging.debug(f"Found desc_patch: {desc_patch is not None}")
                 if desc_patch:
                     desc_patch["value"] = description
                     logging.debug("Updated existing desc_patch")

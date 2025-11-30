@@ -139,6 +139,25 @@ def cmd_azdo_pipeline_create(verbose: bool = False) -> int:
         print("Please set AZURE_DEVOPS_PAT environment variable.")
         return 1
 
+    # Check if YAML file exists locally before creating pipeline
+    yaml_path = config['pipelineYamlPath']
+    if not os.path.isfile(yaml_path):
+        print(f"❌ Pipeline YAML file not found: {yaml_path}")
+        print("Please create the pipeline YAML file before creating the pipeline definition.")
+        print()
+        print("Example YAML file structure:")
+        print(f"  {yaml_path}")
+        print("  trigger:")
+        print("  - main")
+        print("  ")
+        print("  pool:")
+        print("    vmImage: 'ubuntu-latest'")
+        print("  ")
+        print("  steps:")
+        print("  - script: echo Hello, world!")
+        print("    displayName: 'Run a one-line script'")
+        return 1
+
     # Initialize Azure DevOps client
     client = AzureDevOpsClient(
         config['organization'],
@@ -1392,13 +1411,70 @@ def cmd_pipeline_create(verbose: bool = False) -> int:
     if platform == "azdo":
         return cmd_azdo_pipeline_create(verbose)
     elif platform == "github":
-        print("GitHub Actions workflows are typically created by adding YAML files to .github/workflows/")
-        print("SDO does not create workflow files automatically.")
-        print("\nTo create a workflow:")
-        print("1. Create the directory: mkdir .github/workflows")
-        print("2. Add a workflow YAML file (e.g., ci.yml)")
-        print("3. Commit and push the changes")
-        return 0
+        # Find the repository root directory
+        try:
+            import subprocess
+            result = subprocess.run(
+                ["git", "rev-parse", "--show-toplevel"],
+                capture_output=True,
+                text=True,
+                check=True
+            )
+            repo_root = result.stdout.strip()
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            print("❌ Could not determine Git repository root directory.")
+            print("Please ensure you're in a Git repository.")
+            return 1
+
+        # Check if .github/workflows directory exists and has files relative to repo root
+        workflows_dir = os.path.join(repo_root, ".github", "workflows")
+        has_workflows = False
+        existing_workflows = []
+
+        if os.path.isdir(workflows_dir):
+            try:
+                workflow_files = [f for f in os.listdir(workflows_dir) if f.endswith(('.yml', '.yaml'))]
+                if workflow_files:
+                    has_workflows = True
+                    existing_workflows = workflow_files
+            except OSError:
+                pass  # Directory exists but can't read it
+
+        if has_workflows:
+            print("GitHub Actions workflows found in your repository:")
+            for workflow in existing_workflows[:5]:  # Show first 5
+                print(f"  • {workflow}")
+            if len(existing_workflows) > 5:
+                print(f"  ... and {len(existing_workflows) - 5} more")
+            print()
+            print("Your repository already has workflow files.")
+            print("To create additional workflows, add more YAML files to .github/workflows/")
+            print("and commit/push them to trigger GitHub Actions.")
+            return 0
+        else:
+            print("GitHub Actions workflows are created by adding YAML files to .github/workflows/")
+            print("SDO does not create workflow files automatically.")
+            print()
+            print("To create a workflow:")
+            print("1. Create the directory: mkdir -p .github/workflows")
+            print("2. Add a workflow YAML file (e.g., ci.yml)")
+            print("3. Commit and push the changes")
+            print()
+            print("Example workflow file (.github/workflows/ci.yml):")
+            print("  name: CI")
+            print("  on:")
+            print("    push:")
+            print("      branches: [ main ]")
+            print("    pull_request:")
+            print("      branches: [ main ]")
+            print("  jobs:")
+            print("    build:")
+            print("      runs-on: ubuntu-latest")
+            print("      steps:")
+            print("      - uses: actions/checkout@v4")
+            print("      - name: Run tests")
+            print("        run: echo 'Add your test commands here'")
+            return 0
     else:
         print(f"❌ Unsupported platform: {platform}")
         return 1

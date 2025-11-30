@@ -15,6 +15,7 @@ atools/
 │   ├── client.py                   # Azure DevOps REST API client
 │   ├── exceptions.py               # Custom exception classes
 │   ├── pull_requests.py            # Pull request operations (multi-platform)
+│   ├── pipelines.py                # Pipeline operations (multi-platform)
 │   ├── repositories.py             # Repository operations (multi-platform)
 │   ├── version.py                  # Version information
 │   ├── work_items.py               # Work item orchestration logic
@@ -28,6 +29,7 @@ atools/
 │       ├── pr_base.py              # Abstract base class for PR platforms
 │       ├── azdo_platform.py        # Azure DevOps work item operations
 │       ├── azdo_pr_platform.py     # Azure DevOps pull request operations
+│       ├── azdo_pipeline_platform.py # Azure DevOps pipeline operations
 │       ├── github_platform.py      # GitHub work item operations
 │       └── github_pr_platform.py   # GitHub pull request operations
 ├── tests/                          # Test suite
@@ -38,10 +40,12 @@ atools/
 │   ├── test_github_platform.py     # GitHub platform tests
 │   ├── test_markdown_parser.py     # Markdown parser tests
 │   ├── test_pull_requests.py       # Pull request operations tests
+│   ├── test_pipelines.py           # Pipeline operations tests
 │   ├── test_repositories.py        # Repository operations tests
 │   ├── test_sdo.py                 # Main module tests
 │   ├── test_sdo_cli.py             # CLI integration tests
-│   └── test_sdo_workitems.py       # Work item tests
+│   ├── test_sdo_workitems.py       # Work item tests
+│   └── test_sdo_pipelines.py       # Pipeline tests
 ├── pyproject.toml                  # Python project configuration
 ├── requirements.txt                # Production dependencies
 ├── requirements-dev.txt            # Development dependencies
@@ -139,7 +143,11 @@ atools/
 ```
 sdo
 ├── workitem
-│   └── create          # Create work items from markdown files
+│   ├── create          # Create work items from markdown files
+│   ├── list            # List work items with filtering
+│   ├── show            # Show work item details
+│   ├── update          # Update work item fields
+│   └── comment         # Add comments to work items
 ├── repo
 │   ├── create          # Create repositories
 │   ├── show            # Show repository information
@@ -151,6 +159,16 @@ sdo
 │   ├── status          # Check pull request status
 │   ├── ls              # List pull requests
 │   └── update          # Update pull request
+├── pipeline
+│   ├── create          # Create pipelines
+│   ├── show            # Show pipeline information
+│   ├── ls              # List pipelines
+│   ├── run             # Run pipelines
+│   ├── status          # Check pipeline status
+│   ├── logs            # View pipeline logs
+│   ├── lastbuild       # Show last build information
+│   ├── update          # Update pipeline configuration
+│   └── delete          # Delete pipelines
 └── add-issue           # Legacy compatibility command
 ```
 
@@ -161,7 +179,7 @@ sdo
 - Graceful error handling with helpful messages
 - Global `--verbose` flag support
 
-### 3. Business Logic Layer (work_items.py, repositories.py & pull_requests.py)
+### 3. Business Logic Layer (work_items.py, repositories.py, pull_requests.py & pipelines.py)
 **Purpose**: Core application logic and orchestration
 **Responsibilities**:
 - Content processing workflow coordination
@@ -169,17 +187,20 @@ sdo
 - Work item creation orchestration (work_items.py)
 - Repository operations orchestration (repositories.py)
 - Pull request operations orchestration (pull_requests.py)
+- Pipeline operations orchestration (pipelines.py)
 - Result validation and reporting
 
 **Key Functions**:
-- `cmd_workitem_create()`: Main work item creation workflow
+- `cmd_workitem_create/list/show/update/comment()`: Work item operation workflows
 - `cmd_repo_create/show/ls/delete()`: Repository operation workflows
 - `cmd_pr_create/show/status/ls/update()`: Pull request operation workflows
+- `cmd_pipeline_create/show/ls/run/status/logs/lastbuild/update/delete()`: Pipeline operation workflows
 - `get_pr_platform()`: Platform factory for pull request operations
+- `get_pipeline_platform()`: Platform factory for pipeline operations
 - Platform factory functions for creating appropriate platform instances
 - Result handling and user feedback
 
-**Architecture Note**: Repository and pull request operations use abstract base classes with platform-specific implementations, providing a consistent interface across Azure DevOps and GitHub.
+**Architecture Note**: Repository, pull request, and pipeline operations use abstract base classes with platform-specific implementations, providing a consistent interface across Azure DevOps and GitHub.
 
 ### 4. Parser Layer (parsers/)
 **Purpose**: Content extraction and metadata processing
@@ -353,6 +374,52 @@ class PRPlatform(ABC):
 - Draft PR support
 - Repository context detection
 
+#### Pipeline Platform Interface
+**Abstract Interface**:
+```python
+class PipelinePlatform(ABC):
+    @abstractmethod
+    def create_pipeline(self, name: str, **kwargs) -> Dict[str, Any]:
+        """Create a new pipeline."""
+        
+    @abstractmethod
+    def get_pipeline(self, name: str) -> Optional[Dict[str, Any]]:
+        """Get pipeline information."""
+        
+    @abstractmethod
+    def list_pipelines(self, repo_filter: Optional[str] = None) -> List[Dict[str, Any]]:
+        """List pipelines with optional repository filtering."""
+        
+    @abstractmethod
+    def run_pipeline(self, name: str, branch: str) -> Dict[str, Any]:
+        """Run a pipeline on specified branch."""
+        
+    @abstractmethod
+    def get_pipeline_status(self, build_id: Optional[int] = None) -> Dict[str, Any]:
+        """Get pipeline build status."""
+        
+    @abstractmethod
+    def get_pipeline_logs(self, build_id: int) -> str:
+        """Get logs for a pipeline build."""
+        
+    @abstractmethod
+    def delete_pipeline(self, name: str) -> bool:
+        """Delete a pipeline."""
+```
+
+#### Azure DevOps Pipeline Platform (azdo_pipeline_platform.py)
+**Responsibilities**:
+- Azure DevOps Pipeline REST API integration
+- Pipeline creation, execution, and monitoring
+- Build status and log retrieval
+- Pipeline configuration management
+
+**Key Features**:
+- Full pipeline lifecycle management
+- Build queue and execution tracking
+- Comprehensive logging and status reporting
+- Integration with Azure DevOps build system
+
 ### 7. Repository Operations (repositories.py)
 **Purpose**: Multi-platform repository management
 **Responsibilities**:
@@ -372,6 +439,25 @@ class PRPlatform(ABC):
 - Automatic platform detection from Git remotes
 - Consistent error handling and logging
 - Support for both Azure DevOps and GitHub repositories
+
+### 8. Pipeline Operations (pipelines.py)
+**Purpose**: Multi-platform CI/CD pipeline management
+**Responsibilities**:
+- Pipeline creation, execution, monitoring, and management
+- Platform-specific pipeline operations
+- Build status tracking and log retrieval
+- Unified interface across platforms
+
+**Architecture**:
+- `PipelinePlatform`: Abstract base class for pipeline operations
+- `AzureDevOpsPipelinePlatform`: Azure DevOps REST API implementation
+- `create_pipeline_platform()`: Factory function for platform selection
+
+**Key Features**:
+- Platform-agnostic pipeline operations
+- Automatic platform detection from Git remotes
+- Comprehensive build monitoring and logging
+- Support for both Azure DevOps and GitHub Actions pipelines
 
 ### 6. Client Layer (client.py)
 **Purpose**: Low-level API communication and platform utilities
@@ -407,6 +493,7 @@ User Command → CLI Parser → Business Logic Layer
 Work Items: Content Parsing → Platform Selection → Work Item Creation
 Repository: Git Remote Parsing → Platform Selection → Repository Operations
 Pull Requests: Content Parsing → Platform Selection → PR Operations
+Pipelines: Git Remote Parsing → Platform Selection → Pipeline Operations
      ↓
 Result Reporting ← Success/Error Aggregation ← API/CLI Calls
 ```
@@ -514,6 +601,9 @@ CLI Error Presenter → Console Output with Context
 - Branch management operations
 - PR review and approval workflows
 - PR merge operations with conflict resolution
+- Enhanced pipeline monitoring and alerting
+- Pipeline template management
+- Cross-platform pipeline migration tools
 
 ### 2. **Architecture Evolution**
 - Microservice decomposition for large-scale deployments

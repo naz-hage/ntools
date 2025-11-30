@@ -703,14 +703,35 @@ def pipeline(ctx):
 @click.option("--verbose", "-v", is_flag=True, help="Show detailed API information and responses")
 @click.pass_context
 def create(ctx, verbose):
-    """Create a pipeline in the current project.
+    """Create a pipeline/workflow in the current project.
 
-    The pipeline name and configuration are extracted from the current Git remote.
+    Automatically detects your platform (Azure DevOps or GitHub) from Git remote URLs
+    and creates pipelines differently for each platform.
+
+    AZURE DEVOPS:
+    - Validates that the YAML file exists locally before creating pipeline definition
+    - Creates an actual pipeline definition via REST API
+    - Links to YAML file at '.azure-pipelines/azurepipeline.yml'
+    - Pipeline name defaults to repository name
+    - Requires: AZURE_DEVOPS_PAT environment variable
+    - Requires: YAML file in repository
+
+    GITHUB:
+    - Checks for existing workflow files in .github/workflows/
+    - If workflows exist: Lists them and notes repository is already configured
+    - If no workflows exist: Provides step-by-step creation guide with example
+    - Does not create workflow files automatically (GitHub API limitation)
+
     If the pipeline already exists, no action is taken.
 
     Examples:
-        sdo pipeline create
-        sdo pipeline create --verbose
+        sdo pipeline create                    # Create pipeline for current repo
+        sdo pipeline create --verbose          # Show detailed API responses
+
+    Prerequisites:
+        Azure DevOps: Set AZURE_DEVOPS_PAT environment variable
+        GitHub: Install GitHub CLI (gh) and authenticate
+        Repository: Must be in a Git repository with remote configured
     """
     try:
         # Call the business logic
