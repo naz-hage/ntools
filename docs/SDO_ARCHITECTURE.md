@@ -75,44 +75,88 @@ atools/
 
 ## System Architecture
 
+SDO uses a **domain-driven architecture** with separate platform abstractions for each business domain. Each domain (work items, repositories, pipelines, pull requests) has its own business logic module and platform interface because the operations are fundamentally different between Azure DevOps and GitHub.
+
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                         SDO CLI Tool                            │
 ├─────────────────────────────────────────────────────────────────┤
-│  sdo.py (Main Entry Point)                                     │
-│  ├── Click CLI Framework                                       │
-│  ├── Command Registration                                      │
-│  └── Global Configuration                                      │
+│  sdo.py (Main Entry Point)                                      │
+│  ├── Click CLI Framework                                        │
+│  ├── Command Registration                                       │
+│  └── Global Configuration                                       │
 └─────────────────────────────────────────────────────────────────┘
                                     │
                                     ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                    CLI Layer (cli.py)                          │
+│                    CLI Layer (cli.py)                           │
 ├─────────────────────────────────────────────────────────────────┤
-│  ├── workitem group: create                                    │
-│  ├── repo group: create, show, ls, delete                      │
-│  ├── Command argument parsing and validation                   │
-│  ├── Verbose output management                                 │
-│  └── Error handling and user feedback                          │
+│  ├── workitem group: create, list, show, update, comment        │
+│  ├── repo group: create, show, ls, delete                       │
+│  ├── pr group: create, show, status, ls, update                 │
+│  ├── pipeline group: create, show, ls, run, status, logs        │
+│  ├── Command argument parsing and validation                    │
+│  ├── Verbose output management                                  │
+│  └── Error handling and user feedback                           │
+└─────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                 Business Logic Layer                            │
+├─────────────────────────────────────────────────────────────────┤
+│  ├── work_items.py: Work item orchestration                     │
+│  ├── repositories.py: Repository operations                     │
+│  ├── pull_requests.py: PR operations                            │
+│  └── pipelines.py: Pipeline operations                          │
+│                                                                 │
+│  Each module:                                                   │
+│  ├── Platform detection and selection                           │
+│  ├── Content processing workflow coordination                   │
+│  ├── Result validation and reporting                            │
+│  └── Error handling and user feedback                           │
 └─────────────────────────────────────────────────────────────────┘
                                     │
                     ┌───────────────┼───────────────┐
+                    │               │               │
                     ▼               ▼               ▼
     ┌─────────────────────┐ ┌─────────────────┐ ┌─────────────────┐
     │   Parser Layer      │ │ Platform Layer  │ │  Client Layer   │
     │   (parsers/)        │ │ (platforms/)    │ │   (client.py)   │
+    │                     │ │                 │ │                 │
+    │  Content parsing:   │ │ Domain-specific │ │ Low-level API:  │
+    │  ├── Markdown files │ │ abstractions:   │ │ ├── HTTP client │
+    │  ├── Metadata       │ │ ├── Work items  │ │ ├── Auth        │
+    │  └── Validation     │ │ ├── Repos       │ │ ├── Platform    │
+    │                     │ │ ├── Pipelines   │ │ │   detection   │
+    │                     │ │ └── PRs         │ │ └── Logging     │
     └─────────────────────┘ └─────────────────┘ └─────────────────┘
-                                    │
-                                    ▼
-┌─────────────────────────────────────────────────────────────────┐
-│            Repository Operations (repositories.py)             │
-├─────────────────────────────────────────────────────────────────┤
-│  ├── RepositoryPlatform abstract base class                    │
-│  ├── AzureDevOpsRepositoryPlatform                             │
-│  ├── GitHubRepositoryPlatform                                  │
-│  └── Platform factory and orchestration                        │
-└─────────────────────────────────────────────────────────────────┘
 ```
+
+### Architecture Principles
+
+#### 1. **Domain-Driven Design**
+Each business domain (work items, repositories, pipelines, PRs) has:
+- **Dedicated business logic module** (work_items.py, repositories.py, etc.)
+- **Separate platform abstractions** because Azure DevOps and GitHub APIs are fundamentally different
+- **Independent evolution** allowing each domain to be enhanced separately
+
+#### 2. **Platform Abstraction Strategy**
+```
+Business Logic Module → Platform Interface → Platform Implementation → Client Layer
+
+Example for Work Items:
+work_items.py → WorkItemPlatform → azdo_platform.py/github_platform.py → client.py
+
+Example for Repositories:
+repositories.py → RepositoryPlatform → AzureDevOpsRepoPlatform/GitHubRepoPlatform → client.py
+```
+
+#### 3. **Why Separate Platform Interfaces**
+Work item operations are too different to share common code:
+- **Azure DevOps**: Complex work item types, parent-child relationships, acceptance criteria fields
+- **GitHub**: Simple issue model, issue references, labels, CLI-based operations
+
+Attempting consolidation would create more complexity than separation.
 
 ## Component Details
 
@@ -488,23 +532,53 @@ class PipelinePlatform(ABC):
 
 ### 1. Command Execution Flow
 ```
-User Command → CLI Parser → Business Logic Layer
+User Command → CLI Parser (cli.py) → Business Logic Module
      ↓
-Work Items: Content Parsing → Platform Selection → Work Item Creation
-Repository: Git Remote Parsing → Platform Selection → Repository Operations
-Pull Requests: Content Parsing → Platform Selection → PR Operations
-Pipelines: Git Remote Parsing → Platform Selection → Pipeline Operations
+Business Logic: Content Parsing (Parser Layer) → Platform Selection → Platform Implementation → Client Layer (API/CLI calls)
      ↓
-Result Reporting ← Success/Error Aggregation ← API/CLI Calls
+Result Reporting ← Success/Error Aggregation ← Platform Response
 ```
 
-### 2. Error Handling Flow
+### 2. Domain-Specific Flows
+
+#### Work Items Flow:
 ```
-Exception Occurrence → Platform-Specific Handler → SDOException
+sdo workitem create file.md
+    ↓
+CLI (cli.py) → work_items.py → MarkdownParser → Platform Detection
+    ↓
+WorkItemPlatform → azdo_platform.py/github_platform.py → AzureDevOpsClient/GitHub CLI
+    ↓
+API Response → Result Formatting → User Output
+```
+
+#### Repository Flow:
+```
+sdo repo create
+    ↓
+CLI (cli.py) → repositories.py → Git Remote Parsing → Platform Detection
+    ↓
+RepositoryPlatform → AzureDevOpsRepoPlatform/GitHubRepoPlatform → Client Layer
+    ↓
+API Response → Result Formatting → User Output
+```
+
+#### Pipeline Flow:
+```
+sdo pipeline run --branch main
+    ↓
+CLI (cli.py) → pipelines.py → Git Remote Parsing → Platform Detection
+    ↓
+PipelinePlatform → AzureDevOpsPipelinePlatform → AzureDevOpsClient
+    ↓
+Build Queue Response → Status Monitoring → User Output
+```
+
+### 3. Error Handling Flow
+```
+Exception Occurrence → Platform-Specific Handler → Business Logic Error Handler → CLI Error Presenter
      ↓
-Business Logic Error Handler → User-Friendly Message
-     ↓
-CLI Error Presenter → Console Output with Context
+User-Friendly Message ← Error Context Aggregation ← Exception Details
 ```
 
 ## Security Considerations
