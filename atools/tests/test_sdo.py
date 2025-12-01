@@ -58,12 +58,6 @@ class TestSDOConfiguration:
         # In a real implementation, we would test the Click context
         pass
 
-    def test_environment_variable_handling(self):
-        """Test environment variable configuration."""
-        with patch.dict("os.environ", {"SDO_VERBOSE": "true"}):
-            # Test that environment variables are respected
-            pass
-
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

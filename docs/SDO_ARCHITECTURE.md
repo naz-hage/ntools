@@ -526,10 +526,9 @@ CLI Error Presenter → Console Output with Context
 
 ## Configuration Management
 
-### 1. **Environment Variables**
+### 2. **Environment Variables**
 - `AZURE_DEVOPS_PAT`: Azure DevOps Personal Access Token
 - `GITHUB_TOKEN`: GitHub authentication token (optional if using GitHub CLI)
-- `SDO_VERBOSE`: Global verbose mode setting
 
 ### 2. **File-based Configuration**
 - Platform detection from markdown metadata
