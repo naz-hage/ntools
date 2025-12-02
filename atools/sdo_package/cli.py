@@ -39,6 +39,7 @@ from .pipelines import (  # noqa: E402
     cmd_pipeline_lastbuild,
     cmd_pipeline_update,
 )
+from .client import extract_platform_info_from_git  # noqa: E402
 import importlib.metadata
 
 try:
@@ -62,6 +63,13 @@ Environment Variables:
 
 Requirements:
     GitHub CLI (gh)     - Required for GitHub operations (install from https://cli.github.com/)
+
+COMMANDS:
+    map                 - Show command mappings between SDO and native CLI tools
+    workitem            - Work item operations (create, list, show, update, comment)
+    repo                - Repository operations (create, show, list, delete)
+    pr                  - Pull request operations (create, show, list, update)
+    pipeline            - Pipeline operations (create, show, list, run, status, logs, delete)
 """
 
 
@@ -1068,6 +1076,206 @@ def update(ctx, verbose):
         if ctx.obj.get("verbose"):
             import traceback
 
+            click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
+        sys.exit(1)
+
+
+@cli.command()
+@click.argument("platform", required=False, type=click.Choice(["gh", "azdo", "github", "azure-devops"]))
+@click.option("--all", is_flag=True, help="Show all mappings regardless of detected platform")
+@click.pass_context
+def map(ctx, platform, all):
+    """Show command mappings between SDO and native CLI tools.
+
+    Displays equivalent commands for GitHub CLI (gh) and Azure CLI (az) based on
+    the detected platform from your Git repository, or show all mappings.
+
+    Examples:
+        sdo map                    # Show mappings for detected platform
+        sdo map gh                 # Show GitHub CLI mappings
+        sdo map azdo               # Show Azure CLI mappings
+        sdo map --all              # Show all mappings
+
+    The mappings document is located at: sdo_package/mapping.md
+    """
+    try:
+        # Detect current platform
+        platform_info = extract_platform_info_from_git()
+        detected_platform = platform_info.get("platform", "unknown") if platform_info else "unknown"
+
+        # Normalize platform names
+        platform_map = {
+            "gh": "github",
+            "azdo": "azure-devops",
+            "github": "github",
+            "azure-devops": "azure-devops"
+        }
+
+        # Determine which platform to show
+        if all:
+            target_platform = None  # Show all
+        elif platform:
+            target_platform = platform_map.get(platform.lower())
+            if not target_platform:
+                click.echo(f"❌ Unknown platform: {platform}")
+                click.echo("Valid platforms: gh, azdo, github, azure-devops")
+                sys.exit(1)
+        else:
+            # Auto-detect
+            if detected_platform == "github":
+                target_platform = "github"
+            elif detected_platform == "azdo":
+                target_platform = "azure-devops"
+            else:
+                click.echo("⚠️  Could not detect platform from Git repository.")
+                click.echo("Showing all mappings. Use 'sdo map --all' to see everything.")
+                target_platform = None
+
+        # Read and parse the mapping file
+        # Try multiple locations: installed location first, then source location
+        mapping_file = None
+
+        # Check common installation directories first
+        install_dirs = [
+            r"C:\Program Files\NBuild",
+            r"C:\Program Files (x86)\NBuild",
+            os.path.dirname(os.path.dirname(os.path.dirname(__file__))),  # Parent of source
+        ]
+
+        for install_dir in install_dirs:
+            potential_path = os.path.join(install_dir, "mapping.md")
+            if os.path.exists(potential_path):
+                mapping_file = potential_path
+                break
+
+        # Fall back to source location
+        if not mapping_file:
+            mapping_file = os.path.join(os.path.dirname(__file__), "mapping.md")
+
+        if not os.path.exists(mapping_file):
+            click.echo(f"❌ Mapping file not found: {mapping_file}")
+            sys.exit(1)
+
+        with open(mapping_file, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        # Parse the markdown and extract relevant sections
+        lines = content.split("\n")
+        current_section = None
+        in_table = False
+        table_data = []
+        sections = {}
+
+        for line in lines:
+            line = line.strip()
+            if line.startswith("## "):
+                # New section
+                if current_section and table_data:
+                    sections[current_section] = table_data
+                current_section = line[3:].lower().replace(" ", "-")
+                table_data = []
+                in_table = False
+            elif line.startswith("|") and current_section:
+                # Table row
+                if not in_table:
+                    in_table = True
+                table_data.append(line)
+
+        # Add the last section
+        if current_section and table_data:
+            sections[current_section] = table_data
+
+        # Display header
+        click.echo("SDO Command Mappings")
+        click.echo("=" * 50)
+
+        if target_platform:
+            platform_name = "GitHub" if target_platform == "github" else "Azure DevOps"
+            click.echo(f"Platform: {platform_name} (detected: {detected_platform})")
+        else:
+            click.echo("Platform: All platforms")
+        click.echo()
+
+        # Display mappings
+        section_headers = {
+            "work-item-commands": "Work Item Commands",
+            "repository-commands": "Repository Commands",
+            "pull-request-commands": "Pull Request Commands",
+            "pipeline-commands": "Pipeline Commands"
+        }
+
+        found_mappings = False
+        for section_key, header in section_headers.items():
+            if section_key in sections:
+                section_data = sections[section_key]
+
+                # Filter by platform if specified
+                filtered_data = []
+                if target_platform:
+                    for row in section_data:
+                        if target_platform == "github" and ("github cli" in row.lower() or "gh " in row.lower()):
+                            filtered_data.append(row)
+                        elif target_platform == "azure-devops" and ("azure cli" in row.lower() or "az " in row.lower()):
+                            filtered_data.append(row)
+                else:
+                    filtered_data = section_data
+
+                if filtered_data:
+                    found_mappings = True
+                    click.echo(f"## {header}")
+                    click.echo()
+
+                    # Display filtered rows in a more readable format
+                    for row in filtered_data[2:]:  # Skip header rows
+                        if target_platform == "github":
+                            # Extract SDO and GitHub columns
+                            parts = row.split("|")
+                            if len(parts) >= 4:
+                                sdo_cmd = parts[1].strip()
+                                gh_cmd = parts[2].strip()
+                                if sdo_cmd and gh_cmd and not sdo_cmd.startswith("SDO Command"):
+                                    click.echo(f"  {sdo_cmd}")
+                                    click.echo(f"    → {gh_cmd}")
+                                    click.echo()
+                        elif target_platform == "azure-devops":
+                            # Extract SDO and Azure columns
+                            parts = row.split("|")
+                            if len(parts) >= 4:
+                                sdo_cmd = parts[1].strip()
+                                az_cmd = parts[3].strip()
+                                if sdo_cmd and az_cmd and not sdo_cmd.startswith("SDO Command"):
+                                    click.echo(f"  {sdo_cmd}")
+                                    click.echo(f"    → {az_cmd}")
+                                    click.echo()
+                        else:
+                            # Show all columns in readable format
+                            parts = row.split("|")
+                            if len(parts) >= 4:
+                                sdo_cmd = parts[1].strip()
+                                gh_cmd = parts[2].strip()
+                                az_cmd = parts[3].strip()
+                                if sdo_cmd and not sdo_cmd.startswith("SDO Command"):
+                                    click.echo(f"  {sdo_cmd}")
+                                    if gh_cmd:
+                                        click.echo(f"    GitHub:  {gh_cmd}")
+                                    if az_cmd:
+                                        click.echo(f"    Azure:   {az_cmd}")
+                                    click.echo()
+
+                    click.echo()
+
+        if not found_mappings:
+            click.echo("No mappings found for the specified platform.")
+            click.echo()
+
+        # Footer
+        click.echo("💡 Tip: Use 'sdo map --all' to see all platform mappings")
+        click.echo(f"📖 Full documentation: {mapping_file}")
+
+    except Exception as e:
+        click.echo(f"❌ Error reading mappings: {str(e)}", err=True)
+        if ctx.obj.get("verbose"):
+            import traceback
             click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
         sys.exit(1)
 

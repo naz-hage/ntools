@@ -2,6 +2,12 @@
 
 This document provides mappings between SDO commands and their equivalent GitHub CLI (`gh`) and Azure CLI (`az`) commands.
 
+**Quick Access**: Use `sdo map` to view these mappings directly in your terminal:
+- `sdo map` - Show mappings for detected platform
+- `sdo map gh` - Show GitHub CLI mappings
+- `sdo map azdo` - Show Azure CLI mappings
+- `sdo map --all` - Show all mappings
+
 ## Work Item Commands
 
 ### sdo workitem create
