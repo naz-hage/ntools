@@ -332,6 +332,18 @@ class AzureDevOpsClient:
             self._handle_api_error(e, "fetching pipeline")
             return None
 
+    def get_pipeline_details(self, pipeline_id: int) -> Optional[Dict[str, Any]]:
+        """Get detailed pipeline information including configuration."""
+        url = f"{self.base_url}/_apis/pipelines/{pipeline_id}?api-version={self.api_version}"
+
+        try:
+            response = requests.get(url, headers=self.headers)
+            response.raise_for_status()
+            return response.json()
+        except requests.RequestException as e:
+            self._handle_api_error(e, f"fetching pipeline details for ID {pipeline_id}")
+            return None
+
     def list_pipelines(self) -> Optional[list]:
         """List all pipelines in the project."""
         url = f"{self.base_url}/_apis/pipelines?api-version={self.api_version}"
@@ -497,7 +509,7 @@ class AzureDevOpsClient:
             print(f"Build ID: {build['id']}")
             print(f"Build Number: {build['buildNumber']}")
             print(f"Status: {build['status']}")
-            print(f"URL: {build['url']}")
+            print(f"URL: https://dev.azure.com/{self.organization}/{self.project}/_build/results?buildId={build['id']}")
             return build
         except requests.RequestException as e:
             self._handle_api_error(e, "running pipeline")
@@ -570,6 +582,19 @@ class AzureDevOpsClient:
             return response.json()
         except requests.RequestException as e:
             self._handle_api_error(e, "getting build timeline")
+            return None
+
+    def get_build_issues(self, build_id: int) -> Optional[Dict[str, Any]]:
+        """Get issues/errors for a specific build."""
+        url = f"{self.base_url}/_apis/build/builds/{build_id}?api-version={self.api_version}&$expand=issues"
+
+        try:
+            response = requests.get(url, headers=self.headers)
+            response.raise_for_status()
+            build_data = response.json()
+            return build_data.get("issues", {})
+        except requests.RequestException as e:
+            self._handle_api_error(e, "getting build issues")
             return None
 
     def list_builds(self, pipeline_name: Optional[str] = None, top: int = 10) -> Optional[list]:
@@ -969,7 +994,7 @@ class AzureDevOpsClient:
                 )
             else:
                 # Append to description (for Tasks and other work item types without dedicated field)
-                logging.debug("Using description approach for {work_item_type}")
+                logging.debug(f"Using description field for acceptance criteria in {work_item_type}")
                 if description:
                     description += f"\n\n<h3>Acceptance Criteria</h3>\n{ac_html}"
                 else:
@@ -979,7 +1004,7 @@ class AzureDevOpsClient:
                     (p for p in patch_document if p.get("path") == "/fields/System.Description"),
                     None,
                 )
-                logging.debug("Found desc_patch: {desc_patch is not None}")
+                logging.debug(f"Found desc_patch: {desc_patch is not None}")
                 if desc_patch:
                     desc_patch["value"] = description
                     logging.debug("Updated existing desc_patch")

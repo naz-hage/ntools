@@ -128,7 +128,7 @@ class TestGitHubRepositoryPlatformAuth:
         result = self.platform.validate_auth()
 
         assert result is True
-        mock_run.assert_called_once_with(["gh", "auth", "status"], capture_output=True, text=True)
+        mock_run.assert_called_once_with(["gh", "auth", "status"], capture_output=True, text=True, encoding='utf-8', errors='replace')
 
     @patch("subprocess.run")
     def test_validate_auth_failure(self, mock_run):
@@ -182,6 +182,8 @@ class TestGitHubRepositoryPlatformOperations:
             ],
             capture_output=True,
             text=True,
+            encoding='utf-8',
+            errors='replace',
         )
 
     @patch("subprocess.run")
@@ -313,7 +315,7 @@ class TestGitHubRepositoryPlatformOperations:
 
         assert result is True
         mock_run.assert_called_once_with(
-            ["gh", "repo", "delete", "testuser/old-repo", "--yes"], capture_output=True, text=True
+            ["gh", "repo", "delete", "testuser/old-repo", "--yes"], capture_output=True, text=True, encoding='utf-8', errors='replace'
         )
 
     @patch("subprocess.run")

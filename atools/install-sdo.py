@@ -207,6 +207,26 @@ def install_sdo(sdo_source_path: Path, target_path: Path, is_local: bool = False
             return False
         print("✓ SDO installed successfully")
 
+    # Copy mapping.md file to target directory
+    mapping_source = sdo_source_path / "sdo_package" / "mapping.md"
+    if is_local:
+        mapping_dest = target_path.parent / "mapping.md"  # Copy to atools directory for local install
+    else:
+        mapping_dest = target_path / "mapping.md"  # Copy to NBuild directory for system install
+
+    if mapping_source.exists():
+        if dry_run:
+            print(f"Would copy mapping.md from {mapping_source} to {mapping_dest}")
+        else:
+            try:
+                import shutil
+                shutil.copy2(mapping_source, mapping_dest)
+                print(f"✓ Copied mapping.md to {mapping_dest}")
+            except Exception as e:
+                print(f"⚠️  Warning: Failed to copy mapping.md: {e}")
+    else:
+        print(f"⚠️  Warning: mapping.md not found at {mapping_source}")
+
     # Create launcher script (only for system-wide install, not local)
     if not is_local:
         if not create_launcher_script(target_path, venv_path, dry_run):

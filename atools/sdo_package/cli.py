@@ -28,7 +28,25 @@ from .pull_requests import (  # noqa: E402
     cmd_pr_list,
     cmd_pr_update,
 )
-from .version import __version__  # noqa: E402
+from .pipelines import (  # noqa: E402
+    cmd_pipeline_create,
+    cmd_pipeline_show,
+    cmd_pipeline_list,
+    cmd_pipeline_delete,
+    cmd_pipeline_run,
+    cmd_pipeline_status,
+    cmd_pipeline_logs,
+    cmd_pipeline_lastbuild,
+    cmd_pipeline_update,
+)
+from .client import extract_platform_info_from_git  # noqa: E402
+import importlib.metadata
+
+try:
+    __version__ = importlib.metadata.version("sdo")
+except importlib.metadata.PackageNotFoundError:
+    # Fallback for development
+    __version__ = "0.0.0"
 
 
 # Define the CLI docstring with version
@@ -37,7 +55,7 @@ CLI_DOCSTRING = f"""SDO {__version__} - Simple DevOps Operations Tool
 A modern CLI tool for Azure DevOps and GitHub operations.
 
 PLATFORM SUPPORT:
-- Azure DevOps: Work items (PBIs, Tasks, Bugs, Epics), repositories, and pull requests
+- Azure DevOps: Work items (PBIs, Tasks, Bugs, Epics), repositories, pipelines, and pull requests
 - GitHub: Work items (Issues), repositories, and pull requests
 
 Environment Variables:
@@ -45,6 +63,13 @@ Environment Variables:
 
 Requirements:
     GitHub CLI (gh)     - Required for GitHub operations (install from https://cli.github.com/)
+
+COMMANDS:
+    map                 - Show command mappings between SDO and native CLI tools
+    workitem            - Work item operations (create, list, show, update, comment)
+    repo                - Repository operations (create, show, list, delete)
+    pr                  - Pull request operations (create, show, list, update)
+    pipeline            - Pipeline operations (create, show, list, run, status, logs, delete)
 """
 
 
@@ -672,6 +697,585 @@ def update(ctx, pr_id, file, title, status, verbose):  # noqa: F811
         if ctx.obj.get("verbose"):
             import traceback
 
+            click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
+        sys.exit(1)
+
+
+@cli.group()
+@click.pass_context
+def pipeline(ctx):
+    """Pipeline operations."""
+
+
+@pipeline.command()
+@click.option("--verbose", "-v", is_flag=True, help="Show detailed API information and responses")
+@click.pass_context
+def create(ctx, verbose):
+    """Create a pipeline/workflow in the current project.
+
+    Automatically detects your platform (Azure DevOps or GitHub) from Git remote URLs
+    and creates pipelines differently for each platform.
+
+    AZURE DEVOPS:
+    - Validates that the YAML file exists locally before creating pipeline definition
+    - Creates an actual pipeline definition via REST API
+    - Links to YAML file at '.azure-pipelines/azurepipeline.yml'
+    - Pipeline name defaults to repository name
+    - Requires: AZURE_DEVOPS_PAT environment variable
+    - Requires: YAML file in repository
+
+    GITHUB:
+    - Checks for existing workflow files in .github/workflows/
+    - If workflows exist: Lists them and notes repository is already configured
+    - If no workflows exist: Provides step-by-step creation guide with example
+    - Does not create workflow files automatically (GitHub API limitation)
+
+    If the pipeline already exists, no action is taken.
+
+    Examples:
+        sdo pipeline create                    # Create pipeline for current repo
+        sdo pipeline create --verbose          # Show detailed API responses
+
+    Prerequisites:
+        Azure DevOps: Set AZURE_DEVOPS_PAT environment variable
+        GitHub: Install GitHub CLI (gh) and authenticate
+        Repository: Must be in a Git repository with remote configured
+    """
+    try:
+        # Call the business logic
+        result = cmd_pipeline_create(verbose=verbose)
+
+        if result != 0:
+            sys.exit(result)
+
+    except (SDOError, ConfigurationError, ValidationError) as e:
+        click.echo(f"❌ {str(e)}", err=True)
+        if ctx.obj.get("verbose"):
+            click.echo(f"   Error type: {type(e).__name__}", err=True)
+            if hasattr(e, "details"):
+                click.echo(f"   Details: {e.details}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"❌ Unexpected error: {str(e)}", err=True)
+        if ctx.obj.get("verbose"):
+            import traceback
+
+            click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
+        sys.exit(1)
+
+
+@pipeline.command()
+@click.option("--verbose", "-v", is_flag=True, help="Show detailed API information and responses")
+@click.pass_context
+def show(ctx, verbose):
+    """Show information about the current pipeline.
+
+    The pipeline name is extracted from the current Git remote.
+
+    Examples:
+        sdo pipeline show
+        sdo pipeline show --verbose
+    """
+    try:
+        # Call the business logic
+        result = cmd_pipeline_show(verbose=verbose)
+
+        if result != 0:
+            sys.exit(result)
+
+    except (SDOError, ConfigurationError, ValidationError) as e:
+        click.echo(f"❌ {str(e)}", err=True)
+        if ctx.obj.get("verbose"):
+            click.echo(f"   Error type: {type(e).__name__}", err=True)
+            if hasattr(e, "details"):
+                click.echo(f"   Details: {e.details}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"❌ Unexpected error: {str(e)}", err=True)
+        if ctx.obj.get("verbose"):
+            import traceback
+
+            click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
+        sys.exit(1)
+
+
+@pipeline.command()
+@click.option("--repo", help="Filter pipelines by repository name (shows only pipelines for this repo)")
+@click.option("--all", "show_all", is_flag=True, help="Show all pipelines in the project")
+@click.option("--verbose", "-v", is_flag=True, help="Show detailed API information and responses")
+@click.pass_context
+def ls(ctx, repo, show_all, verbose):
+    """List pipelines for the current repository.
+
+    By default, shows only pipelines associated with the current repository
+    (detected from git remote). Use --repo to filter by a different repository,
+    or --all to show all pipelines in the project.
+
+    Examples:
+        sdo pipeline ls                    # Show current repo pipelines
+        sdo pipeline ls --repo other-repo  # Show pipelines for other-repo
+        sdo pipeline ls --all              # Show all pipelines in project
+        sdo pipeline ls --verbose          # Show API details
+    """
+    try:
+        # Call the business logic
+        result = cmd_pipeline_list(repo_filter=repo, show_all=show_all, verbose=verbose)
+
+        if result != 0:
+            sys.exit(result)
+
+    except (SDOError, ConfigurationError, ValidationError) as e:
+        click.echo(f"❌ {str(e)}", err=True)
+        if ctx.obj.get("verbose"):
+            click.echo(f"   Error type: {type(e).__name__}", err=True)
+            if hasattr(e, "details"):
+                click.echo(f"   Details: {e.details}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"❌ Unexpected error: {str(e)}", err=True)
+        if ctx.obj.get("verbose"):
+            import traceback
+
+            click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
+        sys.exit(1)
+
+
+@pipeline.command()
+@click.argument("pipeline_name", required=False)
+@click.option("--force", "-f", is_flag=True, help="Skip confirmation prompt")
+@click.option("--verbose", "-v", is_flag=True, help="Show detailed API information and responses")
+@click.pass_context
+def delete(ctx, pipeline_name, force, verbose):
+    """Delete a pipeline.
+
+    ⚠️  WARNING: This action cannot be undone!
+
+    If PIPELINE_NAME is not provided, the pipeline name is extracted from the current Git remote.
+    You will be prompted to confirm before deletion unless --force is used.
+
+    Examples:
+        sdo pipeline delete                    # Delete current pipeline (from git remote)
+        sdo pipeline delete my-pipeline        # Delete specific pipeline
+        sdo pipeline delete my-pipeline --force  # Delete without confirmation
+        sdo pipeline delete --verbose          # Show API details
+    """
+    try:
+        # Call the business logic
+        result = cmd_pipeline_delete(pipeline_name=pipeline_name, force=force, verbose=verbose)
+
+        if result != 0:
+            sys.exit(result)
+
+    except (SDOError, ConfigurationError, ValidationError) as e:
+        click.echo(f"❌ {str(e)}", err=True)
+        if ctx.obj.get("verbose"):
+            click.echo(f"   Error type: {type(e).__name__}", err=True)
+            if hasattr(e, "details"):
+                click.echo(f"   Details: {e.details}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"❌ Unexpected error: {str(e)}", err=True)
+        if ctx.obj.get("verbose"):
+            import traceback
+
+            click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
+        sys.exit(1)
+
+
+@pipeline.command()
+@click.argument("pipeline_name", required=False)
+@click.option("--branch", "-b", required=True, help="Branch to run the pipeline on")
+@click.option("--verbose", "-v", is_flag=True, help="Show detailed API information and responses")
+@click.pass_context
+def run(ctx, pipeline_name, branch, verbose):
+    """Run a pipeline.
+
+    If PIPELINE_NAME is not provided, runs the pipeline for the current repository.
+    Runs the pipeline on the specified branch.
+
+    Examples:
+        sdo pipeline run --branch main
+        sdo pipeline run ai-question-api-precheck -b main
+        sdo pipeline run my-pipeline -b develop --verbose
+    """
+    try:
+        # Call the business logic
+        result = cmd_pipeline_run(pipeline_name, branch, verbose=verbose)
+
+        if result != 0:
+            sys.exit(result)
+
+    except (SDOError, ConfigurationError, ValidationError) as e:
+        click.echo(f"❌ {str(e)}", err=True)
+        if ctx.obj.get("verbose"):
+            click.echo(f"   Error type: {type(e).__name__}", err=True)
+            if hasattr(e, "details"):
+                click.echo(f"   Details: {e.details}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"❌ Unexpected error: {str(e)}", err=True)
+        if ctx.obj.get("verbose"):
+            import traceback
+
+            click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
+        sys.exit(1)
+
+
+@pipeline.command()
+@click.argument("build_id", type=int, required=False)
+@click.option("--verbose", "-v", is_flag=True, help="Show detailed API information and responses")
+@click.pass_context
+def status(ctx, build_id, verbose):
+    """Show status of a pipeline build.
+
+    If BUILD_ID is not provided, shows the status of the latest build/run.
+
+    Examples:
+        sdo pipeline status              # Show latest build/run status
+        sdo pipeline status 12345        # Show specific build/run status
+        sdo pipeline status 12345 --verbose
+    """
+    try:
+        # Call the business logic
+        result = cmd_pipeline_status(build_id, verbose=verbose)
+
+        if result != 0:
+            sys.exit(result)
+
+    except (SDOError, ConfigurationError, ValidationError) as e:
+        click.echo(f"❌ {str(e)}", err=True)
+        if ctx.obj.get("verbose"):
+            click.echo(f"   Error type: {type(e).__name__}", err=True)
+            if hasattr(e, "details"):
+                click.echo(f"   Details: {e.details}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"❌ Unexpected error: {str(e)}", err=True)
+        if ctx.obj.get("verbose"):
+            import traceback
+
+            click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
+        sys.exit(1)
+
+
+@pipeline.command()
+@click.argument("build_id", type=int, required=False)
+@click.option("--build-id", "build_id_option", type=int, help="Build ID to get logs for (alternative to positional argument)")
+@click.option("--verbose", "-v", is_flag=True, help="Show detailed API information and responses")
+@click.pass_context
+def logs(ctx, build_id, build_id_option, verbose):
+    """Show logs for a pipeline build.
+
+    Examples:
+        sdo pipeline logs 12345
+        sdo pipeline logs --build-id 12345
+        sdo pipeline logs 12345 --verbose
+    """
+    # Use build_id_option if provided, otherwise use positional build_id
+    final_build_id = build_id_option if build_id_option is not None else build_id
+
+    if final_build_id is None:
+        click.echo("❌ Build ID is required. Use 'sdo pipeline logs <build_id>' or 'sdo pipeline logs --build-id <build_id>'")
+        click.echo()
+        click.echo("Examples:")
+        click.echo("  sdo pipeline logs 12345")
+        click.echo("  sdo pipeline logs --build-id 12345")
+        sys.exit(1)
+
+    try:
+        # Call the business logic
+        result = cmd_pipeline_logs(final_build_id, verbose=verbose)
+
+        if result != 0:
+            sys.exit(result)
+
+    except (SDOError, ConfigurationError, ValidationError) as e:
+        click.echo(f"❌ {str(e)}", err=True)
+        if ctx.obj.get("verbose"):
+            click.echo(f"   Error type: {type(e).__name__}", err=True)
+            if hasattr(e, "details"):
+                click.echo(f"   Details: {e.details}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"❌ Unexpected error: {str(e)}", err=True)
+        if ctx.obj.get("verbose"):
+            import traceback
+
+            click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
+        sys.exit(1)
+
+
+@pipeline.command()
+@click.argument("pipeline_name", required=False)
+@click.option("--verbose", "-v", is_flag=True, help="Show detailed API information and responses")
+@click.pass_context
+def lastbuild(ctx, pipeline_name, verbose):
+    """Show information about the last build(s).
+
+    If PIPELINE_NAME is not provided, shows the last build for all pipelines
+    in the current repository. If PIPELINE_NAME is provided, shows the last
+    build for that specific pipeline.
+
+    Examples:
+        sdo pipeline lastbuild                    # Show all pipelines in current repo
+        sdo pipeline lastbuild approach-authserver  # Show specific pipeline
+        sdo pipeline lastbuild --verbose          # Show all with details
+    """
+    try:
+        # Call the business logic
+        result = cmd_pipeline_lastbuild(pipeline_name, verbose=verbose)
+
+        if result != 0:
+            sys.exit(result)
+
+    except (SDOError, ConfigurationError, ValidationError) as e:
+        click.echo(f"❌ {str(e)}", err=True)
+        if ctx.obj.get("verbose"):
+            click.echo(f"   Error type: {type(e).__name__}", err=True)
+            if hasattr(e, "details"):
+                click.echo(f"   Details: {e.details}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"❌ Unexpected error: {str(e)}", err=True)
+        if ctx.obj.get("verbose"):
+            import traceback
+
+            click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
+        sys.exit(1)
+
+
+@pipeline.command()
+@click.option("--verbose", "-v", is_flag=True, help="Show detailed API information and responses")
+@click.pass_context
+def update(ctx, verbose):
+    """Update the current pipeline configuration.
+
+    Checks if the pipeline configuration needs to be updated and provides
+    guidance on how to update it if necessary.
+
+    Examples:
+        sdo pipeline update
+        sdo pipeline update --verbose
+    """
+    try:
+        # Call the business logic
+        result = cmd_pipeline_update(verbose=verbose)
+
+        if result != 0:
+            sys.exit(result)
+
+    except (SDOError, ConfigurationError, ValidationError) as e:
+        click.echo(f"❌ {str(e)}", err=True)
+        if ctx.obj.get("verbose"):
+            click.echo(f"   Error type: {type(e).__name__}", err=True)
+            if hasattr(e, "details"):
+                click.echo(f"   Details: {e.details}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"❌ Unexpected error: {str(e)}", err=True)
+        if ctx.obj.get("verbose"):
+            import traceback
+
+            click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
+        sys.exit(1)
+
+
+@cli.command()
+@click.argument("platform", required=False, type=click.Choice(["gh", "azdo", "github", "azure-devops"]))
+@click.option("--all", is_flag=True, help="Show all mappings regardless of detected platform")
+@click.pass_context
+def map(ctx, platform, all):
+    """Show command mappings between SDO and native CLI tools.
+
+    Displays equivalent commands for GitHub CLI (gh) and Azure CLI (az) based on
+    the detected platform from your Git repository, or show all mappings.
+
+    Examples:
+        sdo map                    # Show mappings for detected platform
+        sdo map gh                 # Show GitHub CLI mappings
+        sdo map azdo               # Show Azure CLI mappings
+        sdo map --all              # Show all mappings
+
+    The mappings document is located at: sdo_package/mapping.md
+    """
+    try:
+        # Detect current platform
+        platform_info = extract_platform_info_from_git()
+        detected_platform = platform_info.get("platform", "unknown") if platform_info else "unknown"
+
+        # Normalize platform names
+        platform_map = {
+            "gh": "github",
+            "azdo": "azure-devops",
+            "github": "github",
+            "azure-devops": "azure-devops"
+        }
+
+        # Determine which platform to show
+        if all:
+            target_platform = None  # Show all
+        elif platform:
+            target_platform = platform_map.get(platform.lower())
+            if not target_platform:
+                click.echo(f"❌ Unknown platform: {platform}")
+                click.echo("Valid platforms: gh, azdo, github, azure-devops")
+                sys.exit(1)
+        else:
+            # Auto-detect
+            if detected_platform == "github":
+                target_platform = "github"
+            elif detected_platform == "azdo":
+                target_platform = "azure-devops"
+            else:
+                click.echo("⚠️  Could not detect platform from Git repository.")
+                click.echo("Showing all mappings. Use 'sdo map --all' to see everything.")
+                target_platform = None
+
+        # Read and parse the mapping file
+        # Try multiple locations: installed location first, then source location
+        mapping_file = None
+
+        # Check common installation directories first
+        install_dirs = [
+            r"C:\Program Files\NBuild",
+            r"C:\Program Files (x86)\NBuild",
+            os.path.dirname(os.path.dirname(os.path.dirname(__file__))),  # Parent of source
+        ]
+
+        for install_dir in install_dirs:
+            potential_path = os.path.join(install_dir, "mapping.md")
+            if os.path.exists(potential_path):
+                mapping_file = potential_path
+                break
+
+        # Fall back to source location
+        if not mapping_file:
+            mapping_file = os.path.join(os.path.dirname(__file__), "mapping.md")
+
+        if not os.path.exists(mapping_file):
+            click.echo(f"❌ Mapping file not found: {mapping_file}")
+            sys.exit(1)
+
+        with open(mapping_file, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        # Parse the markdown and extract relevant sections
+        lines = content.split("\n")
+        current_section = None
+        in_table = False
+        table_data = []
+        sections = {}
+
+        for line in lines:
+            line = line.strip()
+            if line.startswith("## "):
+                # New section
+                if current_section and table_data:
+                    sections[current_section] = table_data
+                current_section = line[3:].lower().replace(" ", "-")
+                table_data = []
+                in_table = False
+            elif line.startswith("|") and current_section:
+                # Table row
+                if not in_table:
+                    in_table = True
+                table_data.append(line)
+
+        # Add the last section
+        if current_section and table_data:
+            sections[current_section] = table_data
+
+        # Display header
+        click.echo("SDO Command Mappings")
+        click.echo("=" * 50)
+
+        if target_platform:
+            platform_name = "GitHub" if target_platform == "github" else "Azure DevOps"
+            click.echo(f"Platform: {platform_name} (detected: {detected_platform})")
+        else:
+            click.echo("Platform: All platforms")
+        click.echo()
+
+        # Display mappings
+        section_headers = {
+            "work-item-commands": "Work Item Commands",
+            "repository-commands": "Repository Commands",
+            "pull-request-commands": "Pull Request Commands",
+            "pipeline-commands": "Pipeline Commands"
+        }
+
+        found_mappings = False
+        for section_key, header in section_headers.items():
+            if section_key in sections:
+                section_data = sections[section_key]
+
+                # Filter by platform if specified
+                filtered_data = []
+                if target_platform:
+                    for row in section_data:
+                        if target_platform == "github" and ("github cli" in row.lower() or "gh " in row.lower()):
+                            filtered_data.append(row)
+                        elif target_platform == "azure-devops" and ("azure cli" in row.lower() or "az " in row.lower()):
+                            filtered_data.append(row)
+                else:
+                    filtered_data = section_data
+
+                if filtered_data:
+                    found_mappings = True
+                    click.echo(f"## {header}")
+                    click.echo()
+
+                    # Display filtered rows in a more readable format
+                    for row in filtered_data[2:]:  # Skip header rows
+                        if target_platform == "github":
+                            # Extract SDO and GitHub columns
+                            parts = row.split("|")
+                            if len(parts) >= 4:
+                                sdo_cmd = parts[1].strip()
+                                gh_cmd = parts[2].strip()
+                                if sdo_cmd and gh_cmd and not sdo_cmd.startswith("SDO Command"):
+                                    click.echo(f"  {sdo_cmd}")
+                                    click.echo(f"    → {gh_cmd}")
+                                    click.echo()
+                        elif target_platform == "azure-devops":
+                            # Extract SDO and Azure columns
+                            parts = row.split("|")
+                            if len(parts) >= 4:
+                                sdo_cmd = parts[1].strip()
+                                az_cmd = parts[3].strip()
+                                if sdo_cmd and az_cmd and not sdo_cmd.startswith("SDO Command"):
+                                    click.echo(f"  {sdo_cmd}")
+                                    click.echo(f"    → {az_cmd}")
+                                    click.echo()
+                        else:
+                            # Show all columns in readable format
+                            parts = row.split("|")
+                            if len(parts) >= 4:
+                                sdo_cmd = parts[1].strip()
+                                gh_cmd = parts[2].strip()
+                                az_cmd = parts[3].strip()
+                                if sdo_cmd and not sdo_cmd.startswith("SDO Command"):
+                                    click.echo(f"  {sdo_cmd}")
+                                    if gh_cmd:
+                                        click.echo(f"    GitHub:  {gh_cmd}")
+                                    if az_cmd:
+                                        click.echo(f"    Azure:   {az_cmd}")
+                                    click.echo()
+
+                    click.echo()
+
+        if not found_mappings:
+            click.echo("No mappings found for the specified platform.")
+            click.echo()
+
+        # Footer
+        click.echo("💡 Tip: Use 'sdo map --all' to see all platform mappings")
+        click.echo(f"📖 Full documentation: {mapping_file}")
+
+    except Exception as e:
+        click.echo(f"❌ Error reading mappings: {str(e)}", err=True)
+        if ctx.obj.get("verbose"):
+            import traceback
             click.echo(f"   Full traceback:\n{traceback.format_exc()}", err=True)
         sys.exit(1)
 

@@ -187,7 +187,7 @@ class GitHubRepositoryPlatform(RepositoryPlatform):
         try:
             import subprocess
 
-            result = subprocess.run(["gh", "auth", "status"], capture_output=True, text=True)
+            result = subprocess.run(["gh", "auth", "status"], capture_output=True, text=True, encoding='utf-8', errors='replace')
             if result.returncode == 0:
                 return True
             else:
@@ -221,7 +221,7 @@ class GitHubRepositoryPlatform(RepositoryPlatform):
             if self.verbose:
                 print(f"Running: {' '.join(cmd)}")
 
-            result = subprocess.run(cmd, capture_output=True, text=True)
+            result = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8', errors='replace')
 
             if result.returncode == 0:
                 print(f"✓ Created repository '{self.config['owner']}/{name}' successfully")
@@ -253,7 +253,7 @@ class GitHubRepositoryPlatform(RepositoryPlatform):
             if self.verbose:
                 print(f"Running: {' '.join(cmd)}")
 
-            result = subprocess.run(cmd, capture_output=True, text=True)
+            result = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8', errors='replace')
 
             if result.returncode == 0:
                 repo_data = json.loads(result.stdout)
@@ -296,7 +296,7 @@ class GitHubRepositoryPlatform(RepositoryPlatform):
             if self.verbose:
                 print(f"Running: {' '.join(cmd)}")
 
-            result = subprocess.run(cmd, capture_output=True, text=True)
+            result = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8', errors='replace')
 
             if result.returncode == 0:
                 repos_data = json.loads(result.stdout)
@@ -341,7 +341,7 @@ class GitHubRepositoryPlatform(RepositoryPlatform):
             if self.verbose:
                 print(f"Running: {' '.join(cmd)}")
 
-            result = subprocess.run(cmd, capture_output=True, text=True)
+            result = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8', errors='replace')
 
             if result.returncode == 0:
                 print(f"✓ Deleted repository '{self.config['owner']}/{name}' successfully")

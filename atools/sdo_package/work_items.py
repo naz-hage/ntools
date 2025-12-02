@@ -814,20 +814,13 @@ def _cmd_workitem_update_azdo(args, config):
 
 def _cmd_workitem_update_github(args, config):
     """Handle GitHub issue update."""
-    # Build gh issue edit command
-    cmd = ["gh", "issue", "edit", str(args.id), "--repo", f"{config['owner']}/{config['repo']}"]
+    issue_id = str(args.id)
+    repo_arg = f"{config['owner']}/{config['repo']}"
 
-    if getattr(args, "title", None):
-        cmd.extend(["--title", args.title])
+    # Track if we made any changes
+    changes_made = False
 
-    if getattr(args, "description", None):
-        cmd.extend(["--body", args.description])
-
-    # Note: GitHub uses assignee (singular) for setting one assignee
-    if getattr(args, "assigned_to", None):
-        cmd.extend(["--add-assignee", args.assigned_to])
-
-    # Map state to GitHub state (open/closed)
+    # Handle state changes separately (close/reopen commands)
     if getattr(args, "state", None):
         state_map = {
             "New": "open",
@@ -837,33 +830,58 @@ def _cmd_workitem_update_github(args, config):
             "Closed": "closed",
         }
         gh_state = state_map.get(args.state, args.state.lower())
-        if gh_state == "closed":
-            cmd.append("--closed")
-        elif gh_state == "open":
-            cmd.append("--reopen")
 
-    try:
-        _result = subprocess.run(cmd, capture_output=True, text=True, check=True)  # noqa: F841
-        print(f"✅ Issue #{args.id} updated successfully")
-        if getattr(args, "verbose", False):
-            print(f"   URL: https://github.com/{config['owner']}/{config['repo']}/issues/{args.id}")
+        try:
+            if gh_state == "closed":
+                # Close the issue
+                cmd = ["gh", "issue", "close", issue_id, "--repo", repo_arg]
+                subprocess.run(cmd, capture_output=True, text=True, check=True)
+                print(f"✅ Issue #{args.id} closed")
+                changes_made = True
+            elif gh_state == "open":
+                # Reopen the issue
+                cmd = ["gh", "issue", "reopen", issue_id, "--repo", repo_arg]
+                subprocess.run(cmd, capture_output=True, text=True, check=True)
+                print(f"✅ Issue #{args.id} reopened")
+                changes_made = True
+        except subprocess.CalledProcessError as e:
+            print(f"❌ Failed to update issue state: {e.stderr}")
+            return 1
+
+    # Handle other field updates with gh issue edit
+    edit_cmd = ["gh", "issue", "edit", issue_id, "--repo", repo_arg]
+    fields_to_update = False
+
+    if getattr(args, "title", None):
+        edit_cmd.extend(["--title", args.title])
+        fields_to_update = True
+
+    if getattr(args, "description", None):
+        edit_cmd.extend(["--body", args.description])
+        fields_to_update = True
+
+    # Note: GitHub uses assignee (singular) for setting one assignee
+    if getattr(args, "assigned_to", None):
+        edit_cmd.extend(["--add-assignee", args.assigned_to])
+        fields_to_update = True
+
+    # Only run edit command if there are fields to update
+    if fields_to_update:
+        try:
+            _result = subprocess.run(edit_cmd, capture_output=True, text=True, check=True)  # noqa: F841
+            print(f"✅ Issue #{args.id} fields updated")
+        except subprocess.CalledProcessError as e:
+            print(f"❌ Failed to update issue fields: {e.stderr}")
+            return 1
+
+    if not changes_made:
+        print(f"ℹ️  No changes specified for issue #{args.id}")
         return 0
 
-    except subprocess.CalledProcessError as e:
-        print(f"❌ Failed to update issue #{args.id}")
-        if getattr(args, "verbose", False):
-            print(f"Error: {e.stderr}")
-        return 1
-    except FileNotFoundError:
-        print("❌ GitHub CLI (gh) not found. Please install from https://cli.github.com/")
-        return 1
-    except Exception as e:
-        print(f"❌ Error updating issue: {e}")
-        if getattr(args, "verbose", False):
-            import traceback
-
-            traceback.print_exc()
-        return 1
+    print(f"✅ Issue #{args.id} updated successfully")
+    if getattr(args, "verbose", False):
+        print(f"   URL: https://github.com/{config['owner']}/{config['repo']}/issues/{args.id}")
+    return 0
 
 
 def cmd_workitem_comment(args):

@@ -11,6 +11,7 @@ This page documents the `sdo` CLI tool. Use this page for detailed prerequisites
 - **Work Item Creation**: Parse markdown files and create GitHub issues or Azure DevOps work items (PBIs, Bugs, Tasks)
 - **Repository Management**: Create, list, show, and delete repositories on both platforms
 - **Pull Request Management**: Create, list, show, and update pull requests with work item linking
+- **Pipeline Management**: Create, run, monitor, and manage CI/CD pipelines across platforms
 - **Multi-Platform Support**: Seamless operations across Azure DevOps and GitHub
 - **Dry-Run Previews**: Preview operations before execution
 - **Automatic Platform Detection**: Detects platform from Git remote configuration
@@ -473,6 +474,454 @@ Running a workflow (Release)    pass    3m24s   https://github.com/naz-hage/ntoo
 sdo pr update --pr-id 211 --title "Updated: Implement PR Management"
 ```
 
+### Pipeline Operations
+
+#### Create Pipeline
+
+```bash
+sdo pipeline create [OPTIONS]
+```
+
+Creates a new pipeline/workflow in the current project.
+
+**Options:**
+- `-v, --verbose` - Show detailed API information
+
+**Examples:**
+```bash
+sdo pipeline create
+sdo pipeline create --verbose
+```
+
+## How Pipeline Creation Works
+
+The `sdo pipeline create` command automatically detects your platform and creates pipelines differently for each:
+
+### Azure DevOps Pipeline Creation
+
+**What it does:**
+1. **Validates YAML file exists locally** - Checks that the pipeline YAML file exists before creating the pipeline definition
+2. **Auto-detects configuration** from your Git remote:
+   - Organization: `your-org`
+   - Project: `your-project` 
+   - Repository: `your-repo`
+   - Pipeline Name: `your-repo` (same as repository name)
+   - YAML Path: `.azure-pipelines/azurepipeline.yml`
+   - Folder: `\` (root folder)
+
+3. **Creates the pipeline** using Azure DevOps REST API
+4. **Links to existing YAML file** in your repository
+
+**Prerequisites:**
+- Repository must contain a pipeline YAML file at `.azure-pipelines/azurepipeline.yml`
+- `AZURE_DEVOPS_PAT` environment variable must be set
+- User must have "Edit build pipeline" permissions
+
+**What happens during creation:**
+```
+✅ Detected Azure DevOps repository:
+   Organization: contoso
+   Project: my-project
+   Repository: my-app
+   Pipeline Name: my-app
+   Pipeline YAML Path: .azure-pipelines/azurepipeline.yml
+   Pipeline Folder: \
+
+✅ Pipeline YAML file found: .azure-pipelines/azurepipeline.yml
+Creating pipeline 'my-app'...
+✅ Pipeline created successfully!
+   ID: 12345
+   Name: my-app
+   URL: https://dev.azure.com/contoso/my-project/_build?definitionId=12345
+   Folder: \
+```
+
+**Error if YAML file missing:**
+```
+❌ Pipeline YAML file not found: .azure-pipelines/azurepipeline.yml
+Please create the pipeline YAML file before creating the pipeline definition.
+
+Example YAML file structure:
+  .azure-pipelines/azurepipeline.yml
+  trigger:
+  - main
+
+  pool:
+    vmImage: 'ubuntu-latest'
+
+  steps:
+  - script: echo Hello, world!
+    displayName: 'Run a one-line script'
+```
+
+### GitHub Actions Workflow Creation
+
+**Important:** SDO does **not** create GitHub workflow files automatically.
+
+**What it does:**
+- **Checks for existing workflows** in `.github/workflows/` directory
+- **Lists existing workflow files** if any are found
+- **Provides guidance** for manual workflow creation
+
+**Manual creation steps:**
+1. Create the workflows directory:
+   ```bash
+   mkdir -p .github/workflows
+   ```
+
+2. Create a workflow YAML file (e.g., `ci.yml`):
+   ```yaml
+   # .github/workflows/ci.yml
+   name: CI
+   
+   on:
+     push:
+       branches: [ main ]
+     pull_request:
+       branches: [ main ]
+   
+   jobs:
+     build:
+       runs-on: ubuntu-latest
+       
+       steps:
+       - uses: actions/checkout@v4
+       - name: Run a one-line script
+         run: echo Hello, world!
+   ```
+
+3. Commit and push the workflow file:
+   ```bash
+   git add .github/workflows/ci.yml
+   git commit -m "Add CI workflow"
+   git push
+   ```
+
+**SDO output for GitHub (no existing workflows):**
+```
+GitHub Actions workflows are created by adding YAML files to .github/workflows/
+SDO does not create workflow files automatically.
+
+To create a workflow:
+1. Create the directory: mkdir -p .github/workflows
+2. Add a workflow YAML file (e.g., ci.yml)
+3. Commit and push the changes
+
+Example workflow file (.github/workflows/ci.yml):
+  name: CI
+  on:
+    push:
+      branches: [ main ]
+    pull_request:
+      branches: [ main ]
+  jobs:
+    build:
+      runs-on: ubuntu-latest
+      steps:
+      - uses: actions/checkout@v4
+      - name: Run tests
+        run: echo 'Add your test commands here'
+```
+
+**SDO output for GitHub (with existing workflows):**
+```
+GitHub Actions workflows found in your repository:
+  • ntools.yml
+  • ci.yml
+
+Your repository already has workflow files.
+To create additional workflows, add more YAML files to .github/workflows/
+and commit/push them to trigger GitHub Actions.
+```
+
+**SDO output for GitHub (no existing workflows):**
+```
+GitHub Actions workflows are created by adding YAML files to .github/workflows/
+SDO does not create workflow files automatically.
+
+To create a workflow:
+1. Create the directory: mkdir -p .github/workflows
+2. Add a workflow YAML file (e.g., ci.yml)
+3. Commit and push the changes
+
+Example workflow file (.github/workflows/ci.yml):
+  name: CI
+  on:
+    push:
+      branches: [ main ]
+    pull_request:
+      branches: [ main ]
+  jobs:
+    build:
+      runs-on: ubuntu-latest
+      steps:
+      - uses: actions/checkout@v4
+      - name: Run tests
+        run: echo 'Add your test commands here'
+```
+
+### Platform Detection
+
+SDO automatically detects your platform from Git remote URLs:
+
+**Azure DevOps URLs:**
+- `https://dev.azure.com/organization/project/_git/repository`
+- `https://organization@dev.azure.com/organization/project/_git/repository`
+
+**GitHub URLs:**
+- `https://github.com/owner/repository.git`
+- `git@github.com:owner/repository.git`
+
+### Common Issues
+
+**Azure DevOps Issues:**
+- **"YAML file not found"**: Ensure `.azure-pipelines/azurepipeline.yml` exists in your repository
+- **"Access denied"**: Check PAT permissions include "Build (Read & execute)"
+- **"Pipeline already exists"**: Pipeline with that name already exists (command exits successfully)
+
+**GitHub Issues:**
+- **Manual process required**: GitHub workflows cannot be created via API
+- **File naming**: Use lowercase with hyphens (e.g., `ci.yml`, not `CI.yml`)
+
+### Pipeline Naming Convention
+
+**Azure DevOps:** Pipeline name defaults to repository name
+**GitHub:** Workflow name comes from the `name:` field in YAML or filename
+
+### Security Considerations
+
+- **Azure DevOps PAT** requires appropriate permissions
+- **GitHub workflows** run with repository permissions
+- **YAML files** should be reviewed before committing
+
+#### List Pipelines
+
+```bash
+sdo pipeline ls [OPTIONS]
+```
+
+Lists pipelines in the current project or repository.
+
+**Options:**
+- `--repo REPO` - Filter pipelines by repository name
+- `--all` - Show all pipelines in the project (default: current repository only)
+- `-v, --verbose` - Show detailed API information
+
+**Examples:**
+```bash
+# List pipelines for current repository
+sdo pipeline ls
+
+# List pipelines for specific repository
+sdo pipeline ls --repo my-repo
+
+# List all pipelines in project
+sdo pipeline ls --all
+
+# List with verbose output
+sdo pipeline ls --verbose
+```
+
+#### Show Pipeline
+
+```bash
+sdo pipeline show [OPTIONS]
+```
+
+Shows detailed information about the current pipeline.
+
+**Options:**
+- `-v, --verbose` - Show detailed API information
+
+**Examples:**
+```bash
+sdo pipeline show
+sdo pipeline show --verbose
+```
+
+#### Delete Pipeline
+
+```bash
+sdo pipeline delete [OPTIONS]
+```
+
+Deletes the current pipeline (with confirmation prompt).
+
+**Options:**
+- `-v, --verbose` - Show detailed API information
+
+**Examples:**
+```bash
+sdo pipeline delete  # Will prompt for confirmation
+```
+
+#### Run Pipeline
+
+```bash
+sdo pipeline run [PIPELINE_NAME] --branch BRANCH [OPTIONS]
+```
+
+Runs a pipeline on the specified branch.
+
+**Arguments:**
+- `PIPELINE_NAME` - Name of pipeline to run (optional, uses current repository pipeline if not specified)
+
+**Options:**
+- `-b, --branch BRANCH` - Branch to run pipeline on (required)
+- `-v, --verbose` - Show detailed API information
+
+**Examples:**
+```bash
+# Run current repository pipeline on main branch
+sdo pipeline run --branch main
+
+# Run specific pipeline on develop branch
+sdo pipeline run my-pipeline --branch develop
+
+# Run with verbose output
+sdo pipeline run --branch main --verbose
+```
+
+#### Check Pipeline Status
+
+```bash
+sdo pipeline status [BUILD_ID] [OPTIONS]
+```
+
+Shows the status of a pipeline build/run.
+
+**Arguments:**
+- `BUILD_ID` - Specific build ID to check (optional, shows latest if not specified)
+
+**Options:**
+- `-v, --verbose` - Show detailed API information
+
+**Examples:**
+```bash
+# Show latest build status
+sdo pipeline status
+
+# Show specific build status
+sdo pipeline status 12345
+
+# Show with verbose API details
+sdo pipeline status 12345 --verbose
+```
+
+#### Show Pipeline Logs
+
+```bash
+sdo pipeline logs [BUILD_ID] [OPTIONS]
+```
+
+Shows logs for a pipeline build/run.
+
+**Arguments:**
+- `BUILD_ID` - Build ID to get logs for (required)
+
+**Options:**
+- `--build-id BUILD_ID` - Alternative way to specify build ID
+- `-v, --verbose` - Show detailed API information
+
+**Examples:**
+```bash
+# Show logs for build ID 12345
+sdo pipeline logs 12345
+
+# Alternative syntax
+sdo pipeline logs --build-id 12345
+
+# Show with verbose output
+sdo pipeline logs 12345 --verbose
+```
+
+#### Show Last Build
+
+```bash
+sdo pipeline lastbuild [OPTIONS]
+```
+
+Shows information about the last build of the current pipeline.
+
+**Options:**
+- `-v, --verbose` - Show detailed API information
+
+**Examples:**
+```bash
+sdo pipeline lastbuild
+sdo pipeline lastbuild --verbose
+```
+
+#### Update Pipeline
+
+```bash
+sdo pipeline update [OPTIONS]
+```
+
+Checks if the pipeline configuration needs updating and provides guidance.
+
+**Options:**
+- `-v, --verbose` - Show detailed API information
+
+**Examples:**
+```bash
+sdo pipeline update
+sdo pipeline update --verbose
+```
+
+### Examples
+
+#### Pipeline Operations
+
+##### Create Pipeline
+
+```bash
+sdo pipeline create
+```
+
+##### List Pipelines
+
+```bash
+# List all pipelines for current repository
+sdo pipeline ls
+
+# List all pipelines in project
+sdo pipeline ls --all
+```
+
+##### Run Pipeline
+
+```bash
+# Run pipeline on main branch
+sdo pipeline run --branch main
+
+# Run specific pipeline
+sdo pipeline run ci-pipeline --branch feature-branch
+```
+
+##### Check Pipeline Status
+
+```bash
+# Check latest build status
+sdo pipeline status
+
+# Check specific build
+sdo pipeline status 12345
+```
+
+##### View Pipeline Logs
+
+```bash
+# View logs for build 12345
+sdo pipeline logs 12345
+```
+
+##### Show Last Build Information
+
+```bash
+sdo pipeline lastbuild
+```
+
 ## Markdown File Format
 
 SDO expects markdown files with specific metadata headers. See the example files:
@@ -505,6 +954,7 @@ Description content here...
 - **Work Item Fields**: Title, Description, Area Path, Iteration Path, Priority, Effort
 - **Repository Operations**: Create, List, Show, Delete repositories
 - **Pull Request Operations**: Create, List, Show, Update pull requests with work item linking
+- **Pipeline Operations**: Create, Run, Monitor, Update CI/CD pipelines
 - **Authentication**: Personal Access Token (PAT)
 - **API**: REST API integration
 - **Automatic**: Organization/Project detection from Git remote
@@ -514,6 +964,7 @@ Description content here...
 - **Work Item Fields**: Title, Description, Labels, Assignees
 - **Repository Operations**: Create, List, Show, Delete repositories
 - **Pull Request Operations**: Create, List, Show, Update pull requests with issue references
+- **Pipeline Operations**: Run, Monitor GitHub Actions workflows
 - **Authentication**: GitHub CLI (`gh`) or Personal Access Token
 - **API**: GitHub CLI integration for repositories, REST API for work items and PRs
 - **Automatic**: Repository detection from Git remote
@@ -551,6 +1002,7 @@ All major functionality is tested with comprehensive test cases covering:
 - Work item creation workflows
 - Repository management operations
 - Pull request management operations (create, list, show, update)
+- Pipeline management operations (create, run, monitor, update)
 - Multi-platform API integrations
 - Error handling and validation
 - CLI command interfaces
@@ -622,6 +1074,7 @@ SDO is built with a modular architecture:
 - **`client.py`** - Azure DevOps REST API client
 - **`work_items.py`** - Business logic for work item operations
 - **`pull_requests.py`** - Business logic for pull request operations
+- **`pipelines.py`** - Business logic for pipeline operations
 - **`platforms/`** - Platform-specific implementations (GitHub, Azure DevOps)
   - `github_pr_platform.py` - GitHub pull request operations
   - `azdo_pr_platform.py` - Azure DevOps pull request operations

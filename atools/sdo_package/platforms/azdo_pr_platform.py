@@ -318,8 +318,7 @@ class AzureDevOpsPullRequestPlatform(PRPlatform):
                     "author": pr.get("createdBy", {}).get("displayName"),
                     "source_branch": pr.get("sourceRefName", "").replace("refs/heads/", ""),
                     "target_branch": pr.get("targetRefName", "").replace("refs/heads/", ""),
-                    "url": pr.get("url")
-                    or f"{self.client.base_url}/_git/{self._repository}/pullrequest/{pr.get('pullRequestId')}",
+                    "url": f"{self.client.base_url}/_git/{self._repository}/pullrequest/{pr.get('pullRequestId')}",
                     "created_at": pr.get("creationDate"),
                     "updated_at": pr.get("creationDate"),
                 }
