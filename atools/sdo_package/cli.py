@@ -833,23 +833,27 @@ def ls(ctx, repo, show_all, verbose):
 
 
 @pipeline.command()
+@click.argument("pipeline_name", required=False)
+@click.option("--force", "-f", is_flag=True, help="Skip confirmation prompt")
 @click.option("--verbose", "-v", is_flag=True, help="Show detailed API information and responses")
 @click.pass_context
-def delete(ctx, verbose):
-    """Delete the current pipeline.
+def delete(ctx, pipeline_name, force, verbose):
+    """Delete a pipeline.
 
     ⚠️  WARNING: This action cannot be undone!
 
-    The pipeline name is extracted from the current Git remote.
-    You will be prompted to confirm before deletion.
+    If PIPELINE_NAME is not provided, the pipeline name is extracted from the current Git remote.
+    You will be prompted to confirm before deletion unless --force is used.
 
     Examples:
-        sdo pipeline delete
-        sdo pipeline delete --verbose
+        sdo pipeline delete                    # Delete current pipeline (from git remote)
+        sdo pipeline delete my-pipeline        # Delete specific pipeline
+        sdo pipeline delete my-pipeline --force  # Delete without confirmation
+        sdo pipeline delete --verbose          # Show API details
     """
     try:
         # Call the business logic
-        result = cmd_pipeline_delete(verbose=verbose)
+        result = cmd_pipeline_delete(pipeline_name=pipeline_name, force=force, verbose=verbose)
 
         if result != 0:
             sys.exit(result)

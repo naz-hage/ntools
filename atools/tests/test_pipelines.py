@@ -34,6 +34,7 @@ from sdo_package.pipelines import (
     cmd_pipeline_logs,
     cmd_pipeline_lastbuild,
     cmd_pipeline_update,
+    cmd_azdo_pipeline_delete,
 )
 
 
@@ -316,8 +317,178 @@ class TestGitHubWorkflowCommands:
         mock_run.assert_called_with(['workflow', 'view', 'auto-detected-workflow'], False)
 
 
-class TestUnifiedCommandHandlers:
-    """Test unified command handlers for both platforms."""
+class TestAzureDevOpsPipelineDelete:
+    """Test Azure DevOps pipeline delete functionality."""
+
+    @patch('sdo_package.pipelines.get_pipeline_config')
+    @patch('sdo_package.pipelines.get_personal_access_token')
+    @patch('sdo_package.pipelines.AzureDevOpsClient')
+    def test_cmd_azdo_pipeline_delete_with_pipeline_name(self, mock_client_class, mock_pat, mock_config):
+        """Test Azure DevOps pipeline delete with specific pipeline name."""
+        mock_config.return_value = {
+            'organization': 'testorg',
+            'project': 'testproject',
+            'pipelineName': 'auto-detected-pipeline'
+        }
+        mock_pat.return_value = 'test-pat'
+        mock_client = MagicMock()
+        mock_client_class.return_value = mock_client
+        mock_client.delete_pipeline.return_value = True
+
+        result = cmd_azdo_pipeline_delete(pipeline_name='my-custom-pipeline', force=True)
+
+        assert result == 0
+        mock_client.delete_pipeline.assert_called_once_with('my-custom-pipeline')
+
+    @patch('sdo_package.pipelines.get_pipeline_config')
+    @patch('sdo_package.pipelines.get_personal_access_token')
+    @patch('sdo_package.pipelines.AzureDevOpsClient')
+    def test_cmd_azdo_pipeline_delete_auto_detect_name(self, mock_client_class, mock_pat, mock_config):
+        """Test Azure DevOps pipeline delete with auto-detected pipeline name."""
+        mock_config.return_value = {
+            'organization': 'testorg',
+            'project': 'testproject',
+            'pipelineName': 'auto-detected-pipeline'
+        }
+        mock_pat.return_value = 'test-pat'
+        mock_client = MagicMock()
+        mock_client_class.return_value = mock_client
+        mock_client.delete_pipeline.return_value = True
+
+        result = cmd_azdo_pipeline_delete(force=True)  # No pipeline_name provided
+
+        assert result == 0
+        mock_client.delete_pipeline.assert_called_once_with('auto-detected-pipeline')
+
+    @patch('sdo_package.pipelines.get_pipeline_config')
+    @patch('sdo_package.pipelines.get_personal_access_token')
+    @patch('builtins.input')
+    @patch('sdo_package.pipelines.AzureDevOpsClient')
+    def test_cmd_azdo_pipeline_delete_with_confirmation_yes(self, mock_client_class, mock_input, mock_pat, mock_config):
+        """Test Azure DevOps pipeline delete with user confirmation (yes)."""
+        mock_config.return_value = {
+            'organization': 'testorg',
+            'project': 'testproject',
+            'pipelineName': 'test-pipeline'
+        }
+        mock_pat.return_value = 'test-pat'
+        mock_input.return_value = 'yes'
+        mock_client = MagicMock()
+        mock_client_class.return_value = mock_client
+        mock_client.delete_pipeline.return_value = True
+
+        result = cmd_azdo_pipeline_delete(force=False)  # Confirmation required
+
+        assert result == 0
+        mock_client.delete_pipeline.assert_called_once_with('test-pipeline')
+        mock_input.assert_called_once_with("Are you sure you want to continue? (yes/no): ")
+
+    @patch('sdo_package.pipelines.get_pipeline_config')
+    @patch('sdo_package.pipelines.get_personal_access_token')
+    @patch('builtins.input')
+    @patch('sdo_package.pipelines.AzureDevOpsClient')
+    def test_cmd_azdo_pipeline_delete_with_confirmation_no(self, mock_client_class, mock_input, mock_pat, mock_config):
+        """Test Azure DevOps pipeline delete with user confirmation (no)."""
+        mock_config.return_value = {
+            'organization': 'testorg',
+            'project': 'testproject',
+            'pipelineName': 'test-pipeline'
+        }
+        mock_pat.return_value = 'test-pat'
+        mock_input.return_value = 'no'
+        mock_client = MagicMock()
+        mock_client_class.return_value = mock_client
+
+        result = cmd_azdo_pipeline_delete(force=False)  # Confirmation required
+
+        assert result == 0
+        mock_client.delete_pipeline.assert_not_called()
+        mock_input.assert_called_once_with("Are you sure you want to continue? (yes/no): ")
+
+    @patch('sdo_package.pipelines.get_pipeline_config')
+    @patch('sdo_package.pipelines.get_personal_access_token')
+    @patch('builtins.input')
+    @patch('sdo_package.pipelines.AzureDevOpsClient')
+    def test_cmd_azdo_pipeline_delete_keyboard_interrupt(self, mock_client_class, mock_input, mock_pat, mock_config):
+        """Test Azure DevOps pipeline delete with keyboard interrupt during confirmation."""
+        mock_config.return_value = {
+            'organization': 'testorg',
+            'project': 'testproject',
+            'pipelineName': 'test-pipeline'
+        }
+        mock_pat.return_value = 'test-pat'
+        mock_input.side_effect = KeyboardInterrupt()
+        mock_client = MagicMock()
+        mock_client_class.return_value = mock_client
+
+        result = cmd_azdo_pipeline_delete(force=False)  # Confirmation required
+
+        assert result == 0
+        mock_client.delete_pipeline.assert_not_called()
+
+    @patch('sdo_package.pipelines.get_pipeline_config')
+    @patch('sdo_package.pipelines.get_personal_access_token')
+    @patch('sdo_package.pipelines.AzureDevOpsClient')
+    def test_cmd_azdo_pipeline_delete_success(self, mock_client_class, mock_pat, mock_config):
+        """Test successful Azure DevOps pipeline delete."""
+        mock_config.return_value = {
+            'organization': 'testorg',
+            'project': 'testproject',
+            'pipelineName': 'test-pipeline'
+        }
+        mock_pat.return_value = 'test-pat'
+        mock_client = MagicMock()
+        mock_client_class.return_value = mock_client
+        mock_client.delete_pipeline.return_value = True
+
+        result = cmd_azdo_pipeline_delete(force=True)
+
+        assert result == 0
+        mock_client.delete_pipeline.assert_called_once_with('test-pipeline')
+
+    @patch('sdo_package.pipelines.get_pipeline_config')
+    @patch('sdo_package.pipelines.get_personal_access_token')
+    @patch('sdo_package.pipelines.AzureDevOpsClient')
+    def test_cmd_azdo_pipeline_delete_failure(self, mock_client_class, mock_pat, mock_config):
+        """Test failed Azure DevOps pipeline delete."""
+        mock_config.return_value = {
+            'organization': 'testorg',
+            'project': 'testproject',
+            'pipelineName': 'test-pipeline'
+        }
+        mock_pat.return_value = 'test-pat'
+        mock_client = MagicMock()
+        mock_client_class.return_value = mock_client
+        mock_client.delete_pipeline.return_value = False
+
+        result = cmd_azdo_pipeline_delete(force=True)
+
+        assert result == 1
+        mock_client.delete_pipeline.assert_called_once_with('test-pipeline')
+
+    @patch('sdo_package.pipelines.get_pipeline_config')
+    def test_cmd_azdo_pipeline_delete_config_failure(self, mock_config):
+        """Test Azure DevOps pipeline delete with config failure."""
+        mock_config.return_value = None
+
+        result = cmd_azdo_pipeline_delete()
+
+        assert result == 1
+
+    @patch('sdo_package.pipelines.get_pipeline_config')
+    @patch('sdo_package.pipelines.get_personal_access_token')
+    def test_cmd_azdo_pipeline_delete_missing_pat(self, mock_pat, mock_config):
+        """Test Azure DevOps pipeline delete with missing PAT."""
+        mock_config.return_value = {
+            'organization': 'testorg',
+            'project': 'testproject',
+            'pipelineName': 'test-pipeline'
+        }
+        mock_pat.return_value = None
+
+        result = cmd_azdo_pipeline_delete()
+
+        assert result == 1
 
     @patch('sdo_package.pipelines.get_pipeline_config')
     def test_cmd_pipeline_create_github(self, mock_config):
@@ -479,6 +650,50 @@ class TestUnifiedCommandHandlers:
         result = cmd_pipeline_delete()
 
         assert result == 0
+
+    @patch('sdo_package.pipelines.get_pipeline_config')
+    def test_cmd_pipeline_delete_azdo_with_pipeline_name(self, mock_config):
+        """Test pipeline delete command for Azure DevOps with specific pipeline name."""
+        mock_config.return_value = {'platform': 'azdo'}
+
+        with patch('sdo_package.pipelines.cmd_azdo_pipeline_delete') as mock_cmd:
+            mock_cmd.return_value = 0
+            result = cmd_pipeline_delete(pipeline_name='my-pipeline')
+            assert result == 0
+            mock_cmd.assert_called_once_with(pipeline_name='my-pipeline', force=False, verbose=False)
+
+    @patch('sdo_package.pipelines.get_pipeline_config')
+    def test_cmd_pipeline_delete_azdo_with_force(self, mock_config):
+        """Test pipeline delete command for Azure DevOps with force flag."""
+        mock_config.return_value = {'platform': 'azdo'}
+
+        with patch('sdo_package.pipelines.cmd_azdo_pipeline_delete') as mock_cmd:
+            mock_cmd.return_value = 0
+            result = cmd_pipeline_delete(pipeline_name='my-pipeline', force=True)
+            assert result == 0
+            mock_cmd.assert_called_once_with(pipeline_name='my-pipeline', force=True, verbose=False)
+
+    @patch('sdo_package.pipelines.get_pipeline_config')
+    def test_cmd_pipeline_delete_azdo_with_verbose(self, mock_config):
+        """Test pipeline delete command for Azure DevOps with verbose flag."""
+        mock_config.return_value = {'platform': 'azdo'}
+
+        with patch('sdo_package.pipelines.cmd_azdo_pipeline_delete') as mock_cmd:
+            mock_cmd.return_value = 0
+            result = cmd_pipeline_delete(pipeline_name='my-pipeline', force=False, verbose=True)
+            assert result == 0
+            mock_cmd.assert_called_once_with(pipeline_name='my-pipeline', force=False, verbose=True)
+
+    @patch('sdo_package.pipelines.get_pipeline_config')
+    def test_cmd_pipeline_delete_azdo_auto_detect(self, mock_config):
+        """Test pipeline delete command for Azure DevOps with auto-detected pipeline name."""
+        mock_config.return_value = {'platform': 'azdo'}
+
+        with patch('sdo_package.pipelines.cmd_azdo_pipeline_delete') as mock_cmd:
+            mock_cmd.return_value = 0
+            result = cmd_pipeline_delete()  # No pipeline_name provided
+            assert result == 0
+            mock_cmd.assert_called_once_with(pipeline_name=None, force=False, verbose=False)
 
     @patch('sdo_package.pipelines.get_pipeline_config')
     def test_cmd_pipeline_update_github(self, mock_config):

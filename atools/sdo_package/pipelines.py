@@ -335,7 +335,7 @@ def cmd_azdo_pipeline_list(config: dict = None, repo_filter: str = None, show_al
         return 1
 
 
-def cmd_azdo_pipeline_delete(verbose: bool = False) -> int:
+def cmd_azdo_pipeline_delete(pipeline_name: str = None, force: bool = False, verbose: bool = False) -> int:
     """Handle 'sdo pipeline delete' command for Azure DevOps."""
     # Get configuration (auto-extract from Git if needed)
     config = get_pipeline_config()
@@ -357,20 +357,24 @@ def cmd_azdo_pipeline_delete(verbose: bool = False) -> int:
         print("Please set AZURE_DEVOPS_PAT environment variable.")
         return 1
 
-    # Get pipeline name from config (always available from Git extraction)
-    pipeline_name = config['pipelineName']
+    # Use provided pipeline name or get from config (always available from Git extraction)
+    if pipeline_name:
+        target_pipeline_name = pipeline_name
+    else:
+        target_pipeline_name = config['pipelineName']
 
-    # Confirm deletion
-    print(f"⚠️  WARNING: This will permanently delete the pipeline '{pipeline_name}'!")
-    print("This action cannot be undone.")
-    try:
-        confirm = input("Are you sure you want to continue? (yes/no): ").strip().lower()
-        if confirm not in ['yes', 'y']:
-            print("Pipeline deletion cancelled.")
+    # If force flag is not set, confirm deletion
+    if not force:
+        print(f"⚠️  WARNING: This will permanently delete the pipeline '{target_pipeline_name}'!")
+        print("This action cannot be undone.")
+        try:
+            confirm = input("Are you sure you want to continue? (yes/no): ").strip().lower()
+            if confirm not in ['yes', 'y']:
+                print("Pipeline deletion cancelled.")
+                return 0
+        except KeyboardInterrupt:
+            print("\nPipeline deletion cancelled.")
             return 0
-    except KeyboardInterrupt:
-        print("\nPipeline deletion cancelled.")
-        return 0
 
     # Initialize Azure DevOps client
     client = AzureDevOpsClient(
@@ -381,8 +385,8 @@ def cmd_azdo_pipeline_delete(verbose: bool = False) -> int:
     )
 
     # Delete pipeline
-    print(f"Deleting pipeline '{pipeline_name}'...")
-    if client.delete_pipeline(pipeline_name):
+    print(f"Deleting pipeline '{target_pipeline_name}'...")
+    if client.delete_pipeline(target_pipeline_name):
         print("✓ Pipeline deleted successfully!")
         return 0
     else:
@@ -1547,7 +1551,7 @@ def cmd_pipeline_list(repo_filter: str = None, show_all: bool = False, verbose: 
         return 1
 
 
-def cmd_pipeline_delete(verbose: bool = False) -> int:
+def cmd_pipeline_delete(pipeline_name: str = None, force: bool = False, verbose: bool = False) -> int:
     """Handle 'sdo pipeline delete' command."""
     config = get_pipeline_config()
     if config is None:
@@ -1556,7 +1560,7 @@ def cmd_pipeline_delete(verbose: bool = False) -> int:
     platform = config.get("platform")
 
     if platform == "azdo":
-        return cmd_azdo_pipeline_delete(verbose)
+        return cmd_azdo_pipeline_delete(pipeline_name=pipeline_name, force=force, verbose=verbose)
     elif platform == "github":
         print("GitHub Actions workflows are deleted by removing the YAML files from .github/workflows/")
         print("SDO does not delete workflow files automatically.")
