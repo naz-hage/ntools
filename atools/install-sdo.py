@@ -135,6 +135,37 @@ def uninstall_venv(venv_path: Path, dry_run: bool = False) -> bool:
         print(f"Would delete virtual environment at: {venv_path}")
         return True
     
+    # Stop any running Python processes using this virtual environment
+    print("Stopping any running Python processes using the virtual environment...")
+    try:
+        if sys.platform == 'win32':
+            # Use PowerShell to stop processes - look for the full venv path
+            venv_path_str = str(venv_path).replace('\\', '\\\\')
+            ps_cmd = f'Get-Process | Where-Object {{ $_.Path -like "*{venv_path_str}*" }} | Stop-Process -Force -ErrorAction SilentlyContinue'
+            result = subprocess.run(['powershell', '-Command', ps_cmd], 
+                                  capture_output=True, text=True, timeout=30)
+            if result.returncode == 0:
+                if result.stdout.strip() or result.stderr.strip():
+                    print("✓ Stopped running processes")
+                else:
+                    print("ℹ️  No running processes found to stop")
+            else:
+                print(f"⚠️  Warning: Could not stop processes: {result.stderr}")
+        else:
+            # For Linux/Mac, use pkill
+            result = subprocess.run(['pkill', '-f', str(venv_path)], 
+                                  capture_output=True, text=True, timeout=10)
+            if result.returncode == 0:
+                print("✓ Stopped running processes")
+    except subprocess.TimeoutExpired:
+        print("⚠️  Warning: Process stopping timed out")
+    except Exception as e:
+        print(f"⚠️  Warning: Could not stop processes: {e}")
+    
+    # Small delay to ensure processes are fully stopped
+    import time
+    time.sleep(2)
+    
     try:
         import shutil
         print(f"Deleting virtual environment at {venv_path}...")
