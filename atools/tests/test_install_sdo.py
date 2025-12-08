@@ -82,7 +82,7 @@ class TestUninstallVenv:
         env['PYTHONIOENCODING'] = 'utf-8'
         res = subprocess.run(cmd, capture_output=True, text=True, cwd=str(tmp_path), env=env, encoding='utf-8', errors='replace')
         assert res.returncode == 0
-        assert "Stopped running processes" in res.stdout or "No running processes found" in res.stdout
+        assert "Process stopping command completed" in res.stdout
 
     def test_uninstall_with_processes_linux(self, tmp_path, monkeypatch):
         """Test process stopping on Linux/Mac (mocked)."""
