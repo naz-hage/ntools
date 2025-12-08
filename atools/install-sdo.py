@@ -140,8 +140,8 @@ def uninstall_venv(venv_path: Path, dry_run: bool = False) -> bool:
     try:
         if sys.platform == 'win32':
             # Use PowerShell to stop processes - look for the full venv path
-            venv_path_str = str(venv_path).replace('\\', '\\\\')
-            ps_cmd = f'Get-Process | Where-Object {{ $_.Path -like "*{venv_path_str}*" }} | Stop-Process -Force -ErrorAction SilentlyContinue'
+            venv_path_str = str(venv_path).replace("'", "''").replace('\\', '\\\\')
+            ps_cmd = f"Get-Process | Where-Object {{ $_.Path -and $_.Path -like '*{venv_path_str}*' }} | Stop-Process -Force -ErrorAction SilentlyContinue"
             result = subprocess.run(['powershell', '-Command', ps_cmd], 
                                   capture_output=True, text=True, timeout=30)
             if result.returncode == 0:
