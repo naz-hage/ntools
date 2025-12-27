@@ -62,8 +62,6 @@
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../nbackup/">Nbackup (nbackup.exe)</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../wi/">wi (wi.exe)</a>
-                  </li>
                   <li class="toctree-l1"><a class="reference internal" href="../github-release/">Github Release</a>
                   </li>
               </ul>
@@ -389,7 +387,7 @@ nb verify_artifacts /p:ArtifactsFolder=&quot;C:\Artifacts\MySolution\Release\1.2
 nb smoke_test
 </code></pre>
 <p>This target performs:
-1. <strong>Artifact Validation</strong>: Tests 4+ executables (nb.exe, lf.exe, nBackup.exe, wi.exe)
+1. <strong>Artifact Validation</strong>: Tests 3+ executables (nb.exe, lf.exe, nBackup.exe)
 2. <strong>Build System Validation</strong>: Uses <code>Test-TargetDelegation</code> function to verify MSBuild target relationships
 3. <strong>Consolidated Results</strong>: Single pass/fail result for all validation checks</p>
 <p><strong>Migration Note</strong>: The deprecated <code>TEST_TARGET_DELEGATION</code> target functionality is now integrated into <code>SMOKE_TEST</code>.</p>
