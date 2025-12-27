@@ -182,7 +182,7 @@ SDO was designed as a **cross-platform, zero-configuration DevOps CLI** to unify
 - **Automatic Platform Detection**: Extracts organization/project details from Git remotes, eliminating manual configuration. Users don't need to remember which CLI to use or set environment variables for each platform.
 - **Rich Content Handling**: Supports markdown files for creating work items and PRs with formatted descriptions, checklists, and attachments—features not natively streamlined in `gh` or `az`.
 - **Consistency and Simplicity**: Commands follow a predictable structure (e.g., `sdo workitem create` vs. platform-specific syntax). It abstracts away API differences, making it easier for non-experts.
-- **Specialized Features**: Bulk operations (e.g., via the complementary `wi.csproj` tool), enhanced error handling, and logging tailored for DevOps workflows.
+- **Specialized Features**: Bulk operations, enhanced error handling, and logging tailored for DevOps workflows.
 
 From the command mappings we documented, SDO effectively bridges gaps:
 - For GitHub users, it provides Azure DevOps parity without switching tools.

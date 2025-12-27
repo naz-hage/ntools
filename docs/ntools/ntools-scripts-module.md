@@ -206,7 +206,7 @@ nb smoke_test
 ```
 
 This target performs:
-1. **Artifact Validation**: Tests 4+ executables (nb.exe, lf.exe, nBackup.exe, wi.exe)
+1. **Artifact Validation**: Tests 3+ executables (nb.exe, lf.exe, nBackup.exe)
 2. **Build System Validation**: Uses `Test-TargetDelegation` function to verify MSBuild target relationships
 3. **Consolidated Results**: Single pass/fail result for all validation checks
 

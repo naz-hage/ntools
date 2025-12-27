@@ -13,7 +13,6 @@ This repository contains a collection of software tools specifically designed to
     - [Nbuild (nb.exe)](ntools/nbuild.md)
     - [File and Folder Listing Utility (lf.exe)](ntools/lf.md)
     - [Nbackup (nbackup.exe)](ntools/nbackup.md)
-    - [Azure DevOps Work Item CLI Utility (wi.exe)](ntools/wi.md)
     - [Github Release](ntools/github-release.md)
 
 Don't hesitate to write an [issue](https://github.com/naz-hage/NTools/issues) if you have any questions or suggestions.
