@@ -21,7 +21,6 @@ nav:
       - Nbuild (nb.exe): ntools/nbuild.md
       - lf (lf.exe): ntools/lf.md
       - Nbackup (nbackup.exe): ntools/nbackup.md
-      - wi (wi.exe): ntools/wi.md
       - Github Release : ntools/github-release.md
   - Custom Build Tasks:
       - Nbuild Tasks: ntools/nbuildtasks.md

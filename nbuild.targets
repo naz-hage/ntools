@@ -503,18 +503,13 @@
 		<Exec Command='dotnet test "$(SolutionDir)\nBackupTests\NbackupTests.csproj" --diag:"$(SolutionDir)\TestResults\nBackupTests-diag-vstest.txt" -v minimal' WorkingDirectory="$(SolutionDir)" />
 	</Target>
 
-	<Target Name="NB_DIAG_wiTests">
-		<Message Text="Running diag for wiTests" Importance="high" />
-		<Exec Command='dotnet test "$(SolutionDir)\wiTests\wiTests.csproj" --diag:"$(SolutionDir)\TestResults\wiTests-diag-vstest.txt" -v minimal' WorkingDirectory="$(SolutionDir)" />
-	</Target>
-
 	<Target Name="NB_DIAG_GitHubReleaseTests">
 		<Message Text="Running diag for GitHubReleaseTests" Importance="high" />
 		<Exec Command='dotnet test "$(SolutionDir)\GitHubReleaseTests\GitHubReleaseTests.csproj" --diag:"$(SolutionDir)\TestResults\GitHubReleaseTests-diag-vstest.txt" -v minimal' WorkingDirectory="$(SolutionDir)" />
 	</Target>
 
 	<!-- Aggregate target: run all per-project diagnostics sequentially -->
-	<Target Name="NB_TEST_DIAG_ALL" DependsOnTargets="NB_DIAG_NbuildTasksTests;NB_DIAG_NbuildTests;NB_DIAG_lfTests;NB_DIAG_nbTests;NB_DIAG_nBackupTests;NB_DIAG_wiTests;NB_DIAG_GitHubReleaseTests">
+	<Target Name="NB_TEST_DIAG_ALL" DependsOnTargets="NB_DIAG_NbuildTasksTests;NB_DIAG_NbuildTests;NB_DIAG_lfTests;NB_DIAG_nbTests;NB_DIAG_nBackupTests;NB_DIAG_GitHubReleaseTests">
 		<Message Text=">== NB_TEST_DIAG_ALL completed" Importance="high" />
 	</Target>
 
@@ -587,12 +582,6 @@
             </ExecutablesToTest>
             <ExecutablesToTest Include="$(ArtifactsFolder)\nBackup.exe">
                 <DisplayName>nBackup.exe (Backup utility)</DisplayName>
-                <TestCommand>--help</TestCommand>
-                <HelpCommand></HelpCommand>
-                <Required>true</Required>
-            </ExecutablesToTest>
-            <ExecutablesToTest Include="$(ArtifactsFolder)\wi.exe">
-                <DisplayName>wi.exe (Work items utility)</DisplayName>
                 <TestCommand>--help</TestCommand>
                 <HelpCommand></HelpCommand>
                 <Required>true</Required>
@@ -692,7 +681,7 @@
             <NBackupSuccess Condition="'$(ExitCode_nBackup)' == '0' Or '$(ExitCode_nBackup)' == '-1'">true</NBackupSuccess>
             <NBackupSuccess Condition="'$(NBackupSuccess)' == ''">false</NBackupSuccess>
             
-            <AllTestsPassed Condition="'$(ExitCode_nb)' == '0' And '$(ExitCode_lf)' == '0' And '$(NBackupSuccess)' == 'true' And '$(ExitCode_wi)' == '0' And '$(NbInstallHelpExitCode)' == '0' And '$(DelegationTestExitCode)' == '0'">true</AllTestsPassed>
+            <AllTestsPassed Condition="'$(ExitCode_nb)' == '0' And '$(ExitCode_lf)' == '0' And '$(NBackupSuccess)' == 'true' And '$(NbInstallHelpExitCode)' == '0' And '$(DelegationTestExitCode)' == '0'">true</AllTestsPassed>
             <AllTestsPassed Condition="'$(AllTestsPassed)' == ''">false</AllTestsPassed>
         </PropertyGroup>
         

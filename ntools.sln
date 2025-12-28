@@ -20,7 +20,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		prebuild.bat = prebuild.bat
 		README.md = README.md
 		targets.md = targets.md
-		wi\wi.csproj = wi\wi.csproj
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NbackupTests", "nBackupTests\NbackupTests.csproj", "{79DD18A9-0E82-4F97-8353-1E5D8BC844BA}"
@@ -108,13 +107,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lf", "lf\lf.csproj", "{524E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lfTests", "lfTests\lfTests.csproj", "{B70A8112-F9C0-5646-4C66-B34C8E8AB203}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "wi", "wi\wi.csproj", "{78D9DDB5-4B3D-01F8-E5D0-0498080F54F1}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nbuild", "Nbuild\Nbuild.csproj", "{CB80CD10-DC2F-48A6-91D6-192C84AD765A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nBackup", "nBackup\nBackup.csproj", "{75AF1D68-CD4A-4C01-9728-7A93B8DDEA1B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "wiTests", "wiTests\wiTests.csproj", "{B8D3FBB1-E102-48FE-838E-5F907B9B3A8D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiVersions", "ApiVersions\ApiVersions.csproj", "{71123CA7-06B4-BEC1-ED29-A55FCC7F22BB}"
 EndProject
