@@ -34,41 +34,40 @@ var listFilesCommand = new Command("files", "List files with specified extension
 /// Option: --directoryPath | -d
 /// The directory path to search in. Defaults to the current directory.
 /// </summary>
-var filesDirectoryPathOption = new Option<string>(
-    name: "--directoryPath",
-    description: "Directory path to search in",
-    getDefaultValue: () => Directory.GetCurrentDirectory()
-);
-filesDirectoryPathOption.AddAlias("-d");
+var filesDirectoryPathOption = new Option<string>("--directoryPath", "-d")
+{
+    Description = "Directory path to search in"
+};
+filesDirectoryPathOption.DefaultValueFactory = _ => Directory.GetCurrentDirectory();
 
 /// <summary>
 /// Option: --extensions | -e
 /// Comma-separated file extensions to search for. Defaults to ".yml,.yaml".
 /// </summary>
-var extensionsOption = new Option<string>(
-   name: "--extensions",
-   description: "Comma-separated file extensions to search for (e.g., .yml,.yaml)",
-   getDefaultValue: () => ".yml,.yaml"
-);
-extensionsOption.AddAlias("-e");
+var extensionsOption = new Option<string>("--extensions", "-e")
+{
+    Description = "Comma-separated file extensions to search for (e.g., .yml,.yaml)"
+};
+extensionsOption.DefaultValueFactory = _ => ".yml,.yaml";
 
-listFilesCommand.AddOption(filesDirectoryPathOption);
-listFilesCommand.AddOption(extensionsOption);
+listFilesCommand.Options.Add(filesDirectoryPathOption);
+listFilesCommand.Options.Add(extensionsOption);
 
 /// <summary>
 /// Handler for the 'files' command.
 /// Splits the extensions string, searches for files, and prints the results.
 /// </summary>
-/// <param name="extensions">Comma-separated list of file extensions.</param>
-/// <param name="directoryPath">Directory to search in.</param>
-listFilesCommand.SetHandler((string extensions, string directoryPath) =>
+listFilesCommand.SetAction((System.CommandLine.ParseResult parseResult) =>
 {
-    string[] extensionsArray = extensions.Split(',', StringSplitOptions.RemoveEmptyEntries);
+    var extensions = parseResult.GetValue(extensionsOption);
+    var directoryPath = parseResult.GetValue(filesDirectoryPathOption);
+    string[] extensionsArray = (extensions ?? ".yml,.yaml").Split(',', StringSplitOptions.RemoveEmptyEntries);
     Console.WriteLine($"Searching for files with specified extensions in {directoryPath} recursively");
-    ListSearcher.ListFiles(directoryPath, extensionsArray);
-}, extensionsOption, filesDirectoryPathOption);
+    ListSearcher.ListFiles(directoryPath ?? Directory.GetCurrentDirectory(), extensionsArray);
+    return 0;
+});
 
-rootCommand.AddCommand(listFilesCommand);
+rootCommand.Subcommands.Add(listFilesCommand);
 
 /// <summary>
 /// Command: folders
@@ -80,43 +79,43 @@ var listFoldersCommand = new Command("folders", "List folders containing specifi
 /// Option: --directoryPath | -d
 /// The directory path to search in. Defaults to the current directory.
 /// </summary>
-var foldersDirectoryPathOption = new Option<string>(
-    name: "--directoryPath",
-    description: "Directory path to search in",
-    getDefaultValue: () => Directory.GetCurrentDirectory()
-);
-foldersDirectoryPathOption.AddAlias("-d");
+var foldersDirectoryPathOption = new Option<string>("--directoryPath", "-d")
+{
+    Description = "Directory path to search in"
+};
+foldersDirectoryPathOption.DefaultValueFactory = _ => Directory.GetCurrentDirectory();
 
 /// <summary>
 /// Option: --name | -n
 /// Comma-separated list of folder names to search for.
 /// </summary>
-var folderNamesOption = new Option<string>(
-    name: "--name",
-    description: "Comma-separated list of folder names to search for",
-    getDefaultValue: () => string.Empty
-);
-folderNamesOption.AddAlias("-n");
+var folderNamesOption = new Option<string>("--name", "-n")
+{
+    Description = "Comma-separated list of folder names to search for"
+};
+folderNamesOption.DefaultValueFactory = _ => string.Empty;
 
-listFoldersCommand.AddOption(foldersDirectoryPathOption);
-listFoldersCommand.AddOption(folderNamesOption);
+listFoldersCommand.Options.Add(foldersDirectoryPathOption);
+listFoldersCommand.Options.Add(folderNamesOption);
 
 /// <summary>
 /// Handler for the 'folders' command.
 /// Splits the names string, searches for folders, and prints the results.
 /// </summary>
-/// <param name="directoryPath">Directory to search in.</param>
-/// <param name="names">Comma-separated list of folder names.</param>
-listFoldersCommand.SetHandler((string directoryPath, string names) =>
+listFoldersCommand.SetAction((System.CommandLine.ParseResult parseResult) =>
 {
-    string[] folderNames = names.Split(',', StringSplitOptions.RemoveEmptyEntries);
+    var directoryPath = parseResult.GetValue(foldersDirectoryPathOption);
+    var names = parseResult.GetValue(folderNamesOption);
+    string[] folderNames = (names ?? string.Empty).Split(',', StringSplitOptions.RemoveEmptyEntries);
     Console.WriteLine($"Searching for folders containing specified names in {directoryPath} recursively");
-    ListSearcher.ListFoldersContaining(directoryPath, folderNames);
-}, foldersDirectoryPathOption, folderNamesOption);
+    ListSearcher.ListFoldersContaining(directoryPath ?? Directory.GetCurrentDirectory(), folderNames);
+    return 0;
+});
 
-rootCommand.AddCommand(listFoldersCommand);
+rootCommand.Subcommands.Add(listFoldersCommand);
 
 /// <summary>
 /// Program entry point. Invokes the root command with the provided arguments.
 /// </summary>
-return await rootCommand.InvokeAsync(args);
+var parseResult = rootCommand.Parse(args);
+return await parseResult.InvokeAsync();

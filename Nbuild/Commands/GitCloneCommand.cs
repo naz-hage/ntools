@@ -50,29 +50,28 @@ namespace Nbuild.Commands
                 "Example:\n" +
                 "  nb git_clone --url https://github.com/user/repo --path ./repo --verbose\n");
 
-            var urlOption = new Option<string>("--url", "Specifies the Git repository URL") { IsRequired = true };
+            var urlOption = new Option<string>("--url", "Specifies the Git repository URL") { Required = true };
             var pathOption = new Option<string>("--path", "The path where the repo will be cloned. If not specified, the current directory will be used");
             var verboseOption = new Option<bool>("--verbose", "Verbose output");
 
-            gitCloneCommand.AddOption(urlOption);
-            gitCloneCommand.AddOption(pathOption);
-            gitCloneCommand.AddOption(verboseOption);
+            gitCloneCommand.Options.Add(urlOption);
+            gitCloneCommand.Options.Add(pathOption);
+            gitCloneCommand.Options.Add(verboseOption);
 
-            // Use an InvocationContext handler to access the parse result and the invocation console.
-            gitCloneCommand.SetHandler((System.CommandLine.Invocation.InvocationContext ctx) =>
+            // Use ParseResult directly (InvocationContext was removed in v2.0.1)
+            gitCloneCommand.SetAction((System.CommandLine.ParseResult parse) =>
             {
-                var parse = ctx.ParseResult;
-                var url = parse.GetValueForOption(urlOption);
-                var path = parse.GetValueForOption(pathOption);
+                var url = parse.GetValue(urlOption);
+                var path = parse.GetValue(pathOption);
                 // Use command-local verbose option only
-                var verbose = parse.GetValueForOption(verboseOption);
-                var dryRun = parse.GetValueForOption(dryRunOption);
+                var verbose = parse.GetValue(verboseOption);
+                var dryRun = parse.GetValue(dryRunOption);
 
-                var exitCode = cloneService.Clone(url ?? string.Empty, path ?? string.Empty, verbose, dryRun, ctx.Console);
-                Environment.ExitCode = exitCode;
+                var exitCode = cloneService.Clone(url ?? string.Empty, path ?? string.Empty, verbose, dryRun, Console.Out);
+                return exitCode;
             });
 
-            rootCommand.AddCommand(gitCloneCommand);
+            rootCommand.Subcommands.Add(gitCloneCommand);
         }
 
     }
