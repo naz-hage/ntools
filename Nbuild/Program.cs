@@ -1,4 +1,4 @@
-﻿using Nbuild.Commands;
+using Nbuild.Commands;
 using Nbuild.Services;
 using NbuildTasks;
 using System.CommandLine;
@@ -20,8 +20,12 @@ namespace Nbuild
 
             var rootCommand = new RootCommand("Nbuild - Build and DevOps Utility");
             // Global dry-run option: add as a root-level/global option so it can be provided on any command.
-            var dryRunOption = new Option<bool>("--dry-run", "Perform a dry run: show actions but do not perform side effects") { IsRequired = false };
-            rootCommand.AddGlobalOption(dryRunOption);
+            var dryRunOption = new Option<bool>("--dry-run") 
+            { 
+                Description = "Perform a dry run: show actions but do not perform side effects",
+                Required = false 
+            };
+            rootCommand.Options.Add(dryRunOption);
 
             // NOTE: prefer per-command --verbose options; no global --verbose option registered
             AddInstallCommand(rootCommand);
@@ -47,9 +51,9 @@ namespace Nbuild
             // Enable strict validation for the root command but allow unmatched tokens for build targets
             rootCommand.TreatUnmatchedTokensAsErrors = false;
 
-            rootCommand.SetHandler((ctx) =>
+            rootCommand.SetAction((System.CommandLine.ParseResult parseResult) =>
             {
-                var unmatched = ctx.ParseResult.UnmatchedTokens;
+                var unmatched = parseResult.UnmatchedTokens;
 
                 // Check for potential option typos before treating as build targets
                 var potentialOptions = unmatched.Where(token => token.StartsWith("-")).ToList();
@@ -61,14 +65,12 @@ namespace Nbuild
                         if (!string.IsNullOrEmpty(suggestion))
                         {
                             Console.Error.WriteLine($"Unknown option '{option}'. Did you mean '{suggestion}'?");
-                            Environment.ExitCode = 1;
-                            return;
+                            return 1;
                         }
                         else
                         {
                             Console.Error.WriteLine($"Unknown option '{option}'. Use 'nb --help' to see available options.");
-                            Environment.ExitCode = 1;
-                            return;
+                            return 1;
                         }
                     }
                 }
@@ -78,24 +80,23 @@ namespace Nbuild
                     var target = unmatched[0];
                     ConsoleHelper.WriteLine($"Executing target: {target}", ConsoleColor.Green);
                     var resultHelper = BuildStarter.Build(target, false);
-                    Environment.ExitCode = resultHelper.Code;
+                    return resultHelper.Code;
                 }
                 else if (unmatched.Count > 1)
                 {
                     Console.Error.WriteLine($"Unknown command or too many arguments: {string.Join(' ', unmatched)}");
-                    Environment.ExitCode = 1;
+                    return 1;
                 }
+                return 0;
             });
-            // Parse the provided args to capture global options (like --dry-run) before invoking handlers.
-            var parseResult = rootCommand.Parse(args);
-
+            
             // Validate for common option typos before execution
             if (CliValidation.ValidateArgsForTypos(args))
             {
                 return 1; // Exit with error code if typos found
             }
 
-            return rootCommand.Invoke(args);
+            return rootCommand.Parse(args).Invoke();
         }
 
         // Try to call Nversion.Get in a compatibility-safe way. Some compiled binaries or older versions
@@ -111,36 +112,40 @@ namespace Nbuild
 
             var jsonOption = new Option<string>("--json", "Full path to the manifest file containing your tool definitions.\nIf the path contains spaces, use double quotes.")
             {
-                IsRequired = true
+                Required = true
             };
             var verboseOption = new Option<bool>("--verbose", "Verbose output");
 
-            downloadCommand.AddOption(jsonOption);
-            downloadCommand.AddOption(verboseOption);
-            downloadCommand.SetHandler((json, verbose, dryRun) =>
+            downloadCommand.Options.Add(jsonOption);
+            downloadCommand.Options.Add(verboseOption);
+            downloadCommand.SetAction((System.CommandLine.ParseResult parseResult) =>
             {
+                var json = parseResult.GetValue(jsonOption)!;
+                var verbose = parseResult.GetValue(verboseOption);
+                var dryRun = parseResult.GetValue(rootCommand.Options.OfType<Option<bool>>().First(o => o.Name == "dry-run"));
                 if (dryRun)
                 {
                     ConsoleHelper.WriteLine("DRY-RUN: running in dry-run mode; no destructive actions will be performed.", ConsoleColor.Yellow);
                 }
                 var exitCode = HandleDownloadCommand(json, verbose, dryRun);
-                Environment.ExitCode = exitCode;
-            }, jsonOption, verboseOption, rootCommand.Options.OfType<Option<bool>>().First(o => o.Name == "dry-run"));
-            rootCommand.AddCommand(downloadCommand);
+                return exitCode;
+            });
+            rootCommand.Subcommands.Add(downloadCommand);
         }
 
         private static void AddPathCommand(RootCommand rootCommand)
         {
             var cmd = new System.CommandLine.Command("path", "Display each segment of the effective PATH environment variable on a separate line, with duplicates removed. Shows the complete PATH that processes actually use (Machine + User PATH combined).");
             var verboseOption = new Option<bool>("--verbose", "Verbose output");
-            cmd.AddOption(verboseOption);
-            cmd.SetHandler((verbose) =>
+            cmd.Options.Add(verboseOption);
+            cmd.SetAction((System.CommandLine.ParseResult parseResult) =>
             {
+                var verbose = parseResult.GetValue(verboseOption);
                 PathManager.DisplayPathSegments();
                 if (verbose) ConsoleHelper.WriteLine("[VERBOSE] Displaying PATH segments.", ConsoleColor.Gray);
-                Environment.ExitCode = 0;
-            }, verboseOption);
-            rootCommand.AddCommand(cmd);
+                return 0;
+            });
+            rootCommand.Subcommands.Add(cmd);
         }
 
         private static void AddGitInfoCommand(RootCommand rootCommand, Option<bool> dryRunOption)
@@ -154,14 +159,16 @@ namespace Nbuild
                 "  nb git_info --verbose\n"
             );
             var verboseOption = new Option<bool>("--verbose", "Verbose output");
-            gitInfoCommand.AddOption(verboseOption);
-            gitInfoCommand.SetHandler((verbose, dryRun) =>
+            gitInfoCommand.Options.Add(verboseOption);
+            gitInfoCommand.SetAction((System.CommandLine.ParseResult parseResult) =>
             {
-                if (verbose) ConsoleHelper.WriteLine("[VERBOSE] Displaying git info.", ConsoleColor.Gray);
+                var verbose = parseResult.GetValue(verboseOption);
+                var dryRun = parseResult.GetValue(dryRunOption);
+                if (verbose) ConsoleHelper.WriteLine("[VERBOSE] Displaying Git repository information.", ConsoleColor.Gray);
                 var exitCode = HandleGitInfoCommand(verbose, dryRun);
-                Environment.ExitCode = exitCode;
-            }, verboseOption, dryRunOption);
-            rootCommand.AddCommand(gitInfoCommand);
+                return exitCode;
+            });
+            rootCommand.Subcommands.Add(gitInfoCommand);
         }
 
         private static void AddGitSetTagCommand(RootCommand rootCommand, Option<bool> dryRunOption)
@@ -176,18 +183,21 @@ namespace Nbuild
                 "  nb git_settag --tag 1.24.33 --verbose\n");
             var tagOption = new Option<string>("--tag", "Tag to set (e.g., 1.24.33)")
             {
-                IsRequired = true
+                Required = true
             };
             var verboseOption = new Option<bool>("--verbose", "Verbose output");
-            gitSetTagCommand.AddOption(tagOption);
-            gitSetTagCommand.AddOption(verboseOption);
-            gitSetTagCommand.SetHandler((tag, verbose, dryRun) =>
+            gitSetTagCommand.Options.Add(tagOption);
+            gitSetTagCommand.Options.Add(verboseOption);
+            gitSetTagCommand.SetAction((System.CommandLine.ParseResult parseResult) =>
             {
+                var tag = parseResult.GetValue(tagOption)!;
+                var verbose = parseResult.GetValue(verboseOption);
+                var dryRun = parseResult.GetValue(dryRunOption);
                 if (verbose) ConsoleHelper.WriteLine($"[VERBOSE] Setting git tag: {tag}", ConsoleColor.Gray);
                 var exitCode = HandleGitSetTagCommand(tag, verbose, dryRun);
-                Environment.ExitCode = exitCode;
-            }, tagOption, verboseOption, dryRunOption);
-            rootCommand.AddCommand(gitSetTagCommand);
+                return exitCode;
+            });
+            rootCommand.Subcommands.Add(gitSetTagCommand);
         }
 
         private static void AddGitAutoTagCommand(RootCommand rootCommand, Option<bool> dryRunOption)
@@ -200,21 +210,24 @@ namespace Nbuild
                 "  --verbose   Verbose output\n\n" +
                 "Example:\n" +
                 "  nb git_autotag --buildtype STAGE --verbose\n");
-            gitAutoTagCommand.AddAlias("auto_tag");
+            gitAutoTagCommand.Aliases.Add("auto_tag");
             var buildTypeOption = new Option<string>("--buildtype", "Specifies the build type used for this command. Possible values: STAGE, PROD")
             {
-                IsRequired = true
+                Required = true
             };
             var verboseOption = new Option<bool>("--verbose", "Verbose output");
-            gitAutoTagCommand.AddOption(buildTypeOption);
-            gitAutoTagCommand.AddOption(verboseOption);
-            gitAutoTagCommand.SetHandler((buildType, verbose, dryRun) =>
+            gitAutoTagCommand.Options.Add(buildTypeOption);
+            gitAutoTagCommand.Options.Add(verboseOption);
+            gitAutoTagCommand.SetAction((System.CommandLine.ParseResult parseResult) =>
             {
+                var buildType = parseResult.GetValue(buildTypeOption)!;
+                var verbose = parseResult.GetValue(verboseOption);
+                var dryRun = parseResult.GetValue(dryRunOption);
                 if (verbose) ConsoleHelper.WriteLine($"[VERBOSE] Auto-tagging for build type: {buildType}", ConsoleColor.Gray);
                 var exitCode = HandleGitAutoTagCommand(buildType, false, verbose, dryRun);
-                Environment.ExitCode = exitCode;
-            }, buildTypeOption, verboseOption, dryRunOption);
-            rootCommand.AddCommand(gitAutoTagCommand);
+                return exitCode;
+            });
+            rootCommand.Subcommands.Add(gitAutoTagCommand);
         }
 
         private static void AddGitPushAutoTagCommand(RootCommand rootCommand, Option<bool> dryRunOption)
@@ -229,18 +242,21 @@ namespace Nbuild
                 "  nb git_push_autotag --buildtype PROD --verbose\n");
             var buildTypeOption = new Option<string>("--buildtype", "Specifies the build type used for this command. Possible values: STAGE, PROD")
             {
-                IsRequired = true
+                Required = true
             };
             var verboseOption = new Option<bool>("--verbose", "Verbose output");
-            gitPushAutoTagCommand.AddOption(buildTypeOption);
-            gitPushAutoTagCommand.AddOption(verboseOption);
-            gitPushAutoTagCommand.SetHandler((buildType, verbose, dryRun) =>
+            gitPushAutoTagCommand.Options.Add(buildTypeOption);
+            gitPushAutoTagCommand.Options.Add(verboseOption);
+            gitPushAutoTagCommand.SetAction((System.CommandLine.ParseResult parseResult) =>
             {
+                var buildType = parseResult.GetValue(buildTypeOption)!;
+                var verbose = parseResult.GetValue(verboseOption);
+                var dryRun = parseResult.GetValue(dryRunOption);
                 if (verbose) ConsoleHelper.WriteLine($"[VERBOSE] Push auto-tag for build type: {buildType}", ConsoleColor.Gray);
                 var exitCode = HandleGitAutoTagCommand(buildType, true, verbose, dryRun);
-                Environment.ExitCode = exitCode;
-            }, buildTypeOption, verboseOption, dryRunOption);
-            rootCommand.AddCommand(gitPushAutoTagCommand);
+                return exitCode;
+            });
+            rootCommand.Subcommands.Add(gitPushAutoTagCommand);
         }
 
         private static void AddGitBranchCommand(RootCommand rootCommand)
@@ -253,14 +269,15 @@ namespace Nbuild
                 "  nb git_branch --verbose\n"
             );
             var verboseOption = new Option<bool>("--verbose", "Verbose output");
-            gitBranchCommand.AddOption(verboseOption);
-            gitBranchCommand.SetHandler((verbose) =>
+            gitBranchCommand.Options.Add(verboseOption);
+            gitBranchCommand.SetAction((System.CommandLine.ParseResult parseResult) =>
             {
+                var verbose = parseResult.GetValue(verboseOption);
                 if (verbose) ConsoleHelper.WriteLine("[VERBOSE] Displaying git branch.", ConsoleColor.Gray);
                 var exitCode = HandleGitBranchCommand();
-                Environment.ExitCode = exitCode;
-            }, verboseOption);
-            rootCommand.AddCommand(gitBranchCommand);
+                return exitCode;
+            });
+            rootCommand.Subcommands.Add(gitBranchCommand);
         }
 
 
@@ -276,18 +293,21 @@ namespace Nbuild
                 "  nb git_deletetag --tag 1.24.33 --verbose\n");
             var tagOption = new Option<string>("--tag", "Tag to delete (e.g., 1.24.33)")
             {
-                IsRequired = true
+                Required = true
             };
             var verboseOption = new Option<bool>("--verbose", "Verbose output");
-            gitDeleteTagCommand.AddOption(tagOption);
-            gitDeleteTagCommand.AddOption(verboseOption);
-            gitDeleteTagCommand.SetHandler((tag, verbose, dryRun) =>
+            gitDeleteTagCommand.Options.Add(tagOption);
+            gitDeleteTagCommand.Options.Add(verboseOption);
+            gitDeleteTagCommand.SetAction((System.CommandLine.ParseResult parseResult) =>
             {
+                var tag = parseResult.GetValue(tagOption)!;
+                var verbose = parseResult.GetValue(verboseOption);
+                var dryRun = parseResult.GetValue(dryRunOption);
                 if (verbose) ConsoleHelper.WriteLine($"[VERBOSE] Deleting git tag: {tag}", ConsoleColor.Gray);
                 var exitCode = HandleGitDeleteTagCommand(tag, verbose, dryRun);
-                Environment.ExitCode = exitCode;
-            }, tagOption, verboseOption, dryRunOption);
-            rootCommand.AddCommand(gitDeleteTagCommand);
+                return exitCode;
+            });
+            rootCommand.Subcommands.Add(gitDeleteTagCommand);
         }
 
         private static void AddReleaseCreateCommand(RootCommand rootCommand)
@@ -307,28 +327,34 @@ namespace Nbuild
             var repoOption = new Option<string>("--repo",
                 "Git repository. Accepts:\n  - repoName (uses OWNER env variable)\n  - userName/repoName\n  - Full GitHub URL (https://github.com/userName/repoName)")
             {
-                IsRequired = true
+                Required = true
             };
             var tagOption = new Option<string>("--tag", "Specifies the tag used")
             {
-                IsRequired = true
+                Required = true
             };
             var branchOption = new Option<string>("--branch", "Specifies the branch name")
             {
-                IsRequired = true
+                Required = true
             };
             var fileOption = new Option<string>("--file", "Specifies the asset file name. Must include full path")
             {
-                IsRequired = true
+                Required = true
             };
             var verboseOption = new Option<bool>("--verbose", "Verbose output");
-            releaseCreateCommand.AddOption(repoOption);
-            releaseCreateCommand.AddOption(tagOption);
-            releaseCreateCommand.AddOption(branchOption);
-            releaseCreateCommand.AddOption(fileOption);
-            releaseCreateCommand.AddOption(verboseOption);
-            releaseCreateCommand.SetHandler(async (repo, tag, branch, file, verbose, dryRun) =>
+            releaseCreateCommand.Options.Add(repoOption);
+            releaseCreateCommand.Options.Add(tagOption);
+            releaseCreateCommand.Options.Add(branchOption);
+            releaseCreateCommand.Options.Add(fileOption);
+            releaseCreateCommand.Options.Add(verboseOption);
+            releaseCreateCommand.SetAction(async (System.CommandLine.ParseResult parseResult, CancellationToken cancellationToken) =>
             {
+                var repo = parseResult.GetValue(repoOption)!;
+                var tag = parseResult.GetValue(tagOption)!;
+                var branch = parseResult.GetValue(branchOption)!;
+                var file = parseResult.GetValue(fileOption)!;
+                var verbose = parseResult.GetValue(verboseOption);
+                var dryRun = parseResult.GetValue(rootCommand.Options.OfType<Option<bool>>().First(o => o.Name == "dry-run"));
                 if (dryRun)
                 {
                     ConsoleHelper.WriteLine("DRY-RUN: running in dry-run mode; no destructive actions will be performed.", ConsoleColor.Yellow);
@@ -340,9 +366,9 @@ namespace Nbuild
                     ConsoleHelper.WriteLine($"[VERBOSE] API_GITHUB_KEY env: {(string.IsNullOrEmpty(Environment.GetEnvironmentVariable("API_GITHUB_KEY")) ? "(not set)" : "(set)")}", ConsoleColor.Gray);
                 }
                 var exitCode = await HandleReleaseCreateCommand(repo, tag, branch, file, false, dryRun);
-                Environment.ExitCode = exitCode;
-            }, repoOption, tagOption, branchOption, fileOption, verboseOption, rootCommand.Options.OfType<Option<bool>>().First(o => o.Name == "dry-run"));
-            rootCommand.AddCommand(releaseCreateCommand);
+                return exitCode;
+            });
+            rootCommand.Subcommands.Add(releaseCreateCommand);
         }
 
         private static void AddPreReleaseCreateCommand(RootCommand rootCommand)
@@ -362,28 +388,34 @@ namespace Nbuild
             );
             var repoOption = new Option<string>("--repo", "Specifies the Git repository in any of the following formats:\n- repoName  (UserName is declared the `OWNER` environment variable)\n- userName/repoName\n- https://github.com/userName/repoName (Full URL to the repository on GitHub)")
             {
-                IsRequired = true
+                Required = true
             };
             var tagOption = new Option<string>("--tag", "Specifies the tag used")
             {
-                IsRequired = true
+                Required = true
             };
             var branchOption = new Option<string>("--branch", "Specifies the branch name")
             {
-                IsRequired = true
+                Required = true
             };
             var fileOption = new Option<string>("--file", "Specifies the asset file name. Must include full path")
             {
-                IsRequired = true
+                Required = true
             };
             var verboseOption = new Option<bool>("--verbose", "Verbose output");
-            preReleaseCreateCommand.AddOption(repoOption);
-            preReleaseCreateCommand.AddOption(tagOption);
-            preReleaseCreateCommand.AddOption(branchOption);
-            preReleaseCreateCommand.AddOption(fileOption);
-            preReleaseCreateCommand.AddOption(verboseOption);
-            preReleaseCreateCommand.SetHandler(async (repo, tag, branch, file, verbose, dryRun) =>
+            preReleaseCreateCommand.Options.Add(repoOption);
+            preReleaseCreateCommand.Options.Add(tagOption);
+            preReleaseCreateCommand.Options.Add(branchOption);
+            preReleaseCreateCommand.Options.Add(fileOption);
+            preReleaseCreateCommand.Options.Add(verboseOption);
+            preReleaseCreateCommand.SetAction(async (System.CommandLine.ParseResult parseResult, CancellationToken cancellationToken) =>
             {
+                var repo = parseResult.GetValue(repoOption)!;
+                var tag = parseResult.GetValue(tagOption)!;
+                var branch = parseResult.GetValue(branchOption)!;
+                var file = parseResult.GetValue(fileOption)!;
+                var verbose = parseResult.GetValue(verboseOption);
+                var dryRun = parseResult.GetValue(rootCommand.Options.OfType<Option<bool>>().First(o => o.Name == "dry-run"));
                 if (dryRun)
                 {
                     ConsoleHelper.WriteLine("DRY-RUN: running in dry-run mode; no destructive actions will be performed.", ConsoleColor.Yellow);
@@ -407,9 +439,9 @@ namespace Nbuild
                 }
 
                 var exitCode = await HandleReleaseCreateCommand(repo, tag, branch, file, true, dryRun);
-                Environment.ExitCode = exitCode;
-            }, repoOption, tagOption, branchOption, fileOption, verboseOption, rootCommand.Options.OfType<Option<bool>>().First(o => o.Name == "dry-run"));
-            rootCommand.AddCommand(preReleaseCreateCommand);
+                return exitCode;
+            });
+            rootCommand.Subcommands.Add(preReleaseCreateCommand);
         }
 
         private static void AddReleaseDownloadCommand(RootCommand rootCommand)
@@ -428,32 +460,37 @@ namespace Nbuild
             );
             var repoOption = new Option<string>("--repo", "Specifies the Git repository in any of the following formats:\n- repoName  (UserName is declared the `OWNER` environment variable)\n- userName/repoName\n- https://github.com/userName/repoName (Full URL to the repository on GitHub)")
             {
-                IsRequired = true
+                Required = true
             };
             var tagOption = new Option<string>("--tag", "Specifies the tag used")
             {
-                IsRequired = true
+                Required = true
             };
             var pathOption = new Option<string>("--path", "Specifies the path used for this command. If not specified, the current directory will be used")
             {
-                IsRequired = false
+                Required = false
             };
             var verboseOption = new Option<bool>("--verbose", "Verbose output");
-            releaseDownloadCommand.AddOption(repoOption);
-            releaseDownloadCommand.AddOption(tagOption);
-            releaseDownloadCommand.AddOption(pathOption);
-            releaseDownloadCommand.AddOption(verboseOption);
-            releaseDownloadCommand.SetHandler(async (repo, tag, path, verbose, dryRun) =>
+            releaseDownloadCommand.Options.Add(repoOption);
+            releaseDownloadCommand.Options.Add(tagOption);
+            releaseDownloadCommand.Options.Add(pathOption);
+            releaseDownloadCommand.Options.Add(verboseOption);
+            releaseDownloadCommand.SetAction(async (System.CommandLine.ParseResult parseResult, CancellationToken cancellationToken) =>
             {
+                var repo = parseResult.GetValue(repoOption)!;
+                var tag = parseResult.GetValue(tagOption)!;
+                var path = parseResult.GetValue(pathOption)!;
+                var verbose = parseResult.GetValue(verboseOption);
+                var dryRun = parseResult.GetValue(rootCommand.Options.OfType<Option<bool>>().First(o => o.Name == "dry-run"));
                 if (dryRun)
                 {
                     ConsoleHelper.WriteLine("DRY-RUN: running in dry-run mode; no destructive actions will be performed.", ConsoleColor.Yellow);
                 }
                 if (verbose) ConsoleHelper.WriteLine($"[VERBOSE] Downloading asset for repo: {repo}, tag: {tag}, path: {path}", ConsoleColor.Gray);
                 var exitCode = await HandleReleaseDownloadCommand(repo, tag, path, dryRun);
-                Environment.ExitCode = exitCode;
-            }, repoOption, tagOption, pathOption, verboseOption, rootCommand.Options.OfType<Option<bool>>().First(o => o.Name == "dry-run"));
-            rootCommand.AddCommand(releaseDownloadCommand);
+                return exitCode;
+            });
+            rootCommand.Subcommands.Add(releaseDownloadCommand);
         }
 
         private static void AddListReleaseCommand(RootCommand rootCommand)
@@ -470,13 +507,16 @@ namespace Nbuild
             );
             var repoOption = new Option<string>("--repo", "Specifies the Git repository in any of the following formats:\n- repoName  (UserName is declared the `OWNER` environment variable)\n- userName/repoName\n- https://github.com/userName/repoName (Full URL to the repository on GitHub)")
             {
-                IsRequired = true
+                Required = true
             };
             var verboseOption = new Option<bool>("--verbose", "Verbose output");
-            listReleaseCommand.AddOption(repoOption);
-            listReleaseCommand.AddOption(verboseOption);
-            listReleaseCommand.SetHandler(async (repo, verbose, dryRun) =>
+            listReleaseCommand.Options.Add(repoOption);
+            listReleaseCommand.Options.Add(verboseOption);
+            listReleaseCommand.SetAction(async (System.CommandLine.ParseResult parseResult, CancellationToken cancellationToken) =>
             {
+                var repo = parseResult.GetValue(repoOption)!;
+                var verbose = parseResult.GetValue(verboseOption);
+                var dryRun = parseResult.GetValue(rootCommand.Options.OfType<Option<bool>>().First(o => o.Name == "dry-run"));
                 if (dryRun)
                 {
                     ConsoleHelper.WriteLine("DRY-RUN: running in dry-run mode; no destructive actions will be performed.", ConsoleColor.Yellow);
@@ -484,9 +524,9 @@ namespace Nbuild
                 if (verbose) ConsoleHelper.WriteLine($"Verbose mode enabled", ConsoleColor.Yellow);
                 if (verbose) ConsoleHelper.WriteLine($"[VERBOSE] Listing releases for repo: {repo}", ConsoleColor.Gray);
                 var exitCode = await HandleListReleasesCommand(repo, verbose, dryRun);
-                Environment.ExitCode = exitCode;
-            }, repoOption, verboseOption, rootCommand.Options.OfType<Option<bool>>().First(o => o.Name == "dry-run"));
-            rootCommand.AddCommand(listReleaseCommand);
+                return exitCode;
+            });
+            rootCommand.Subcommands.Add(listReleaseCommand);
         }
 
         private static void AddTargetsCommand(RootCommand rootCommand)
@@ -503,14 +543,15 @@ namespace Nbuild
                 "  nb targets --verbose\n"
             );
             var verboseOption = new Option<bool>("--verbose", "Verbose output");
-            cmd.AddOption(verboseOption);
-            cmd.SetHandler((verbose) =>
+            cmd.Options.Add(verboseOption);
+            cmd.SetAction((System.CommandLine.ParseResult parseResult) =>
             {
+                var verbose = parseResult.GetValue(verboseOption);
                 if (verbose) ConsoleHelper.WriteLine("[VERBOSE] Displaying build targets.", ConsoleColor.Gray);
                 var result = BuildStarter.DisplayTargets(Environment.CurrentDirectory);
-                Environment.ExitCode = result.Code;
-            }, verboseOption);
-            rootCommand.AddCommand(cmd);
+                return result.Code;
+            });
+            rootCommand.Subcommands.Add(cmd);
         }
 
         private static void AddInstallCommand(RootCommand rootCommand)
@@ -522,21 +563,24 @@ namespace Nbuild
 
             var jsonOption = new Option<string>("--json", "Full path to the manifest file containing your tool definitions.\nIf the path contains spaces, use double quotes.")
             {
-                IsRequired = true
+                Required = true
             };
             var verboseOption = new Option<bool>("--verbose", "Verbose output");
-            installCommand.AddOption(jsonOption);
-            installCommand.AddOption(verboseOption);
-            installCommand.SetHandler((json, verbose, dryRun) =>
+            installCommand.Options.Add(jsonOption);
+            installCommand.Options.Add(verboseOption);
+            installCommand.SetAction((System.CommandLine.ParseResult parseResult) =>
             {
+                var json = parseResult.GetValue(jsonOption)!;
+                var verbose = parseResult.GetValue(verboseOption);
+                var dryRun = parseResult.GetValue(rootCommand.Options.OfType<Option<bool>>().First(o => o.Name == "dry-run"));
                 if (dryRun)
                 {
                     ConsoleHelper.WriteLine("DRY-RUN: running in dry-run mode; no destructive actions will be performed.", ConsoleColor.Yellow);
                 }
                 var exitCode = HandleInstallCommand(json, verbose, dryRun);
-                Environment.ExitCode = exitCode;
-            }, jsonOption, verboseOption, rootCommand.Options.OfType<Option<bool>>().First(o => o.Name == "dry-run"));
-            rootCommand.AddCommand(installCommand);
+                return exitCode;
+            });
+            rootCommand.Subcommands.Add(installCommand);
         }
 
         private static void AddUninstallCommand(RootCommand rootCommand)
@@ -544,21 +588,24 @@ namespace Nbuild
             var uninstallCommand = new System.CommandLine.Command("uninstall", "Uninstall tools and applications specified in the manifest file.");
             var jsonOption = new Option<string>("--json", "Full path to the manifest file containing your tool definitions.\nIf the path contains spaces, use double quotes.")
             {
-                IsRequired = true
+                Required = true
             };
             var verboseOption = new Option<bool>("--verbose", "Verbose output");
-            uninstallCommand.AddOption(jsonOption);
-            uninstallCommand.AddOption(verboseOption);
-            uninstallCommand.SetHandler((json, verbose, dryRun) =>
+            uninstallCommand.Options.Add(jsonOption);
+            uninstallCommand.Options.Add(verboseOption);
+            uninstallCommand.SetAction((System.CommandLine.ParseResult parseResult) =>
             {
+                var json = parseResult.GetValue(jsonOption)!;
+                var verbose = parseResult.GetValue(verboseOption);
+                var dryRun = parseResult.GetValue(rootCommand.Options.OfType<Option<bool>>().First(o => o.Name == "dry-run"));
                 if (dryRun)
                 {
                     ConsoleHelper.WriteLine("DRY-RUN: running in dry-run mode; no destructive actions will be performed.", ConsoleColor.Yellow);
                 }
                 var exitCode = HandleUninstallCommand(json, verbose, dryRun);
-                Environment.ExitCode = exitCode;
-            }, jsonOption, verboseOption, rootCommand.Options.OfType<Option<bool>>().First(o => o.Name == "dry-run"));
-            rootCommand.AddCommand(uninstallCommand);
+                return exitCode;
+            });
+            rootCommand.Subcommands.Add(uninstallCommand);
         }
 
         private static void AddListCommand(RootCommand rootCommand)
@@ -571,19 +618,21 @@ namespace Nbuild
             // Enable strict option validation for this subcommand
             listCommand.TreatUnmatchedTokensAsErrors = true;
 
-            var jsonOption = new Option<string>("--json", () =>
+            var jsonOption = new Option<string>("--json") { Description = "Full path to the manifest file containing your tool definitions.\nIf the path contains spaces, use double quotes." };
+            jsonOption.DefaultValueFactory = _ =>
             {
                 var programFiles = Environment.GetEnvironmentVariable("ProgramFiles") ?? "C:\\Program Files";
                 var defaultPath = $"{programFiles}\\NBuild\\ntools.json";
                 return $"\"{defaultPath}\"";
-            }, "Full path to the manifest file containing your tool definitions.\nIf the path contains spaces, use double quotes.");
-            listCommand.AddOption(jsonOption);
-            listCommand.SetHandler((json) =>
+            };
+            listCommand.Options.Add(jsonOption);
+            listCommand.SetAction((System.CommandLine.ParseResult parseResult) =>
             {
+                var json = parseResult.GetValue(jsonOption) ?? string.Empty;
                 var exitCode = HandleListCommand(json);
-                Environment.ExitCode = exitCode;
-            }, jsonOption);
-            rootCommand.AddCommand(listCommand);
+                return exitCode;
+            });
+            rootCommand.Subcommands.Add(listCommand);
         }
 
         private static int HandleListCommand(string json)
@@ -781,3 +830,4 @@ namespace Nbuild
         }
     }
 }
+
