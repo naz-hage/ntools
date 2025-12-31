@@ -110,11 +110,8 @@ namespace Nbuild
             // Enable strict option validation for this subcommand
             downloadCommand.TreatUnmatchedTokensAsErrors = true;
 
-            var jsonOption = new Option<string>("--json", "Full path to the manifest file containing your tool definitions.\nIf the path contains spaces, use double quotes.")
-            {
-                Required = true
-            };
-            var verboseOption = new Option<bool>("--verbose", "Verbose output");
+            var jsonOption = new Option<string>("--json") { Description = "Full path to the manifest file containing your tool definitions.\nIf the path contains spaces, use double quotes.", Required = true };
+            var verboseOption = new Option<bool>("--verbose") { Description = "Verbose output" };
 
             downloadCommand.Options.Add(jsonOption);
             downloadCommand.Options.Add(verboseOption);
@@ -136,7 +133,7 @@ namespace Nbuild
         private static void AddPathCommand(RootCommand rootCommand)
         {
             var cmd = new System.CommandLine.Command("path", "Display each segment of the effective PATH environment variable on a separate line, with duplicates removed. Shows the complete PATH that processes actually use (Machine + User PATH combined).");
-            var verboseOption = new Option<bool>("--verbose", "Verbose output");
+            var verboseOption = new Option<bool>("--verbose") { Description = "Verbose output" };
             cmd.Options.Add(verboseOption);
             cmd.SetAction((System.CommandLine.ParseResult parseResult) =>
             {
@@ -158,7 +155,7 @@ namespace Nbuild
                 "Example:\n" +
                 "  nb git_info --verbose\n"
             );
-            var verboseOption = new Option<bool>("--verbose", "Verbose output");
+            var verboseOption = new Option<bool>("--verbose") { Description = "Verbose output" };
             gitInfoCommand.Options.Add(verboseOption);
             gitInfoCommand.SetAction((System.CommandLine.ParseResult parseResult) =>
             {
@@ -181,11 +178,8 @@ namespace Nbuild
                 "  --verbose   Verbose output\n\n" +
                 "Example:\n" +
                 "  nb git_settag --tag 1.24.33 --verbose\n");
-            var tagOption = new Option<string>("--tag", "Tag to set (e.g., 1.24.33)")
-            {
-                Required = true
-            };
-            var verboseOption = new Option<bool>("--verbose", "Verbose output");
+            var tagOption = new Option<string>("--tag") { Description = "Tag to set (e.g., 1.24.33)", Required = true };
+            var verboseOption = new Option<bool>("--verbose") { Description = "Verbose output" };
             gitSetTagCommand.Options.Add(tagOption);
             gitSetTagCommand.Options.Add(verboseOption);
             gitSetTagCommand.SetAction((System.CommandLine.ParseResult parseResult) =>
@@ -211,11 +205,8 @@ namespace Nbuild
                 "Example:\n" +
                 "  nb git_autotag --buildtype STAGE --verbose\n");
             gitAutoTagCommand.Aliases.Add("auto_tag");
-            var buildTypeOption = new Option<string>("--buildtype", "Specifies the build type used for this command. Possible values: STAGE, PROD")
-            {
-                Required = true
-            };
-            var verboseOption = new Option<bool>("--verbose", "Verbose output");
+            var buildTypeOption = new Option<string>("--buildtype") { Description = "Specifies the build type used for this command. Possible values: STAGE, PROD", Required = true };
+            var verboseOption = new Option<bool>("--verbose") { Description = "Verbose output" };
             gitAutoTagCommand.Options.Add(buildTypeOption);
             gitAutoTagCommand.Options.Add(verboseOption);
             gitAutoTagCommand.SetAction((System.CommandLine.ParseResult parseResult) =>
@@ -240,11 +231,8 @@ namespace Nbuild
                 "  --verbose   Verbose output\n\n" +
                 "Example:\n" +
                 "  nb git_push_autotag --buildtype PROD --verbose\n");
-            var buildTypeOption = new Option<string>("--buildtype", "Specifies the build type used for this command. Possible values: STAGE, PROD")
-            {
-                Required = true
-            };
-            var verboseOption = new Option<bool>("--verbose", "Verbose output");
+            var buildTypeOption = new Option<string>("--buildtype") { Description = "Specifies the build type used for this command. Possible values: STAGE, PROD", Required = true };
+            var verboseOption = new Option<bool>("--verbose") { Description = "Verbose output" };
             gitPushAutoTagCommand.Options.Add(buildTypeOption);
             gitPushAutoTagCommand.Options.Add(verboseOption);
             gitPushAutoTagCommand.SetAction((System.CommandLine.ParseResult parseResult) =>
@@ -268,7 +256,7 @@ namespace Nbuild
                 "Example:\n" +
                 "  nb git_branch --verbose\n"
             );
-            var verboseOption = new Option<bool>("--verbose", "Verbose output");
+            var verboseOption = new Option<bool>("--verbose") { Description = "Verbose output" };
             gitBranchCommand.Options.Add(verboseOption);
             gitBranchCommand.SetAction((System.CommandLine.ParseResult parseResult) =>
             {
@@ -291,11 +279,8 @@ namespace Nbuild
                 "  --verbose   Verbose output\n\n" +
                 "Example:\n" +
                 "  nb git_deletetag --tag 1.24.33 --verbose\n");
-            var tagOption = new Option<string>("--tag", "Tag to delete (e.g., 1.24.33)")
-            {
-                Required = true
-            };
-            var verboseOption = new Option<bool>("--verbose", "Verbose output");
+            var tagOption = new Option<string>("--tag") { Description = "Tag to delete (e.g., 1.24.33)", Required = true };
+            var verboseOption = new Option<bool>("--verbose") { Description = "Verbose output" };
             gitDeleteTagCommand.Options.Add(tagOption);
             gitDeleteTagCommand.Options.Add(verboseOption);
             gitDeleteTagCommand.SetAction((System.CommandLine.ParseResult parseResult) =>
@@ -324,24 +309,11 @@ namespace Nbuild
                 "Examples:\n" +
                 "  nb release_create --repo user/repo --tag 1.24.33 --branch main --file C:\\path\\to\\asset.zip --verbose\n" +
                 "  nb release_create --repo https://github.com/user/repo --tag 1.24.33 --branch main --file ./asset.zip --verbose\n");
-            var repoOption = new Option<string>("--repo",
-                "Git repository. Accepts:\n  - repoName (uses OWNER env variable)\n  - userName/repoName\n  - Full GitHub URL (https://github.com/userName/repoName)")
-            {
-                Required = true
-            };
-            var tagOption = new Option<string>("--tag", "Specifies the tag used")
-            {
-                Required = true
-            };
-            var branchOption = new Option<string>("--branch", "Specifies the branch name")
-            {
-                Required = true
-            };
-            var fileOption = new Option<string>("--file", "Specifies the asset file name. Must include full path")
-            {
-                Required = true
-            };
-            var verboseOption = new Option<bool>("--verbose", "Verbose output");
+            var repoOption = new Option<string>("--repo") { Description = "Git repository. Accepts:\n  - repoName (uses OWNER env variable)\n  - userName/repoName\n  - Full GitHub URL (https://github.com/userName/repoName)", Required = true };
+            var tagOption = new Option<string>("--tag") { Description = "Specifies the tag used", Required = true };
+            var branchOption = new Option<string>("--branch") { Description = "Specifies the branch name", Required = true };
+            var fileOption = new Option<string>("--file") { Description = "Specifies the asset file name. Must include full path", Required = true };
+            var verboseOption = new Option<bool>("--verbose") { Description = "Verbose output" };
             releaseCreateCommand.Options.Add(repoOption);
             releaseCreateCommand.Options.Add(tagOption);
             releaseCreateCommand.Options.Add(branchOption);
@@ -386,23 +358,11 @@ namespace Nbuild
                 "Example:\n" +
                 "  nb pre_release_create --repo user/repo --tag 1.24.33 --branch main --file C:\\path\\to\\asset.zip --verbose\n"
             );
-            var repoOption = new Option<string>("--repo", "Specifies the Git repository in any of the following formats:\n- repoName  (UserName is declared the `OWNER` environment variable)\n- userName/repoName\n- https://github.com/userName/repoName (Full URL to the repository on GitHub)")
-            {
-                Required = true
-            };
-            var tagOption = new Option<string>("--tag", "Specifies the tag used")
-            {
-                Required = true
-            };
-            var branchOption = new Option<string>("--branch", "Specifies the branch name")
-            {
-                Required = true
-            };
-            var fileOption = new Option<string>("--file", "Specifies the asset file name. Must include full path")
-            {
-                Required = true
-            };
-            var verboseOption = new Option<bool>("--verbose", "Verbose output");
+            var repoOption = new Option<string>("--repo") { Description = "Specifies the Git repository in any of the following formats:\n- repoName  (UserName is declared the `OWNER` environment variable)\n- userName/repoName\n- https://github.com/userName/repoName (Full URL to the repository on GitHub)", Required = true };
+            var tagOption = new Option<string>("--tag") { Description = "Specifies the tag used", Required = true };
+            var branchOption = new Option<string>("--branch") { Description = "Specifies the branch name", Required = true };
+            var fileOption = new Option<string>("--file") { Description = "Specifies the asset file name. Must include full path", Required = true };
+            var verboseOption = new Option<bool>("--verbose") { Description = "Verbose output" };
             preReleaseCreateCommand.Options.Add(repoOption);
             preReleaseCreateCommand.Options.Add(tagOption);
             preReleaseCreateCommand.Options.Add(branchOption);
@@ -458,19 +418,10 @@ namespace Nbuild
                 "Example:\n" +
                 "  nb release_download --repo user/repo --tag 1.24.33 --path C:\\downloads --verbose\n"
             );
-            var repoOption = new Option<string>("--repo", "Specifies the Git repository in any of the following formats:\n- repoName  (UserName is declared the `OWNER` environment variable)\n- userName/repoName\n- https://github.com/userName/repoName (Full URL to the repository on GitHub)")
-            {
-                Required = true
-            };
-            var tagOption = new Option<string>("--tag", "Specifies the tag used")
-            {
-                Required = true
-            };
-            var pathOption = new Option<string>("--path", "Specifies the path used for this command. If not specified, the current directory will be used")
-            {
-                Required = false
-            };
-            var verboseOption = new Option<bool>("--verbose", "Verbose output");
+            var repoOption = new Option<string>("--repo") { Description = "Specifies the Git repository in any of the following formats:\n- repoName  (UserName is declared the `OWNER` environment variable)\n- userName/repoName\n- https://github.com/userName/repoName (Full URL to the repository on GitHub)", Required = true };
+            var tagOption = new Option<string>("--tag") { Description = "Specifies the tag used", Required = true };
+            var pathOption = new Option<string>("--path") { Description = "Specifies the path used for this command. If not specified, the current directory will be used", Required = false };
+            var verboseOption = new Option<bool>("--verbose") { Description = "Verbose output" };
             releaseDownloadCommand.Options.Add(repoOption);
             releaseDownloadCommand.Options.Add(tagOption);
             releaseDownloadCommand.Options.Add(pathOption);
@@ -505,11 +456,8 @@ namespace Nbuild
                 "Example:\n" +
                 "  nb list_release --repo user/repo --verbose\n"
             );
-            var repoOption = new Option<string>("--repo", "Specifies the Git repository in any of the following formats:\n- repoName  (UserName is declared the `OWNER` environment variable)\n- userName/repoName\n- https://github.com/userName/repoName (Full URL to the repository on GitHub)")
-            {
-                Required = true
-            };
-            var verboseOption = new Option<bool>("--verbose", "Verbose output");
+            var repoOption = new Option<string>("--repo") { Description = "Specifies the Git repository in any of the following formats:\n- repoName  (UserName is declared the `OWNER` environment variable)\n- userName/repoName\n- https://github.com/userName/repoName (Full URL to the repository on GitHub)", Required = true };
+            var verboseOption = new Option<bool>("--verbose") { Description = "Verbose output" };
             listReleaseCommand.Options.Add(repoOption);
             listReleaseCommand.Options.Add(verboseOption);
             listReleaseCommand.SetAction(async (System.CommandLine.ParseResult parseResult, CancellationToken cancellationToken) =>
@@ -542,7 +490,7 @@ namespace Nbuild
                 "To list all targets:\n" +
                 "  nb targets --verbose\n"
             );
-            var verboseOption = new Option<bool>("--verbose", "Verbose output");
+            var verboseOption = new Option<bool>("--verbose") { Description = "Verbose output" };
             cmd.Options.Add(verboseOption);
             cmd.SetAction((System.CommandLine.ParseResult parseResult) =>
             {
@@ -561,11 +509,8 @@ namespace Nbuild
             // Enable strict option validation for this subcommand
             installCommand.TreatUnmatchedTokensAsErrors = true;
 
-            var jsonOption = new Option<string>("--json", "Full path to the manifest file containing your tool definitions.\nIf the path contains spaces, use double quotes.")
-            {
-                Required = true
-            };
-            var verboseOption = new Option<bool>("--verbose", "Verbose output");
+            var jsonOption = new Option<string>("--json") { Description = "Full path to the manifest file containing your tool definitions.\nIf the path contains spaces, use double quotes.", Required = true };
+            var verboseOption = new Option<bool>("--verbose") { Description = "Verbose output" };
             installCommand.Options.Add(jsonOption);
             installCommand.Options.Add(verboseOption);
             installCommand.SetAction((System.CommandLine.ParseResult parseResult) =>
@@ -586,11 +531,8 @@ namespace Nbuild
         private static void AddUninstallCommand(RootCommand rootCommand)
         {
             var uninstallCommand = new System.CommandLine.Command("uninstall", "Uninstall tools and applications specified in the manifest file.");
-            var jsonOption = new Option<string>("--json", "Full path to the manifest file containing your tool definitions.\nIf the path contains spaces, use double quotes.")
-            {
-                Required = true
-            };
-            var verboseOption = new Option<bool>("--verbose", "Verbose output");
+            var jsonOption = new Option<string>("--json") { Description = "Full path to the manifest file containing your tool definitions.\nIf the path contains spaces, use double quotes.", Required = true };
+            var verboseOption = new Option<bool>("--verbose") { Description = "Verbose output" };
             uninstallCommand.Options.Add(jsonOption);
             uninstallCommand.Options.Add(verboseOption);
             uninstallCommand.SetAction((System.CommandLine.ParseResult parseResult) =>

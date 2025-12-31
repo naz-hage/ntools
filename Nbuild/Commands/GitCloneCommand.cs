@@ -50,9 +50,9 @@ namespace Nbuild.Commands
                 "Example:\n" +
                 "  nb git_clone --url https://github.com/user/repo --path ./repo --verbose\n");
 
-            var urlOption = new Option<string>("--url", "Specifies the Git repository URL") { Required = true };
-            var pathOption = new Option<string>("--path", "The path where the repo will be cloned. If not specified, the current directory will be used");
-            var verboseOption = new Option<bool>("--verbose", "Verbose output");
+            var urlOption = new Option<string>("--url") { Description = "Specifies the Git repository URL", Required = true };
+            var pathOption = new Option<string>("--path") { Description = "The path where the repo will be cloned. If not specified, the current directory will be used" };
+            var verboseOption = new Option<bool>("--verbose") { Description = "Verbose output" };
 
             gitCloneCommand.Options.Add(urlOption);
             gitCloneCommand.Options.Add(pathOption);
