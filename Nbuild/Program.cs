@@ -45,7 +45,7 @@ namespace Nbuild
             AddReleaseCreateCommand(rootCommand);
             AddPreReleaseCreateCommand(rootCommand);
             AddReleaseDownloadCommand(rootCommand);
-            AddListReleaseCommand(rootCommand);
+            AddListReleaseCommand(rootCommand, dryRunOption);
             AddTargetsCommand(rootCommand);
 
             // Enable strict validation for the root command but allow unmatched tokens for build targets
@@ -444,7 +444,7 @@ namespace Nbuild
             rootCommand.Subcommands.Add(releaseDownloadCommand);
         }
 
-        private static void AddListReleaseCommand(RootCommand rootCommand)
+        private static void AddListReleaseCommand(RootCommand rootCommand, Option<bool> dryRunOption)
         {
             var listReleaseCommand = new System.CommandLine.Command(
                 "list_release",
@@ -464,7 +464,7 @@ namespace Nbuild
             {
                 var repo = parseResult.GetValue(repoOption)!;
                 var verbose = parseResult.GetValue(verboseOption);
-                var dryRun = parseResult.GetValue(rootCommand.Options.OfType<Option<bool>>().First(o => o.Name == "dry-run"));
+                var dryRun = parseResult.GetValue(dryRunOption);
                 if (dryRun)
                 {
                     ConsoleHelper.WriteLine("DRY-RUN: running in dry-run mode; no destructive actions will be performed.", ConsoleColor.Yellow);
