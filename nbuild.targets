@@ -10,7 +10,8 @@
 		<DeploymentFolder>$(ProgramFiles)\Nbuild</DeploymentFolder>
 		<!--  Modify these paths to match your Python installation -->
 		<!-- Always use python.exe from PATH for portability -->
-		<PipPath>python.exe -m pip</PipPath>
+		<PythonPath>C:\Program Files\Python\3.13.3</PythonPath>
+		<PythonExe>$(PythonPath)\python.exe</PythonExe>
 		<MkDocsExe>$(USERPROFILE)\AppData\Roaming\Python\Python313\Scripts\mkdocs.exe</MkDocsExe>
 	</PropertyGroup>
 
@@ -110,13 +111,13 @@
 		<Error Condition="!Exists('$(PythonPath)\python.exe')" Text="Python is not installed at $(PythonPath)" />
 
 		<!-- Upgrade pip -->
-		<Exec Command="&quot;$(PipPath)&quot; install --upgrade pip" WorkingDirectory="$(SolutionDir)">
+		<Exec Command='"$(PythonExe)" -m pip install --upgrade pip' WorkingDirectory="$(SolutionDir)">
 			<Output TaskParameter="ExitCode" PropertyName="PipUpgradeExitCode" />
 		</Exec>
 		<Error Condition="'$(PipUpgradeExitCode)' != '0'" Text="Failed to upgrade pip. Exit code: $(PipUpgradeExitCode)" />
 
 		<!-- Install mkdocs -->
-		<Exec Command="&quot;$(PipPath)&quot; install mkdocs" WorkingDirectory="$(SolutionDir)">
+		<Exec Command='"$(PythonExe)" -m pip install mkdocs' WorkingDirectory="$(SolutionDir)">
 			<Output TaskParameter="ExitCode" PropertyName="MkDocsInstallExitCode" />
 		</Exec>
 		<Error Condition="'$(MkDocsInstallExitCode)' != '0'" Text="Failed to install mkdocs. Exit code: $(MkDocsInstallExitCode)" />

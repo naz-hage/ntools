@@ -10,6 +10,10 @@ namespace Nbuild
         public static int Main(params string[] args)
         {
             ConsoleHelper.WriteLine($"{Nversion.Get()}\n", ConsoleColor.Yellow);
+            
+            // Pre-process arguments to move global options to the front so they work regardless of position
+            args = PreProcessGlobalOptions(args);
+            
             // Check for common option typos BEFORE parsing
             var typoCheck = CliValidation.CheckForCommonTypos(args);
             if (typoCheck != null)
@@ -97,6 +101,34 @@ namespace Nbuild
             }
 
             return rootCommand.Parse(args).Invoke();
+        }
+
+        /// <summary>
+        /// Pre-processes command line arguments to move global options (--dry-run, --verbose) to the front
+        /// so they work regardless of their position in the command line.
+        /// </summary>
+        private static string[] PreProcessGlobalOptions(string[] args)
+        {
+            if (args.Length == 0)
+                return args;
+
+            var globalOptions = new List<string>();
+            var otherArgs = new List<string>();
+
+            foreach (var arg in args)
+            {
+                if (arg == "--dry-run" || arg == "--verbose")
+                {
+                    globalOptions.Add(arg);
+                }
+                else
+                {
+                    otherArgs.Add(arg);
+                }
+            }
+
+            // Return global options first, then other arguments
+            return globalOptions.Concat(otherArgs).ToArray();
         }
 
         // Try to call Nversion.Get in a compatibility-safe way. Some compiled binaries or older versions
