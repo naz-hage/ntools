@@ -1,5 +1,4 @@
-﻿using CommandLine;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Nbuild;
 using NbuildTasks;
 using System.Reflection;
@@ -43,12 +42,12 @@ namespace NbuildTests
                 throw new ArgumentNullException(nameof(json));
             }
 
-            var listAppData = JsonSerializer.Deserialize<NbuildApps>(json) ?? throw new ParserException("Failed to parse json to list of objects", null);
+            var listAppData = JsonSerializer.Deserialize<NbuildApps>(json) ?? throw new ArgumentException("Failed to parse json to list of objects");
 
             // make sure version matches SupportedVersion
             if (listAppData.Version != SupportedVersion)
             {
-                throw new ParserException($"Version {listAppData.Version} is not supported. Please use version {SupportedVersion}", null);
+                throw new ArgumentException($"Version {listAppData.Version} is not supported. Please use version {SupportedVersion}");
             }
 
             var appsFolder = @"c:\temp\apps";
