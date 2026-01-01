@@ -61,17 +61,7 @@
     <li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#dry-run-contract">Dry-run contract</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#nbuildtargets">nbuild.targets</a>
         <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#commontargets">common.targets</a>
-    </li>
-        </ul>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#1-install-applications">1. Install Applications</a>
-    </li>
     <li class="toctree-l3"><a class="reference internal" href="#2-uninstall-applications">2. Uninstall Applications</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#3-list-installed-applications">3. List Installed Applications</a>
@@ -206,7 +196,8 @@
 - Install, uninstall, and list development tools from a manifest file
 - Download tools and assets for your environment
 - Integrate with Git for tagging, branching, and release automation
-- Automate GitHub releases and asset downloads</p>
+- Automate GitHub releases and asset downloads
+- <strong>Global options</strong> (<code>--dry-run</code>, <code>--verbose</code>) available for all commands</p>
 <blockquote>
 <p><strong>Note:</strong> <code>nb.exe</code> expects the <a href="#nbuildtargets">nbuild.targets</a> file to be present in your solution folder for build-related commands.</p>
 </blockquote>
@@ -218,8 +209,10 @@ Usage:
   nb [command] [options] [[--] &lt;additional arguments&gt;...]
 
 Options:
-  --version       Show version information
+  --dry-run       Perform a dry run: show actions but do not perform side effects
+  --verbose       Verbose output
   -?, -h, --help  Show help and usage information
+  --version       Show version information
 
 Commands:
   install                Install tools and applications specified in the manifest file.
@@ -228,246 +221,121 @@ Commands:
                          Use this command to audit, compare, or document the state of your development environment.
   download               Download tools and applications specified in the manifest file.
   path                   Display each segment of the effective PATH environment variable on a separate line, with duplicates removed. Shows the complete PATH that processes actually use (Machine + User PATH combined).
-
-                         Optional option:
-                           --verbose   Verbose output
-
-                         Example:
-                           nb path --verbose
-  git_info               Displays the current git information for the local repository, including branch, and latest
-                         tag.
-
-                         Optional option:
-                           --verbose   Verbose output
-
-                         Example:
-                           nb git_info --verbose
+  git_info               Displays the current git information for the local repository, including branch, and latest tag.
   git_settag             Sets a git tag in the local repository.
-
-                         Required option:
-                           --tag   The tag to set (e.g., 1.24.33)
-                         Optional option:
-                           --verbose   Verbose output
-
-                         Example:
-                           nb git_settag --tag 1.24.33 --verbose
-  auto_tag, git_autotag  Automatically sets the next git tag based on build type.
-
-                         Required option:
-                           --buildtype   Build type (STAGE or PROD)
-                         Optional option:
-                           --verbose   Verbose output
-
-                         Example:
-                           nb git_autotag --buildtype STAGE --verbose
+  git_autotag            Automatically sets the next git tag based on build type.
   git_push_autotag       Sets the next git tag based on build type and pushes to remote.
-
-                         Required option:
-                           --buildtype   Build type (STAGE or PROD)
-                         Optional option:
-                           --verbose   Verbose output
-
-                         Example:
-                           nb git_push_autotag --buildtype PROD --verbose
   git_branch             Displays the current git branch in the local repository.
-
-                         Optional option:
-                           --verbose   Verbose output
-
-                         Example:
-                           nb git_branch --verbose
   git_clone              Clones a Git repository to a specified path.
-
-                         Required option:
-                           --url   Git repository URL
-                         Optional options:
-                           --path      Path to clone into (default: current directory)
-                           --verbose   Verbose output
-
-                         Example:
-                           nb git_clone --url https://github.com/user/repo --path ./repo --verbose
   git_deletetag          Deletes a git tag from the local repository.
-
-                         Required option:
-                           --tag   The tag to delete (e.g., 1.24.33)
-                         Optional option:
-                           --verbose   Verbose output
-
-                         Example:
-                           nb git_deletetag --tag 1.24.33 --verbose
   release_create         Creates a GitHub release.
-
-                         Required options:
-                           --repo   Git repository (formats: repoName, userName/repoName, or full GitHub URL)
-                           --tag    Tag to use for the release (e.g., 1.24.33)
-                           --branch Branch name to release from (e.g., main)
-                           --file   Asset file name (full path required)
-                         Optional option:
-                           --verbose   Verbose output
-
-                         Examples:
-                           nb release_create --repo user/repo --tag 1.24.33 --branch main --file C:\path\to\asset.zip --verbose
-                           nb release_create --repo https://github.com/user/repo --tag 1.24.33 --branch main --file ./asset.zip --verbose
   pre_release_create     Creates a GitHub pre-release.
-
-                         Required options:
-                           --repo   Git repository (formats: repoName, userName/repoName, or full GitHub URL)
-                           --tag    Tag to use for the pre-release (e.g., 1.24.33)
-                           --branch Branch name to release from (e.g., main)
-                           --file   Asset file name (full path required)
-                         Optional option:
-                           --verbose   Verbose output
-
-                         Example:
-                           nb pre_release_create --repo user/repo --tag 1.24.33 --branch main --file C:\path\to\asset.zip --verbose
   release_download       Downloads a specific asset from a GitHub release.
-
-                         Required options:
-                           --repo   Git repository (formats: repoName, userName/repoName, or full GitHub URL)
-                           --tag    Tag to use for the release (e.g., 1.24.33)
-                         Optional option:
-                           --path   Path to download asset to (default: current directory)
-                           --verbose   Verbose output
-
-                         Example:
-                           nb release_download --repo user/repo --tag 1.24.33 --path C:\downloads --verbose
-  list_release           Lists the latest 3 releases for the specified repository, and the latest pre-release if newer.
-
-                         Required option:
-                           --repo   Git repository (formats: repoName, userName/repoName, or full GitHub URL)
-                         Optional option:
-                           --verbose   Verbose output
-
-                         Example:
-                           nb list_release --repo user/repo --verbose
+  list_release           Lists the latest releases for the specified repository.
   targets                Displays all available build targets for the current solution or project.
 
-                         Optional option:
-                           --verbose   Verbose output
-
-                         You can run any listed target directly using nb.exe.
-                         Example: If 'core' is listed, you can run:
-                           nb core
-
-                         To list all targets:
-                           nb targets --verbose
 Additional Arguments:
   Arguments passed to the application that is being run.
 </code></pre>
 <h2 id="dry-run-contract">Dry-run contract</h2>
-<p>When <code>--dry-run</code> is supplied to <code>nb.exe</code> the CLI will not perform any state-changing
-operations. The intent of <code>--dry-run</code> is to provide a safe, predictable preview of
+<pre><code>                       --repo   Git repository (formats: repoName, userName/repoName, or full GitHub URL)
+                       --tag    Tag to use for the release (e.g., 1.24.33)
+                       --branch Branch name to release from (e.g., main)
+                       --file   Asset file name (full path required)
+</code></pre>
+<p>Examples:
+                           nb release_create --repo user/repo --tag 1.24.33 --branch main --file C:\path\to\asset.zip
+                           nb release_create --repo https://github.com/user/repo --tag 1.24.33 --branch main --file ./asset.zip
+  pre_release_create     Creates a GitHub pre-release.</p>
+<pre><code>                     Required options:
+                       --repo   Git repository (formats: repoName, userName/repoName, or full GitHub URL)
+                       --tag    Tag to use for the pre-release (e.g., 1.24.33)
+                       --branch Branch name to release from (e.g., main)
+                       --file   Asset file name (full path required)
+</code></pre>
+<p>Example:
+                           nb pre_release_create --repo user/repo --tag 1.24.33 --branch main --file C:\path\to\asset.zip
+  release_download       Downloads a specific asset from a GitHub release.</p>
+<pre><code>                     Required options:
+                       --repo   Git repository (formats: repoName, userName/repoName, or full GitHub URL)
+                       --tag    Tag to use for the release (e.g., 1.24.33)
+                       --path   Path to download asset to (default: current directory)
+</code></pre>
+<p>Example:
+                           nb release_download --repo user/repo --tag 1.24.33 --path C:\downloads
+  list_release           Lists the latest 3 releases for the specified repository, and the latest pre-release if newer.</p>
+<pre><code>                     Required option:
+                       --repo   Git repository (formats: repoName, userName/repoName, or full GitHub URL)
+</code></pre>
+<p>Example:
+                           nb list_release --repo user/repo
+  targets                Displays all available build targets for the current solution or project.</p>
+<p>You can run any listed target directly using nb.exe.
+                         Example: If 'core' is listed, you can run:
+                           nb core</p>
+<p>Additional Arguments:
+  Arguments passed to the application that is being run.</p>
+<pre><code>
+## Dry-run contract
+
+When `--dry-run` is supplied to `nb.exe` the CLI will not perform any state-changing
+operations. The intent of `--dry-run` is to provide a safe, predictable preview of
 what the CLI would do without modifying remote services, local files, system
-configuration, or registry state.</p>
-<p>Key points:
-- <code>--dry-run</code> must never upload files, create or modify GitHub releases, write to
+configuration, or registry state.
+
+Key points:
+- `--dry-run` must never upload files, create or modify GitHub releases, write to
   Program Files, change PATH, edit the registry, or delete files.
-- For destructive commands (for example <code>release_create</code>, <code>pre_release_create</code>,
-  <code>install</code>, <code>uninstall</code>, <code>upload</code>) the command will short-circuit and print a
-  concise action summary prefixed with <code>DRY-RUN:</code> (for example: <code>DRY-RUN: would
-  upload asset X to release Y</code>).
-- For read-only commands (for example <code>list_release</code>) the default Behavior is to
+- For destructive commands (for example `release_create`, `pre_release_create`,
+  `install`, `uninstall`, `upload`) the command will short-circuit and print a
+  concise action summary prefixed with `DRY-RUN:` (for example: `DRY-RUN: would
+  upload asset X to release Y`).
+- For read-only commands (for example `list_release`) the default Behavior is to
   avoid network access in dry-run and print a short simulated message. If a
   project requires read-only network access during dry-run, it should be made
-  explicit (for example <code>--dry-run=fetch</code>) in a follow-up PBI.</p>
-<blockquote>
-<p><strong>Tip:</strong> If the <code>--json</code> option is not specified, the default manifest file <code>C:\Program Files\NBuild\ntools.json</code> is used.</p>
-</blockquote>
-<hr />
-<h2 id="nbuildtargets">nbuild.targets</h2>
-<p>See <a href="https://github.com/naz-hage/ntools/blob/main/Nbuild/resources/nbuild.targets"><code>nbuild.targets</code></a> for more information and checkout other targets in <a href="https://github.com/naz-hage/ntools/blob/main/Nbuild/resources"><code>Nbuild/resources</code></a>.</p>
-<h3 id="commontargets">common.targets</h3>
-<ul>
-<li>The <code>common.targets</code> file includes all the defaults targets needed to build, test and deploy a solution.  The <code>common.targets</code> file is located in the <code>$(ProgramFiles)\Nbuild</code> folder.  The <code>nbuild.targets</code> file in the solution folder imports the <code>common.targets</code> file</li>
-</ul>
-<p>Below is a list of common targets defined in the <code>common.targets</code> file:</p>
-<table>
-<thead>
-<tr>
-<th><strong>Target Name</strong></th>
-<th><strong>Description</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>PROPERTIES</td>
-<td>Common properties that will be used by all targets</td>
-</tr>
-<tr>
-<td>CLEAN</td>
-<td>Clean up the project and artifacts folder</td>
-</tr>
-<tr>
-<td>INSTALL_DEP</td>
-<td>Install dependencies</td>
-</tr>
-<tr>
-<td>TELEMETRY_OPT_OUT</td>
-<td>Opt out of the DOTNET_CLI_TELEMETRY_OPTOUT - move to common</td>
-</tr>
-<tr>
-<td>STAGE</td>
-<td>Create a stage package for testing</td>
-</tr>
-<tr>
-<td>PROD</td>
-<td>Create a production package for release</td>
-</tr>
-<tr>
-<td>STAGE_DEPLOY</td>
-<td>Create a stage package and deploy for testing</td>
-</tr>
-<tr>
-<td>PROD_DEPLOY</td>
-<td>Create a production package and deploy for release</td>
-</tr>
-<tr>
-<td>SOLUTION</td>
-<td>Build the solution Release configuration  using dotnet build</td>
-</tr>
-<tr>
-<td>SOLUTION_MSBUILD</td>
-<td>Build the solution Release configuration  using MSBuild</td>
-</tr>
-<tr>
-<td>PACKAGE</td>
-<td>Create a package for the solution default is a zip file of all artifacts</td>
-</tr>
-<tr>
-<td>COPY_ARTIFACTS</td>
-<td>Save the artifacts to the artifacts folder</td>
-</tr>
-<tr>
-<td>DEPLOY</td>
-<td>Deploy the package. default is to extract artifacts into DeploymentProperty folder</td>
-</tr>
-<tr>
-<td>TEST</td>
-<td>Run all tests using dotnet test in Release mode</td>
-</tr>
-<tr>
-<td>TEST_DEBUG</td>
-<td>Run all tests using dotnet test in Debug mode</td>
-</tr>
-<tr>
-<td>IS_ADMIN</td>
-<td>Check if current process is running in admin mode AdminCheckExitCode property is set</td>
-</tr>
-<tr>
-<td>SingleProject</td>
-<td>Example how to build a single project</td>
-</tr>
-<tr>
-<td>HandleError</td>
-<td>Error handling placeholder</td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h2 id="examples">Examples</h2>
-<p>Below are practical examples for using <code>nb.exe</code>. These examples assume you are running in a PowerShell terminal.</p>
-<h3 id="1-install-applications">1. Install Applications</h3>
-<pre><code class="language-cmd">nb.exe install --json &quot;C:\Program Files\tools.json&quot;
+  explicit (for example `--dry-run=fetch`) in a follow-up PBI.
+&gt; **Tip:** If the `--json` option is not specified, the default manifest file `C:\Program Files\NBuild\ntools.json` is used.
+
+---
+
+## nbuild.targets
+See [`nbuild.targets`](https://github.com/naz-hage/ntools/blob/main/Nbuild/resources/nbuild.targets) for more information and checkout other targets in [`Nbuild/resources`](https://github.com/naz-hage/ntools/blob/main/Nbuild/resources).
+
+### common.targets
+- The `common.targets` file includes all the defaults targets needed to build, test and deploy a solution.  The `common.targets` file is located in the `$(ProgramFiles)\Nbuild` folder.  The `nbuild.targets` file in the solution folder imports the `common.targets` file
+
+Below is a list of common targets defined in the `common.targets` file:
+
+| **Target Name** | **Description** |
+| --- | --- |
+| PROPERTIES          | Common properties that will be used by all targets |
+| CLEAN               | Clean up the project and artifacts folder |
+| INSTALL_DEP         | Install dependencies |
+| TELEMETRY_OPT_OUT   | Opt out of the DOTNET_CLI_TELEMETRY_OPTOUT - move to common |
+| STAGE             | Create a stage package for testing |
+| PROD          | Create a production package for release |
+| STAGE_DEPLOY      | Create a stage package and deploy for testing |
+| PROD_DEPLOY   | Create a production package and deploy for release |
+| SOLUTION            | Build the solution Release configuration  using dotnet build |
+| SOLUTION_MSBUILD    | Build the solution Release configuration  using MSBuild |
+| PACKAGE             | Create a package for the solution default is a zip file of all artifacts |
+| COPY_ARTIFACTS      | Save the artifacts to the artifacts folder |
+| DEPLOY              | Deploy the package. default is to extract artifacts into DeploymentProperty folder |
+| TEST                | Run all tests using dotnet test in Release mode |
+| TEST_DEBUG          | Run all tests using dotnet test in Debug mode |
+| IS_ADMIN            | Check if current process is running in admin mode AdminCheckExitCode property is set |
+| SingleProject       | Example how to build a single project |
+| HandleError         | Error handling placeholder |
+
+---
+
+## Examples
+
+Below are practical examples for using `nb.exe`. These examples assume you are running in a PowerShell terminal.
+
+### 1. Install Applications
+```cmd
+nb.exe install --json &quot;C:\Program Files\tools.json&quot;
 </code></pre>
 <p>Installs applications specified in the manifest file. (Requires admin privileges.)</p>
 <h3 id="2-uninstall-applications">2. Uninstall Applications</h3>
@@ -485,7 +353,7 @@ nb.exe list --json &quot;C:\Program Files\NBuild\ntools.json&quot;
 <p>Downloads tools and applications specified in the manifest file.</p>
 <h3 id="5-display-path-segments">5. Display Path Segments</h3>
 <pre><code class="language-cmd">nb.exe path
-nb.exe path --verbose
+nb.exe path
 </code></pre>
 <p>Displays each segment of the effective PATH environment variable on a separate line, with duplicates removed. Shows the complete PATH that processes actually use (Machine + User PATH combined). Use <code>--verbose</code> for additional output.</p>
 <h3 id="6-display-git-information">6. Display Git Information</h3>
@@ -509,7 +377,7 @@ nb.exe path --verbose
 </code></pre>
 <p>Displays the current git branch in the local repository.</p>
 <h3 id="11-clone-a-git-repository">11. Clone a Git Repository</h3>
-<pre><code class="language-cmd">nb.exe git_clone --url https://github.com/example/repo --path C:\Projects --verbose
+<pre><code class="language-cmd">nb.exe git_clone --url https://github.com/example/repo --path C:\Projects
 </code></pre>
 <p>Clones the specified git repository into the specified path. Use <code>--verbose</code> for detailed output.</p>
 <h3 id="12-delete-a-specific-tag">12. Delete a Specific Tag</h3>
@@ -537,7 +405,7 @@ nb.exe path --verbose
 </code></pre>
 <p>Downloads an asset using the full GitHub repository URL.</p>
 <h3 id="18-list-latest-releases">18. List Latest Releases</h3>
-<pre><code class="language-cmd">nb.exe list_release --repo https://github.com/userName/my-repo --verbose
+<pre><code class="language-cmd">nb.exe list_release --repo https://github.com/userName/my-repo
 </code></pre>
 <p>Lists the latest 3 releases and the newest pre-release (if newer than the latest release). Use <code>--verbose</code> for detailed output.</p>
 <h3 id="19-list-build-targets">19. List Build Targets</h3>

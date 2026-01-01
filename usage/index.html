@@ -46,6 +46,8 @@
                   <li class="toctree-l1"><a class="reference internal" href="../installation/">Installation</a>
                   </li>
                   <li class="toctree-l1 current"><a class="reference internal current" href="#">Practice</a>
+    <ul class="current">
+    </ul>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../setup/">Setup your project</a>
                   </li>
@@ -137,6 +139,11 @@
             <div class="section" itemprop="articleBody">
               
                 <p>Once Ntools is installed, Open a Developer Command prompt for Visual Studio 2022 and navigate to your solution folder (i.e. <code>./ntools</code>).  The <a href="../ntools/nbuild/"><code>nb.exe</code></a> is the main executable for the Ntools.  The following are some examples of how to use the Ntools:</p>
+<h2 id="global-options">Global Options</h2>
+<p>Ntools supports global options that work across all commands:
+- <code>--dry-run</code>: Preview changes without applying them
+- <code>--verbose</code>: Enable verbose output for detailed information</p>
+<h2 id="build-test-commands">Build &amp; Test Commands</h2>
 <ul>
 <li>Build a solution: Compiles the solution in the solution directory</li>
 </ul>
@@ -151,6 +158,13 @@
 <li>Test solution: runs all the tests in the solution with optional code coverage</li>
 </ul>
 <pre><code class="language-cmd">nb.exe test
+</code></pre>
+<ul>
+<li>Run specific unit test suites:</li>
+</ul>
+<pre><code class="language-cmd">nb UNIT_TEST_CLI_VALIDATION    # CLI validation tests
+nb UNIT_TEST_GIT_CLONE_COMMAND # Git clone command tests
+nb UNIT_TEST_ALL              # All unit tests (except long-running ones)
 </code></pre>
 <ul>
 <li>Create a stage release: Creates a stage build which includes the following steps:<ul>
