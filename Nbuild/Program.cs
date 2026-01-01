@@ -42,9 +42,9 @@ namespace Nbuild
             // register git_clone command from dedicated class (pass global dry-run option and service)
             GitCloneCommand.Register(rootCommand, dryRunOption, new GitCloneService());
             AddGitDeleteTagCommand(rootCommand, dryRunOption);
-            AddReleaseCreateCommand(rootCommand);
-            AddPreReleaseCreateCommand(rootCommand);
-            AddReleaseDownloadCommand(rootCommand);
+            AddReleaseCreateCommand(rootCommand, dryRunOption);
+            AddPreReleaseCreateCommand(rootCommand, dryRunOption);
+            AddReleaseDownloadCommand(rootCommand, dryRunOption);
             AddListReleaseCommand(rootCommand, dryRunOption);
             AddTargetsCommand(rootCommand);
 
@@ -295,7 +295,7 @@ namespace Nbuild
             rootCommand.Subcommands.Add(gitDeleteTagCommand);
         }
 
-        private static void AddReleaseCreateCommand(RootCommand rootCommand)
+        private static void AddReleaseCreateCommand(RootCommand rootCommand, Option<bool> dryRunOption)
         {
             var releaseCreateCommand = new System.CommandLine.Command("release_create",
                 "Creates a GitHub release.\n\n" +
@@ -326,7 +326,7 @@ namespace Nbuild
                 var branch = parseResult.GetValue(branchOption)!;
                 var file = parseResult.GetValue(fileOption)!;
                 var verbose = parseResult.GetValue(verboseOption);
-                var dryRun = parseResult.GetValue(rootCommand.Options.OfType<Option<bool>>().First(o => o.Name == "dry-run"));
+                var dryRun = parseResult.GetValue(dryRunOption);
                 if (dryRun)
                 {
                     ConsoleHelper.WriteLine("DRY-RUN: running in dry-run mode; no destructive actions will be performed.", ConsoleColor.Yellow);
@@ -343,7 +343,7 @@ namespace Nbuild
             rootCommand.Subcommands.Add(releaseCreateCommand);
         }
 
-        private static void AddPreReleaseCreateCommand(RootCommand rootCommand)
+        private static void AddPreReleaseCreateCommand(RootCommand rootCommand, Option<bool> dryRunOption)
         {
             var preReleaseCreateCommand = new System.CommandLine.Command(
                 "pre_release_create",
@@ -375,7 +375,7 @@ namespace Nbuild
                 var branch = parseResult.GetValue(branchOption)!;
                 var file = parseResult.GetValue(fileOption)!;
                 var verbose = parseResult.GetValue(verboseOption);
-                var dryRun = parseResult.GetValue(rootCommand.Options.OfType<Option<bool>>().First(o => o.Name == "dry-run"));
+                var dryRun = parseResult.GetValue(dryRunOption);
                 if (dryRun)
                 {
                     ConsoleHelper.WriteLine("DRY-RUN: running in dry-run mode; no destructive actions will be performed.", ConsoleColor.Yellow);
@@ -404,7 +404,7 @@ namespace Nbuild
             rootCommand.Subcommands.Add(preReleaseCreateCommand);
         }
 
-        private static void AddReleaseDownloadCommand(RootCommand rootCommand)
+        private static void AddReleaseDownloadCommand(RootCommand rootCommand, Option<bool> dryRunOption)
         {
             var releaseDownloadCommand = new System.CommandLine.Command(
                 "release_download",
@@ -432,7 +432,7 @@ namespace Nbuild
                 var tag = parseResult.GetValue(tagOption)!;
                 var path = parseResult.GetValue(pathOption)!;
                 var verbose = parseResult.GetValue(verboseOption);
-                var dryRun = parseResult.GetValue(rootCommand.Options.OfType<Option<bool>>().First(o => o.Name == "dry-run"));
+                var dryRun = parseResult.GetValue(dryRunOption);
                 if (dryRun)
                 {
                     ConsoleHelper.WriteLine("DRY-RUN: running in dry-run mode; no destructive actions will be performed.", ConsoleColor.Yellow);
