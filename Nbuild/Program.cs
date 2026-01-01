@@ -19,34 +19,34 @@ namespace Nbuild
             }
 
             var rootCommand = new RootCommand("Nbuild - Build and DevOps Utility");
-            // Global dry-run option: add as a root-level/global option so it can be provided on any command.
+            // Global options: add as root-level/global options so they can be provided on any command.
             var dryRunOption = new Option<bool>("--dry-run") 
             { 
                 Description = "Perform a dry run: show actions but do not perform side effects",
                 Required = false 
             };
+            var verboseOption = new Option<bool>("--verbose") { Description = "Verbose output" };
             rootCommand.Options.Add(dryRunOption);
-
-            // NOTE: prefer per-command --verbose options; no global --verbose option registered
-            AddInstallCommand(rootCommand, dryRunOption);
-            AddUninstallCommand(rootCommand, dryRunOption);
+            rootCommand.Options.Add(verboseOption);
+            AddInstallCommand(rootCommand, dryRunOption, verboseOption);
+            AddUninstallCommand(rootCommand, dryRunOption, verboseOption);
             AddListCommand(rootCommand);
-            AddDownloadCommand(rootCommand, dryRunOption);
-            AddPathCommand(rootCommand);
-            AddGitInfoCommand(rootCommand, dryRunOption);
-            AddGitSetTagCommand(rootCommand, dryRunOption);
-            AddGitAutoTagCommand(rootCommand, dryRunOption);
-            AddGitPushAutoTagCommand(rootCommand, dryRunOption);
-            AddGitBranchCommand(rootCommand);
+            AddDownloadCommand(rootCommand, dryRunOption, verboseOption);
+            AddPathCommand(rootCommand, verboseOption);
+            AddGitInfoCommand(rootCommand, dryRunOption, verboseOption);
+            AddGitSetTagCommand(rootCommand, dryRunOption, verboseOption);
+            AddGitAutoTagCommand(rootCommand, dryRunOption, verboseOption);
+            AddGitPushAutoTagCommand(rootCommand, dryRunOption, verboseOption);
+            AddGitBranchCommand(rootCommand, verboseOption);
 
             // register git_clone command from dedicated class (pass global dry-run option and service)
-            GitCloneCommand.Register(rootCommand, dryRunOption, new GitCloneService());
-            AddGitDeleteTagCommand(rootCommand, dryRunOption);
-            AddReleaseCreateCommand(rootCommand, dryRunOption);
-            AddPreReleaseCreateCommand(rootCommand, dryRunOption);
-            AddReleaseDownloadCommand(rootCommand, dryRunOption);
-            AddListReleaseCommand(rootCommand, dryRunOption);
-            AddTargetsCommand(rootCommand);
+            GitCloneCommand.Register(rootCommand, dryRunOption, verboseOption, new GitCloneService());
+            AddGitDeleteTagCommand(rootCommand, dryRunOption, verboseOption);
+            AddReleaseCreateCommand(rootCommand, dryRunOption, verboseOption);
+            AddPreReleaseCreateCommand(rootCommand, dryRunOption, verboseOption);
+            AddReleaseDownloadCommand(rootCommand, dryRunOption, verboseOption);
+            AddListReleaseCommand(rootCommand, dryRunOption, verboseOption);
+            AddTargetsCommand(rootCommand, verboseOption);
 
             // Enable strict validation for the root command but allow unmatched tokens for build targets
             rootCommand.TreatUnmatchedTokensAsErrors = false;
@@ -103,7 +103,7 @@ namespace Nbuild
         // may expose a different overload (for example Get(string)). We prefer calling the parameterless
         // overload when available, otherwise attempt to invoke any available Get method via reflection.
 
-        private static void AddDownloadCommand(RootCommand rootCommand, Option<bool> dryRunOption)
+        private static void AddDownloadCommand(RootCommand rootCommand, Option<bool> dryRunOption, Option<bool> verboseOption)
         {
             var downloadCommand = new System.CommandLine.Command("download", "Download tools and applications specified in the manifest file.");
 
@@ -111,10 +111,8 @@ namespace Nbuild
             downloadCommand.TreatUnmatchedTokensAsErrors = true;
 
             var jsonOption = new Option<string>("--json") { Description = "Full path to the manifest file containing your tool definitions.\nIf the path contains spaces, use double quotes.", Required = true };
-            var verboseOption = new Option<bool>("--verbose") { Description = "Verbose output" };
 
             downloadCommand.Options.Add(jsonOption);
-            downloadCommand.Options.Add(verboseOption);
             downloadCommand.SetAction((System.CommandLine.ParseResult parseResult) =>
             {
                 var json = parseResult.GetValue(jsonOption)!;
@@ -130,11 +128,9 @@ namespace Nbuild
             rootCommand.Subcommands.Add(downloadCommand);
         }
 
-        private static void AddPathCommand(RootCommand rootCommand)
+        private static void AddPathCommand(RootCommand rootCommand, Option<bool> verboseOption)
         {
             var cmd = new System.CommandLine.Command("path", "Display each segment of the effective PATH environment variable on a separate line, with duplicates removed. Shows the complete PATH that processes actually use (Machine + User PATH combined).");
-            var verboseOption = new Option<bool>("--verbose") { Description = "Verbose output" };
-            cmd.Options.Add(verboseOption);
             cmd.SetAction((System.CommandLine.ParseResult parseResult) =>
             {
                 var verbose = parseResult.GetValue(verboseOption);
@@ -145,18 +141,12 @@ namespace Nbuild
             rootCommand.Subcommands.Add(cmd);
         }
 
-        private static void AddGitInfoCommand(RootCommand rootCommand, Option<bool> dryRunOption)
+        private static void AddGitInfoCommand(RootCommand rootCommand, Option<bool> dryRunOption, Option<bool> verboseOption)
         {
             var gitInfoCommand = new System.CommandLine.Command(
                 "git_info",
-                "Displays the current git information for the local repository, including branch, and latest tag.\n\n" +
-                "Optional option:\n" +
-                "  --verbose   Verbose output\n\n" +
-                "Example:\n" +
-                "  nb git_info --verbose\n"
+                "Displays the current git information for the local repository, including branch, and latest tag.\n\n"
             );
-            var verboseOption = new Option<bool>("--verbose") { Description = "Verbose output" };
-            gitInfoCommand.Options.Add(verboseOption);
             gitInfoCommand.SetAction((System.CommandLine.ParseResult parseResult) =>
             {
                 var verbose = parseResult.GetValue(verboseOption);
@@ -168,20 +158,12 @@ namespace Nbuild
             rootCommand.Subcommands.Add(gitInfoCommand);
         }
 
-        private static void AddGitSetTagCommand(RootCommand rootCommand, Option<bool> dryRunOption)
+        private static void AddGitSetTagCommand(RootCommand rootCommand, Option<bool> dryRunOption, Option<bool> verboseOption)
         {
             var gitSetTagCommand = new System.CommandLine.Command("git_settag",
-                "Sets a git tag in the local repository.\n\n" +
-                "Required option:\n" +
-                "  --tag   The tag to set (e.g., 1.24.33)\n" +
-                "Optional option:\n" +
-                "  --verbose   Verbose output\n\n" +
-                "Example:\n" +
-                "  nb git_settag --tag 1.24.33 --verbose\n");
+                "Sets a git tag in the local repository.");
             var tagOption = new Option<string>("--tag") { Description = "Tag to set (e.g., 1.24.33)", Required = true };
-            var verboseOption = new Option<bool>("--verbose") { Description = "Verbose output" };
             gitSetTagCommand.Options.Add(tagOption);
-            gitSetTagCommand.Options.Add(verboseOption);
             gitSetTagCommand.SetAction((System.CommandLine.ParseResult parseResult) =>
             {
                 var tag = parseResult.GetValue(tagOption)!;
@@ -194,21 +176,12 @@ namespace Nbuild
             rootCommand.Subcommands.Add(gitSetTagCommand);
         }
 
-        private static void AddGitAutoTagCommand(RootCommand rootCommand, Option<bool> dryRunOption)
+        private static void AddGitAutoTagCommand(RootCommand rootCommand, Option<bool> dryRunOption, Option<bool> verboseOption)
         {
             var gitAutoTagCommand = new System.CommandLine.Command("git_autotag",
-                "Automatically sets the next git tag based on build type.\n\n" +
-                "Required option:\n" +
-                "  --buildtype   Build type (STAGE or PROD)\n" +
-                "Optional option:\n" +
-                "  --verbose   Verbose output\n\n" +
-                "Example:\n" +
-                "  nb git_autotag --buildtype STAGE --verbose\n");
-            gitAutoTagCommand.Aliases.Add("auto_tag");
+                "Automatically sets the next git tag based on build type.");
             var buildTypeOption = new Option<string>("--buildtype") { Description = "Specifies the build type used for this command. Possible values: STAGE, PROD", Required = true };
-            var verboseOption = new Option<bool>("--verbose") { Description = "Verbose output" };
             gitAutoTagCommand.Options.Add(buildTypeOption);
-            gitAutoTagCommand.Options.Add(verboseOption);
             gitAutoTagCommand.SetAction((System.CommandLine.ParseResult parseResult) =>
             {
                 var buildType = parseResult.GetValue(buildTypeOption)!;
@@ -221,20 +194,12 @@ namespace Nbuild
             rootCommand.Subcommands.Add(gitAutoTagCommand);
         }
 
-        private static void AddGitPushAutoTagCommand(RootCommand rootCommand, Option<bool> dryRunOption)
+        private static void AddGitPushAutoTagCommand(RootCommand rootCommand, Option<bool> dryRunOption, Option<bool> verboseOption)
         {
             var gitPushAutoTagCommand = new System.CommandLine.Command("git_push_autotag",
-                "Sets the next git tag based on build type and pushes to remote.\n\n" +
-                "Required option:\n" +
-                "  --buildtype   Build type (STAGE or PROD)\n" +
-                "Optional option:\n" +
-                "  --verbose   Verbose output\n\n" +
-                "Example:\n" +
-                "  nb git_push_autotag --buildtype PROD --verbose\n");
+                "Sets the next git tag based on build type and pushes to remote.");
             var buildTypeOption = new Option<string>("--buildtype") { Description = "Specifies the build type used for this command. Possible values: STAGE, PROD", Required = true };
-            var verboseOption = new Option<bool>("--verbose") { Description = "Verbose output" };
             gitPushAutoTagCommand.Options.Add(buildTypeOption);
-            gitPushAutoTagCommand.Options.Add(verboseOption);
             gitPushAutoTagCommand.SetAction((System.CommandLine.ParseResult parseResult) =>
             {
                 var buildType = parseResult.GetValue(buildTypeOption)!;
@@ -247,17 +212,11 @@ namespace Nbuild
             rootCommand.Subcommands.Add(gitPushAutoTagCommand);
         }
 
-        private static void AddGitBranchCommand(RootCommand rootCommand)
+        private static void AddGitBranchCommand(RootCommand rootCommand, Option<bool> verboseOption)
         {
             var gitBranchCommand = new System.CommandLine.Command("git_branch",
-                "Displays the current git branch in the local repository.\n\n" +
-                "Optional option:\n" +
-                "  --verbose   Verbose output\n\n" +
-                "Example:\n" +
-                "  nb git_branch --verbose\n"
+                "Displays the current git branch in the local repository."
             );
-            var verboseOption = new Option<bool>("--verbose") { Description = "Verbose output" };
-            gitBranchCommand.Options.Add(verboseOption);
             gitBranchCommand.SetAction((System.CommandLine.ParseResult parseResult) =>
             {
                 var verbose = parseResult.GetValue(verboseOption);
@@ -269,20 +228,12 @@ namespace Nbuild
         }
 
 
-        private static void AddGitDeleteTagCommand(RootCommand rootCommand, Option<bool> dryRunOption)
+        private static void AddGitDeleteTagCommand(RootCommand rootCommand, Option<bool> dryRunOption, Option<bool> verboseOption)
         {
             var gitDeleteTagCommand = new System.CommandLine.Command("git_deletetag",
-                "Deletes a git tag from the local repository.\n\n" +
-                "Required option:\n" +
-                "  --tag   The tag to delete (e.g., 1.24.33)\n" +
-                "Optional option:\n" +
-                "  --verbose   Verbose output\n\n" +
-                "Example:\n" +
-                "  nb git_deletetag --tag 1.24.33 --verbose\n");
+                "Deletes a git tag from the local repository.");
             var tagOption = new Option<string>("--tag") { Description = "Tag to delete (e.g., 1.24.33)", Required = true };
-            var verboseOption = new Option<bool>("--verbose") { Description = "Verbose output" };
             gitDeleteTagCommand.Options.Add(tagOption);
-            gitDeleteTagCommand.Options.Add(verboseOption);
             gitDeleteTagCommand.SetAction((System.CommandLine.ParseResult parseResult) =>
             {
                 var tag = parseResult.GetValue(tagOption)!;
@@ -295,30 +246,18 @@ namespace Nbuild
             rootCommand.Subcommands.Add(gitDeleteTagCommand);
         }
 
-        private static void AddReleaseCreateCommand(RootCommand rootCommand, Option<bool> dryRunOption)
+        private static void AddReleaseCreateCommand(RootCommand rootCommand, Option<bool> dryRunOption, Option<bool> verboseOption)
         {
             var releaseCreateCommand = new System.CommandLine.Command("release_create",
-                "Creates a GitHub release.\n\n" +
-                "Required options:\n" +
-                "  --repo   Git repository (formats: repoName, userName/repoName, or full GitHub URL)\n" +
-                "  --tag    Tag to use for the release (e.g., 1.24.33)\n" +
-                "  --branch Branch name to release from (e.g., main)\n" +
-                "  --file   Asset file name (full path required)\n" +
-                "Optional option:\n" +
-                "  --verbose   Verbose output\n\n" +
-                "Examples:\n" +
-                "  nb release_create --repo user/repo --tag 1.24.33 --branch main --file C:\\path\\to\\asset.zip --verbose\n" +
-                "  nb release_create --repo https://github.com/user/repo --tag 1.24.33 --branch main --file ./asset.zip --verbose\n");
+                "Creates a GitHub release.");
             var repoOption = new Option<string>("--repo") { Description = "Git repository. Accepts:\n  - repoName (uses OWNER env variable)\n  - userName/repoName\n  - Full GitHub URL (https://github.com/userName/repoName)", Required = true };
             var tagOption = new Option<string>("--tag") { Description = "Specifies the tag used", Required = true };
             var branchOption = new Option<string>("--branch") { Description = "Specifies the branch name", Required = true };
             var fileOption = new Option<string>("--file") { Description = "Specifies the asset file name. Must include full path", Required = true };
-            var verboseOption = new Option<bool>("--verbose") { Description = "Verbose output" };
             releaseCreateCommand.Options.Add(repoOption);
             releaseCreateCommand.Options.Add(tagOption);
             releaseCreateCommand.Options.Add(branchOption);
             releaseCreateCommand.Options.Add(fileOption);
-            releaseCreateCommand.Options.Add(verboseOption);
             releaseCreateCommand.SetAction(async (System.CommandLine.ParseResult parseResult, CancellationToken cancellationToken) =>
             {
                 var repo = parseResult.GetValue(repoOption)!;
@@ -343,31 +282,20 @@ namespace Nbuild
             rootCommand.Subcommands.Add(releaseCreateCommand);
         }
 
-        private static void AddPreReleaseCreateCommand(RootCommand rootCommand, Option<bool> dryRunOption)
+        private static void AddPreReleaseCreateCommand(RootCommand rootCommand, Option<bool> dryRunOption, Option<bool> verboseOption)
         {
             var preReleaseCreateCommand = new System.CommandLine.Command(
                 "pre_release_create",
-                "Creates a GitHub pre-release.\n\n" +
-                "Required options:\n" +
-                "  --repo   Git repository (formats: repoName, userName/repoName, or full GitHub URL)\n" +
-                "  --tag    Tag to use for the pre-release (e.g., 1.24.33)\n" +
-                "  --branch Branch name to release from (e.g., main)\n" +
-                "  --file   Asset file name (full path required)\n" +
-                "Optional option:\n" +
-                "  --verbose   Verbose output\n\n" +
-                "Example:\n" +
-                "  nb pre_release_create --repo user/repo --tag 1.24.33 --branch main --file C:\\path\\to\\asset.zip --verbose\n"
+                "Creates a GitHub pre-release."
             );
             var repoOption = new Option<string>("--repo") { Description = "Specifies the Git repository in any of the following formats:\n- repoName  (UserName is declared the `OWNER` environment variable)\n- userName/repoName\n- https://github.com/userName/repoName (Full URL to the repository on GitHub)", Required = true };
             var tagOption = new Option<string>("--tag") { Description = "Specifies the tag used", Required = true };
             var branchOption = new Option<string>("--branch") { Description = "Specifies the branch name", Required = true };
             var fileOption = new Option<string>("--file") { Description = "Specifies the asset file name. Must include full path", Required = true };
-            var verboseOption = new Option<bool>("--verbose") { Description = "Verbose output" };
             preReleaseCreateCommand.Options.Add(repoOption);
             preReleaseCreateCommand.Options.Add(tagOption);
             preReleaseCreateCommand.Options.Add(branchOption);
             preReleaseCreateCommand.Options.Add(fileOption);
-            preReleaseCreateCommand.Options.Add(verboseOption);
             preReleaseCreateCommand.SetAction(async (System.CommandLine.ParseResult parseResult, CancellationToken cancellationToken) =>
             {
                 var repo = parseResult.GetValue(repoOption)!;
@@ -404,28 +332,18 @@ namespace Nbuild
             rootCommand.Subcommands.Add(preReleaseCreateCommand);
         }
 
-        private static void AddReleaseDownloadCommand(RootCommand rootCommand, Option<bool> dryRunOption)
+        private static void AddReleaseDownloadCommand(RootCommand rootCommand, Option<bool> dryRunOption, Option<bool> verboseOption)
         {
             var releaseDownloadCommand = new System.CommandLine.Command(
                 "release_download",
-                "Downloads a specific asset from a GitHub release.\n\n" +
-                "Required options:\n" +
-                "  --repo   Git repository (formats: repoName, userName/repoName, or full GitHub URL)\n" +
-                "  --tag    Tag to use for the release (e.g., 1.24.33)\n" +
-                "Optional option:\n" +
-                "  --path   Path to download asset to (default: current directory)\n" +
-                "  --verbose   Verbose output\n\n" +
-                "Example:\n" +
-                "  nb release_download --repo user/repo --tag 1.24.33 --path C:\\downloads --verbose\n"
+                "Downloads a specific asset from a GitHub release."
             );
             var repoOption = new Option<string>("--repo") { Description = "Specifies the Git repository in any of the following formats:\n- repoName  (UserName is declared the `OWNER` environment variable)\n- userName/repoName\n- https://github.com/userName/repoName (Full URL to the repository on GitHub)", Required = true };
             var tagOption = new Option<string>("--tag") { Description = "Specifies the tag used", Required = true };
             var pathOption = new Option<string>("--path") { Description = "Specifies the path used for this command. If not specified, the current directory will be used", Required = false };
-            var verboseOption = new Option<bool>("--verbose") { Description = "Verbose output" };
             releaseDownloadCommand.Options.Add(repoOption);
             releaseDownloadCommand.Options.Add(tagOption);
             releaseDownloadCommand.Options.Add(pathOption);
-            releaseDownloadCommand.Options.Add(verboseOption);
             releaseDownloadCommand.SetAction(async (System.CommandLine.ParseResult parseResult, CancellationToken cancellationToken) =>
             {
                 var repo = parseResult.GetValue(repoOption)!;
@@ -444,22 +362,14 @@ namespace Nbuild
             rootCommand.Subcommands.Add(releaseDownloadCommand);
         }
 
-        private static void AddListReleaseCommand(RootCommand rootCommand, Option<bool> dryRunOption)
+        private static void AddListReleaseCommand(RootCommand rootCommand, Option<bool> dryRunOption, Option<bool> verboseOption)
         {
             var listReleaseCommand = new System.CommandLine.Command(
                 "list_release",
-                "Lists the latest 3 releases for the specified repository, and the latest pre-release if newer.\n\n" +
-                "Required option:\n" +
-                "  --repo   Git repository (formats: repoName, userName/repoName, or full GitHub URL)\n" +
-                "Optional option:\n" +
-                "  --verbose   Verbose output\n\n" +
-                "Example:\n" +
-                "  nb list_release --repo user/repo --verbose\n"
+                "Lists the latest releases for the specified repository."
             );
             var repoOption = new Option<string>("--repo") { Description = "Specifies the Git repository in any of the following formats:\n- repoName  (UserName is declared the `OWNER` environment variable)\n- userName/repoName\n- https://github.com/userName/repoName (Full URL to the repository on GitHub)", Required = true };
-            var verboseOption = new Option<bool>("--verbose") { Description = "Verbose output" };
             listReleaseCommand.Options.Add(repoOption);
-            listReleaseCommand.Options.Add(verboseOption);
             listReleaseCommand.SetAction(async (System.CommandLine.ParseResult parseResult, CancellationToken cancellationToken) =>
             {
                 var repo = parseResult.GetValue(repoOption)!;
@@ -477,21 +387,12 @@ namespace Nbuild
             rootCommand.Subcommands.Add(listReleaseCommand);
         }
 
-        private static void AddTargetsCommand(RootCommand rootCommand)
+        private static void AddTargetsCommand(RootCommand rootCommand, Option<bool> verboseOption)
         {
             var cmd = new System.CommandLine.Command(
                 "targets",
-                "Displays all available build targets for the current solution or project.\n\n" +
-                "Optional option:\n" +
-                "  --verbose   Verbose output\n\n" +
-                "You can run any listed target directly using nb.exe.\n" +
-                "Example: If 'core' is listed, you can run:\n" +
-                "  nb core\n\n" +
-                "To list all targets:\n" +
-                "  nb targets --verbose\n"
+                "Displays all available build targets for the current solution or project."
             );
-            var verboseOption = new Option<bool>("--verbose") { Description = "Verbose output" };
-            cmd.Options.Add(verboseOption);
             cmd.SetAction((System.CommandLine.ParseResult parseResult) =>
             {
                 var verbose = parseResult.GetValue(verboseOption);
@@ -502,7 +403,7 @@ namespace Nbuild
             rootCommand.Subcommands.Add(cmd);
         }
 
-        private static void AddInstallCommand(RootCommand rootCommand, Option<bool> dryRunOption)
+        private static void AddInstallCommand(RootCommand rootCommand, Option<bool> dryRunOption, Option<bool> verboseOption)
         {
             var installCommand = new System.CommandLine.Command("install", "Install tools and applications specified in the manifest file.");
 
@@ -510,9 +411,7 @@ namespace Nbuild
             installCommand.TreatUnmatchedTokensAsErrors = true;
 
             var jsonOption = new Option<string>("--json") { Description = "Full path to the manifest file containing your tool definitions.\nIf the path contains spaces, use double quotes.", Required = true };
-            var verboseOption = new Option<bool>("--verbose") { Description = "Verbose output" };
             installCommand.Options.Add(jsonOption);
-            installCommand.Options.Add(verboseOption);
             installCommand.SetAction((System.CommandLine.ParseResult parseResult) =>
             {
                 var json = parseResult.GetValue(jsonOption)!;
@@ -528,13 +427,11 @@ namespace Nbuild
             rootCommand.Subcommands.Add(installCommand);
         }
 
-        private static void AddUninstallCommand(RootCommand rootCommand, Option<bool> dryRunOption)
+        private static void AddUninstallCommand(RootCommand rootCommand, Option<bool> dryRunOption, Option<bool> verboseOption)
         {
             var uninstallCommand = new System.CommandLine.Command("uninstall", "Uninstall tools and applications specified in the manifest file.");
             var jsonOption = new Option<string>("--json") { Description = "Full path to the manifest file containing your tool definitions.\nIf the path contains spaces, use double quotes.", Required = true };
-            var verboseOption = new Option<bool>("--verbose") { Description = "Verbose output" };
             uninstallCommand.Options.Add(jsonOption);
-            uninstallCommand.Options.Add(verboseOption);
             uninstallCommand.SetAction((System.CommandLine.ParseResult parseResult) =>
             {
                 var json = parseResult.GetValue(jsonOption)!;

@@ -38,25 +38,16 @@ namespace Nbuild.Commands
         /// <param name="cloneService">Injected service implementing the clone behavior.
         /// The service receives primitive arguments (string/bool) and an <see cref="IConsole"/>
         /// for output. This keeps the command thin and testable.</param>
-        public static void Register(RootCommand rootCommand, Option<bool> dryRunOption, Interfaces.IGitCloneService cloneService)
+        public static void Register(RootCommand rootCommand, Option<bool> dryRunOption, Option<bool> verboseOption, Interfaces.IGitCloneService cloneService)
         {
             var gitCloneCommand = new System.CommandLine.Command("git_clone",
-                "Clones a Git repository to a specified path.\n\n" +
-                "Required option:\n" +
-                "  --url   Git repository URL\n" +
-                "Optional options:\n" +
-                "  --path      Path to clone into (default: current directory)\n" +
-                "  --verbose   Verbose output\n\n" +
-                "Example:\n" +
-                "  nb git_clone --url https://github.com/user/repo --path ./repo --verbose\n");
+                "Clones a Git repository to a specified path.");
 
             var urlOption = new Option<string>("--url") { Description = "Specifies the Git repository URL", Required = true };
             var pathOption = new Option<string>("--path") { Description = "The path where the repo will be cloned. If not specified, the current directory will be used" };
-            var verboseOption = new Option<bool>("--verbose") { Description = "Verbose output" };
 
             gitCloneCommand.Options.Add(urlOption);
             gitCloneCommand.Options.Add(pathOption);
-            gitCloneCommand.Options.Add(verboseOption);
 
             // Use ParseResult directly (InvocationContext was removed in v2.0.1)
             gitCloneCommand.SetAction((System.CommandLine.ParseResult parse) =>

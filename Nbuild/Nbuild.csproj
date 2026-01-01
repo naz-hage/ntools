@@ -21,6 +21,10 @@
   </PropertyGroup>
 
 	<ItemGroup>
+		<InternalsVisibleTo Include="NbuildTests" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<EmbeddedResource Include="resources\common.targets" />
 		<EmbeddedResource Include="resources\dotnet.targets" />
 		<EmbeddedResource Include="resources\mongodb.targets" />
