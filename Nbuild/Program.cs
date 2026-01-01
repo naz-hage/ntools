@@ -28,10 +28,10 @@ namespace Nbuild
             rootCommand.Options.Add(dryRunOption);
 
             // NOTE: prefer per-command --verbose options; no global --verbose option registered
-            AddInstallCommand(rootCommand);
-            AddUninstallCommand(rootCommand);
+            AddInstallCommand(rootCommand, dryRunOption);
+            AddUninstallCommand(rootCommand, dryRunOption);
             AddListCommand(rootCommand);
-            AddDownloadCommand(rootCommand);
+            AddDownloadCommand(rootCommand, dryRunOption);
             AddPathCommand(rootCommand);
             AddGitInfoCommand(rootCommand, dryRunOption);
             AddGitSetTagCommand(rootCommand, dryRunOption);
@@ -103,7 +103,7 @@ namespace Nbuild
         // may expose a different overload (for example Get(string)). We prefer calling the parameterless
         // overload when available, otherwise attempt to invoke any available Get method via reflection.
 
-        private static void AddDownloadCommand(RootCommand rootCommand)
+        private static void AddDownloadCommand(RootCommand rootCommand, Option<bool> dryRunOption)
         {
             var downloadCommand = new System.CommandLine.Command("download", "Download tools and applications specified in the manifest file.");
 
@@ -119,7 +119,7 @@ namespace Nbuild
             {
                 var json = parseResult.GetValue(jsonOption)!;
                 var verbose = parseResult.GetValue(verboseOption);
-                var dryRun = parseResult.GetValue(rootCommand.Options.OfType<Option<bool>>().First(o => o.Name == "dry-run"));
+                var dryRun = parseResult.GetValue(dryRunOption);
                 if (dryRun)
                 {
                     ConsoleHelper.WriteLine("DRY-RUN: running in dry-run mode; no destructive actions will be performed.", ConsoleColor.Yellow);
@@ -502,7 +502,7 @@ namespace Nbuild
             rootCommand.Subcommands.Add(cmd);
         }
 
-        private static void AddInstallCommand(RootCommand rootCommand)
+        private static void AddInstallCommand(RootCommand rootCommand, Option<bool> dryRunOption)
         {
             var installCommand = new System.CommandLine.Command("install", "Install tools and applications specified in the manifest file.");
 
@@ -517,7 +517,7 @@ namespace Nbuild
             {
                 var json = parseResult.GetValue(jsonOption)!;
                 var verbose = parseResult.GetValue(verboseOption);
-                var dryRun = parseResult.GetValue(rootCommand.Options.OfType<Option<bool>>().First(o => o.Name == "dry-run"));
+                var dryRun = parseResult.GetValue(dryRunOption);
                 if (dryRun)
                 {
                     ConsoleHelper.WriteLine("DRY-RUN: running in dry-run mode; no destructive actions will be performed.", ConsoleColor.Yellow);
@@ -528,7 +528,7 @@ namespace Nbuild
             rootCommand.Subcommands.Add(installCommand);
         }
 
-        private static void AddUninstallCommand(RootCommand rootCommand)
+        private static void AddUninstallCommand(RootCommand rootCommand, Option<bool> dryRunOption)
         {
             var uninstallCommand = new System.CommandLine.Command("uninstall", "Uninstall tools and applications specified in the manifest file.");
             var jsonOption = new Option<string>("--json") { Description = "Full path to the manifest file containing your tool definitions.\nIf the path contains spaces, use double quotes.", Required = true };
@@ -539,7 +539,7 @@ namespace Nbuild
             {
                 var json = parseResult.GetValue(jsonOption)!;
                 var verbose = parseResult.GetValue(verboseOption);
-                var dryRun = parseResult.GetValue(rootCommand.Options.OfType<Option<bool>>().First(o => o.Name == "dry-run"));
+                var dryRun = parseResult.GetValue(dryRunOption);
                 if (dryRun)
                 {
                     ConsoleHelper.WriteLine("DRY-RUN: running in dry-run mode; no destructive actions will be performed.", ConsoleColor.Yellow);
