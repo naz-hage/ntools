@@ -79,11 +79,17 @@ namespace Nbuild
                     }
                 }
 
+                // If there are unmatched tokens, treat them as build targets
                 if (unmatched.Count == 1)
                 {
+                    var verbose = parseResult.GetValue(verboseOption);
                     var target = unmatched[0];
                     ConsoleHelper.WriteLine($"Executing target: {target}", ConsoleColor.Green);
-                    var resultHelper = BuildStarter.Build(target, false);
+                    var resultHelper = BuildStarter.Build(target, verbose);
+                    if (resultHelper.IsFail())
+                    {
+                        ConsoleHelper.WriteLine($"Failed to execute target '{target}': {resultHelper.GetFirstOutput()}", ConsoleColor.Red);
+                    }
                     return resultHelper.Code;
                 }
                 else if (unmatched.Count > 1)

@@ -21,8 +21,9 @@ public class BuildStarter
     /// </summary>
     /// <param name="target">The target to build. If null, the default target will be built.</param>
     /// <param name="verbose">Specifies whether to display verbose output during the build process.</param>
+    /// <param name="extractBatchFile">Specifies whether to extract the batch file before building.</param>
     /// <returns>A <see cref="ResultHelper"/> object representing the result of the build operation.</returns>
-    public static ResultHelper Build(string? target, bool verbose = false)
+    public static ResultHelper Build(string? target, bool verbose = false, bool extractBatchFile = false)
     {
         string nbuildPath = Path.Combine(Environment.CurrentDirectory, BuildFileName);
         string commonBuildXmlPath = Path.Combine($"{Environment.GetEnvironmentVariable("ProgramFiles")}\\nbuild", CommonBuildFileName);
@@ -32,16 +33,22 @@ public class BuildStarter
             return ResultHelper.Fail(-1, $"'{nbuildPath}' not found.");
         }
 
-        // check if target is valid
-        if (!ValidTarget(target, verbose))
+        if (extractBatchFile)
         {
-            ConsoleHelper.WriteLine($"Target '{target}' not found");
-            return ResultHelper.Fail(-1, $"Target '{target}' not found");
+            ExtractBatchFile();
         }
 
-        ExtractBatchFile();
+        // Before we check target, ensure that nbuild.targets exists
+        if (!File.Exists(nbuildPath))
+        {
+            return ResultHelper.Fail(-1, $"'{nbuildPath}' not found.");
+        }
 
-        Console.WriteLine($"MSBuild started with Target: '{target ?? "Default"}' | verbose:{verbose}");
+        // check if target is valid
+        if (!ValidTarget(nbuildPath, target, verbose))
+        {
+            return ResultHelper.Fail(-1, $"Target '{target}' not found");
+        }
 
         LogFile = Path.Combine(Environment.CurrentDirectory, LogFile);
         string cmd = string.IsNullOrEmpty(target)
@@ -55,7 +62,7 @@ public class BuildStarter
 
         //  Get location of msbuild.exe
         //var msbuildPath = ShellUtility.GetFullPathOfFile(MsbuildExe);
-        var msbuildPath = FindMsBuild64BitPath(verbose: true);
+        var msbuildPath = FindMsBuild64BitPath();
 
         if (verbose)
         {
@@ -76,7 +83,10 @@ public class BuildStarter
             }
         };
 
-        Console.WriteLine($"==> {process.StartInfo.FileName} {process.StartInfo.Arguments}");
+        if (verbose)
+        {
+            Console.WriteLine($"==> {process.StartInfo.FileName} {process.StartInfo.Arguments}");
+        }
 
         var result = process.LockStart(verbose);
 
@@ -100,10 +110,9 @@ public class BuildStarter
     /// </summary>
     /// <param name="target">The target to check.</param>
     /// <returns>True if the target is valid, false otherwise.</returns>
-    public static bool ValidTarget(string? target, bool verbose)
+    public static bool ValidTarget(string nbuildPath, string? target, bool verbose)
     {
         // check if target is valid in the current directory
-        string nbuildPath = Path.Combine(Environment.CurrentDirectory, BuildFileName);
         if (ValidTarget(nbuildPath, target)) return true;
 
         List<string> KnownTargetFiles = new List<string>();
