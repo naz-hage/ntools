@@ -123,10 +123,10 @@ Key points:
 
 ---
 
-## nbuild.targets <a id="nbuildtargets"></a>
+## nbuild.targets {#nbuildtargets}
 See [`nbuild.targets`](https://github.com/naz-hage/ntools/blob/main/Nbuild/resources/nbuild.targets) for more information and checkout other targets in [`Nbuild/resources`](https://github.com/naz-hage/ntools/blob/main/Nbuild/resources).
                     
-### common.targets <a id="commontargets"></a>
+### common.targets {#commontargets}
 - The `common.targets` file includes all the defaults targets needed to build, test and deploy a solution.  The `common.targets` file is located in the `$(ProgramFiles)\Nbuild` folder.  The `nbuild.targets` file in the solution folder imports the `common.targets` file
 
 Below is a list of common targets defined in the `common.targets` file:

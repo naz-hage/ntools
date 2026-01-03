@@ -33,6 +33,9 @@ markdown_extensions:
   - pymdownx.snippets
   - pymdownx.tabbed
   - pymdownx.details
+  - toc:
+      permalink: true
+      permalink_title: Anchor link to this section for reference
 
 nav:
   - Getting Started: 
