@@ -1,168 +1,1401 @@
-<!DOCTYPE html>
-<html class="writer-html5" lang="en" >
-<head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="naz-hage" />
-      <link rel="shortcut icon" href="../../img/favicon.ico" />
-    <title>Nbuild Tasks - Ntools - Work in Progress</title>
-    <link rel="stylesheet" href="../../css/theme.css" />
-    <link rel="stylesheet" href="../../css/theme_extra.css" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
     
-      <script>
-        // Current page data
-        var mkdocs_page_name = "Nbuild Tasks";
-        var mkdocs_page_input_path = "ntools/nbuildtasks.md";
-        var mkdocs_page_url = null;
-      </script>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Software Tools Collection.">
+      
+      
+        <meta name="author" content="naz-hage">
+      
+      
+      
+        <link rel="prev" href="../github-release/">
+      
+      
+        <link rel="next" href="../../version-automation-guide/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.31">
     
-    <!--[if lt IE 9]>
-      <script src="../../js/html5shiv.min.js"></script>
-    <![endif]-->
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
-      <script>hljs.highlightAll();</script> 
-</head>
+    
+      
+        <title>Nbuild Tasks - Ntools - Work in Progress</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.3cba04c6.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
 
-<body class="wy-body-for-nav" role="document">
 
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
-    <div class="wy-side-scroll">
-      <div class="wy-side-nav-search">
-          <a href="../.." class="icon icon-home"> Ntools - Work in Progress
-        </a><div role="search">
-  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
-  </form>
-</div>
-      </div>
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption"><span class="caption-text">Getting Started</span></p>
-              <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../installation/">Installation</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../usage/">Practice</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../setup/">Setup your project</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../buildtypes/">Build Types</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../versioning/">Versioning</a>
-                  </li>
-              </ul>
-              <p class="caption"><span class="caption-text">List of Tools</span></p>
-              <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="../nbuild/">Nbuild (nb.exe)</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../lf/">lf (lf.exe)</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../nbackup/">Nbackup (nbackup.exe)</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../github-release/">Github Release</a>
-                  </li>
-              </ul>
-              <p class="caption"><span class="caption-text">Custom Build Tasks</span></p>
-              <ul class="current">
-                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Nbuild Tasks</a>
-    <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#list-of-tasks">List of Tasks</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#rederror">RedError</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#git">Git</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#colormessage">ColorMessage</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#fileversion">FileVersion</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#webdownload">WebDownload</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#unzip">Unzip</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#zip">Zip</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#pwsh">Pwsh</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#updateversionsindocs">UpdateVersionsInDocs</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#modern-approach-with-ntools-scripts-module">Modern Approach with ntools-scripts module</a>
-    </li>
-    </ul>
-                  </li>
-              </ul>
-              <p class="caption"><span class="caption-text">Developer setup</span></p>
-              <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="../../version-automation-guide/">Version Automation Guide</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../ntools/">Development Tools</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" >ntools-scripts module</a>
-    <ul>
-                <li class="toctree-l2"><a class="reference internal" href="../ntools-scripts-module/">Module</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../ntools-scripts-module-api/">API</a>
-                </li>
-    </ul>
-                  </li>
-              </ul>
-              <p class="caption"><span class="caption-text">Build System Features</span></p>
-              <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="../code-coverage/">Code Coverage</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../nbuild-targets/">MSBuild Targets</a>
-                  </li>
-              </ul>
-              <p class="caption"><span class="caption-text">atools</span></p>
-              <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="../../atools/">Overview</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" >List of tools</a>
-    <ul>
-                <li class="toctree-l2"><a class="reference internal" href="../../atools/sdo/">SDO (Simple DevOps Operations)</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../../atools/sdo-installation/">SDO Installation</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../../atools/install-ntools/">Install NTools</a>
-                </li>
-    </ul>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../SDO_ARCHITECTURE/">SDO Architecture</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../atools/azdo_payloads/">AzDO payloads</a>
-                  </li>
-              </ul>
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#nbuildtasks" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Ntools - Work in Progress" class="md-header__button md-logo" aria-label="Ntools - Work in Progress" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Ntools - Work in Progress
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Nbuild Tasks
+            
+          </span>
+        </div>
       </div>
     </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../..">Ntools - Work in Progress</a>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="blue"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
         
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
       </nav>
-      <div class="wy-nav-content">
-        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
-  <ul class="wy-breadcrumbs">
-    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
-          <li class="breadcrumb-item">Custom Build Tasks</li>
-      <li class="breadcrumb-item active">Nbuild Tasks</li>
-    <li class="wy-breadcrumbs-aside">
-          <a href="https://github.com/naz-hage/ntools/edit/main/docs/ntools/nbuildtasks.md">Edit on ntools</a>
-    </li>
-  </ul>
-  <hr/>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-            <div class="section" itemprop="articleBody">
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/naz-hage/ntools" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    ntools
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../.." class="md-tabs__link">
+          
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../nbuild/" class="md-tabs__link">
+          
+  
+  List of Tools
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  Custom Build Tasks
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../version-automation-guide/" class="md-tabs__link">
+          
+  
+  Developer setup
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../code-coverage/" class="md-tabs__link">
+          
+  
+  Build System Features
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../atools/" class="md-tabs__link">
+          
+  
+  atools
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
               
-                <h2 id="nbuildtasks">NbuildTasks</h2>
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Ntools - Work in Progress" class="md-nav__button md-logo" aria-label="Ntools - Work in Progress" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    Ntools - Work in Progress
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/naz-hage/ntools" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    ntools
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Getting Started
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            Getting Started
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../installation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Installation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../usage/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Practice
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../setup/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Setup your project
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../buildtypes/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Build Types
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../versioning/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Versioning
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    List of Tools
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            List of Tools
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../nbuild/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Nbuild (nb.exe)
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lf/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    lf (lf.exe)
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../nbackup/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Nbackup (nbackup.exe)
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../github-release/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Github Release
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Custom Build Tasks
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Custom Build Tasks
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Nbuild Tasks
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Nbuild Tasks
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#nbuildtasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      NbuildTasks
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="NbuildTasks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#list-of-tasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      List of Tasks
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rederror" class="md-nav__link">
+    <span class="md-ellipsis">
+      RedError
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#git" class="md-nav__link">
+    <span class="md-ellipsis">
+      Git
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#colormessage" class="md-nav__link">
+    <span class="md-ellipsis">
+      ColorMessage
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fileversion" class="md-nav__link">
+    <span class="md-ellipsis">
+      FileVersion
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#webdownload" class="md-nav__link">
+    <span class="md-ellipsis">
+      WebDownload
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#unzip" class="md-nav__link">
+    <span class="md-ellipsis">
+      Unzip
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#zip" class="md-nav__link">
+    <span class="md-ellipsis">
+      Zip
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pwsh" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pwsh
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#updateversionsindocs" class="md-nav__link">
+    <span class="md-ellipsis">
+      UpdateVersionsInDocs
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modern-approach-with-ntools-scripts-module" class="md-nav__link">
+    <span class="md-ellipsis">
+      Modern Approach with ntools-scripts module
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Developer setup
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Developer setup
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../version-automation-guide/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Version Automation Guide
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ntools/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Development Tools
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_3" id="__nav_4_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    ntools-scripts module
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_3">
+            <span class="md-nav__icon md-icon"></span>
+            ntools-scripts module
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ntools-scripts-module/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Module
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ntools-scripts-module-api/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    API
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Build System Features
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Build System Features
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code-coverage/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Code Coverage
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../nbuild-targets/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    MSBuild Targets
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    atools
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            atools
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../atools/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_2" id="__nav_6_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    List of tools
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_2">
+            <span class="md-nav__icon md-icon"></span>
+            List of tools
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../atools/sdo/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    SDO (Simple DevOps Operations)
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../atools/sdo-installation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    SDO Installation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../atools/install-ntools/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Install NTools
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devops-tools-suite-architecture/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    DevOps Tools Suite Architecture
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../atools/azdo_payloads/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AzDO payloads
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+  <h1>Nbuild Tasks</h1>
+
+<h2 id="nbuildtasks">NbuildTasks<a class="headerlink" href="#nbuildtasks" title="Anchor link to this section for reference">&para;</a></h2>
 <p><code>NbuildTasks</code> (nbuildtasks.dll) is a class library that exposes custom <code>MSBuild</code> tasks. It is used by <code>Nbuild</code> to perform various tasks such as web download and tools installation during the build of any project.</p>
-<h3 id="list-of-tasks">List of Tasks</h3>
+<h3 id="list-of-tasks">List of Tasks<a class="headerlink" href="#list-of-tasks" title="Anchor link to this section for reference">&para;</a></h3>
 <table>
 <thead>
 <tr>
@@ -210,103 +1443,103 @@
 </tbody>
 </table>
 <p>Here are examples of custom Tasks that can be used during builds:</p>
-<h3 id="rederror">RedError</h3>
-<pre><code class="language-xml">&lt;!-- This target uses the `RedError` task to display an error message in red color --&gt;
-&lt;Target Name=&quot;RED_ERROR&quot;&gt;
-    &lt;RedError Message=&quot;This is an error message displayed in Red&quot; /&gt;
-&lt;/Target&gt;
-</code></pre>
-<h3 id="git">Git</h3>
-<pre><code class="language-xml">&lt;Target Name=&quot;TAG&quot;&gt;
-    &lt;-- This target uses the `GetTag` task to display the tag from a branch --&gt;
-    &lt;GetTag Branch=&quot;$(Branch)&quot; BuildType=&quot;$(BuildType)&quot;&gt;
-        &lt;Output TaskParameter=&quot;Tag&quot; PropertyName=&quot;Tag&quot; /&gt;
-    &lt;/GetTag&gt;
-    &lt;Message Text=&quot;Tag: $(Tag)&quot; Importance=&quot;high&quot; /&gt;
-&lt;/Target&gt;
-</code></pre>
-<h3 id="colormessage">ColorMessage</h3>
-<pre><code class="language-xml">&lt;!-- This target uses the `ColorMessage` task to display a message with a specified color --&gt;
-&lt;Target Name=&quot;COLOR_MESSAGE&quot;&gt;
-    &lt;ColorMessage Message=&quot;This is a message displayed in Yellow&quot; Color=&quot;Yellow&quot; /&gt;
-&lt;/Target&gt;
-</code></pre>
-<h3 id="fileversion">FileVersion</h3>
-<pre><code class="language-xml">    &lt;!-- This target uses the `FileVersion` task to file version of specified file --&gt;
-    &lt;Target Name=&quot;FILE_VERSION&quot;&gt;
-        &lt;PropertyGroup&gt;
-            &lt;FileExe&gt;$(ProgramFiles)\Nbuild\nb.exe&lt;/FileExe&gt;
-        &lt;/PropertyGroup&gt;
+<h3 id="rederror">RedError<a class="headerlink" href="#rederror" title="Anchor link to this section for reference">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="cm">&lt;!-- This target uses the `RedError` task to display an error message in red color --&gt;</span>
+<span class="nt">&lt;Target</span><span class="w"> </span><span class="na">Name=</span><span class="s">&quot;RED_ERROR&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;RedError</span><span class="w"> </span><span class="na">Message=</span><span class="s">&quot;This is an error message displayed in Red&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/Target&gt;</span>
+</code></pre></div>
+<h3 id="git">Git<a class="headerlink" href="#git" title="Anchor link to this section for reference">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;Target</span><span class="w"> </span><span class="na">Name=</span><span class="s">&quot;TAG&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;--</span><span class="w"> </span><span class="err">This</span><span class="w"> </span><span class="err">target</span><span class="w"> </span><span class="err">uses</span><span class="w"> </span><span class="err">the</span><span class="w"> </span><span class="err">`GetTag`</span><span class="w"> </span><span class="err">task</span><span class="w"> </span><span class="err">to</span><span class="w"> </span><span class="err">display</span><span class="w"> </span><span class="err">the</span><span class="w"> </span><span class="err">tag</span><span class="w"> </span><span class="err">from</span><span class="w"> </span><span class="err">a</span><span class="w"> </span><span class="err">branch</span><span class="w"> </span><span class="err">--</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;GetTag</span><span class="w"> </span><span class="na">Branch=</span><span class="s">&quot;$(Branch)&quot;</span><span class="w"> </span><span class="na">BuildType=</span><span class="s">&quot;$(BuildType)&quot;</span><span class="nt">&gt;</span>
+<span class="w">        </span><span class="nt">&lt;Output</span><span class="w"> </span><span class="na">TaskParameter=</span><span class="s">&quot;Tag&quot;</span><span class="w"> </span><span class="na">PropertyName=</span><span class="s">&quot;Tag&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/GetTag&gt;</span>
+<span class="w">    </span><span class="nt">&lt;Message</span><span class="w"> </span><span class="na">Text=</span><span class="s">&quot;Tag: $(Tag)&quot;</span><span class="w"> </span><span class="na">Importance=</span><span class="s">&quot;high&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/Target&gt;</span>
+</code></pre></div>
+<h3 id="colormessage">ColorMessage<a class="headerlink" href="#colormessage" title="Anchor link to this section for reference">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="cm">&lt;!-- This target uses the `ColorMessage` task to display a message with a specified color --&gt;</span>
+<span class="nt">&lt;Target</span><span class="w"> </span><span class="na">Name=</span><span class="s">&quot;COLOR_MESSAGE&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;ColorMessage</span><span class="w"> </span><span class="na">Message=</span><span class="s">&quot;This is a message displayed in Yellow&quot;</span><span class="w"> </span><span class="na">Color=</span><span class="s">&quot;Yellow&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/Target&gt;</span>
+</code></pre></div>
+<h3 id="fileversion">FileVersion<a class="headerlink" href="#fileversion" title="Anchor link to this section for reference">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="cm">&lt;!-- This target uses the `FileVersion` task to file version of specified file --&gt;</span>
+<span class="w">    </span><span class="nt">&lt;Target</span><span class="w"> </span><span class="na">Name=</span><span class="s">&quot;FILE_VERSION&quot;</span><span class="nt">&gt;</span>
+<span class="w">        </span><span class="nt">&lt;PropertyGroup&gt;</span>
+<span class="w">            </span><span class="nt">&lt;FileExe&gt;</span>$(ProgramFiles)\Nbuild\nb.exe<span class="nt">&lt;/FileExe&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/PropertyGroup&gt;</span>
 
-        &lt;FileVersion Name=&quot;$(FileExe)&quot; Condition=&quot;Exists('$(FileExe)')&quot; &gt;
-            &lt;Output TaskParameter=&quot;Output&quot; PropertyName=&quot;Version&quot; /&gt;
-        &lt;/FileVersion&gt;
-    &lt;/Target&gt;
-</code></pre>
-<h3 id="webdownload">WebDownload</h3>
-<pre><code class="language-xml">&lt;!-- This target uses the `WebDownload` task to download a file from a specified URL --&gt;
-&lt;Target Name=&quot;WEB_DOWNLOAD&quot; DependsOnTargets=&quot;IS_ADMIN&quot; &gt;
-    &lt;PropertyGroup&gt;
-        &lt;!-- visit https://nodejs.org/dist/ to get the latest stable version --&gt;
-        &lt;DownloadsDirectory&gt;c:\NtoolsDownloads&lt;/DownloadsDirectory&gt;
-        &lt;NodeAppName&gt;Node.js&lt;/NodeAppName&gt;
-        &lt;NodeTargetVersion&gt;21.5.0&lt;/NodeTargetVersion&gt;
-        &lt;WebUri&gt;https://nodejs.org/dist/v$(NodeTargetVersion)/node-v$(NodeTargetVersion)-x64.msi&lt;/WebUri&gt;
-        &lt;FileName&gt;$(DownloadsDirectory)\node-v$(NodeTargetVersion)-x64.msi&lt;/FileName&gt;
-    &lt;/PropertyGroup&gt;
-    &lt;RedError Condition=&quot;'$(IsAdmin)' == false&quot; Message=&quot;Must be an admin to install $(NodeAppName)&quot; /&gt;
-    &lt;Delete Files=&quot;$(FileName)&quot; Condition=&quot;Exists('$(FileName)') == true&quot; /&gt;
-    &lt;WebDownload WebUri=&quot;$(WebUri)&quot; FileName=&quot;$(FileName)&quot; /&gt;
-    &lt;Message Text=&quot;==&gt; NODE_DONE&quot;/&gt;
-&lt;/Target&gt;
-</code></pre>
-<h3 id="unzip">Unzip</h3>
-<pre><code class="language-xml">&lt;!-- This target uses the `Unzip` task to decompress a specified file --&gt;
-&lt;Target Name=&quot;UNZIP&quot;&gt;
-    &lt;PropertyGroup&gt;
-        &lt;FileName&gt;c:\temp\source.zip&lt;/FileName&gt;
-        &lt;Path&gt;c:\temp\test1&lt;/Path&gt;
-    &lt;/PropertyGroup&gt;
-    &lt;Unzip FileName=&quot;$(FileName)&quot; Destination=&quot;$(Path)&quot; /&gt;
-    &lt;Message Text=&quot;==&gt; ZIP_DONE&quot;/&gt;
-&lt;/Target&gt;
-</code></pre>
-<h3 id="zip">Zip</h3>
-<pre><code class="language-xml">&lt;!-- This target uses the `Zip` task to compress a specified file --&gt;
-&lt;Target Name=&quot;ZIP&quot;&gt;
-    &lt;PropertyGroup&gt;
-        &lt;FileName&gt;c:\temp\source.zip&lt;/FileName&gt;
-        &lt;Path&gt;c:\temp\test&lt;/Path&gt;
-    &lt;/PropertyGroup&gt;
-    &lt;Zip FileName=&quot;$(FileName)&quot; Path=&quot;$(Path)&quot; /&gt;
-    &lt;Message Text=&quot;==&gt; ZIP_DONE&quot;/&gt;
-&lt;/Target&gt;
-</code></pre>
-<h3 id="pwsh">Pwsh</h3>
-<pre><code class="language-xml">&lt;!-- This target uses the `Pwsh` task to run a PowerShell Core script from MSBuild --&gt;
-&lt;Target Name=&quot;RUN_PWSH&quot;&gt;
-    &lt;PropertyGroup&gt;
-        &lt;ScriptPath&gt;$(SolutionDir)scripts\build\custom-script.ps1&lt;/ScriptPath&gt;
-        &lt;ScriptArgs&gt;--example true&lt;/ScriptArgs&gt;
-    &lt;/PropertyGroup&gt;
+<span class="w">        </span><span class="nt">&lt;FileVersion</span><span class="w"> </span><span class="na">Name=</span><span class="s">&quot;$(FileExe)&quot;</span><span class="w"> </span><span class="na">Condition=</span><span class="s">&quot;Exists(&#39;$(FileExe)&#39;)&quot;</span><span class="w"> </span><span class="nt">&gt;</span>
+<span class="w">            </span><span class="nt">&lt;Output</span><span class="w"> </span><span class="na">TaskParameter=</span><span class="s">&quot;Output&quot;</span><span class="w"> </span><span class="na">PropertyName=</span><span class="s">&quot;Version&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/FileVersion&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/Target&gt;</span>
+</code></pre></div>
+<h3 id="webdownload">WebDownload<a class="headerlink" href="#webdownload" title="Anchor link to this section for reference">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="cm">&lt;!-- This target uses the `WebDownload` task to download a file from a specified URL --&gt;</span>
+<span class="nt">&lt;Target</span><span class="w"> </span><span class="na">Name=</span><span class="s">&quot;WEB_DOWNLOAD&quot;</span><span class="w"> </span><span class="na">DependsOnTargets=</span><span class="s">&quot;IS_ADMIN&quot;</span><span class="w"> </span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;PropertyGroup&gt;</span>
+<span class="w">        </span><span class="cm">&lt;!-- visit https://nodejs.org/dist/ to get the latest stable version --&gt;</span>
+<span class="w">        </span><span class="nt">&lt;DownloadsDirectory&gt;</span>c:\NtoolsDownloads<span class="nt">&lt;/DownloadsDirectory&gt;</span>
+<span class="w">        </span><span class="nt">&lt;NodeAppName&gt;</span>Node.js<span class="nt">&lt;/NodeAppName&gt;</span>
+<span class="w">        </span><span class="nt">&lt;NodeTargetVersion&gt;</span>21.5.0<span class="nt">&lt;/NodeTargetVersion&gt;</span>
+<span class="w">        </span><span class="nt">&lt;WebUri&gt;</span>https://nodejs.org/dist/v$(NodeTargetVersion)/node-v$(NodeTargetVersion)-x64.msi<span class="nt">&lt;/WebUri&gt;</span>
+<span class="w">        </span><span class="nt">&lt;FileName&gt;</span>$(DownloadsDirectory)\node-v$(NodeTargetVersion)-x64.msi<span class="nt">&lt;/FileName&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/PropertyGroup&gt;</span>
+<span class="w">    </span><span class="nt">&lt;RedError</span><span class="w"> </span><span class="na">Condition=</span><span class="s">&quot;&#39;$(IsAdmin)&#39; == false&quot;</span><span class="w"> </span><span class="na">Message=</span><span class="s">&quot;Must be an admin to install $(NodeAppName)&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">    </span><span class="nt">&lt;Delete</span><span class="w"> </span><span class="na">Files=</span><span class="s">&quot;$(FileName)&quot;</span><span class="w"> </span><span class="na">Condition=</span><span class="s">&quot;Exists(&#39;$(FileName)&#39;) == true&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">    </span><span class="nt">&lt;WebDownload</span><span class="w"> </span><span class="na">WebUri=</span><span class="s">&quot;$(WebUri)&quot;</span><span class="w"> </span><span class="na">FileName=</span><span class="s">&quot;$(FileName)&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">    </span><span class="nt">&lt;Message</span><span class="w"> </span><span class="na">Text=</span><span class="s">&quot;==&gt; NODE_DONE&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/Target&gt;</span>
+</code></pre></div>
+<h3 id="unzip">Unzip<a class="headerlink" href="#unzip" title="Anchor link to this section for reference">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="cm">&lt;!-- This target uses the `Unzip` task to decompress a specified file --&gt;</span>
+<span class="nt">&lt;Target</span><span class="w"> </span><span class="na">Name=</span><span class="s">&quot;UNZIP&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;PropertyGroup&gt;</span>
+<span class="w">        </span><span class="nt">&lt;FileName&gt;</span>c:\temp\source.zip<span class="nt">&lt;/FileName&gt;</span>
+<span class="w">        </span><span class="nt">&lt;Path&gt;</span>c:\temp\test1<span class="nt">&lt;/Path&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/PropertyGroup&gt;</span>
+<span class="w">    </span><span class="nt">&lt;Unzip</span><span class="w"> </span><span class="na">FileName=</span><span class="s">&quot;$(FileName)&quot;</span><span class="w"> </span><span class="na">Destination=</span><span class="s">&quot;$(Path)&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">    </span><span class="nt">&lt;Message</span><span class="w"> </span><span class="na">Text=</span><span class="s">&quot;==&gt; ZIP_DONE&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/Target&gt;</span>
+</code></pre></div>
+<h3 id="zip">Zip<a class="headerlink" href="#zip" title="Anchor link to this section for reference">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="cm">&lt;!-- This target uses the `Zip` task to compress a specified file --&gt;</span>
+<span class="nt">&lt;Target</span><span class="w"> </span><span class="na">Name=</span><span class="s">&quot;ZIP&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;PropertyGroup&gt;</span>
+<span class="w">        </span><span class="nt">&lt;FileName&gt;</span>c:\temp\source.zip<span class="nt">&lt;/FileName&gt;</span>
+<span class="w">        </span><span class="nt">&lt;Path&gt;</span>c:\temp\test<span class="nt">&lt;/Path&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/PropertyGroup&gt;</span>
+<span class="w">    </span><span class="nt">&lt;Zip</span><span class="w"> </span><span class="na">FileName=</span><span class="s">&quot;$(FileName)&quot;</span><span class="w"> </span><span class="na">Path=</span><span class="s">&quot;$(Path)&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">    </span><span class="nt">&lt;Message</span><span class="w"> </span><span class="na">Text=</span><span class="s">&quot;==&gt; ZIP_DONE&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/Target&gt;</span>
+</code></pre></div>
+<h3 id="pwsh">Pwsh<a class="headerlink" href="#pwsh" title="Anchor link to this section for reference">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="cm">&lt;!-- This target uses the `Pwsh` task to run a PowerShell Core script from MSBuild --&gt;</span>
+<span class="nt">&lt;Target</span><span class="w"> </span><span class="na">Name=</span><span class="s">&quot;RUN_PWSH&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;PropertyGroup&gt;</span>
+<span class="w">        </span><span class="nt">&lt;ScriptPath&gt;</span>$(SolutionDir)scripts\build\custom-script.ps1<span class="nt">&lt;/ScriptPath&gt;</span>
+<span class="w">        </span><span class="nt">&lt;ScriptArgs&gt;</span>--example<span class="w"> </span>true<span class="nt">&lt;/ScriptArgs&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/PropertyGroup&gt;</span>
 
-    &lt;!-- Pwsh is a custom MSBuild task that executes a PowerShell Core script --&gt;
-    &lt;Pwsh Script=&quot;$(ScriptPath)&quot; Arguments=&quot;$(ScriptArgs)&quot; NoProfile=&quot;true&quot; ExecutionPolicy=&quot;Bypass&quot; /&gt;
+<span class="w">    </span><span class="cm">&lt;!-- Pwsh is a custom MSBuild task that executes a PowerShell Core script --&gt;</span>
+<span class="w">    </span><span class="nt">&lt;Pwsh</span><span class="w"> </span><span class="na">Script=</span><span class="s">&quot;$(ScriptPath)&quot;</span><span class="w"> </span><span class="na">Arguments=</span><span class="s">&quot;$(ScriptArgs)&quot;</span><span class="w"> </span><span class="na">NoProfile=</span><span class="s">&quot;true&quot;</span><span class="w"> </span><span class="na">ExecutionPolicy=</span><span class="s">&quot;Bypass&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
 
-    &lt;Message Text=&quot;==&gt; PWSH_DONE&quot; /&gt;
-&lt;/Target&gt;
-</code></pre>
-<h3 id="updateversionsindocs">UpdateVersionsInDocs</h3>
-<pre><code class="language-xml">&lt;!-- This target uses the `UpdateVersionsInDocs` task to update version numbers in documentation files --&gt;
-&lt;Target Name=&quot;UPDATE_DOC_VERSIONS&quot;&gt;
-    &lt;UpdateVersionsInDocs DocsPath=&quot;$(SolutionDir)docs&quot; Version=&quot;$(Version)&quot; /&gt;
-&lt;/Target&gt;
-</code></pre>
-<h3 id="modern-approach-with-ntools-scripts-module">Modern Approach with ntools-scripts module</h3>
-<pre><code class="language-xml">&lt;Target Name=&quot;PUBLISH&quot;&gt;
-    &lt;Exec Command='pwsh -NoProfile -ExecutionPolicy Bypass -Command &quot;Import-Module &amp;apos;$(BuildTools)\modules\ntools-scripts\ntools-scripts.psm1&amp;apos; -Force; Publish-AllProjects -OutputDir &amp;apos;$(ArtifactsFolder)&amp;apos; -Version &amp;apos;$(ProductVersion)&amp;apos; -RepositoryRoot &amp;apos;$(SolutionDir)&amp;apos;&quot;' WorkingDirectory=&quot;$(SolutionDir)&quot; /&gt;
-&lt;/Target&gt;
-</code></pre>
+<span class="w">    </span><span class="nt">&lt;Message</span><span class="w"> </span><span class="na">Text=</span><span class="s">&quot;==&gt; PWSH_DONE&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/Target&gt;</span>
+</code></pre></div>
+<h3 id="updateversionsindocs">UpdateVersionsInDocs<a class="headerlink" href="#updateversionsindocs" title="Anchor link to this section for reference">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="cm">&lt;!-- This target uses the `UpdateVersionsInDocs` task to update version numbers in documentation files --&gt;</span>
+<span class="nt">&lt;Target</span><span class="w"> </span><span class="na">Name=</span><span class="s">&quot;UPDATE_DOC_VERSIONS&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;UpdateVersionsInDocs</span><span class="w"> </span><span class="na">DocsPath=</span><span class="s">&quot;$(SolutionDir)docs&quot;</span><span class="w"> </span><span class="na">Version=</span><span class="s">&quot;$(Version)&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/Target&gt;</span>
+</code></pre></div>
+<h3 id="modern-approach-with-ntools-scripts-module">Modern Approach with ntools-scripts module<a class="headerlink" href="#modern-approach-with-ntools-scripts-module" title="Anchor link to this section for reference">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;Target</span><span class="w"> </span><span class="na">Name=</span><span class="s">&quot;PUBLISH&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;Exec</span><span class="w"> </span><span class="na">Command=</span><span class="s">&#39;pwsh -NoProfile -ExecutionPolicy Bypass -Command &quot;Import-Module &amp;apos;$(BuildTools)\modules\ntools-scripts\ntools-scripts.psm1&amp;apos; -Force; Publish-AllProjects -OutputDir &amp;apos;$(ArtifactsFolder)&amp;apos; -Version &amp;apos;$(ProductVersion)&amp;apos; -RepositoryRoot &amp;apos;$(SolutionDir)&amp;apos;&quot;&#39;</span><span class="w"> </span><span class="na">WorkingDirectory=</span><span class="s">&quot;$(SolutionDir)&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/Target&gt;</span>
+</code></pre></div>
 <p><strong>Benefits of the Module Approach:</strong>
 - <strong>Deterministic paths</strong>: Explicit <code>RepositoryRoot</code> parameter eliminates path detection issues
 - <strong>Centralized functionality</strong>: All PowerShell functions in one module
@@ -327,55 +1560,57 @@ You can also find the complete list of predefined <a href="https://learn.microso
 <li><code>$(MSBuildProjectFullPath)</code>: The absolute path of the project file.</li>
 <li><code>$(MSBuildThisFileDirectory)</code>: The directory of the MSBuild file that is currently being processed.</li>
 </ul>
-              
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
             </div>
-          </div><footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../github-release/" class="btn btn-neutral float-left" title="Github Release"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../../version-automation-guide/" class="btn btn-neutral float-right" title="Version Automation Guide">Next <span class="icon icon-circle-arrow-right"></span></a>
-    </div>
-
-  <hr/>
-
-  <div role="contentinfo">
-    <!-- Copyright etc -->
-  </div>
-
-  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
-</footer>
           
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
         </div>
-      </div>
-
-    </section>
-
-  </div>
-
-  <div class="rst-versions" role="note" aria-label="Versions">
-  <span class="rst-current-version" data-toggle="rst-current-version">
-    
-        <span>
-          <a href="https://github.com/naz-hage/ntools" class="fa fa-code-fork" style="color: #fcfcfc"> ntools</a>
-        </span>
-    
-    
-      <span><a href="../github-release/" style="color: #fcfcfc">&laquo; Previous</a></span>
-    
-    
-      <span><a href="../../version-automation-guide/" style="color: #fcfcfc">Next &raquo;</a></span>
-    
-  </span>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
 </div>
-    <script src="../../js/jquery-3.6.0.min.js"></script>
-    <script>var base_url = "../..";</script>
-    <script src="../../js/theme_extra.js"></script>
-    <script src="../../js/theme.js"></script>
-      <script src="../../search/main.js"></script>
-    <script>
-        jQuery(function () {
-            SphinxRtdTheme.Navigation.enable(true);
-        });
-    </script>
-
-</body>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.sections", "toc.integrate", "search.suggest", "search.highlight"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.fe8b6f2b.min.js"></script>
+      
+    
+  </body>
 </html>

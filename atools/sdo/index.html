@@ -1,255 +1,2313 @@
-<!DOCTYPE html>
-<html class="writer-html5" lang="en" >
-<head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="naz-hage" />
-      <link rel="shortcut icon" href="../../img/favicon.ico" />
-    <title>SDO (Simple DevOps Operations) - Ntools - Work in Progress</title>
-    <link rel="stylesheet" href="../../css/theme.css" />
-    <link rel="stylesheet" href="../../css/theme_extra.css" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
     
-      <script>
-        // Current page data
-        var mkdocs_page_name = "SDO (Simple DevOps Operations)";
-        var mkdocs_page_input_path = "atools/sdo.md";
-        var mkdocs_page_url = null;
-      </script>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Software Tools Collection.">
+      
+      
+        <meta name="author" content="naz-hage">
+      
+      
+      
+        <link rel="prev" href="../">
+      
+      
+        <link rel="next" href="../sdo-installation/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.31">
     
-    <!--[if lt IE 9]>
-      <script src="../../js/html5shiv.min.js"></script>
-    <![endif]-->
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
-      <script>hljs.highlightAll();</script> 
-</head>
+    
+      
+        <title>SDO (Simple DevOps Operations) - Ntools - Work in Progress</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.3cba04c6.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
 
-<body class="wy-body-for-nav" role="document">
 
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
-    <div class="wy-side-scroll">
-      <div class="wy-side-nav-search">
-          <a href="../.." class="icon icon-home"> Ntools - Work in Progress
-        </a><div role="search">
-  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
-  </form>
-</div>
-      </div>
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption"><span class="caption-text">Getting Started</span></p>
-              <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../installation/">Installation</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../usage/">Practice</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../setup/">Setup your project</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../buildtypes/">Build Types</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../versioning/">Versioning</a>
-                  </li>
-              </ul>
-              <p class="caption"><span class="caption-text">List of Tools</span></p>
-              <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="../../ntools/nbuild/">Nbuild (nb.exe)</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../ntools/lf/">lf (lf.exe)</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../ntools/nbackup/">Nbackup (nbackup.exe)</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../ntools/github-release/">Github Release</a>
-                  </li>
-              </ul>
-              <p class="caption"><span class="caption-text">Custom Build Tasks</span></p>
-              <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="../../ntools/nbuildtasks/">Nbuild Tasks</a>
-                  </li>
-              </ul>
-              <p class="caption"><span class="caption-text">Developer setup</span></p>
-              <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="../../version-automation-guide/">Version Automation Guide</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../ntools/ntools/">Development Tools</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" >ntools-scripts module</a>
-    <ul>
-                <li class="toctree-l2"><a class="reference internal" href="../../ntools/ntools-scripts-module/">Module</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../../ntools/ntools-scripts-module-api/">API</a>
-                </li>
-    </ul>
-                  </li>
-              </ul>
-              <p class="caption"><span class="caption-text">Build System Features</span></p>
-              <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="../../ntools/code-coverage/">Code Coverage</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../ntools/nbuild-targets/">MSBuild Targets</a>
-                  </li>
-              </ul>
-              <p class="caption"><span class="caption-text">atools</span></p>
-              <ul class="current">
-                  <li class="toctree-l1"><a class="reference internal" href="../">Overview</a>
-                  </li>
-                  <li class="toctree-l1 current"><a class="reference internal current" >List of tools</a>
-    <ul class="current">
-                <li class="toctree-l2 current"><a class="reference internal current" href="#">SDO (Simple DevOps Operations)</a>
-    <ul class="current">
-    <li class="toctree-l3"><a class="reference internal" href="#overview">Overview</a>
-        <ul>
-    <li class="toctree-l4"><a class="reference internal" href="#key-features">Key Features</a>
-    </li>
-        </ul>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#prerequisites">Prerequisites</a>
-        <ul>
-    <li class="toctree-l4"><a class="reference internal" href="#required-environment-variables">Required Environment Variables</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#python-requirements">Python Requirements</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#git-repository-context">Git Repository Context</a>
-    </li>
-        </ul>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#installation">Installation</a>
-        <ul>
-    <li class="toctree-l4"><a class="reference internal" href="#quick-installation-virtual-environment">Quick Installation (Virtual Environment)</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#prerequisites_1">Prerequisites</a>
-    </li>
-        </ul>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a>
-        <ul>
-    <li class="toctree-l4"><a class="reference internal" href="#basic-command-structure">Basic Command Structure</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#global-options">Global Options</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#work-item-operations">Work Item Operations</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#repository-operations">Repository Operations</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#pull-request-operations">Pull Request Operations</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#examples_1">Examples</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#pipeline-operations">Pipeline Operations</a>
-    </li>
-        </ul>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#how-pipeline-creation-works">How Pipeline Creation Works</a>
-        <ul>
-    <li class="toctree-l4"><a class="reference internal" href="#azure-devops-pipeline-creation">Azure DevOps Pipeline Creation</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#github-actions-workflow-creation">GitHub Actions Workflow Creation</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#platform-detection">Platform Detection</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#common-issues">Common Issues</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#pipeline-naming-convention">Pipeline Naming Convention</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#security-considerations">Security Considerations</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#examples_2">Examples</a>
-    </li>
-        </ul>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#markdown-file-format">Markdown File Format</a>
-        <ul>
-    <li class="toctree-l4"><a class="reference internal" href="#required-metadata">Required Metadata</a>
-    </li>
-        </ul>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#supported-platforms">Supported Platforms</a>
-        <ul>
-    <li class="toctree-l4"><a class="reference internal" href="#azure-devops">Azure DevOps</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#github">GitHub</a>
-    </li>
-        </ul>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#error-handling">Error Handling</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#testing">Testing</a>
-        <ul>
-    <li class="toctree-l4"><a class="reference internal" href="#run-all-tests">Run All Tests</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#test-categories">Test Categories</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#test-coverage">Test Coverage</a>
-    </li>
-        </ul>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#troubleshooting">Troubleshooting</a>
-        <ul>
-    <li class="toctree-l4"><a class="reference internal" href="#common-issues_1">Common Issues</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#debug-mode">Debug Mode</a>
-    </li>
-        </ul>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#architecture">Architecture</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#development">Development</a>
-        <ul>
-    <li class="toctree-l4"><a class="reference internal" href="#code-quality">Code Quality</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#contributing">Contributing</a>
-    </li>
-        </ul>
-    </li>
-    </ul>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../sdo-installation/">SDO Installation</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../install-ntools/">Install NTools</a>
-                </li>
-    </ul>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../SDO_ARCHITECTURE/">SDO Architecture</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../azdo_payloads/">AzDO payloads</a>
-                  </li>
-              </ul>
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#sdo-simple-devops-operations-tool" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Ntools - Work in Progress" class="md-header__button md-logo" aria-label="Ntools - Work in Progress" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Ntools - Work in Progress
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              SDO (Simple DevOps Operations)
+            
+          </span>
+        </div>
       </div>
     </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../..">Ntools - Work in Progress</a>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="blue"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
         
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
       </nav>
-      <div class="wy-nav-content">
-        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
-  <ul class="wy-breadcrumbs">
-    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
-          <li class="breadcrumb-item">atools</li>
-          <li class="breadcrumb-item">List of tools</li>
-      <li class="breadcrumb-item active">SDO (Simple DevOps Operations)</li>
-    <li class="wy-breadcrumbs-aside">
-          <a href="https://github.com/naz-hage/ntools/edit/main/docs/atools/sdo.md">Edit on ntools</a>
-    </li>
-  </ul>
-  <hr/>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-            <div class="section" itemprop="articleBody">
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/naz-hage/ntools" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    ntools
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../.." class="md-tabs__link">
+          
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../ntools/nbuild/" class="md-tabs__link">
+          
+  
+  List of Tools
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../ntools/nbuildtasks/" class="md-tabs__link">
+          
+  
+  Custom Build Tasks
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../version-automation-guide/" class="md-tabs__link">
+          
+  
+  Developer setup
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../ntools/code-coverage/" class="md-tabs__link">
+          
+  
+  Build System Features
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  atools
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
               
-                <h1 id="sdo-simple-devops-operations-tool">sdo - Simple DevOps Operations Tool</h1>
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Ntools - Work in Progress" class="md-nav__button md-logo" aria-label="Ntools - Work in Progress" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    Ntools - Work in Progress
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/naz-hage/ntools" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    ntools
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Getting Started
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            Getting Started
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../installation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Installation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../usage/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Practice
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../setup/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Setup your project
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../buildtypes/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Build Types
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../versioning/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Versioning
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    List of Tools
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            List of Tools
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ntools/nbuild/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Nbuild (nb.exe)
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ntools/lf/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    lf (lf.exe)
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ntools/nbackup/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Nbackup (nbackup.exe)
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ntools/github-release/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Github Release
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Custom Build Tasks
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Custom Build Tasks
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ntools/nbuildtasks/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Nbuild Tasks
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Developer setup
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Developer setup
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../version-automation-guide/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Version Automation Guide
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ntools/ntools/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Development Tools
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_3" id="__nav_4_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    ntools-scripts module
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_3">
+            <span class="md-nav__icon md-icon"></span>
+            ntools-scripts module
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ntools/ntools-scripts-module/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Module
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ntools/ntools-scripts-module-api/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    API
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Build System Features
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Build System Features
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ntools/code-coverage/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Code Coverage
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ntools/nbuild-targets/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    MSBuild Targets
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    atools
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            atools
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6_2" id="__nav_6_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    List of tools
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6_2">
+            <span class="md-nav__icon md-icon"></span>
+            List of tools
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    SDO (Simple DevOps Operations)
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    SDO (Simple DevOps Operations)
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overview
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#key-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      Key Features
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prerequisites
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Prerequisites">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#required-environment-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Required Environment Variables
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      Python Requirements
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#git-repository-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      Git Repository Context
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Installation
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Installation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quick-installation-virtual-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Quick Installation (Virtual Environment)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prerequisites_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prerequisites
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      Usage
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Usage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#basic-command-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      Basic Command Structure
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#global-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      Global Options
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#work-item-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Work Item Operations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Work Item Operations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create-work-item" class="md-nav__link">
+    <span class="md-ellipsis">
+      Create Work Item
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#list-work-items" class="md-nav__link">
+    <span class="md-ellipsis">
+      List Work Items
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#show-work-item" class="md-nav__link">
+    <span class="md-ellipsis">
+      Show Work Item
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#update-work-item" class="md-nav__link">
+    <span class="md-ellipsis">
+      Update Work Item
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#add-comment-to-work-item" class="md-nav__link">
+    <span class="md-ellipsis">
+      Add Comment to Work Item
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#repository-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Repository Operations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Repository Operations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create-repository" class="md-nav__link">
+    <span class="md-ellipsis">
+      Create Repository
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#list-repositories" class="md-nav__link">
+    <span class="md-ellipsis">
+      List Repositories
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#show-repository" class="md-nav__link">
+    <span class="md-ellipsis">
+      Show Repository
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#delete-repository" class="md-nav__link">
+    <span class="md-ellipsis">
+      Delete Repository
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#work-item-operations_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Work Item Operations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Work Item Operations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create-work-item_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Create Work Item
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Create Work Item">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dry-run-preview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dry Run (Preview)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-azure-devops-work-item" class="md-nav__link">
+    <span class="md-ellipsis">
+      Create Azure DevOps Work Item
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-with-verbose-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      Create with Verbose Output
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#list-work-items_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      List Work Items
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#show-work-item_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Show Work Item
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#update-work-item_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Update Work Item
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#add-comment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Add Comment
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#repository-operations_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Repository Operations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Repository Operations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create-repository_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Create Repository
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#list-repositories_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      List Repositories
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#show-repository-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      Show Repository Details
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#delete-repository_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Delete Repository
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pull-request-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pull Request Operations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Pull Request Operations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create-pull-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      Create Pull Request
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#list-pull-requests" class="md-nav__link">
+    <span class="md-ellipsis">
+      List Pull Requests
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#show-pull-request-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      Show Pull Request Details
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#check-pull-request-status" class="md-nav__link">
+    <span class="md-ellipsis">
+      Check Pull Request Status
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#update-pull-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      Update Pull Request
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pull-request-operations_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pull Request Operations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Pull Request Operations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create-pull-request-from-markdown" class="md-nav__link">
+    <span class="md-ellipsis">
+      Create Pull Request from Markdown
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#preview-pr-creation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Preview PR Creation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#list-recent-pull-requests" class="md-nav__link">
+    <span class="md-ellipsis">
+      List Recent Pull Requests
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#show-pull-request-details_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Show Pull Request Details
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#check-pull-request-status_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Check Pull Request Status
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#update-pull-request_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Update Pull Request
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pipeline-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pipeline Operations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Pipeline Operations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      Create Pipeline
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-pipeline-creation-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      How Pipeline Creation Works
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="How Pipeline Creation Works">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#azure-devops-pipeline-creation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Azure DevOps Pipeline Creation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#github-actions-workflow-creation" class="md-nav__link">
+    <span class="md-ellipsis">
+      GitHub Actions Workflow Creation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#platform-detection" class="md-nav__link">
+    <span class="md-ellipsis">
+      Platform Detection
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common Issues
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pipeline-naming-convention" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pipeline Naming Convention
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#security-considerations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Security Considerations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Security Considerations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#list-pipelines" class="md-nav__link">
+    <span class="md-ellipsis">
+      List Pipelines
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#show-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      Show Pipeline
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#delete-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      Delete Pipeline
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      Run Pipeline
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#check-pipeline-status" class="md-nav__link">
+    <span class="md-ellipsis">
+      Check Pipeline Status
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#show-pipeline-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Show Pipeline Logs
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#show-last-build" class="md-nav__link">
+    <span class="md-ellipsis">
+      Show Last Build
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#update-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      Update Pipeline
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pipeline-operations_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pipeline Operations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Pipeline Operations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create-pipeline_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Create Pipeline
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#list-pipelines_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      List Pipelines
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run-pipeline_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Run Pipeline
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#check-pipeline-status_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Check Pipeline Status
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#view-pipeline-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      View Pipeline Logs
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#show-last-build-information" class="md-nav__link">
+    <span class="md-ellipsis">
+      Show Last Build Information
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#markdown-file-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      Markdown File Format
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Markdown File Format">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#required-metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      Required Metadata
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#supported-platforms" class="md-nav__link">
+    <span class="md-ellipsis">
+      Supported Platforms
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Supported Platforms">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#azure-devops" class="md-nav__link">
+    <span class="md-ellipsis">
+      Azure DevOps
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#github" class="md-nav__link">
+    <span class="md-ellipsis">
+      GitHub
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      Error Handling
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#run-all-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      Run All Tests
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-categories" class="md-nav__link">
+    <span class="md-ellipsis">
+      Test Categories
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-coverage" class="md-nav__link">
+    <span class="md-ellipsis">
+      Test Coverage
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#common-issues_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common Issues
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Common Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#authentication-failures" class="md-nav__link">
+    <span class="md-ellipsis">
+      Authentication Failures
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#git-remote-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Git Remote Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#file-format-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      File Format Issues
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#debug-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      Debug Mode
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      Architecture
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#development" class="md-nav__link">
+    <span class="md-ellipsis">
+      Development
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Development">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#code-quality" class="md-nav__link">
+    <span class="md-ellipsis">
+      Code Quality
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#contributing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Contributing
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sdo-installation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    SDO Installation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../install-ntools/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Install NTools
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devops-tools-suite-architecture/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    DevOps Tools Suite Architecture
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../azdo_payloads/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AzDO payloads
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="sdo-simple-devops-operations-tool">sdo - Simple DevOps Operations Tool<a class="headerlink" href="#sdo-simple-devops-operations-tool" title="Anchor link to this section for reference">&para;</a></h1>
 <p>This page documents the <code>sdo</code> CLI tool. Use this page for detailed prerequisites, installation, usage examples, troubleshooting, and testing.</p>
-<h2 id="overview">Overview</h2>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Anchor link to this section for reference">&para;</a></h2>
 <p><code>sdo</code> (Simple DevOps Operations) is a modern CLI tool that provides unified operations for both work items and repositories across Azure DevOps and GitHub platforms. It parses backlog-style markdown files to create work items and offers comprehensive repository management capabilities.</p>
-<h3 id="key-features">Key Features</h3>
+<h3 id="key-features">Key Features<a class="headerlink" href="#key-features" title="Anchor link to this section for reference">&para;</a></h3>
 <ul>
 <li><strong>Work Item Creation</strong>: Parse markdown files and create GitHub issues or Azure DevOps work items (PBIs, Bugs, Tasks)</li>
 <li><strong>Repository Management</strong>: Create, list, show, and delete repositories on both platforms</li>
@@ -259,52 +2317,52 @@
 <li><strong>Dry-Run Previews</strong>: Preview operations before execution</li>
 <li><strong>Automatic Platform Detection</strong>: Detects platform from Git remote configuration</li>
 </ul>
-<h2 id="prerequisites">Prerequisites</h2>
-<h3 id="required-environment-variables">Required Environment Variables</h3>
+<h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Anchor link to this section for reference">&para;</a></h2>
+<h3 id="required-environment-variables">Required Environment Variables<a class="headerlink" href="#required-environment-variables" title="Anchor link to this section for reference">&para;</a></h3>
 <ul>
 <li><code>AZURE_DEVOPS_PAT</code> - Personal Access Token for Azure DevOps API access</li>
 <li><code>GITHUB_TOKEN</code> - GitHub Personal Access Token (for GitHub operations)</li>
 </ul>
-<h3 id="python-requirements">Python Requirements</h3>
+<h3 id="python-requirements">Python Requirements<a class="headerlink" href="#python-requirements" title="Anchor link to this section for reference">&para;</a></h3>
 <ul>
 <li>Python 3.8+</li>
 <li>Dependencies listed in <code>requirements.txt</code></li>
 </ul>
-<h3 id="git-repository-context">Git Repository Context</h3>
+<h3 id="git-repository-context">Git Repository Context<a class="headerlink" href="#git-repository-context" title="Anchor link to this section for reference">&para;</a></h3>
 <p>The tool automatically detects Azure DevOps organization and project from the current Git remote configuration.</p>
-<h2 id="installation">Installation</h2>
+<h2 id="installation">Installation<a class="headerlink" href="#installation" title="Anchor link to this section for reference">&para;</a></h2>
 <p>For detailed installation instructions, see <a href="../sdo-installation/">SDO Installation</a>.</p>
-<h3 id="quick-installation-virtual-environment">Quick Installation (Virtual Environment)</h3>
-<pre><code class="language-bash"># Navigate to NTools directory
-cd &quot;C:\Program Files\NBuild&quot;
+<h3 id="quick-installation-virtual-environment">Quick Installation (Virtual Environment)<a class="headerlink" href="#quick-installation-virtual-environment" title="Anchor link to this section for reference">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Navigate to NTools directory</span>
+<span class="nb">cd</span><span class="w"> </span><span class="s2">&quot;C:\Program Files\NBuild&quot;</span>
 
-# Run the installer
-python atools\install-sdo.py
-</code></pre>
-<h3 id="prerequisites_1">Prerequisites</h3>
+<span class="c1"># Run the installer</span>
+python<span class="w"> </span>atools<span class="se">\i</span>nstall-sdo.py
+</code></pre></div>
+<h3 id="prerequisites_1">Prerequisites<a class="headerlink" href="#prerequisites_1" title="Anchor link to this section for reference">&para;</a></h3>
 <ul>
 <li>Python 3.8+</li>
 <li>Administrative privileges (recommended)</li>
 </ul>
-<h2 id="usage">Usage</h2>
-<h3 id="basic-command-structure">Basic Command Structure</h3>
-<pre><code class="language-bash">sdo [OPTIONS] COMMAND [ARGS]...
-</code></pre>
-<h3 id="global-options">Global Options</h3>
+<h2 id="usage">Usage<a class="headerlink" href="#usage" title="Anchor link to this section for reference">&para;</a></h2>
+<h3 id="basic-command-structure">Basic Command Structure<a class="headerlink" href="#basic-command-structure" title="Anchor link to this section for reference">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>COMMAND<span class="w"> </span><span class="o">[</span>ARGS<span class="o">]</span>...
+</code></pre></div>
+<h3 id="global-options">Global Options<a class="headerlink" href="#global-options" title="Anchor link to this section for reference">&para;</a></h3>
 <ul>
 <li><code>-v, --verbose</code> - Show detailed API error information</li>
 <li><code>--version</code> - Show version information</li>
 </ul>
-<h3 id="work-item-operations">Work Item Operations</h3>
-<h4 id="create-work-item">Create Work Item</h4>
-<pre><code class="language-bash">sdo workitem create --file-path FILE_PATH [OPTIONS]
-</code></pre>
+<h3 id="work-item-operations">Work Item Operations<a class="headerlink" href="#work-item-operations" title="Anchor link to this section for reference">&para;</a></h3>
+<h4 id="create-work-item">Create Work Item<a class="headerlink" href="#create-work-item" title="Anchor link to this section for reference">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>workitem<span class="w"> </span>create<span class="w"> </span>--file-path<span class="w"> </span>FILE_PATH<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</code></pre></div>
 <p><strong>Options:</strong>
 - <code>-f, --file-path PATH</code> - Path to markdown file (required)
 - <code>--dry-run</code> - Parse and preview without creating</p>
-<h4 id="list-work-items">List Work Items</h4>
-<pre><code class="language-bash">sdo workitem list [OPTIONS]
-</code></pre>
+<h4 id="list-work-items">List Work Items<a class="headerlink" href="#list-work-items" title="Anchor link to this section for reference">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>workitem<span class="w"> </span>list<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</code></pre></div>
 <p>Lists work items with optional filtering. Works with both Azure DevOps and GitHub.</p>
 <p><strong>Options:</strong>
 - <code>--type TYPE</code> - Filter by work item type (PBI, Bug, Task, Spike, Epic)
@@ -313,17 +2371,17 @@ python atools\install-sdo.py
 - <code>--assigned-to-me</code> - Filter by work items assigned to current user
 - <code>--top INTEGER</code> - Maximum number of items to return (default: 50)
 - <code>-v, --verbose</code> - Show detailed API information and URLs</p>
-<h4 id="show-work-item">Show Work Item</h4>
-<pre><code class="language-bash">sdo workitem show --id ID [OPTIONS]
-</code></pre>
+<h4 id="show-work-item">Show Work Item<a class="headerlink" href="#show-work-item" title="Anchor link to this section for reference">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>workitem<span class="w"> </span>show<span class="w"> </span>--id<span class="w"> </span>ID<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</code></pre></div>
 <p>Shows detailed work item information including acceptance criteria.</p>
 <p><strong>Options:</strong>
 - <code>--id INTEGER</code> - Work item ID (required)
 - <code>-c, --comments</code> - Show comments/discussion
 - <code>-v, --verbose</code> - Show full API response</p>
-<h4 id="update-work-item">Update Work Item</h4>
-<pre><code class="language-bash">sdo workitem update --id ID [OPTIONS]
-</code></pre>
+<h4 id="update-work-item">Update Work Item<a class="headerlink" href="#update-work-item" title="Anchor link to this section for reference">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>workitem<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span>ID<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</code></pre></div>
 <p>Updates work item fields.</p>
 <p><strong>Options:</strong>
 - <code>--id INTEGER</code> - Work item ID (required)
@@ -332,117 +2390,117 @@ python atools\install-sdo.py
 - <code>--assigned-to EMAIL</code> - Update assigned user (email or display name)
 - <code>--state STATE</code> - Update state (New, Approved, Committed, Done, To Do, In Progress)
 - <code>-v, --verbose</code> - Show full API response</p>
-<h4 id="add-comment-to-work-item">Add Comment to Work Item</h4>
-<pre><code class="language-bash">sdo workitem comment --id ID --text TEXT [OPTIONS]
-</code></pre>
+<h4 id="add-comment-to-work-item">Add Comment to Work Item<a class="headerlink" href="#add-comment-to-work-item" title="Anchor link to this section for reference">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>workitem<span class="w"> </span>comment<span class="w"> </span>--id<span class="w"> </span>ID<span class="w"> </span>--text<span class="w"> </span>TEXT<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</code></pre></div>
 <p>Adds a comment to a work item or issue.</p>
 <p><strong>Options:</strong>
 - <code>--id INTEGER</code> - Work item ID (required)
 - <code>--text TEXT</code> - Comment text (required)
 - <code>-v, --verbose</code> - Show full API response</p>
-<h3 id="repository-operations">Repository Operations</h3>
-<h4 id="create-repository">Create Repository</h4>
-<pre><code class="language-bash">sdo repo create [OPTIONS]
-</code></pre>
+<h3 id="repository-operations">Repository Operations<a class="headerlink" href="#repository-operations" title="Anchor link to this section for reference">&para;</a></h3>
+<h4 id="create-repository">Create Repository<a class="headerlink" href="#create-repository" title="Anchor link to this section for reference">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>repo<span class="w"> </span>create<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</code></pre></div>
 <p>Creates a new repository in the current project/organization.</p>
 <p><strong>Options:</strong>
 - <code>-v, --verbose</code> - Show detailed API information</p>
-<h4 id="list-repositories">List Repositories</h4>
-<pre><code class="language-bash">sdo repo ls [OPTIONS]
-</code></pre>
+<h4 id="list-repositories">List Repositories<a class="headerlink" href="#list-repositories" title="Anchor link to this section for reference">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>repo<span class="w"> </span>ls<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</code></pre></div>
 <p>Lists all repositories in the current project/organization.</p>
 <p><strong>Options:</strong>
 - <code>-v, --verbose</code> - Show detailed API information</p>
-<h4 id="show-repository">Show Repository</h4>
-<pre><code class="language-bash">sdo repo show [OPTIONS]
-</code></pre>
+<h4 id="show-repository">Show Repository<a class="headerlink" href="#show-repository" title="Anchor link to this section for reference">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>repo<span class="w"> </span>show<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</code></pre></div>
 <p>Shows detailed information about the current repository.</p>
 <p><strong>Options:</strong>
 - <code>-v, --verbose</code> - Show detailed API information</p>
-<h4 id="delete-repository">Delete Repository</h4>
-<pre><code class="language-bash">sdo repo delete [OPTIONS]
-</code></pre>
+<h4 id="delete-repository">Delete Repository<a class="headerlink" href="#delete-repository" title="Anchor link to this section for reference">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>repo<span class="w"> </span>delete<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</code></pre></div>
 <p>Deletes the current repository (with confirmation prompt).</p>
 <p><strong>Options:</strong>
 - <code>-v, --verbose</code> - Show detailed API information</p>
-<h3 id="examples">Examples</h3>
-<h4 id="work-item-operations_1">Work Item Operations</h4>
-<h5 id="create-work-item_1">Create Work Item</h5>
-<h6 id="dry-run-preview">Dry Run (Preview)</h6>
-<pre><code class="language-bash">sdo workitem create --file-path &quot;atools/issue-azdo-example.md&quot; --dry-run
-</code></pre>
-<h6 id="create-azure-devops-work-item">Create Azure DevOps Work Item</h6>
-<pre><code class="language-bash">sdo workitem create --file-path &quot;atools/issue-azdo-example.md&quot;
-</code></pre>
-<h6 id="create-with-verbose-output">Create with Verbose Output</h6>
-<pre><code class="language-bash">sdo workitem create --file-path &quot;atools/issue-azdo-example.md&quot; --verbose
-</code></pre>
-<h5 id="list-work-items_1">List Work Items</h5>
-<pre><code class="language-bash"># List all work items
-sdo workitem list
+<h3 id="examples">Examples<a class="headerlink" href="#examples" title="Anchor link to this section for reference">&para;</a></h3>
+<h4 id="work-item-operations_1">Work Item Operations<a class="headerlink" href="#work-item-operations_1" title="Anchor link to this section for reference">&para;</a></h4>
+<h5 id="create-work-item_1">Create Work Item<a class="headerlink" href="#create-work-item_1" title="Anchor link to this section for reference">&para;</a></h5>
+<h6 id="dry-run-preview">Dry Run (Preview)<a class="headerlink" href="#dry-run-preview" title="Anchor link to this section for reference">&para;</a></h6>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>workitem<span class="w"> </span>create<span class="w"> </span>--file-path<span class="w"> </span><span class="s2">&quot;atools/issue-azdo-example.md&quot;</span><span class="w"> </span>--dry-run
+</code></pre></div>
+<h6 id="create-azure-devops-work-item">Create Azure DevOps Work Item<a class="headerlink" href="#create-azure-devops-work-item" title="Anchor link to this section for reference">&para;</a></h6>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>workitem<span class="w"> </span>create<span class="w"> </span>--file-path<span class="w"> </span><span class="s2">&quot;atools/issue-azdo-example.md&quot;</span>
+</code></pre></div>
+<h6 id="create-with-verbose-output">Create with Verbose Output<a class="headerlink" href="#create-with-verbose-output" title="Anchor link to this section for reference">&para;</a></h6>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>workitem<span class="w"> </span>create<span class="w"> </span>--file-path<span class="w"> </span><span class="s2">&quot;atools/issue-azdo-example.md&quot;</span><span class="w"> </span>--verbose
+</code></pre></div>
+<h5 id="list-work-items_1">List Work Items<a class="headerlink" href="#list-work-items_1" title="Anchor link to this section for reference">&para;</a></h5>
+<div class="highlight"><pre><span></span><code><span class="c1"># List all work items</span>
+sdo<span class="w"> </span>workitem<span class="w"> </span>list
 
-# List only PBIs in &quot;New&quot; state
-sdo workitem list --type PBI --state New
+<span class="c1"># List only PBIs in &quot;New&quot; state</span>
+sdo<span class="w"> </span>workitem<span class="w"> </span>list<span class="w"> </span>--type<span class="w"> </span>PBI<span class="w"> </span>--state<span class="w"> </span>New
 
-# List work items assigned to you
-sdo workitem list --assigned-to-me
+<span class="c1"># List work items assigned to you</span>
+sdo<span class="w"> </span>workitem<span class="w"> </span>list<span class="w"> </span>--assigned-to-me
 
-# List tasks in progress with verbose output
-sdo workitem list --type Task --state &quot;In Progress&quot; --verbose
+<span class="c1"># List tasks in progress with verbose output</span>
+sdo<span class="w"> </span>workitem<span class="w"> </span>list<span class="w"> </span>--type<span class="w"> </span>Task<span class="w"> </span>--state<span class="w"> </span><span class="s2">&quot;In Progress&quot;</span><span class="w"> </span>--verbose
 
-# List top 10 work items
-sdo workitem list --top 10
-</code></pre>
-<h5 id="show-work-item_1">Show Work Item</h5>
-<pre><code class="language-bash"># Show work item details
-sdo workitem show --id 123
+<span class="c1"># List top 10 work items</span>
+sdo<span class="w"> </span>workitem<span class="w"> </span>list<span class="w"> </span>--top<span class="w"> </span><span class="m">10</span>
+</code></pre></div>
+<h5 id="show-work-item_1">Show Work Item<a class="headerlink" href="#show-work-item_1" title="Anchor link to this section for reference">&para;</a></h5>
+<div class="highlight"><pre><span></span><code><span class="c1"># Show work item details</span>
+sdo<span class="w"> </span>workitem<span class="w"> </span>show<span class="w"> </span>--id<span class="w"> </span><span class="m">123</span>
 
-# Show work item with comments
-sdo workitem show --id 123 --comments
+<span class="c1"># Show work item with comments</span>
+sdo<span class="w"> </span>workitem<span class="w"> </span>show<span class="w"> </span>--id<span class="w"> </span><span class="m">123</span><span class="w"> </span>--comments
 
-# Show with verbose API response
-sdo workitem show --id 123 --verbose
-</code></pre>
-<h5 id="update-work-item_1">Update Work Item</h5>
-<pre><code class="language-bash"># Update work item state
-sdo workitem update --id 123 --state &quot;In Progress&quot;
+<span class="c1"># Show with verbose API response</span>
+sdo<span class="w"> </span>workitem<span class="w"> </span>show<span class="w"> </span>--id<span class="w"> </span><span class="m">123</span><span class="w"> </span>--verbose
+</code></pre></div>
+<h5 id="update-work-item_1">Update Work Item<a class="headerlink" href="#update-work-item_1" title="Anchor link to this section for reference">&para;</a></h5>
+<div class="highlight"><pre><span></span><code><span class="c1"># Update work item state</span>
+sdo<span class="w"> </span>workitem<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">123</span><span class="w"> </span>--state<span class="w"> </span><span class="s2">&quot;In Progress&quot;</span>
 
-# Update title and description
-sdo workitem update --id 123 --title &quot;New Title&quot; --description &quot;Updated description&quot;
+<span class="c1"># Update title and description</span>
+sdo<span class="w"> </span>workitem<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">123</span><span class="w"> </span>--title<span class="w"> </span><span class="s2">&quot;New Title&quot;</span><span class="w"> </span>--description<span class="w"> </span><span class="s2">&quot;Updated description&quot;</span>
 
-# Assign work item to user
-sdo workitem update --id 123 --assigned-to &quot;user@example.com&quot;
+<span class="c1"># Assign work item to user</span>
+sdo<span class="w"> </span>workitem<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">123</span><span class="w"> </span>--assigned-to<span class="w"> </span><span class="s2">&quot;user@example.com&quot;</span>
 
-# Update multiple fields
-sdo workitem update --id 123 --state Done --assigned-to &quot;user@example.com&quot; --verbose
-</code></pre>
-<h5 id="add-comment">Add Comment</h5>
-<pre><code class="language-bash"># Add a comment to work item
-sdo workitem comment --id 123 --text &quot;This is a test comment&quot;
+<span class="c1"># Update multiple fields</span>
+sdo<span class="w"> </span>workitem<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">123</span><span class="w"> </span>--state<span class="w"> </span>Done<span class="w"> </span>--assigned-to<span class="w"> </span><span class="s2">&quot;user@example.com&quot;</span><span class="w"> </span>--verbose
+</code></pre></div>
+<h5 id="add-comment">Add Comment<a class="headerlink" href="#add-comment" title="Anchor link to this section for reference">&para;</a></h5>
+<div class="highlight"><pre><span></span><code><span class="c1"># Add a comment to work item</span>
+sdo<span class="w"> </span>workitem<span class="w"> </span>comment<span class="w"> </span>--id<span class="w"> </span><span class="m">123</span><span class="w"> </span>--text<span class="w"> </span><span class="s2">&quot;This is a test comment&quot;</span>
 
-# Add comment with verbose output
-sdo workitem comment --id 123 --text &quot;Completed testing&quot; --verbose
-</code></pre>
-<h4 id="repository-operations_1">Repository Operations</h4>
-<h5 id="create-repository_1">Create Repository</h5>
-<pre><code class="language-bash">sdo repo create
-sdo repo create --verbose
-</code></pre>
-<h5 id="list-repositories_1">List Repositories</h5>
-<pre><code class="language-bash">sdo repo ls
-sdo repo list  # Alternative command
-</code></pre>
-<h5 id="show-repository-details">Show Repository Details</h5>
-<pre><code class="language-bash">sdo repo show
-sdo repo show --verbose
-</code></pre>
-<h5 id="delete-repository_1">Delete Repository</h5>
-<pre><code class="language-bash">sdo repo delete  # Will prompt for confirmation
-</code></pre>
-<h3 id="pull-request-operations">Pull Request Operations</h3>
-<h4 id="create-pull-request">Create Pull Request</h4>
-<pre><code class="language-bash">sdo pr create [OPTIONS]
-</code></pre>
+<span class="c1"># Add comment with verbose output</span>
+sdo<span class="w"> </span>workitem<span class="w"> </span>comment<span class="w"> </span>--id<span class="w"> </span><span class="m">123</span><span class="w"> </span>--text<span class="w"> </span><span class="s2">&quot;Completed testing&quot;</span><span class="w"> </span>--verbose
+</code></pre></div>
+<h4 id="repository-operations_1">Repository Operations<a class="headerlink" href="#repository-operations_1" title="Anchor link to this section for reference">&para;</a></h4>
+<h5 id="create-repository_1">Create Repository<a class="headerlink" href="#create-repository_1" title="Anchor link to this section for reference">&para;</a></h5>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>repo<span class="w"> </span>create
+sdo<span class="w"> </span>repo<span class="w"> </span>create<span class="w"> </span>--verbose
+</code></pre></div>
+<h5 id="list-repositories_1">List Repositories<a class="headerlink" href="#list-repositories_1" title="Anchor link to this section for reference">&para;</a></h5>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>repo<span class="w"> </span>ls
+sdo<span class="w"> </span>repo<span class="w"> </span>list<span class="w">  </span><span class="c1"># Alternative command</span>
+</code></pre></div>
+<h5 id="show-repository-details">Show Repository Details<a class="headerlink" href="#show-repository-details" title="Anchor link to this section for reference">&para;</a></h5>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>repo<span class="w"> </span>show
+sdo<span class="w"> </span>repo<span class="w"> </span>show<span class="w"> </span>--verbose
+</code></pre></div>
+<h5 id="delete-repository_1">Delete Repository<a class="headerlink" href="#delete-repository_1" title="Anchor link to this section for reference">&para;</a></h5>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>repo<span class="w"> </span>delete<span class="w">  </span><span class="c1"># Will prompt for confirmation</span>
+</code></pre></div>
+<h3 id="pull-request-operations">Pull Request Operations<a class="headerlink" href="#pull-request-operations" title="Anchor link to this section for reference">&para;</a></h3>
+<h4 id="create-pull-request">Create Pull Request<a class="headerlink" href="#create-pull-request" title="Anchor link to this section for reference">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</code></pre></div>
 <p>Creates a new pull request from a markdown file.</p>
 <p><strong>Options:</strong>
 - <code>-f, --file PATH</code> - Path to markdown file containing PR details (required)
@@ -450,53 +2508,53 @@ sdo repo show --verbose
 - <code>--draft</code> - Create as draft pull request
 - <code>--dry-run</code> - Parse and preview PR creation without creating it
 - <code>-v, --verbose</code> - Show detailed API information and responses</p>
-<p><strong>Examples:</strong></p>
-<pre><code class="language-bash"># Create PR with dry-run preview
-sdo pr create -f pr-description.md --work-item 123 --dry-run
+<p><strong>Examples:</strong>
+<div class="highlight"><pre><span></span><code><span class="c1"># Create PR with dry-run preview</span>
+sdo<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>pr-description.md<span class="w"> </span>--work-item<span class="w"> </span><span class="m">123</span><span class="w"> </span>--dry-run
 
-# Create draft PR
-sdo pr create -f pr-description.md --work-item 123 --draft
+<span class="c1"># Create draft PR</span>
+sdo<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>pr-description.md<span class="w"> </span>--work-item<span class="w"> </span><span class="m">123</span><span class="w"> </span>--draft
 
-# Create PR with verbose output
-sdo pr create -f pr-description.md --work-item 123 --verbose
-</code></pre>
-<h4 id="list-pull-requests">List Pull Requests</h4>
-<pre><code class="language-bash">sdo pr ls [OPTIONS]
-</code></pre>
+<span class="c1"># Create PR with verbose output</span>
+sdo<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>pr-description.md<span class="w"> </span>--work-item<span class="w"> </span><span class="m">123</span><span class="w"> </span>--verbose
+</code></pre></div></p>
+<h4 id="list-pull-requests">List Pull Requests<a class="headerlink" href="#list-pull-requests" title="Anchor link to this section for reference">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pr<span class="w"> </span>ls<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</code></pre></div>
 <p>Lists pull requests in the current repository.</p>
 <p><strong>Options:</strong>
 - <code>--status STATUS</code> - Filter by status (active, completed, abandoned) [default: active]
 - <code>--top INTEGER</code> - Maximum number of PRs to show [default: 10]
 - <code>-v, --verbose</code> - Show detailed API information</p>
-<p><strong>Examples:</strong></p>
-<pre><code class="language-bash"># List active PRs
-sdo pr ls
+<p><strong>Examples:</strong>
+<div class="highlight"><pre><span></span><code><span class="c1"># List active PRs</span>
+sdo<span class="w"> </span>pr<span class="w"> </span>ls
 
-# List completed PRs
-sdo pr ls --status completed
+<span class="c1"># List completed PRs</span>
+sdo<span class="w"> </span>pr<span class="w"> </span>ls<span class="w"> </span>--status<span class="w"> </span>completed
 
-# List with custom limit
-sdo pr ls --top 20
+<span class="c1"># List with custom limit</span>
+sdo<span class="w"> </span>pr<span class="w"> </span>ls<span class="w"> </span>--top<span class="w"> </span><span class="m">20</span>
 
-# List with verbose output
-sdo pr ls --verbose
-</code></pre>
-<h4 id="show-pull-request-details">Show Pull Request Details</h4>
-<pre><code class="language-bash">sdo pr show PR_NUMBER [OPTIONS]
-</code></pre>
+<span class="c1"># List with verbose output</span>
+sdo<span class="w"> </span>pr<span class="w"> </span>ls<span class="w"> </span>--verbose
+</code></pre></div></p>
+<h4 id="show-pull-request-details">Show Pull Request Details<a class="headerlink" href="#show-pull-request-details" title="Anchor link to this section for reference">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pr<span class="w"> </span>show<span class="w"> </span>PR_NUMBER<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</code></pre></div>
 <p>Shows detailed information about a specific pull request.</p>
 <p><strong>Options:</strong>
 - <code>-v, --verbose</code> - Show detailed API information</p>
-<p><strong>Examples:</strong></p>
-<pre><code class="language-bash"># Show PR details
-sdo pr show 123
+<p><strong>Examples:</strong>
+<div class="highlight"><pre><span></span><code><span class="c1"># Show PR details</span>
+sdo<span class="w"> </span>pr<span class="w"> </span>show<span class="w"> </span><span class="m">123</span>
 
-# Show PR with verbose API details
-sdo pr show 123 --verbose
-</code></pre>
-<h4 id="check-pull-request-status">Check Pull Request Status</h4>
-<pre><code class="language-bash">sdo pr status PR_NUMBER [OPTIONS]
-</code></pre>
+<span class="c1"># Show PR with verbose API details</span>
+sdo<span class="w"> </span>pr<span class="w"> </span>show<span class="w"> </span><span class="m">123</span><span class="w"> </span>--verbose
+</code></pre></div></p>
+<h4 id="check-pull-request-status">Check Pull Request Status<a class="headerlink" href="#check-pull-request-status" title="Anchor link to this section for reference">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pr<span class="w"> </span>status<span class="w"> </span>PR_NUMBER<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</code></pre></div>
 <p>Shows the current status of a specific pull request including CI/CD check results.</p>
 <p>Displays:
 - PR status (open, closed, merged, etc.)
@@ -505,16 +2563,16 @@ sdo pr show 123 --verbose
 - Check results with pass/fail indicators and URLs</p>
 <p><strong>Options:</strong>
 - <code>-v, --verbose</code> - Show detailed API information</p>
-<p><strong>Examples:</strong></p>
-<pre><code class="language-bash"># Check PR status with CI/CD checks
-sdo pr status 123
+<p><strong>Examples:</strong>
+<div class="highlight"><pre><span></span><code><span class="c1"># Check PR status with CI/CD checks</span>
+sdo<span class="w"> </span>pr<span class="w"> </span>status<span class="w"> </span><span class="m">123</span>
 
-# Check PR status with verbose details
-sdo pr status 123 --verbose
-</code></pre>
-<h4 id="update-pull-request">Update Pull Request</h4>
-<pre><code class="language-bash">sdo pr update [OPTIONS]
-</code></pre>
+<span class="c1"># Check PR status with verbose details</span>
+sdo<span class="w"> </span>pr<span class="w"> </span>status<span class="w"> </span><span class="m">123</span><span class="w"> </span>--verbose
+</code></pre></div></p>
+<h4 id="update-pull-request">Update Pull Request<a class="headerlink" href="#update-pull-request" title="Anchor link to this section for reference">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pr<span class="w"> </span>update<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</code></pre></div>
 <p>Updates an existing pull request.</p>
 <p><strong>Options:</strong>
 - <code>--pr-id INTEGER</code> - Pull request ID to update (required)
@@ -522,35 +2580,35 @@ sdo pr status 123 --verbose
 - <code>-t, --title TEXT</code> - New title for the PR
 - <code>--status STATUS</code> - New status (active, abandoned, completed)
 - <code>-v, --verbose</code> - Show detailed API information</p>
-<p><strong>Examples:</strong></p>
-<pre><code class="language-bash"># Update PR title
-sdo pr update --pr-id 123 --title &quot;Updated PR Title&quot;
+<p><strong>Examples:</strong>
+<div class="highlight"><pre><span></span><code><span class="c1"># Update PR title</span>
+sdo<span class="w"> </span>pr<span class="w"> </span>update<span class="w"> </span>--pr-id<span class="w"> </span><span class="m">123</span><span class="w"> </span>--title<span class="w"> </span><span class="s2">&quot;Updated PR Title&quot;</span>
 
-# Update PR from markdown file
-sdo pr update --pr-id 123 --file updated-pr.md
+<span class="c1"># Update PR from markdown file</span>
+sdo<span class="w"> </span>pr<span class="w"> </span>update<span class="w"> </span>--pr-id<span class="w"> </span><span class="m">123</span><span class="w"> </span>--file<span class="w"> </span>updated-pr.md
 
-# Update PR status to completed
-sdo pr update --pr-id 123 --status completed
-</code></pre>
-<h3 id="examples_1">Examples</h3>
-<h4 id="pull-request-operations_1">Pull Request Operations</h4>
-<h5 id="create-pull-request-from-markdown">Create Pull Request from Markdown</h5>
-<pre><code class="language-bash">sdo pr create -f pr-description.md --work-item 208
-</code></pre>
-<h5 id="preview-pr-creation">Preview PR Creation</h5>
-<pre><code class="language-bash">sdo pr create -f pr-description.md --work-item 208 --dry-run
-</code></pre>
-<h5 id="list-recent-pull-requests">List Recent Pull Requests</h5>
-<pre><code class="language-bash">sdo pr ls --top 5
-</code></pre>
-<h5 id="show-pull-request-details_1">Show Pull Request Details</h5>
-<pre><code class="language-bash">sdo pr show 211
-</code></pre>
-<h5 id="check-pull-request-status_1">Check Pull Request Status</h5>
-<pre><code class="language-bash">sdo pr status 211
-</code></pre>
-<p><strong>Output includes CI/CD checks:</strong></p>
-<pre><code>✅ PR #211: MERGED
+<span class="c1"># Update PR status to completed</span>
+sdo<span class="w"> </span>pr<span class="w"> </span>update<span class="w"> </span>--pr-id<span class="w"> </span><span class="m">123</span><span class="w"> </span>--status<span class="w"> </span>completed
+</code></pre></div></p>
+<h3 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Anchor link to this section for reference">&para;</a></h3>
+<h4 id="pull-request-operations_1">Pull Request Operations<a class="headerlink" href="#pull-request-operations_1" title="Anchor link to this section for reference">&para;</a></h4>
+<h5 id="create-pull-request-from-markdown">Create Pull Request from Markdown<a class="headerlink" href="#create-pull-request-from-markdown" title="Anchor link to this section for reference">&para;</a></h5>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>pr-description.md<span class="w"> </span>--work-item<span class="w"> </span><span class="m">208</span>
+</code></pre></div>
+<h5 id="preview-pr-creation">Preview PR Creation<a class="headerlink" href="#preview-pr-creation" title="Anchor link to this section for reference">&para;</a></h5>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>pr-description.md<span class="w"> </span>--work-item<span class="w"> </span><span class="m">208</span><span class="w"> </span>--dry-run
+</code></pre></div>
+<h5 id="list-recent-pull-requests">List Recent Pull Requests<a class="headerlink" href="#list-recent-pull-requests" title="Anchor link to this section for reference">&para;</a></h5>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pr<span class="w"> </span>ls<span class="w"> </span>--top<span class="w"> </span><span class="m">5</span>
+</code></pre></div>
+<h5 id="show-pull-request-details_1">Show Pull Request Details<a class="headerlink" href="#show-pull-request-details_1" title="Anchor link to this section for reference">&para;</a></h5>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pr<span class="w"> </span>show<span class="w"> </span><span class="m">211</span>
+</code></pre></div>
+<h5 id="check-pull-request-status_1">Check Pull Request Status<a class="headerlink" href="#check-pull-request-status_1" title="Anchor link to this section for reference">&para;</a></h5>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pr<span class="w"> </span>status<span class="w"> </span><span class="m">211</span>
+</code></pre></div>
+<p><strong>Output includes CI/CD checks:</strong>
+<div class="highlight"><pre><span></span><code>✅ PR #211: MERGED
 Title: [208] Implement Comprehensive Pull Request Management for SDO CLI
 Author: naz-hage
 Branch: gh-208 → main
@@ -559,24 +2617,24 @@ CI/CD Checks:
 Python Tests    pass    27s     https://github.com/naz-hage/ntools/actions/runs/...
 Publish Docs    pass    13s     https://github.com/naz-hage/ntools/actions/runs/...
 Running a workflow (Release)    pass    3m24s   https://github.com/naz-hage/ntools/actions/runs/...
-</code></pre>
-<h5 id="update-pull-request_1">Update Pull Request</h5>
-<pre><code class="language-bash">sdo pr update --pr-id 211 --title &quot;Updated: Implement PR Management&quot;
-</code></pre>
-<h3 id="pipeline-operations">Pipeline Operations</h3>
-<h4 id="create-pipeline">Create Pipeline</h4>
-<pre><code class="language-bash">sdo pipeline create [OPTIONS]
-</code></pre>
+</code></pre></div></p>
+<h5 id="update-pull-request_1">Update Pull Request<a class="headerlink" href="#update-pull-request_1" title="Anchor link to this section for reference">&para;</a></h5>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pr<span class="w"> </span>update<span class="w"> </span>--pr-id<span class="w"> </span><span class="m">211</span><span class="w"> </span>--title<span class="w"> </span><span class="s2">&quot;Updated: Implement PR Management&quot;</span>
+</code></pre></div>
+<h3 id="pipeline-operations">Pipeline Operations<a class="headerlink" href="#pipeline-operations" title="Anchor link to this section for reference">&para;</a></h3>
+<h4 id="create-pipeline">Create Pipeline<a class="headerlink" href="#create-pipeline" title="Anchor link to this section for reference">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pipeline<span class="w"> </span>create<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</code></pre></div>
 <p>Creates a new pipeline/workflow in the current project.</p>
 <p><strong>Options:</strong>
 - <code>-v, --verbose</code> - Show detailed API information</p>
-<p><strong>Examples:</strong></p>
-<pre><code class="language-bash">sdo pipeline create
-sdo pipeline create --verbose
-</code></pre>
-<h2 id="how-pipeline-creation-works">How Pipeline Creation Works</h2>
+<p><strong>Examples:</strong>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pipeline<span class="w"> </span>create
+sdo<span class="w"> </span>pipeline<span class="w"> </span>create<span class="w"> </span>--verbose
+</code></pre></div></p>
+<h2 id="how-pipeline-creation-works">How Pipeline Creation Works<a class="headerlink" href="#how-pipeline-creation-works" title="Anchor link to this section for reference">&para;</a></h2>
 <p>The <code>sdo pipeline create</code> command automatically detects your platform and creates pipelines differently for each:</p>
-<h3 id="azure-devops-pipeline-creation">Azure DevOps Pipeline Creation</h3>
+<h3 id="azure-devops-pipeline-creation">Azure DevOps Pipeline Creation<a class="headerlink" href="#azure-devops-pipeline-creation" title="Anchor link to this section for reference">&para;</a></h3>
 <p><strong>What it does:</strong>
 1. <strong>Validates YAML file exists locally</strong> - Checks that the pipeline YAML file exists before creating the pipeline definition
 2. <strong>Auto-detects configuration</strong> from your Git remote:
@@ -594,8 +2652,8 @@ sdo pipeline create --verbose
 - Repository must contain a pipeline YAML file at <code>.azure-pipelines/azurepipeline.yml</code>
 - <code>AZURE_DEVOPS_PAT</code> environment variable must be set
 - User must have "Edit build pipeline" permissions</p>
-<p><strong>What happens during creation:</strong></p>
-<pre><code>✅ Detected Azure DevOps repository:
+<p><strong>What happens during creation:</strong>
+<div class="highlight"><pre><span></span><code>✅ Detected Azure DevOps repository:
    Organization: contoso
    Project: my-project
    Repository: my-app
@@ -604,15 +2662,15 @@ sdo pipeline create --verbose
    Pipeline Folder: \
 
 ✅ Pipeline YAML file found: .azure-pipelines/azurepipeline.yml
-Creating pipeline 'my-app'...
+Creating pipeline &#39;my-app&#39;...
 ✅ Pipeline created successfully!
    ID: 12345
    Name: my-app
    URL: https://dev.azure.com/contoso/my-project/_build?definitionId=12345
    Folder: \
-</code></pre>
-<p><strong>Error if YAML file missing:</strong></p>
-<pre><code>❌ Pipeline YAML file not found: .azure-pipelines/azurepipeline.yml
+</code></pre></div></p>
+<p><strong>Error if YAML file missing:</strong>
+<div class="highlight"><pre><span></span><code>❌ Pipeline YAML file not found: .azure-pipelines/azurepipeline.yml
 Please create the pipeline YAML file before creating the pipeline definition.
 
 Example YAML file structure:
@@ -621,13 +2679,13 @@ Example YAML file structure:
   - main
 
   pool:
-    vmImage: 'ubuntu-latest'
+    vmImage: &#39;ubuntu-latest&#39;
 
   steps:
   - script: echo Hello, world!
-    displayName: 'Run a one-line script'
-</code></pre>
-<h3 id="github-actions-workflow-creation">GitHub Actions Workflow Creation</h3>
+    displayName: &#39;Run a one-line script&#39;
+</code></pre></div></p>
+<h3 id="github-actions-workflow-creation">GitHub Actions Workflow Creation<a class="headerlink" href="#github-actions-workflow-creation" title="Anchor link to this section for reference">&para;</a></h3>
 <p><strong>Important:</strong> SDO does <strong>not</strong> create GitHub workflow files automatically.</p>
 <p><strong>What it does:</strong>
 - <strong>Checks for existing workflows</strong> in <code>.github/workflows/</code> directory
@@ -635,37 +2693,40 @@ Example YAML file structure:
 - <strong>Provides guidance</strong> for manual workflow creation</p>
 <p><strong>Manual creation steps:</strong>
 1. Create the workflows directory:
-   <code>bash
-   mkdir -p .github/workflows</code></p>
+   <div class="highlight"><pre><span></span><code>mkdir<span class="w"> </span>-p<span class="w"> </span>.github/workflows
+</code></pre></div></p>
 <ol>
-<li>Create a workflow YAML file (e.g., <code>ci.yml</code>):
-   ```yaml
-   # .github/workflows/ci.yml
-   name: CI</li>
+<li>
+<p>Create a workflow YAML file (e.g., <code>ci.yml</code>):
+   <div class="highlight"><pre><span></span><code><span class="c1"># .github/workflows/ci.yml</span>
+<span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CI</span>
+
+<span class="nt">on</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">push</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">branches</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="nv">main</span><span class="w"> </span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">pull_request</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">branches</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="nv">main</span><span class="w"> </span><span class="p p-Indicator">]</span>
+
+<span class="nt">jobs</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">build</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu-latest</span>
+
+<span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/checkout@v4</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Run a one-line script</span>
+<span class="w">      </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">echo Hello, world!</span>
+</code></pre></div></p>
+</li>
+<li>
+<p>Commit and push the workflow file:
+   <div class="highlight"><pre><span></span><code>git<span class="w"> </span>add<span class="w"> </span>.github/workflows/ci.yml
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;Add CI workflow&quot;</span>
+git<span class="w"> </span>push
+</code></pre></div></p>
+</li>
 </ol>
-<p>on:
-     push:
-       branches: [ main ]
-     pull_request:
-       branches: [ main ]</p>
-<p>jobs:
-     build:
-       runs-on: ubuntu-latest</p>
-<pre><code>   steps:
-   - uses: actions/checkout@v4
-   - name: Run a one-line script
-     run: echo Hello, world!
-</code></pre>
-<p>```</p>
-<ol>
-<li>Commit and push the workflow file:
-   <code>bash
-   git add .github/workflows/ci.yml
-   git commit -m "Add CI workflow"
-   git push</code></li>
-</ol>
-<p><strong>SDO output for GitHub (no existing workflows):</strong></p>
-<pre><code>GitHub Actions workflows are created by adding YAML files to .github/workflows/
+<p><strong>SDO output for GitHub (no existing workflows):</strong>
+<div class="highlight"><pre><span></span><code>GitHub Actions workflows are created by adding YAML files to .github/workflows/
 SDO does not create workflow files automatically.
 
 To create a workflow:
@@ -686,19 +2747,19 @@ Example workflow file (.github/workflows/ci.yml):
       steps:
       - uses: actions/checkout@v4
       - name: Run tests
-        run: echo 'Add your test commands here'
-</code></pre>
-<p><strong>SDO output for GitHub (with existing workflows):</strong></p>
-<pre><code>GitHub Actions workflows found in your repository:
+        run: echo &#39;Add your test commands here&#39;
+</code></pre></div></p>
+<p><strong>SDO output for GitHub (with existing workflows):</strong>
+<div class="highlight"><pre><span></span><code>GitHub Actions workflows found in your repository:
   • ntools.yml
   • ci.yml
 
 Your repository already has workflow files.
 To create additional workflows, add more YAML files to .github/workflows/
 and commit/push them to trigger GitHub Actions.
-</code></pre>
-<p><strong>SDO output for GitHub (no existing workflows):</strong></p>
-<pre><code>GitHub Actions workflows are created by adding YAML files to .github/workflows/
+</code></pre></div></p>
+<p><strong>SDO output for GitHub (no existing workflows):</strong>
+<div class="highlight"><pre><span></span><code>GitHub Actions workflows are created by adding YAML files to .github/workflows/
 SDO does not create workflow files automatically.
 
 To create a workflow:
@@ -719,9 +2780,9 @@ Example workflow file (.github/workflows/ci.yml):
       steps:
       - uses: actions/checkout@v4
       - name: Run tests
-        run: echo 'Add your test commands here'
-</code></pre>
-<h3 id="platform-detection">Platform Detection</h3>
+        run: echo &#39;Add your test commands here&#39;
+</code></pre></div></p>
+<h3 id="platform-detection">Platform Detection<a class="headerlink" href="#platform-detection" title="Anchor link to this section for reference">&para;</a></h3>
 <p>SDO automatically detects your platform from Git remote URLs:</p>
 <p><strong>Azure DevOps URLs:</strong>
 - <code>https://dev.azure.com/organization/project/_git/repository</code>
@@ -729,7 +2790,7 @@ Example workflow file (.github/workflows/ci.yml):
 <p><strong>GitHub URLs:</strong>
 - <code>https://github.com/owner/repository.git</code>
 - <code>git@github.com:owner/repository.git</code></p>
-<h3 id="common-issues">Common Issues</h3>
+<h3 id="common-issues">Common Issues<a class="headerlink" href="#common-issues" title="Anchor link to this section for reference">&para;</a></h3>
 <p><strong>Azure DevOps Issues:</strong>
 - <strong>"YAML file not found"</strong>: Ensure <code>.azure-pipelines/azurepipeline.yml</code> exists in your repository
 - <strong>"Access denied"</strong>: Check PAT permissions include "Build (Read &amp; execute)"
@@ -737,165 +2798,165 @@ Example workflow file (.github/workflows/ci.yml):
 <p><strong>GitHub Issues:</strong>
 - <strong>Manual process required</strong>: GitHub workflows cannot be created via API
 - <strong>File naming</strong>: Use lowercase with hyphens (e.g., <code>ci.yml</code>, not <code>CI.yml</code>)</p>
-<h3 id="pipeline-naming-convention">Pipeline Naming Convention</h3>
+<h3 id="pipeline-naming-convention">Pipeline Naming Convention<a class="headerlink" href="#pipeline-naming-convention" title="Anchor link to this section for reference">&para;</a></h3>
 <p><strong>Azure DevOps:</strong> Pipeline name defaults to repository name
 <strong>GitHub:</strong> Workflow name comes from the <code>name:</code> field in YAML or filename</p>
-<h3 id="security-considerations">Security Considerations</h3>
+<h3 id="security-considerations">Security Considerations<a class="headerlink" href="#security-considerations" title="Anchor link to this section for reference">&para;</a></h3>
 <ul>
 <li><strong>Azure DevOps PAT</strong> requires appropriate permissions</li>
 <li><strong>GitHub workflows</strong> run with repository permissions</li>
 <li><strong>YAML files</strong> should be reviewed before committing</li>
 </ul>
-<h4 id="list-pipelines">List Pipelines</h4>
-<pre><code class="language-bash">sdo pipeline ls [OPTIONS]
-</code></pre>
+<h4 id="list-pipelines">List Pipelines<a class="headerlink" href="#list-pipelines" title="Anchor link to this section for reference">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pipeline<span class="w"> </span>ls<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</code></pre></div>
 <p>Lists pipelines in the current project or repository.</p>
 <p><strong>Options:</strong>
 - <code>--repo REPO</code> - Filter pipelines by repository name
 - <code>--all</code> - Show all pipelines in the project (default: current repository only)
 - <code>-v, --verbose</code> - Show detailed API information</p>
-<p><strong>Examples:</strong></p>
-<pre><code class="language-bash"># List pipelines for current repository
-sdo pipeline ls
+<p><strong>Examples:</strong>
+<div class="highlight"><pre><span></span><code><span class="c1"># List pipelines for current repository</span>
+sdo<span class="w"> </span>pipeline<span class="w"> </span>ls
 
-# List pipelines for specific repository
-sdo pipeline ls --repo my-repo
+<span class="c1"># List pipelines for specific repository</span>
+sdo<span class="w"> </span>pipeline<span class="w"> </span>ls<span class="w"> </span>--repo<span class="w"> </span>my-repo
 
-# List all pipelines in project
-sdo pipeline ls --all
+<span class="c1"># List all pipelines in project</span>
+sdo<span class="w"> </span>pipeline<span class="w"> </span>ls<span class="w"> </span>--all
 
-# List with verbose output
-sdo pipeline ls --verbose
-</code></pre>
-<h4 id="show-pipeline">Show Pipeline</h4>
-<pre><code class="language-bash">sdo pipeline show [OPTIONS]
-</code></pre>
+<span class="c1"># List with verbose output</span>
+sdo<span class="w"> </span>pipeline<span class="w"> </span>ls<span class="w"> </span>--verbose
+</code></pre></div></p>
+<h4 id="show-pipeline">Show Pipeline<a class="headerlink" href="#show-pipeline" title="Anchor link to this section for reference">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pipeline<span class="w"> </span>show<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</code></pre></div>
 <p>Shows detailed information about the current pipeline.</p>
 <p><strong>Options:</strong>
 - <code>-v, --verbose</code> - Show detailed API information</p>
-<p><strong>Examples:</strong></p>
-<pre><code class="language-bash">sdo pipeline show
-sdo pipeline show --verbose
-</code></pre>
-<h4 id="delete-pipeline">Delete Pipeline</h4>
-<pre><code class="language-bash">sdo pipeline delete [OPTIONS]
-</code></pre>
+<p><strong>Examples:</strong>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pipeline<span class="w"> </span>show
+sdo<span class="w"> </span>pipeline<span class="w"> </span>show<span class="w"> </span>--verbose
+</code></pre></div></p>
+<h4 id="delete-pipeline">Delete Pipeline<a class="headerlink" href="#delete-pipeline" title="Anchor link to this section for reference">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pipeline<span class="w"> </span>delete<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</code></pre></div>
 <p>Deletes the current pipeline (with confirmation prompt).</p>
 <p><strong>Options:</strong>
 - <code>-v, --verbose</code> - Show detailed API information</p>
-<p><strong>Examples:</strong></p>
-<pre><code class="language-bash">sdo pipeline delete  # Will prompt for confirmation
-</code></pre>
-<h4 id="run-pipeline">Run Pipeline</h4>
-<pre><code class="language-bash">sdo pipeline run [PIPELINE_NAME] --branch BRANCH [OPTIONS]
-</code></pre>
+<p><strong>Examples:</strong>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pipeline<span class="w"> </span>delete<span class="w">  </span><span class="c1"># Will prompt for confirmation</span>
+</code></pre></div></p>
+<h4 id="run-pipeline">Run Pipeline<a class="headerlink" href="#run-pipeline" title="Anchor link to this section for reference">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pipeline<span class="w"> </span>run<span class="w"> </span><span class="o">[</span>PIPELINE_NAME<span class="o">]</span><span class="w"> </span>--branch<span class="w"> </span>BRANCH<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</code></pre></div>
 <p>Runs a pipeline on the specified branch.</p>
 <p><strong>Arguments:</strong>
 - <code>PIPELINE_NAME</code> - Name of pipeline to run (optional, uses current repository pipeline if not specified)</p>
 <p><strong>Options:</strong>
 - <code>-b, --branch BRANCH</code> - Branch to run pipeline on (required)
 - <code>-v, --verbose</code> - Show detailed API information</p>
-<p><strong>Examples:</strong></p>
-<pre><code class="language-bash"># Run current repository pipeline on main branch
-sdo pipeline run --branch main
+<p><strong>Examples:</strong>
+<div class="highlight"><pre><span></span><code><span class="c1"># Run current repository pipeline on main branch</span>
+sdo<span class="w"> </span>pipeline<span class="w"> </span>run<span class="w"> </span>--branch<span class="w"> </span>main
 
-# Run specific pipeline on develop branch
-sdo pipeline run my-pipeline --branch develop
+<span class="c1"># Run specific pipeline on develop branch</span>
+sdo<span class="w"> </span>pipeline<span class="w"> </span>run<span class="w"> </span>my-pipeline<span class="w"> </span>--branch<span class="w"> </span>develop
 
-# Run with verbose output
-sdo pipeline run --branch main --verbose
-</code></pre>
-<h4 id="check-pipeline-status">Check Pipeline Status</h4>
-<pre><code class="language-bash">sdo pipeline status [BUILD_ID] [OPTIONS]
-</code></pre>
+<span class="c1"># Run with verbose output</span>
+sdo<span class="w"> </span>pipeline<span class="w"> </span>run<span class="w"> </span>--branch<span class="w"> </span>main<span class="w"> </span>--verbose
+</code></pre></div></p>
+<h4 id="check-pipeline-status">Check Pipeline Status<a class="headerlink" href="#check-pipeline-status" title="Anchor link to this section for reference">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pipeline<span class="w"> </span>status<span class="w"> </span><span class="o">[</span>BUILD_ID<span class="o">]</span><span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</code></pre></div>
 <p>Shows the status of a pipeline build/run.</p>
 <p><strong>Arguments:</strong>
 - <code>BUILD_ID</code> - Specific build ID to check (optional, shows latest if not specified)</p>
 <p><strong>Options:</strong>
 - <code>-v, --verbose</code> - Show detailed API information</p>
-<p><strong>Examples:</strong></p>
-<pre><code class="language-bash"># Show latest build status
-sdo pipeline status
+<p><strong>Examples:</strong>
+<div class="highlight"><pre><span></span><code><span class="c1"># Show latest build status</span>
+sdo<span class="w"> </span>pipeline<span class="w"> </span>status
 
-# Show specific build status
-sdo pipeline status 12345
+<span class="c1"># Show specific build status</span>
+sdo<span class="w"> </span>pipeline<span class="w"> </span>status<span class="w"> </span><span class="m">12345</span>
 
-# Show with verbose API details
-sdo pipeline status 12345 --verbose
-</code></pre>
-<h4 id="show-pipeline-logs">Show Pipeline Logs</h4>
-<pre><code class="language-bash">sdo pipeline logs [BUILD_ID] [OPTIONS]
-</code></pre>
+<span class="c1"># Show with verbose API details</span>
+sdo<span class="w"> </span>pipeline<span class="w"> </span>status<span class="w"> </span><span class="m">12345</span><span class="w"> </span>--verbose
+</code></pre></div></p>
+<h4 id="show-pipeline-logs">Show Pipeline Logs<a class="headerlink" href="#show-pipeline-logs" title="Anchor link to this section for reference">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pipeline<span class="w"> </span>logs<span class="w"> </span><span class="o">[</span>BUILD_ID<span class="o">]</span><span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</code></pre></div>
 <p>Shows logs for a pipeline build/run.</p>
 <p><strong>Arguments:</strong>
 - <code>BUILD_ID</code> - Build ID to get logs for (required)</p>
 <p><strong>Options:</strong>
 - <code>--build-id BUILD_ID</code> - Alternative way to specify build ID
 - <code>-v, --verbose</code> - Show detailed API information</p>
-<p><strong>Examples:</strong></p>
-<pre><code class="language-bash"># Show logs for build ID 12345
-sdo pipeline logs 12345
+<p><strong>Examples:</strong>
+<div class="highlight"><pre><span></span><code><span class="c1"># Show logs for build ID 12345</span>
+sdo<span class="w"> </span>pipeline<span class="w"> </span>logs<span class="w"> </span><span class="m">12345</span>
 
-# Alternative syntax
-sdo pipeline logs --build-id 12345
+<span class="c1"># Alternative syntax</span>
+sdo<span class="w"> </span>pipeline<span class="w"> </span>logs<span class="w"> </span>--build-id<span class="w"> </span><span class="m">12345</span>
 
-# Show with verbose output
-sdo pipeline logs 12345 --verbose
-</code></pre>
-<h4 id="show-last-build">Show Last Build</h4>
-<pre><code class="language-bash">sdo pipeline lastbuild [OPTIONS]
-</code></pre>
+<span class="c1"># Show with verbose output</span>
+sdo<span class="w"> </span>pipeline<span class="w"> </span>logs<span class="w"> </span><span class="m">12345</span><span class="w"> </span>--verbose
+</code></pre></div></p>
+<h4 id="show-last-build">Show Last Build<a class="headerlink" href="#show-last-build" title="Anchor link to this section for reference">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pipeline<span class="w"> </span>lastbuild<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</code></pre></div>
 <p>Shows information about the last build of the current pipeline.</p>
 <p><strong>Options:</strong>
 - <code>-v, --verbose</code> - Show detailed API information</p>
-<p><strong>Examples:</strong></p>
-<pre><code class="language-bash">sdo pipeline lastbuild
-sdo pipeline lastbuild --verbose
-</code></pre>
-<h4 id="update-pipeline">Update Pipeline</h4>
-<pre><code class="language-bash">sdo pipeline update [OPTIONS]
-</code></pre>
+<p><strong>Examples:</strong>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pipeline<span class="w"> </span>lastbuild
+sdo<span class="w"> </span>pipeline<span class="w"> </span>lastbuild<span class="w"> </span>--verbose
+</code></pre></div></p>
+<h4 id="update-pipeline">Update Pipeline<a class="headerlink" href="#update-pipeline" title="Anchor link to this section for reference">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pipeline<span class="w"> </span>update<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</code></pre></div>
 <p>Checks if the pipeline configuration needs updating and provides guidance.</p>
 <p><strong>Options:</strong>
 - <code>-v, --verbose</code> - Show detailed API information</p>
-<p><strong>Examples:</strong></p>
-<pre><code class="language-bash">sdo pipeline update
-sdo pipeline update --verbose
-</code></pre>
-<h3 id="examples_2">Examples</h3>
-<h4 id="pipeline-operations_1">Pipeline Operations</h4>
-<h5 id="create-pipeline_1">Create Pipeline</h5>
-<pre><code class="language-bash">sdo pipeline create
-</code></pre>
-<h5 id="list-pipelines_1">List Pipelines</h5>
-<pre><code class="language-bash"># List all pipelines for current repository
-sdo pipeline ls
+<p><strong>Examples:</strong>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pipeline<span class="w"> </span>update
+sdo<span class="w"> </span>pipeline<span class="w"> </span>update<span class="w"> </span>--verbose
+</code></pre></div></p>
+<h3 id="examples_2">Examples<a class="headerlink" href="#examples_2" title="Anchor link to this section for reference">&para;</a></h3>
+<h4 id="pipeline-operations_1">Pipeline Operations<a class="headerlink" href="#pipeline-operations_1" title="Anchor link to this section for reference">&para;</a></h4>
+<h5 id="create-pipeline_1">Create Pipeline<a class="headerlink" href="#create-pipeline_1" title="Anchor link to this section for reference">&para;</a></h5>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pipeline<span class="w"> </span>create
+</code></pre></div>
+<h5 id="list-pipelines_1">List Pipelines<a class="headerlink" href="#list-pipelines_1" title="Anchor link to this section for reference">&para;</a></h5>
+<div class="highlight"><pre><span></span><code><span class="c1"># List all pipelines for current repository</span>
+sdo<span class="w"> </span>pipeline<span class="w"> </span>ls
 
-# List all pipelines in project
-sdo pipeline ls --all
-</code></pre>
-<h5 id="run-pipeline_1">Run Pipeline</h5>
-<pre><code class="language-bash"># Run pipeline on main branch
-sdo pipeline run --branch main
+<span class="c1"># List all pipelines in project</span>
+sdo<span class="w"> </span>pipeline<span class="w"> </span>ls<span class="w"> </span>--all
+</code></pre></div>
+<h5 id="run-pipeline_1">Run Pipeline<a class="headerlink" href="#run-pipeline_1" title="Anchor link to this section for reference">&para;</a></h5>
+<div class="highlight"><pre><span></span><code><span class="c1"># Run pipeline on main branch</span>
+sdo<span class="w"> </span>pipeline<span class="w"> </span>run<span class="w"> </span>--branch<span class="w"> </span>main
 
-# Run specific pipeline
-sdo pipeline run ci-pipeline --branch feature-branch
-</code></pre>
-<h5 id="check-pipeline-status_1">Check Pipeline Status</h5>
-<pre><code class="language-bash"># Check latest build status
-sdo pipeline status
+<span class="c1"># Run specific pipeline</span>
+sdo<span class="w"> </span>pipeline<span class="w"> </span>run<span class="w"> </span>ci-pipeline<span class="w"> </span>--branch<span class="w"> </span>feature-branch
+</code></pre></div>
+<h5 id="check-pipeline-status_1">Check Pipeline Status<a class="headerlink" href="#check-pipeline-status_1" title="Anchor link to this section for reference">&para;</a></h5>
+<div class="highlight"><pre><span></span><code><span class="c1"># Check latest build status</span>
+sdo<span class="w"> </span>pipeline<span class="w"> </span>status
 
-# Check specific build
-sdo pipeline status 12345
-</code></pre>
-<h5 id="view-pipeline-logs">View Pipeline Logs</h5>
-<pre><code class="language-bash"># View logs for build 12345
-sdo pipeline logs 12345
-</code></pre>
-<h5 id="show-last-build-information">Show Last Build Information</h5>
-<pre><code class="language-bash">sdo pipeline lastbuild
-</code></pre>
-<h2 id="markdown-file-format">Markdown File Format</h2>
+<span class="c1"># Check specific build</span>
+sdo<span class="w"> </span>pipeline<span class="w"> </span>status<span class="w"> </span><span class="m">12345</span>
+</code></pre></div>
+<h5 id="view-pipeline-logs">View Pipeline Logs<a class="headerlink" href="#view-pipeline-logs" title="Anchor link to this section for reference">&para;</a></h5>
+<div class="highlight"><pre><span></span><code><span class="c1"># View logs for build 12345</span>
+sdo<span class="w"> </span>pipeline<span class="w"> </span>logs<span class="w"> </span><span class="m">12345</span>
+</code></pre></div>
+<h5 id="show-last-build-information">Show Last Build Information<a class="headerlink" href="#show-last-build-information" title="Anchor link to this section for reference">&para;</a></h5>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pipeline<span class="w"> </span>lastbuild
+</code></pre></div>
+<h2 id="markdown-file-format">Markdown File Format<a class="headerlink" href="#markdown-file-format" title="Anchor link to this section for reference">&para;</a></h2>
 <p>SDO expects markdown files with specific metadata headers. See the example files:</p>
 <p><strong>Azure DevOps Examples:</strong>
 - <a href="../issue-azdo-bug-example/">issue-azdo-bug-example.md</a> - Bug work item format
@@ -904,17 +2965,17 @@ sdo pipeline logs 12345
 - <a href="../issue-azdo-epic-example/">issue-azdo-epic-example.md</a> - Epic work item format</p>
 <p><strong>GitHub Examples:</strong>
 - <a href="../issue-gh-example/">issue-gh-example.md</a> - GitHub issue format</p>
-<h3 id="required-metadata">Required Metadata</h3>
-<pre><code class="language-markdown"># Issue Title
+<h3 id="required-metadata">Required Metadata<a class="headerlink" href="#required-metadata" title="Anchor link to this section for reference">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="gh"># Issue Title</span>
 
-## Target: azdo|github
-## Type: PBI|Bug|Task|Issue
-## Project: ProjectName (for Azure DevOps)
+<span class="gu">## Target: azdo|github</span>
+<span class="gu">## Type: PBI|Bug|Task|Issue</span>
+<span class="gu">## Project: ProjectName (for Azure DevOps)</span>
 
 Description content here...
-</code></pre>
-<h2 id="supported-platforms">Supported Platforms</h2>
-<h3 id="azure-devops">Azure DevOps</h3>
+</code></pre></div>
+<h2 id="supported-platforms">Supported Platforms<a class="headerlink" href="#supported-platforms" title="Anchor link to this section for reference">&para;</a></h2>
+<h3 id="azure-devops">Azure DevOps<a class="headerlink" href="#azure-devops" title="Anchor link to this section for reference">&para;</a></h3>
 <ul>
 <li><strong>Work Item Types</strong>: Product Backlog Item (PBI), Bug, Task</li>
 <li><strong>Work Item Fields</strong>: Title, Description, Area Path, Iteration Path, Priority, Effort</li>
@@ -925,7 +2986,7 @@ Description content here...
 <li><strong>API</strong>: REST API integration</li>
 <li><strong>Automatic</strong>: Organization/Project detection from Git remote</li>
 </ul>
-<h3 id="github">GitHub</h3>
+<h3 id="github">GitHub<a class="headerlink" href="#github" title="Anchor link to this section for reference">&para;</a></h3>
 <ul>
 <li><strong>Work Item Types</strong>: Issues</li>
 <li><strong>Work Item Fields</strong>: Title, Description, Labels, Assignees</li>
@@ -936,7 +2997,7 @@ Description content here...
 <li><strong>API</strong>: GitHub CLI integration for repositories, REST API for work items and PRs</li>
 <li><strong>Automatic</strong>: Repository detection from Git remote</li>
 </ul>
-<h2 id="error-handling">Error Handling</h2>
+<h2 id="error-handling">Error Handling<a class="headerlink" href="#error-handling" title="Anchor link to this section for reference">&para;</a></h2>
 <p>SDO provides clear error messages for common issues:</p>
 <ul>
 <li><strong>Authentication</strong>: Missing or invalid PAT tokens</li>
@@ -945,19 +3006,19 @@ Description content here...
 <li><strong>Validation</strong>: Missing required metadata fields</li>
 </ul>
 <p>Use <code>--verbose</code> flag for detailed error information including API responses.</p>
-<h2 id="testing">Testing</h2>
-<h3 id="run-all-tests">Run All Tests</h3>
-<pre><code class="language-bash">cd atools
-python -m pytest tests/
-</code></pre>
-<h3 id="test-categories">Test Categories</h3>
+<h2 id="testing">Testing<a class="headerlink" href="#testing" title="Anchor link to this section for reference">&para;</a></h2>
+<h3 id="run-all-tests">Run All Tests<a class="headerlink" href="#run-all-tests" title="Anchor link to this section for reference">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>atools
+python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>tests/
+</code></pre></div>
+<h3 id="test-categories">Test Categories<a class="headerlink" href="#test-categories" title="Anchor link to this section for reference">&para;</a></h3>
 <ul>
 <li><strong>Unit Tests</strong>: Core functionality validation</li>
 <li><strong>Integration Tests</strong>: API interaction testing</li>
 <li><strong>CLI Tests</strong>: Command-line interface validation</li>
 <li><strong>Error Path Tests</strong>: Failure scenario handling</li>
 </ul>
-<h3 id="test-coverage">Test Coverage</h3>
+<h3 id="test-coverage">Test Coverage<a class="headerlink" href="#test-coverage" title="Anchor link to this section for reference">&para;</a></h3>
 <p>All major functionality is tested with comprehensive test cases covering:
 - Work item creation workflows
 - Repository management operations
@@ -970,43 +3031,43 @@ python -m pytest tests/
 - Platform-specific operations
 - Error handling scenarios
 - CLI argument parsing</p>
-<h2 id="troubleshooting">Troubleshooting</h2>
-<h3 id="common-issues_1">Common Issues</h3>
-<h4 id="authentication-failures">Authentication Failures</h4>
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Anchor link to this section for reference">&para;</a></h2>
+<h3 id="common-issues_1">Common Issues<a class="headerlink" href="#common-issues_1" title="Anchor link to this section for reference">&para;</a></h3>
+<h4 id="authentication-failures">Authentication Failures<a class="headerlink" href="#authentication-failures" title="Anchor link to this section for reference">&para;</a></h4>
 <p><strong>Error:</strong> <code>Authentication failed. Check your AZURE_DEVOPS_PAT token.</code></p>
-<p><strong>Solution:</strong></p>
-<pre><code class="language-bash"># Set PAT token
-export AZURE_DEVOPS_PAT=&quot;your-token-here&quot;
+<p><strong>Solution:</strong>
+<div class="highlight"><pre><span></span><code><span class="c1"># Set PAT token</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">AZURE_DEVOPS_PAT</span><span class="o">=</span><span class="s2">&quot;your-token-here&quot;</span>
 
-# Verify token has required permissions
-# Azure DevOps: Work Items (Read/Write), Project (Read)
-# GitHub: Issues (Read/Write), Repository (Read)
-</code></pre>
-<h4 id="git-remote-configuration">Git Remote Configuration</h4>
+<span class="c1"># Verify token has required permissions</span>
+<span class="c1"># Azure DevOps: Work Items (Read/Write), Project (Read)</span>
+<span class="c1"># GitHub: Issues (Read/Write), Repository (Read)</span>
+</code></pre></div></p>
+<h4 id="git-remote-configuration">Git Remote Configuration<a class="headerlink" href="#git-remote-configuration" title="Anchor link to this section for reference">&para;</a></h4>
 <p><strong>Error:</strong> <code>Unable to detect Azure DevOps organization from Git remote</code></p>
-<p><strong>Solution:</strong></p>
-<pre><code class="language-bash"># Check current remote
-git remote -v
+<p><strong>Solution:</strong>
+<div class="highlight"><pre><span></span><code><span class="c1"># Check current remote</span>
+git<span class="w"> </span>remote<span class="w"> </span>-v
 
-# Should show Azure DevOps URL like:
-# origin  https://dev.azure.com/organization/project/_git/repo (fetch)
-</code></pre>
-<h4 id="file-format-issues">File Format Issues</h4>
+<span class="c1"># Should show Azure DevOps URL like:</span>
+<span class="c1"># origin  https://dev.azure.com/organization/project/_git/repo (fetch)</span>
+</code></pre></div></p>
+<h4 id="file-format-issues">File Format Issues<a class="headerlink" href="#file-format-issues" title="Anchor link to this section for reference">&para;</a></h4>
 <p><strong>Error:</strong> <code>Missing required metadata: target</code></p>
-<p><strong>Solution:</strong> Ensure markdown file includes required headers:</p>
-<pre><code class="language-markdown">## Target: azdo
-## Type: PBI
-</code></pre>
-<h3 id="debug-mode">Debug Mode</h3>
+<p><strong>Solution:</strong> Ensure markdown file includes required headers:
+<div class="highlight"><pre><span></span><code><span class="gu">## Target: azdo</span>
+<span class="gu">## Type: PBI</span>
+</code></pre></div></p>
+<h3 id="debug-mode">Debug Mode<a class="headerlink" href="#debug-mode" title="Anchor link to this section for reference">&para;</a></h3>
 <p>Enable verbose output for detailed troubleshooting:</p>
-<pre><code class="language-bash">sdo --verbose workitem create --file-path file.md
-</code></pre>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>--verbose<span class="w"> </span>workitem<span class="w"> </span>create<span class="w"> </span>--file-path<span class="w"> </span>file.md
+</code></pre></div>
 <p>This shows:
 - API request/response details
 - File parsing results
 - Authentication status
 - Full error stack traces</p>
-<h2 id="architecture">Architecture</h2>
+<h2 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Anchor link to this section for reference">&para;</a></h2>
 <p>SDO is built with a modular architecture:</p>
 <ul>
 <li><strong><code>cli.py</code></strong> - Click-based command interface</li>
@@ -1019,69 +3080,71 @@ git remote -v
 <li><code>azdo_pr_platform.py</code> - Azure DevOps pull request operations</li>
 <li><strong><code>parsers/</code></strong> - Markdown parsing and metadata extraction</li>
 </ul>
-<h2 id="development">Development</h2>
-<h3 id="code-quality">Code Quality</h3>
+<h2 id="development">Development<a class="headerlink" href="#development" title="Anchor link to this section for reference">&para;</a></h2>
+<h3 id="code-quality">Code Quality<a class="headerlink" href="#code-quality" title="Anchor link to this section for reference">&para;</a></h3>
 <p>SDO maintains high code quality standards:
 - <strong>Linting</strong>: flake8 with comprehensive rules
 - <strong>Testing</strong>: 34 test cases with high coverage
 - <strong>Type Hints</strong>: Full type annotation support
 - <strong>Documentation</strong>: Comprehensive docstrings</p>
-<h3 id="contributing">Contributing</h3>
+<h3 id="contributing">Contributing<a class="headerlink" href="#contributing" title="Anchor link to this section for reference">&para;</a></h3>
 <ol>
 <li>Follow existing code patterns</li>
 <li>Add tests for new functionality</li>
 <li>Update documentation</li>
 <li>Run full test suite before submitting</li>
 </ol>
-              
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
             </div>
-          </div><footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../" class="btn btn-neutral float-left" title="Overview"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../sdo-installation/" class="btn btn-neutral float-right" title="SDO Installation">Next <span class="icon icon-circle-arrow-right"></span></a>
-    </div>
-
-  <hr/>
-
-  <div role="contentinfo">
-    <!-- Copyright etc -->
-  </div>
-
-  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
-</footer>
           
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
         </div>
-      </div>
-
-    </section>
-
-  </div>
-
-  <div class="rst-versions" role="note" aria-label="Versions">
-  <span class="rst-current-version" data-toggle="rst-current-version">
-    
-        <span>
-          <a href="https://github.com/naz-hage/ntools" class="fa fa-code-fork" style="color: #fcfcfc"> ntools</a>
-        </span>
-    
-    
-      <span><a href="../" style="color: #fcfcfc">&laquo; Previous</a></span>
-    
-    
-      <span><a href="../sdo-installation/" style="color: #fcfcfc">Next &raquo;</a></span>
-    
-  </span>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
 </div>
-    <script src="../../js/jquery-3.6.0.min.js"></script>
-    <script>var base_url = "../..";</script>
-    <script src="../../js/theme_extra.js"></script>
-    <script src="../../js/theme.js"></script>
-      <script src="../../search/main.js"></script>
-    <script>
-        jQuery(function () {
-            SphinxRtdTheme.Navigation.enable(true);
-        });
-    </script>
-
-</body>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.sections", "toc.integrate", "search.suggest", "search.highlight"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.fe8b6f2b.min.js"></script>
+      
+    
+  </body>
 </html>
