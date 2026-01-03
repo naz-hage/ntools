@@ -505,6 +505,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#sdo-installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      SDO Installation
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#what-each-option-installs" class="md-nav__link">
     <span class="md-ellipsis">
       What Each Option Installs
@@ -1362,6 +1371,15 @@
 <p><strong>Custom installation path:</strong></p>
 <div class="highlight"><pre><span></span><code><span class="n">python</span> <span class="n">atools</span><span class="p">/</span><span class="nb">install-ntools</span><span class="p">.</span><span class="n">py</span> <span class="p">-</span><span class="n">-version</span> <span class="n">1</span><span class="p">.</span><span class="n">32</span><span class="p">.</span><span class="n">0</span> <span class="p">-</span><span class="n">-deploy-path</span> <span class="s2">&quot;C:\MyTools\Nbuild&quot;</span>
 </code></pre></div>
+<h2 id="sdo-installation">SDO Installation<a class="headerlink" href="#sdo-installation" title="Anchor link to this section for reference">&para;</a></h2>
+<p>SDO (Simple DevOps Operations Tool) is installed using an isolated virtual environment to prevent dependency conflicts. After installing NTools, install SDO:</p>
+<div class="highlight"><pre><span></span><code>cd &quot;C:\Program Files\NBuild&quot;
+python install-sdo.py
+</code></pre></div>
+<p><strong>Verify installation:</strong>
+<div class="highlight"><pre><span></span><code>sdo --version
+sdo --help
+</code></pre></div></p>
 <h2 id="what-each-option-installs">What Each Option Installs<a class="headerlink" href="#what-each-option-installs" title="Anchor link to this section for reference">&para;</a></h2>
 <table>
 <thead>

@@ -1200,44 +1200,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#installation-steps" class="md-nav__link">
+  <a href="#quick-installation" class="md-nav__link">
     <span class="md-ellipsis">
-      Installation Steps
+      Quick Installation
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Installation Steps">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-ensure-ntools-is-installed" class="md-nav__link">
-    <span class="md-ellipsis">
-      1. Ensure NTools is Installed
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-run-sdo-installation-script" class="md-nav__link">
-    <span class="md-ellipsis">
-      2. Run SDO Installation Script
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-verify-installation" class="md-nav__link">
-    <span class="md-ellipsis">
-      3. Verify Installation
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1245,24 +1212,6 @@
   <a href="#what-the-installation-does" class="md-nav__link">
     <span class="md-ellipsis">
       What the Installation Does
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#directory-structure-after-installation" class="md-nav__link">
-    <span class="md-ellipsis">
-      Directory Structure After Installation
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#benefits-of-virtual-environment-approach" class="md-nav__link">
-    <span class="md-ellipsis">
-      Benefits of Virtual Environment Approach
     </span>
   </a>
   
@@ -1438,22 +1387,15 @@
 <p>SDO (Simple DevOps) is installed using an isolated virtual environment to prevent dependency conflicts with other Python tools. This approach keeps the NTools distribution smaller by shipping only source code rather than pre-compiled executables.</p>
 <h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Anchor link to this section for reference">&para;</a></h2>
 <p>Before installing SDO, you must have NTools installed. See the main <a href="../../installation/">Installation</a> documentation for NTools setup instructions.</p>
-<h2 id="installation-steps">Installation Steps<a class="headerlink" href="#installation-steps" title="Anchor link to this section for reference">&para;</a></h2>
-<h3 id="1-ensure-ntools-is-installed">1. Ensure NTools is Installed<a class="headerlink" href="#1-ensure-ntools-is-installed" title="Anchor link to this section for reference">&para;</a></h3>
-<p>Follow the <a href="../../installation/">NTools Installation</a> guide to extract the NTools zip file to your preferred location (e.g., <code>C:\Program Files\NBuild</code>).</p>
-<h3 id="2-run-sdo-installation-script">2. Run SDO Installation Script<a class="headerlink" href="#2-run-sdo-installation-script" title="Anchor link to this section for reference">&para;</a></h3>
-<p>Open a command prompt and navigate to the NTools directory:</p>
+<h2 id="quick-installation">Quick Installation<a class="headerlink" href="#quick-installation" title="Anchor link to this section for reference">&para;</a></h2>
+<p>After installing NTools, run the SDO installer:</p>
 <div class="highlight"><pre><span></span><code>cd &quot;C:\Program Files\NBuild&quot;
 python install-sdo.py
 </code></pre></div>
-<p><strong>Alternative: If NTools is already in PATH:</strong></p>
-<div class="highlight"><pre><span></span><code>python install-sdo.py
-</code></pre></div>
-<h3 id="3-verify-installation">3. Verify Installation<a class="headerlink" href="#3-verify-installation" title="Anchor link to this section for reference">&para;</a></h3>
-<p>Test that SDO is working:</p>
+<p><strong>Verify installation:</strong>
 <div class="highlight"><pre><span></span><code>sdo --version
 sdo --help
-</code></pre></div>
+</code></pre></div></p>
 <h2 id="what-the-installation-does">What the Installation Does<a class="headerlink" href="#what-the-installation-does" title="Anchor link to this section for reference">&para;</a></h2>
 <ol>
 <li><strong>Creates Virtual Environment</strong>: <code>C:\Program Files\NBuild\venv\</code></li>
@@ -1461,28 +1403,6 @@ sdo --help
 <li><strong>Creates Launcher</strong>: <code>sdo.cmd</code> script that activates venv and runs SDO</li>
 <li><strong>Maintains PATH</strong>: Since NBuild is in PATH, <code>sdo</code> works globally</li>
 </ol>
-<h2 id="directory-structure-after-installation">Directory Structure After Installation<a class="headerlink" href="#directory-structure-after-installation" title="Anchor link to this section for reference">&para;</a></h2>
-<div class="highlight"><pre><span></span><code>C:\Program Files\NBuild\
-├── nb.exe                    # NTools executable
-├── sdo.cmd                   # SDO launcher script (created by installer)
-├── venv\                     # Virtual environment
-│   ├── Scripts\             # Python executables
-│   ├── Lib\site-packages\   # Isolated SDO dependencies
-│   └── pyvenv.cfg
-├── install-sdo.py           # SDO installation script
-├── pyproject.toml           # SDO package configuration
-├── sdo_package\             # SDO source code
-└── [other NTools files...]
-</code></pre></div>
-<h2 id="benefits-of-virtual-environment-approach">Benefits of Virtual Environment Approach<a class="headerlink" href="#benefits-of-virtual-environment-approach" title="Anchor link to this section for reference">&para;</a></h2>
-<ul>
-<li><strong>Smaller Distribution</strong>: NTools zip contains only source code, not compiled executables</li>
-<li><strong>No Dependency Conflicts</strong>: SDO packages don't interfere with system Python</li>
-<li><strong>Isolated Environment</strong>: Each tool has its own dependencies</li>
-<li><strong>Easy Updates</strong>: Delete <code>venv\</code> folder to reset SDO installation</li>
-<li><strong>Flexible Deployment</strong>: Works across different Python environments</li>
-<li><strong>Professional Distribution</strong>: Follows Python best practices</li>
-</ul>
 <h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Anchor link to this section for reference">&para;</a></h2>
 <h3 id="python-not-found">Python Not Found<a class="headerlink" href="#python-not-found" title="Anchor link to this section for reference">&para;</a></h3>
 <ul>

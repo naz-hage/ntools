@@ -1384,6 +1384,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#file-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      File Structure
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#build-system" class="md-nav__link">
     <span class="md-ellipsis">
       Build System
@@ -1417,7 +1426,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#file-structure" class="md-nav__link">
+  <a href="#file-structure_1" class="md-nav__link">
     <span class="md-ellipsis">
       File Structure
     </span>
@@ -1529,18 +1538,18 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#core-dependencies" class="md-nav__link">
+  <a href="#ntools-suite-net" class="md-nav__link">
     <span class="md-ellipsis">
-      Core Dependencies
+      ntools Suite (.NET)
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#development-dependencies" class="md-nav__link">
+  <a href="#sdo-tool-python" class="md-nav__link">
     <span class="md-ellipsis">
-      Development Dependencies
+      SDO Tool (Python)
     </span>
   </a>
   
@@ -1579,30 +1588,6 @@
   <a href="#shared-concepts" class="md-nav__link">
     <span class="md-ellipsis">
       Shared Concepts
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#future-considerations" class="md-nav__link">
-    <span class="md-ellipsis">
-      Future Considerations
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Future Considerations">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#unified-cli-experience" class="md-nav__link">
-    <span class="md-ellipsis">
-      Unified CLI Experience
     </span>
   </a>
   
@@ -1754,17 +1739,13 @@
 <h4 id="nbackupexe-nbackup">Nbackup.exe (nBackup)<a class="headerlink" href="#nbackupexe-nbackup" title="Anchor link to this section for reference">&para;</a></h4>
 <ul>
 <li><strong>Purpose</strong>: Backup automation utility</li>
-<li><strong>Features</strong>:</li>
-<li>Automated backup operations</li>
-<li>Configuration-based backups</li>
-<li><strong>Dependencies</strong>: NbuildTasks, CommandLine.Net</li>
+<li><strong>Features</strong>: Automated backup operations, configuration-based backups</li>
+<li><strong>Dependencies</strong>: NbuildTasks, System.CommandLine</li>
 </ul>
 <h4 id="lfexe-lf">lf.exe (lf)<a class="headerlink" href="#lfexe-lf" title="Anchor link to this section for reference">&para;</a></h4>
 <ul>
 <li><strong>Purpose</strong>: File listing and management utility</li>
-<li><strong>Features</strong>:</li>
-<li>Advanced file listing</li>
-<li>File operations</li>
+<li><strong>Features</strong>: Advanced file listing, file operations</li>
 <li><strong>Dependencies</strong>: NbuildTasks, System.CommandLine</li>
 </ul>
 <h4 id="go-executables">Go Executables<a class="headerlink" href="#go-executables" title="Anchor link to this section for reference">&para;</a></h4>
@@ -1775,18 +1756,88 @@
 </ul>
 <h3 id="shared-components">Shared Components<a class="headerlink" href="#shared-components" title="Anchor link to this section for reference">&para;</a></h3>
 <h4 id="nbuildtasks">NbuildTasks<a class="headerlink" href="#nbuildtasks" title="Anchor link to this section for reference">&para;</a></h4>
-<p>Core library providing:
-- Git operations
-- File system utilities
-- Build task implementations
-- Common functionality for all executables</p>
+<p>Core library providing Git operations, file system utilities, build task implementations, and common functionality for all executables.</p>
 <h4 id="githubrelease">GitHubRelease<a class="headerlink" href="#githubrelease" title="Anchor link to this section for reference">&para;</a></h4>
-<p>Library for GitHub integration:
-- Release creation and management
-- Asset uploading
-- Repository operations</p>
+<p>Library for GitHub integration including release creation and management, asset uploading, and repository operations.</p>
 <h4 id="apiversions">ApiVersions<a class="headerlink" href="#apiversions" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Utility library for API version management and tracking.</p>
+<h3 id="file-structure">File Structure<a class="headerlink" href="#file-structure" title="Anchor link to this section for reference">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>ntools/
+├── ntools.sln                    # Main solution file
+├── Nbuild.bat                    # Build script
+├── prebuild.bat                  # Pre-build setup script
+├── mkdocs.yml                    # Documentation configuration
+├── pyproject.toml                # Python project configuration (for docs)
+├── docs-requirements.txt         # Documentation dependencies
+├── CHANGELOG.md                  # Change log
+├── README.md                     # Project documentation
+├── targets.md                    # Build targets documentation
+├── coverage.cobertura.xml        # Test coverage report
+├── nbuild.targets                # MSBuild targets
+├── unit-tests.targets            # Unit test targets
+├── e2e-tests.targets             # E2E test targets
+│
+├── Nbuild/                       # Main Nbuild executable project
+│   ├── Nbuild.csproj
+│   ├── Program.cs
+│   └── Commands/                 # CLI command implementations
+│
+├── NbuildTasks/                  # Shared library
+│   ├── NbuildTasks.csproj
+│   ├── GitTasks.cs               # Git operations
+│   ├── FileTasks.cs              # File system utilities
+│   ├── BuildTasks.cs             # Build task implementations
+│   └── Common/                   # Shared utilities
+│
+├── GitHubRelease/                # GitHub integration library
+│   ├── GitHubRelease.csproj
+│   ├── ReleaseManager.cs         # Release management
+│   ├── AssetUploader.cs          # Asset upload functionality
+│   └── RepositoryOps.cs          # Repository operations
+│
+├── ApiVersions/                  # API version management
+│   ├── ApiVersions.csproj
+│   ├── VersionManager.cs         # Version tracking
+│   └── ApiClient.cs              # API client utilities
+│
+├── Nbackup/                      # Backup tool
+│   ├── Nbackup.csproj
+│   ├── Program.cs
+│   └── BackupEngine.cs           # Backup logic
+│
+├── lf/                           # File listing utility
+│   ├── lf.csproj
+│   ├── Program.cs
+│   └── FileLister.cs             # File listing implementation
+│
+├── go/                           # Go-based utilities
+│   ├── build-apps/               # Application builder
+│   ├── other-tools/              # Additional Go tools
+│   └── build-scripts/            # Go build scripts
+│
+├── GitHubReleaseTests/           # Unit tests for GitHubRelease
+│   ├── GitHubReleaseTests.csproj
+│   └── ReleaseTests.cs
+│
+├── lfTests/                      # Unit tests for lf
+│   ├── lfTests.csproj
+│   └── FileListerTests.cs
+│
+├── nBackupTests/                 # Unit tests for Nbackup
+│   ├── nBackupTests.csproj
+│   └── BackupTests.cs
+│
+├── docs/                         # Documentation
+│   ├── index.md
+│   ├── devops-tools-suite-architecture.md
+│   └── other-docs/
+│
+├── dev-setup/                    # Development setup scripts
+├── Debug/                        # Debug build outputs
+├── ArtifactsFolder/              # Build artifacts
+├── logs/                         # Build and test logs
+└── atools/                       # Additional tools
+</code></pre></div>
 <h3 id="build-system">Build System<a class="headerlink" href="#build-system" title="Anchor link to this section for reference">&para;</a></h3>
 <p>All .NET executables are built using:
 - .NET 9.0 SDK
@@ -1797,8 +1848,8 @@
 <hr />
 <h2 id="sdo-architecture">SDO Architecture<a class="headerlink" href="#sdo-architecture" title="Anchor link to this section for reference">&para;</a></h2>
 <h3 id="overview">Overview<a class="headerlink" href="#overview" title="Anchor link to this section for reference">&para;</a></h3>
-<p>SDO (Simple DevOps Operations Tool) is a command-line interface tool designed to streamline work item creation and repository management across multiple DevOps platforms including Azure DevOps and GitHub. The tool follows a modular, extensible architecture that allows for easy addition of new platforms and operations.</p>
-<h3 id="file-structure">File Structure<a class="headerlink" href="#file-structure" title="Anchor link to this section for reference">&para;</a></h3>
+<p>SDO (Simple DevOps Operations Tool) is a command-line interface tool for work item creation and repository management across Azure DevOps and GitHub platforms, following a modular, extensible architecture.</p>
+<h3 id="file-structure_1">File Structure<a class="headerlink" href="#file-structure_1" title="Anchor link to this section for reference">&para;</a></h3>
 <div class="highlight"><pre><span></span><code>atools/
 ├── sdo.py                          # Main entry point and CLI framework
 ├── sdo_package/                    # Main package directory
@@ -1846,112 +1897,86 @@
 └── install-sdo.py                  # Installation script
 </code></pre></div>
 <h3 id="architecture-principles">Architecture Principles<a class="headerlink" href="#architecture-principles" title="Anchor link to this section for reference">&para;</a></h3>
+<p>Both tool suites follow consistent design principles:</p>
 <h4 id="1-separation-of-concerns">1. <strong>Separation of Concerns</strong><a class="headerlink" href="#1-separation-of-concerns" title="Anchor link to this section for reference">&para;</a></h4>
 <ul>
 <li><strong>CLI Layer</strong>: User interaction and command handling</li>
-<li><strong>Business Logic</strong>: Work item orchestration and validation</li>
-<li><strong>Platform Layer</strong>: Platform-specific implementations</li>
+<li><strong>Business Logic</strong>: Domain-specific orchestration and validation</li>
+<li><strong>Platform Layer</strong>: Platform-specific implementations with abstract interfaces</li>
 <li><strong>Parser Layer</strong>: Content extraction and metadata processing</li>
 <li><strong>Client Layer</strong>: API communication and authentication</li>
 </ul>
 <h4 id="2-strategy-pattern">2. <strong>Strategy Pattern</strong><a class="headerlink" href="#2-strategy-pattern" title="Anchor link to this section for reference">&para;</a></h4>
 <ul>
-<li>Abstract platform interface allows seamless switching between DevOps platforms</li>
+<li>Abstract platform interfaces enable seamless switching between DevOps platforms</li>
 <li>Platform-specific implementations handle unique API requirements</li>
-<li>Consistent interface across all supported platforms</li>
+<li>Consistent interfaces across all supported platforms</li>
 </ul>
 <h4 id="3-extensibility">3. <strong>Extensibility</strong><a class="headerlink" href="#3-extensibility" title="Anchor link to this section for reference">&para;</a></h4>
 <ul>
 <li>Plugin-style architecture for adding new platforms</li>
-<li>Modular parser system for different content formats</li>
-<li>Configurable metadata extraction</li>
+<li>Modular parser systems for different content formats</li>
+<li>Configurable metadata extraction and processing</li>
 </ul>
 <h3 id="system-architecture">System Architecture<a class="headerlink" href="#system-architecture" title="Anchor link to this section for reference">&para;</a></h3>
-<p>SDO uses a <strong>domain-driven architecture</strong> with separate platform abstractions for each business domain. Each domain (work items, repositories, pipelines, pull requests) has its own business logic module and platform interface because the operations are fundamentally different between Azure DevOps and GitHub.</p>
-<div class="highlight"><pre><span></span><code>┌─────────────────────────────────────────────────────────────────┐
-│                         SDO CLI Tool                            │
-├─────────────────────────────────────────────────────────────────┤
-│  sdo.py (Main Entry Point)                                      │
-│  ├── Click CLI Framework                                        │
-│  ├── Command Registration                                       │
-│  └── Global Configuration                                       │
-└─────────────────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    CLI Layer (cli.py)                           │
-├─────────────────────────────────────────────────────────────────┤
-│  ├── workitem group: create, list, show, update, comment        │
-│  ├── repo group: create, show, ls, delete                       │
-│  ├── pr group: create, show, status, ls, update                 │
-│  ├── pipeline group: create, show, ls, run, status, logs        │
-│  ├── Command argument parsing and validation                    │
-│  ├── Verbose output management                                  │
-│  └── Error handling and user feedback                           │
-└─────────────────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                 Business Logic Layer                            │
-├─────────────────────────────────────────────────────────────────┤
-│  ├── work_items.py: Work item orchestration                     │
-│  ├── repositories.py: Repository operations                     │
-│  ├── pull_requests.py: PR operations                            │
-│  └── pipelines.py: Pipeline operations                          │
-│                                                                 │
-│  Each module:                                                   │
-│  ├── Platform detection and selection                           │
-│  ├── Content processing workflow coordination                   │
-│  ├── Result validation and reporting                            │
-│  └── Error handling and user feedback                           │
-└─────────────────────────────────────────────────────────────────┘
-                                    │
-                    ┌───────────────┼───────────────┐
-                    │               │               │
-                    ▼               ▼               ▼
-    ┌─────────────────────┐ ┌─────────────────┐ ┌─────────────────┐
-    │   Parser Layer      │ │ Platform Layer  │ │  Client Layer   │
-    │   (parsers/)        │ │ (platforms/)    │ │   (client.py)   │
-    │                     │ │                 │ │                 │
-    │  Content parsing:   │ │ Domain-specific │ │ Low-level API:  │
-    │  ├── Markdown files │ │ abstractions:   │ │ ├── HTTP client │
-    │  ├── Metadata       │ │ ├── Work items  │ │ ├── Auth        │
-    │  └── Validation     │ │ ├── Repos       │ │ ├── Platform    │
-    │                     │ │ ├── Pipelines   │ │ │   detection   │
-    │                     │ │ └── PRs         │ │ └── Logging     │
-    └─────────────────────┘ └─────────────────┘ └─────────────────┘
-</code></pre></div>
+<p>SDO uses a domain-driven architecture with separate platform abstractions for each business domain (work items, repositories, pipelines, pull requests), where each domain has its own business logic module and platform interface.</p>
+<pre class="mermaid"><code>graph TB
+    subgraph "SDO CLI Tool"
+        SDO[SDO CLI Tool&lt;br/&gt;sdo.py Main Entry Point&lt;br/&gt;Click CLI Framework&lt;br/&gt;Command Registration&lt;br/&gt;Global Configuration]
+    end
+
+    subgraph "CLI Layer"
+        CLI[CLI Layer&lt;br/&gt;cli.py&lt;br/&gt;workitem • repo • pr • pipeline groups&lt;br/&gt;Command parsing • validation&lt;br/&gt;Verbose output • Error handling]
+    end
+
+    subgraph "Business Logic Layer"
+        BIZ[Business Logic Layer&lt;br/&gt;work_items.py • repositories.py&lt;br/&gt;pull_requests.py • pipelines.py&lt;br/&gt;Platform detection • Content processing&lt;br/&gt;Result validation • Error handling]
+    end
+
+    subgraph "Supporting Layers"
+        subgraph "Parser Layer"
+            PARSER[Parser Layer&lt;br/&gt;parsers/&lt;br/&gt;markdown_parser.py&lt;br/&gt;metadata_parser.py&lt;br/&gt;Content parsing • Metadata extraction&lt;br/&gt;Validation]
+        end
+
+        subgraph "Platform Layer"
+            PLATFORM[Platform Layer&lt;br/&gt;platforms/&lt;br/&gt;Abstract base classes&lt;br/&gt;Azure DevOps • GitHub implementations&lt;br/&gt;Work items • Repos • PRs • Pipelines]
+        end
+
+        subgraph "Client Layer"
+            CLIENT[Client Layer&lt;br/&gt;client.py&lt;br/&gt;HTTP client • Authentication&lt;br/&gt;Platform detection • Logging&lt;br/&gt;Low-level API communication]
+        end
+    end
+
+    SDO --&gt; CLI
+    CLI --&gt; BIZ
+    BIZ --&gt; PARSER
+    BIZ --&gt; PLATFORM
+    BIZ --&gt; CLIENT
+
+    style SDO fill:#e1f5fe
+    style CLI fill:#f3e5f5
+    style BIZ fill:#fff3e0
+    style PARSER fill:#e8f5e8
+    style PLATFORM fill:#fce4ec
+    style CLIENT fill:#f1f8e9</code></pre>
 <h3 id="key-components">Key Components<a class="headerlink" href="#key-components" title="Anchor link to this section for reference">&para;</a></h3>
 <h4 id="cli-layer-clipy">CLI Layer (cli.py)<a class="headerlink" href="#cli-layer-clipy" title="Anchor link to this section for reference">&para;</a></h4>
-<p>Provides hierarchical command structure:
-- <strong>workitem</strong>: create, list, show, update, comment
-- <strong>repo</strong>: create, show, ls, delete
-- <strong>pr</strong>: create, show, status, ls, update
-- <strong>pipeline</strong>: create, show, ls, run, status, logs, lastbuild, update, delete</p>
+<p>Provides hierarchical command structure for workitem, repo, pr, and pipeline operations with command parsing, validation, and error handling.</p>
 <h4 id="business-logic-layer">Business Logic Layer<a class="headerlink" href="#business-logic-layer" title="Anchor link to this section for reference">&para;</a></h4>
-<p>Core orchestration modules for each domain:
-- <strong>work_items.py</strong>: Work item creation and management
-- <strong>repositories.py</strong>: Repository operations
-- <strong>pull_requests.py</strong>: PR operations
-- <strong>pipelines.py</strong>: Pipeline operations</p>
+<p>Core orchestration modules: work_items.py, repositories.py, pull_requests.py, and pipelines.py for domain-specific operations.</p>
 <h4 id="platform-layer-platforms">Platform Layer (platforms/)<a class="headerlink" href="#platform-layer-platforms" title="Anchor link to this section for reference">&para;</a></h4>
-<p>Abstract interfaces with platform-specific implementations:
-- <strong>Azure DevOps</strong>: REST API integration
-- <strong>GitHub</strong>: CLI-based operations
-- Separate abstractions for work items, repos, PRs, and pipelines</p>
+<p>Abstract interfaces with platform-specific implementations for Azure DevOps (REST API) and GitHub (CLI-based) across work items, repos, PRs, and pipelines.</p>
 <h3 id="dependencies">Dependencies<a class="headerlink" href="#dependencies" title="Anchor link to this section for reference">&para;</a></h3>
-<h4 id="core-dependencies">Core Dependencies<a class="headerlink" href="#core-dependencies" title="Anchor link to this section for reference">&para;</a></h4>
+<h4 id="ntools-suite-net">ntools Suite (.NET)<a class="headerlink" href="#ntools-suite-net" title="Anchor link to this section for reference">&para;</a></h4>
 <ul>
-<li><code>click&gt;=8.0.0</code>: CLI framework</li>
-<li><code>requests&gt;=2.25.0</code>: HTTP client for Azure DevOps</li>
-<li><code>pyyaml&gt;=6.0.0</code>: YAML parsing</li>
+<li><strong>Runtime</strong>: .NET 9.0 SDK, Go runtime</li>
+<li><strong>CLI Framework</strong>: System.CommandLine</li>
+<li><strong>Build System</strong>: MSBuild with custom targets</li>
 </ul>
-<h4 id="development-dependencies">Development Dependencies<a class="headerlink" href="#development-dependencies" title="Anchor link to this section for reference">&para;</a></h4>
+<h4 id="sdo-tool-python">SDO Tool (Python)<a class="headerlink" href="#sdo-tool-python" title="Anchor link to this section for reference">&para;</a></h4>
 <ul>
-<li><code>pytest</code>: Testing framework</li>
-<li><code>black</code>: Code formatting</li>
-<li><code>mypy</code>: Static type checking</li>
-<li><code>coverage</code>: Test coverage analysis</li>
+<li><strong>Core</strong>: <code>click&gt;=8.0.0</code> (CLI framework), <code>requests&gt;=2.25.0</code> (HTTP client), <code>pyyaml&gt;=6.0.0</code> (YAML parsing)</li>
+<li><strong>Development</strong>: <code>pytest</code>, <code>black</code>, <code>mypy</code>, <code>coverage</code></li>
 </ul>
 <h2 id="integration-points">Integration Points<a class="headerlink" href="#integration-points" title="Anchor link to this section for reference">&para;</a></h2>
 <h3 id="cross-tool-workflows">Cross-Tool Workflows<a class="headerlink" href="#cross-tool-workflows" title="Anchor link to this section for reference">&para;</a></h3>
@@ -1962,20 +1987,12 @@
 </ol>
 <h3 id="shared-concepts">Shared Concepts<a class="headerlink" href="#shared-concepts" title="Anchor link to this section for reference">&para;</a></h3>
 <ul>
-<li>Both tools support Azure DevOps and GitHub integration</li>
-<li>Common authentication patterns (PATs, CLI auth)</li>
-<li>Similar CLI design principles</li>
+<li>Dual platform support (Azure DevOps and GitHub)</li>
+<li>Common authentication patterns</li>
+<li>Consistent CLI design principles</li>
 <li>Cross-platform compatibility</li>
 </ul>
-<h2 id="future-considerations">Future Considerations<a class="headerlink" href="#future-considerations" title="Anchor link to this section for reference">&para;</a></h2>
-<h3 id="unified-cli-experience">Unified CLI Experience<a class="headerlink" href="#unified-cli-experience" title="Anchor link to this section for reference">&para;</a></h3>
-<p>Potential future enhancements could include:
-- Unified authentication management
-- Cross-tool command chaining
-- Shared configuration system
-- Integrated help and discovery</p>
-<p>This combined architecture document provides a comprehensive view of both tool suites, enabling better understanding of the complete DevOps toolchain and potential integration opportunities.</content>
-<parameter name="filePath">c:\source\ntools\docs\devops-tools-suite-architecture.md</p>
+<p>This combined architecture document provides a comprehensive view of both tool suites, enabling better understanding of the complete DevOps toolchain and potential integration opportunities.</p>
 
 
 

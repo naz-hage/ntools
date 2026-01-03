@@ -523,6 +523,17 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Versioning
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -532,6 +543,49 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#version-automation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version Automation
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Version Automation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#powershell-module-integration-v230" class="md-nav__link">
+    <span class="md-ellipsis">
+      PowerShell Module Integration (v2.3.0+)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -1275,6 +1329,21 @@
 <li>Associate release assets with a particular version.</li>
 <li>Generate release notes based on commits since the last tag.</li>
 </ul>
+<h2 id="version-automation">Version Automation<a class="headerlink" href="#version-automation" title="Anchor link to this section for reference">&para;</a></h2>
+<p>Tool versions in documentation are automatically updated using the MSBuild task (<code>UpdateVersionsInDocs</code>) via the <code>nb update_doc_versions</code> command. This extracts all tool/version pairs from every <code>NbuildAppList</code> entry in every <code>*.json</code> file in <code>dev-setup</code> and updates the documentation table accordingly.</p>
+<h3 id="powershell-module-integration-v230">PowerShell Module Integration (v2.3.0+)<a class="headerlink" href="#powershell-module-integration-v230" title="Anchor link to this section for reference">&para;</a></h3>
+<ul>
+<li><strong>Module</strong>: <code>scripts/module-package/ntools-scripts.psm1</code></li>
+<li><strong>Function</strong>: <code>Get-VersionFromJson</code></li>
+<li><strong>Purpose</strong>: Consolidated version management within the ntools-scripts module</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="c"># Import the module</span>
+<span class="nb">Import-Module</span> <span class="s2">&quot;./scripts/module-package/ntools-scripts.psm1&quot;</span> <span class="n">-Force</span>
+
+<span class="c"># Get version from specific JSON file</span>
+<span class="nv">$version</span> <span class="p">=</span> <span class="nb">Get-VersionFromJson</span> <span class="n">-JsonFilePath</span> <span class="s2">&quot;./dev-setup/ntools.json&quot;</span>
+</code></pre></div>
+<p>For complete automation details, see <a href="../version-automation-guide/">Version Automation Guide</a>.</p>
 
 
 
