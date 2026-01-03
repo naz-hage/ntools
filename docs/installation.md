@@ -47,6 +47,21 @@ python atools/install-ntools.py --version 1.32.0
 python atools/install-ntools.py --version 1.32.0 --deploy-path "C:\MyTools\Nbuild"
 ```
 
+## SDO Installation
+
+SDO (Simple DevOps Operations Tool) is installed using an isolated virtual environment to prevent dependency conflicts. After installing NTools, install SDO:
+
+```cmd
+cd "C:\Program Files\NBuild"
+python install-sdo.py
+```
+
+**Verify installation:**
+```cmd
+sdo --version
+sdo --help
+```
+
 ## What Each Option Installs
 
 | Component | Development Setup | NTools Only |

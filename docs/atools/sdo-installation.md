@@ -8,31 +8,16 @@ SDO (Simple DevOps) is installed using an isolated virtual environment to preven
 
 Before installing SDO, you must have NTools installed. See the main [Installation](../installation.md) documentation for NTools setup instructions.
 
-## Installation Steps
+## Quick Installation
 
-### 1. Ensure NTools is Installed
-
-Follow the [NTools Installation](../installation.md) guide to extract the NTools zip file to your preferred location (e.g., `C:\Program Files\NBuild`).
-
-### 2. Run SDO Installation Script
-
-Open a command prompt and navigate to the NTools directory:
+After installing NTools, run the SDO installer:
 
 ```cmd
 cd "C:\Program Files\NBuild"
 python install-sdo.py
 ```
 
-**Alternative: If NTools is already in PATH:**
-
-```cmd
-python install-sdo.py
-```
-
-### 3. Verify Installation
-
-Test that SDO is working:
-
+**Verify installation:**
 ```cmd
 sdo --version
 sdo --help
@@ -44,31 +29,6 @@ sdo --help
 2. **Installs SDO**: Installs SDO and dependencies in isolation
 3. **Creates Launcher**: `sdo.cmd` script that activates venv and runs SDO
 4. **Maintains PATH**: Since NBuild is in PATH, `sdo` works globally
-
-## Directory Structure After Installation
-
-```
-C:\Program Files\NBuild\
-├── nb.exe                    # NTools executable
-├── sdo.cmd                   # SDO launcher script (created by installer)
-├── venv\                     # Virtual environment
-│   ├── Scripts\             # Python executables
-│   ├── Lib\site-packages\   # Isolated SDO dependencies
-│   └── pyvenv.cfg
-├── install-sdo.py           # SDO installation script
-├── pyproject.toml           # SDO package configuration
-├── sdo_package\             # SDO source code
-└── [other NTools files...]
-```
-
-## Benefits of Virtual Environment Approach
-
-- **Smaller Distribution**: NTools zip contains only source code, not compiled executables
-- **No Dependency Conflicts**: SDO packages don't interfere with system Python
-- **Isolated Environment**: Each tool has its own dependencies
-- **Easy Updates**: Delete `venv\` folder to reset SDO installation
-- **Flexible Deployment**: Works across different Python environments
-- **Professional Distribution**: Follows Python best practices
 
 ## Troubleshooting
 
