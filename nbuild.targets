@@ -511,35 +511,6 @@
 		<Message Text=">== NB_TEST_DIAG_ALL completed" Importance="high" />
 	</Target>
 
-	<!-- Clean up the project and artifacts folder -->
-	<Target Name="CLEAN">
-		<Message Text="Cleaning repository: removing bin/, obj/, Debug/, Release/, TestResults/, CoverageReport/ and artifacts (safe mode)" Importance="high" />
-
-		<!-- Safety: ensure SolutionDir is set to avoid accidental root-level deletes -->
-		<PropertyGroup>
-			<_SolutionDir>$(SolutionDir)</_SolutionDir>
-		</PropertyGroup>
-
-		<Error Condition="'$(_SolutionDir)' == ''" Text="CLEAN aborted: $(SolutionDir) is not set. This prevents unsafe deletes." />
-
-		<!-- Collect directories to remove (MSBuild supports wildcards in Item Include) -->
-		<ItemGroup>
-			<DirectoriesToRemove Include="$(_SolutionDir)**\bin;
-										$(_SolutionDir)**\obj;
-										$(_SolutionDir)Debug;
-										$(_SolutionDir)Release;
-										$(_SolutionDir)TestResults;
-										$(_SolutionDir)CoverageReport;
-										c:\debug;
-										c:\release;
-										$(_SolutionDir)artifacts" />
-		</ItemGroup>
-
-		<Message Text="Directories to remove: @(DirectoriesToRemove)" Importance="high" />
-		<RemoveDir Directories="@(DirectoriesToRemove)" />
-
-		<Message Text="Cleaning complete." Importance="high" />
-	</Target>
 
 	<!-- Create a stage package for testing -->
 	<Target Name="STAGE" DependsOnTargets="STAGE_NEW" >
