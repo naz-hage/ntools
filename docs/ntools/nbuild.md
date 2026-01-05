@@ -1,8 +1,3 @@
-- [Usage](#usage)
-- [nbuild.targets](#nbuildtargets)
-- [common.targets](#commontargets)
----
-
 # Nbuild (`nb.exe`)
 
 `Nbuild` (`nb.exe`) is a powerful command-line utility for .NET developers. It wraps [MSBuild](https://docs.microsoft.com/en-us/visualstudio/msbuild/msbuild) to simplify building solutions, running custom targets, and managing your development toolchain.
@@ -57,14 +52,6 @@ Additional Arguments:
 ```
 
 ## Dry-run contract
-                           --repo   Git repository (formats: repoName, userName/repoName, or full GitHub URL)
-                           --tag    Tag to use for the release (e.g., 1.24.33)
-                           --branch Branch name to release from (e.g., main)
-                           --file   Asset file name (full path required)
-
-Examples:
-                           nb release_create --repo user/repo --tag 1.24.33 --branch main --file C:\path\to\asset.zip
-                           nb release_create --repo https://github.com/user/repo --tag 1.24.33 --branch main --file ./asset.zip
   pre_release_create     Creates a GitHub pre-release.
 
                          Required options:

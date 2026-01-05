@@ -38,12 +38,6 @@ public class BuildStarter
             ExtractBatchFile();
         }
 
-        // Before we check target, ensure that nbuild.targets exists
-        if (!File.Exists(nbuildPath))
-        {
-            return ResultHelper.Fail(-1, $"'{nbuildPath}' not found.");
-        }
-
         // check if target is valid
         if (!ValidTarget(nbuildPath, target, verbose))
         {

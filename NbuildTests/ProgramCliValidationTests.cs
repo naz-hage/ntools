@@ -256,7 +256,7 @@ namespace NbuildTests
             var args = new[] { "list", "--json", "test.json", "--verbose" };
 
             // Act
-            var exitCode = Program.Main(args);
+            Program.Main(args);
 
             // Assert - should not show error for global verbose option
             var errorOutput = GetErrorOutput();
@@ -270,7 +270,7 @@ namespace NbuildTests
             var args = new[] { "install", "--json", "test.json", "--dry-run" };
 
             // Act
-            var exitCode = Program.Main(args);
+            Program.Main(args);
 
             // Assert - should not show error for global dry-run option
             var errorOutput = GetErrorOutput();
@@ -284,7 +284,7 @@ namespace NbuildTests
             var args = new[] { "download", "--json", "test.json", "--verbose", "--dry-run" };
 
             // Act
-            var exitCode = Program.Main(args);
+            Program.Main(args);
 
             // Assert
             var errorOutput = GetErrorOutput();

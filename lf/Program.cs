@@ -34,20 +34,16 @@ var listFilesCommand = new Command("files", "List files with specified extension
 /// Option: --directoryPath | -d
 /// The directory path to search in. Defaults to the current directory.
 /// </summary>
-var filesDirectoryPathOption = new Option<string>("--directoryPath", "-d")
-{
-    Description = "Directory path to search in"
-};
+var filesDirectoryPathOption = new Option<string>("--directoryPath", new[] { "-d" });
+filesDirectoryPathOption.Description = "Directory path to search in";
 filesDirectoryPathOption.DefaultValueFactory = _ => Directory.GetCurrentDirectory();
 
 /// <summary>
 /// Option: --extensions | -e
 /// Comma-separated file extensions to search for. Defaults to ".yml,.yaml".
 /// </summary>
-var extensionsOption = new Option<string>("--extensions", "-e")
-{
-    Description = "Comma-separated file extensions to search for (e.g., .yml,.yaml)"
-};
+var extensionsOption = new Option<string>("--extensions", new[] { "-e" });
+extensionsOption.Description = "Comma-separated file extensions to search for (e.g., .yml,.yaml)";
 extensionsOption.DefaultValueFactory = _ => ".yml,.yaml";
 
 listFilesCommand.Options.Add(filesDirectoryPathOption);
@@ -79,20 +75,16 @@ var listFoldersCommand = new Command("folders", "List folders containing specifi
 /// Option: --directoryPath | -d
 /// The directory path to search in. Defaults to the current directory.
 /// </summary>
-var foldersDirectoryPathOption = new Option<string>("--directoryPath", "-d")
-{
-    Description = "Directory path to search in"
-};
+var foldersDirectoryPathOption = new Option<string>("--directoryPath", new[] { "-d" });
+foldersDirectoryPathOption.Description = "Directory path to search in";
 foldersDirectoryPathOption.DefaultValueFactory = _ => Directory.GetCurrentDirectory();
 
 /// <summary>
 /// Option: --name | -n
 /// Comma-separated list of folder names to search for.
 /// </summary>
-var folderNamesOption = new Option<string>("--name", "-n")
-{
-    Description = "Comma-separated list of folder names to search for"
-};
+var folderNamesOption = new Option<string>("--name", new[] { "-n" });
+folderNamesOption.Description = "Comma-separated list of folder names to search for";
 folderNamesOption.DefaultValueFactory = _ => string.Empty;
 
 listFoldersCommand.Options.Add(foldersDirectoryPathOption);

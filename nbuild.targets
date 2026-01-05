@@ -10,8 +10,7 @@
 		<DeploymentFolder>$(ProgramFiles)\Nbuild</DeploymentFolder>
 		<!--  Modify these paths to match your Python installation -->
 		<!-- Always use python.exe from PATH for portability -->
-		<PythonPath>C:\Program Files\Python\3.13.3</PythonPath>
-		<PythonExe>$(PythonPath)\python.exe</PythonExe>
+		<PythonExe>python.exe</PythonExe>
 		<MkDocsExe>$(USERPROFILE)\AppData\Roaming\Python\Python313\Scripts\mkdocs.exe</MkDocsExe>
 	</PropertyGroup>
 
@@ -108,7 +107,7 @@
 	<!-- Build docs locally for testing -->
 	<Target Name="MKDOCS" >
 		<!-- Check if Python is installed -->
-		<Error Condition="!Exists('$(PythonPath)\python.exe')" Text="Python is not installed at $(PythonPath)" />
+		<!-- Note: Python is expected to be available in PATH -->
 
 		<!-- Upgrade pip -->
 		<Exec Command='"$(PythonExe)" -m pip install --upgrade pip' WorkingDirectory="$(SolutionDir)">
@@ -146,7 +145,6 @@
 	<Target Name="INSTALL_PYTHON_TEST_DEPS">
 		<Message Text="Installing Python test dependencies for atools" Importance="high" />
 		<PropertyGroup>
-			<PythonExe>$(PythonPath)\python.exe</PythonExe>
 			<PipExe Condition="'$(PipPath)' != ''">$(PipPath)</PipExe>
 			<!-- Fallback to python -m pip if PipPath not set -->
 			<PipExe Condition="'$(PipExe)' == ''">&quot;$(PythonExe)&quot; -m pip</PipExe>
@@ -169,7 +167,6 @@
 	<Target Name="RUN_PYTESTS_VERBOSE" DependsOnTargets="INSTALL_PYTHON_TEST_DEPS" >
 		<Message Text="Running Python pytest for atools (verbose)" Importance="high" />
 		<PropertyGroup>
-			<PythonExe>$(PythonPath)\python.exe</PythonExe>
 			<!-- Allow overriding test path via TEST_PATH -->
 			<TestPath Condition="'$(TestPath)' == ''">$(SolutionDir)\atools\tests</TestPath>
 		</PropertyGroup>
@@ -185,7 +182,6 @@
 	<Target Name="RUN_SDO_TESTS" DependsOnTargets="INSTALL_PYTHON_TEST_DEPS">
 		<Message Text="Running SDO tests" Importance="high" />
 		<PropertyGroup>
-			<PythonExe>$(PythonPath)\python.exe</PythonExe>
 			<!-- Allow overriding test path via TEST_PATH -->
 			<SdoTestPath Condition="'$(SdoTestPath)' == ''">$(SolutionDir)\atools\tests</SdoTestPath>
 		</PropertyGroup>
