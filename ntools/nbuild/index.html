@@ -1476,12 +1476,6 @@
   
 
 
-<ul>
-<li><a href="#usage">Usage</a></li>
-<li><a href="#nbuildtargets">nbuild.targets</a></li>
-<li><a href="#commontargets">common.targets</a></li>
-</ul>
-<hr />
 <h1 id="nbuild-nbexe">Nbuild (<code>nb.exe</code>)<a class="headerlink" href="#nbuild-nbexe" title="Anchor link to this section for reference">&para;</a></h1>
 <p><code>Nbuild</code> (<code>nb.exe</code>) is a powerful command-line utility for .NET developers. It wraps <a href="https://docs.microsoft.com/en-us/visualstudio/msbuild/msbuild">MSBuild</a> to simplify building solutions, running custom targets, and managing your development toolchain.</p>
 <p><strong>Key Features:</strong>
@@ -1531,15 +1525,7 @@ Additional Arguments:
   Arguments passed to the application that is being run.
 </code></pre></div>
 <h2 id="dry-run-contract">Dry-run contract<a class="headerlink" href="#dry-run-contract" title="Anchor link to this section for reference">&para;</a></h2>
-<div class="highlight"><pre><span></span><code>                       --repo   Git repository (formats: repoName, userName/repoName, or full GitHub URL)
-                       --tag    Tag to use for the release (e.g., 1.24.33)
-                       --branch Branch name to release from (e.g., main)
-                       --file   Asset file name (full path required)
-</code></pre></div>
-<p>Examples:
-                           nb release_create --repo user/repo --tag 1.24.33 --branch main --file C:\path\to\asset.zip
-                           nb release_create --repo https://github.com/user/repo --tag 1.24.33 --branch main --file ./asset.zip
-  pre_release_create     Creates a GitHub pre-release.</p>
+<p>pre_release_create     Creates a GitHub pre-release.</p>
 <div class="highlight"><pre><span></span><code>                     Required options:
                        --repo   Git repository (formats: repoName, userName/repoName, or full GitHub URL)
                        --tag    Tag to use for the pre-release (e.g., 1.24.33)
