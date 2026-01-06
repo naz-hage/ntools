@@ -18,3 +18,23 @@ Tags in the [GitHubRelease](./ntools/github-release.md) are used to:
 - Identify specific versions of the repository.
 - Associate release assets with a particular version.
 - Generate release notes based on commits since the last tag.
+
+## Version Automation
+
+Tool versions in documentation are automatically updated using the MSBuild task (`UpdateVersionsInDocs`) via the `nb update_doc_versions` command. This extracts all tool/version pairs from every `NbuildAppList` entry in every `*.json` file in `dev-setup` and updates the documentation table accordingly.
+
+### PowerShell Module Integration (v2.3.0+)
+
+- **Module**: `scripts/module-package/ntools-scripts.psm1`
+- **Function**: `Get-VersionFromJson`
+- **Purpose**: Consolidated version management within the ntools-scripts module
+
+```powershell
+# Import the module
+Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
+
+# Get version from specific JSON file
+$version = Get-VersionFromJson -JsonFilePath "./dev-setup/ntools.json"
+```
+
+For complete automation details, see [Version Automation Guide](version-automation-guide.md).

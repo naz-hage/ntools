@@ -1,5 +1,4 @@
-﻿using CommandLine.Attributes;
-using GitHubRelease;
+﻿using GitHubRelease;
 using NbuildTasks;
 
 namespace Nbuild;
@@ -37,92 +36,47 @@ public class Cli
     /// Gets or sets the command to execute.
     /// Possible values: targets, install, uninstall, download, list, path, git_info, git_settag, git_autotag, git_push_autotag, git_branch, git_clone, git_deletetag.
     /// </summary>
-    [RequiredArgument(0, "command", "Specifies the command to execute.\n" +
-        "\t list \t\t\t -> Lists apps specified in the -json option.\n" +
-        "\t install \t\t -> Downloads and installs apps specified in the -json option (requires admin privileges).\n" +
-        "\t uninstall \t\t -> Uninstalls apps specified in the -json option (requires admin privileges).\n" +
-        "\t download \t\t -> Downloads tools or apps listed in the -json option (requires admin privileges).\n" +
-        "\t targets \t\t -> Lists available build targets and saves them in the targets.md file.\n" +
-        "\t path \t\t\t -> Displays the environment PATH variable for the local machine.\n" +
-        "\t git_info \t\t -> Displays the current git information for the local repository.\n" +
-        "\t git_settag \t\t -> Sets the specified tag using the -tag option.\n" +
-        "\t git_autotag \t\t -> Sets the next tag based on the build type: STAGE or PROD.\n" +
-        "\t git_push_autotag \t -> Sets the next tag based on the build type and pushes to the remote repository.\n" +
-        "\t git_branch \t\t -> Displays the current git branch in the local repository.\n" +
-        "\t git_clone \t\t -> Clones the specified Git repository using the -url option.\n" +
-        "\t git_deletetag \t\t -> Deletes the specified tag using the -tag option.\n" +
-        "\t release_create \t -> Creates a GitHub release. Requires -repo, -tag, -branch, and -file options.\n" +
-        "\t pre_release_create \t -> Creates a GitHub pre-release. Requires -repo, -tag, -branch, and -file options.\n" +
-        "\t release_download \t -> Downloads a specific asset from a GitHub release. Requires -repo, -tag, and -path (optional, defaults to current directory).\n" +
-        "\t list_release \t\t -> Lists latest 3 releases for the specified repository (and latest pre-release if newer). Requires -repo.\n" +
-        "\t ----\n" +
-        "\t  The nbuild.exe can also execute targets defined in an nbuild.targets file if one " +
-        "\t exists in the current folder.\n" +
-        "\t To execute a target defined in nbuild.targets, simply use its name as the command.\n" +
-        "\t For example, if nbuild.targets defines a target named 'build', you can run it" +
-        "\t  with: `nb.exe build`\n")]
     public CommandType Command { get; set; }
 
     /// <summary>
     /// Gets or sets the JSON file that holds the list of apps.
     /// Only valid for the install, download, and list commands.
     /// </summary>
-    [OptionalArgument("$(ProgramFiles)\\nbuild\\ntools.json", "json", "Specifies the JSON file that holds the list of apps. Only valid for the install, download, and list commands.\n" +
-        "\t - By default, the -json option points to the ntools deployment folder: $(ProgramFiles)\\build\\ntools.json.\n" +
-        "\t Sample JSON file: https://github.com/naz-hage/ntools/blob/main/dev-setup/ntools.json\n" +
-        "\t ")]
     public string? Json { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether to set the console output verbose level.
     /// </summary>
-    [OptionalArgument(false, "v", "Optional parameter which sets the console output verbose level\n" +
-        "\t ----\n" +
-        "\t - if no command line options are specified with the -v option , i.e.: 'Nb.exe stage -v true` \n" +
-        "\t   `Nb` will run an MSbuild target `stage` defined in a `nbuild.targets` file which present in the solution folder.\n" +
-        "\t   Run `Nb.exe Targets` to list the available targets. \n" +
-        "\t -v Possible Values:")]
     public bool Verbose { get; set; }
 
     /// <summary>
     /// Gets or sets the Git repository URL.
     /// </summary>
-    [OptionalArgument("", "url", "Specifies the Git repository URL.")]
     public string? Url { get; set; }
 
-    [OptionalArgument("", "tag", "Specifies the tag used for git_settag and git_deletetag commands.")]
     public string? Tag { get; set; }
 
-    [OptionalArgument("", "path", "Specifies the path used for git_clone, pre_release_create and release_create commands. If not specified, the current directory will be used.\n" +
-        "\t for pre_release_create and release_create commands, it must be an absolute path")]
     public string? Path { get; set; }
 
     /// <summary>
     /// Gets or sets the build type used for git_autotag and git_push_autotag commands.
     /// Possible values: STAGE, PROD.
     /// </summary>
-    [OptionalArgument("", "buildtype", "Specifies the build type used for git_autotag and git_push_autotag commands. Possible values: STAGE, PROD.")]
     public string? BuildType { get; internal set; }
 
     /// <summary>
     /// Gets or sets the repository name in the format userName/repoName.
     /// </summary>
-    [OptionalArgument("", "repo", "Specifies the Git repository in the format any of the following formats: \n" +
-        "\t repoName  (UserName is declared the `OWNER` environment variable) \n" +
-        "\t userName/repoName\n" +
-        "\t https://github.com/userName/repoName (Full URL to the repository on GitHub). This is applicable to release_create, pre_release_create and release_download commands.")]
     public string? Repo { get; set; }
 
     /// <summary>
     /// Gets or sets the branch name.
     /// </summary>
-    [OptionalArgument("main", "branch", "Specifies the branch name. Applicable for release_create, pre_release_create commands")]
     public string? Branch { get; set; }
 
     /// <summary>
     /// Gets or sets the asset file name for `create` command.
     /// </summary>
-    [OptionalArgument("", "file", "Specifies the asset file name. Must include full path. Applicable for release_create, pre_release_create commands")]
     public string? AssetFileName { get; set; }
 
     ///// <summary>

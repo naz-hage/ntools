@@ -1,0 +1,13 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<!-- E2E test targets for end-to-end testing -->
+
+	<!-- Placeholder for E2E tests - can be expanded as needed -->
+	<Target Name="E2E" DependsOnTargets="ARTIFACTS">
+		<Message Text="Running E2E tests..." Importance="high" />
+		<!-- Add E2E test execution commands here when E2E tests are implemented -->
+		<Message Text="No E2E tests configured yet" Importance="normal" />
+		<Message Text="E2E tests completed" Importance="high" />
+	</Target>
+
+</Project>

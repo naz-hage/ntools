@@ -40,14 +40,13 @@ scripts/
 
 The module exports a broad set of functions covering build, CI/devops, setup/install, testing, utilities, and code-signing helpers. For the complete, authoritative list of exported function names and the exact API surface, see the dedicated API reference:
 
-- docs/ntools/ntools-scripts-module-api.md
+- [ntools-scripts Module API](ntools-scripts-module-api.md)
 
 If you need to discover functions at runtime, import the module and run:
 
 ```powershell
 Get-Command -Module ntools-scripts | Sort-Object Name
 ```
-```powershell
 # Test the module
 Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
 Test-NToolsScriptsModule

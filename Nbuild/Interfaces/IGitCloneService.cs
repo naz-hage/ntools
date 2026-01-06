@@ -34,8 +34,8 @@ namespace Nbuild.Interfaces
         /// <param name="path">Target path for the clone; when empty, use the current directory.</param>
         /// <param name="verbose">If true, emit additional diagnostic output.</param>
         /// <param name="dryRun">If true, perform a dry-run: describe actions but do not perform destructive operations.</param>
-        /// <param name="console">Console instance to write output to; must not be null.</param>
+        /// <param name="output">TextWriter instance to write output to; must not be null.</param>
         /// <returns>Process-style integer exit code: 0 on success, non-zero on failure.</returns>
-        int Clone(string url, string path, bool verbose, bool dryRun, IConsole console);
+        int Clone(string url, string path, bool verbose, bool dryRun, TextWriter output);
     }
 }

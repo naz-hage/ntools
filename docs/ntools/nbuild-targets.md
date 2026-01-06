@@ -54,6 +54,17 @@ The table below lists all available targets for the Nbuild tool.
 | COVERAGE_SUMMARY    | Display high-level code coverage summary |
 | SMOKE_TEST          | **Comprehensive smoke test**: Validates published artifacts (4+ executables) AND build system integrity (target delegation). Consolidated from TEST_TARGET_DELEGATION |
 | SMOKE_TEST_PWSH     | REMOVED: functionality consolidated into `SMOKE_TEST` |
+| UNIT_TEST_CLI_VALIDATION | Run CLI validation unit tests |
+| UNIT_TEST_BUILD_STARTER | Run BuildStarter unit tests |
+| UNIT_TEST_CLI       | Run CLI unit tests |
+| UNIT_TEST_COMMAND   | Run Command unit tests |
+| UNIT_TEST_NB_COMMAND | Run NbCommand unit tests |
+| UNIT_TEST_GIT_CLONE_COMMAND | Run GitCloneCommand unit tests |
+| UNIT_TEST_NTOOLS_JSON | Run NtoolsJson unit tests |
+| UNIT_TEST_PATH_MANAGER | Run PathManager unit tests (excluded from UNIT_TEST_ALL due to long execution time) |
+| UNIT_TEST_RELEASE_SERVICE_FACTORY | Run ReleaseServiceFactory unit tests |
+| UNIT_TEST_RESOURCE_HELPER | Run ResourceHelper unit tests |
+| UNIT_TEST_ALL       | Run all unit tests except UNIT_TEST_PATH_MANAGER |
 | IS_ADMIN            | Check if current process is running in admin mode AdminCheckExitCode property is set |
 | SingleProject       | Example how to build a single project |
 | HandleError         | Error handling placeholder |

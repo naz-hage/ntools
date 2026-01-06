@@ -1,5 +1,23 @@
 # Software Tools Collection
 
+A powerful command-line utility for .NET developers, providing build automation, testing, Git operations, and GitHub release management.
+
+## Key Features
+
+- **Build & Test**: Comprehensive build system with MSBuild integration and extensive testing support
+- **Git Operations**: Complete Git workflow automation including tagging, branching, and repository cloning
+- **GitHub Integration**: Automated release creation and asset management
+- **Global Options**: `--dry-run` and `--verbose` options available across all commands
+- **Modular Architecture**: Clean separation of concerns with service-based design
+- **Extensive Testing**: Comprehensive unit test suite with targeted execution options
+
+## Recent Updates
+
+- **System.CommandLine 2.0.1**: Upgraded to stable CLI framework with global option support
+- **Enhanced Testing**: Added granular unit testing targets for efficient test execution
+- **Git Clone Support**: New command for repository cloning operations
+- **Improved Documentation**: Updated CLI reference and build target documentation
+
 - Checkout the [documentation](https://naz-hage.github.io/ntools/) for more information.
 
 - The [installation](https://naz-hage.github.io/ntools/installation/) process is straightforward, and the tools are highly reliable and efficient, ensuring the safety and integrity of your data.
