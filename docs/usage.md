@@ -2,6 +2,14 @@
 
 Once Ntools is installed, Open a Developer Command prompt for Visual Studio 2022 and navigate to your solution folder (i.e. `./ntools`).  The [`nb.exe`](./ntools/nbuild.md) is the main executable for the Ntools.  The following are some examples of how to use the Ntools:
 
+## Global Options
+
+Ntools supports global options that work across all commands:
+- `--dry-run`: Preview changes without applying them
+- `--verbose`: Enable verbose output for detailed information
+
+## Build & Test Commands
+
 -   Build a solution: Compiles the solution in the solution directory
 
 ```cmd
@@ -17,6 +25,14 @@ nb.exe clean
 ```cmd
 nb.exe test
 ```
+
+- Run specific unit test suites:
+```cmd
+nb UNIT_TEST_CLI_VALIDATION    # CLI validation tests
+nb UNIT_TEST_GIT_CLONE_COMMAND # Git clone command tests
+nb UNIT_TEST_ALL              # All unit tests (except long-running ones)
+```
+
 - Create a stage release: Creates a stage build which includes the following steps:
     - Clean the solution
     - Build the solution

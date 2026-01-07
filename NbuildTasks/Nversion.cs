@@ -34,13 +34,7 @@ namespace NbuildTasks
 
             string updatedCopyright = fileVersionInfo.LegalCopyright.Replace("XXXX", DateTime.Now.Year.ToString());
 
-            return $" *** {fileVersionInfo.FileDescription}, " +
-                   $"{fileVersionInfo.ProductName}, " +
-                   $"{fileVersionInfo.CompanyName}, " +
-                   $"{updatedCopyright} - " +
-                   $" Version: {fileVersionInfo.ProductMajorPart}." +
-                   $"{fileVersionInfo.ProductMinorPart}." +
-                   $"{fileVersionInfo.ProductBuildPart}";
+            return $"{fileVersionInfo.FileDescription} v{fileVersionInfo.ProductMajorPart}.{fileVersionInfo.ProductMinorPart}.{fileVersionInfo.ProductBuildPart} - {fileVersionInfo.ProductName} by {fileVersionInfo.CompanyName} ({updatedCopyright})";
         }
     }
 }

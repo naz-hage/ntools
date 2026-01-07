@@ -248,5 +248,68 @@ namespace NbuildTests
             Assert.IsTrue(errorOutput.Contains("--hep"), "Error should mention the invalid option");
             Assert.IsTrue(errorOutput.Contains("--help"), "Error should suggest the correct option");
         }
+
+        [TestMethod]
+        public void Main_WithGlobalVerboseOption_ShouldAcceptIt()
+        {
+            // Arrange - use a command that supports verbose
+            var args = new[] { "list", "--json", "test.json", "--verbose" };
+
+            // Act
+            Program.Main(args);
+
+            // Assert - should not show error for global verbose option
+            var errorOutput = GetErrorOutput();
+            Assert.IsFalse(errorOutput.Contains("Unknown option"), "Should not show unknown option error for global --verbose");
+        }
+
+        [TestMethod]
+        public void Main_WithGlobalDryRunOption_ShouldAcceptIt()
+        {
+            // Arrange - use a command that supports dry-run
+            var args = new[] { "install", "--json", "test.json", "--dry-run" };
+
+            // Act
+            Program.Main(args);
+
+            // Assert - should not show error for global dry-run option
+            var errorOutput = GetErrorOutput();
+            Assert.IsFalse(errorOutput.Contains("Unknown option"), "Should not show unknown option error for global --dry-run");
+        }
+
+        [TestMethod]
+        public void Main_WithBothGlobalOptions_ShouldAcceptThem()
+        {
+            // Arrange
+            var args = new[] { "download", "--json", "test.json", "--verbose", "--dry-run" };
+
+            // Act
+            Program.Main(args);
+
+            // Assert
+            var errorOutput = GetErrorOutput();
+            Assert.IsFalse(errorOutput.Contains("Unknown option"), "Should not show unknown option error for global options");
+        }
+
+        [TestMethod]
+        public void Main_GlobalOptionsShowInRootHelp()
+        {
+            // Arrange
+            var args = new[] { "--help" };
+
+            // Act
+            var exitCode = Program.Main(args);
+
+            // Assert
+            Assert.AreEqual(0, exitCode, "Help should succeed");
+            var output = GetConsoleOutput();
+            Assert.IsTrue(output.Contains("--dry-run"), "Root help should show --dry-run");
+            Assert.IsTrue(output.Contains("--verbose"), "Root help should show --verbose");
+        }
+
+        private string GetConsoleOutput()
+        {
+            return _consoleOutput?.ToString() ?? string.Empty;
+        }
     }
 }

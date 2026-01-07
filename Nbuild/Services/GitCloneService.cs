@@ -52,20 +52,20 @@ namespace Nbuild.Services
         /// <param name="dryRun">When true, perform a dry-run: show actions but
         /// do not perform destructive side effects. Both this service and the
         /// underlying <c>Command.Clone</c> should honor this flag.</param>
-        /// <param name="console">The <see cref="IConsole"/> to write output to.
+        /// <param name="output">The <see cref="TextWriter"/> to write output to.
         /// This allows tests to capture/inspect output without touching the
         /// real console.</param>
         /// <returns>Process-like integer exit code. 0 on success; negative on
         /// internal error; otherwise use codes returned from
         /// <c>Command.Clone</c>.</returns>
-        public int Clone(string url, string path, bool verbose, bool dryRun, IConsole console)
+        public int Clone(string url, string path, bool verbose, bool dryRun, TextWriter output)
         {
             try
             {
                 if (dryRun)
                 {
-                    // Use System.CommandLine.ConsoleExtensions to write to the provided IConsole
-                    ConsoleExtensions.WriteLine(console, "DRY-RUN: running in dry-run mode; no destructive actions will be performed.");
+                    // Write to the provided TextWriter
+                    output.WriteLine("DRY-RUN: running in dry-run mode; no destructive actions will be performed.");
                 }
 
                 var result = Command.Clone(url, path, verbose, dryRun);
@@ -73,9 +73,9 @@ namespace Nbuild.Services
             }
             catch (Exception ex)
             {
-                // Surface a friendly error message to the supplied console so
+                // Surface a friendly error message to the supplied output so
                 // callers (and tests) can verify output.
-                ConsoleExtensions.WriteLine(console, $"Error: {ex.Message}");
+                output.WriteLine($"Error: {ex.Message}");
                 return -1;
             }
         }

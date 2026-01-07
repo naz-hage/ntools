@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+    <!-- Unit tests for CLI validation -->
+    <Target Name="UNIT_TEST_CLI_VALIDATION">
+        <Message Text="Running unit tests for CLI validation..." />
+        <Exec Command='dotnet test "$(SolutionDir)\NbuildTests\NbuildTests.csproj" --filter "FullyQualifiedName~ProgramCliValidationTests" --logger trx' WorkingDirectory="$(SolutionDir)" />
+        <Message Text="Unit tests for CLI validation complete." />
+    </Target>
+
+    <!-- Unit tests for BuildStarter -->
+    <Target Name="UNIT_TEST_BUILD_STARTER">
+        <Message Text="Running unit tests for BuildStarter..." />
+        <Exec Command='dotnet test "$(SolutionDir)\NbuildTests\NbuildTests.csproj" --filter "FullyQualifiedName~BuildStarterTests" --logger trx' WorkingDirectory="$(SolutionDir)" />
+        <Message Text="Unit tests for BuildStarter complete." />
+    </Target>
+
+    <!-- Unit tests for CLI -->
+    <Target Name="UNIT_TEST_CLI">
+        <Message Text="Running unit tests for CLI..." />
+        <Exec Command='dotnet test "$(SolutionDir)\NbuildTests\NbuildTests.csproj" --filter "FullyQualifiedName~CliTests" --logger trx' WorkingDirectory="$(SolutionDir)" />
+        <Message Text="Unit tests for CLI complete." />
+    </Target>
+
+    <!-- Unit tests for Command -->
+    <Target Name="UNIT_TEST_COMMAND">
+        <Message Text="Running unit tests for Command..." />
+        <Exec Command='dotnet test "$(SolutionDir)\NbuildTests\NbuildTests.csproj" --filter "FullyQualifiedName~CommandTests" --logger trx' WorkingDirectory="$(SolutionDir)" />
+        <Message Text="Unit tests for Command complete." />
+    </Target>
+
+    <!-- Unit tests for NbCommand -->
+    <Target Name="UNIT_TEST_NB_COMMAND">
+        <Message Text="Running unit tests for NbCommand..." />
+        <Exec Command='dotnet test "$(SolutionDir)\NbuildTests\NbuildTests.csproj" --filter "FullyQualifiedName~NbCommandTests" --logger trx' WorkingDirectory="$(SolutionDir)" />
+        <Message Text="Unit tests for NbCommand complete." />
+    </Target>
+
+    <!-- Unit tests for GitCloneCommand -->
+    <Target Name="UNIT_TEST_GIT_CLONE_COMMAND">
+        <Message Text="Running unit tests for GitCloneCommand..." />
+        <Exec Command='dotnet test "$(SolutionDir)\NbuildTests\NbuildTests.csproj" --filter "FullyQualifiedName~GitCloneCommandTests" --logger trx' WorkingDirectory="$(SolutionDir)" />
+        <Message Text="Unit tests for GitCloneCommand complete." />
+    </Target>
+
+    <!-- Unit tests for NtoolsJson -->
+    <Target Name="UNIT_TEST_NTOOLS_JSON">
+        <Message Text="Running unit tests for NtoolsJson..." />
+        <Exec Command='dotnet test "$(SolutionDir)\NbuildTests\NbuildTests.csproj" --filter "FullyQualifiedName~NtoolsJsonTests" --logger trx' WorkingDirectory="$(SolutionDir)" />
+        <Message Text="Unit tests for NtoolsJson complete." />
+    </Target>
+
+	<!-- Unit tests for PathManager -->
+	<!-- NOTE: Tests in this class take too long locally and are skipped for now -->
+	<!-- UNIT_TEST_PATH_MANAGER is excluded from UNIT_TEST_ALL and should be run separately with: nb UNIT_TEST_PATH_MANAGER -->
+    <Target Name="UNIT_TEST_PATH_MANAGER">
+        <Message Text="Running unit tests for PathManager..." />
+        <Exec Command='dotnet test "$(SolutionDir)\NbuildTests\NbuildTests.csproj" --filter "FullyQualifiedName~PathManagerTests" --logger trx' WorkingDirectory="$(SolutionDir)" />
+        <Message Text="Unit tests for PathManager complete." />
+    </Target>
+
+    <!-- Unit tests for ReleaseServiceFactory -->
+    <Target Name="UNIT_TEST_RELEASE_SERVICE_FACTORY">
+        <Message Text="Running unit tests for ReleaseServiceFactory..." />
+        <Exec Command='dotnet test "$(SolutionDir)\NbuildTests\NbuildTests.csproj" --filter "FullyQualifiedName~ReleaseServiceFactoryTests" --logger trx' WorkingDirectory="$(SolutionDir)" />
+        <Message Text="Unit tests for ReleaseServiceFactory complete." />
+    </Target>
+
+    <!-- Unit tests for ResourceHelper -->
+    <Target Name="UNIT_TEST_RESOURCE_HELPER">
+        <Message Text="Running unit tests for ResourceHelper..." />
+        <Exec Command='dotnet test "$(SolutionDir)\NbuildTests\NbuildTests.csproj" --filter "FullyQualifiedName~ResourceHelperTests" --logger trx' WorkingDirectory="$(SolutionDir)" />
+        <Message Text="Unit tests for ResourceHelper complete." />
+    </Target>
+
+    <!-- Run all unit tests -->
+    <Target Name="UNIT_TEST_ALL" DependsOnTargets="UNIT_TEST_CLI_VALIDATION;UNIT_TEST_BUILD_STARTER;UNIT_TEST_CLI;UNIT_TEST_COMMAND;UNIT_TEST_NB_COMMAND;UNIT_TEST_GIT_CLONE_COMMAND;UNIT_TEST_NTOOLS_JSON;UNIT_TEST_RELEASE_SERVICE_FACTORY;UNIT_TEST_RESOURCE_HELPER">
+        <Message Text="All unit tests completed." />
+    </Target>
+
+</Project>

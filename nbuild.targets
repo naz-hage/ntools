@@ -3,13 +3,14 @@
 	<!-- Reference: https://learn.microsoft.com/en-us/visualstudio/msbuild/walkthrough-using-msbuild?view=vs-2022 -->
 	
 	<Import Project="$(ProgramFiles)\Nbuild\common.targets"/>
+	<Import Project="unit-tests.targets"/>
 
 	<PropertyGroup>
 		<!-- This is the folder where the *.sln resides-->
 		<DeploymentFolder>$(ProgramFiles)\Nbuild</DeploymentFolder>
 		<!--  Modify these paths to match your Python installation -->
 		<!-- Always use python.exe from PATH for portability -->
-		<PipPath>python.exe -m pip</PipPath>
+		<PythonExe>python.exe</PythonExe>
 		<MkDocsExe>$(USERPROFILE)\AppData\Roaming\Python\Python313\Scripts\mkdocs.exe</MkDocsExe>
 	</PropertyGroup>
 
@@ -106,16 +107,16 @@
 	<!-- Build docs locally for testing -->
 	<Target Name="MKDOCS" >
 		<!-- Check if Python is installed -->
-		<Error Condition="!Exists('$(PythonPath)\python.exe')" Text="Python is not installed at $(PythonPath)" />
+		<!-- Note: Python is expected to be available in PATH -->
 
 		<!-- Upgrade pip -->
-		<Exec Command="&quot;$(PipPath)&quot; install --upgrade pip" WorkingDirectory="$(SolutionDir)">
+		<Exec Command='"$(PythonExe)" -m pip install --upgrade pip' WorkingDirectory="$(SolutionDir)">
 			<Output TaskParameter="ExitCode" PropertyName="PipUpgradeExitCode" />
 		</Exec>
 		<Error Condition="'$(PipUpgradeExitCode)' != '0'" Text="Failed to upgrade pip. Exit code: $(PipUpgradeExitCode)" />
 
 		<!-- Install mkdocs -->
-		<Exec Command="&quot;$(PipPath)&quot; install mkdocs" WorkingDirectory="$(SolutionDir)">
+		<Exec Command='"$(PythonExe)" -m pip install mkdocs' WorkingDirectory="$(SolutionDir)">
 			<Output TaskParameter="ExitCode" PropertyName="MkDocsInstallExitCode" />
 		</Exec>
 		<Error Condition="'$(MkDocsInstallExitCode)' != '0'" Text="Failed to install mkdocs. Exit code: $(MkDocsInstallExitCode)" />
@@ -144,7 +145,6 @@
 	<Target Name="INSTALL_PYTHON_TEST_DEPS">
 		<Message Text="Installing Python test dependencies for atools" Importance="high" />
 		<PropertyGroup>
-			<PythonExe>$(PythonPath)\python.exe</PythonExe>
 			<PipExe Condition="'$(PipPath)' != ''">$(PipPath)</PipExe>
 			<!-- Fallback to python -m pip if PipPath not set -->
 			<PipExe Condition="'$(PipExe)' == ''">&quot;$(PythonExe)&quot; -m pip</PipExe>
@@ -167,7 +167,6 @@
 	<Target Name="RUN_PYTESTS_VERBOSE" DependsOnTargets="INSTALL_PYTHON_TEST_DEPS" >
 		<Message Text="Running Python pytest for atools (verbose)" Importance="high" />
 		<PropertyGroup>
-			<PythonExe>$(PythonPath)\python.exe</PythonExe>
 			<!-- Allow overriding test path via TEST_PATH -->
 			<TestPath Condition="'$(TestPath)' == ''">$(SolutionDir)\atools\tests</TestPath>
 		</PropertyGroup>
@@ -183,7 +182,6 @@
 	<Target Name="RUN_SDO_TESTS" DependsOnTargets="INSTALL_PYTHON_TEST_DEPS">
 		<Message Text="Running SDO tests" Importance="high" />
 		<PropertyGroup>
-			<PythonExe>$(PythonPath)\python.exe</PythonExe>
 			<!-- Allow overriding test path via TEST_PATH -->
 			<SdoTestPath Condition="'$(SdoTestPath)' == ''">$(SolutionDir)\atools\tests</SdoTestPath>
 		</PropertyGroup>
@@ -513,35 +511,6 @@
 		<Message Text=">== NB_TEST_DIAG_ALL completed" Importance="high" />
 	</Target>
 
-	<!-- Clean up the project and artifacts folder -->
-	<Target Name="CLEAN">
-		<Message Text="Cleaning repository: removing bin/, obj/, Debug/, Release/, TestResults/, CoverageReport/ and artifacts (safe mode)" Importance="high" />
-
-		<!-- Safety: ensure SolutionDir is set to avoid accidental root-level deletes -->
-		<PropertyGroup>
-			<_SolutionDir>$(SolutionDir)</_SolutionDir>
-		</PropertyGroup>
-
-		<Error Condition="'$(_SolutionDir)' == ''" Text="CLEAN aborted: $(SolutionDir) is not set. This prevents unsafe deletes." />
-
-		<!-- Collect directories to remove (MSBuild supports wildcards in Item Include) -->
-		<ItemGroup>
-			<DirectoriesToRemove Include="$(_SolutionDir)**\bin;
-										$(_SolutionDir)**\obj;
-										$(_SolutionDir)Debug;
-										$(_SolutionDir)Release;
-										$(_SolutionDir)TestResults;
-										$(_SolutionDir)CoverageReport;
-										c:\debug;
-										c:\release;
-										$(_SolutionDir)artifacts" />
-		</ItemGroup>
-
-		<Message Text="Directories to remove: @(DirectoriesToRemove)" Importance="high" />
-		<RemoveDir Directories="@(DirectoriesToRemove)" />
-
-		<Message Text="Cleaning complete." Importance="high" />
-	</Target>
 
 	<!-- Create a stage package for testing -->
 	<Target Name="STAGE" DependsOnTargets="STAGE_NEW" >

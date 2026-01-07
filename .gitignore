@@ -420,3 +420,4 @@ BuildToolsTest/
 
 # Documentation files that should not be tracked
 docs/todo.md
+/build-errors.txt

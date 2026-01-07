@@ -1,10 +1,3 @@
-- [Usage](#usage)
-- [nbuild.targets](#nbuildtargets)
-- [common.targets](#commontargets)
-- [Examples](#examples)
----
-
-
 # Nbuild (`nb.exe`)
 
 `Nbuild` (`nb.exe`) is a powerful command-line utility for .NET developers. It wraps [MSBuild](https://docs.microsoft.com/en-us/visualstudio/msbuild/msbuild) to simplify building solutions, running custom targets, and managing your development toolchain.
@@ -15,6 +8,7 @@
 - Download tools and assets for your environment
 - Integrate with Git for tagging, branching, and release automation
 - Automate GitHub releases and asset downloads
+- **Global options** (`--dry-run`, `--verbose`) available for all commands
 
 > **Note:** `nb.exe` expects the [nbuild.targets](#nbuildtargets) file to be present in your solution folder for build-related commands.
 
@@ -28,8 +22,10 @@ Usage:
   nb [command] [options] [[--] <additional arguments>...]
 
 Options:
-  --version       Show version information
+  --dry-run       Perform a dry run: show actions but do not perform side effects
+  --verbose       Verbose output
   -?, -h, --help  Show help and usage information
+  --version       Show version information
 
 Commands:
   install                Install tools and applications specified in the manifest file.
@@ -38,86 +34,24 @@ Commands:
                          Use this command to audit, compare, or document the state of your development environment.
   download               Download tools and applications specified in the manifest file.
   path                   Display each segment of the effective PATH environment variable on a separate line, with duplicates removed. Shows the complete PATH that processes actually use (Machine + User PATH combined).
-
-                         Optional option:
-                           --verbose   Verbose output
-
-                         Example:
-                           nb path --verbose
-  git_info               Displays the current git information for the local repository, including branch, and latest
-                         tag.
-
-                         Optional option:
-                           --verbose   Verbose output
-
-                         Example:
-                           nb git_info --verbose
+  git_info               Displays the current git information for the local repository, including branch, and latest tag.
   git_settag             Sets a git tag in the local repository.
-
-                         Required option:
-                           --tag   The tag to set (e.g., 1.24.33)
-                         Optional option:
-                           --verbose   Verbose output
-
-                         Example:
-                           nb git_settag --tag 1.24.33 --verbose
-  auto_tag, git_autotag  Automatically sets the next git tag based on build type.
-
-                         Required option:
-                           --buildtype   Build type (STAGE or PROD)
-                         Optional option:
-                           --verbose   Verbose output
-
-                         Example:
-                           nb git_autotag --buildtype STAGE --verbose
+  git_autotag            Automatically sets the next git tag based on build type.
   git_push_autotag       Sets the next git tag based on build type and pushes to remote.
-
-                         Required option:
-                           --buildtype   Build type (STAGE or PROD)
-                         Optional option:
-                           --verbose   Verbose output
-
-                         Example:
-                           nb git_push_autotag --buildtype PROD --verbose
   git_branch             Displays the current git branch in the local repository.
-
-                         Optional option:
-                           --verbose   Verbose output
-
-                         Example:
-                           nb git_branch --verbose
   git_clone              Clones a Git repository to a specified path.
-
-                         Required option:
-                           --url   Git repository URL
-                         Optional options:
-                           --path      Path to clone into (default: current directory)
-                           --verbose   Verbose output
-
-                         Example:
-                           nb git_clone --url https://github.com/user/repo --path ./repo --verbose
   git_deletetag          Deletes a git tag from the local repository.
-
-                         Required option:
-                           --tag   The tag to delete (e.g., 1.24.33)
-                         Optional option:
-                           --verbose   Verbose output
-
-                         Example:
-                           nb git_deletetag --tag 1.24.33 --verbose
   release_create         Creates a GitHub release.
+  pre_release_create     Creates a GitHub pre-release.
+  release_download       Downloads a specific asset from a GitHub release.
+  list_release           Lists the latest releases for the specified repository.
+  targets                Displays all available build targets for the current solution or project.
 
-                         Required options:
-                           --repo   Git repository (formats: repoName, userName/repoName, or full GitHub URL)
-                           --tag    Tag to use for the release (e.g., 1.24.33)
-                           --branch Branch name to release from (e.g., main)
-                           --file   Asset file name (full path required)
-                         Optional option:
-                           --verbose   Verbose output
+Additional Arguments:
+  Arguments passed to the application that is being run.
+```
 
-                         Examples:
-                           nb release_create --repo user/repo --tag 1.24.33 --branch main --file C:\path\to\asset.zip --verbose
-                           nb release_create --repo https://github.com/user/repo --tag 1.24.33 --branch main --file ./asset.zip --verbose
+## Dry-run contract
   pre_release_create     Creates a GitHub pre-release.
 
                          Required options:
@@ -125,42 +59,31 @@ Commands:
                            --tag    Tag to use for the pre-release (e.g., 1.24.33)
                            --branch Branch name to release from (e.g., main)
                            --file   Asset file name (full path required)
-                         Optional option:
-                           --verbose   Verbose output
 
-                         Example:
-                           nb pre_release_create --repo user/repo --tag 1.24.33 --branch main --file C:\path\to\asset.zip --verbose
+Example:
+                           nb pre_release_create --repo user/repo --tag 1.24.33 --branch main --file C:\path\to\asset.zip
   release_download       Downloads a specific asset from a GitHub release.
 
                          Required options:
                            --repo   Git repository (formats: repoName, userName/repoName, or full GitHub URL)
                            --tag    Tag to use for the release (e.g., 1.24.33)
-                         Optional option:
                            --path   Path to download asset to (default: current directory)
-                           --verbose   Verbose output
 
-                         Example:
-                           nb release_download --repo user/repo --tag 1.24.33 --path C:\downloads --verbose
+Example:
+                           nb release_download --repo user/repo --tag 1.24.33 --path C:\downloads
   list_release           Lists the latest 3 releases for the specified repository, and the latest pre-release if newer.
 
                          Required option:
                            --repo   Git repository (formats: repoName, userName/repoName, or full GitHub URL)
-                         Optional option:
-                           --verbose   Verbose output
 
-                         Example:
-                           nb list_release --repo user/repo --verbose
+Example:
+                           nb list_release --repo user/repo
   targets                Displays all available build targets for the current solution or project.
 
-                         Optional option:
-                           --verbose   Verbose output
-
-                         You can run any listed target directly using nb.exe.
+You can run any listed target directly using nb.exe.
                          Example: If 'core' is listed, you can run:
                            nb core
 
-                         To list all targets:
-                           nb targets --verbose
 Additional Arguments:
   Arguments passed to the application that is being run.
 ```
@@ -187,12 +110,11 @@ Key points:
 
 ---
 
-## nbuild.targets
+## nbuild.targets {#nbuildtargets}
 See [`nbuild.targets`](https://github.com/naz-hage/ntools/blob/main/Nbuild/resources/nbuild.targets) for more information and checkout other targets in [`Nbuild/resources`](https://github.com/naz-hage/ntools/blob/main/Nbuild/resources).
                     
-### common.targets
+### common.targets {#commontargets}
 - The `common.targets` file includes all the defaults targets needed to build, test and deploy a solution.  The `common.targets` file is located in the `$(ProgramFiles)\Nbuild` folder.  The `nbuild.targets` file in the solution folder imports the `common.targets` file
-
 
 Below is a list of common targets defined in the `common.targets` file:
 
@@ -217,11 +139,9 @@ Below is a list of common targets defined in the `common.targets` file:
 | SingleProject       | Example how to build a single project |
 | HandleError         | Error handling placeholder |
 
-
 ---
 
 ## Examples
-
 
 Below are practical examples for using `nb.exe`. These examples assume you are running in a PowerShell terminal.
 
@@ -253,7 +173,7 @@ Downloads tools and applications specified in the manifest file.
 ### 5. Display Path Segments
 ```cmd
 nb.exe path
-nb.exe path --verbose
+nb.exe path
 ```
 Displays each segment of the effective PATH environment variable on a separate line, with duplicates removed. Shows the complete PATH that processes actually use (Machine + User PATH combined). Use `--verbose` for additional output.
 
@@ -289,7 +209,7 @@ Displays the current git branch in the local repository.
 
 ### 11. Clone a Git Repository
 ```cmd
-nb.exe git_clone --url https://github.com/example/repo --path C:\Projects --verbose
+nb.exe git_clone --url https://github.com/example/repo --path C:\Projects
 ```
 Clones the specified git repository into the specified path. Use `--verbose` for detailed output.
 
@@ -331,7 +251,7 @@ Downloads an asset using the full GitHub repository URL.
 
 ### 18. List Latest Releases
 ```cmd
-nb.exe list_release --repo https://github.com/userName/my-repo --verbose
+nb.exe list_release --repo https://github.com/userName/my-repo
 ```
 Lists the latest 3 releases and the newest pre-release (if newer than the latest release). Use `--verbose` for detailed output.
 
@@ -348,3 +268,4 @@ nb.exe core
 Runs the target named `core` if it is listed by `nb targets`.
 
 ---
+
