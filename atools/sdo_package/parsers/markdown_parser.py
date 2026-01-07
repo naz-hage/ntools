@@ -60,6 +60,7 @@ class MarkdownParser:
         # State tracking
         in_acceptance_criteria = False
         in_repro_steps = False
+        description_complete = False
         description_lines = []
         repro_lines = []
 
@@ -121,6 +122,24 @@ class MarkdownParser:
                 in_acceptance_criteria = True
                 continue
 
+            # Check for sections that should stop description collection
+            if line.lower() in [
+                "## implementation details",
+                "## dependencies",
+                "## testing requirements",
+                "## definition of done",
+                "## effort estimate",
+                "## implementation details:",
+                "## dependencies:",
+                "## testing requirements:",
+                "## definition of done:",
+                "## effort estimate:",
+            ]:
+                # Stop collecting description when we hit implementation details or other sections
+                description_complete = True
+                in_acceptance_criteria = False
+                continue
+
             # Extract repro steps
             if in_repro_steps:
                 if line.startswith("**") or line.startswith("##"):
@@ -154,7 +173,7 @@ class MarkdownParser:
                     continue
 
             # Add to description if not in special sections
-            if not in_acceptance_criteria and not line.startswith("#"):
+            if not in_acceptance_criteria and not description_complete and not line.startswith("#") and not line.startswith("**Parent PBI:**"):
                 description_lines.append(line)
 
         # Join description lines
