@@ -99,6 +99,23 @@ class MarkdownParser:
                 result["title"] = title
                 continue
 
+            # Check for sections that should stop description collection
+            section_names = {
+                "## implementation details",
+                "## dependencies", 
+                "## testing requirements",
+                "## definition of done",
+                "## effort estimate",
+            }
+            section_names_with_colon = {name + ":" for name in section_names}
+            all_section_names = section_names | section_names_with_colon
+            
+            if line.lower() in all_section_names:
+                # Stop collecting description when we hit implementation details or other sections
+                description_complete = True
+                in_acceptance_criteria = False
+                continue
+
             # Extract metadata (## Key: Value format)
             metadata_match = re.match(r"^##\s*([^:]+):\s*(.*)$", line)
             if metadata_match:
@@ -121,27 +138,6 @@ class MarkdownParser:
             ]:
                 in_acceptance_criteria = True
                 continue
-
-            # Check for sections that should stop description collection
-            if line.lower() in [
-                "## implementation details",
-                "## dependencies",
-                "## testing requirements",
-                "## definition of done",
-                "## effort estimate",
-                "## implementation details:",
-                "## dependencies:",
-                "## testing requirements:",
-                "## definition of done:",
-                "## effort estimate:",
-            ]:
-                # Stop collecting description when we hit implementation details or other sections
-                description_complete = True
-                in_acceptance_criteria = False
-                continue
-
-            # Extract repro steps
-            if in_repro_steps:
                 if line.startswith("**") or line.startswith("##"):
                     in_repro_steps = False
                 else:
@@ -173,7 +169,11 @@ class MarkdownParser:
                     continue
 
             # Add to description if not in special sections
-            if not in_acceptance_criteria and not description_complete and not line.startswith("#") and not line.startswith("**Parent PBI:**"):
+            is_not_special_section = not in_acceptance_criteria and not description_complete
+            is_not_heading = not line.startswith("#")
+            is_not_parent_pbi = not line.lower().startswith("**parent pbi:**")
+            
+            if is_not_special_section and is_not_heading and is_not_parent_pbi:
                 description_lines.append(line)
 
         # Join description lines

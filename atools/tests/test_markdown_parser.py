@@ -257,6 +257,125 @@ Some issue description.
         assert result is None
 
 
+class TestMarkdownParserDescriptionCollection:
+    """Test description collection behavior with section boundaries."""
+
+    def setup_method(self):
+        """Set up test fixtures."""
+        self.parser = MarkdownParser(verbose=True)
+
+    def test_description_stops_at_implementation_details(self):
+        """Test that description collection stops at implementation details section."""
+        markdown_content = """# Task: Test Description Collection
+
+## Description
+This is the main description.
+It should include this line.
+
+## Implementation Details
+This should not be in description.
+"""
+        result = self.parser.parse_content(markdown_content)
+        
+        assert "This is the main description." in result["description"]
+        assert "It should include this line." in result["description"]
+        assert "This should not be in description." not in result["description"]
+
+    def test_description_stops_at_implementation_details_with_colon(self):
+        """Test that description collection stops at implementation details section with colon."""
+        markdown_content = """# Task: Test Description Collection
+
+## Description
+This is the main description.
+
+## Implementation Details:
+This should not be in description.
+"""
+        result = self.parser.parse_content(markdown_content)
+        
+        assert "This is the main description." in result["description"]
+        assert "This should not be in description." not in result["description"]
+
+    def test_description_stops_at_dependencies(self):
+        """Test that description collection stops at dependencies section."""
+        markdown_content = """# Task: Test Description Collection
+
+## Description
+This is the main description.
+
+## Dependencies
+This should not be in description.
+"""
+        result = self.parser.parse_content(markdown_content)
+        
+        assert "This is the main description." in result["description"]
+        assert "This should not be in description." not in result["description"]
+
+    def test_description_stops_at_testing_requirements(self):
+        """Test that description collection stops at testing requirements section."""
+        markdown_content = """# Task: Test Description Collection
+
+## Description
+This is the main description.
+
+## Testing Requirements
+This should not be in description.
+"""
+        result = self.parser.parse_content(markdown_content)
+        
+        assert "This is the main description." in result["description"]
+        assert "This should not be in description." not in result["description"]
+
+    def test_description_stops_at_definition_of_done(self):
+        """Test that description collection stops at definition of done section."""
+        markdown_content = """# Task: Test Description Collection
+
+## Description
+This is the main description.
+
+## Definition of Done
+This should not be in description.
+"""
+        result = self.parser.parse_content(markdown_content)
+        
+        assert "This is the main description." in result["description"]
+        assert "This should not be in description." not in result["description"]
+
+    def test_description_stops_at_effort_estimate(self):
+        """Test that description collection stops at effort estimate section."""
+        markdown_content = """# Task: Test Description Collection
+
+## Description
+This is the main description.
+
+## Effort Estimate
+This should not be in description.
+"""
+        result = self.parser.parse_content(markdown_content)
+        
+        assert "This is the main description." in result["description"]
+        assert "This should not be in description." not in result["description"]
+
+    def test_description_excludes_parent_pbi_case_insensitive(self):
+        """Test that description excludes Parent PBI lines regardless of case."""
+        markdown_content = """# Task: Test Description Collection
+
+## Description
+This is the main description.
+**Parent PBI:** 123
+**parent pbi:** 456
+**PARENT PBI:** 789
+This should be included.
+"""
+        result = self.parser.parse_content(markdown_content)
+        
+        assert "This is the main description." in result["description"]
+        assert "This should be included." in result["description"]
+        assert "**Parent PBI:** 123" not in result["description"]
+        assert "**parent pbi:** 456" not in result["description"]
+        assert "**PARENT PBI:** 789" not in result["description"]
+
+
 class TestMarkdownParserValidation:
     """Test markdown validation functionality."""
 
