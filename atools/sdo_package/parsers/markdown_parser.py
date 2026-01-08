@@ -138,11 +138,6 @@ class MarkdownParser:
             ]:
                 in_acceptance_criteria = True
                 continue
-                if line.startswith("**") or line.startswith("##"):
-                    in_repro_steps = False
-                else:
-                    repro_lines.append(line)
-                    continue
 
             # Extract acceptance criteria
             if in_acceptance_criteria:
@@ -166,6 +161,14 @@ class MarkdownParser:
                     result["acceptance_criteria"].append(
                         {"text": numbered_match.group(1).strip(), "completed": False}
                     )
+                    continue
+
+            # Handle repro steps
+            if in_repro_steps:
+                if line.startswith("**") or line.startswith("##"):
+                    in_repro_steps = False
+                else:
+                    repro_lines.append(line)
                     continue
 
             # Add to description if not in special sections
