@@ -228,21 +228,5 @@ namespace Nbuild.Tests
             // Cleanup
             File.Delete(testFileName);
         }
-
-        [TestMethod()]
-        public void FindMsBuildPathTest()
-        {
-            // Arrange
-            var buildStarter = new BuildStarter();
-
-            // Act
-            var msBuildPath = BuildStarter.FindMsBuild64BitPath(verbose: true);
-
-            Console.WriteLine($"MSBuild Path: {msBuildPath}");
-
-            // Assert not null and contains amd64
-            Assert.IsNotNull(msBuildPath);
-            Assert.IsTrue(msBuildPath.Contains("amd64"));
-        }
     }
 }

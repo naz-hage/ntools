@@ -14,7 +14,6 @@ public class BuildStarter
     private const string NbuildBatchFile = "Nbuild.bat";
     private const string ResourceLocation = "Nbuild.resources.nbuild.bat";
     private const string TargetsMd = "targets.md";
-    private const string MsbuildExe = "msbuild.exe";
 
     /// <summary>
     /// Builds the specified target using nbuild.
@@ -54,38 +53,40 @@ public class BuildStarter
             Console.WriteLine($"==> {cmd}");
         }
 
-        //  Get location of msbuild.exe
-        //var msbuildPath = ShellUtility.GetFullPathOfFile(MsbuildExe);
-        var msbuildPath = FindMsBuild64BitPath();
-
-        if (verbose)
+        try
         {
-            Console.WriteLine($"MSBuild Path: {msbuildPath}");
-        }
-
-        var process = new Process
-        {
-            StartInfo = new ProcessStartInfo
+            // Find dotnet executable path
+            string dotnetPath = GetDotnetPath();
+            
+            // Use dotnet msbuild
+            var process = new Process
             {
-                WorkingDirectory = Path.GetDirectoryName(msbuildPath),
-                FileName = MsbuildExe,
-                Arguments = cmd,
-                RedirectStandardOutput = false,
-                RedirectStandardError = false,
-                UseShellExecute = false,
-                CreateNoWindow = false,
+                StartInfo = new ProcessStartInfo
+                {
+                    WorkingDirectory = Environment.CurrentDirectory,
+                    FileName = dotnetPath,
+                    Arguments = $"msbuild {cmd}",
+                    RedirectStandardOutput = false,
+                    RedirectStandardError = false,
+                    UseShellExecute = false,
+                    CreateNoWindow = false,
+                }
+            };
+
+            if (verbose)
+            {
+                Console.WriteLine($"==> {process.StartInfo.FileName} {process.StartInfo.Arguments}");
             }
-        };
 
-        if (verbose)
-        {
-            Console.WriteLine($"==> {process.StartInfo.FileName} {process.StartInfo.Arguments}");
+            var result = process.LockStart(verbose);
+
+            DisplayLog(5);
+            return result;
         }
-
-        var result = process.LockStart(verbose);
-
-        DisplayLog(5);
-        return result;
+        catch (Exception ex)
+        {
+            return ResultHelper.Fail(-1, ex.Message);
+        }
     }
 
     // <summary>
@@ -288,6 +289,46 @@ public class BuildStarter
     }
 
     /// <summary>
+    /// Retrieves the path to the dotnet executable.
+    /// </summary>
+    /// <returns>The path to the dotnet executable.</returns>
+    private static string GetDotnetPath()
+    {
+        // Try to find dotnet in PATH
+        var path = Environment.GetEnvironmentVariable("PATH");
+        if (path != null)
+        {
+            var paths = path.Split(Path.PathSeparator);
+            foreach (var p in paths)
+            {
+                var dotnetPath = Path.Combine(p, "dotnet.exe");
+                if (File.Exists(dotnetPath))
+                {
+                    return dotnetPath;
+                }
+                dotnetPath = Path.Combine(p, "dotnet");
+                if (File.Exists(dotnetPath))
+                {
+                    return dotnetPath;
+                }
+            }
+        }
+
+        // Fallback to common installation location
+        var fallbackPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "dotnet", "dotnet.exe");
+        if (File.Exists(fallbackPath))
+        {
+            return fallbackPath;
+        }
+
+        // If not found, throw an exception with actionable message
+        throw new FileNotFoundException(
+            "The dotnet executable was not found. Please ensure that the .NET SDK is installed and dotnet.exe is in your PATH.\n" +
+            "To install the .NET SDK, visit: https://dotnet.microsoft.com/download\n" +
+            "After installation, restart your command prompt and try again.");
+    }
+
+    /// <summary>
     /// Reads the common.targets file and returns the specified attributes, with optional replacements for placeholders.
     /// </summary>
     /// <param name="filePath">The path to the common.targets file.</param>
@@ -328,49 +369,6 @@ public class BuildStarter
                 yield return attributeValue;
             }
         }
-    }
-
-    /// <summary>
-    /// Retrieves the path to the 64-bit MSBuild executable.
-    /// </summary>
-    /// <returns>The path to the 64-bit MSBuild executable, or null if not found.</returns>
-    public static string? FindMsBuild64BitPath(bool verbose = false)
-    {
-        // Define the directories where msbuild.exe might be located
-        var possibleDirectories = new[]
-        {
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin"),
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Microsoft Visual Studio\\2022\\Professional\\MSBuild\\Current\\Bin"),
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Microsoft Visual Studio\\2022\\Enterprise\\MSBuild\\Current\\Bin"),
-        };
-
-        if (verbose)
-        {
-            Console.WriteLine("Searching for msbuild.exe in the following directories:");
-            foreach (var dir in possibleDirectories)
-            {
-                Console.WriteLine(dir);
-            }
-        }
-
-        // Search for msbuild.exe in the directories and their subdirectories
-        var msbuildPaths = possibleDirectories
-            .Where(Directory.Exists)
-            .SelectMany(dir => Directory.EnumerateFiles(dir, "msbuild.exe", SearchOption.AllDirectories))
-            .Where(path => !path.Contains("Preview") && path.Contains("amd64"))
-            .ToList();
-
-        if (verbose)
-        {
-            Console.WriteLine("Found the following msbuild.exe paths:");
-            foreach (var path in msbuildPaths)
-            {
-                Console.WriteLine(path);
-            }
-        }
-
-        // Return the first path found, or null if no path was found
-        return msbuildPaths.FirstOrDefault();
     }
 
     /// <summary>
