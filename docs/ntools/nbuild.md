@@ -1,6 +1,6 @@
 # Nbuild (`nb.exe`)
 
-`Nbuild` (`nb.exe`) is a powerful command-line utility for .NET developers. It wraps [MSBuild](https://docs.microsoft.com/en-us/visualstudio/msbuild/msbuild) to simplify building solutions, running custom targets, and managing your development toolchain.
+`Nbuild` (`nb.exe`) is a powerful command-line utility for .NET developers. It wraps the [.NET SDK](https://dotnet.microsoft.com/download) to simplify building solutions, running custom targets, and managing your development toolchain.
 
 **Key Features:**
 - Build and run custom targets with a single command
@@ -10,7 +10,24 @@
 - Automate GitHub releases and asset downloads
 - **Global options** (`--dry-run`, `--verbose`) available for all commands
 
+## Why Use nb.exe?
+
+While you could run `dotnet build` or `dotnet msbuild` directly, `nb.exe` provides practical benefits for .NET development workflows:
+
+- **Simplified commands**: Instead of complex MSBuild parameters, use simple commands like `nb solution` or `nb test`
+- **Environment awareness**: Automatically finds dotnet.exe, manages versions, and handles dependencies
+- **Git integration**: Seamlessly works with git tags for versioning and release management
+- **Cross-project consistency**: Standardized build processes that work the same way across different projects
+- **DevOps automation**: Streamlined workflows for testing, packaging, and deployment
+
+For example, `nb solution` doesn't just run `dotnet build`—it ensures dependencies are restored, applies proper versioning from git tags, and uses consistent build configurations.
+
 > **Note:** `nb.exe` expects the [nbuild.targets](#nbuildtargets) file to be present in your solution folder for build-related commands.
+
+## Prerequisites
+
+- **.NET SDK**: The .NET SDK must be installed and available in your PATH. If not found, `nb.exe` will display an error message with installation instructions.
+- **Git**: Git for Windows is required for Git-related operations.
 
 ## Usage
 

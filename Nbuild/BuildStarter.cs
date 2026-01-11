@@ -58,6 +58,12 @@ public class BuildStarter
         //var msbuildPath = ShellUtility.GetFullPathOfFile(MsbuildExe);
         var msbuildPath = GetDotnetPath();
 
+        if (msbuildPath == null)
+        {
+            Console.WriteLine("Error: dotnet.exe not found. Please install the .NET SDK from https://dotnet.microsoft.com/download");
+            return ResultHelper.Fail(-1, "dotnet.exe not found");
+        }
+
         if (verbose)
         {
             Console.WriteLine($"MSBuild Path: {msbuildPath}");
