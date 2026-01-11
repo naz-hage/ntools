@@ -54,7 +54,7 @@ public class BuildStarter
             Console.WriteLine($"==> {cmd}");
         }
 
-        //  Get location of msbuild.exe
+        //  Get location of dotnet.exe
         //var msbuildPath = ShellUtility.GetFullPathOfFile(MsbuildExe);
         var msbuildPath = GetDotnetPath();
 
@@ -68,7 +68,7 @@ public class BuildStarter
             StartInfo = new ProcessStartInfo
             {
                 WorkingDirectory = Environment.CurrentDirectory,
-                FileName = "dotnet",
+                FileName = msbuildPath,
                 Arguments = $"msbuild {cmd}",
                 RedirectStandardOutput = false,
                 RedirectStandardError = false,
