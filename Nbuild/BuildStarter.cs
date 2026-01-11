@@ -54,9 +54,15 @@ public class BuildStarter
             Console.WriteLine($"==> {cmd}");
         }
 
-        //  Get location of msbuild.exe
+        //  Get location of dotnet.exe
         //var msbuildPath = ShellUtility.GetFullPathOfFile(MsbuildExe);
-        var msbuildPath = FindMsBuild64BitPath();
+        var msbuildPath = GetDotnetPath();
+
+        if (msbuildPath == null)
+        {
+            Console.WriteLine("Error: dotnet.exe not found. Please install the .NET SDK from https://dotnet.microsoft.com/download");
+            return ResultHelper.Fail(-1, "dotnet.exe not found");
+        }
 
         if (verbose)
         {
@@ -67,9 +73,9 @@ public class BuildStarter
         {
             StartInfo = new ProcessStartInfo
             {
-                WorkingDirectory = Path.GetDirectoryName(msbuildPath),
-                FileName = MsbuildExe,
-                Arguments = cmd,
+                WorkingDirectory = Environment.CurrentDirectory,
+                FileName = msbuildPath,
+                Arguments = $"msbuild {cmd}",
                 RedirectStandardOutput = false,
                 RedirectStandardError = false,
                 UseShellExecute = false,
@@ -371,6 +377,61 @@ public class BuildStarter
 
         // Return the first path found, or null if no path was found
         return msbuildPaths.FirstOrDefault();
+    }
+
+    /// <summary>
+    /// Retrieves the path to the dotnet executable.
+    /// </summary>
+    /// <returns>The path to the dotnet executable, or null if not found.</returns>
+    public static string? GetDotnetPath(bool verbose = false)
+    {
+        // Try to find dotnet in PATH
+        var dotnetPath = ShellUtility.GetFullPathOfFile("dotnet.exe");
+        if (dotnetPath != null)
+        {
+            if (verbose)
+            {
+                Console.WriteLine($"Found dotnet at: {dotnetPath}");
+            }
+            return dotnetPath;
+        }
+
+        // Define common directories where dotnet might be installed
+        var possibleDirectories = new[]
+        {
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "dotnet"),
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "dotnet"),
+            Path.Combine(Environment.GetEnvironmentVariable("USERPROFILE") ?? "", ".dotnet"),
+            Path.Combine(Environment.GetEnvironmentVariable("LOCALAPPDATA") ?? "", "Microsoft", "dotnet"),
+        };
+
+        if (verbose)
+        {
+            Console.WriteLine("Searching for dotnet.exe in the following directories:");
+            foreach (var dir in possibleDirectories)
+            {
+                Console.WriteLine(dir);
+            }
+        }
+
+        // Search for dotnet.exe in the directories
+        var dotnetPaths = possibleDirectories
+            .Where(Directory.Exists)
+            .Select(dir => Path.Combine(dir, "dotnet.exe"))
+            .Where(File.Exists)
+            .ToList();
+
+        if (verbose)
+        {
+            Console.WriteLine("Found the following dotnet.exe paths:");
+            foreach (var path in dotnetPaths)
+            {
+                Console.WriteLine(path);
+            }
+        }
+
+        // Return the first path found, or null if no path was found
+        return dotnetPaths.FirstOrDefault();
     }
 
     /// <summary>

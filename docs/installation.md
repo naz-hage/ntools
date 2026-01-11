@@ -1,5 +1,5 @@
 
-To get started with `ntools`, you need to install the latest version of [64-bit Git for Windows](https://git-scm.com/download/win) on your machine, then follow these steps:
+To get started with `ntools`, you need to install the latest version of [64-bit Git for Windows](https://git-scm.com/download/win) and the [.NET SDK](https://dotnet.microsoft.com/download) on your machine, then follow these steps:
 
 - Open a PowerShell in administrative mode.  Assume c:\source as directory `%MainDirectory%` which will be used through this document.
 - Clone this repository to your local machine from the `%MainDirectory%` folder.
@@ -66,7 +66,7 @@ sdo --help
 
 | Component | Development Setup | NTools Only |
 |-----------|------------------|-------------|
-| .NET Runtime | ✅ | ❌ |
+| .NET SDK | ✅ | ❌ |
 | NTools Core | ✅ | ✅ |
 | Development Apps | ✅ | ❌ |
 | Cross-Platform | ⚠️ (Windows only) | ✅ |

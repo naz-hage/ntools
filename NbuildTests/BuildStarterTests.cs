@@ -230,19 +230,19 @@ namespace Nbuild.Tests
         }
 
         [TestMethod()]
-        public void FindMsBuildPathTest()
+        public void GetDotnetPathTest()
         {
             // Arrange
             var buildStarter = new BuildStarter();
 
             // Act
-            var msBuildPath = BuildStarter.FindMsBuild64BitPath(verbose: true);
+            var dotnetPath = BuildStarter.GetDotnetPath(verbose: true);
 
-            Console.WriteLine($"MSBuild Path: {msBuildPath}");
+            Console.WriteLine($"Dotnet Path: {dotnetPath}");
 
-            // Assert not null and contains amd64
-            Assert.IsNotNull(msBuildPath);
-            Assert.IsTrue(msBuildPath.Contains("amd64"));
+            // Assert not null and ends with dotnet.exe
+            Assert.IsNotNull(dotnetPath);
+            Assert.IsTrue(dotnetPath.EndsWith("dotnet.exe"));
         }
     }
 }

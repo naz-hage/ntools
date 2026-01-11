@@ -4,7 +4,7 @@ A powerful command-line utility for .NET developers, providing build automation,
 
 ## Key Features
 
-- **Build & Test**: Comprehensive build system with MSBuild integration and extensive testing support
+- **Build & Test**: Comprehensive build system with .NET SDK integration and extensive testing support
 - **Git Operations**: Complete Git workflow automation including tagging, branching, and repository cloning
 - **GitHub Integration**: Automated release creation and asset management
 - **Global Options**: `--dry-run` and `--verbose` options available across all commands
@@ -13,6 +13,7 @@ A powerful command-line utility for .NET developers, providing build automation,
 
 ## Recent Updates
 
+- **.NET SDK Integration**: Updated nb.exe to use .NET SDK instead of direct MSBuild dependency with automatic dotnet.exe detection
 - **System.CommandLine 2.0.1**: Upgraded to stable CLI framework with global option support
 - **Enhanced Testing**: Added granular unit testing targets for efficient test execution
 - **Git Clone Support**: New command for repository cloning operations
