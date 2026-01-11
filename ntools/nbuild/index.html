@@ -628,6 +628,24 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#why-use-nbexe" class="md-nav__link">
+    <span class="md-ellipsis">
+      Why Use nb.exe?
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prerequisites
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#usage" class="md-nav__link">
     <span class="md-ellipsis">
       Usage
@@ -1477,7 +1495,7 @@
 
 
 <h1 id="nbuild-nbexe">Nbuild (<code>nb.exe</code>)<a class="headerlink" href="#nbuild-nbexe" title="Anchor link to this section for reference">&para;</a></h1>
-<p><code>Nbuild</code> (<code>nb.exe</code>) is a powerful command-line utility for .NET developers. It wraps <a href="https://docs.microsoft.com/en-us/visualstudio/msbuild/msbuild">MSBuild</a> to simplify building solutions, running custom targets, and managing your development toolchain.</p>
+<p><code>Nbuild</code> (<code>nb.exe</code>) is a powerful command-line utility for .NET developers. It wraps the <a href="https://dotnet.microsoft.com/download">.NET SDK</a> to simplify building solutions, running custom targets, and managing your development toolchain.</p>
 <p><strong>Key Features:</strong>
 - Build and run custom targets with a single command
 - Install, uninstall, and list development tools from a manifest file
@@ -1485,9 +1503,24 @@
 - Integrate with Git for tagging, branching, and release automation
 - Automate GitHub releases and asset downloads
 - <strong>Global options</strong> (<code>--dry-run</code>, <code>--verbose</code>) available for all commands</p>
+<h2 id="why-use-nbexe">Why Use nb.exe?<a class="headerlink" href="#why-use-nbexe" title="Anchor link to this section for reference">&para;</a></h2>
+<p>While you could run <code>dotnet build</code> or <code>dotnet msbuild</code> directly, <code>nb.exe</code> provides practical benefits for .NET development workflows:</p>
+<ul>
+<li><strong>Simplified commands</strong>: Instead of complex MSBuild parameters, use simple commands like <code>nb solution</code> or <code>nb test</code></li>
+<li><strong>Environment awareness</strong>: Automatically finds dotnet.exe, manages versions, and handles dependencies</li>
+<li><strong>Git integration</strong>: Seamlessly works with git tags for versioning and release management</li>
+<li><strong>Cross-project consistency</strong>: Standardized build processes that work the same way across different projects</li>
+<li><strong>DevOps automation</strong>: Streamlined workflows for testing, packaging, and deployment</li>
+</ul>
+<p>For example, <code>nb solution</code> doesn't just run <code>dotnet build</code>—it ensures dependencies are restored, applies proper versioning from git tags, and uses consistent build configurations.</p>
 <blockquote>
 <p><strong>Note:</strong> <code>nb.exe</code> expects the <a href="#nbuildtargets">nbuild.targets</a> file to be present in your solution folder for build-related commands.</p>
 </blockquote>
+<h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Anchor link to this section for reference">&para;</a></h2>
+<ul>
+<li><strong>.NET SDK</strong>: The .NET SDK must be installed and available in your PATH. If not found, <code>nb.exe</code> will display an error message with installation instructions.</li>
+<li><strong>Git</strong>: Git for Windows is required for Git-related operations.</li>
+</ul>
 <h2 id="usage">Usage<a class="headerlink" href="#usage" title="Anchor link to this section for reference">&para;</a></h2>
 <div class="highlight"><pre><span></span><code>Description:
   Nbuild - Build and DevOps Utility
