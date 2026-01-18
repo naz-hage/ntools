@@ -46,7 +46,7 @@ This file provides the installation details for ntools, which is required to man
   "NbuildAppList": [
     {
       "Name": "Ntools",
-      "Version": "1.8.0",
+      "Version": "1.7.0",
       "AppFileName": "$(InstallPath)\\nb.exe",
       "WebDownloadFile": "https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip",
       "DownloadedFile": "$(Version).zip",
