@@ -41,38 +41,6 @@ def _print_header_local(tool_name: str, tool_version: str, start_year: int = 202
 
 _print_header_local(TOOL_NAME, TOOL_VERSION)
 
-def update_sdo_version(version: str, pyproject_path: Path = None) -> None:
-    """Update the version in pyproject.toml."""
-    if pyproject_path is None:
-        pyproject_path = Path(__file__).parent / "pyproject.toml"
-    if pyproject_path.exists():
-        print(f"Updating SDO version to {version} in pyproject.toml...")
-        try:
-            # Read the current pyproject.toml
-            with open(pyproject_path, 'r', encoding='utf-8') as f:
-                content = f.read()
-            
-            # Update the version in the [project] section
-            version_pattern = r'(^\[project\]$)(.*?)(^version\s*=\s*")([^"]*)(")'
-            
-            def repl(m):
-                return m.group(1) + m.group(2) + m.group(3) + version + m.group(5)
-            
-            if re.search(version_pattern, content, re.MULTILINE | re.DOTALL):
-                updated_content = re.sub(version_pattern, repl, content, flags=re.MULTILINE | re.DOTALL)
-                
-                # Write back the updated content
-                with open(pyproject_path, 'w', encoding='utf-8') as f:
-                    f.write(updated_content)
-                
-                print(f"✓ Updated SDO version to {version}")
-            else:
-                print("⚠️  Could not find version field in pyproject.toml")
-        except Exception as e:
-            print(f"⚠️  Failed to update pyproject.toml version: {e}")
-    else:
-        print("pyproject.toml not found, skipping version update")
-
 def parse_args():
     parser = argparse.ArgumentParser(description="Install NTools from release ZIP (cross-platform)")
     parser.add_argument('--version', help='Release version to install (e.g. 1.32.0)')
@@ -305,9 +273,6 @@ def main():
         print("Install complete and PATH updated.")
     else:
         print("Install complete. Please ensure the deployment path is on PATH to use ntools.")
-    
-    # Update SDO version in pyproject.toml if it exists
-    update_sdo_version(args.version)
     
     # Install SDO after successful NTools installation
     print("\n" + "="*50)
