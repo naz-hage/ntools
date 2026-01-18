@@ -266,6 +266,11 @@ def main():
         print(f"Refusing to remove deploy path: {ex}")
         return 3
 
+    # Install NTools
+    print("\n" + "="*50)
+    print("Installing NTools (Build Tools)...")
+    print("="*50)
+
     extract_zip(download_dest, deploy_path)
 
     updated = update_path(deploy_path, args.no_path_update)
