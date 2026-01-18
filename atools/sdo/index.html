@@ -2642,14 +2642,14 @@ sdo<span class="w"> </span>pipeline<span class="w"> </span>create<span class="w"
    - Project: <code>your-project</code> 
    - Repository: <code>your-repo</code>
    - Pipeline Name: <code>your-repo</code> (same as repository name)
-   - YAML Path: <code>.azure-pipelines/azurepipeline.yml</code>
+   - YAML Path: <code>.azure-pipelines/azure-pipeline.yml</code>
    - Folder: <code>\</code> (root folder)</p>
 <ol>
 <li><strong>Creates the pipeline</strong> using Azure DevOps REST API</li>
 <li><strong>Links to existing YAML file</strong> in your repository</li>
 </ol>
 <p><strong>Prerequisites:</strong>
-- Repository must contain a pipeline YAML file at <code>.azure-pipelines/azurepipeline.yml</code>
+- Repository must contain a pipeline YAML file at <code>.azure-pipelines/azure-pipeline.yml</code>
 - <code>AZURE_DEVOPS_PAT</code> environment variable must be set
 - User must have "Edit build pipeline" permissions</p>
 <p><strong>What happens during creation:</strong>
@@ -2658,10 +2658,10 @@ sdo<span class="w"> </span>pipeline<span class="w"> </span>create<span class="w"
    Project: my-project
    Repository: my-app
    Pipeline Name: my-app
-   Pipeline YAML Path: .azure-pipelines/azurepipeline.yml
+   Pipeline YAML Path: .azure-pipelines/azure-pipeline.yml
    Pipeline Folder: \
 
-✅ Pipeline YAML file found: .azure-pipelines/azurepipeline.yml
+✅ Pipeline YAML file found: .azure-pipelines/azure-pipeline.yml
 Creating pipeline &#39;my-app&#39;...
 ✅ Pipeline created successfully!
    ID: 12345
@@ -2670,11 +2670,11 @@ Creating pipeline &#39;my-app&#39;...
    Folder: \
 </code></pre></div></p>
 <p><strong>Error if YAML file missing:</strong>
-<div class="highlight"><pre><span></span><code>❌ Pipeline YAML file not found: .azure-pipelines/azurepipeline.yml
+<div class="highlight"><pre><span></span><code>❌ Pipeline YAML file not found: .azure-pipelines/azure-pipeline.yml
 Please create the pipeline YAML file before creating the pipeline definition.
 
 Example YAML file structure:
-  .azure-pipelines/azurepipeline.yml
+  .azure-pipelines/azure-pipeline.yml
   trigger:
   - main
 
@@ -2792,7 +2792,7 @@ Example workflow file (.github/workflows/ci.yml):
 - <code>git@github.com:owner/repository.git</code></p>
 <h3 id="common-issues">Common Issues<a class="headerlink" href="#common-issues" title="Anchor link to this section for reference">&para;</a></h3>
 <p><strong>Azure DevOps Issues:</strong>
-- <strong>"YAML file not found"</strong>: Ensure <code>.azure-pipelines/azurepipeline.yml</code> exists in your repository
+- <strong>"YAML file not found"</strong>: Ensure <code>.azure-pipelines/azure-pipeline.yml</code> exists in your repository
 - <strong>"Access denied"</strong>: Check PAT permissions include "Build (Read &amp; execute)"
 - <strong>"Pipeline already exists"</strong>: Pipeline with that name already exists (command exits successfully)</p>
 <p><strong>GitHub Issues:</strong>
