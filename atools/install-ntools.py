@@ -16,7 +16,9 @@ Usage: run with --help for options
 import argparse
 import json
 import os
+import subprocess
 import sys
+import time
 from pathlib import Path
 from urllib.parse import urlparse
 import requests
@@ -270,6 +272,64 @@ def main():
         print("Install complete and PATH updated.")
     else:
         print("Install complete. Please ensure the deployment path is on PATH to use ntools.")
+
+    # Install SDO after successful NTools installation
+    print("\n" + "="*50)
+    print("Installing SDO (Simple DevOps) tool...")
+    print("="*50)
+
+    # Store original working directory
+    original_cwd = os.getcwd()
+
+    # Switch to deployment path for SDO installation
+    os.chdir(str(deploy_path))
+
+    # Path to install-sdo.py script
+    install_sdo_script = Path(__file__).resolve().parent / "install-sdo.py"
+
+    if not install_sdo_script.exists():
+        print(f"⚠️  SDO installation script not found at: {install_sdo_script}")
+        print("Skipping SDO installation.")
+        os.chdir(original_cwd)
+        return 0
+
+    # First uninstall any existing SDO installation
+    print("Uninstalling any existing SDO installation...")
+    uninstall_cmd = [sys.executable, str(install_sdo_script), "--nbuild-path", ".", "--uninstall"]
+
+    if args.dry_run:
+        print(f"DRY RUN: Would run: {' '.join(uninstall_cmd)}")
+    else:
+        result = subprocess.run(uninstall_cmd, capture_output=True, text=True, timeout=30)
+        if result.returncode == 0:
+            print("✓ Existing SDO installation removed (if it existed)")
+        else:
+            print(f"⚠️  SDO uninstall completed with warnings")
+
+    # Brief pause to ensure uninstall cleanup is complete
+    time.sleep(1.0)
+
+    # Now install SDO
+    print("Installing SDO...")
+    install_cmd = [sys.executable, str(install_sdo_script), "--nbuild-path", "."]
+
+    if args.dry_run:
+        print(f"DRY RUN: Would run: {' '.join(install_cmd)}")
+    else:
+        result = subprocess.run(install_cmd, capture_output=False, text=True, timeout=300)
+        if result.returncode == 0:
+            print("✓ SDO installation completed successfully!")
+        else:
+            print(f"❌ SDO installation failed with return code {result.returncode}")
+            os.chdir(original_cwd)
+            return 4
+
+    # Return to original working directory
+    os.chdir(original_cwd)
+
+    print("\n🎉 NTools and SDO installation completed successfully!")
+    print(f"Both tools are installed in: {deploy_path}")
+    print("You can now use 'ntools' and 'sdo' commands from any location.")
 
     return 0
 
