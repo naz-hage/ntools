@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sdo"
-version = "1.59.0"
+version = "1.59.1"
 description = "Simple DevOps CLI tool for Azure DevOps work item management"
 readme = "README.md"
 license = "MIT"
