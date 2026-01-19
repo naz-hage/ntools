@@ -80,7 +80,7 @@ def get_pipeline_config() -> Optional[dict]:
         # Set default pipeline values based on repository name
         repo_name = platform_info['repository']
         config['pipelineName'] = repo_name
-        config['pipelineYamlPath'] = '.azure-pipelines/azurepipeline.yml'
+        config['pipelineYamlPath'] = '.azure-pipelines/azure-pipeline.yml'
         config['pipelineFolder'] = '\\'
 
         print(f"  Pipeline Name: {config['pipelineName']}")

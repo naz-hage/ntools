@@ -69,7 +69,7 @@ class TestPipelineConfig:
             'repository': 'testrepo',
             'branch': 'main',
             'pipelineName': 'testrepo',
-            'pipelineYamlPath': '.azure-pipelines/azure-pipelines.yml'
+            'pipelineYamlPath': '.azure-pipelines/azure-pipeline.yml'
         }
 
         config = get_pipeline_config()

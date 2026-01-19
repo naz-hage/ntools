@@ -719,7 +719,7 @@ def create(ctx, verbose):
     AZURE DEVOPS:
     - Validates that the YAML file exists locally before creating pipeline definition
     - Creates an actual pipeline definition via REST API
-    - Links to YAML file at '.azure-pipelines/azurepipeline.yml'
+    - Links to YAML file at '.azure-pipelines/azure-pipeline.yml'
     - Pipeline name defaults to repository name
     - Requires: AZURE_DEVOPS_PAT environment variable
     - Requires: YAML file in repository

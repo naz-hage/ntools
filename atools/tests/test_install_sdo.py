@@ -102,3 +102,39 @@ class TestUninstallVenv:
         assert res.returncode == 0
         # Just verify the uninstall completed successfully
         assert "Virtual environment deleted successfully" in res.stdout
+
+
+def test_update_sdo_version(tmp_path):
+    """Test the update_sdo_version function."""
+    import importlib.util
+    from pathlib import Path
+    
+    # Import the install-sdo module
+    script_path = Path(__file__).parent.parent / "install-sdo.py"
+    spec = importlib.util.spec_from_file_location("install_sdo", script_path)
+    install_sdo = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(install_sdo)
+    
+    # Create a sample pyproject.toml
+    pyproject_content = '''[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sdo"
+version = "1.59.0"
+description = "Simple DevOps CLI tool"
+'''
+    pyproject_path = tmp_path / "pyproject.toml"
+    with open(pyproject_path, 'w', encoding='utf-8') as f:
+        f.write(pyproject_content)
+    
+    # Test updating the version
+    new_version = "2.0.0"
+    install_sdo.update_sdo_version(new_version, pyproject_path)
+    
+    # Read back and check
+    with open(pyproject_path, 'r', encoding='utf-8') as f:
+        updated_content = f.read()
+    
+    assert f'version = "{new_version}"' in updated_content

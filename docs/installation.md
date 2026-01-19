@@ -32,9 +32,9 @@ Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
 Install-DevelopmentApps -JsonPath "./dev-setup/apps.json"
 ```
 
-### Option 2: NTools Only Installation (Cross-Platform)
+### Option 2: NTools + SDO Installation (Cross-Platform)
 
-For users who just want to install NTools without the full development environment:
+For users who want to install both NTools and SDO with automatic version synchronization:
 
 ```powershell
 cd ./ntools
@@ -47,14 +47,11 @@ python atools/install-ntools.py --version 1.32.0
 python atools/install-ntools.py --version 1.32.0 --deploy-path "C:\MyTools\Nbuild"
 ```
 
+This will install both NTools and SDO in a single command, with SDO installed in an isolated virtual environment to prevent dependency conflicts.
+
 ## SDO Installation
 
-SDO (Simple DevOps Operations Tool) is installed using an isolated virtual environment to prevent dependency conflicts. After installing NTools, install SDO:
-
-```cmd
-cd "C:\Program Files\NBuild"
-python install-sdo.py
-```
+SDO is now automatically installed alongside NTools when using Option 2 above. The installer creates an isolated virtual environment for SDO to prevent dependency conflicts.
 
 **Verify installation:**
 ```cmd
@@ -64,10 +61,11 @@ sdo --help
 
 ## What Each Option Installs
 
-| Component | Development Setup | NTools Only |
-|-----------|------------------|-------------|
+| Component | Development Setup | NTools + SDO |
+|-----------|------------------|--------------|
 | .NET SDK | ✅ | ❌ |
 | NTools Core | ✅ | ✅ |
+| SDO Tool | ❌ | ✅ |
 | Development Apps | ✅ | ❌ |
 | Cross-Platform | ⚠️ (Windows only) | ✅ |
 | Admin Required | ✅ | ❌ (unless system paths) |

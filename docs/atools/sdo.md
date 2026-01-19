@@ -506,14 +506,14 @@ The `sdo pipeline create` command automatically detects your platform and create
    - Project: `your-project` 
    - Repository: `your-repo`
    - Pipeline Name: `your-repo` (same as repository name)
-   - YAML Path: `.azure-pipelines/azurepipeline.yml`
+   - YAML Path: `.azure-pipelines/azure-pipeline.yml`
    - Folder: `\` (root folder)
 
 3. **Creates the pipeline** using Azure DevOps REST API
 4. **Links to existing YAML file** in your repository
 
 **Prerequisites:**
-- Repository must contain a pipeline YAML file at `.azure-pipelines/azurepipeline.yml`
+- Repository must contain a pipeline YAML file at `.azure-pipelines/azure-pipeline.yml`
 - `AZURE_DEVOPS_PAT` environment variable must be set
 - User must have "Edit build pipeline" permissions
 
@@ -524,10 +524,10 @@ The `sdo pipeline create` command automatically detects your platform and create
    Project: my-project
    Repository: my-app
    Pipeline Name: my-app
-   Pipeline YAML Path: .azure-pipelines/azurepipeline.yml
+   Pipeline YAML Path: .azure-pipelines/azure-pipeline.yml
    Pipeline Folder: \
 
-✅ Pipeline YAML file found: .azure-pipelines/azurepipeline.yml
+✅ Pipeline YAML file found: .azure-pipelines/azure-pipeline.yml
 Creating pipeline 'my-app'...
 ✅ Pipeline created successfully!
    ID: 12345
@@ -538,11 +538,11 @@ Creating pipeline 'my-app'...
 
 **Error if YAML file missing:**
 ```
-❌ Pipeline YAML file not found: .azure-pipelines/azurepipeline.yml
+❌ Pipeline YAML file not found: .azure-pipelines/azure-pipeline.yml
 Please create the pipeline YAML file before creating the pipeline definition.
 
 Example YAML file structure:
-  .azure-pipelines/azurepipeline.yml
+  .azure-pipelines/azure-pipeline.yml
   trigger:
   - main
 
@@ -675,7 +675,7 @@ SDO automatically detects your platform from Git remote URLs:
 ### Common Issues
 
 **Azure DevOps Issues:**
-- **"YAML file not found"**: Ensure `.azure-pipelines/azurepipeline.yml` exists in your repository
+- **"YAML file not found"**: Ensure `.azure-pipelines/azure-pipeline.yml` exists in your repository
 - **"Access denied"**: Check PAT permissions include "Build (Read & execute)"
 - **"Pipeline already exists"**: Pipeline with that name already exists (command exits successfully)
 
