@@ -1203,9 +1203,204 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overview
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#quick-usage" class="md-nav__link">
     <span class="md-ellipsis">
-      Quick usage
+      Quick Usage
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quick Usage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dry-run-recommended-first" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dry Run (Recommended First)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#full-installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Full Installation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#custom-installation-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      Custom Installation Path
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation-process" class="md-nav__link">
+    <span class="md-ellipsis">
+      Installation Process
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Installation Process">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#phase-1-ntools-installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Phase 1: NTools Installation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-2-sdo-installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Phase 2: SDO Installation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#final-result" class="md-nav__link">
+    <span class="md-ellipsis">
+      Final Result
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#command-line-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      Command Line Options
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#safety-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      Safety Features
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#basic-installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Basic Installation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#development-installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Development Installation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#offline-verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      Offline Verification
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#path-not-updated" class="md-nav__link">
+    <span class="md-ellipsis">
+      PATH Not Updated
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#permission-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      Permission Errors
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#network-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Network Issues
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Related Documentation
     </span>
   </a>
   
@@ -1296,15 +1491,136 @@
 
 
 <h1 id="install-ntoolspy">install-ntools.py<a class="headerlink" href="#install-ntoolspy" title="Anchor link to this section for reference">&para;</a></h1>
-<p>A companion Python installer that downloads and extracts an NTools release ZIP.</p>
-<h2 id="quick-usage">Quick usage<a class="headerlink" href="#quick-usage" title="Anchor link to this section for reference">&para;</a></h2>
-<p>Dry-run:</p>
-<div class="highlight"><pre><span></span><code><span class="n">python</span> <span class="n">atools</span><span class="p">/</span><span class="nb">install-ntools</span><span class="p">.</span><span class="n">py</span> <span class="p">-</span><span class="n">-version</span> <span class="n">1</span><span class="p">.</span><span class="n">33</span><span class="p">.</span><span class="n">3</span> <span class="p">-</span><span class="n">-dry-run</span>
+<p>A cross-platform Python installer that downloads, extracts, and installs NTools release ZIPs along with the SDO (Simple DevOps) tool.</p>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Anchor link to this section for reference">&para;</a></h2>
+<p>This script performs a complete installation of both NTools and SDO:</p>
+<ol>
+<li><strong>Downloads</strong> the specified NTools release from GitHub</li>
+<li><strong>Extracts</strong> NTools to the deployment directory</li>
+<li><strong>Updates</strong> system PATH (on Windows)</li>
+<li><strong>Installs</strong> SDO with the same version number</li>
+<li><strong>Configures</strong> SDO for immediate use</li>
+</ol>
+<h2 id="quick-usage">Quick Usage<a class="headerlink" href="#quick-usage" title="Anchor link to this section for reference">&para;</a></h2>
+<h3 id="dry-run-recommended-first">Dry Run (Recommended First)<a class="headerlink" href="#dry-run-recommended-first" title="Anchor link to this section for reference">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>atools/install-ntools.py<span class="w"> </span>--version<span class="w"> </span><span class="m">1</span>.60.0<span class="w"> </span>--dry-run
 </code></pre></div>
-<p>Install:</p>
-<div class="highlight"><pre><span></span><code><span class="n">python</span> <span class="n">atools</span><span class="p">/</span><span class="nb">install-ntools</span><span class="p">.</span><span class="n">py</span> <span class="p">-</span><span class="n">-version</span> <span class="n">1</span><span class="p">.</span><span class="n">33</span><span class="p">.</span><span class="n">3</span>
+<h3 id="full-installation">Full Installation<a class="headerlink" href="#full-installation" title="Anchor link to this section for reference">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>atools/install-ntools.py<span class="w"> </span>--version<span class="w"> </span><span class="m">1</span>.60.0
 </code></pre></div>
-<p>See <code>docs/atools/index.md</code> for more background and notes on defaults and safety checks.</p>
+<h3 id="custom-installation-path">Custom Installation Path<a class="headerlink" href="#custom-installation-path" title="Anchor link to this section for reference">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>atools/install-ntools.py<span class="w"> </span>--version<span class="w"> </span><span class="m">1</span>.60.0<span class="w"> </span>--deploy-path<span class="w"> </span><span class="s2">&quot;/custom/path&quot;</span>
+</code></pre></div>
+<h2 id="installation-process">Installation Process<a class="headerlink" href="#installation-process" title="Anchor link to this section for reference">&para;</a></h2>
+<p>The installer provides clear visual feedback with banners for each phase:</p>
+<h3 id="phase-1-ntools-installation">Phase 1: NTools Installation<a class="headerlink" href="#phase-1-ntools-installation" title="Anchor link to this section for reference">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>==================================================
+Installing NTools (Build Tools)...
+==================================================
+</code></pre></div>
+<ul>
+<li>Downloads the release ZIP from GitHub</li>
+<li>Extracts to deployment directory</li>
+<li>Updates system PATH</li>
+<li>Verifies installation</li>
+</ul>
+<h3 id="phase-2-sdo-installation">Phase 2: SDO Installation<a class="headerlink" href="#phase-2-sdo-installation" title="Anchor link to this section for reference">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>==================================================
+Installing SDO (Simple DevOps) tool...
+==================================================
+</code></pre></div>
+<ul>
+<li>Uninstalls any existing SDO installation</li>
+<li>Installs SDO with matching version</li>
+<li>Updates pyproject.toml version</li>
+<li>Creates launcher scripts</li>
+<li>Tests the installation</li>
+</ul>
+<h3 id="final-result">Final Result<a class="headerlink" href="#final-result" title="Anchor link to this section for reference">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>[SUCCESS] NTools and SDO installation completed successfully!
+Both tools are installed in: C:\Program Files\Nbuild
+You can now use &#39;ntools&#39; and &#39;sdo&#39; commands from any location.
+</code></pre></div>
+<h2 id="command-line-options">Command Line Options<a class="headerlink" href="#command-line-options" title="Anchor link to this section for reference">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--version</code></td>
+<td><strong>Required.</strong> Release version to install (e.g., <code>1.60.0</code>)</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>--dry-run</code></td>
+<td>Show what would be done without making changes</td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td><code>--deploy-path</code></td>
+<td>Custom installation directory</td>
+<td>Platform-specific default</td>
+</tr>
+<tr>
+<td><code>--downloads-dir</code></td>
+<td>Directory for ZIP downloads</td>
+<td>Platform-specific temp directory</td>
+</tr>
+<tr>
+<td><code>--json</code></td>
+<td>Path to ntools.json config file</td>
+<td><code>./dev-setup/ntools.json</code></td>
+</tr>
+<tr>
+<td><code>--no-path-update</code></td>
+<td>Skip PATH environment variable updates</td>
+<td><code>false</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="safety-features">Safety Features<a class="headerlink" href="#safety-features" title="Anchor link to this section for reference">&para;</a></h2>
+<ul>
+<li><strong>Version validation</strong>: Ensures release exists before downloading</li>
+<li><strong>Path safety</strong>: Refuses to overwrite critical system directories</li>
+<li><strong>Backup protection</strong>: Safe removal of existing installations</li>
+<li><strong>Network verification</strong>: HEAD requests to verify download URLs</li>
+<li><strong>Cross-platform</strong>: Works on Windows, macOS, and Linux</li>
+</ul>
+<h2 id="examples">Examples<a class="headerlink" href="#examples" title="Anchor link to this section for reference">&para;</a></h2>
+<h3 id="basic-installation">Basic Installation<a class="headerlink" href="#basic-installation" title="Anchor link to this section for reference">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>atools/install-ntools.py<span class="w"> </span>--version<span class="w"> </span><span class="m">1</span>.60.0
+</code></pre></div>
+<h3 id="development-installation">Development Installation<a class="headerlink" href="#development-installation" title="Anchor link to this section for reference">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>atools/install-ntools.py<span class="w"> </span>--version<span class="w"> </span><span class="m">1</span>.60.0<span class="w"> </span>--deploy-path<span class="w"> </span>./local-tools
+</code></pre></div>
+<h3 id="offline-verification">Offline Verification<a class="headerlink" href="#offline-verification" title="Anchor link to this section for reference">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>atools/install-ntools.py<span class="w"> </span>--version<span class="w"> </span><span class="m">1</span>.60.0<span class="w"> </span>--dry-run
+</code></pre></div>
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Anchor link to this section for reference">&para;</a></h2>
+<h3 id="path-not-updated">PATH Not Updated<a class="headerlink" href="#path-not-updated" title="Anchor link to this section for reference">&para;</a></h3>
+<p>If <code>ntools</code> command is not found after installation:
+- <strong>Windows</strong>: Sign out and sign back in, or restart your command prompt
+- <strong>Unix</strong>: Run <code>source ~/.bashrc</code> or restart your terminal</p>
+<h3 id="permission-errors">Permission Errors<a class="headerlink" href="#permission-errors" title="Anchor link to this section for reference">&para;</a></h3>
+<p>If installation fails with permission errors:
+- <strong>Windows</strong>: Run as Administrator
+- <strong>Unix</strong>: Use <code>sudo</code> or install to user directory with <code>--deploy-path</code></p>
+<h3 id="network-issues">Network Issues<a class="headerlink" href="#network-issues" title="Anchor link to this section for reference">&para;</a></h3>
+<p>If download fails:
+- Verify internet connection
+- Check if the version exists on GitHub releases
+- Use <code>--dry-run</code> to verify URLs without downloading</p>
+<h2 id="related-documentation">Related Documentation<a class="headerlink" href="#related-documentation" title="Anchor link to this section for reference">&para;</a></h2>
+<ul>
+<li><a href="../">atools/index.md</a> - Overview of all atools scripts</li>
+<li><a href="../../installation/">installation.md</a> - General installation guide</li>
+<li><a href="../../setup/">setup.md</a> - Development setup instructions</li>
+</ul>
 
 
 

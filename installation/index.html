@@ -491,9 +491,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#option-2-ntools-only-installation-cross-platform" class="md-nav__link">
+  <a href="#option-2-ntools-sdo-installation-cross-platform" class="md-nav__link">
     <span class="md-ellipsis">
-      Option 2: NTools Only Installation (Cross-Platform)
+      Option 2: NTools + SDO Installation (Cross-Platform)
     </span>
   </a>
   
@@ -1363,19 +1363,17 @@
 <span class="nb">Install-NTools</span> <span class="n">-NtoolsJsonPath</span> <span class="s2">&quot;./dev-setup/ntools.json&quot;</span>
 <span class="nb">Install-DevelopmentApps</span> <span class="n">-JsonPath</span> <span class="s2">&quot;./dev-setup/apps.json&quot;</span>
 </code></pre></div>
-<h3 id="option-2-ntools-only-installation-cross-platform">Option 2: NTools Only Installation (Cross-Platform)<a class="headerlink" href="#option-2-ntools-only-installation-cross-platform" title="Anchor link to this section for reference">&para;</a></h3>
-<p>For users who just want to install NTools without the full development environment:</p>
+<h3 id="option-2-ntools-sdo-installation-cross-platform">Option 2: NTools + SDO Installation (Cross-Platform)<a class="headerlink" href="#option-2-ntools-sdo-installation-cross-platform" title="Anchor link to this section for reference">&para;</a></h3>
+<p>For users who want to install both NTools and SDO with automatic version synchronization:</p>
 <div class="highlight"><pre><span></span><code><span class="nb">cd </span><span class="p">./</span><span class="n">ntools</span>
 <span class="n">python</span> <span class="n">atools</span><span class="p">/</span><span class="nb">install-ntools</span><span class="p">.</span><span class="n">py</span> <span class="p">-</span><span class="n">-version</span> <span class="n">1</span><span class="p">.</span><span class="n">32</span><span class="p">.</span><span class="n">0</span>
 </code></pre></div>
 <p><strong>Custom installation path:</strong></p>
 <div class="highlight"><pre><span></span><code><span class="n">python</span> <span class="n">atools</span><span class="p">/</span><span class="nb">install-ntools</span><span class="p">.</span><span class="n">py</span> <span class="p">-</span><span class="n">-version</span> <span class="n">1</span><span class="p">.</span><span class="n">32</span><span class="p">.</span><span class="n">0</span> <span class="p">-</span><span class="n">-deploy-path</span> <span class="s2">&quot;C:\MyTools\Nbuild&quot;</span>
 </code></pre></div>
+<p>This will install both NTools and SDO in a single command, with SDO installed in an isolated virtual environment to prevent dependency conflicts.</p>
 <h2 id="sdo-installation">SDO Installation<a class="headerlink" href="#sdo-installation" title="Anchor link to this section for reference">&para;</a></h2>
-<p>SDO (Simple DevOps Operations Tool) is installed using an isolated virtual environment to prevent dependency conflicts. After installing NTools, install SDO:</p>
-<div class="highlight"><pre><span></span><code>cd &quot;C:\Program Files\NBuild&quot;
-python install-sdo.py
-</code></pre></div>
+<p>SDO is now automatically installed alongside NTools when using Option 2 above. The installer creates an isolated virtual environment for SDO to prevent dependency conflicts.</p>
 <p><strong>Verify installation:</strong>
 <div class="highlight"><pre><span></span><code>sdo --version
 sdo --help
@@ -1386,7 +1384,7 @@ sdo --help
 <tr>
 <th>Component</th>
 <th>Development Setup</th>
-<th>NTools Only</th>
+<th>NTools + SDO</th>
 </tr>
 </thead>
 <tbody>
@@ -1398,6 +1396,11 @@ sdo --help
 <tr>
 <td>NTools Core</td>
 <td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>SDO Tool</td>
+<td>❌</td>
 <td>✅</td>
 </tr>
 <tr>
