@@ -84,22 +84,51 @@ def update_sdo_version(version: str, pyproject_path: Path = None) -> None:
     if pyproject_path.exists():
         print(f"Updating SDO version to {version} in pyproject.toml...")
         try:
-            # Read the current pyproject.toml
+            # Read the current pyproject.toml as lines
             with open(pyproject_path, 'r', encoding='utf-8') as f:
-                content = f.read()
+                lines = f.readlines()
             
-            # Update the version in the [project] section
-            version_pattern = r'(^\[project\]$)(.*?)(^version\s*=\s*")([^"]*)(")'
-
-            def repl(m):
-                return m.group(1) + m.group(2) + m.group(3) + version + m.group(5)
+            # Find the [project] section
+            project_start = None
+            for idx, line in enumerate(lines):
+                if line.strip() == "[project]":
+                    project_start = idx
+                    break
             
-            if re.search(version_pattern, content, re.MULTILINE | re.DOTALL):
-                updated_content = re.sub(version_pattern, repl, content, flags=re.MULTILINE | re.DOTALL)
-                
+            if project_start is None:
+                print("[WARNING] Could not find [project] section in pyproject.toml")
+                return
+            
+            # Determine the end of the [project] section (next section header or EOF)
+            project_end = len(lines)
+            for idx in range(project_start + 1, len(lines)):
+                stripped = lines[idx].lstrip()
+                if stripped.startswith('[') and stripped.rstrip().endswith(']'):
+                    project_end = idx
+                    break
+            
+            # Regex to match the version line within the [project] section
+            version_line_pattern = re.compile(
+                r'^(?P<prefix>\s*version\s*=\s*")(?P<value>[^"]*)(?P<suffix>".*)$'
+            )
+            
+            updated = False
+            for idx in range(project_start + 1, project_end):
+                original_line = lines[idx]
+                # Preserve newline separately
+                line_wo_nl = original_line.rstrip('\n')
+                m = version_line_pattern.match(line_wo_nl)
+                if m:
+                    new_line_core = f"{m.group('prefix')}{version}{m.group('suffix')}"
+                    newline = '\n' if original_line.endswith('\n') else ''
+                    lines[idx] = new_line_core + newline
+                    updated = True
+                    break
+            
+            if updated:
                 # Write back the updated content
                 with open(pyproject_path, 'w', encoding='utf-8') as f:
-                    f.write(updated_content)
+                    f.writelines(lines)
                 
                 print(f"[OK] Updated SDO version to {version}")
             else:

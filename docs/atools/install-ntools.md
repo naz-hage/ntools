@@ -45,13 +45,14 @@ Installing NTools (Build Tools)...
 - Updates system PATH
 - Verifies installation
 
-### Phase 2: SDO Installation
+### Phase 2: SDO Installation (Skipped in Dry Run)
 ```
 ==================================================
 Installing SDO (Simple DevOps) tool...
 ==================================================
 ```
 
+- **Note**: This phase is skipped in `--dry-run` mode
 - Uninstalls any existing SDO installation
 - Installs SDO with matching version
 - Updates pyproject.toml version
