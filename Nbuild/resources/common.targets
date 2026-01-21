@@ -158,7 +158,10 @@
 
 	<!-- Creates a stage or prod release -->
 	<Target Name="GITHUB_RELEASE" DependsOnTargets="ARTIFACTS;GIT_BRANCH" AfterTargets="PROD" Condition="'$(GITHUB_ACTIONS)' != ''" >
-		<Git Command="PushTag" TaskParameter="$(ProductVersion)" />
+		<Git Command="PushTag" TaskParameter="$(ProductVersion)">
+			<Output TaskParameter="Output" PropertyName="PushResult"/>
+		</Git>
+		<RedError Condition="'$(PushResult)' != 'True'" Message="Failed to push tag $(ProductVersion) to remote. Check for conflicting tags." />
 		<Exec Command='"$(BuildTools)\nb.exe"  release_create --repo $(OWNER)/$(SolutionName) --tag $(ProductVersion) --branch $(GitBranch) --file $(ArtifactsFolder).zip' WorkingDirectory="$(BuildTools)" />
 
 		<Message Text="==> DONE"/>
@@ -166,7 +169,10 @@
 
 	<!-- Creates a stage or prod pre-release -->
 	<Target Name="GITHUB_PRE_RELEASE" DependsOnTargets="ARTIFACTS;GIT_BRANCH" AfterTargets="STAGE" Condition="'$(GITHUB_ACTIONS)' != ''" >
-		<Git Command="PushTag" TaskParameter="$(ProductVersion)" />
+		<Git Command="PushTag" TaskParameter="$(ProductVersion)">
+			<Output TaskParameter="Output" PropertyName="PushResult"/>
+		</Git>
+		<RedError Condition="'$(PushResult)' != 'True'" Message="Failed to push tag $(ProductVersion) to remote. Check for conflicting tags." />
 		<Exec Command='"$(BuildTools)\nb.exe" pre_release_create --repo $(OWNER)/$(SolutionName) --tag $(ProductVersion) --branch $(GitBranch) --file $(ArtifactsFolder).zip' WorkingDirectory="$(BuildTools)" />
 
 		<Message Text="==> DONE"/>
