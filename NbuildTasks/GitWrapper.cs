@@ -828,8 +828,10 @@ namespace NbuildTasks
         /// 2. Converts a 4-digit tag to a 3-digit tag for backward compatibility if the tag is valid in the 4-digit format.
         /// 3. Validates the tag. If the tag is invalid, returns <c>null</c>.
         /// 4. If the tag is valid, increments the third version number by 1 and constructs a new stage tag.
-        /// 5. Validates the newly constructed stage tag. If valid, returns it; otherwise, returns <c>null</c>.
-        /// 6. If an exception occurs during the construction of the stage tag, it logs the exception message and returns <c>null</c>.
+        /// 5. Checks if the constructed tag already exists on the remote repository. If it does, increments the patch version again.
+        /// 6. Repeats step 5 until finding a tag that doesn't exist on remote.
+        /// 7. Validates the final constructed stage tag. If valid, returns it; otherwise, returns <c>null</c>.
+        /// 8. If an exception occurs during the construction of the stage tag, it logs the exception message and returns <c>null</c>.
         /// </remarks>
         public string StageTag()
         {
@@ -852,8 +854,19 @@ namespace NbuildTasks
             else
             {
                 string[] version = tag.Split('.');
-                version[2] = ((Int32.Parse(version.Last())) + 1).ToString();
-                return string.Join(".", version);
+                int patchVersion = Int32.Parse(version.Last());
+                
+                // Keep incrementing patch version until we find a tag that doesn't exist on remote
+                string stageTag;
+                do
+                {
+                    patchVersion++;
+                    version[2] = patchVersion.ToString();
+                    stageTag = string.Join(".", version);
+                }
+                while (RemoteTagExists(stageTag) && IsValidTag(stageTag));
+                
+                return stageTag;
             }
         }
 
@@ -869,7 +882,9 @@ namespace NbuildTasks
         /// 3. Validates the tag. If the tag is invalid, returns <c>null</c>.
         /// 4. If the tag is valid, increments the second version number by 1, resets the third version number to 0, 
         ///    and constructs a new production tag.
-        /// 5. Validates the newly constructed production tag. If valid, returns it; otherwise, returns <c>null</c>.
+        /// 5. Checks if the constructed tag already exists on the remote repository. If it does, increments the minor version again.
+        /// 6. Repeats step 5 until finding a tag that doesn't exist on remote.
+        /// 7. Validates the final constructed production tag. If valid, returns it; otherwise, returns <c>null</c>.
         /// 
         /// If an exception occurs during the construction of the production tag, it logs the exception message 
         /// and returns <c>null</c>.
@@ -896,11 +911,21 @@ namespace NbuildTasks
             else
             {
                 string[] version = tag.Split('.');
-                version[1] = ((Int32.Parse(version[1])) + 1).ToString();
-                version[2] = "0";
+                int minorVersion = Int32.Parse(version[1]);
+                
+                // Keep incrementing minor version until we find a tag that doesn't exist on remote
+                string productionTag;
+                do
+                {
+                    minorVersion++;
+                    version[1] = minorVersion.ToString();
+                    version[2] = "0";
+                    productionTag = string.Join(".", version);
+                }
+                while (RemoteTagExists(productionTag) && IsValidTag(productionTag));
+                
                 try
                 {
-                    string productionTag = string.Join(".", version);
                     return IsValidTag(productionTag) ? productionTag : null;
                 }
                 catch (Exception ex)

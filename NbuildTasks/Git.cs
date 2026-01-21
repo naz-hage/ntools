@@ -12,6 +12,7 @@ namespace NbuildTasks
         private const string SetTagCommand = "SetTag";
         private const string DeleteTagCommand = "DeleteTag";
         private const string PushTagCommand = "PushTag";
+        private const string RemoteTagExistsCommand = "RemoteTagExists";
 
         [Required]
         public string Command { get; set; }
@@ -91,6 +92,18 @@ namespace NbuildTasks
                     {
                         Log.LogMessage($"Tag: {TaskParameter}");
                         Output = gitWrapper.PushTag(TaskParameter) ? "True" : "False";
+                    }
+                    else
+                    {
+                        Log.LogError($"Tag is null or empty");
+                    }
+                    break;
+
+                case RemoteTagExistsCommand:
+                    if (!string.IsNullOrEmpty(TaskParameter))
+                    {
+                        Log.LogMessage($"Tag: {TaskParameter}");
+                        Output = gitWrapper.RemoteTagExists(TaskParameter) ? "True" : "False";
                     }
                     else
                     {
