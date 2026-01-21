@@ -20,6 +20,7 @@ import subprocess
 import sys
 import time
 from pathlib import Path
+import re
 
 
 def parse_args():
@@ -68,7 +69,74 @@ Examples:
         help='Show what would be done without making changes'
     )
 
+    parser.add_argument(
+        '--version',
+        help='Version to set in pyproject.toml before installation'
+    )
+
     return parser.parse_args()
+
+
+def update_sdo_version(version: str, pyproject_path: Path = None) -> None:
+    """Update the version in pyproject.toml."""
+    if pyproject_path is None:
+        pyproject_path = Path(__file__).parent / "pyproject.toml"
+    if pyproject_path.exists():
+        print(f"Updating SDO version to {version} in pyproject.toml...")
+        try:
+            # Read the current pyproject.toml as lines
+            with open(pyproject_path, 'r', encoding='utf-8') as f:
+                lines = f.readlines()
+            
+            # Find the [project] section
+            project_start = None
+            for idx, line in enumerate(lines):
+                if line.strip() == "[project]":
+                    project_start = idx
+                    break
+            
+            if project_start is None:
+                print("[WARNING] Could not find [project] section in pyproject.toml")
+                return
+            
+            # Determine the end of the [project] section (next section header or EOF)
+            project_end = len(lines)
+            for idx in range(project_start + 1, len(lines)):
+                stripped = lines[idx].lstrip()
+                if stripped.startswith('[') and stripped.rstrip().endswith(']'):
+                    project_end = idx
+                    break
+            
+            # Regex to match the version line within the [project] section
+            version_line_pattern = re.compile(
+                r'^(?P<prefix>\s*version\s*=\s*")(?P<value>[^"]*)(?P<suffix>".*)$'
+            )
+            
+            updated = False
+            for idx in range(project_start + 1, project_end):
+                original_line = lines[idx]
+                # Preserve newline separately
+                line_wo_nl = original_line.rstrip('\n')
+                m = version_line_pattern.match(line_wo_nl)
+                if m:
+                    new_line_core = f"{m.group('prefix')}{version}{m.group('suffix')}"
+                    newline = '\n' if original_line.endswith('\n') else ''
+                    lines[idx] = new_line_core + newline
+                    updated = True
+                    break
+            
+            if updated:
+                # Write back the updated content
+                with open(pyproject_path, 'w', encoding='utf-8') as f:
+                    f.writelines(lines)
+                
+                print(f"[OK] Updated SDO version to {version}")
+            else:
+                print("[WARNING] Could not find version field in pyproject.toml")
+        except Exception as e:
+            print(f"[WARNING] Failed to update pyproject.toml version: {e}")
+    else:
+        print("pyproject.toml not found, skipping version update")
 
 
 def find_nbuild_in_path():
@@ -119,10 +187,10 @@ exec python -m sdo_package.cli "$@"
 
     try:
         launcher_path.write_text(launcher_content)
-        print(f"✓ Created SDO launcher at {launcher_path}")
+        print(f"[OK] Created SDO launcher at {launcher_path}")
         return True
     except Exception as e:
-        print(f"❌ Failed to create launcher script: {e}")
+        print(f"[ERROR] Failed to create launcher script: {e}")
         return False
 
 
@@ -130,7 +198,7 @@ def uninstall_venv(venv_path: Path, dry_run: bool = False) -> bool:
     """Remove virtual environment directory."""
     
     if not venv_path.exists():
-        print(f"⚠️  Virtual environment not found at {venv_path}")
+        print(f"[WARNING]  Virtual environment not found at {venv_path}")
         return True
     
     if dry_run:
@@ -147,21 +215,21 @@ def uninstall_venv(venv_path: Path, dry_run: bool = False) -> bool:
             result = subprocess.run(['powershell', '-Command', ps_cmd], 
                                   capture_output=True, text=True, timeout=30)
             if result.returncode == 0:
-                print("✓ Process stopping command completed")
+                print("[OK] Process stopping command completed")
             else:
-                print(f"⚠️  Warning: Could not stop processes: {result.stderr}")
+                print(f"[WARNING]  Warning: Could not stop processes: {result.stderr}")
         else:
             # For Linux/Mac, use pkill
             result = subprocess.run(['pkill', '-f', str(venv_path)], 
                                   capture_output=True, text=True, timeout=10)
             if result.returncode == 0:
-                print("✓ Stopped running processes")
+                print("[OK] Stopped running processes")
             elif result.returncode == 1:
                 print("ℹ️  No running processes found to stop")
     except subprocess.TimeoutExpired:
-        print("⚠️  Warning: Process stopping timed out")
+        print("[WARNING]  Warning: Process stopping timed out")
     except Exception as e:
-        print(f"⚠️  Warning: Could not stop processes: {e}")
+        print(f"[WARNING]  Warning: Could not stop processes: {e}")
     
     # Small delay to ensure processes are fully stopped
     time.sleep(1.0)
@@ -169,10 +237,10 @@ def uninstall_venv(venv_path: Path, dry_run: bool = False) -> bool:
     try:
         print(f"Deleting virtual environment at {venv_path}...")
         shutil.rmtree(venv_path)
-        print("✓ Virtual environment deleted successfully")
+        print("[OK] Virtual environment deleted successfully")
         return True
     except Exception as e:
-        print(f"❌ Failed to delete virtual environment: {e}")
+        print(f"[ERROR] Failed to delete virtual environment: {e}")
         return False
 
 
@@ -193,7 +261,7 @@ def install_sdo(sdo_source_path: Path, target_path: Path, is_local: bool = False
                 print(f"Would create directory: {target_path}")
             else:
                 target_path.mkdir(parents=True, exist_ok=True)
-                print(f"✓ Created directory: {target_path}")
+                print(f"[OK] Created directory: {target_path}")
 
     # Create virtual environment
     if dry_run:
@@ -203,9 +271,9 @@ def install_sdo(sdo_source_path: Path, target_path: Path, is_local: bool = False
         cmd = [sys.executable, "-m", "venv", str(venv_path)]
         result = subprocess.run(cmd, capture_output=True, text=True, check=False)
         if result.returncode != 0:
-            print(f"❌ Failed to create virtual environment: {result.stderr}")
+            print(f"[ERROR] Failed to create virtual environment: {result.stderr}")
             return False
-        print("✓ Virtual environment created")
+        print("[OK] Virtual environment created")
 
     # Get venv python and pip paths
     if sys.platform == 'win32':
@@ -221,9 +289,9 @@ def install_sdo(sdo_source_path: Path, target_path: Path, is_local: bool = False
         cmd = [str(venv_python), "-m", "pip", "install", "--upgrade", "pip"]
         result = subprocess.run(cmd, capture_output=True, text=True, check=False)
         if result.returncode != 0:
-            print(f"⚠️  Warning: Failed to upgrade pip: {result.stderr}")
+            print(f"[WARNING]  Warning: Failed to upgrade pip: {result.stderr}")
         else:
-            print("✓ Pip upgraded successfully")
+            print("[OK] Pip upgraded successfully")
 
     # Install SDO in virtual environment
     if dry_run:
@@ -233,9 +301,9 @@ def install_sdo(sdo_source_path: Path, target_path: Path, is_local: bool = False
         cmd = [str(venv_python), "-m", "pip", "install", "-e", str(sdo_source_path)]
         result = subprocess.run(cmd, capture_output=True, text=True, check=False)
         if result.returncode != 0:
-            print(f"❌ SDO installation failed: {result.stderr}")
+            print(f"[ERROR] SDO installation failed: {result.stderr}")
             return False
-        print("✓ SDO installed successfully")
+        print("[OK] SDO installed successfully")
 
     # Copy mapping.md file to target directory
     mapping_source = sdo_source_path / "sdo_package" / "mapping.md"
@@ -251,11 +319,11 @@ def install_sdo(sdo_source_path: Path, target_path: Path, is_local: bool = False
             try:
                 import shutil
                 shutil.copy2(mapping_source, mapping_dest)
-                print(f"✓ Copied mapping.md to {mapping_dest}")
+                print(f"[OK] Copied mapping.md to {mapping_dest}")
             except Exception as e:
-                print(f"⚠️  Warning: Failed to copy mapping.md: {e}")
+                print(f"[WARNING]  Warning: Failed to copy mapping.md: {e}")
     else:
-        print(f"⚠️  Warning: mapping.md not found at {mapping_source}")
+        print(f"[WARNING]  Warning: mapping.md not found at {mapping_source}")
 
     # Create launcher script (only for system-wide install, not local)
     if not is_local:
@@ -267,6 +335,10 @@ def install_sdo(sdo_source_path: Path, target_path: Path, is_local: bool = False
 
 def main():
     args = parse_args()
+
+    # Update version if specified
+    if args.version:
+        update_sdo_version(args.version)
 
     print("SDO Installation Script")
     print("=" * 40)
@@ -303,24 +375,24 @@ def main():
             if launcher_path.exists() and not args.dry_run:
                 try:
                     launcher_path.unlink()
-                    print(f"✓ Removed launcher script: {launcher_path}")
+                    print(f"[OK] Removed launcher script: {launcher_path}")
                 except Exception as e:
-                    print(f"⚠️  Could not remove launcher script: {e}")
+                    print(f"[WARNING]  Could not remove launcher script: {e}")
         
         success = uninstall_venv(venv_path, args.dry_run)
         if success:
-            print(f"\n✅ SDO {install_type} environment removed successfully")
+            print(f"\n[SUCCESS] SDO {install_type} environment removed successfully")
         return 0 if success else 1
 
     # Validate source path for installation
     if not sdo_source_path.exists():
-        print(f"❌ SDO source path does not exist: {sdo_source_path}")
+        print(f"[ERROR] SDO source path does not exist: {sdo_source_path}")
         print("Please specify the correct path with --source-path")
         return 1
 
     sdo_package_path = sdo_source_path / "sdo_package"
     if not sdo_package_path.exists():
-        print(f"❌ SDO package not found at: {sdo_package_path}")
+        print(f"[ERROR] SDO package not found at: {sdo_package_path}")
         print("Please ensure you're pointing to the directory containing sdo_package")
         return 1
 
@@ -331,7 +403,7 @@ def main():
             print(f"Found NBuild in PATH: {found_nbuild}")
             target_path = found_nbuild
         else:
-            print(f"⚠️  NBuild directory not found at {target_path}")
+            print(f"[WARNING]  NBuild directory not found at {target_path}")
             if not args.dry_run:
                 print("Installation will create the directory")
 
@@ -340,10 +412,10 @@ def main():
 
     if success:
         if args.dry_run:
-            print("\n✅ Dry run completed successfully")
+            print("\n[SUCCESS] Dry run completed successfully")
             print("Run without --dry-run to perform actual installation")
         else:
-            print(f"\n✅ SDO {install_type} installation completed successfully!")
+            print(f"\n[SUCCESS] SDO {install_type} installation completed successfully!")
             if args.local:
                 print(f"To activate the virtual environment, run:")
                 if sys.platform == 'win32':
@@ -361,22 +433,22 @@ def main():
                 try:
                     if sys.platform == 'win32':
                         if launcher_path.exists():
-                            print("✓ Launcher script exists and is ready")
+                            print("[OK] Launcher script exists and is ready")
                         else:
-                            print("⚠️  Launcher script not found")
+                            print("[WARNING]  Launcher script not found")
                     else:
                         cmd = [str(launcher_path), "--help"]
                         result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
                         if result.returncode == 0:
-                            print("✓ SDO launcher works correctly")
+                            print("[OK] SDO launcher works correctly")
                         else:
-                            print(f"⚠️  SDO launcher test failed: {result.stderr}")
+                            print(f"[WARNING]  SDO launcher test failed: {result.stderr}")
                 except Exception as e:
-                    print(f"⚠️  Could not test SDO launcher: {e}")
+                    print(f"[WARNING]  Could not test SDO launcher: {e}")
 
         return 0
     else:
-        print(f"\n❌ SDO {install_type} installation failed")
+        print(f"\n[ERROR] SDO {install_type} installation failed")
         return 1
 
 
