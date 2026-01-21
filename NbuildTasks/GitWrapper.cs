@@ -818,7 +818,7 @@ namespace NbuildTasks
 
         /// <summary>
         /// Generates a stage tag based on the current tag.
-        /// /// </summary>
+        /// </summary>
         /// <returns>
         /// A valid stage tag string if the current tag is valid; otherwise, <c>null</c>.
         /// </returns>
@@ -828,8 +828,8 @@ namespace NbuildTasks
         /// 2. Converts a 4-digit tag to a 3-digit tag for backward compatibility if the tag is valid in the 4-digit format.
         /// 3. Validates the tag. If the tag is invalid, returns <c>null</c>.
         /// 4. If the tag is valid, increments the third version number by 1 and constructs a new stage tag.
-        /// 5. Validates the newly constructed stage tag. If valid, returns it; otherwise, returns <c>null</c>.
-        /// 6. If an exception occurs during the construction of the stage tag, it logs the exception message and returns <c>null</c>.
+        /// 5. If the generated tag already exists on remote, continues incrementing until a unique tag is found.
+        /// 6. Validates the newly constructed stage tag. If valid, returns it; otherwise, returns <c>null</c>.
         /// </remarks>
         public string StageTag()
         {
@@ -852,11 +852,30 @@ namespace NbuildTasks
             else
             {
                 string[] version = tag.Split('.');
-                version[2] = ((Int32.Parse(version.Last())) + 1).ToString();
-                return string.Join(".", version);
+                int patchVersion = Int32.Parse(version.Last()) + 1;
+                string candidateTag;
+
+                // Increment version until we find a tag that doesn't exist on remote
+                do
+                {
+                    version[2] = patchVersion.ToString();
+                    candidateTag = string.Join(".", version);
+                    if (RemoteTagExists(candidateTag))
+                    {
+                        if (Verbose) Console.WriteLine($"Tag {candidateTag} already exists on remote, incrementing...");
+                        patchVersion++;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                } while (true);
+
+                return candidateTag;
             }
         }
 
+        /// <summary>
         /// Generates a production tag based on the current tag.
         /// </summary>
         /// <returns>
@@ -867,12 +886,10 @@ namespace NbuildTasks
         /// 1. Checks if the current tag is <c>null</c>. If it is, returns <c>null</c>.
         /// 2. Converts a 4-digit tag to a 3-digit tag for backward compatibility if the tag is valid in the 4-digit format.
         /// 3. Validates the tag. If the tag is invalid, returns <c>null</c>.
-        /// 4. If the tag is valid, increments the second version number by 1, resets the third version number to 0, 
+        /// 4. If the tag is valid, increments the second version number by 1, resets the third version number to 0,
         ///    and constructs a new production tag.
-        /// 5. Validates the newly constructed production tag. If valid, returns it; otherwise, returns <c>null</c>.
-        /// 
-        /// If an exception occurs during the construction of the production tag, it logs the exception message 
-        /// and returns <c>null</c>.
+        /// 5. If the generated tag already exists on remote, continues incrementing the minor version until a unique tag is found.
+        /// 6. Validates the newly constructed production tag. If valid, returns it; otherwise, returns <c>null</c>.
         /// </remarks>
         public string ProdTag()
         {
@@ -896,18 +913,31 @@ namespace NbuildTasks
             else
             {
                 string[] version = tag.Split('.');
-                version[1] = ((Int32.Parse(version[1])) + 1).ToString();
-                version[2] = "0";
-                try
+                int minorVersion = Int32.Parse(version[1]) + 1;
+                string candidateTag;
+
+                // Increment version until we find a tag that doesn't exist on remote
+                do
                 {
-                    string productionTag = string.Join(".", version);
-                    return IsValidTag(productionTag) ? productionTag : null;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Exception occurred when building a production tag: {ex.Message}");
-                    return null;
-                }
+                    version[1] = minorVersion.ToString();
+                    version[2] = "0";
+                    candidateTag = string.Join(".", version);
+                    if (!IsValidTag(candidateTag))
+                    {
+                        return null;
+                    }
+                    if (RemoteTagExists(candidateTag))
+                    {
+                        if (Verbose) Console.WriteLine($"Tag {candidateTag} already exists on remote, incrementing...");
+                        minorVersion++;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                } while (true);
+
+                return candidateTag;
             }
         }
         #endregion
