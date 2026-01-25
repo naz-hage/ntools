@@ -221,6 +221,12 @@
 		<Message Text="==> DONE"/>
 	</Target>
 
+
+	<!-- Build the solution alias solution target -->
+    <Target Name="BUILD" >
+        <CallTarget Targets="solution" />
+    </Target>
+
 	<!-- Check for API_GITHUB_KEY environment variable and print its length -->
 	<Target Name="CHECK_GITHUB_KEY">
 		<!-- If not set, print a clear message -->

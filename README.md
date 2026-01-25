@@ -13,6 +13,7 @@ A powerful command-line utility for .NET developers, providing build automation,
 
 ## Recent Updates
 
+- **.NET 10.0 Upgrade**: Upgraded all projects to .NET 10.0 for C# 14.0 syntax support and latest runtime features
 - **.NET SDK Integration**: Updated nb.exe to use .NET SDK instead of direct MSBuild dependency with automatic dotnet.exe detection
 - **System.CommandLine 2.0.1**: Upgraded to stable CLI framework with global option support
 - **Enhanced Testing**: Added granular unit testing targets for efficient test execution
