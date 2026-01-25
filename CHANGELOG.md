@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **.NET 10.0 Upgrade**: Upgraded all 11 projects from .NET 9.0/.NET Standard 2.0 to .NET 10.0
+  - Enables C# 14.0 syntax support
+  - Access to latest .NET runtime features and performance improvements
+  - Updated System.Text.Json (now included in .NET 10.0 runtime)
+  - All 141 tests passing on .NET 10.0
+
 ### Added
 - **Global Options**: Added `--dry-run` and `--verbose` as global options available to all commands
 - **Git Clone Command**: New `git_clone` command for cloning Git repositories
