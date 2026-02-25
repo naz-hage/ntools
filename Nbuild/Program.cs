@@ -614,23 +614,50 @@ namespace Nbuild
         /// </remarks>
         private static void AddInstallCommand(RootCommand rootCommand, Option<bool> dryRunOption, Option<bool> verboseOption)
         {
-            var installCommand = new System.CommandLine.Command("install", "Install tools and applications specified in the manifest file.");
+            var installCommand = new System.CommandLine.Command("install", "Install tools and applications specified in the manifest file or by name/version from current directory JSON files.");
 
             // Enable strict option validation for this subcommand
             installCommand.TreatUnmatchedTokensAsErrors = true;
 
-            var jsonOption = new Option<string>("--json") { Description = "Full path to the manifest file containing your tool definitions.\nIf the path contains spaces, use double quotes.", Required = true };
+            var jsonOption = new Option<string>("--json") { Description = "Full path to the manifest file containing your tool definitions.\nIf the path contains spaces, use double quotes.\nWhen specified, --name and --version are ignored.", Required = false };
+            var nameOption = new Option<string>("--name") { Description = "Name of the application to install from current directory JSON files.\nRequired when --json is not specified.", Required = false };
+            var versionOption = new Option<string>("--version") { Description = "Version of the application to install.\nOverrides the version specified in the JSON file.\nOptional - uses JSON version if not specified.", Required = false };
+
             installCommand.Options.Add(jsonOption);
+            installCommand.Options.Add(nameOption);
+            installCommand.Options.Add(versionOption);
+
             installCommand.SetAction((System.CommandLine.ParseResult parseResult) =>
             {
-                var json = parseResult.GetValue(jsonOption)!;
+                var json = parseResult.GetValue(jsonOption);
+                var name = parseResult.GetValue(nameOption);
+                var version = parseResult.GetValue(versionOption);
                 var verbose = parseResult.GetValue(verboseOption);
                 var dryRun = parseResult.GetValue(dryRunOption);
+
+                // Validation: either --json OR --name must be provided
+                if (string.IsNullOrEmpty(json) && string.IsNullOrEmpty(name))
+                {
+                    Console.Error.WriteLine("Error: Either --json or --name must be specified.");
+                    Console.Error.WriteLine("Use --json for direct file path, or --name to search current directory.");
+                    return 1;
+                }
+
+                // Validation: --json takes precedence, ignore --name/--version if --json is provided
+                if (!string.IsNullOrEmpty(json))
+                {
+                    if (!string.IsNullOrEmpty(name) || !string.IsNullOrEmpty(version))
+                    {
+                        ConsoleHelper.WriteLine("Warning: --json specified, ignoring --name and --version parameters.", ConsoleColor.Yellow);
+                    }
+                }
+
                 if (dryRun)
                 {
                     ConsoleHelper.WriteLine("DRY-RUN: running in dry-run mode; no destructive actions will be performed.", ConsoleColor.Yellow);
                 }
-                var exitCode = HandleInstallCommand(json, verbose, dryRun);
+
+                var exitCode = HandleInstallCommand(json, name, version, verbose, dryRun);
                 return exitCode;
             });
             rootCommand.Subcommands.Add(installCommand);
@@ -736,11 +763,11 @@ namespace Nbuild
         /// to install tools and applications specified in the manifest file.
         /// Supports dry-run mode for testing installations.
         /// </remarks>
-        private static int HandleInstallCommand(string json, bool verbose, bool dryRun)
+        private static int HandleInstallCommand(string? json, string? name, string? version, bool verbose, bool dryRun)
         {
             try
             {
-                var result = Command.Install(json, verbose, dryRun);
+                var result = Command.Install(json, name, version, verbose, dryRun);
                 return result.Code;
             }
             catch (Exception ex)

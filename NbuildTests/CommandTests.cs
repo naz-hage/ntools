@@ -45,6 +45,33 @@ namespace NbuildTests
         }
 
         [TestMethod]
+        public void Install_DryRun_WithName_PrintsDryRunMessage()
+        {
+            var result = Command.Install(null, "test-app", null, false, true);
+            Assert.IsTrue(result.IsSuccess());
+            Assert.IsTrue(result.Output.Any(x => x.Contains("DRY-RUN")));
+            Assert.IsTrue(result.Output.Any(x => x.Contains("test-app")));
+        }
+
+        [TestMethod]
+        public void Install_DryRun_WithNameAndVersion_PrintsDryRunMessage()
+        {
+            var result = Command.Install(null, "test-app", "1.0.0", false, true);
+            Assert.IsTrue(result.IsSuccess());
+            Assert.IsTrue(result.Output.Any(x => x.Contains("DRY-RUN")));
+            Assert.IsTrue(result.Output.Any(x => x.Contains("test-app")));
+            Assert.IsTrue(result.Output.Any(x => x.Contains("1.0.0")));
+        }
+
+        [TestMethod]
+        public void Install_WithoutJsonOrName_Fails()
+        {
+            var result = Command.Install(null, null, null, false, false);
+            Assert.IsFalse(result.IsSuccess());
+            Assert.IsTrue(result.Output.Any(x => x.Contains("Either json file path or app name must be provided")));
+        }
+
+        [TestMethod]
         public void Uninstall_DryRun_PrintsDryRunMessage()
         {
             var result = Command.Uninstall("{\"NbuildAppList\":[]}", false, true);

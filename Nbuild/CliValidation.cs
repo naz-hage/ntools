@@ -55,6 +55,17 @@ namespace Nbuild
                 ["--jso"] = "--json"
             };
 
+            // Check if there's a subcommand in the args
+            var subcommands = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "install", "uninstall", "list", "download", "path",
+                "git_info", "git_settag", "git_autotag", "git_push_autotag",
+                "git_branch", "git_clone", "git_deletetag", "release_create",
+                "pre_release_create", "release_download", "list_release", "targets"
+            };
+
+            bool hasSubcommand = args.Any(arg => subcommands.Contains(arg.ToLower()));
+
             for (int i = 0; i < args.Length; i++)
             {
                 var arg = args[i];
@@ -63,6 +74,27 @@ namespace Nbuild
                     if (commonTypos.TryGetValue(arg.ToLower(), out var correction))
                     {
                         return $"Unknown option '{arg}'. Did you mean '{correction}'?\nUse 'nb --help' or 'nb [command] --help' to see available options.";
+                    }
+
+                    // If there's a subcommand, skip validation for options that come after it
+                    if (hasSubcommand)
+                    {
+                        // Find the subcommand position
+                        int subcommandIndex = -1;
+                        for (int j = 0; j < args.Length; j++)
+                        {
+                            if (subcommands.Contains(args[j].ToLower()))
+                            {
+                                subcommandIndex = j;
+                                break;
+                            }
+                        }
+
+                        // If this option comes after the subcommand, skip validation
+                        if (i > subcommandIndex)
+                        {
+                            continue;
+                        }
                     }
 
                     if (!IsValidOption(arg, args))
@@ -99,6 +131,7 @@ namespace Nbuild
             {
                 "--help", "--version", "--dry-run", "--verbose",
                 "--json", "--tag", "--repo", "--branch", "--file", "--path", "--url", "--buildtype",
+                "--name", "--version", "--appname", "--appversion",
                 "install", "uninstall", "list", "download", "targets", "path", "git_info", "git_settag",
                 "git_autotag", "git_push_autotag", "git_branch", "git_clone", "git_deletetag",
                 "release_create", "pre_release_create", "release_download", "list_release"
@@ -255,14 +288,36 @@ namespace Nbuild
         /// <returns><c>true</c> when the option is considered valid; otherwise <c>false</c>.</returns>
         private static bool IsValidOption(string option, string[] args)
         {
-            var validOptions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            // Check if this option comes after a subcommand
+            var subcommands = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
             {
-                "--help", "--version", "--dry-run", "--verbose",
-                "--json", "--tag", "--repo", "--branch", "--file",
-                "--path", "--url", "--buildtype"
+                "install", "uninstall", "list", "download", "path",
+                "git_info", "git_settag", "git_autotag", "git_push_autotag",
+                "git_branch", "git_clone", "git_deletetag", "release_create",
+                "pre_release_create", "release_download", "list_release", "targets"
             };
 
-            return validOptions.Contains(option.ToLower());
+            // Find the position of this option in args
+            int optionIndex = Array.IndexOf(args, option);
+            if (optionIndex == -1) return false;
+
+            // Check if there's a subcommand before this option
+            for (int i = 0; i < optionIndex; i++)
+            {
+                if (subcommands.Contains(args[i].ToLower()))
+                {
+                    // This is a subcommand option, allow it
+                    return true;
+                }
+            }
+
+            // This is a global option, check against known global options
+            var globalOptions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "--help", "--version", "--dry-run", "--verbose"
+            };
+
+            return globalOptions.Contains(option.ToLower());
         }
     }
 }
