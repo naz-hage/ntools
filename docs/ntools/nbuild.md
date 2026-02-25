@@ -4,7 +4,7 @@
 
 **Key Features:**
 - Build and run custom targets with a single command
-- Install, uninstall, and list development tools from a manifest file
+- Install, uninstall, and list development tools from a manifest file or by name/version from current directory JSON files
 - Download tools and assets for your environment
 - Integrate with Git for tagging, branching, and release automation
 - Automate GitHub releases and asset downloads
@@ -45,7 +45,7 @@ Options:
   --version       Show version information
 
 Commands:
-  install                Install tools and applications specified in the manifest file.
+  install                Install tools and applications specified in the manifest file or by name/version from current directory JSON files.
   uninstall              Uninstall tools and applications specified in the manifest file.
   list                   Display a formatted table of all tools and their versions.
                          Use this command to audit, compare, or document the state of your development environment.
@@ -163,10 +163,21 @@ Below is a list of common targets defined in the `common.targets` file:
 Below are practical examples for using `nb.exe`. These examples assume you are running in a PowerShell terminal.
 
 ### 1. Install Applications
+
+#### Install from JSON file (traditional method):
 ```cmd
 nb.exe install --json "C:\Program Files\tools.json"
 ```
 Installs applications specified in the manifest file. (Requires admin privileges.)
+
+#### Install by name from current directory JSON files (new method):
+```cmd
+nb.exe install --name "MyApp"
+nb.exe install --name "MyApp" --version "1.2.3"
+```
+Searches for JSON files in the current directory and installs the application matching the specified name. The `--version` parameter is optional and overrides the version specified in the JSON file. This method automatically discovers and parses all JSON files in the current directory to find the matching application.
+
+**Note:** You must specify either `--json` OR `--name`, but not both. The `--name` method provides a more convenient way to install applications without needing to know the exact path to the JSON configuration file.
 
 ### 2. Uninstall Applications
 ```cmd
