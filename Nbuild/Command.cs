@@ -115,18 +115,45 @@ namespace Nbuild
 
         public static ResultHelper Install(string? json, bool verbose = false, bool dryRun = false)
         {
+            return Install(json, null, null, verbose, dryRun);
+        }
+
+        public static ResultHelper Install(string? json, string? name, string? version, bool verbose = false, bool dryRun = false)
+        {
             Verbose = verbose;
             ResultHelper result = ResultHelper.New();
+
             if (dryRun)
             {
                 var msg = $"DRY-RUN: would install apps from json: {json ?? "<default>"}";
+                if (!string.IsNullOrEmpty(name))
+                {
+                    msg = $"DRY-RUN: would install app '{name}'{(version != null ? $" version {version}" : "")} from dev-setup directory";
+                }
                 ConsoleHelper.WriteLine(msg, ConsoleColor.Yellow);
                 return ResultHelper.Success(msg);
             }
+
             if (!CanRunCommand()) return ResultHelper.Fail(-1, $"You must run this command as an administrator");
 
-            var apps = GetApps(json);
-            if (apps == null) return ResultHelper.Fail(-1, $"Invalid json input");
+            IEnumerable<NbuildApp> apps;
+
+            if (!string.IsNullOrEmpty(json))
+            {
+                // Original behavior: use provided JSON file
+                apps = GetApps(json);
+            }
+            else if (!string.IsNullOrEmpty(name))
+            {
+                // New behavior: search current directory for app by name/version
+                apps = GetAppsFromCurrentDirectory(name, version);
+            }
+            else
+            {
+                return ResultHelper.Fail(-1, "Either json file path or app name must be provided");
+            }
+
+            if (apps == null || !apps.Any()) return ResultHelper.Fail(-1, $"No apps found to install");
 
             if (Verbose) ConsoleHelper.WriteLine($"{apps.Count()} apps to install.", ConsoleColor.Yellow);
 
@@ -803,6 +830,106 @@ namespace Nbuild
                 UpdateEnvironmentVariables(appData);
                 yield return appData;
             }
+        }
+
+        /// <summary>
+        /// Searches for an application by name in the dev-setup directory and returns matching apps.
+        /// </summary>
+        /// <param name="name">The name of the application to search for.</param>
+        /// <param name="version">Optional version override. If specified, overrides the version in the JSON file.</param>
+        /// <returns>An enumerable of matching NbuildApp objects.</returns>
+        public static IEnumerable<NbuildApp> GetAppsFromCurrentDirectory(string name, string? version = null)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+
+            // Get the current working directory
+            var currentDirectory = Directory.GetCurrentDirectory();
+
+            // Get all JSON files in current directory
+            var jsonFiles = Directory.GetFiles(currentDirectory, "*.json");
+
+            if (jsonFiles.Length == 0)
+            {
+                throw new FileNotFoundException($"No JSON files found in current directory: {currentDirectory}");
+            }
+
+            NbuildApp? foundApp = null;
+            var availableApps = new List<string>();
+
+            foreach (var jsonFile in jsonFiles)
+            {
+                try
+                {
+                    var jsonContent = File.ReadAllText(jsonFile);
+
+                    // Parse JSON directly without calling GetApps to avoid premature template processing
+                    NbuildApps? listAppData;
+                    try
+                    {
+                        listAppData = JsonSerializer.Deserialize<NbuildApps>(jsonContent);
+                    }
+                    catch (JsonException ex)
+                    {
+                        throw new ArgumentException($"Invalid JSON format: {ex.Message}. Please check the JSON file for proper escaping of backslashes and quotes.", ex);
+                    }
+
+                    if (listAppData == null || listAppData.NbuildAppList == null)
+                    {
+                        continue;
+                    }
+
+                    // Make sure version matches supported version
+                    if (listAppData.Version != SupportedVersion)
+                    {
+                        throw new ArgumentException($"Json Version {listAppData.Version} is not supported. Please use version {SupportedVersion}");
+                    }
+
+                    foreach (var appData in listAppData.NbuildAppList)
+                    {
+                        availableApps.Add($"{appData.Name} - Version: {appData.Version}");
+                        if (string.Equals(appData.Name, name, StringComparison.OrdinalIgnoreCase))
+                        {
+                            foundApp = appData;
+                            break;
+                        }
+                    }
+
+                    if (foundApp != null)
+                    {
+                        break;
+                    }
+                }
+                catch (Exception ex) when (ex is not ArgumentException)
+                {
+                    // Log warning but continue searching other files
+                    ConsoleHelper.WriteLine($"Warning: Failed to parse {Path.GetFileName(jsonFile)}: {ex.Message}", ConsoleColor.Yellow);
+                }
+            }
+
+            if (foundApp == null)
+            {
+                var errorMessage = $"Application '{name}' not found in any JSON file in current directory.";
+                if (availableApps.Any())
+                {
+                    errorMessage += $"\n\nAvailable applications:\n{string.Join("\n", availableApps.Distinct().OrderBy(a => a))}";
+                }
+                throw new ArgumentException(errorMessage);
+            }
+
+            // Apply version override if specified BEFORE processing templates
+            if (!string.IsNullOrEmpty(version))
+            {
+                foundApp.Version = version;
+            }
+
+            // Now validate and update environment variables with the correct version
+            Validate(foundApp);
+            UpdateEnvironmentVariables(foundApp);
+
+            yield return foundApp;
         }
 
         private static void Validate(NbuildApp nbuildApp)

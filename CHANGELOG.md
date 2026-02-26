@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Global Options**: Added `--dry-run` and `--verbose` as global options available to all commands
 - **Git Clone Command**: New `git_clone` command for cloning Git repositories
 - **Unit Testing Infrastructure**: Comprehensive unit testing targets for granular test execution
+- **Enhanced Install Command**: Added `--name` and `--version` parameters to `nb install` for installing applications by name from current directory JSON files
   - `UNIT_TEST_CLI_VALIDATION`: CLI validation tests
   - `UNIT_TEST_BUILD_STARTER`: BuildStarter tests
   - `UNIT_TEST_CLI`: CLI tests

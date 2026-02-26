@@ -30,6 +30,7 @@ namespace NbuildTasks
         };
 
         public bool Verbose = false;
+        private bool TestMode = false;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GitWrapper"/> class.
@@ -39,12 +40,27 @@ namespace NbuildTasks
         /// <param name="testMode">A flag indicating whether to enable test mode.</param>
         /// <remarks>
         /// The working directory is set to the specified project directory or the current directory if no project is provided.
+        /// In test mode, uses temp directories to avoid conflicts with build cleanup.
         /// </remarks>
         public GitWrapper(string project = null, bool verbose = false, bool testMode = false) : base(testMode)
         {
             Verbose = verbose;
+            TestMode = testMode;
 
-            Process.StartInfo.WorkingDirectory = project == null ? Environment.CurrentDirectory : $@"{DevDrive}\{MainDir}\{project}";
+            if (testMode)
+            {
+                // In test mode, use temp directory to avoid build cleanup issues
+                var tempDir = Path.Combine(Path.GetTempPath(), "NbuildTasksTests");
+                if (!Directory.Exists(tempDir))
+                {
+                    Directory.CreateDirectory(tempDir);
+                }
+                Process.StartInfo.WorkingDirectory = project == null ? tempDir : Path.Combine(tempDir, project);
+            }
+            else
+            {
+                Process.StartInfo.WorkingDirectory = project == null ? Environment.CurrentDirectory : $@"{DevDrive}\{MainDir}\{project}";
+            }
 
             // print Parameters
             if (verbose) Console.WriteLine($"GitWrapper.Process.StartInfo.WorkingDirectory: {Process.StartInfo.WorkingDirectory}");
@@ -86,7 +102,8 @@ namespace NbuildTasks
             }
 
             // change to project directory
-            var projectDir = $@"{SourceDir}\{projectName}";
+            var sourceDir = this.SourceDir;
+            var projectDir = Path.Combine(sourceDir, projectName);
 
             Process.StartInfo.WorkingDirectory = string.IsNullOrEmpty(projectName) ? Environment.CurrentDirectory : projectDir;
 
@@ -416,16 +433,17 @@ namespace NbuildTasks
 
             ResultHelper result;
             // change to project directory
-            var clonePath = $@"{SourceDir}\{projectName}";
+            var sourceDir = this.SourceDir;
+            var clonePath = Path.Combine(sourceDir, projectName);
             var dirExists = Directory.Exists(clonePath);
             if (!dirExists)
             {
-                if (!Directory.Exists(SourceDir))
+                if (!Directory.Exists(sourceDir))
                 {
-                    Directory.CreateDirectory(SourceDir);
+                    Directory.CreateDirectory(sourceDir);
                 }
 
-                Process.StartInfo.WorkingDirectory = SourceDir;
+                Process.StartInfo.WorkingDirectory = sourceDir;
                 Process.StartInfo.Arguments = $"clone {url} ";
 
                 result = Process.LockStart(Verbose);
