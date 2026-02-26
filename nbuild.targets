@@ -12,6 +12,8 @@
 		<!-- Always use python.exe from PATH for portability -->
 		<PythonExe>python.exe</PythonExe>
 		<MkDocsExe>$(USERPROFILE)\AppData\Roaming\Python\Python313\Scripts\mkdocs.exe</MkDocsExe>
+		<!-- Enable code coverage for tests -->
+		<EnableCodeCoverage>true</EnableCodeCoverage>
 	</PropertyGroup>
 
 	<!--Setup the ARTIFACTS folders for binaries and test results - override -->
@@ -695,6 +697,20 @@
 
 		<Message Text="SDO package built successfully with virtual environment installer" Importance="high" />
 		<Message Text="==> BUILD_SDO DONE"/>
+	</Target>
+
+	<!-- Override the TEST target from common.targets to run individual test projects -->
+	<!-- This prevents double test execution that causes conflicts -->
+	<Target Name="TEST" DependsOnTargets="ARTIFACTS;TAG">
+		<RemoveDir Directories="$(ArtifactsTestResultsFolder)"></RemoveDir>
+		<!-- Run tests on individual projects with code coverage to avoid VSTest conflicts -->
+		<Exec Command='dotnet test "$(SolutionDir)\NbuildTests\NbuildTests.csproj" --configuration $(TargetRelease) --logger trx --results-directory:$(ArtifactsTestResultsFolder) --collect:"XPlat Code Coverage"'/>
+		<Exec Command='dotnet test "$(SolutionDir)\NbuildTasksTests\NbuildTasksTests.csproj" --configuration $(TargetRelease) --logger trx --results-directory:$(ArtifactsTestResultsFolder) --collect:"XPlat Code Coverage"'/>
+		<Exec Command='dotnet test "$(SolutionDir)\GitHubReleaseTests\GitHubReleaseTests.csproj" --configuration $(TargetRelease) --logger trx --results-directory:$(ArtifactsTestResultsFolder) --collect:"XPlat Code Coverage"'/>
+		<Exec Command='dotnet test "$(SolutionDir)\lfTests\lfTests.csproj" --configuration $(TargetRelease) --logger trx --results-directory:$(ArtifactsTestResultsFolder) --collect:"XPlat Code Coverage"'/>
+		<Exec Command='dotnet test "$(SolutionDir)\nBackupTests\NbackupTests.csproj" --configuration $(TargetRelease) --logger trx --results-directory:$(ArtifactsTestResultsFolder) --collect:"XPlat Code Coverage"'/>
+		<Message Text="TEST target completed - individual project tests executed with code coverage" />
+		<Message Text="==> COMMON_DONE"/>
 	</Target>
 
 	<!-- Publish all non-test projects to artifacts folder -->

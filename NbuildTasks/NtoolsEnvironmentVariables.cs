@@ -29,8 +29,7 @@ namespace NbuildTasks
         /// <param name="testMode">Indicates whether the instance is created in test mode.</param>
         public NtoolsEnvironmentVariables(bool testMode = false)
         {
-            DevDrive = GetDevDrive();
-
+            DevDrive = GetDevDrive(testMode);
             MainDir = GetMainDir(testMode);
 
             SourceDir = $"{DevDrive}\\{MainDir}";
@@ -39,13 +38,18 @@ namespace NbuildTasks
         /// <summary>
         /// Gets the development drive.
         /// </summary>
+        /// <param name="testMode">Indicates whether to use test mode paths.</param>
         /// <returns>The development drive path.</returns>
         /// <remarks>
         /// The Development Drive is defined as the root directory of the current working directory.
-        /// This method retrieves the root path of the drive where the application is currently running.
+        /// In test mode, returns the temp directory path.
         /// </remarks>
-        private static string GetDevDrive()
+        private static string GetDevDrive(bool testMode = false)
         {
+            if (testMode)
+            {
+                return Path.GetTempPath().TrimEnd('\\');
+            }
             string currentDirectory = Directory.GetCurrentDirectory();
             return Path.GetPathRoot(currentDirectory);
         }
@@ -59,17 +63,20 @@ namespace NbuildTasks
         /// <remarks>
         /// The Main Directory is defined as the parent directory of the current working directory 
         /// and calculates the main directory path relative to the root of the drive. 
-        /// If test mode is enabled, it ensures that the returned path does not end with "ntools".
+        /// If test mode is enabled, returns "NbuildTasksTests".
         /// </remarks>
         private static string GetMainDir(bool testMode = false)
         {
-            var parentDir = Directory.GetParent(Environment.CurrentDirectory).FullName;
-            var mainDir = Path.GetFullPath(parentDir).Substring(Path.GetPathRoot(parentDir).Length);
             if (testMode)
             {
-                mainDir = mainDir.EndsWith("ntools") ? mainDir.Substring(0, mainDir.Length - 7) : mainDir;
+                return "NbuildTasksTests";
             }
-
+            var parentDir = Directory.GetParent(Environment.CurrentDirectory).FullName;
+            var mainDir = Path.GetFullPath(parentDir).Substring(Path.GetPathRoot(parentDir).Length);
+            if (mainDir.EndsWith("ntools"))
+            {
+                mainDir = mainDir.Substring(0, mainDir.Length - 7);
+            }
             return mainDir;
         }
     }
