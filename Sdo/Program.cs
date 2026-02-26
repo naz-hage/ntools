@@ -38,6 +38,9 @@ namespace Sdo
             verboseOption.Description = "Enable verbose output";
             rootCommand.Options.Add(verboseOption);
 
+            // Add commands
+            rootCommand.Subcommands.Add(new Commands.MapCommand(verboseOption));
+
             // TODO: Add subcommands for work items, repositories, etc.
             // This is the starting point for the migration
 
