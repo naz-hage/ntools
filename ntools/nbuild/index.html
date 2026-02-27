@@ -665,15 +665,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#install-by-name-from-current-directory-json-files-new-method" class="md-nav__link">
-    <span class="md-ellipsis">
-      Install by name from current directory JSON files (new method):
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#2-uninstall-applications" class="md-nav__link">
     <span class="md-ellipsis">
       2. Uninstall Applications
@@ -1507,7 +1498,7 @@
 <p><code>Nbuild</code> (<code>nb.exe</code>) is a powerful command-line utility for .NET developers. It wraps the <a href="https://dotnet.microsoft.com/download">.NET SDK</a> to simplify building solutions, running custom targets, and managing your development toolchain.</p>
 <p><strong>Key Features:</strong>
 - Build and run custom targets with a single command
-- Install, uninstall, and list development tools from a manifest file or by name/version from current directory JSON files
+- Install, uninstall, and list development tools from a manifest file
 - Download tools and assets for your environment
 - Integrate with Git for tagging, branching, and release automation
 - Automate GitHub releases and asset downloads
@@ -1544,7 +1535,7 @@ Options:
   --version       Show version information
 
 Commands:
-  install                Install tools and applications specified in the manifest file or by name/version from current directory JSON files.
+  install                Install tools and applications specified in the manifest file.
   uninstall              Uninstall tools and applications specified in the manifest file.
   list                   Display a formatted table of all tools and their versions.
                          Use this command to audit, compare, or document the state of your development environment.
@@ -1654,18 +1645,10 @@ Below is a list of common targets defined in the `common.targets` file:
 Below are practical examples for using `nb.exe`. These examples assume you are running in a PowerShell terminal.
 
 ### 1. Install Applications
-
-#### Install from JSON file (traditional method):
 ```cmd
 nb.exe install --json &quot;C:\Program Files\tools.json&quot;
 </code></pre></div>
 Installs applications specified in the manifest file. (Requires admin privileges.)</p>
-<h4 id="install-by-name-from-current-directory-json-files-new-method">Install by name from current directory JSON files (new method):<a class="headerlink" href="#install-by-name-from-current-directory-json-files-new-method" title="Anchor link to this section for reference">&para;</a></h4>
-<p><div class="highlight"><pre><span></span><code>nb.exe install --name &quot;MyApp&quot;
-nb.exe install --name &quot;MyApp&quot; --version &quot;1.2.3&quot;
-</code></pre></div>
-Searches for JSON files in the current directory and installs the application matching the specified name. The <code>--version</code> parameter is optional and overrides the version specified in the JSON file. This method automatically discovers and parses all JSON files in the current directory to find the matching application.</p>
-<p><strong>Note:</strong> You must specify either <code>--json</code> OR <code>--name</code>, but not both. The <code>--name</code> method provides a more convenient way to install applications without needing to know the exact path to the JSON configuration file.</p>
 <h3 id="2-uninstall-applications">2. Uninstall Applications<a class="headerlink" href="#2-uninstall-applications" title="Anchor link to this section for reference">&para;</a></h3>
 <p><div class="highlight"><pre><span></span><code>nb.exe uninstall --json &quot;C:\Program Files\example-tool.json&quot;
 </code></pre></div>
