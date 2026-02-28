@@ -11,16 +11,20 @@ namespace GitHubRelease.Tests
             // Arrange
             string? lastPublished = null;
 
-            // Use mock data when running locally
+            // Use mock data when running locally or in CI environments to avoid external API dependencies
+            // CI environments (like GitHub Actions) may block outbound connections to api.github.com,
+            // causing network failures that should not break the build pipeline.
             var owner = Credentials.GetOwner();
             var repoParts = Repo.Split('/');
             var repoOwner = repoParts.Length > 1 ? repoParts[0] : owner;
-            var isLocal = string.IsNullOrEmpty(Environment.GetEnvironmentVariable("API_GITHUB_KEY")) || !string.Equals(owner, repoOwner, StringComparison.OrdinalIgnoreCase);
+            var isLocal = string.IsNullOrEmpty(Environment.GetEnvironmentVariable("API_GITHUB_KEY")) ||
+                         !string.Equals(owner, repoOwner, StringComparison.OrdinalIgnoreCase) ||
+                         !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("GITHUB_ACTIONS"));
             List<JsonElement> commits;
             if (isLocal)
             {
-                Console.WriteLine("[TestMode] Local mode detected");
-                // Create a dummy commit as JsonElement
+                Console.WriteLine("[TestMode] Local/CI mode detected - using mock data");
+                // Create a dummy commit as JsonElement to simulate API response without network calls
                 var dummyCommitJson = "{" +
                     "\"sha\": \"dummysha\"," +
                     "\"commit\": {" +
@@ -33,7 +37,10 @@ namespace GitHubRelease.Tests
             }
             else
             {
-                Console.WriteLine("[TestMode] Real mode detected");
+                Console.WriteLine("[TestMode] Real mode detected - making live API calls");
+                // Note: This branch only executes when API_GITHUB_KEY is set and owner matches repo owner
+                // and NOT running in GitHub Actions CI. If network connectivity fails here, consider
+                // adding fallback to local mode or improving error handling.
                 var apiService = new ApiService();
                 var commitService = new CommitService(apiService, Repo);
                 commits = await commitService.GetCommits(DefaultBranch, lastPublished);
