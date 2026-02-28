@@ -12,8 +12,6 @@
 		<!-- Always use python.exe from PATH for portability -->
 		<PythonExe>python.exe</PythonExe>
 		<MkDocsExe>$(USERPROFILE)\AppData\Roaming\Python\Python313\Scripts\mkdocs.exe</MkDocsExe>
-		<!-- Enable code coverage for tests -->
-		<EnableCodeCoverage>true</EnableCodeCoverage>
 	</PropertyGroup>
 
 	<!--Setup the ARTIFACTS folders for binaries and test results - override -->

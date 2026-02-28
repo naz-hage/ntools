@@ -621,7 +621,7 @@ namespace Nbuild
 
             var jsonOption = new Option<string>("--json") { Description = "Full path to the manifest file containing your tool definitions.\nIf the path contains spaces, use double quotes.\nWhen specified, --name and --version are ignored.", Required = false };
             var nameOption = new Option<string>("--name") { Description = "Name of the application to install from current directory JSON files.\nRequired when --json is not specified.", Required = false };
-            var versionOption = new Option<string>("--version") { Description = "Version of the application to install.\nOverrides the version specified in the JSON file.\nOptional - uses JSON version if not specified.", Required = false };
+            var versionOption = new Option<string>("--appversion") { Description = "Version of the application to install.\nOverrides the version specified in the JSON file.\nOptional - uses JSON version if not specified.", Required = false };
 
             installCommand.Options.Add(jsonOption);
             installCommand.Options.Add(nameOption);

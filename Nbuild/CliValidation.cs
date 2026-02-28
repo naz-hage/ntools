@@ -64,7 +64,7 @@ namespace Nbuild
                 "pre_release_create", "release_download", "list_release", "targets"
             };
 
-            bool hasSubcommand = args.Any(arg => subcommands.Contains(arg.ToLower()));
+            bool hasSubcommand = args.Any(arg => subcommands.Contains(arg));
 
             for (int i = 0; i < args.Length; i++)
             {
@@ -131,7 +131,7 @@ namespace Nbuild
             {
                 "--help", "--version", "--dry-run", "--verbose",
                 "--json", "--tag", "--repo", "--branch", "--file", "--path", "--url", "--buildtype",
-                "--name", "--version", "--appname", "--appversion",
+                "--name", "--appname", "--appversion",
                 "install", "uninstall", "list", "download", "targets", "path", "git_info", "git_settag",
                 "git_autotag", "git_push_autotag", "git_branch", "git_clone", "git_deletetag",
                 "release_create", "pre_release_create", "release_download", "list_release"

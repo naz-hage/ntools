@@ -125,10 +125,18 @@ namespace Nbuild
 
             if (dryRun)
             {
-                var msg = $"DRY-RUN: would install apps from json: {json ?? "<default>"}";
-                if (!string.IsNullOrEmpty(name))
+                string msg;
+                if (!string.IsNullOrEmpty(json))
                 {
-                    msg = $"DRY-RUN: would install app '{name}'{(version != null ? $" version {version}" : "")} from dev-setup directory";
+                    msg = $"DRY-RUN: would install apps from json: {json}";
+                }
+                else if (!string.IsNullOrEmpty(name))
+                {
+                    msg = $"DRY-RUN: would install app '{name}'{(version != null ? $" version {version}" : "")} from current directory (JSON discovery)";
+                }
+                else
+                {
+                    msg = "DRY-RUN: would install apps from json: <default>";
                 }
                 ConsoleHelper.WriteLine(msg, ConsoleColor.Yellow);
                 return ResultHelper.Success(msg);
@@ -153,11 +161,14 @@ namespace Nbuild
                 return ResultHelper.Fail(-1, "Either json file path or app name must be provided");
             }
 
-            if (apps == null || !apps.Any()) return ResultHelper.Fail(-1, $"No apps found to install");
+            // Materialize the enumerable to avoid multiple enumeration
+            var appsList = apps.ToList();
 
-            if (Verbose) ConsoleHelper.WriteLine($"{apps.Count()} apps to install.", ConsoleColor.Yellow);
+            if (appsList == null || !appsList.Any()) return ResultHelper.Fail(-1, $"No apps found to install");
 
-            foreach (var app in apps)
+            if (Verbose) ConsoleHelper.WriteLine($"{appsList.Count} apps to install.", ConsoleColor.Yellow);
+
+            foreach (var app in appsList)
             {
                 result = Install(app, verbose);
                 if (!result.IsSuccess())
@@ -833,7 +844,7 @@ namespace Nbuild
         }
 
         /// <summary>
-        /// Searches for an application by name in the dev-setup directory and returns matching apps.
+        /// Searches for an application by name in the current working directory and returns matching apps.
         /// </summary>
         /// <param name="name">The name of the application to search for.</param>
         /// <param name="version">Optional version override. If specified, overrides the version in the JSON file.</param>
@@ -884,16 +895,43 @@ namespace Nbuild
                     // Make sure version matches supported version
                     if (listAppData.Version != SupportedVersion)
                     {
-                        throw new ArgumentException($"Json Version {listAppData.Version} is not supported. Please use version {SupportedVersion}");
+                        // Log warning but continue searching other files
+                        ConsoleHelper.WriteLine($"Warning: Skipping {Path.GetFileName(jsonFile)} - unsupported version {listAppData.Version}. Supported version: {SupportedVersion}", ConsoleColor.Yellow);
+                        continue;
                     }
 
                     foreach (var appData in listAppData.NbuildAppList)
                     {
                         availableApps.Add($"{appData.Name} - Version: {appData.Version}");
+
+                        // Match by name and, when provided, by version
                         if (string.Equals(appData.Name, name, StringComparison.OrdinalIgnoreCase))
                         {
-                            foundApp = appData;
-                            break;
+                            var versionProvided = !string.IsNullOrEmpty(version);
+
+                            if (versionProvided)
+                            {
+                                // When a version is specified, require both name and version to match
+                                if (string.Equals(appData.Version, version, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    foundApp = appData;
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                // No version specified: if multiple configs share the same name, fail explicitly
+                                if (foundApp == null)
+                                {
+                                    foundApp = appData;
+                                }
+                                else
+                                {
+                                    throw new ArgumentException(
+                                        $"Multiple apps found with name '{name}'. Please specify a version. " +
+                                        $"Examples: '{name}' version '{foundApp.Version}', '{name}' version '{appData.Version}'.");
+                                }
+                            }
                         }
                     }
 
