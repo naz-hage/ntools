@@ -164,7 +164,7 @@ namespace Nbuild
             // Materialize the enumerable to avoid multiple enumeration
             var appsList = apps.ToList();
 
-            if (appsList == null || !appsList.Any()) return ResultHelper.Fail(-1, $"No apps found to install");
+            if (!appsList.Any()) return ResultHelper.Fail(-1, $"No apps found to install");
 
             if (Verbose) ConsoleHelper.WriteLine($"{appsList.Count} apps to install.", ConsoleColor.Yellow);
 

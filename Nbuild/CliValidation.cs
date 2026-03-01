@@ -131,7 +131,7 @@ namespace Nbuild
             {
                 "--help", "--version", "--dry-run", "--verbose",
                 "--json", "--tag", "--repo", "--branch", "--file", "--path", "--url", "--buildtype",
-                "--name", "--appname", "--appversion",
+                "--name", "--appversion",
                 "install", "uninstall", "list", "download", "targets", "path", "git_info", "git_settag",
                 "git_autotag", "git_push_autotag", "git_branch", "git_clone", "git_deletetag",
                 "release_create", "pre_release_create", "release_download", "list_release"
