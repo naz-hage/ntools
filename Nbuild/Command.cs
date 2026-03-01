@@ -935,10 +935,7 @@ namespace Nbuild
                         }
                     }
 
-                    if (foundApp != null)
-                    {
-                        break;
-                    }
+                    // Continue to next file to check for multiple matches when no version specified
                 }
                 catch (Exception ex) when (ex is not ArgumentException)
                 {
@@ -949,12 +946,8 @@ namespace Nbuild
 
             if (foundApp == null)
             {
-                var errorMessage = $"Application '{name}' not found in any JSON file in current directory.";
-                if (availableApps.Any())
-                {
-                    errorMessage += $"\n\nAvailable applications:\n{string.Join("\n", availableApps.Distinct().OrderBy(a => a))}";
-                }
-                throw new ArgumentException(errorMessage);
+                // Return empty - caller will handle "not found" appropriately
+                yield break;
             }
 
             // Apply version override if specified BEFORE processing templates

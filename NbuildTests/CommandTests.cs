@@ -772,7 +772,9 @@ namespace NbuildTests
                             ""DownloadedFile"": ""testapp.zip"",
                             ""InstallCommand"": ""echo"",
                             ""InstallArgs"": ""installed"",
-                            ""InstallPath"": ""C:\\Temp\\testapp""
+                            ""InstallPath"": ""C:\\Temp\\testapp"",
+                            ""UninstallCommand"": ""echo"",
+                            ""UninstallArgs"": ""uninstalled""
                         }
                     ]
                 }";
@@ -817,7 +819,9 @@ namespace NbuildTests
                             ""DownloadedFile"": ""testapp.zip"",
                             ""InstallCommand"": ""echo"",
                             ""InstallArgs"": ""installed"",
-                            ""InstallPath"": ""C:\\Temp\\testapp""
+                            ""InstallPath"": ""C:\\Temp\\testapp"",
+                            ""UninstallCommand"": ""echo"",
+                            ""UninstallArgs"": ""uninstalled""
                         }
                     ]
                 }";
@@ -832,7 +836,9 @@ namespace NbuildTests
                             ""DownloadedFile"": ""testapp.zip"",
                             ""InstallCommand"": ""echo"",
                             ""InstallArgs"": ""installed"",
-                            ""InstallPath"": ""C:\\Temp\\testapp""
+                            ""InstallPath"": ""C:\\Temp\\testapp"",
+                            ""UninstallCommand"": ""echo"",
+                            ""UninstallArgs"": ""uninstalled""
                         }
                     ]
                 }";
@@ -878,7 +884,9 @@ namespace NbuildTests
                             ""DownloadedFile"": ""testapp.zip"",
                             ""InstallCommand"": ""echo"",
                             ""InstallArgs"": ""installed"",
-                            ""InstallPath"": ""C:\\Temp\\testapp""
+                            ""InstallPath"": ""C:\\Temp\\testapp"",
+                            ""UninstallCommand"": ""echo"",
+                            ""UninstallArgs"": ""uninstalled""
                         }
                     ]
                 }";
@@ -893,7 +901,9 @@ namespace NbuildTests
                             ""DownloadedFile"": ""testapp.zip"",
                             ""InstallCommand"": ""echo"",
                             ""InstallArgs"": ""installed"",
-                            ""InstallPath"": ""C:\\Temp\\testapp""
+                            ""InstallPath"": ""C:\\Temp\\testapp"",
+                            ""UninstallCommand"": ""echo"",
+                            ""UninstallArgs"": ""uninstalled""
                         }
                     ]
                 }";
@@ -937,7 +947,9 @@ namespace NbuildTests
                             ""DownloadedFile"": ""badapp.zip"",
                             ""InstallCommand"": ""echo"",
                             ""InstallArgs"": ""installed"",
-                            ""InstallPath"": ""C:\\Temp\\badapp""
+                            ""InstallPath"": ""C:\\Temp\\badapp"",
+                            ""UninstallCommand"": ""echo"",
+                            ""UninstallArgs"": ""uninstalled""
                         }
                     ]
                 }";
@@ -953,7 +965,9 @@ namespace NbuildTests
                             ""DownloadedFile"": ""goodapp.zip"",
                             ""InstallCommand"": ""echo"",
                             ""InstallArgs"": ""installed"",
-                            ""InstallPath"": ""C:\\Temp\\goodapp""
+                            ""InstallPath"": ""C:\\Temp\\goodapp"",
+                            ""UninstallCommand"": ""echo"",
+                            ""UninstallArgs"": ""uninstalled""
                         }
                     ]
                 }";
@@ -998,7 +1012,9 @@ namespace NbuildTests
                             ""DownloadedFile"": ""testapp.zip"",
                             ""InstallCommand"": ""echo"",
                             ""InstallArgs"": ""installed"",
-                            ""InstallPath"": ""C:\\Temp\\testapp""
+                            ""InstallPath"": ""C:\\Temp\\testapp"",
+                            ""UninstallCommand"": ""echo"",
+                            ""UninstallArgs"": ""uninstalled""
                         }
                     ]
                 }";
