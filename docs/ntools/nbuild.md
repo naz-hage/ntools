@@ -173,11 +173,11 @@ Installs applications specified in the manifest file. (Requires admin privileges
 #### Install by name from current directory JSON files (new method):
 ```cmd
 nb.exe install --name "MyApp"
-nb.exe install --name "MyApp" --version "1.2.3"
+nb.exe install --name "MyApp" --appversion "1.2.3"
 ```
-Searches for JSON files in the current directory and installs the application matching the specified name. The `--version` parameter is optional and overrides the version specified in the JSON file. This method automatically discovers and parses all JSON files in the current directory to find the matching application.
+Searches for JSON files in the current directory and installs the application matching the specified name. The `--appversion` parameter is optional and overrides the version specified in the JSON file. This method automatically discovers and parses all JSON files in the current directory to find the matching application.
 
-**Note:** You must specify either `--json` OR `--name`, but not both. The `--name` method provides a more convenient way to install applications without needing to know the exact path to the JSON configuration file.
+**Note:** If you specify both `--json` and `--name`, the command is allowed, but `--json` takes precedence and a warning is emitted. The `--name` method provides a more convenient way to install applications without needing to know the exact path to the JSON configuration file.
 
 ### 2. Uninstall Applications
 ```cmd

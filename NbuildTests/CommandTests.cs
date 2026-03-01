@@ -747,6 +747,273 @@ namespace NbuildTests
             // teardown
             TeardownTestModeFlag();
         }
+
+        [TestMethod]
+        public void GetAppsFromCurrentDirectory_FindsAppByName()
+        {
+            // Arrange
+            var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            Directory.CreateDirectory(tempDir);
+            var originalDir = Directory.GetCurrentDirectory();
+
+            try
+            {
+                Directory.SetCurrentDirectory(tempDir);
+
+                // Create a test JSON file
+                var jsonContent = @"{
+                    ""Version"": ""1.2.0"",
+                    ""NbuildAppList"": [
+                        {
+                            ""Name"": ""testapp"",
+                            ""Version"": ""1.0.0"",
+                            ""AppFileName"": ""testapp.exe"",
+                            ""WebDownloadFile"": ""https://example.com/testapp.zip"",
+                            ""DownloadedFile"": ""testapp.zip"",
+                            ""InstallCommand"": ""echo"",
+                            ""InstallArgs"": ""installed"",
+                            ""InstallPath"": ""C:\\Temp\\testapp"",
+                            ""UninstallCommand"": ""echo"",
+                            ""UninstallArgs"": ""uninstalled""
+                        }
+                    ]
+                }";
+                File.WriteAllText("test.json", jsonContent);
+
+                // Act
+                var apps = Command.GetAppsFromCurrentDirectory("testapp", null).ToList();
+
+                // Assert
+                Assert.AreEqual(1, apps.Count);
+                Assert.AreEqual("testapp", apps[0].Name);
+                Assert.AreEqual("1.0.0", apps[0].Version);
+            }
+            finally
+            {
+                Directory.SetCurrentDirectory(originalDir);
+                Directory.Delete(tempDir, true);
+            }
+        }
+
+        [TestMethod]
+        public void GetAppsFromCurrentDirectory_FindsAppByNameAndVersion()
+        {
+            // Arrange
+            var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            Directory.CreateDirectory(tempDir);
+            var originalDir = Directory.GetCurrentDirectory();
+
+            try
+            {
+                Directory.SetCurrentDirectory(tempDir);
+
+                // Create test JSON file with app
+                var jsonContent = @"{
+                    ""Version"": ""1.2.0"",
+                    ""NbuildAppList"": [
+                        {
+                            ""Name"": ""testapp"",
+                            ""Version"": ""1.0.0"",
+                            ""AppFileName"": ""testapp.exe"",
+                            ""WebDownloadFile"": ""https://example.com/testapp.zip"",
+                            ""DownloadedFile"": ""testapp.zip"",
+                            ""InstallCommand"": ""echo"",
+                            ""InstallArgs"": ""installed"",
+                            ""InstallPath"": ""C:\\Temp\\testapp"",
+                            ""UninstallCommand"": ""echo"",
+                            ""UninstallArgs"": ""uninstalled""
+                        }
+                    ]
+                }";
+                File.WriteAllText("test.json", jsonContent);
+
+                // Act - version parameter should override the JSON version
+                var apps = Command.GetAppsFromCurrentDirectory("testapp", "2.0.0").ToList();
+
+                // Assert
+                Assert.AreEqual(1, apps.Count);
+                Assert.AreEqual("testapp", apps[0].Name);
+                Assert.AreEqual("2.0.0", apps[0].Version); // Version should be overridden
+            }
+            finally
+            {
+                Directory.SetCurrentDirectory(originalDir);
+                Directory.Delete(tempDir, true);
+            }
+        }
+
+        [TestMethod]
+        public void GetAppsFromCurrentDirectory_ThrowsOnMultipleAppsWithSameName()
+        {
+            // Arrange
+            var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            Directory.CreateDirectory(tempDir);
+            var originalDir = Directory.GetCurrentDirectory();
+
+            try
+            {
+                Directory.SetCurrentDirectory(tempDir);
+
+                // Create test JSON files with same name but different versions
+                var jsonContent1 = @"{
+                    ""Version"": ""1.2.0"",
+                    ""NbuildAppList"": [
+                        {
+                            ""Name"": ""testapp"",
+                            ""Version"": ""1.0.0"",
+                            ""AppFileName"": ""testapp.exe"",
+                            ""WebDownloadFile"": ""https://example.com/testapp.zip"",
+                            ""DownloadedFile"": ""testapp.zip"",
+                            ""InstallCommand"": ""echo"",
+                            ""InstallArgs"": ""installed"",
+                            ""InstallPath"": ""C:\\Temp\\testapp"",
+                            ""UninstallCommand"": ""echo"",
+                            ""UninstallArgs"": ""uninstalled""
+                        }
+                    ]
+                }";
+                var jsonContent2 = @"{
+                    ""Version"": ""1.2.0"",
+                    ""NbuildAppList"": [
+                        {
+                            ""Name"": ""testapp"",
+                            ""Version"": ""2.0.0"",
+                            ""AppFileName"": ""testapp.exe"",
+                            ""WebDownloadFile"": ""https://example.com/testapp.zip"",
+                            ""DownloadedFile"": ""testapp.zip"",
+                            ""InstallCommand"": ""echo"",
+                            ""InstallArgs"": ""installed"",
+                            ""InstallPath"": ""C:\\Temp\\testapp"",
+                            ""UninstallCommand"": ""echo"",
+                            ""UninstallArgs"": ""uninstalled""
+                        }
+                    ]
+                }";
+                File.WriteAllText("test1.json", jsonContent1);
+                File.WriteAllText("test2.json", jsonContent2);
+
+                // Act & Assert
+                var ex = Assert.ThrowsException<ArgumentException>(() =>
+                    Command.GetAppsFromCurrentDirectory("testapp", null).ToList());
+                Assert.IsTrue(ex.Message.Contains("Multiple apps found with name 'testapp'"));
+                Assert.IsTrue(ex.Message.Contains("Please specify a version"));
+            }
+            finally
+            {
+                Directory.SetCurrentDirectory(originalDir);
+                Directory.Delete(tempDir, true);
+            }
+        }
+
+        [TestMethod]
+        public void GetAppsFromCurrentDirectory_HandlesUnsupportedVersionGracefully()
+        {
+            // Arrange
+            var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            Directory.CreateDirectory(tempDir);
+            var originalDir = Directory.GetCurrentDirectory();
+
+            try
+            {
+                Directory.SetCurrentDirectory(tempDir);
+
+                // Create a test JSON file with unsupported version
+                var jsonContent1 = @"{
+                    ""Version"": ""99.0.0"",
+                    ""NbuildAppList"": [
+                        {
+                            ""Name"": ""badapp"",
+                            ""Version"": ""1.0.0"",
+                            ""AppFileName"": ""badapp.exe"",
+                            ""WebDownloadFile"": ""https://example.com/badapp.zip"",
+                            ""DownloadedFile"": ""badapp.zip"",
+                            ""InstallCommand"": ""echo"",
+                            ""InstallArgs"": ""installed"",
+                            ""InstallPath"": ""C:\\Temp\\badapp"",
+                            ""UninstallCommand"": ""echo"",
+                            ""UninstallArgs"": ""uninstalled""
+                        }
+                    ]
+                }";
+                // Create a valid JSON file
+                var jsonContent2 = @"{
+                    ""Version"": ""1.2.0"",
+                    ""NbuildAppList"": [
+                        {
+                            ""Name"": ""goodapp"",
+                            ""Version"": ""1.0.0"",
+                            ""AppFileName"": ""goodapp.exe"",
+                            ""WebDownloadFile"": ""https://example.com/goodapp.zip"",
+                            ""DownloadedFile"": ""goodapp.zip"",
+                            ""InstallCommand"": ""echo"",
+                            ""InstallArgs"": ""installed"",
+                            ""InstallPath"": ""C:\\Temp\\goodapp"",
+                            ""UninstallCommand"": ""echo"",
+                            ""UninstallArgs"": ""uninstalled""
+                        }
+                    ]
+                }";
+                File.WriteAllText("bad.json", jsonContent1);
+                File.WriteAllText("good.json", jsonContent2);
+
+                // Act
+                var apps = Command.GetAppsFromCurrentDirectory("goodapp", null).ToList();
+
+                // Assert - should find the good app despite the bad one
+                Assert.AreEqual(1, apps.Count);
+                Assert.AreEqual("goodapp", apps[0].Name);
+            }
+            finally
+            {
+                Directory.SetCurrentDirectory(originalDir);
+                Directory.Delete(tempDir, true);
+            }
+        }
+
+        [TestMethod]
+        public void GetAppsFromCurrentDirectory_ReturnsEmptyWhenNoMatch()
+        {
+            // Arrange
+            var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            Directory.CreateDirectory(tempDir);
+            var originalDir = Directory.GetCurrentDirectory();
+
+            try
+            {
+                Directory.SetCurrentDirectory(tempDir);
+
+                // Create a test JSON file
+                var jsonContent = @"{
+                    ""Version"": ""1.2.0"",
+                    ""NbuildAppList"": [
+                        {
+                            ""Name"": ""testapp"",
+                            ""Version"": ""1.0.0"",
+                            ""AppFileName"": ""testapp.exe"",
+                            ""WebDownloadFile"": ""https://example.com/testapp.zip"",
+                            ""DownloadedFile"": ""testapp.zip"",
+                            ""InstallCommand"": ""echo"",
+                            ""InstallArgs"": ""installed"",
+                            ""InstallPath"": ""C:\\Temp\\testapp"",
+                            ""UninstallCommand"": ""echo"",
+                            ""UninstallArgs"": ""uninstalled""
+                        }
+                    ]
+                }";
+                File.WriteAllText("test.json", jsonContent);
+
+                // Act
+                var apps = Command.GetAppsFromCurrentDirectory("nonexistent", null).ToList();
+
+                // Assert
+                Assert.AreEqual(0, apps.Count);
+            }
+            finally
+            {
+                Directory.SetCurrentDirectory(originalDir);
+                Directory.Delete(tempDir, true);
+            }
+        }
     }
 }
 

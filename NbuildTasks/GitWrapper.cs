@@ -30,7 +30,6 @@ namespace NbuildTasks
         };
 
         public bool Verbose = false;
-        private bool TestMode = false;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GitWrapper"/> class.
@@ -45,7 +44,6 @@ namespace NbuildTasks
         public GitWrapper(string project = null, bool verbose = false, bool testMode = false) : base(testMode)
         {
             Verbose = verbose;
-            TestMode = testMode;
 
             if (testMode)
             {
