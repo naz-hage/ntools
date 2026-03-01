@@ -1662,9 +1662,9 @@ nb.exe install --json &quot;C:\Program Files\tools.json&quot;
 Installs applications specified in the manifest file. (Requires admin privileges.)</p>
 <h4 id="install-by-name-from-current-directory-json-files-new-method">Install by name from current directory JSON files (new method):<a class="headerlink" href="#install-by-name-from-current-directory-json-files-new-method" title="Anchor link to this section for reference">&para;</a></h4>
 <p><div class="highlight"><pre><span></span><code>nb.exe install --name &quot;MyApp&quot;
-nb.exe install --name &quot;MyApp&quot; --version &quot;1.2.3&quot;
+nb.exe install --name &quot;MyApp&quot; --appversion &quot;1.2.3&quot;
 </code></pre></div>
-Searches for JSON files in the current directory and installs the application matching the specified name. The <code>--version</code> parameter is optional and overrides the version specified in the JSON file. This method automatically discovers and parses all JSON files in the current directory to find the matching application.</p>
+Searches for JSON files in the current directory and installs the application matching the specified name. The <code>--appversion</code> parameter is optional and overrides the version specified in the JSON file. This method automatically discovers and parses all JSON files in the current directory to find the matching application.</p>
 <p><strong>Note:</strong> If you specify both <code>--json</code> and <code>--name</code>, the command is allowed, but <code>--json</code> takes precedence and a warning is emitted. The <code>--name</code> method provides a more convenient way to install applications without needing to know the exact path to the JSON configuration file.</p>
 <h3 id="2-uninstall-applications">2. Uninstall Applications<a class="headerlink" href="#2-uninstall-applications" title="Anchor link to this section for reference">&para;</a></h3>
 <p><div class="highlight"><pre><span></span><code>nb.exe uninstall --json &quot;C:\Program Files\example-tool.json&quot;
