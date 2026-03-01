@@ -807,8 +807,8 @@ namespace NbuildTests
             {
                 Directory.SetCurrentDirectory(tempDir);
 
-                // Create test JSON files with different versions
-                var jsonContent1 = @"{
+                // Create test JSON file with app
+                var jsonContent = @"{
                     ""Version"": ""1.2.0"",
                     ""NbuildAppList"": [
                         {
@@ -825,33 +825,15 @@ namespace NbuildTests
                         }
                     ]
                 }";
-                var jsonContent2 = @"{
-                    ""Version"": ""1.2.0"",
-                    ""NbuildAppList"": [
-                        {
-                            ""Name"": ""testapp"",
-                            ""Version"": ""2.0.0"",
-                            ""AppFileName"": ""testapp.exe"",
-                            ""WebDownloadFile"": ""https://example.com/testapp.zip"",
-                            ""DownloadedFile"": ""testapp.zip"",
-                            ""InstallCommand"": ""echo"",
-                            ""InstallArgs"": ""installed"",
-                            ""InstallPath"": ""C:\\Temp\\testapp"",
-                            ""UninstallCommand"": ""echo"",
-                            ""UninstallArgs"": ""uninstalled""
-                        }
-                    ]
-                }";
-                File.WriteAllText("test1.json", jsonContent1);
-                File.WriteAllText("test2.json", jsonContent2);
+                File.WriteAllText("test.json", jsonContent);
 
-                // Act
+                // Act - version parameter should override the JSON version
                 var apps = Command.GetAppsFromCurrentDirectory("testapp", "2.0.0").ToList();
 
                 // Assert
                 Assert.AreEqual(1, apps.Count);
                 Assert.AreEqual("testapp", apps[0].Name);
-                Assert.AreEqual("2.0.0", apps[0].Version);
+                Assert.AreEqual("2.0.0", apps[0].Version); // Version should be overridden
             }
             finally
             {

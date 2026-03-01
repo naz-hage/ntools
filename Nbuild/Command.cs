@@ -904,23 +904,12 @@ namespace Nbuild
                     {
                         availableApps.Add($"{appData.Name} - Version: {appData.Version}");
 
-                        // Match by name and, when provided, by version
+                        // Match by name only - version parameter is for override, not filtering
                         if (string.Equals(appData.Name, name, StringComparison.OrdinalIgnoreCase))
                         {
-                            var versionProvided = !string.IsNullOrEmpty(version);
-
-                            if (versionProvided)
+                            // No version specified: if multiple configs share the same name, fail explicitly
+                            if (string.IsNullOrEmpty(version))
                             {
-                                // When a version is specified, require both name and version to match
-                                if (string.Equals(appData.Version, version, StringComparison.OrdinalIgnoreCase))
-                                {
-                                    foundApp = appData;
-                                    break;
-                                }
-                            }
-                            else
-                            {
-                                // No version specified: if multiple configs share the same name, fail explicitly
                                 if (foundApp == null)
                                 {
                                     foundApp = appData;
@@ -930,6 +919,14 @@ namespace Nbuild
                                     throw new ArgumentException(
                                         $"Multiple apps found with name '{name}'. Please specify a version. " +
                                         $"Examples: '{name}' version '{foundApp.Version}', '{name}' version '{appData.Version}'.");
+                                }
+                            }
+                            else
+                            {
+                                // Version specified: allow multiple, take the first one (will be overridden anyway)
+                                if (foundApp == null)
+                                {
+                                    foundApp = appData;
                                 }
                             }
                         }
