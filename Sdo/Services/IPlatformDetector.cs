@@ -38,6 +38,7 @@ namespace Sdo.Services
         /// Detects the DevOps platform by analyzing Git remote URLs.
         /// </summary>
         /// <returns>The detected platform, or Platform.Unknown if detection fails.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when not in a Git repository or no supported remote is found.</exception>
         Platform DetectPlatform();
 
         /// <summary>

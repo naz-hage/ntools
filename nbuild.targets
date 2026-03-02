@@ -707,6 +707,7 @@
 		<Exec Command='dotnet test "$(SolutionDir)\GitHubReleaseTests\GitHubReleaseTests.csproj" --configuration $(TargetRelease) --logger trx --results-directory:$(ArtifactsTestResultsFolder) --collect:"XPlat Code Coverage"'/>
 		<Exec Command='dotnet test "$(SolutionDir)\lfTests\lfTests.csproj" --configuration $(TargetRelease) --logger trx --results-directory:$(ArtifactsTestResultsFolder) --collect:"XPlat Code Coverage"'/>
 		<Exec Command='dotnet test "$(SolutionDir)\nBackupTests\NbackupTests.csproj" --configuration $(TargetRelease) --logger trx --results-directory:$(ArtifactsTestResultsFolder) --collect:"XPlat Code Coverage"'/>
+		<Exec Command='dotnet test "$(SolutionDir)\SdoTests\SdoTests.csproj" --configuration $(TargetRelease) --logger trx --results-directory:$(ArtifactsTestResultsFolder) --collect:"XPlat Code Coverage"'/>
 		<Message Text="TEST target completed - individual project tests executed with code coverage" />
 		<Message Text="==> COMMON_DONE"/>
 	</Target>
