@@ -11,8 +11,6 @@ public class BuildStarter
     public static string LogFile { get; set; } = "nbuild.log";
     private const string BuildFileName = "nbuild.targets";
     private const string CommonBuildFileName = "common.targets";
-    private const string NbuildBatchFile = "Nbuild.bat";
-    private const string ResourceLocation = "Nbuild.resources.nbuild.bat";
     private const string TargetsMd = "targets.md";
     private const string MsbuildExe = "msbuild.exe";
 
@@ -21,9 +19,8 @@ public class BuildStarter
     /// </summary>
     /// <param name="target">The target to build. If null, the default target will be built.</param>
     /// <param name="verbose">Specifies whether to display verbose output during the build process.</param>
-    /// <param name="extractBatchFile">Specifies whether to extract the batch file before building.</param>
     /// <returns>A <see cref="ResultHelper"/> object representing the result of the build operation.</returns>
-    public static ResultHelper Build(string? target, bool verbose = false, bool extractBatchFile = false)
+    public static ResultHelper Build(string? target, bool verbose = false)
     {
         string nbuildPath = Path.Combine(Environment.CurrentDirectory, BuildFileName);
         string commonBuildXmlPath = Path.Combine($"{Environment.GetEnvironmentVariable("ProgramFiles")}\\nbuild", CommonBuildFileName);
@@ -31,11 +28,6 @@ public class BuildStarter
         if (!File.Exists(nbuildPath))
         {
             return ResultHelper.Fail(-1, $"'{nbuildPath}' not found.");
-        }
-
-        if (extractBatchFile)
-        {
-            ExtractBatchFile();
         }
 
         // check if target is valid
@@ -161,15 +153,7 @@ public class BuildStarter
         return found;
     }
 
-    ///<summary>
-    /// Extracts the batch file from the embedded resource.
-    /// </summary>
-    private static void ExtractBatchFile()
-    {
-        // Always extract nbuild.bat common.targets.xml
-        ResourceHelper.ExtractEmbeddedResourceFromCallingAssembly(ResourceLocation, Path.Combine(Environment.CurrentDirectory, NbuildBatchFile));
-        ConsoleHelper.WriteLine($"!Extracted '{NbuildBatchFile}' to {Environment.CurrentDirectory}\n", ConsoleColor.Yellow);
-    }
+
 
     /// <summary>
     /// Retrieves the targets from the specified XML document.

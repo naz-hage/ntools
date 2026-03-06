@@ -124,7 +124,6 @@ Utility library for API version management and tracking.
 ```
 ntools/
 ├── ntools.sln                    # Main solution file
-├── Nbuild.bat                    # Build script
 ├── prebuild.bat                  # Pre-build setup script
 ├── mkdocs.yml                    # Documentation configuration
 ├── pyproject.toml                # Python project configuration (for docs)
