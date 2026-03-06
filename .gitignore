@@ -407,7 +407,6 @@ FodyWeavers.xsd
 **/launchSettings.json
 /site
 /targets.md
-/nbuild.bat
 /.temp
 /dev-setup/build-apps.exe
 /go/build-apps.exe
