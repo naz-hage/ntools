@@ -22,7 +22,8 @@ namespace Sdo.Services
         /// <summary>
         /// Detects the DevOps platform by analyzing Git remote URLs.
         /// </summary>
-        /// <returns>The detected platform, or Platform.Unknown if detection fails.</returns>
+        /// <returns>The detected platform.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when not in a Git repository or no supported remote is found.</exception>
         public Platform DetectPlatform()
         {
             if (_detectedPlatform != Platform.Unknown)
@@ -35,20 +36,26 @@ namespace Sdo.Services
                 var remoteUrl = GetGitRemoteUrl();
                 if (string.IsNullOrEmpty(remoteUrl))
                 {
-                    return Platform.Unknown;
+                    throw new InvalidOperationException("❌ Could not extract platform info from Git remote. Please ensure you're in a Git repository with a supported remote (Azure DevOps or GitHub).");
                 }
 
                 _detectedPlatform = ParsePlatformFromUrl(remoteUrl);
-                if (_detectedPlatform != Platform.Unknown)
+                if (_detectedPlatform == Platform.Unknown)
                 {
-                    ParseOrganizationAndProject(remoteUrl);
+                    throw new InvalidOperationException("❌ Could not extract platform info from Git remote. Please ensure you're in a Git repository with a supported remote (Azure DevOps or GitHub).");
                 }
+
+                ParseOrganizationAndProject(remoteUrl);
 
                 return _detectedPlatform;
             }
+            catch (InvalidOperationException)
+            {
+                throw;
+            }
             catch
             {
-                return Platform.Unknown;
+                throw new InvalidOperationException("❌ Could not extract platform info from Git remote. Please ensure you're in a Git repository with a supported remote (Azure DevOps or GitHub).");
             }
         }
 
@@ -168,17 +175,17 @@ namespace Sdo.Services
                     // dev.azure.com/organization/project/_git/repository
                     // organization.visualstudio.com/project/_git/repository
                     var parts = cleanUrl.Split('/');
-                    if (parts.Length >= 4)
+                    if (parts.Length >= 5)
                     {
                         if (parts[0].Contains("dev.azure.com"))
                         {
                             _organization = parts[1];
-                            _project = parts[3].Replace(".git", "");
+                            _project = parts[2]; // Project is parts[2], repository is parts[4]
                         }
                         else if (parts[0].Contains("visualstudio.com"))
                         {
                             _organization = parts[0].Split('.').First();
-                            _project = parts[3].Replace(".git", "");
+                            _project = parts[1]; // Project is parts[1] for visualstudio.com format
                         }
                     }
                 }

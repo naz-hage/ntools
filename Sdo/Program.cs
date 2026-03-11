@@ -40,6 +40,7 @@ namespace Sdo
 
             // Add commands
             rootCommand.Subcommands.Add(new Commands.MapCommand(verboseOption));
+            rootCommand.Subcommands.Add(new Commands.AuthCommand(verboseOption));
 
             // TODO: Add subcommands for work items, repositories, etc.
             // This is the starting point for the migration
