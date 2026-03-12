@@ -1237,17 +1237,17 @@
 <h3 id="key-features-phase-31-complete">Key Features (Phase 3.1 Complete)<a class="headerlink" href="#key-features-phase-31-complete" title="Anchor link to this section for reference">&para;</a></h3>
 <ul>
 <li><strong>Work Item Management</strong>:</li>
-<li><code>workitem show</code>: Display detailed work item information (GitHub issues or Azure DevOps work items)</li>
-<li><code>workitem list</code>: List work items with filtering and pagination</li>
+<li><code>wi show</code>: Display detailed work item information (GitHub issues or Azure DevOps work items)</li>
+<li><code>wi list</code>: List work items with filtering and pagination</li>
 <li><strong>Multi-Platform Support</strong>: Seamless operations across Azure DevOps and GitHub</li>
 <li><strong>Automatic Platform Detection</strong>: Detects platform from Git remote configuration</li>
 <li><strong>Clean Output Formatting</strong>: Native table display with emoji headers and proper column alignment</li>
 </ul>
 <h3 id="planned-features-phase-32">Planned Features (Phase 3.2+)<a class="headerlink" href="#planned-features-phase-32" title="Anchor link to this section for reference">&para;</a></h3>
 <ul>
-<li><code>workitem create</code>: Create new work items from structured input</li>
-<li><code>workitem update</code>: Update work item properties</li>
-<li><code>workitem comment</code>: Add comments/discussion to work items</li>
+<li><code>wi create</code>: Create new work items from structured input</li>
+<li><code>wi update</code>: Update work item properties</li>
+<li><code>wi comment</code>: Add comments/discussion to work items</li>
 <li>Additional commands: <code>pipeline</code>, <code>pr</code> (pull request), <code>repo</code> (repository) management</li>
 </ul>
 <h2 id="help-output">Help Output<a class="headerlink" href="#help-output" title="Anchor link to this section for reference">&para;</a></h2>
@@ -1271,10 +1271,10 @@ Options:
 Commands:
   map       Show command mappings between SDO and native CLI tools
   auth      Verify authentication with GitHub or Azure DevOps
-  workitem  Work item management commands
+  wi  Work item management commands
 </code></pre></div>
-<h3 id="workitem-command-help">Workitem Command Help<a class="headerlink" href="#workitem-command-help" title="Anchor link to this section for reference">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>$ sdo workitem --help
+<h3 id="wi-command-help">wi Command Help<a class="headerlink" href="#wi-command-help" title="Anchor link to this section for reference">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>$ sdo wi --help
 
 Simple DevOps Operations (SDO) - C# Migration
 ============================================
@@ -1282,7 +1282,7 @@ Description:
   Work item management commands
 
 Usage:
-  sdo workitem [command] [options]
+  sdo wi [command] [options]
 
 Options:
   -?, -h, --help  Show help and usage information
@@ -1292,7 +1292,7 @@ Commands:
   list  List work items with optional filtering
 </code></pre></div>
 <h3 id="show-subcommand-help">Show Subcommand Help<a class="headerlink" href="#show-subcommand-help" title="Anchor link to this section for reference">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>$ sdo workitem show --help
+<div class="highlight"><pre><span></span><code>$ sdo wi show --help
 
 Simple DevOps Operations (SDO) - C# Migration
 ============================================
@@ -1300,7 +1300,7 @@ Description:
   Display detailed work item information
 
 Usage:
-  sdo workitem show [options]
+  sdo wi show [options]
 
 Options:
   --id &lt;id&gt;       Work item ID (required)
@@ -1309,7 +1309,7 @@ Options:
   -?, -h, --help  Show help and usage information
 </code></pre></div>
 <h3 id="list-subcommand-help">List Subcommand Help<a class="headerlink" href="#list-subcommand-help" title="Anchor link to this section for reference">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>$ sdo workitem list --help
+<div class="highlight"><pre><span></span><code>$ sdo wi list --help
 
 Simple DevOps Operations (SDO) - C# Migration
 ============================================
@@ -1317,7 +1317,7 @@ Description:
   List work items with optional filtering
 
 Usage:
-  sdo workitem list [options]
+  sdo wi list [options]
 
 Options:
   --type &lt;type&gt;                Filter by work item type (PBI, Bug, Task, Spike,
@@ -1368,19 +1368,19 @@ sdo<span class="w"> </span>auth<span class="w"> </span>devops<span class="w">   
 <h4 id="list-work-items">List Work Items<a class="headerlink" href="#list-work-items" title="Anchor link to this section for reference">&para;</a></h4>
 <p>List work items from the current repository (defaults to GitHub). By default, shows all work items <strong>EXCEPT closed (GitHub) or done (Azure DevOps)</strong> to display active work-in-progress items.</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># List active work items (excludes closed/done by default)</span>
-sdo<span class="w"> </span>workitem<span class="w"> </span>list
+sdo<span class="w"> </span>wi<span class="w"> </span>list
 
 <span class="c1"># List specific number of items</span>
-sdo<span class="w"> </span>workitem<span class="w"> </span>list<span class="w"> </span>--top<span class="w"> </span><span class="m">20</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--top<span class="w"> </span><span class="m">20</span>
 
 <span class="c1"># Show only closed issues</span>
-sdo<span class="w"> </span>workitem<span class="w"> </span>list<span class="w"> </span>--state<span class="w"> </span>closed
+sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--state<span class="w"> </span>closed
 
 <span class="c1"># Show items in a specific state</span>
-sdo<span class="w"> </span>workitem<span class="w"> </span>list<span class="w"> </span>--state<span class="w"> </span><span class="s2">&quot;In Progress&quot;</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--state<span class="w"> </span><span class="s2">&quot;In Progress&quot;</span>
 
 <span class="c1"># Verbose output with debugging information</span>
-sdo<span class="w"> </span>workitem<span class="w"> </span>list<span class="w"> </span>--verbose
+sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--verbose
 </code></pre></div>
 <p><strong>Default Behavior:</strong>
 - <strong>GitHub</strong>: Shows all issues EXCEPT <code>closed</code>
@@ -1410,13 +1410,13 @@ sdo<span class="w"> </span>workitem<span class="w"> </span>list<span class="w"> 
 <h4 id="show-work-item-details">Show Work Item Details<a class="headerlink" href="#show-work-item-details" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Display full details of a specific work item:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Show GitHub issue #243</span>
-sdo<span class="w"> </span>workitem<span class="w"> </span>show<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>show<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span>
 
 <span class="c1"># Show with verbose output</span>
-sdo<span class="w"> </span>workitem<span class="w"> </span>show<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--verbose
+sdo<span class="w"> </span>wi<span class="w"> </span>show<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--verbose
 
 <span class="c1"># Show with comments (when available)</span>
-sdo<span class="w"> </span>workitem<span class="w"> </span>show<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--comments
+sdo<span class="w"> </span>wi<span class="w"> </span>show<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--comments
 </code></pre></div>
 <p><strong>Output Format:</strong></p>
 <div class="highlight"><pre><span></span><code>Issue #243
@@ -1446,13 +1446,13 @@ URL: https://github.com/naz-hage/ntools/issues/243
 </ul>
 <h3 id="planned-commands">Planned Commands<a class="headerlink" href="#planned-commands" title="Anchor link to this section for reference">&para;</a></h3>
 <h4 id="create-work-item-phase-32">Create Work Item (Phase 3.2)<a class="headerlink" href="#create-work-item-phase-32" title="Anchor link to this section for reference">&para;</a></h4>
-<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>workitem<span class="w"> </span>create<span class="w"> </span>--title<span class="w"> </span><span class="s2">&quot;New Feature&quot;</span><span class="w"> </span>--type<span class="w"> </span>PBI<span class="w"> </span>--description<span class="w"> </span><span class="s2">&quot;Description&quot;</span>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>wi<span class="w"> </span>create<span class="w"> </span>--title<span class="w"> </span><span class="s2">&quot;New Feature&quot;</span><span class="w"> </span>--type<span class="w"> </span>PBI<span class="w"> </span>--description<span class="w"> </span><span class="s2">&quot;Description&quot;</span>
 </code></pre></div>
 <h4 id="update-work-item-phase-32">Update Work Item (Phase 3.2)<a class="headerlink" href="#update-work-item-phase-32" title="Anchor link to this section for reference">&para;</a></h4>
-<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>workitem<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--title<span class="w"> </span><span class="s2">&quot;Updated Title&quot;</span><span class="w"> </span>--state<span class="w"> </span>closed<span class="w"> </span>--assigned-to<span class="w"> </span>user@example.com
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--title<span class="w"> </span><span class="s2">&quot;Updated Title&quot;</span><span class="w"> </span>--state<span class="w"> </span>closed<span class="w"> </span>--assigned-to<span class="w"> </span>user@example.com
 </code></pre></div>
 <h4 id="add-comment-phase-32">Add Comment (Phase 3.2)<a class="headerlink" href="#add-comment-phase-32" title="Anchor link to this section for reference">&para;</a></h4>
-<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>workitem<span class="w"> </span>comment<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--text<span class="w"> </span><span class="s2">&quot;This is my comment&quot;</span>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>wi<span class="w"> </span>comment<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--text<span class="w"> </span><span class="s2">&quot;This is my comment&quot;</span>
 </code></pre></div>
 <h2 id="platform-detection">Platform Detection<a class="headerlink" href="#platform-detection" title="Anchor link to this section for reference">&para;</a></h2>
 <p>The tool automatically detects which platform to use based on your Git remote:</p>
@@ -1501,9 +1501,9 @@ gh<span class="w"> </span>auth<span class="w"> </span>login
 <h2 id="testing">Testing<a class="headerlink" href="#testing" title="Anchor link to this section for reference">&para;</a></h2>
 <h3 id="unit-tests">Unit Tests<a class="headerlink" href="#unit-tests" title="Anchor link to this section for reference">&para;</a></h3>
 <p>All commands have comprehensive unit test coverage:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Run all workitem command tests</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># Run all wi command tests</span>
 <span class="nb">cd</span><span class="w"> </span>C:<span class="se">\s</span>ource<span class="se">\n</span>tools
-nb<span class="w"> </span>UNIT_TEST_WORKITEM_COMMAND
+nb<span class="w"> </span>UNIT_TEST_WI_COMMAND
 
 <span class="c1"># Output shows</span>
 Passed!<span class="w">  </span>-<span class="w"> </span>Failed:<span class="w"> </span><span class="m">0</span>,<span class="w"> </span>Passed:<span class="w"> </span><span class="m">33</span>,<span class="w"> </span>Skipped:<span class="w"> </span><span class="m">10</span>,<span class="w"> </span>Total:<span class="w"> </span><span class="m">43</span>
@@ -1512,19 +1512,19 @@ Passed!<span class="w">  </span>-<span class="w"> </span>Failed:<span class="w">
 <p>Test with real repositories:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Test with ntools repository</span>
 <span class="nb">cd</span><span class="w"> </span>C:<span class="se">\s</span>ource<span class="se">\n</span>tools
-sdo<span class="w"> </span>workitem<span class="w"> </span>list<span class="w"> </span>--top<span class="w"> </span><span class="m">5</span>
-sdo<span class="w"> </span>workitem<span class="w"> </span>show<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--top<span class="w"> </span><span class="m">5</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>show<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span>
 
 <span class="c1"># Test with different repository</span>
 <span class="nb">cd</span><span class="w"> </span>Path<span class="se">\T</span>o<span class="se">\Y</span>our<span class="se">\R</span>epo
-sdo<span class="w"> </span>workitem<span class="w"> </span>list
-sdo<span class="w"> </span>workitem<span class="w"> </span>show<span class="w"> </span>--id<span class="w"> </span>&lt;issue_number&gt;
+sdo<span class="w"> </span>wi<span class="w"> </span>list
+sdo<span class="w"> </span>wi<span class="w"> </span>show<span class="w"> </span>--id<span class="w"> </span>&lt;issue_number&gt;
 </code></pre></div>
 <h2 id="phase-status">Phase Status<a class="headerlink" href="#phase-status" title="Anchor link to this section for reference">&para;</a></h2>
 <h3 id="phase-31-work-item-commands-show-list">Phase 3.1 - ✅ Work Item Commands (show, list)<a class="headerlink" href="#phase-31-work-item-commands-show-list" title="Anchor link to this section for reference">&para;</a></h3>
 <ul>
-<li>✅ Implement <code>workitem show</code> subcommand</li>
-<li>✅ Implement <code>workitem list</code> subcommand  </li>
+<li>✅ Implement <code>wi show</code> subcommand</li>
+<li>✅ Implement <code>wi list</code> subcommand  </li>
 <li>✅ Support GitHub issues with full metadata</li>
 <li>✅ Proper date deserialization and formatting</li>
 <li>✅ Labels and assignee display</li>
@@ -1534,8 +1534,8 @@ sdo<span class="w"> </span>workitem<span class="w"> </span>show<span class="w"> 
 </ul>
 <h3 id="phase-32-pending-update-comment">Phase 3.2 - Pending (update, comment)<a class="headerlink" href="#phase-32-pending-update-comment" title="Anchor link to this section for reference">&para;</a></h3>
 <ul>
-<li>⏳ Implement <code>workitem update</code> subcommand</li>
-<li>⏳ Implement <code>workitem comment</code> subcommand</li>
+<li>⏳ Implement <code>wi update</code> subcommand</li>
+<li>⏳ Implement <code>wi comment</code> subcommand</li>
 <li>⏳ Add filtering options (--type, --assigned-to, --assigned-to-me)</li>
 <li>⏳ 10 placeholder tests awaiting implementation</li>
 </ul>
@@ -1552,7 +1552,7 @@ sdo<span class="w"> </span>workitem<span class="w"> </span>show<span class="w"> 
 - ✅ <strong>State Filtering</strong>: Default behavior excludes closed items; <code>--state closed</code> retrieves closed issues<br />
 - ✅ <strong>Result Limiting</strong>: <code>--top</code> parameter correctly limits results after filtering
 - ✅ All 33 unit tests passing with pagination
-- ✅ Verified with real data: <code>workitem list</code> now returns all 18 open issues (previously limited to 14)</p>
+- ✅ Verified with real data: <code>wi list</code> now returns all 18 open issues (previously limited to 14)</p>
 <p><strong>Known Limitations</strong>:
 - Azure DevOps: Same pagination logic applied; tested with state filtering
 - Update/Comment operations: Unit tests written (Phase 3.2), awaiting implementation</p>
@@ -1561,7 +1561,7 @@ sdo<span class="w"> </span>workitem<span class="w"> </span>show<span class="w"> 
 <div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>C:<span class="se">\s</span>ource<span class="se">\n</span>tools
 nb<span class="w"> </span>build<span class="w">                    </span><span class="c1"># Build solution</span>
 nb<span class="w"> </span><span class="nb">test</span><span class="w">                     </span><span class="c1"># Run all tests</span>
-nb<span class="w"> </span>UNIT_TEST_WORKITEM_COMMAND<span class="w">  </span><span class="c1"># Run workitem tests only</span>
+nb<span class="w"> </span>UNIT_TEST_WI_COMMAND<span class="w">  </span><span class="c1"># Run wi tests only</span>
 </code></pre></div>
 <h3 id="source-code">Source Code<a class="headerlink" href="#source-code" title="Anchor link to this section for reference">&para;</a></h3>
 <ul>
