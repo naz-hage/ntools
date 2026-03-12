@@ -14,7 +14,7 @@ namespace Sdo.Services
     /// <summary>
     /// Implementation of platform detection that analyzes Git remote URLs.
     /// </summary>
-    public class PlatformDetector : IPlatformDetector
+    public class PlatformService : IPlatformService
     {
         private Platform _detectedPlatform = Platform.Unknown;
         private string? _organization;
@@ -214,21 +214,5 @@ namespace Sdo.Services
                 // Ignore parsing errors
             }
         }
-    }
-
-    /// <summary>
-    /// Represents GitHub repository information.
-    /// </summary>
-    public class RepositoryInfo
-    {
-        /// <summary>
-        /// Gets or sets the repository owner.
-        /// </summary>
-        public string? Owner { get; set; }
-
-        /// <summary>
-        /// Gets or sets the repository name.
-        /// </summary>
-        public string? Repo { get; set; }
     }
 }

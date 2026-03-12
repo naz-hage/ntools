@@ -17,7 +17,7 @@ namespace Sdo.Commands
     /// </summary>
     public class AuthCommand : Command
     {
-        private readonly PlatformDetector _platformDetector;
+        private readonly PlatformService _platformDetector;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AuthCommand"/> class.
@@ -25,7 +25,7 @@ namespace Sdo.Commands
         /// <param name="verboseOption">The global verbose option.</param>
         public AuthCommand(Option<bool> verboseOption) : base("auth", "Verify authentication with GitHub or Azure DevOps")
         {
-            _platformDetector = new PlatformDetector();
+            _platformDetector = new PlatformService();
 
             // Add subcommands
             var ghCommand = new Command("gh", "Verify GitHub authentication");

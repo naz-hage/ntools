@@ -14,13 +14,13 @@ namespace SdoTests;
 /// <summary>
 /// Unit tests for the PlatformDetector class.
 /// </summary>
-public class PlatformDetectorTests
+public class PlatformServiceTests
 {
     [Fact]
     public void DetectPlatform_InGitHubRepo_ReturnsGitHub()
     {
         // Arrange
-        var detector = new PlatformDetector();
+        var detector = new PlatformService();
 
         // Act
         var platform = detector.DetectPlatform();
@@ -33,7 +33,7 @@ public class PlatformDetectorTests
     public void GetOrganization_InGitHubRepo_ReturnsOrganization()
     {
         // Arrange
-        var detector = new PlatformDetector();
+        var detector = new PlatformService();
 
         // Act
         var organization = detector.GetOrganization();
@@ -46,7 +46,7 @@ public class PlatformDetectorTests
     public void GetProject_InGitHubRepo_ReturnsProject()
     {
         // Arrange
-        var detector = new PlatformDetector();
+        var detector = new PlatformService();
 
         // Act
         var project = detector.GetProject();
@@ -95,7 +95,7 @@ public class PlatformDetectorTests
     public void PlatformDetector_CanBeInstantiated()
     {
         // Act
-        var detector = new PlatformDetector();
+        var detector = new PlatformService();
 
         // Assert
         Assert.NotNull(detector);

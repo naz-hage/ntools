@@ -17,7 +17,7 @@ namespace Sdo.Commands
     /// </summary>
     public class WorkItemCommand : Command
     {
-        private readonly PlatformDetector _platformDetector;
+        private readonly PlatformService _platformDetector;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WorkItemCommand"/> class.
@@ -25,7 +25,7 @@ namespace Sdo.Commands
         /// <param name="verboseOption">The global verbose option.</param>
         public WorkItemCommand(Option<bool> verboseOption) : base("workitem", "Work item management commands")
         {
-            _platformDetector = new PlatformDetector();
+            _platformDetector = new PlatformService();
 
             // Add subcommands
             AddShowCommand(verboseOption);

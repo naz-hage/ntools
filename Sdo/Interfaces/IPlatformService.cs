@@ -32,7 +32,7 @@ namespace Sdo.Interfaces
     /// <summary>
     /// Interface for detecting the DevOps platform from Git repository configuration.
     /// </summary>
-    public interface IPlatformDetector
+    public interface IPlatformService
     {
         /// <summary>
         /// Detects the DevOps platform by analyzing Git remote URLs.
