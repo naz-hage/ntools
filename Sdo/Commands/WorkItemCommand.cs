@@ -23,7 +23,7 @@ namespace Sdo.Commands
         /// Initializes a new instance of the <see cref="WorkItemCommand"/> class.
         /// </summary>
         /// <param name="verboseOption">The global verbose option.</param>
-        public WorkItemCommand(Option<bool> verboseOption) : base("workitem", "Work item management commands")
+        public WorkItemCommand(Option<bool> verboseOption) : base("wi", "Work item management commands")
         {
             _platformDetector = new PlatformService();
 

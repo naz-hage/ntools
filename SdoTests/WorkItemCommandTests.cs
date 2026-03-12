@@ -36,7 +36,7 @@ public class WorkItemCommandTests
         var command = new WorkItemCommand(_verboseOption);
 
         // Assert
-        Assert.Equal("workitem", command.Name);
+        Assert.Equal("wi", command.Name);
         Assert.Equal("Work item management commands", command.Description);
     }
 

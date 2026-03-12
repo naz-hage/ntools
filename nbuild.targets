@@ -249,12 +249,12 @@
 		<Message Text="" Importance="high" />
 		<Message Text="Test 1: GitHub Issues from ntools repo" Importance="high" />
 		<Message Text="========================================" Importance="high" />
-		<Exec Command="$(SolutionDir)\Sdo\bin\Release\sdo.exe workitem list" WorkingDirectory="$(SolutionDir)" />
+		<Exec Command="$(SolutionDir)\Sdo\bin\Release\sdo.exe wi list" WorkingDirectory="$(SolutionDir)" />
 		
 		<Message Text="" Importance="high" />
 		<Message Text="Test 2: Azure DevOps from ConsoleApp1 repo" Importance="high" />
 		<Message Text="========================================" Importance="high" />
-		<Exec Command="$(SolutionDir)\Sdo\bin\Release\sdo.exe workitem list --verbose" WorkingDirectory="C:\source\ConsoleApp1" />
+		<Exec Command="$(SolutionDir)\Sdo\bin\Release\sdo.exe wi list --verbose" WorkingDirectory="C:\source\ConsoleApp1" />
 		
 		<Message Text="" Importance="high" />
 		<Message Text="========================================" Importance="high" />

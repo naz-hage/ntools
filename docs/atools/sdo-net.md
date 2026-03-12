@@ -9,17 +9,17 @@ This page documents the `sdo.exe` CLI tool - the C# migration of Simple DevOps O
 ### Key Features (Phase 3.1 Complete)
 
 - **Work Item Management**:
-  - `workitem show`: Display detailed work item information (GitHub issues or Azure DevOps work items)
-  - `workitem list`: List work items with filtering and pagination
+  - `wi show`: Display detailed work item information (GitHub issues or Azure DevOps work items)
+  - `wi list`: List work items with filtering and pagination
 - **Multi-Platform Support**: Seamless operations across Azure DevOps and GitHub
 - **Automatic Platform Detection**: Detects platform from Git remote configuration
 - **Clean Output Formatting**: Native table display with emoji headers and proper column alignment
 
 ### Planned Features (Phase 3.2+)
 
-- `workitem create`: Create new work items from structured input
-- `workitem update`: Update work item properties
-- `workitem comment`: Add comments/discussion to work items
+- `wi create`: Create new work items from structured input
+- `wi update`: Update work item properties
+- `wi comment`: Add comments/discussion to work items
 - Additional commands: `pipeline`, `pr` (pull request), `repo` (repository) management
 
 ## Help Output
@@ -47,13 +47,13 @@ Options:
 Commands:
   map       Show command mappings between SDO and native CLI tools
   auth      Verify authentication with GitHub or Azure DevOps
-  workitem  Work item management commands
+  wi  Work item management commands
 ```
 
-### Workitem Command Help
+### wi Command Help
 
 ```
-$ sdo workitem --help
+$ sdo wi --help
 
 Simple DevOps Operations (SDO) - C# Migration
 ============================================
@@ -61,7 +61,7 @@ Description:
   Work item management commands
 
 Usage:
-  sdo workitem [command] [options]
+  sdo wi [command] [options]
 
 Options:
   -?, -h, --help  Show help and usage information
@@ -74,7 +74,7 @@ Commands:
 ### Show Subcommand Help
 
 ```
-$ sdo workitem show --help
+$ sdo wi show --help
 
 Simple DevOps Operations (SDO) - C# Migration
 ============================================
@@ -82,7 +82,7 @@ Description:
   Display detailed work item information
 
 Usage:
-  sdo workitem show [options]
+  sdo wi show [options]
 
 Options:
   --id <id>       Work item ID (required)
@@ -94,7 +94,7 @@ Options:
 ### List Subcommand Help
 
 ```
-$ sdo workitem list --help
+$ sdo wi list --help
 
 Simple DevOps Operations (SDO) - C# Migration
 ============================================
@@ -102,7 +102,7 @@ Description:
   List work items with optional filtering
 
 Usage:
-  sdo workitem list [options]
+  sdo wi list [options]
 
 Options:
   --type <type>                Filter by work item type (PBI, Bug, Task, Spike,
@@ -172,19 +172,19 @@ List work items from the current repository (defaults to GitHub). By default, sh
 
 ```bash
 # List active work items (excludes closed/done by default)
-sdo workitem list
+sdo wi list
 
 # List specific number of items
-sdo workitem list --top 20
+sdo wi list --top 20
 
 # Show only closed issues
-sdo workitem list --state closed
+sdo wi list --state closed
 
 # Show items in a specific state
-sdo workitem list --state "In Progress"
+sdo wi list --state "In Progress"
 
 # Verbose output with debugging information
-sdo workitem list --verbose
+sdo wi list --verbose
 ```
 
 **Default Behavior:**
@@ -222,13 +222,13 @@ Display full details of a specific work item:
 
 ```bash
 # Show GitHub issue #243
-sdo workitem show --id 243
+sdo wi show --id 243
 
 # Show with verbose output
-sdo workitem show --id 243 --verbose
+sdo wi show --id 243 --verbose
 
 # Show with comments (when available)
-sdo workitem show --id 243 --comments
+sdo wi show --id 243 --comments
 ```
 
 **Output Format:**
@@ -265,19 +265,19 @@ URL: https://github.com/naz-hage/ntools/issues/243
 #### Create Work Item (Phase 3.2)
 
 ```bash
-sdo workitem create --title "New Feature" --type PBI --description "Description"
+sdo wi create --title "New Feature" --type PBI --description "Description"
 ```
 
 #### Update Work Item (Phase 3.2)
 
 ```bash
-sdo workitem update --id 243 --title "Updated Title" --state closed --assigned-to user@example.com
+sdo wi update --id 243 --title "Updated Title" --state closed --assigned-to user@example.com
 ```
 
 #### Add Comment (Phase 3.2)
 
 ```bash
-sdo workitem comment --id 243 --text "This is my comment"
+sdo wi comment --id 243 --text "This is my comment"
 ```
 
 ## Platform Detection
@@ -349,9 +349,9 @@ $env:AZURE_DEVOPS_PAT = "your_token"
 All commands have comprehensive unit test coverage:
 
 ```bash
-# Run all workitem command tests
+# Run all wi command tests
 cd C:\source\ntools
-nb UNIT_TEST_WORKITEM_COMMAND
+nb UNIT_TEST_WI_COMMAND
 
 # Output shows
 Passed!  - Failed: 0, Passed: 33, Skipped: 10, Total: 43
@@ -364,21 +364,21 @@ Test with real repositories:
 ```bash
 # Test with ntools repository
 cd C:\source\ntools
-sdo workitem list --top 5
-sdo workitem show --id 243
+sdo wi list --top 5
+sdo wi show --id 243
 
 # Test with different repository
 cd Path\To\Your\Repo
-sdo workitem list
-sdo workitem show --id <issue_number>
+sdo wi list
+sdo wi show --id <issue_number>
 ```
 
 ## Phase Status
 
 ### Phase 3.1 - ✅ Work Item Commands (show, list)
 
-- ✅ Implement `workitem show` subcommand
-- ✅ Implement `workitem list` subcommand  
+- ✅ Implement `wi show` subcommand
+- ✅ Implement `wi list` subcommand  
 - ✅ Support GitHub issues with full metadata
 - ✅ Proper date deserialization and formatting
 - ✅ Labels and assignee display
@@ -388,8 +388,8 @@ sdo workitem show --id <issue_number>
 
 ### Phase 3.2 - Pending (update, comment)
 
-- ⏳ Implement `workitem update` subcommand
-- ⏳ Implement `workitem comment` subcommand
+- ⏳ Implement `wi update` subcommand
+- ⏳ Implement `wi comment` subcommand
 - ⏳ Add filtering options (--type, --assigned-to, --assigned-to-me)
 - ⏳ 10 placeholder tests awaiting implementation
 
@@ -407,7 +407,7 @@ sdo workitem show --id <issue_number>
 - ✅ **State Filtering**: Default behavior excludes closed items; `--state closed` retrieves closed issues  
 - ✅ **Result Limiting**: `--top` parameter correctly limits results after filtering
 - ✅ All 33 unit tests passing with pagination
-- ✅ Verified with real data: `workitem list` now returns all 18 open issues (previously limited to 14)
+- ✅ Verified with real data: `wi list` now returns all 18 open issues (previously limited to 14)
 
 **Known Limitations**:
 - Azure DevOps: Same pagination logic applied; tested with state filtering
@@ -421,7 +421,7 @@ sdo workitem show --id <issue_number>
 cd C:\source\ntools
 nb build                    # Build solution
 nb test                     # Run all tests
-nb UNIT_TEST_WORKITEM_COMMAND  # Run workitem tests only
+nb UNIT_TEST_WI_COMMAND  # Run wi tests only
 ```
 
 ### Source Code
