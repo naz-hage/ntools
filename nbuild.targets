@@ -240,6 +240,28 @@
 		<Message Text="==> CHECK_GITHUB_KEY done" Importance="high" />
 	</Target>
 
+	<!-- Test sdo.exe output format from ntools and ConsoleApp1 -->
+	<Target Name="current-test" DependsOnTargets="BUILD">
+		<Message Text="========================================" Importance="high" />
+		<Message Text="Testing sdo.exe output format" Importance="high" />
+		<Message Text="========================================" Importance="high" />
+		
+		<Message Text="" Importance="high" />
+		<Message Text="Test 1: GitHub Issues from ntools repo" Importance="high" />
+		<Message Text="========================================" Importance="high" />
+		<Exec Command="$(SolutionDir)\Sdo\bin\Release\sdo.exe workitem list" WorkingDirectory="$(SolutionDir)" />
+		
+		<Message Text="" Importance="high" />
+		<Message Text="Test 2: Azure DevOps from ConsoleApp1 repo" Importance="high" />
+		<Message Text="========================================" Importance="high" />
+		<Exec Command="$(SolutionDir)\Sdo\bin\Release\sdo.exe workitem list --verbose" WorkingDirectory="C:\source\ConsoleApp1" />
+		
+		<Message Text="" Importance="high" />
+		<Message Text="========================================" Importance="high" />
+		<Message Text="✓ All tests passed" Importance="high" />
+		<Message Text="========================================" Importance="high" />
+	</Target>
+
 	<!-- Update ntools locally for testing -->
 	<Target Name="UPDATE_NTOOLS" DependsOnTargets="IS_ADMIN" >
 		<PropertyGroup>

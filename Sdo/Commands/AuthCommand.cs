@@ -198,6 +198,21 @@ namespace Sdo.Commands
             }
 
             using var client = new AzureDevOpsClient(token, organization);
+            
+            if (verbose)
+            {
+                // Show token access permissions
+                var scopes = await client.GetTokenScopesAsync();
+                if (scopes != null && scopes.Count > 0)
+                {
+                    Console.WriteLine("\n  Token Permissions:");
+                    foreach (var kvp in scopes)
+                    {
+                        Console.WriteLine($"    {kvp.Key}: {kvp.Value}");
+                    }
+                }
+            }
+            
             var isAuthenticated = await client.VerifyAuthenticationAsync();
             if (!isAuthenticated)
             {

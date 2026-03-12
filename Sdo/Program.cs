@@ -27,9 +27,6 @@ namespace Sdo
         /// <returns>Exit code: 0 for success, non-zero for errors.</returns>
         public static int Main(params string[] args)
         {
-            Console.WriteLine("Simple DevOps Operations (SDO) - C# Migration");
-            Console.WriteLine("============================================");
-
             // Create the root command
             var rootCommand = new RootCommand("Simple DevOps Operations CLI tool for Azure DevOps and GitHub");
 
@@ -41,9 +38,10 @@ namespace Sdo
             // Add commands
             rootCommand.Subcommands.Add(new Commands.MapCommand(verboseOption));
             rootCommand.Subcommands.Add(new Commands.AuthCommand(verboseOption));
+            rootCommand.Subcommands.Add(new Commands.WorkItemCommand(verboseOption));
 
-            // TODO: Add subcommands for work items, repositories, etc.
-            // This is the starting point for the migration
+            // TODO: Add subcommands for repositories, pull requests, pipelines, and users
+            // This is Phase 3 of the migration
 
             // For now, just show a placeholder message
             rootCommand.SetAction((parseResult) =>

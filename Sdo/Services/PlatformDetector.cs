@@ -82,6 +82,24 @@ namespace Sdo.Services
         }
 
         /// <summary>
+        /// Gets the repository information for GitHub repositories.
+        /// </summary>
+        /// <returns>RepositoryInfo with owner and repo, or null if not a GitHub repository.</returns>
+        public RepositoryInfo? GetRepositoryInfo()
+        {
+            if (DetectPlatform() != Platform.GitHub)
+            {
+                return null;
+            }
+
+            return new RepositoryInfo
+            {
+                Owner = _organization,
+                Repo = _project
+            };
+        }
+
+        /// <summary>
         /// Gets the Git remote URL from the current repository.
         /// </summary>
         /// <returns>The remote URL, or null if not found.</returns>
@@ -195,5 +213,21 @@ namespace Sdo.Services
                 // Ignore parsing errors
             }
         }
+    }
+
+    /// <summary>
+    /// Represents GitHub repository information.
+    /// </summary>
+    public class RepositoryInfo
+    {
+        /// <summary>
+        /// Gets or sets the repository owner.
+        /// </summary>
+        public string? Owner { get; set; }
+
+        /// <summary>
+        /// Gets or sets the repository name.
+        /// </summary>
+        public string? Repo { get; set; }
     }
 }
