@@ -6,6 +6,7 @@
 // Implementation of platform detection service that analyzes Git remote URLs
 // to determine the DevOps platform (GitHub or Azure DevOps).
 
+using Sdo.Interfaces;
 using System.Diagnostics;
 
 namespace Sdo.Services

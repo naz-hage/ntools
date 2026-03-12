@@ -7,6 +7,7 @@
 // across GitHub Issues and Azure DevOps work items.
 
 using System.CommandLine;
+using Sdo.Interfaces;
 using Sdo.Services;
 
 namespace Sdo.Commands

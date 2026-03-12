@@ -7,6 +7,7 @@
 // with GitHub and Azure DevOps platforms based on detected Git remote.
 
 using System.CommandLine;
+using Sdo.Interfaces;
 using Sdo.Services;
 
 namespace Sdo.Commands

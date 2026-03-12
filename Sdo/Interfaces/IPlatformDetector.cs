@@ -6,7 +6,7 @@
 // Interface for platform detection services that identify the DevOps platform
 // (GitHub or Azure DevOps) from Git repository configuration.
 
-namespace Sdo.Services
+namespace Sdo.Interfaces
 {
     /// <summary>
     /// Represents the detected DevOps platform.

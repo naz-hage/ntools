@@ -7,6 +7,7 @@
 // from environment variables and other sources (reusing GitHubRelease authentication).
 
 using GitHubRelease;
+using Sdo.Interfaces;
 
 namespace Sdo.Services
 {

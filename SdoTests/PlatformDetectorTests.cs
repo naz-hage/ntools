@@ -7,6 +7,7 @@
 
 using Xunit;
 using Sdo.Services;
+using Sdo.Interfaces;
 
 namespace SdoTests;
 
