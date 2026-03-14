@@ -7,6 +7,7 @@
 // with GitHub and Azure DevOps platforms based on detected Git remote.
 
 using System.CommandLine;
+using Sdo.Interfaces;
 using Sdo.Services;
 
 namespace Sdo.Commands
@@ -16,7 +17,7 @@ namespace Sdo.Commands
     /// </summary>
     public class AuthCommand : Command
     {
-        private readonly PlatformDetector _platformDetector;
+        private readonly PlatformService _platformDetector;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AuthCommand"/> class.
@@ -24,7 +25,7 @@ namespace Sdo.Commands
         /// <param name="verboseOption">The global verbose option.</param>
         public AuthCommand(Option<bool> verboseOption) : base("auth", "Verify authentication with GitHub or Azure DevOps")
         {
-            _platformDetector = new PlatformDetector();
+            _platformDetector = new PlatformService();
 
             // Add subcommands
             var ghCommand = new Command("gh", "Verify GitHub authentication");
@@ -198,6 +199,21 @@ namespace Sdo.Commands
             }
 
             using var client = new AzureDevOpsClient(token, organization);
+            
+            if (verbose)
+            {
+                // Show token access permissions
+                var scopes = await client.GetTokenScopesAsync();
+                if (scopes != null && scopes.Count > 0)
+                {
+                    Console.WriteLine("\n  Token Permissions:");
+                    foreach (var kvp in scopes)
+                    {
+                        Console.WriteLine($"    {kvp.Key}: {kvp.Value}");
+                    }
+                }
+            }
+            
             var isAuthenticated = await client.VerifyAuthenticationAsync();
             if (!isAuthenticated)
             {

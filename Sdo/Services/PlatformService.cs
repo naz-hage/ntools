@@ -6,6 +6,7 @@
 // Implementation of platform detection service that analyzes Git remote URLs
 // to determine the DevOps platform (GitHub or Azure DevOps).
 
+using Sdo.Interfaces;
 using System.Diagnostics;
 
 namespace Sdo.Services
@@ -13,7 +14,7 @@ namespace Sdo.Services
     /// <summary>
     /// Implementation of platform detection that analyzes Git remote URLs.
     /// </summary>
-    public class PlatformDetector : IPlatformDetector
+    public class PlatformService : IPlatformService
     {
         private Platform _detectedPlatform = Platform.Unknown;
         private string? _organization;
@@ -79,6 +80,24 @@ namespace Sdo.Services
             // Ensure platform is detected
             DetectPlatform();
             return _project;
+        }
+
+        /// <summary>
+        /// Gets the repository information for GitHub repositories.
+        /// </summary>
+        /// <returns>RepositoryInfo with owner and repo, or null if not a GitHub repository.</returns>
+        public RepositoryInfo? GetRepositoryInfo()
+        {
+            if (DetectPlatform() != Platform.GitHub)
+            {
+                return null;
+            }
+
+            return new RepositoryInfo
+            {
+                Owner = _organization,
+                Repo = _project
+            };
         }
 
         /// <summary>

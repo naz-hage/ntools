@@ -6,7 +6,7 @@
 // Interface for authentication services that provide secure token management
 // for DevOps platforms.
 
-namespace Sdo.Services
+namespace Sdo.Interfaces
 {
     /// <summary>
     /// Interface for authentication services.
