@@ -121,20 +121,24 @@ namespace Sdo.Services
         /// </summary>
         /// <param name="owner">Repository owner.</param>
         /// <param name="repo">Repository name.</param>
-        /// <param name="perPage">Number of issues to return (max 100).</param>
-        /// <returns>List of GitHub issues.</returns>
-        public async Task<List<GitHubIssue>?> ListIssuesAsync(string owner, string repo, int perPage = 50)
+        /// <param name="perPage">Number of issues to return (clamped to 1-100). Defaults to 50.</param>
+        /// <param name="state">Issue state filter: 'open', 'closed', or 'all'. Defaults to 'open'.</param>
+        /// <param name="top">Maximum total issues to retrieve. 0 means no limit.</param>
+        /// <returns>List of GitHub issues (excluding pull requests).</returns>
+        public async Task<List<GitHubIssue>?> ListIssuesAsync(string owner, string repo, int perPage = 50, string state = "open", int top = 0)
         {
             try
             {
                 var allIssues = new List<GitHubIssue>();
                 int page = 1;
-                int pageSize = 100; // GitHub API max is 100 per page
-                
-                // Fetch all pages (no limit on total count)
+
+                // Clamp perPage to GitHub API limits (1-100)
+                int pageSize = perPage < 1 ? 1 : (perPage > 100 ? 100 : perPage);
+
+                // Fetch pages until we have enough items or reach the end
                 while (true)
                 {
-                    var url = $"https://api.github.com/repos/{owner}/{repo}/issues?per_page={pageSize}&page={page}&state=all";
+                    var url = $"https://api.github.com/repos/{owner}/{repo}/issues?per_page={pageSize}&page={page}&state={state}";
                     var response = await _httpClient.GetAsync(url);
 
                     if (!response.IsSuccessStatusCode)
@@ -154,8 +158,19 @@ namespace Sdo.Services
                         break;
                     }
 
-                    allIssues.AddRange(issues);
-                    
+                    // Filter out pull requests (they have the pull_request field)
+                    var filteredIssues = issues.Where(i => i.PullRequest == null).ToList();
+
+                    allIssues.AddRange(filteredIssues);
+
+                    // Check if we've reached the requested limit
+                    if (top > 0 && allIssues.Count >= top)
+                    {
+                        // Trim to exact count
+                        allIssues = allIssues.Take(top).ToList();
+                        break;
+                    }
+
                     // If we got fewer items than pageSize, we've reached the end
                     if (issues.Count < pageSize)
                     {
@@ -171,6 +186,93 @@ namespace Sdo.Services
             {
                 System.Diagnostics.Debug.WriteLine($"Error listing GitHub issues: {ex.Message}");
                 return null;
+            }
+        }
+
+        /// <summary>
+        /// Updates a GitHub issue.
+        /// </summary>
+        /// <param name="owner">Repository owner.</param>
+        /// <param name="repo">Repository name.</param>
+        /// <param name="issueNumber">Issue number.</param>
+        /// <param name="title">New issue title (optional).</param>
+        /// <param name="state">New issue state: 'open' or 'closed' (optional).</param>
+        /// <param name="body">New issue body/description (optional).</param>
+        /// <param name="assignee">New assignee login name (optional).</param>
+        /// <returns>The updated GitHub issue, or null if update failed.</returns>
+        public async Task<GitHubIssue?> UpdateIssueAsync(string owner, string repo, int issueNumber,
+            string? title = null, string? state = null, string? body = null, string? assignee = null)
+        {
+            try
+            {
+                var url = $"https://api.github.com/repos/{owner}/{repo}/issues/{issueNumber}";
+
+                // Build request body with only provided fields
+                var updateData = new Dictionary<string, object?>();
+                if (!string.IsNullOrEmpty(title))
+                    updateData["title"] = title;
+                if (!string.IsNullOrEmpty(state))
+                    updateData["state"] = state;
+                if (!string.IsNullOrEmpty(body))
+                    updateData["body"] = body;
+                if (!string.IsNullOrEmpty(assignee))
+                    updateData["assignee"] = assignee;
+
+                var content = JsonSerializer.Serialize(updateData);
+                var request = new StringContent(content, System.Text.Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PatchAsync(url, request);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    System.Diagnostics.Debug.WriteLine($"GitHub API error: {response.StatusCode} {response.ReasonPhrase}");
+                    return null;
+                }
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var issue = JsonSerializer.Deserialize<GitHubIssue>(responseContent, options);
+                return issue;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error updating GitHub issue: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Adds a comment to a GitHub issue.
+        /// </summary>
+        /// <param name="owner">Repository owner.</param>
+        /// <param name="repo">Repository name.</param>
+        /// <param name="issueNumber">Issue number.</param>
+        /// <param name="body">Comment text.</param>
+        /// <returns>True if comment was added successfully, false otherwise.</returns>
+        public async Task<bool> AddCommentAsync(string owner, string repo, int issueNumber, string body)
+        {
+            try
+            {
+                var url = $"https://api.github.com/repos/{owner}/{repo}/issues/{issueNumber}/comments";
+
+                var commentData = new { body };
+                var content = JsonSerializer.Serialize(commentData);
+                var request = new StringContent(content, System.Text.Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync(url, request);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    System.Diagnostics.Debug.WriteLine($"GitHub API error: {response.StatusCode} {response.ReasonPhrase}");
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error adding GitHub issue comment: {ex.Message}");
+                return false;
             }
         }
 
@@ -271,6 +373,13 @@ namespace Sdo.Services
         /// Gets or sets the assignee of the issue.
         /// </summary>
         public GitHubUser? Assignee { get; set; }
+
+        /// <summary>
+        /// Gets or sets the pull request object (null for issues, non-null for PRs).
+        /// Used to distinguish between issues and pull requests.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("pull_request")]
+        public object? PullRequest { get; set; }
     }
 
     /// <summary>

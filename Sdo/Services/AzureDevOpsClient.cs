@@ -121,6 +121,51 @@ namespace Sdo.Services
         }
 
         /// <summary>
+        /// Gets multiple work items in a single batch API call (more efficient than individual calls).
+        /// </summary>
+        /// <param name="workItemIds">The work item IDs to fetch.</param>
+        /// <returns>List of work items.</returns>
+        private async Task<List<AzureDevOpsWorkItem>> GetWorkItemsBatchAsync(List<int> workItemIds)
+        {
+            try
+            {
+                if (workItemIds == null || workItemIds.Count == 0)
+                {
+                    return new List<AzureDevOpsWorkItem>();
+                }
+
+                // Azure DevOps batch API: GET /workitems?ids=1,2,3,...&$expand=all
+                var idsString = string.Join(",", workItemIds);
+                var url = $"https://dev.azure.com/{_organization}/_apis/wit/workitems?ids={idsString}&api-version=7.0&$expand=all";
+
+                var response = await _httpClient.GetAsync(url);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Batch API error: {response.StatusCode}");
+                    return new List<AzureDevOpsWorkItem>();
+                }
+
+                var content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var result = JsonSerializer.Deserialize<BatchWorkItemsResponse>(content, options);
+
+                if (result?.Value == null)
+                {
+                    return new List<AzureDevOpsWorkItem>();
+                }
+
+                // Convert WorkItemResponse objects to AzureDevOpsWorkItem
+                return result.Value.Select(r => r.ToWorkItem()).ToList();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error in batch fetch: {ex.Message}");
+                return new List<AzureDevOpsWorkItem>();
+            }
+        }
+
+        /// <summary>
         /// Gets a specific Azure DevOps work item.
         /// </summary>
         /// <param name="workItemId">The work item ID.</param>
@@ -206,16 +251,9 @@ namespace Sdo.Services
                     return new List<AzureDevOpsWorkItem>();
                 }
 
-                // Get full details for each work item
-                var workItems = new List<AzureDevOpsWorkItem>();
-                foreach (var item in queryResult.WorkItems.Take(top))
-                {
-                    var details = await GetWorkItemAsync(item.Id);
-                    if (details != null)
-                    {
-                        workItems.Add(details);
-                    }
-                }
+                // Fetch full details using batch API (more efficient than sequential calls)
+                var workItemIds = queryResult.WorkItems.Take(top).Select(w => w.Id).ToList();
+                var workItems = await GetWorkItemsBatchAsync(workItemIds);
 
                 return workItems;
             }
@@ -337,6 +375,128 @@ namespace Sdo.Services
         }
 
         /// <summary>
+        /// Updates a work item in Azure DevOps.
+        /// </summary>
+        /// <param name="workItemId">The work item ID.</param>
+        /// <param name="title">New title (optional).</param>
+        /// <param name="state">New state (optional).</param>
+        /// <param name="assignee">New assignee email (optional).</param>
+        /// <param name="description">New description (optional).</param>
+        /// <param name="verbose">Enable verbose logging.</param>
+        /// <returns>The updated work item, or null if update failed.</returns>
+        public async Task<AzureDevOpsWorkItem?> UpdateWorkItemAsync(int workItemId, string? title = null,
+            string? state = null, string? assignee = null, string? description = null, bool verbose = false)
+        {
+            try
+            {
+                // Build JSON patch operations for updated fields
+                var operations = new List<object>();
+
+                if (!string.IsNullOrEmpty(title))
+                    operations.Add(new { op = "add", path = "/fields/System.Title", value = title });
+
+                if (!string.IsNullOrEmpty(state))
+                    operations.Add(new { op = "add", path = "/fields/System.State", value = state });
+
+                if (!string.IsNullOrEmpty(description))
+                    operations.Add(new { op = "add", path = "/fields/System.Description", value = description });
+
+                if (!string.IsNullOrEmpty(assignee))
+                    operations.Add(new { op = "add", path = "/fields/System.AssignedTo", value = assignee });
+
+                if (operations.Count == 0)
+                {
+                    if (verbose)
+                        Console.WriteLine("[VERBOSE] No fields to update");
+                    return null;
+                }
+
+                var url = $"https://dev.azure.com/{_organization}/_apis/wit/workitems/{workItemId}?api-version=7.0";
+
+                var content = JsonSerializer.Serialize(operations);
+                var request = new StringContent(content, System.Text.Encoding.UTF8, "application/json-patch+json");
+
+                if (verbose)
+                    Console.WriteLine($"[VERBOSE] Sending PATCH request to {url}");
+
+                var response = await _httpClient.PatchAsync(url, request);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    _lastError = $"Update failed: {response.StatusCode} {response.ReasonPhrase}\n{errorContent}";
+                    if (verbose)
+                        Console.WriteLine($"[VERBOSE] {_lastError}");
+                    return null;
+                }
+
+                var responseBody = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var workItem = JsonSerializer.Deserialize<WorkItemResponse>(responseBody, options);
+
+                return workItem?.ToWorkItem();
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Exception updating work item: {ex.Message}";
+                if (verbose)
+                    Console.WriteLine($"[VERBOSE] {_lastError}");
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Adds a comment to a work item in Azure DevOps.
+        /// </summary>
+        /// <param name="workItemId">The work item ID.</param>
+        /// <param name="message">The comment message.</param>
+        /// <param name="verbose">Enable verbose logging.</param>
+        /// <returns>True if comment was added successfully, false otherwise.</returns>
+        public async Task<bool> AddCommentAsync(int workItemId, string message, bool verbose = false)
+        {
+            try
+            {
+                // In Azure DevOps, comments are added via the discussion field using JSON patch
+                var operations = new List<object>
+                {
+                    new { op = "add", path = "/fields/System.History", value = message }
+                };
+
+                var url = $"https://dev.azure.com/{_organization}/_apis/wit/workitems/{workItemId}?api-version=7.0";
+
+                var content = JsonSerializer.Serialize(operations);
+                var request = new StringContent(content, System.Text.Encoding.UTF8, "application/json-patch+json");
+
+                if (verbose)
+                    Console.WriteLine($"[VERBOSE] Adding comment to work item {workItemId}");
+
+                var response = await _httpClient.PatchAsync(url, request);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    _lastError = $"Add comment failed: {response.StatusCode} {response.ReasonPhrase}\n{errorContent}";
+                    if (verbose)
+                        Console.WriteLine($"[VERBOSE] {_lastError}");
+                    return false;
+                }
+
+                if (verbose)
+                    Console.WriteLine("[VERBOSE] Comment added successfully");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Exception adding comment: {ex.Message}";
+                if (verbose)
+                    Console.WriteLine($"[VERBOSE] {_lastError}");
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Disposes the HTTP client.
         /// </summary>
         public void Dispose()
@@ -383,6 +543,11 @@ namespace Sdo.Services
         public int Id { get; set; }
 
         /// <summary>
+        /// Gets or sets the work item URL (top-level property from API response).
+        /// </summary>
+        public string? Url { get; set; }
+
+        /// <summary>
         /// Gets or sets the work item fields.
         /// </summary>
         public Dictionary<string, object?>? Fields { get; set; }
@@ -395,7 +560,9 @@ namespace Sdo.Services
             var item = new AzureDevOpsWorkItem
             {
                 Id = Id,
-                Url = Fields?.ContainsKey("System.Url") == true ? Fields["System.Url"]?.ToString() : null,
+                // Prefer top-level Url property, fall back to Fields if not available
+                Url = !string.IsNullOrEmpty(Url) ? Url :
+                    (Fields?.ContainsKey("System.Url") == true ? Fields["System.Url"]?.ToString() : null),
             };
 
             if (Fields != null)
@@ -461,6 +628,18 @@ namespace Sdo.Services
 
             return item;
         }
+    }
+
+    /// <summary>
+    /// Represents the batch API response for multiple work items.
+    /// </summary>
+    public class BatchWorkItemsResponse
+    {
+        /// <summary>
+        /// Gets or sets the list of work item responses.
+        /// </summary>
+        [JsonPropertyName("value")]
+        public List<WorkItemResponse>? Value { get; set; }
     }
 
     /// <summary>

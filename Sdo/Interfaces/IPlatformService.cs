@@ -1,7 +1,7 @@
 // Copyright (c) 2020-2026 naz-hage. All rights reserved.
 // Licensed under the MIT License.
 //
-// IPlatformDetector.cs
+// IPlatformService.cs
 //
 // Interface for platform detection services that identify the DevOps platform
 // (GitHub or Azure DevOps) from Git repository configuration.

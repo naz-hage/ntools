@@ -1,7 +1,7 @@
 // Copyright (c) 2020-2026 naz-hage. All rights reserved.
 // Licensed under the MIT License.
 //
-// PlatformDetector.cs
+// PlatformService.cs
 //
 // Implementation of platform detection service that analyzes Git remote URLs
 // to determine the DevOps platform (GitHub or Azure DevOps).
@@ -37,13 +37,13 @@ namespace Sdo.Services
                 var remoteUrl = GetGitRemoteUrl();
                 if (string.IsNullOrEmpty(remoteUrl))
                 {
-                    throw new InvalidOperationException("❌ Could not extract platform info from Git remote. Please ensure you're in a Git repository with a supported remote (Azure DevOps or GitHub).");
+                    throw new InvalidOperationException("Not a Git repository.\nPlease ensure you're in an Azure or GitHub repository.");
                 }
 
                 _detectedPlatform = ParsePlatformFromUrl(remoteUrl);
                 if (_detectedPlatform == Platform.Unknown)
                 {
-                    throw new InvalidOperationException("❌ Could not extract platform info from Git remote. Please ensure you're in a Git repository with a supported remote (Azure DevOps or GitHub).");
+                    throw new InvalidOperationException("Not a Git repository.\nPlease ensure you're in an Azure or GitHub repository.");
                 }
 
                 ParseOrganizationAndProject(remoteUrl);
@@ -56,7 +56,7 @@ namespace Sdo.Services
             }
             catch
             {
-                throw new InvalidOperationException("❌ Could not extract platform info from Git remote. Please ensure you're in a Git repository with a supported remote (Azure DevOps or GitHub).");
+                throw new InvalidOperationException("Not a Git repository.\nPlease ensure you're in an Azure or GitHub repository.");
             }
         }
 

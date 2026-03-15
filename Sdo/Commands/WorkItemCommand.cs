@@ -27,13 +27,12 @@ namespace Sdo.Commands
         {
             _platformDetector = new PlatformService();
 
-            // Add subcommands
-            AddShowCommand(verboseOption);
+            // Add subcommands (in alphabetical order for help display)
+            AddCommentCommand(verboseOption);
+            AddCreateCommand(verboseOption);
             AddListCommand(verboseOption);
-            // Additional subcommands to be implemented in Phase 3.1:
-            // - create
-            // - update
-            // - comment
+            AddShowCommand(verboseOption);
+            AddUpdateCommand(verboseOption);
         }
 
         /// <summary>
@@ -100,6 +99,102 @@ namespace Sdo.Commands
         }
 
         /// <summary>
+        /// Adds the 'update' subcommand to modify work item properties.
+        /// </summary>
+        /// <param name="verboseOption">The global verbose option.</param>
+        private void AddUpdateCommand(Option<bool> verboseOption)
+        {
+            var updateCommand = new Command("update", "Update work item properties");
+
+            var idOption = new Option<int>("--id") { Description = "Work item ID (required)" };
+            var titleOption = new Option<string?>("--title") { Description = "Update work item title" };
+            var stateOption = new Option<string?>("--state") { Description = "Update work item state" };
+            var assigneeOption = new Option<string?>("--assignee") { Description = "Update assigned user" };
+            var descriptionOption = new Option<string?>("--description") { Description = "Update work item description" };
+
+            updateCommand.Add(idOption);
+            updateCommand.Add(titleOption);
+            updateCommand.Add(stateOption);
+            updateCommand.Add(assigneeOption);
+            updateCommand.Add(descriptionOption);
+            updateCommand.Add(verboseOption);
+
+            updateCommand.SetAction(async (parseResult) =>
+            {
+                var id = parseResult.GetValue(idOption);
+                var title = parseResult.GetValue(titleOption);
+                var state = parseResult.GetValue(stateOption);
+                var assignee = parseResult.GetValue(assigneeOption);
+                var description = parseResult.GetValue(descriptionOption);
+                var verbose = parseResult.GetValue(verboseOption);
+
+                return await UpdateWorkItem(id, title, state, assignee, description, verbose);
+            });
+
+            Subcommands.Add(updateCommand);
+        }
+
+        /// <summary>
+        /// Adds the 'comment' subcommand to add comments to work items.
+        /// </summary>
+        /// <param name="verboseOption">The global verbose option.</param>
+        private void AddCommentCommand(Option<bool> verboseOption)
+        {
+            var commentCommand = new Command("comment", "Add comment to a work item");
+
+            var idOption = new Option<int>("--id") { Description = "Work item ID (required)" };
+            var messageOption = new Option<string>("--message") { Description = "Comment message (required)" };
+
+            commentCommand.Add(idOption);
+            commentCommand.Add(messageOption);
+            commentCommand.Add(verboseOption);
+
+            commentCommand.SetAction(async (parseResult) =>
+            {
+                var id = parseResult.GetValue(idOption);
+                var message = parseResult.GetValue(messageOption);
+                var verbose = parseResult.GetValue(verboseOption);
+
+                return await AddComment(id, message!, verbose);
+            });
+
+            Subcommands.Add(commentCommand);
+        }
+
+        /// <summary>
+        /// Adds the 'create' subcommand to create a new work item.
+        /// </summary>
+        /// <param name="verboseOption">The global verbose option.</param>
+        private void AddCreateCommand(Option<bool> verboseOption)
+        {
+            var createCommand = new Command("create", "Create a new work item");
+
+            var titleOption = new Option<string>("--title") { Description = "Work item title (required)" };
+            var typeOption = new Option<string>("--type") { Description = "Work item type (PBI, Bug, Task, etc.)" };
+            var descriptionOption = new Option<string?>("--description") { Description = "Work item description" };
+            var assigneeOption = new Option<string?>("--assignee") { Description = "Assign to user" };
+
+            createCommand.Add(titleOption);
+            createCommand.Add(typeOption);
+            createCommand.Add(descriptionOption);
+            createCommand.Add(assigneeOption);
+            createCommand.Add(verboseOption);
+
+            createCommand.SetAction(async (parseResult) =>
+            {
+                var title = parseResult.GetValue(titleOption);
+                var type = parseResult.GetValue(typeOption);
+                var description = parseResult.GetValue(descriptionOption);
+                var assignee = parseResult.GetValue(assigneeOption);
+                var verbose = parseResult.GetValue(verboseOption);
+
+                return await CreateWorkItem(title!, type!, description, assignee, verbose);
+            });
+
+            Subcommands.Add(createCommand);
+        }
+
+        /// <summary>
         /// Handles displaying work item details.
         /// </summary>
         /// <param name="id">The work item ID.</param>
@@ -138,7 +233,9 @@ namespace Sdo.Commands
             }
             catch (InvalidOperationException ex)
             {
-                Console.WriteLine($"✗ {ex.Message}");
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"X {ex.Message}");
+                Console.ResetColor();
                 return 1;
             }
             catch (Exception ex)
@@ -282,7 +379,9 @@ namespace Sdo.Commands
             }
             catch (InvalidOperationException ex)
             {
-                Console.WriteLine($"✗ {ex.Message}");
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"X {ex.Message}");
+                Console.ResetColor();
                 return 1;
             }
             catch (Exception ex)
@@ -481,6 +580,410 @@ namespace Sdo.Commands
             catch (Exception ex)
             {
                 Console.WriteLine($"✗ Failed to list Azure DevOps work items: {ex.Message}");
+                return 1;
+            }
+        }
+
+        /// <summary>
+        /// Handles updating work item properties.
+        /// </summary>
+        /// <param name="id">The work item ID.</param>
+        /// <param name="title">New title (optional).</param>
+        /// <param name="state">New state (optional).</param>
+        /// <param name="assignee">New assignee (optional).</param>
+        /// <param name="description">New description (optional).</param>
+        /// <param name="verbose">Whether to enable verbose output.</param>
+        /// <returns>Exit code.</returns>
+        private async Task<int> UpdateWorkItem(int id, string? title, string? state, string? assignee, string? description, bool verbose)
+        {
+            try
+            {
+                if (id <= 0)
+                {
+                    Console.WriteLine("✗ Work item ID must be positive");
+                    return 1;
+                }
+
+                if (string.IsNullOrEmpty(title) && string.IsNullOrEmpty(state) &&
+                    string.IsNullOrEmpty(assignee) && string.IsNullOrEmpty(description))
+                {
+                    Console.WriteLine("✗ At least one property must be specified for update (--title, --state, --assignee, --description)");
+                    return 1;
+                }
+
+                if (verbose)
+                {
+                    Console.WriteLine($"Detecting platform and updating work item {id}...");
+                }
+
+                var platform = _platformDetector.DetectPlatform();
+
+                if (verbose)
+                {
+                    Console.WriteLine($"Detected platform: {platform}");
+                }
+
+                if (platform == Platform.GitHub)
+                {
+                    // Get repository information
+                    var repoInfo = _platformDetector.GetRepositoryInfo();
+                    if (repoInfo == null || repoInfo.Owner == null || repoInfo.Repo == null)
+                    {
+                        Console.WriteLine("✗ Could not determine GitHub repository from Git remote");
+                        return 1;
+                    }
+
+                    using var client = new GitHubClient();
+
+                    if (verbose)
+                    {
+                        Console.WriteLine($"Updating GitHub issue #{id} in {repoInfo.Owner}/{repoInfo.Repo}...");
+                    }
+
+                    var result = await client.UpdateIssueAsync(repoInfo.Owner!, repoInfo.Repo!, id, title, state, description, assignee);
+
+                    if (result != null)
+                    {
+                        Console.WriteLine($"✓ GitHub issue #{id} updated successfully");
+                        if (verbose)
+                        {
+                            Console.WriteLine($"  Title: {result.Title}");
+                            Console.WriteLine($"  State: {result.State}");
+                        }
+                        return 0;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"✗ Failed to update GitHub issue #{id}");
+                        return 1;
+                    }
+                }
+                else if (platform == Platform.AzureDevOps)
+                {
+                    // Get Azure DevOps configuration
+                    var pat = Environment.GetEnvironmentVariable("AZURE_DEVOPS_PAT");
+                    if (string.IsNullOrEmpty(pat))
+                    {
+                        Console.WriteLine("✗ AZURE_DEVOPS_PAT environment variable not set");
+                        return 1;
+                    }
+
+                    var organization = _platformDetector.GetOrganization();
+                    if (string.IsNullOrEmpty(organization))
+                    {
+                        Console.WriteLine("✗ Could not determine Azure DevOps organization");
+                        return 1;
+                    }
+
+                    var project = _platformDetector.GetProject();
+
+                    using var client = new AzureDevOpsClient(pat, organization, project);
+
+                    if (verbose)
+                    {
+                        Console.WriteLine($"Updating Azure DevOps work item {id} in {organization}...");
+                    }
+
+                    var result = await client.UpdateWorkItemAsync(id, title, state, assignee, description);
+
+                    if (result != null)
+                    {
+                        Console.WriteLine($"✓ Work item {id} updated successfully");
+                        if (verbose)
+                        {
+                            Console.WriteLine($"  Title: {result.Title}");
+                            Console.WriteLine($"  State: {result.State}");
+                        }
+                        return 0;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"✗ Failed to update work item {id}");
+                        if (!string.IsNullOrEmpty(client.LastError))
+                        {
+                            Console.WriteLine($"  Error: {client.LastError}");
+                        }
+                        return 1;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("✗ Unsupported platform detected");
+                    return 1;
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"X {ex.Message}");
+                Console.ResetColor();
+                return 1;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"✗ Error: {ex.Message}");
+                if (verbose)
+                {
+                    Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                }
+                return 1;
+            }
+        }
+
+        /// <summary>
+        /// Handles adding a comment to a work item.
+        /// </summary>
+        /// <param name="id">The work item ID.</param>
+        /// <param name="message">The comment message.</param>
+        /// <param name="verbose">Whether to enable verbose output.</param>
+        /// <returns>Exit code.</returns>
+        private async Task<int> AddComment(int id, string message, bool verbose)
+        {
+            try
+            {
+                if (id <= 0)
+                {
+                    Console.WriteLine("✗ Work item ID must be positive");
+                    return 1;
+                }
+
+                if (string.IsNullOrEmpty(message))
+                {
+                    Console.WriteLine("✗ Comment message cannot be empty");
+                    return 1;
+                }
+
+                if (verbose)
+                {
+                    Console.WriteLine($"Detecting platform and adding comment to work item {id}...");
+                }
+
+                var platform = _platformDetector.DetectPlatform();
+
+                if (verbose)
+                {
+                    Console.WriteLine($"Detected platform: {platform}");
+                }
+
+                if (platform == Platform.GitHub)
+                {
+                    // Get repository information
+                    var repoInfo = _platformDetector.GetRepositoryInfo();
+                    if (repoInfo == null || repoInfo.Owner == null || repoInfo.Repo == null)
+                    {
+                        Console.WriteLine("✗ Could not determine GitHub repository from Git remote");
+                        return 1;
+                    }
+
+                    using var client = new GitHubClient();
+
+                    if (verbose)
+                    {
+                        Console.WriteLine($"Adding comment to GitHub issue #{id} in {repoInfo.Owner}/{repoInfo.Repo}...");
+                    }
+
+                    var success = await client.AddCommentAsync(repoInfo.Owner!, repoInfo.Repo!, id, message);
+
+                    if (success)
+                    {
+                        Console.WriteLine($"✓ Comment added to GitHub issue #{id}");
+                        return 0;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"✗ Failed to add comment to GitHub issue #{id}");
+                        return 1;
+                    }
+                }
+                else if (platform == Platform.AzureDevOps)
+                {
+                    // Get Azure DevOps configuration
+                    var pat = Environment.GetEnvironmentVariable("AZURE_DEVOPS_PAT");
+                    if (string.IsNullOrEmpty(pat))
+                    {
+                        Console.WriteLine("✗ AZURE_DEVOPS_PAT environment variable not set");
+                        return 1;
+                    }
+
+                    var organization = _platformDetector.GetOrganization();
+                    if (string.IsNullOrEmpty(organization))
+                    {
+                        Console.WriteLine("✗ Could not determine Azure DevOps organization");
+                        return 1;
+                    }
+
+                    var project = _platformDetector.GetProject();
+
+                    using var client = new AzureDevOpsClient(pat, organization, project);
+
+                    if (verbose)
+                    {
+                        Console.WriteLine($"Adding comment to Azure DevOps work item {id} in {organization}...");
+                    }
+
+                    var success = await client.AddCommentAsync(id, message);
+
+                    if (success)
+                    {
+                        Console.WriteLine($"✓ Comment added to work item {id}");
+                        return 0;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"✗ Failed to add comment to work item {id}");
+                        if (!string.IsNullOrEmpty(client.LastError))
+                        {
+                            Console.WriteLine($"  Error: {client.LastError}");
+                        }
+                        return 1;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("✗ Unsupported platform detected");
+                    return 1;
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"X {ex.Message}");
+                Console.ResetColor();
+                return 1;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"✗ Error: {ex.Message}");
+                if (verbose)
+                {
+                    Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                }
+                return 1;
+            }
+        }
+
+        /// <summary>
+        /// Handles creating a new work item.
+        /// </summary>
+        /// <param name="title">The work item title.</param>
+        /// <param name="type">The work item type.</param>
+        /// <param name="description">The work item description (optional).</param>
+        /// <param name="assignee">The assignee (optional).</param>
+        /// <param name="verbose">Whether to enable verbose output.</param>
+        /// <returns>Exit code.</returns>
+        private async Task<int> CreateWorkItem(string title, string type, string? description, string? assignee, bool verbose)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(title))
+                {
+                    Console.WriteLine("✗ Title is required for creating a work item");
+                    return 1;
+                }
+
+                if (string.IsNullOrEmpty(type))
+                {
+                    Console.WriteLine("✗ Type is required for creating a work item (PBI, Bug, Task, etc.)");
+                    return 1;
+                }
+
+                if (verbose)
+                {
+                    Console.WriteLine($"Detecting platform and creating new work item...");
+                }
+
+                var platform = _platformDetector.DetectPlatform();
+
+                if (verbose)
+                {
+                    Console.WriteLine($"Detected platform: {platform}");
+                }
+
+                if (platform == Platform.GitHub)
+                {
+                    // Get repository information
+                    var repoInfo = _platformDetector.GetRepositoryInfo();
+                    if (repoInfo == null || repoInfo.Owner == null || repoInfo.Repo == null)
+                    {
+                        Console.WriteLine("✗ Could not determine GitHub repository from Git remote");
+                        return 1;
+                    }
+
+                    using var client = new GitHubClient();
+
+                    if (verbose)
+                    {
+                        Console.WriteLine($"Creating GitHub issue in {repoInfo.Owner}/{repoInfo.Repo}...");
+                        Console.WriteLine($"  Title: {title}");
+                        Console.WriteLine($"  Description: {description ?? "(none)"}");
+                    }
+
+                    // TODO: Implement GitHub issue creation in Phase 3.2
+                    Console.WriteLine("ℹ GitHub issue creation endpoint would be called here");
+                    Console.WriteLine($"  Title: {title}");
+                    Console.WriteLine($"  Description: {description ?? "(none)"}");
+                    Console.WriteLine("✓ GitHub issue created (placeholder - not yet implemented)");
+                    return 0;
+                }
+                else if (platform == Platform.AzureDevOps)
+                {
+                    // Get Azure DevOps configuration
+                    var pat = Environment.GetEnvironmentVariable("AZURE_DEVOPS_PAT");
+                    if (string.IsNullOrEmpty(pat))
+                    {
+                        Console.WriteLine("✗ AZURE_DEVOPS_PAT environment variable not set");
+                        return 1;
+                    }
+
+                    var organization = _platformDetector.GetOrganization();
+                    if (string.IsNullOrEmpty(organization))
+                    {
+                        Console.WriteLine("✗ Could not determine Azure DevOps organization");
+                        return 1;
+                    }
+
+                    var project = _platformDetector.GetProject();
+
+                    using var client = new AzureDevOpsClient(pat, organization, project);
+
+                    if (verbose)
+                    {
+                        Console.WriteLine($"Creating Azure DevOps work item in {organization}/{project ?? "default"}...");
+                        Console.WriteLine($"  Title: {title}");
+                        Console.WriteLine($"  Type: {type}");
+                        Console.WriteLine($"  Description: {description ?? "(none)"}");
+                        if (!string.IsNullOrEmpty(assignee)) Console.WriteLine($"  Assignee: {assignee}");
+                    }
+
+                    // TODO: Implement Azure DevOps work item creation in Phase 3.2
+                    Console.WriteLine("ℹ Azure DevOps work item creation endpoint would be called here");
+                    Console.WriteLine($"  Title: {title}");
+                    Console.WriteLine($"  Type: {type}");
+                    Console.WriteLine($"  Description: {description ?? "(none)"}");
+                    if (!string.IsNullOrEmpty(assignee)) Console.WriteLine($"  Assignee: {assignee}");
+                    Console.WriteLine("✓ Azure DevOps work item created (placeholder - not yet implemented)");
+                    return 0;
+                }
+                else
+                {
+                    Console.WriteLine("✗ Unsupported platform detected");
+                    return 1;
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"X {ex.Message}");
+                Console.ResetColor();
+                return 1;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"✗ Error: {ex.Message}");
+                if (verbose)
+                {
+                    Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                }
                 return 1;
             }
         }

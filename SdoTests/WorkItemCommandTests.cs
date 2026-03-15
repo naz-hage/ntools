@@ -105,6 +105,7 @@ public class WorkItemCommandTests
         // Assert
         // The option should support -c as a short alias
         Assert.NotNull(commentsOption);
+        Assert.Contains("-c", commentsOption.Aliases);
     }
 
     [Fact]
@@ -622,6 +623,134 @@ public class WorkItemCommandTests
 
         // Assert
         Assert.True(result == 0 || result == 1, $"Expected exit code 0 or 1, got {result}");
+    }
+
+    #endregion
+
+    #region Create Subcommand Tests
+
+    [Fact]
+    public void Constructor_AddsCreateSubcommand()
+    {
+        // Act
+        var command = new WorkItemCommand(_verboseOption);
+
+        // Assert
+        var createSubcommand = Assert.Single(command.Subcommands, s => s.Name == "create");
+        Assert.NotNull(createSubcommand);
+        Assert.Equal("Create a new work item", createSubcommand.Description);
+    }
+
+    [Fact]
+    public void CreateSubcommand_HasTitleOption()
+    {
+        // Act
+        var command = new WorkItemCommand(_verboseOption);
+        var createCmd = Assert.Single(command.Subcommands, s => s.Name == "create");
+
+        // Assert
+        var titleOption = Assert.Single(createCmd.Options, o => o.Name == "--title");
+        Assert.NotNull(titleOption);
+    }
+
+    [Fact]
+    public void CreateSubcommand_HasTypeOption()
+    {
+        // Act
+        var command = new WorkItemCommand(_verboseOption);
+        var createCmd = Assert.Single(command.Subcommands, s => s.Name == "create");
+
+        // Assert
+        var typeOption = Assert.Single(createCmd.Options, o => o.Name == "--type");
+        Assert.NotNull(typeOption);
+    }
+
+    [Fact]
+    public void CreateSubcommand_WithValidArguments_ReturnsExitCode()
+    {
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        var args = new[] { "create", "--title", "New Issue", "--type", "Bug" };
+
+        // Act
+        var result = command.Parse(args).Invoke();
+
+        // Assert
+        Assert.True(result == 0 || result == 1, $"Expected exit code 0 or 1, got {result}");
+    }
+
+    #endregion
+
+    #region Integration Tests (Phase 3.2+)
+
+    /// <summary>
+    /// Integration tests for actual API calls.
+    /// These require valid credentials and network access.
+    /// Scaffolded for Phase 3.2 implementation.
+    /// </summary>
+
+    [Fact(Skip = "Integration: Scaffolded for Phase 3.2 - requires GitHub credentials")]
+    public void IntegrationTest_Update_GitHub_WithValidIssue()
+    {
+        // TODO: Implement real GitHub API integration test
+        // 1. Create a test issue
+        // 2. Update it using wi update command
+        // 3. Verify update via GitHub API
+        // 4. Clean up test issue
+        Assert.True(true);
+    }
+
+    [Fact(Skip = "Integration: Scaffolded for Phase 3.2 - requires Azure DevOps credentials")]
+    public void IntegrationTest_Update_AzureDevOps_WithValidWorkItem()
+    {
+        // TODO: Implement real Azure DevOps API integration test
+        // 1. Create a test work item
+        // 2. Update it using wi update command
+        // 3. Verify update via Azure DevOps API
+        // 4. Clean up test work item
+        Assert.True(true);
+    }
+
+    [Fact(Skip = "Integration: Scaffolded for Phase 3.2 - requires GitHub credentials")]
+    public void IntegrationTest_Comment_GitHub_WithValidIssue()
+    {
+        // TODO: Implement real GitHub API integration test
+        // 1. Create a test issue
+        // 2. Add comment using wi comment command
+        // 3. Verify comment via GitHub API
+        // 4. Clean up test issue
+        Assert.True(true);
+    }
+
+    [Fact(Skip = "Integration: Scaffolded for Phase 3.2 - requires Azure DevOps credentials")]
+    public void IntegrationTest_Comment_AzureDevOps_WithValidWorkItem()
+    {
+        // TODO: Implement real Azure DevOps API integration test
+        // 1. Create a test work item
+        // 2. Add comment using wi comment command
+        // 3. Verify comment via Azure DevOps API
+        // 4. Clean up test work item
+        Assert.True(true);
+    }
+
+    [Fact(Skip = "Integration: Scaffolded for Phase 3.2 - requires GitHub credentials")]
+    public void IntegrationTest_Create_GitHub_WithValidRepository()
+    {
+        // TODO: Implement real GitHub API integration test
+        // 1. Create new issue using wi create command
+        // 2. Verify issue created via GitHub API
+        // 3. Clean up test issue
+        Assert.True(true);
+    }
+
+    [Fact(Skip = "Integration: Scaffolded for Phase 3.2 - requires Azure DevOps credentials")]
+    public void IntegrationTest_Create_AzureDevOps_WithValidProject()
+    {
+        // TODO: Implement real Azure DevOps API integration test
+        // 1. Create new work item using wi create command
+        // 2. Verify work item created via Azure DevOps API
+        // 3. Clean up test work item
+        Assert.True(true);
     }
 
     #endregion

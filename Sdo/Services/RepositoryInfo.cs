@@ -1,10 +1,10 @@
 // Copyright (c) 2020-2026 naz-hage. All rights reserved.
 // Licensed under the MIT License.
 //
-// PlatformDetector.cs
+// RepositoryInfo.cs
 //
-// Implementation of platform detection service that analyzes Git remote URLs
-// to determine the DevOps platform (GitHub or Azure DevOps).
+// Defines a data model that represents Git repository information,
+// including the repository owner and name.
 
 namespace Sdo.Services
 {
