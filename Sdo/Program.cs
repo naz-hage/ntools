@@ -38,10 +38,13 @@ namespace Sdo
             // Add commands
             rootCommand.Subcommands.Add(new Commands.MapCommand(verboseOption));
             rootCommand.Subcommands.Add(new Commands.AuthCommand(verboseOption));
+            rootCommand.Subcommands.Add(new Commands.RepositoryCommand(verboseOption));
             rootCommand.Subcommands.Add(new Commands.WorkItemCommand(verboseOption));
 
-            // TODO: Add subcommands for repositories, pull requests, pipelines, and users
-            // This is Phase 3 of the migration
+            // TODO: Add subcommands for pull requests, pipelines, and users
+            // Phase 3.4: Pull Request Commands
+            // Phase 3.5: Pipeline Commands
+            // Phase 3.6: User Commands
 
             // For now, just show a placeholder message
             rootCommand.SetAction((parseResult) =>
