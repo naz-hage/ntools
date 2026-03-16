@@ -80,6 +80,13 @@
         <Message Text="Unit tests for WorkItemCommand complete." />
     </Target>
 
+    <!-- Unit tests for WorkItemCommand -->
+    <Target Name="UNIT_TEST_REPOSITORY_COMMAND">
+        <Message Text="Running unit tests for RepositoryCommand..." />
+        <Exec Command='dotnet test "$(SolutionDir)\SdoTests\SdoTests.csproj" --filter "FullyQualifiedName~RepositoryCommandTests" --logger trx' WorkingDirectory="$(SolutionDir)" />
+        <Message Text="Unit tests for RepositoryCommand complete." />
+    </Target>
+
     <!-- Run all unit tests -->
     <Target Name="UNIT_TEST_ALL" DependsOnTargets="UNIT_TEST_CLI_VALIDATION;UNIT_TEST_BUILD_STARTER;UNIT_TEST_CLI;UNIT_TEST_COMMAND;UNIT_TEST_NB_COMMAND;UNIT_TEST_GIT_CLONE_COMMAND;UNIT_TEST_NTOOLS_JSON;UNIT_TEST_RELEASE_SERVICE_FACTORY;UNIT_TEST_RESOURCE_HELPER;UNIT_TEST_WORKITEM_COMMAND">
         <Message Text="All unit tests completed." />

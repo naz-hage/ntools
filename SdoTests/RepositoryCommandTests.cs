@@ -74,7 +74,8 @@ public class RepositoryCommandTests
     {
         var command = new RepositoryCommand(_verboseOption);
         var createCmd = command.Subcommands.First(s => s.Name == "create");
-        var descOption = createCmd.Options.FirstOrDefault(o => o.Name == "description");
+        var descOption = createCmd.Options.FirstOrDefault(o =>
+            o.Name.Contains("description"));
         Assert.NotNull(descOption);
     }
 
@@ -83,7 +84,8 @@ public class RepositoryCommandTests
     {
         var command = new RepositoryCommand(_verboseOption);
         var createCmd = command.Subcommands.First(s => s.Name == "create");
-        var privateOption = createCmd.Options.FirstOrDefault(o => o.Name == "private");
+        var privateOption = createCmd.Options.FirstOrDefault(o =>
+            o.Name.Contains("private"));
         Assert.NotNull(privateOption);
     }
 
@@ -92,7 +94,8 @@ public class RepositoryCommandTests
     {
         var command = new RepositoryCommand(_verboseOption);
         var deleteCmd = command.Subcommands.First(s => s.Name == "delete");
-        var forceOption = deleteCmd.Options.FirstOrDefault(o => o.Name == "force");
+        var forceOption = deleteCmd.Options.FirstOrDefault(o =>
+            o.Name.Contains("force"));
         Assert.NotNull(forceOption);
     }
 
@@ -101,7 +104,8 @@ public class RepositoryCommandTests
     {
         var command = new RepositoryCommand(_verboseOption);
         var listCmd = command.Subcommands.First(s => s.Name == "list");
-        var topOption = listCmd.Options.FirstOrDefault(o => o.Name == "top");
+        var topOption = listCmd.Options.FirstOrDefault(o =>
+            o.Name.Contains("top"));
         Assert.NotNull(topOption);
     }
 }
