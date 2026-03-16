@@ -209,23 +209,21 @@ namespace Sdo.Services
                 else if (_detectedPlatform == Platform.AzureDevOps)
                 {
                     // Azure DevOps formats:
-                    // dev.azure.com/organization/project/_git/repository
-                    // organization.visualstudio.com/project/_git/repository
+                    // dev.azure.com/organization/project/_git/repository (5 parts)
+                    // organization.visualstudio.com/project/_git/repository (4 parts)
                     var parts = cleanUrl.Split('/');
-                    if (parts.Length >= 5)
+
+                    if (parts[0].Contains("dev.azure.com") && parts.Length >= 5)
                     {
-                        if (parts[0].Contains("dev.azure.com"))
-                        {
-                            _organization = parts[1];
-                            _project = parts[2]; // Project is parts[2]
-                            _repository = parts[4]; // Repository is parts[4]
-                        }
-                        else if (parts[0].Contains("visualstudio.com"))
-                        {
-                            _organization = parts[0].Split('.').First();
-                            _project = parts[1]; // Project is parts[1] for visualstudio.com format
-                            _repository = parts[3]; // Repository is parts[3] for visualstudio.com format
-                        }
+                        _organization = parts[1];
+                        _project = parts[2]; // Project is parts[2]
+                        _repository = parts[4].Replace(".git", ""); // Repository is parts[4]
+                    }
+                    else if (parts[0].Contains("visualstudio.com") && parts.Length >= 4)
+                    {
+                        _organization = parts[0].Split('.').First();
+                        _project = parts[1]; // Project is parts[1] for visualstudio.com format
+                        _repository = parts[3].Replace(".git", ""); // Repository is parts[3] for visualstudio.com format
                     }
                 }
             }

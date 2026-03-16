@@ -509,7 +509,7 @@ namespace Sdo.Services
                 var url = $"https://dev.azure.com/{_organization}/_apis/projects?api-version=7.0";
                 if (top > 0)
                 {
-                    url += $"&top={top}";
+                    url += $"&$top={top}";
                 }
                 if (!string.IsNullOrEmpty(continuationToken))
                 {

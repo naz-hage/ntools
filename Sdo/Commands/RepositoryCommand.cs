@@ -123,7 +123,7 @@ namespace Sdo.Commands
             try
             {
                 var jsonStart = fullError.IndexOf("{");
-                if (jsonStart > 0)
+                if (jsonStart >= 0)
                 {
                     var jsonStr = fullError.Substring(jsonStart);
                     var options = new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true };
@@ -183,21 +183,26 @@ namespace Sdo.Commands
                 else if (platform == Platform.AzureDevOps)
                 {
                     var pat = Environment.GetEnvironmentVariable("AZURE_DEVOPS_PAT");
-                    var organization = _platformDetector.GetOrganization();
-                    if (string.IsNullOrEmpty(organization))
+                    if (string.IsNullOrEmpty(pat))
                     {
-                        ConsoleHelper.WriteError("X Unable to determine Azure DevOps organization");
+                        ConsoleHelper.WriteError("X AZURE_DEVOPS_PAT environment variable not set");
                         return 1;
                     }
 
-                    using var client = new AzureDevOpsClient(pat!, organization);
-                    var projects = await client.ListProjectsAsync(1);
-                    if (projects == null || projects.Count == 0) return 1;
-                    var repos = await client.ListRepositoriesAsync(projects[0].Id!, top);
+                    var organization = _platformDetector.GetOrganization();
+                    var project = _platformDetector.GetProject();
+                    if (string.IsNullOrEmpty(organization) || string.IsNullOrEmpty(project))
+                    {
+                        ConsoleHelper.WriteError("X Unable to determine Azure DevOps organization or project");
+                        return 1;
+                    }
+
+                    using var client = new AzureDevOpsClient(pat, organization, project);
+                    var repos = await client.ListRepositoriesAsync(project, top);
                     if (repos == null) return 1;
 
                     // Display header
-                    Console.WriteLine($"Repositories in AZURE_DEVOPS organization '{organization}' ({repos.Count} total):");
+                    Console.WriteLine($"Repositories in AZURE_DEVOPS project '{project}' ({repos.Count} total):");
                     Console.WriteLine(new string('-', 80));
 
                     // Display each repository
@@ -231,7 +236,7 @@ namespace Sdo.Commands
                 var platform = _platformDetector.DetectPlatform();
                 var repoInfo = _platformDetector.GetRepositoryInfo();
 
-                if (repoInfo == null || (string.IsNullOrEmpty(repoInfo.Owner) && string.IsNullOrEmpty(repoInfo.Repo)))
+                if (repoInfo == null || (string.IsNullOrEmpty(repoInfo.Owner) || string.IsNullOrEmpty(repoInfo.Repo)))
                 {
                     ConsoleHelper.WriteError("X Unable to determine repository from current Git remote");
                     return 1;
@@ -358,34 +363,7 @@ namespace Sdo.Commands
             }
             catch (Exception ex)
             {
-                // Try to extract a cleaner error message from GitHub API response
-                var errorMsg = ex.Message;
-                if (errorMsg.Contains("GitHub API error"))
-                {
-                    // Format: "GitHub API error (401): Unauthorized. {"message":"Bad credentials",...}"
-                    if (errorMsg.Contains("\"message\""))
-                    {
-                        try
-                        {
-                            var jsonStart = errorMsg.IndexOf("{");
-                            if (jsonStart > 0)
-                            {
-                                var jsonStr = errorMsg.Substring(jsonStart);
-                                var options = new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                                var errorObj = System.Text.Json.JsonSerializer.Deserialize<System.Collections.Generic.Dictionary<string, System.Text.Json.JsonElement>>(jsonStr, options);
-                                if (errorObj?.TryGetValue("message", out var msgElement) == true)
-                                {
-                                    var msg = msgElement.GetString();
-                                    if (!string.IsNullOrEmpty(msg))
-                                    {
-                                        errorMsg = msg;
-                                    }
-                                }
-                            }
-                        }
-                        catch { /* use original error message if parsing fails */ }
-                    }
-                }
+                var errorMsg = ExtractErrorMessage(ex.Message);
                 ConsoleHelper.WriteError($"X Error: {errorMsg}");
                 return 1;
             }
@@ -398,13 +376,18 @@ namespace Sdo.Commands
                 var platform = _platformDetector.DetectPlatform();
                 var repoInfo = _platformDetector.GetRepositoryInfo();
 
-                if (repoInfo == null || (string.IsNullOrEmpty(repoInfo.Owner) && string.IsNullOrEmpty(repoInfo.Repo)))
+                if (repoInfo == null || (string.IsNullOrEmpty(repoInfo.Owner) || string.IsNullOrEmpty(repoInfo.Repo)))
                 {
                     ConsoleHelper.WriteError("X Unable to determine repository from current Git remote");
                     return 1;
                 }
 
-                var platformName = platform == Platform.GitHub ? "GitHub" : "Azure DevOps";
+                var platformName = platform switch
+                {
+                    Platform.GitHub => "GitHub",
+                    Platform.AzureDevOps => "Azure DevOps",
+                    _ => "Unknown"
+                };
                 if (verbose) Console.WriteLine($"Deleting {platformName} repository '{repoInfo.Repo}'...");
 
                 // Confirm deletion unless --force flag is used
@@ -480,33 +463,7 @@ namespace Sdo.Commands
             }
             catch (Exception ex)
             {
-                // Try to extract a cleaner error message from GitHub API response
-                var errorMsg = ex.Message;
-                if (errorMsg.Contains("GitHub API error"))
-                {
-                    if (errorMsg.Contains("\"message\""))
-                    {
-                        try
-                        {
-                            var jsonStart = errorMsg.IndexOf("{");
-                            if (jsonStart > 0)
-                            {
-                                var jsonStr = errorMsg.Substring(jsonStart);
-                                var options = new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                                var errorObj = System.Text.Json.JsonSerializer.Deserialize<System.Collections.Generic.Dictionary<string, System.Text.Json.JsonElement>>(jsonStr, options);
-                                if (errorObj?.TryGetValue("message", out var msgElement) == true)
-                                {
-                                    var msg = msgElement.GetString();
-                                    if (!string.IsNullOrEmpty(msg))
-                                    {
-                                        errorMsg = msg;
-                                    }
-                                }
-                            }
-                        }
-                        catch { /* use original error message if parsing fails */ }
-                    }
-                }
+                var errorMsg = ExtractErrorMessage(ex.Message);
                 ConsoleHelper.WriteError($"X Error: {errorMsg}");
                 return 1;
             }

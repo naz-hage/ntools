@@ -716,10 +716,10 @@ namespace Sdo.Commands
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"X Error: {ex.Message}");
+                ConsoleHelper.WriteLine($"X Error: {ex.Message}", ConsoleColor.Red);
                 if (verbose)
                 {
-                    Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                    ConsoleHelper.WriteLine($"Stack trace: {ex.StackTrace}", ConsoleColor.Red);
                 }
                 return 1;
             }
