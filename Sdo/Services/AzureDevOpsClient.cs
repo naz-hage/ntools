@@ -659,7 +659,8 @@ namespace Sdo.Services
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    _lastError = $"Get repository failed: {response.StatusCode} {response.ReasonPhrase}";
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    _lastError = $"Get repository failed ({response.StatusCode}): {response.ReasonPhrase}\n{errorContent}";
                     return null;
                 }
 
@@ -669,6 +670,7 @@ namespace Sdo.Services
 
                 if (repoData == null)
                 {
+                    _lastError = "Failed to parse repository response";
                     return null;
                 }
 
@@ -715,7 +717,7 @@ namespace Sdo.Services
                 if (!response.IsSuccessStatusCode)
                 {
                     var errorContent = await response.Content.ReadAsStringAsync();
-                    _lastError = $"Create repository failed: {response.StatusCode} {response.ReasonPhrase}\n{errorContent}";
+                    _lastError = $"Create repository failed ({response.StatusCode}): {response.ReasonPhrase}\n{errorContent}";
                     return null;
                 }
 
@@ -725,6 +727,7 @@ namespace Sdo.Services
 
                 if (repoData == null)
                 {
+                    _lastError = "Failed to parse repository response";
                     return null;
                 }
 
@@ -760,7 +763,8 @@ namespace Sdo.Services
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    _lastError = $"Delete repository failed: {response.StatusCode} {response.ReasonPhrase}";
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    _lastError = $"Delete repository failed ({response.StatusCode}): {response.ReasonPhrase}\n{errorContent}";
                     return false;
                 }
 

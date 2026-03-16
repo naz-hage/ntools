@@ -29,8 +29,52 @@ namespace Sdo.Commands
             _platformDetector = new PlatformService();
 
             // Add subcommands (in alphabetical order)
+            AddCreateCommand(verboseOption);
+            AddDeleteCommand(verboseOption);
             AddListCommand(verboseOption);
             AddShowCommand(verboseOption);
+        }
+
+        private void AddCreateCommand(Option<bool> verboseOption)
+        {
+            var createCommand = new System.CommandLine.Command("create", "Create a new repository");
+            var nameArgument = new Argument<string>("name") { Description = "Repository name" };
+            var descriptionOption = new Option<string?>("--description") { Description = "Repository description" };
+            var privateOption = new Option<bool>("--private") { Description = "Make repository private" };
+
+            createCommand.Add(nameArgument);
+            createCommand.Add(descriptionOption);
+            createCommand.Add(privateOption);
+            createCommand.Add(verboseOption);
+
+            createCommand.SetAction(async (parseResult) =>
+            {
+                var name = parseResult.GetValue(nameArgument);
+                var description = parseResult.GetValue(descriptionOption);
+                var isPrivate = parseResult.GetValue(privateOption);
+                var verbose = parseResult.GetValue(verboseOption);
+                return await CreateRepository(name!, description, isPrivate, verbose);
+            });
+
+            Subcommands.Add(createCommand);
+        }
+
+        private void AddDeleteCommand(Option<bool> verboseOption)
+        {
+            var deleteCommand = new System.CommandLine.Command("delete", "Delete a repository");
+            var forceOption = new Option<bool>("--force") { Description = "Skip confirmation prompt" };
+
+            deleteCommand.Add(forceOption);
+            deleteCommand.Add(verboseOption);
+
+            deleteCommand.SetAction(async (parseResult) =>
+            {
+                var force = parseResult.GetValue(forceOption);
+                var verbose = parseResult.GetValue(verboseOption);
+                return await DeleteRepository(force, verbose);
+            });
+
+            Subcommands.Add(deleteCommand);
         }
 
         private void AddListCommand(Option<bool> verboseOption)
@@ -53,25 +97,53 @@ namespace Sdo.Commands
 
         private void AddShowCommand(Option<bool> verboseOption)
         {
-            var showCommand = new System.CommandLine.Command("show", "Display repository details");
-            var nameOption = new Option<string>("--name") { Description = "Repository name" };
+            var showCommand = new System.CommandLine.Command("show", "Display repository information from current Git remote");
 
-            showCommand.Add(nameOption);
             showCommand.Add(verboseOption);
 
             showCommand.SetAction(async (parseResult) =>
             {
-                var name = parseResult.GetValue(nameOption);
                 var verbose = parseResult.GetValue(verboseOption);
-                if (string.IsNullOrEmpty(name))
-                {
-                    ConsoleHelper.WriteError("X Repository name is required");
-                    return 1;
-                }
-                return await ShowRepository(name, verbose);
+                return await ShowRepository(verbose);
             });
 
             Subcommands.Add(showCommand);
+        }
+
+        /// <summary>
+        /// Extracts a clean error message from API error responses.
+        /// Handles both GitHub and Azure DevOps JSON error formats.
+        /// </summary>
+        private string ExtractErrorMessage(string fullError)
+        {
+            if (string.IsNullOrEmpty(fullError))
+                return "Unknown error occurred";
+
+            // Try to extract from JSON error response
+            try
+            {
+                var jsonStart = fullError.IndexOf("{");
+                if (jsonStart > 0)
+                {
+                    var jsonStr = fullError.Substring(jsonStart);
+                    var options = new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                    var errorObj = System.Text.Json.JsonSerializer.Deserialize<System.Collections.Generic.Dictionary<string, System.Text.Json.JsonElement>>(jsonStr, options);
+
+                    if (errorObj?.TryGetValue("message", out var msgElement) == true)
+                    {
+                        var msg = msgElement.GetString();
+                        if (!string.IsNullOrEmpty(msg))
+                        {
+                            return msg;
+                        }
+                    }
+                }
+            }
+            catch { /* Fall through to return original */ }
+
+            // If no JSON message found, return the error up to the first newline (removes JSON body)
+            var firstLine = fullError.Split('\n')[0];
+            return firstLine;
         }
 
         private async Task<int> ListRepositories(int top, bool verbose)
@@ -84,10 +156,28 @@ namespace Sdo.Commands
 
                 if (platform == Platform.GitHub)
                 {
+                    var repoInfo = _platformDetector.GetRepositoryInfo();
+                    var owner = repoInfo?.Owner ?? "unknown";
+
                     using var client = new GitHubClient();
                     var repos = await client.ListRepositoriesAsync(null, "all", 30, top);
                     if (repos == null) return 1;
-                    Console.WriteLine($"Found {repos.Count} repositories");
+
+                    // Display header
+                    Console.WriteLine($"Repositories in GITHUB account '{owner}' ({repos.Count} total):");
+                    Console.WriteLine(new string('-', 80));
+
+                    // Display each repository
+                    foreach (var repo in repos)
+                    {
+                        Console.WriteLine($"  {repo.Name}");
+                        Console.WriteLine($"    URL: {repo.Url}");
+                        if (!string.IsNullOrEmpty(repo.DefaultBranch))
+                            Console.WriteLine($"    Default Branch: {repo.DefaultBranch}");
+                        string visibility = repo.IsPrivate ? "Private" : "Public";
+                        Console.WriteLine($"    Visibility: {visibility}");
+                        Console.WriteLine();
+                    }
                     return 0;
                 }
                 else if (platform == Platform.AzureDevOps)
@@ -105,7 +195,20 @@ namespace Sdo.Commands
                     if (projects == null || projects.Count == 0) return 1;
                     var repos = await client.ListRepositoriesAsync(projects[0].Id!, top);
                     if (repos == null) return 1;
-                    Console.WriteLine($"Found {repos.Count} repositories");
+
+                    // Display header
+                    Console.WriteLine($"Repositories in AZURE_DEVOPS organization '{organization}' ({repos.Count} total):");
+                    Console.WriteLine(new string('-', 80));
+
+                    // Display each repository
+                    foreach (var repo in repos)
+                    {
+                        Console.WriteLine($"  {repo.Name}");
+                        Console.WriteLine($"    URL: {repo.Url}");
+                        if (!string.IsNullOrEmpty(repo.DefaultBranch))
+                            Console.WriteLine($"    Default Branch: {repo.DefaultBranch}");
+                        Console.WriteLine();
+                    }
                     return 0;
                 }
 
@@ -119,32 +222,35 @@ namespace Sdo.Commands
             }
         }
 
-        private async Task<int> ShowRepository(string name, bool verbose)
+        private async Task<int> ShowRepository(bool verbose)
         {
             try
             {
-                if (verbose) Console.WriteLine($"Retrieving repository '{name}'...");
+                if (verbose) Console.WriteLine("Retrieving repository information from current Git remote...");
 
                 var platform = _platformDetector.DetectPlatform();
                 var repoInfo = _platformDetector.GetRepositoryInfo();
 
-                if (repoInfo == null || string.IsNullOrEmpty(repoInfo.Owner))
+                if (repoInfo == null || (string.IsNullOrEmpty(repoInfo.Owner) && string.IsNullOrEmpty(repoInfo.Repo)))
                 {
-                    ConsoleHelper.WriteError("X Unable to determine repository owner");
+                    ConsoleHelper.WriteError("X Unable to determine repository from current Git remote");
                     return 1;
                 }
 
                 if (platform == Platform.GitHub)
                 {
                     using var client = new GitHubClient();
-                    var repo = await client.GetRepositoryAsync(repoInfo.Owner, name);
+                    var repo = await client.GetRepositoryAsync(repoInfo.Owner ?? "", repoInfo.Repo ?? "");
                     if (repo == null)
                     {
                         ConsoleHelper.WriteError("X Repository not found");
                         return 1;
                     }
-                    Console.WriteLine($"Name: {repo.Name}");
-                    Console.WriteLine($"URL: {repo.Url}");
+                    Console.WriteLine("Repository Information:");
+                    Console.WriteLine($"  Name: {repo.Name}");
+                    Console.WriteLine($"  URL: {repo.Url}");
+                    if (!string.IsNullOrEmpty(repo.DefaultBranch))
+                        Console.WriteLine($"  Default Branch: {repo.DefaultBranch}");
                     return 0;
                 }
                 else if (platform == Platform.AzureDevOps)
@@ -163,15 +269,19 @@ namespace Sdo.Commands
                         return 1;
                     }
 
-                    using var client = new AzureDevOpsClient(pat, organization);
-                    var repo = await client.GetRepositoryAsync(repoInfo.Repo ?? name, name);
+                    var project = _platformDetector.GetProject();
+                    using var client = new AzureDevOpsClient(pat, organization, project);
+                    var repo = await client.GetRepositoryAsync(project ?? "", repoInfo.Repo ?? "");
                     if (repo == null)
                     {
                         ConsoleHelper.WriteError("X Repository not found");
                         return 1;
                     }
-                    Console.WriteLine($"Name: {repo.Name}");
-                    Console.WriteLine($"URL: {repo.Url}");
+                    Console.WriteLine("Repository Information:");
+                    Console.WriteLine($"  Name: {repo.Name}");
+                    Console.WriteLine($"  URL: {repo.Url}");
+                    if (!string.IsNullOrEmpty(repo.DefaultBranch))
+                        Console.WriteLine($"  Default Branch: {repo.DefaultBranch}");
                     return 0;
                 }
 
@@ -181,6 +291,223 @@ namespace Sdo.Commands
             catch (Exception ex)
             {
                 ConsoleHelper.WriteError($"X Error: {ex.Message}");
+                return 1;
+            }
+        }
+
+        private async Task<int> CreateRepository(string name, string? description, bool isPrivate, bool verbose)
+        {
+            try
+            {
+                var platform = _platformDetector.DetectPlatform();
+
+                if (platform == Platform.GitHub)
+                {
+                    if (verbose) Console.WriteLine("Creating GitHub repository...");
+                    using var client = new GitHubClient();
+                    var repo = await client.CreateRepositoryAsync(name, description, isPrivate);
+                    ConsoleHelper.WriteLine($"✓ Repository '{repo!.Name}' created successfully", ConsoleColor.Green);
+                    Console.WriteLine($"  URL: {repo.Url}");
+                    return 0;
+                }
+                else if (platform == Platform.AzureDevOps)
+                {
+                    if (verbose) Console.WriteLine("Creating Azure DevOps repository...");
+
+                    var pat = Environment.GetEnvironmentVariable("AZURE_DEVOPS_PAT");
+                    if (string.IsNullOrEmpty(pat))
+                    {
+                        ConsoleHelper.WriteError("X AZURE_DEVOPS_PAT environment variable not set");
+                        return 1;
+                    }
+
+                    var organization = _platformDetector.GetOrganization();
+                    var project = _platformDetector.GetProject();
+                    if (string.IsNullOrEmpty(organization) || string.IsNullOrEmpty(project))
+                    {
+                        ConsoleHelper.WriteError("X Unable to determine Azure DevOps organization or project");
+                        return 1;
+                    }
+
+                    using var client = new AzureDevOpsClient(pat, organization, project);
+
+                    // Get the project ID (required by Create API)
+                    if (verbose) Console.WriteLine($"  Fetching project ID for '{project}'...");
+                    var projectInfo = await client.GetProjectAsync(project);
+                    if (projectInfo == null)
+                    {
+                        var cleanError = ExtractErrorMessage(client.LastError ?? "Failed to get project details");
+                        ConsoleHelper.WriteError($"X {cleanError}");
+                        return 1;
+                    }
+
+                    var repo = await client.CreateRepositoryAsync(projectInfo.Id ?? project, name);
+                    if (repo == null)
+                    {
+                        var cleanError = ExtractErrorMessage(client.LastError ?? "Failed to create repository");
+                        ConsoleHelper.WriteError($"X {cleanError}");
+                        return 1;
+                    }
+                    ConsoleHelper.WriteLine($"✓ Repository '{repo.Name}' created successfully", ConsoleColor.Green);
+                    Console.WriteLine($"  URL: {repo.Url}");
+                    return 0;
+                }
+
+                ConsoleHelper.WriteError("X Unsupported platform");
+                return 1;
+            }
+            catch (Exception ex)
+            {
+                // Try to extract a cleaner error message from GitHub API response
+                var errorMsg = ex.Message;
+                if (errorMsg.Contains("GitHub API error"))
+                {
+                    // Format: "GitHub API error (401): Unauthorized. {"message":"Bad credentials",...}"
+                    if (errorMsg.Contains("\"message\""))
+                    {
+                        try
+                        {
+                            var jsonStart = errorMsg.IndexOf("{");
+                            if (jsonStart > 0)
+                            {
+                                var jsonStr = errorMsg.Substring(jsonStart);
+                                var options = new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                                var errorObj = System.Text.Json.JsonSerializer.Deserialize<System.Collections.Generic.Dictionary<string, System.Text.Json.JsonElement>>(jsonStr, options);
+                                if (errorObj?.TryGetValue("message", out var msgElement) == true)
+                                {
+                                    var msg = msgElement.GetString();
+                                    if (!string.IsNullOrEmpty(msg))
+                                    {
+                                        errorMsg = msg;
+                                    }
+                                }
+                            }
+                        }
+                        catch { /* use original error message if parsing fails */ }
+                    }
+                }
+                ConsoleHelper.WriteError($"X Error: {errorMsg}");
+                return 1;
+            }
+        }
+
+        private async Task<int> DeleteRepository(bool force, bool verbose)
+        {
+            try
+            {
+                var platform = _platformDetector.DetectPlatform();
+                var repoInfo = _platformDetector.GetRepositoryInfo();
+
+                if (repoInfo == null || (string.IsNullOrEmpty(repoInfo.Owner) && string.IsNullOrEmpty(repoInfo.Repo)))
+                {
+                    ConsoleHelper.WriteError("X Unable to determine repository from current Git remote");
+                    return 1;
+                }
+
+                var platformName = platform == Platform.GitHub ? "GitHub" : "Azure DevOps";
+                if (verbose) Console.WriteLine($"Deleting {platformName} repository '{repoInfo.Repo}'...");
+
+                // Confirm deletion unless --force flag is used
+                if (!force)
+                {
+                    Console.Write($"Are you sure you want to delete repository '{repoInfo.Repo}'? (yes/no): ");
+                    var response = Console.ReadLine();
+                    if (response?.ToLower() != "yes")
+                    {
+                        Console.WriteLine("Deletion cancelled");
+                        return 0;
+                    }
+                }
+
+                if (platform == Platform.GitHub)
+                {
+                    using var client = new GitHubClient();
+                    await client.DeleteRepositoryAsync(repoInfo.Owner ?? "", repoInfo.Repo ?? "");
+                    ConsoleHelper.WriteLine($"✓ Repository '{repoInfo.Repo}' deleted successfully", ConsoleColor.Green);
+                    return 0;
+                }
+                else if (platform == Platform.AzureDevOps)
+                {
+                    var pat = Environment.GetEnvironmentVariable("AZURE_DEVOPS_PAT");
+                    if (string.IsNullOrEmpty(pat))
+                    {
+                        ConsoleHelper.WriteError("X AZURE_DEVOPS_PAT environment variable not set");
+                        return 1;
+                    }
+
+                    var organization = _platformDetector.GetOrganization();
+                    var project = _platformDetector.GetProject();
+                    if (string.IsNullOrEmpty(organization) || string.IsNullOrEmpty(project))
+                    {
+                        ConsoleHelper.WriteError("X Unable to determine Azure DevOps organization or project");
+                        return 1;
+                    }
+
+                    using var client = new AzureDevOpsClient(pat, organization, project);
+
+                    // Get the project ID (required by Delete API)
+                    if (verbose) Console.WriteLine($"  Fetching project ID for '{project}'...");
+                    var projectInfo = await client.GetProjectAsync(project);
+                    if (projectInfo == null)
+                    {
+                        ConsoleHelper.WriteError($"X {client.LastError ?? "Failed to get project details"}");
+                        return 1;
+                    }
+
+                    // Get the repository ID (required by Delete API)
+                    if (verbose) Console.WriteLine($"  Fetching repository ID for '{repoInfo.Repo}'...");
+                    var repoDetails = await client.GetRepositoryAsync(projectInfo.Id ?? project, repoInfo.Repo ?? "");
+                    if (repoDetails == null)
+                    {
+                        var cleanError = ExtractErrorMessage(client.LastError ?? "Repository not found");
+                        ConsoleHelper.WriteError($"X {cleanError}");
+                        return 1;
+                    }
+
+                    var success = await client.DeleteRepositoryAsync(projectInfo.Id ?? project, repoDetails.PlatformId ?? repoInfo.Repo ?? "");
+                    if (!success)
+                    {
+                        var cleanError = ExtractErrorMessage(client.LastError ?? "Failed to delete repository");
+                        ConsoleHelper.WriteError($"X {cleanError}");
+                        return 1;
+                    }
+                    ConsoleHelper.WriteLine($"✓ Repository '{repoInfo.Repo}' deleted successfully", ConsoleColor.Green);
+                    return 0;
+                }
+
+                ConsoleHelper.WriteError("X Unsupported platform");
+                return 1;
+            }
+            catch (Exception ex)
+            {
+                // Try to extract a cleaner error message from GitHub API response
+                var errorMsg = ex.Message;
+                if (errorMsg.Contains("GitHub API error"))
+                {
+                    if (errorMsg.Contains("\"message\""))
+                    {
+                        try
+                        {
+                            var jsonStart = errorMsg.IndexOf("{");
+                            if (jsonStart > 0)
+                            {
+                                var jsonStr = errorMsg.Substring(jsonStart);
+                                var options = new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                                var errorObj = System.Text.Json.JsonSerializer.Deserialize<System.Collections.Generic.Dictionary<string, System.Text.Json.JsonElement>>(jsonStr, options);
+                                if (errorObj?.TryGetValue("message", out var msgElement) == true)
+                                {
+                                    var msg = msgElement.GetString();
+                                    if (!string.IsNullOrEmpty(msg))
+                                    {
+                                        errorMsg = msg;
+                                    }
+                                }
+                            }
+                        }
+                        catch { /* use original error message if parsing fails */ }
+                    }
+                }
+                ConsoleHelper.WriteError($"X Error: {errorMsg}");
                 return 1;
             }
         }

@@ -437,8 +437,8 @@ namespace Sdo.Services
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    System.Diagnostics.Debug.WriteLine($"GitHub API error: {response.StatusCode} {response.ReasonPhrase}");
-                    return null;
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    throw new InvalidOperationException($"GitHub API error ({response.StatusCode}): {response.ReasonPhrase}. {errorContent}");
                 }
 
                 var responseContent = await response.Content.ReadAsStringAsync();
@@ -447,7 +447,7 @@ namespace Sdo.Services
 
                 if (repoData == null)
                 {
-                    return null;
+                    throw new InvalidOperationException("Failed to parse GitHub API response");
                 }
 
                 return new Models.Repository
@@ -464,7 +464,7 @@ namespace Sdo.Services
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error creating GitHub repository: {ex.Message}");
-                return null;
+                throw;
             }
         }
 
@@ -483,8 +483,8 @@ namespace Sdo.Services
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    System.Diagnostics.Debug.WriteLine($"GitHub API error: {response.StatusCode} {response.ReasonPhrase}");
-                    return false;
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    throw new InvalidOperationException($"GitHub API error ({response.StatusCode}): {response.ReasonPhrase}. {errorContent}");
                 }
 
                 return true;
@@ -492,7 +492,7 @@ namespace Sdo.Services
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error deleting GitHub repository: {ex.Message}");
-                return false;
+                throw;
             }
         }
 
