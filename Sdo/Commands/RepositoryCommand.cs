@@ -7,7 +7,7 @@
 // Supports both GitHub repositories and Azure DevOps Git repositories.
 
 using System.CommandLine;
-using Nbuild;
+using Nbuild.Helpers;
 using Sdo.Interfaces;
 using Sdo.Services;
 

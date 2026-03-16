@@ -8,6 +8,7 @@
 // development operations through a command-line interface.
 
 using Nbuild.Commands;
+using Nbuild.Helpers;
 using Nbuild.Services;
 using NbuildTasks;
 using System.CommandLine;
