@@ -294,10 +294,10 @@ namespace Sdo.Commands
         {
             try
             {
-                var pat = Environment.GetEnvironmentVariable("AZURE_DEVOPS_PAT");
+                var pat = await GetAuthenticationTokenAsync(Platform.AzureDevOps);
                 if (string.IsNullOrEmpty(pat))
                 {
-                    ConsoleHelper.WriteLine("X AZURE_DEVOPS_PAT environment variable not set", ConsoleColor.Red);
+                    ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
                     return 1;
                 }
 
@@ -476,10 +476,10 @@ namespace Sdo.Commands
         {
             try
             {
-                var pat = Environment.GetEnvironmentVariable("AZURE_DEVOPS_PAT");
+                var pat = await GetAuthenticationTokenAsync(Platform.AzureDevOps);
                 if (string.IsNullOrEmpty(pat))
                 {
-                    ConsoleHelper.WriteLine("X AZURE_DEVOPS_PAT environment variable not set", ConsoleColor.Red);
+                    ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
                     return 1;
                 }
 
@@ -658,10 +658,10 @@ namespace Sdo.Commands
                 else if (platform == Platform.AzureDevOps)
                 {
                     // Get Azure DevOps configuration
-                    var pat = Environment.GetEnvironmentVariable("AZURE_DEVOPS_PAT");
+                    var pat = await GetAuthenticationTokenAsync(Platform.AzureDevOps);
                     if (string.IsNullOrEmpty(pat))
                     {
-                        ConsoleHelper.WriteLine("X AZURE_DEVOPS_PAT environment variable not set", ConsoleColor.Red);
+                        ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
                         return 1;
                     }
 
@@ -793,10 +793,10 @@ namespace Sdo.Commands
                 else if (platform == Platform.AzureDevOps)
                 {
                     // Get Azure DevOps configuration
-                    var pat = Environment.GetEnvironmentVariable("AZURE_DEVOPS_PAT");
+                    var pat = await GetAuthenticationTokenAsync(Platform.AzureDevOps);
                     if (string.IsNullOrEmpty(pat))
                     {
-                        ConsoleHelper.WriteLine("X AZURE_DEVOPS_PAT environment variable not set", ConsoleColor.Red);
+                        ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
                         return 1;
                     }
 
@@ -921,10 +921,10 @@ namespace Sdo.Commands
                 else if (platform == Platform.AzureDevOps)
                 {
                     // Get Azure DevOps configuration
-                    var pat = Environment.GetEnvironmentVariable("AZURE_DEVOPS_PAT");
+                    var pat = await GetAuthenticationTokenAsync(Platform.AzureDevOps);
                     if (string.IsNullOrEmpty(pat))
                     {
-                        ConsoleHelper.WriteLine("X AZURE_DEVOPS_PAT environment variable not set", ConsoleColor.Red);
+                        ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
                         return 1;
                     }
 
@@ -1098,13 +1098,27 @@ namespace Sdo.Commands
             
             Console.WriteLine("-".PadRight(140, '-'));
             Console.WriteLine($"\n📊 Summary:");
-            
+
             // Summary by type
             var typeCounts = itemList.GroupBy(x => x.Type ?? "Unknown").OrderBy(g => g.Key);
             foreach (var typeGroup in typeCounts)
             {
                 Console.WriteLine($"  {typeGroup.Key}: {typeGroup.Count()}");
             }
+        }
+
+        private async Task<string?> GetAuthenticationTokenAsync(Platform platform)
+        {
+            var auth = new AuthenticationService();
+            if (platform == Platform.GitHub)
+            {
+                return await auth.GetGitHubTokenAsync();
+            }
+            else if (platform == Platform.AzureDevOps)
+            {
+                return await auth.GetAzureDevOpsTokenAsync();
+            }
+            return null;
         }
     }
 }

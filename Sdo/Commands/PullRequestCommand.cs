@@ -7,7 +7,6 @@
 // Supports both GitHub pull requests and Azure DevOps pull requests.
 
 using System.CommandLine;
-using Nbuild;
 using Nbuild.Helpers;
 using Sdo.Interfaces;
 using Sdo.Services;
@@ -164,7 +163,8 @@ namespace Sdo.Commands
 
                 // Read the markdown file
                 var content = System.IO.File.ReadAllText(file);
-                var lines = content.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+                // Split by multiple line ending formats (Windows \r\n, Unix \n, old Mac \r)
+                var lines = content.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
 
                 // Extract title (first line or # format)
                 string? title = null;
@@ -198,6 +198,20 @@ namespace Sdo.Commands
                     return 1;
                 }
 
+                // Add work item ID to title (remove existing brackets and add work item number)
+                if (workItem > 0)
+                {
+                    // Remove existing [PBI-XXX] or similar bracketed prefixes
+                    var titleWithoutBrackets = System.Text.RegularExpressions.Regex.Replace(title, @"^\s*\[[^\]]*\]\s*", "");
+                    title = $"{workItem}: {titleWithoutBrackets}";
+                }
+
+                // Truncate title to 256 characters (GitHub API limit)
+                if (title.Length > 256)
+                {
+                    title = title.Substring(0, 253) + "...";
+                }
+
                 // If dry-run, just show what would be created and exit
                 if (dryRun)
                 {
@@ -210,14 +224,22 @@ namespace Sdo.Commands
                     return 0;
                 }
 
-                var pat = Environment.GetEnvironmentVariable("GITHUB_TOKEN") ?? Environment.GetEnvironmentVariable("AZURE_DEVOPS_EXT_PAT");
+                var platform = _platformDetector.DetectPlatform();
+
+                var pat = await GetAuthenticationTokenAsync(platform);
+
                 if (string.IsNullOrEmpty(pat))
                 {
-                    ConsoleHelper.WriteError("X Error: No authentication token found. Set GITHUB_TOKEN or AZURE_DEVOPS_EXT_PAT environment variable.");
+                    ConsoleHelper.WriteError("X Error: No authentication token found. Run 'sdo auth' to setup authentication.");
                     return 1;
                 }
 
-                var platform = _platformDetector.DetectPlatform();
+                if (verbose)
+                {
+                    var prefix = pat.Length > 4 ? pat.Substring(0, 4) : "????";
+                    Console.WriteLine($"DEBUG: Token type: {prefix}... (length: {pat.Length})");
+                }
+
                 if (platform == Platform.GitHub)
                 {
                     var repoInfo = _platformDetector.GetRepositoryInfo();
@@ -230,8 +252,9 @@ namespace Sdo.Commands
                     using var client = new GitHubClient(pat);
                     try
                     {
+                        var currentBranch = GetCurrentBranch();
                         var pr = await client.CreatePullRequestAsync(repoInfo.Owner, repoInfo.Repo, title,
-                            "feature", "main", body, draft);
+                            currentBranch, "main", body, draft);
 
                         if (pr == null)
                         {
@@ -239,8 +262,12 @@ namespace Sdo.Commands
                             return 1;
                         }
 
-                        ConsoleHelper.WriteLine($"✓ Successfully created pull request #{pr.Number}", ConsoleColor.Green);
-                        if (verbose) ConsoleHelper.WriteLine($"  URL: {pr.Url}");
+                        Console.WriteLine("[OK] Pull request created successfully!");
+                        Console.WriteLine($"URL: {pr.Url}");
+                        if (verbose)
+                        {
+                            Console.WriteLine("Platform: GitHub");
+                        }
                         return 0;
                     }
                     catch (Exception ex)
@@ -262,8 +289,9 @@ namespace Sdo.Commands
                     }
 
                     using var client = new AzureDevOpsClient(pat, organization, project);
+                    var currentBranch = GetCurrentBranch();
                     var pr = await client.CreatePullRequestAsync(project, repoInfo.Repo, title,
-                        "refs/heads/feature", "refs/heads/main", body);
+                        $"refs/heads/{currentBranch}", "refs/heads/main", body);
 
                     if (pr == null)
                     {
@@ -271,7 +299,12 @@ namespace Sdo.Commands
                         return 1;
                     }
 
-                    ConsoleHelper.WriteLine($"✓ Successfully created pull request #{pr.Number}", ConsoleColor.Green);
+                    Console.WriteLine("[OK] Pull request created successfully!");
+                    Console.WriteLine($"URL: {pr.Url}");
+                    if (verbose)
+                    {
+                        Console.WriteLine("Platform: Azure DevOps");
+                    }
                     return 0;
                 }
                 else
@@ -293,14 +326,13 @@ namespace Sdo.Commands
             {
                 if (verbose) Console.WriteLine("Listing pull requests...");
 
-                var pat = Environment.GetEnvironmentVariable("GITHUB_TOKEN") ?? Environment.GetEnvironmentVariable("AZURE_DEVOPS_EXT_PAT");
+                var platform = _platformDetector.DetectPlatform();
+                var pat = await GetAuthenticationTokenAsync(platform);
                 if (string.IsNullOrEmpty(pat))
                 {
-                    ConsoleHelper.WriteError("X Error: No authentication token found. Set GITHUB_TOKEN or AZURE_DEVOPS_EXT_PAT environment variable.");
+                    ConsoleHelper.WriteError("X Error: No authentication token found. Run 'sdo auth' to setup authentication.");
                     return 1;
                 }
-
-                var platform = _platformDetector.DetectPlatform();
                 if (platform == Platform.GitHub)
                 {
                     var repoInfo = _platformDetector.GetRepositoryInfo();
@@ -387,14 +419,13 @@ namespace Sdo.Commands
             {
                 if (verbose) Console.WriteLine($"Retrieving pull request #{prId}...");
 
-                var pat = Environment.GetEnvironmentVariable("GITHUB_TOKEN") ?? Environment.GetEnvironmentVariable("AZURE_DEVOPS_EXT_PAT");
+                var platform = _platformDetector.DetectPlatform();
+                var pat = await GetAuthenticationTokenAsync(platform);
                 if (string.IsNullOrEmpty(pat))
                 {
-                    ConsoleHelper.WriteError("X Error: No authentication token found. Set GITHUB_TOKEN or AZURE_DEVOPS_EXT_PAT environment variable.");
+                    ConsoleHelper.WriteError("X Error: No authentication token found. Run 'sdo auth' to setup authentication.");
                     return 1;
                 }
-
-                var platform = _platformDetector.DetectPlatform();
                 if (platform == Platform.GitHub)
                 {
                     var repoInfo = _platformDetector.GetRepositoryInfo();
@@ -477,14 +508,13 @@ namespace Sdo.Commands
             {
                 if (verbose) Console.WriteLine($"Updating pull request #{prId}...");
 
-                var pat = Environment.GetEnvironmentVariable("GITHUB_TOKEN") ?? Environment.GetEnvironmentVariable("AZURE_DEVOPS_EXT_PAT");
+                var platform = _platformDetector.DetectPlatform();
+                var pat = await GetAuthenticationTokenAsync(platform);
                 if (string.IsNullOrEmpty(pat))
                 {
-                    ConsoleHelper.WriteError("X Error: No authentication token found. Set GITHUB_TOKEN or AZURE_DEVOPS_EXT_PAT environment variable.");
+                    ConsoleHelper.WriteError("X Error: No authentication token found. Run 'sdo auth' to setup authentication.");
                     return 1;
                 }
-
-                var platform = _platformDetector.DetectPlatform();
                 if (platform == Platform.GitHub)
                 {
                     var repoInfo = _platformDetector.GetRepositoryInfo();
@@ -539,6 +569,54 @@ namespace Sdo.Commands
                 ConsoleHelper.WriteError($"X Error: {ex.Message}");
                 return 1;
             }
+        }
+
+        private async Task<string?> GetAuthenticationTokenAsync(Platform platform)
+        {
+            var auth = new AuthenticationService();
+            if (platform == Platform.GitHub)
+            {
+                return await auth.GetGitHubTokenAsync();
+            }
+            else if (platform == Platform.AzureDevOps)
+            {
+                return await auth.GetAzureDevOpsTokenAsync();
+            }
+            return null;
+        }
+
+        private string GetCurrentBranch()
+        {
+            try
+            {
+                var processInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "git",
+                    Arguments = "branch --show-current",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    CreateNoWindow = true
+                };
+
+                using (var process = System.Diagnostics.Process.Start(processInfo))
+                {
+                    if (process != null)
+                    {
+                        var output = process.StandardOutput.ReadToEnd().Trim();
+                        process.WaitForExit();
+                        if (!string.IsNullOrEmpty(output))
+                        {
+                            return output;
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // If git command fails, fall back to default
+            }
+
+            return "main"; // Default fallback
         }
     }
 }

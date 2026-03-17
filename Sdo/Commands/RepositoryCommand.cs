@@ -182,10 +182,10 @@ namespace Sdo.Commands
                 }
                 else if (platform == Platform.AzureDevOps)
                 {
-                    var pat = Environment.GetEnvironmentVariable("AZURE_DEVOPS_PAT");
+                    var pat = await GetAuthenticationTokenAsync(Platform.AzureDevOps);
                     if (string.IsNullOrEmpty(pat))
                     {
-                        ConsoleHelper.WriteError("X AZURE_DEVOPS_PAT environment variable not set");
+                        ConsoleHelper.WriteError("X Error: No authentication token found. Run 'sdo auth' to setup authentication.");
                         return 1;
                     }
 
@@ -260,10 +260,10 @@ namespace Sdo.Commands
                 }
                 else if (platform == Platform.AzureDevOps)
                 {
-                    var pat = Environment.GetEnvironmentVariable("AZURE_DEVOPS_PAT");
+                    var pat = await GetAuthenticationTokenAsync(Platform.AzureDevOps);
                     if (string.IsNullOrEmpty(pat))
                     {
-                        ConsoleHelper.WriteError("X AZURE_DEVOPS_PAT environment variable not set");
+                        ConsoleHelper.WriteError("X Error: No authentication token found. Run 'sdo auth' to setup authentication.");
                         return 1;
                     }
 
@@ -319,10 +319,10 @@ namespace Sdo.Commands
                 {
                     if (verbose) Console.WriteLine("Creating Azure DevOps repository...");
 
-                    var pat = Environment.GetEnvironmentVariable("AZURE_DEVOPS_PAT");
+                    var pat = await GetAuthenticationTokenAsync(Platform.AzureDevOps);
                     if (string.IsNullOrEmpty(pat))
                     {
-                        ConsoleHelper.WriteError("X AZURE_DEVOPS_PAT environment variable not set");
+                        ConsoleHelper.WriteError("X Error: No authentication token found. Run 'sdo auth' to setup authentication.");
                         return 1;
                     }
 
@@ -411,10 +411,10 @@ namespace Sdo.Commands
                 }
                 else if (platform == Platform.AzureDevOps)
                 {
-                    var pat = Environment.GetEnvironmentVariable("AZURE_DEVOPS_PAT");
+                    var pat = await GetAuthenticationTokenAsync(Platform.AzureDevOps);
                     if (string.IsNullOrEmpty(pat))
                     {
-                        ConsoleHelper.WriteError("X AZURE_DEVOPS_PAT environment variable not set");
+                        ConsoleHelper.WriteError("X Error: No authentication token found. Run 'sdo auth' to setup authentication.");
                         return 1;
                     }
 
@@ -467,6 +467,20 @@ namespace Sdo.Commands
                 ConsoleHelper.WriteError($"X Error: {errorMsg}");
                 return 1;
             }
+        }
+
+        private async Task<string?> GetAuthenticationTokenAsync(Platform platform)
+        {
+            var auth = new AuthenticationService();
+            if (platform == Platform.GitHub)
+            {
+                return await auth.GetGitHubTokenAsync();
+            }
+            else if (platform == Platform.AzureDevOps)
+            {
+                return await auth.GetAzureDevOpsTokenAsync();
+            }
+            return null;
         }
     }
 }

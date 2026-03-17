@@ -34,7 +34,7 @@ namespace Sdo.Services
             var authToken = _overrideToken ?? GitHubRelease.Credentials.GetTokenOrDefault();
             if (!string.IsNullOrEmpty(authToken))
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("token", authToken);
             }
         }
 
