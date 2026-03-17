@@ -837,6 +837,350 @@ namespace Sdo.Services
         }
 
         /// <summary>
+        /// Creates a new pull request.
+        /// </summary>
+        /// <param name="projectId">Project ID or name.</param>
+        /// <param name="repositoryId">Repository ID or name.</param>
+        /// <param name="title">Pull request title (required).</param>
+        /// <param name="sourceRefName">Source branch name (required).</param>
+        /// <param name="targetRefName">Target branch name (required).</param>
+        /// <param name="description">Pull request description (optional).</param>
+        /// <returns>Created pull request details, or null if creation failed.</returns>
+        public async Task<Models.PullRequest?> CreatePullRequestAsync(string projectId, string repositoryId,
+            string title, string sourceRefName, string targetRefName, string? description = null)
+        {
+            try
+            {
+                var url = $"https://dev.azure.com/{_organization}/{projectId}/_apis/git/repositories/{repositoryId}/pullrequests?api-version=7.0";
+
+                var createData = new
+                {
+                    sourceRefName,
+                    targetRefName,
+                    title,
+                    description
+                };
+
+                var content = JsonSerializer.Serialize(createData);
+                var request = new StringContent(content, System.Text.Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync(url, request);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    _lastError = $"Create pull request failed ({response.StatusCode}): {response.ReasonPhrase}\n{errorContent}";
+                    return null;
+                }
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var prData = JsonSerializer.Deserialize<AzureDevOpsPullRequestResponse>(responseContent, options);
+
+                if (prData == null)
+                {
+                    _lastError = "Failed to parse pull request response";
+                    return null;
+                }
+
+                return new Models.PullRequest
+                {
+                    Number = prData.PullRequestId,
+                    Title = prData.Title,
+                    Description = prData.Description,
+                    Status = prData.Status,
+                    Url = prData.Url,
+                    Author = prData.CreatedBy?.DisplayName,
+                    SourceBranch = prData.SourceRefName,
+                    TargetBranch = prData.TargetRefName,
+                    CreatedAt = prData.CreationDate,
+                    UpdatedAt = prData.CreationDate
+                };
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Exception creating pull request: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets details for a specific pull request.
+        /// </summary>
+        /// <param name="projectId">Project ID or name.</param>
+        /// <param name="repositoryId">Repository ID or name.</param>
+        /// <param name="prId">Pull request ID.</param>
+        /// <returns>Pull request details, or null if not found.</returns>
+        public async Task<Models.PullRequest?> GetPullRequestAsync(string projectId, string repositoryId, int prId)
+        {
+            try
+            {
+                var url = $"https://dev.azure.com/{_organization}/{projectId}/_apis/git/repositories/{repositoryId}/pullrequests/{prId}?api-version=7.0";
+                var response = await _httpClient.GetAsync(url);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    _lastError = $"Get pull request failed ({response.StatusCode}): {response.ReasonPhrase}\n{errorContent}";
+                    return null;
+                }
+
+                var content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var prData = JsonSerializer.Deserialize<AzureDevOpsPullRequestResponse>(content, options);
+
+                if (prData == null)
+                {
+                    _lastError = "Failed to parse pull request response";
+                    return null;
+                }
+
+                return new Models.PullRequest
+                {
+                    Number = prData.PullRequestId,
+                    Title = prData.Title,
+                    Description = prData.Description,
+                    Status = prData.Status,
+                    Url = prData.Url,
+                    Author = prData.CreatedBy?.DisplayName,
+                    SourceBranch = prData.SourceRefName,
+                    TargetBranch = prData.TargetRefName,
+                    CreatedAt = prData.CreationDate,
+                    UpdatedAt = prData.CreationDate
+                };
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Exception getting pull request: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Lists pull requests for a repository.
+        /// </summary>
+        /// <param name="projectId">Project ID or name.</param>
+        /// <param name="repositoryId">Repository ID or name.</param>
+        /// <param name="status">Filter by status: 'active', 'completed', 'abandoned', 'all'. Default: 'active'.</param>
+        /// <param name="top">Maximum number of results to return. Default: 0 (all).</param>
+        /// <returns>List of pull requests, or null if operation failed.</returns>
+        public async Task<List<Models.PullRequest>?> ListPullRequestsAsync(string projectId, string repositoryId,
+            string status = "active", int top = 0)
+        {
+            try
+            {
+                var url = $"https://dev.azure.com/{_organization}/{projectId}/_apis/git/repositories/{repositoryId}/pullrequests?api-version=7.0";
+
+                var queryParams = new List<string> { $"searchCriteria.status={status}" };
+                if (top > 0)
+                {
+                    queryParams.Add($"$top={top}");
+                }
+
+                if (queryParams.Count > 0)
+                {
+                    url += "?" + string.Join("&", queryParams);
+                }
+
+                var response = await _httpClient.GetAsync(url);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _lastError = $"List pull requests failed: {response.StatusCode} {response.ReasonPhrase}";
+                    return null;
+                }
+
+                var content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var result = JsonSerializer.Deserialize<AzureDevOpsPullRequestListResponse>(content, options);
+
+                if (result == null || result.Value == null)
+                {
+                    return new List<Models.PullRequest>();
+                }
+
+                return result.Value.Select(pr => new Models.PullRequest
+                {
+                    Number = pr.PullRequestId,
+                    Title = pr.Title,
+                    Description = pr.Description,
+                    Status = pr.Status,
+                    Url = pr.Url,
+                    Author = pr.CreatedBy?.DisplayName,
+                    SourceBranch = pr.SourceRefName,
+                    TargetBranch = pr.TargetRefName,
+                    CreatedAt = pr.CreationDate,
+                    UpdatedAt = pr.CreationDate
+                }).ToList();
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Exception listing pull requests: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Approves a pull request.
+        /// </summary>
+        /// <param name="projectId">Project ID or name.</param>
+        /// <param name="repositoryId">Repository ID or name.</param>
+        /// <param name="prId">Pull request ID.</param>
+        /// <returns>True if approval was successful, false otherwise.</returns>
+        public async Task<bool> ApprovePullRequestAsync(string projectId, string repositoryId, int prId)
+        {
+            try
+            {
+                var url = $"https://dev.azure.com/{_organization}/{projectId}/_apis/git/repositories/{repositoryId}/pullrequests/{prId}/reviewers?api-version=7.0";
+
+                // Get current user first to add as reviewer with approved vote
+                var userUrl = $"https://dev.azure.com/{_organization}/_apis/connectiondata?api-version=7.0";
+                var userResponse = await _httpClient.GetAsync(userUrl);
+
+                if (!userResponse.IsSuccessStatusCode)
+                {
+                    _lastError = "Failed to get current user for approval";
+                    return false;
+                }
+
+                var userData = await userResponse.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var connData = JsonSerializer.Deserialize<ConnectionData>(userData, options);
+
+                if (connData?.AuthenticatedUser?.Id == null)
+                {
+                    _lastError = "Could not determine current user ID";
+                    return false;
+                }
+
+                var reviewData = new { vote = 10 }; // 10 = approved in Azure DevOps
+                var content = JsonSerializer.Serialize(reviewData);
+                var request = new StringContent(content, System.Text.Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PutAsync(url, request);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _lastError = $"Approve pull request failed: {response.StatusCode} {response.ReasonPhrase}";
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Exception approving pull request: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Merges a pull request.
+        /// </summary>
+        /// <param name="projectId">Project ID or name.</param>
+        /// <param name="repositoryId">Repository ID or name.</param>
+        /// <param name="prId">Pull request ID.</param>
+        /// <returns>True if merge was successful, false otherwise.</returns>
+        public async Task<bool> MergePullRequestAsync(string projectId, string repositoryId, int prId)
+        {
+            try
+            {
+                var url = $"https://dev.azure.com/{_organization}/{projectId}/_apis/git/repositories/{repositoryId}/pullrequests/{prId}?api-version=7.0";
+
+                var mergeData = new { status = "completed" };
+                var content = JsonSerializer.Serialize(mergeData);
+                var request = new StringContent(content, System.Text.Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PatchAsync(url, request);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _lastError = $"Merge pull request failed: {response.StatusCode} {response.ReasonPhrase}";
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Exception merging pull request: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Updates a pull request.
+        /// </summary>
+        /// <param name="projectId">Project ID or name.</param>
+        /// <param name="repositoryId">Repository ID or name.</param>
+        /// <param name="prId">Pull request ID.</param>
+        /// <param name="title">New pull request title (optional).</param>
+        /// <param name="description">New pull request description (optional).</param>
+        /// <param name="status">New pull request status (optional).</param>
+        /// <returns>Updated pull request details, or null if update failed.</returns>
+        public async Task<Models.PullRequest?> UpdatePullRequestAsync(string projectId, string repositoryId,
+            int prId, string? title = null, string? description = null, string? status = null)
+        {
+            try
+            {
+                var url = $"https://dev.azure.com/{_organization}/{projectId}/_apis/git/repositories/{repositoryId}/pullrequests/{prId}?api-version=7.0";
+
+                var updateData = new Dictionary<string, object?>();
+                if (!string.IsNullOrEmpty(title))
+                    updateData["title"] = title;
+                if (!string.IsNullOrEmpty(description))
+                    updateData["description"] = description;
+                if (!string.IsNullOrEmpty(status))
+                    updateData["status"] = status;
+
+                var content = JsonSerializer.Serialize(updateData);
+                var request = new StringContent(content, System.Text.Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PatchAsync(url, request);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _lastError = $"Update pull request failed: {response.StatusCode} {response.ReasonPhrase}";
+                    return null;
+                }
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var prData = JsonSerializer.Deserialize<AzureDevOpsPullRequestResponse>(responseContent, options);
+
+                if (prData == null)
+                {
+                    return null;
+                }
+
+                return new Models.PullRequest
+                {
+                    Number = prData.PullRequestId,
+                    Title = prData.Title,
+                    Description = prData.Description,
+                    Status = prData.Status,
+                    Url = prData.Url,
+                    Author = prData.CreatedBy?.DisplayName,
+                    SourceBranch = prData.SourceRefName,
+                    TargetBranch = prData.TargetRefName,
+                    CreatedAt = prData.CreationDate,
+                    UpdatedAt = prData.CreationDate
+                };
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Exception updating pull request: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return null;
+            }
+        }
+
+        /// <summary>
         /// Disposes the HTTP client.
         /// </summary>
         public void Dispose()
@@ -1212,5 +1556,78 @@ namespace Sdo.Services
         /// Gets or sets the email address.
         /// </summary>
         public string? PreferredEmail { get; set; }
+    }
+
+    /// <summary>
+    /// Represents an Azure DevOps pull request API response.
+    /// </summary>
+    public class AzureDevOpsPullRequestResponse
+    {
+        /// <summary>
+        /// Gets or sets the pull request ID.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("pullRequestId")]
+        public int PullRequestId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the pull request title.
+        /// </summary>
+        public string? Title { get; set; }
+
+        /// <summary>
+        /// Gets or sets the pull request description.
+        /// </summary>
+        public string? Description { get; set; }
+
+        /// <summary>
+        /// Gets or sets the pull request status.
+        /// </summary>
+        public string? Status { get; set; }
+
+        /// <summary>
+        /// Gets or sets the source ref name (branch).
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("sourceRefName")]
+        public string? SourceRefName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the target ref name (branch).
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("targetRefName")]
+        public string? TargetRefName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the pull request URL.
+        /// </summary>
+        public string? Url { get; set; }
+
+        /// <summary>
+        /// Gets or sets creation date.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("creationDate")]
+        public DateTime CreationDate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the user who created the pull request.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("createdBy")]
+        public AzureDevOpsUser? CreatedBy { get; set; }
+    }
+
+    /// <summary>
+    /// Represents a list of Azure DevOps pull requests API response.
+    /// </summary>
+    public class AzureDevOpsPullRequestListResponse
+    {
+        /// <summary>
+        /// Gets or sets the list of pull requests.
+        /// </summary>
+        public List<AzureDevOpsPullRequestResponse>? Value { get; set; }
+
+        /// <summary>
+        /// Gets or sets the continuation token for pagination.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("continuationToken")]
+        public string? ContinuationToken { get; set; }
     }
 }

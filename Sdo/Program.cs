@@ -38,6 +38,7 @@ namespace Sdo
             // Add commands
             rootCommand.Subcommands.Add(new Commands.MapCommand(verboseOption));
             rootCommand.Subcommands.Add(new Commands.AuthCommand(verboseOption));
+            rootCommand.Subcommands.Add(new Commands.PullRequestCommand(verboseOption));
             rootCommand.Subcommands.Add(new Commands.RepositoryCommand(verboseOption));
             rootCommand.Subcommands.Add(new Commands.WorkItemCommand(verboseOption));
 
