@@ -497,12 +497,486 @@ namespace Sdo.Services
         }
 
         /// <summary>
+        /// Lists all projects in the organization.
+        /// </summary>
+        /// <param name="top">Maximum number of projects to return. Default: 0 (all).</param>
+        /// <param name="continuationToken">Token for pagination (optional).</param>
+        /// <returns>List of projects, or null if operation failed.</returns>
+        public async Task<List<AzureDevOpsProject>?> ListProjectsAsync(int top = 0, string? continuationToken = null)
+        {
+            try
+            {
+                var url = $"https://dev.azure.com/{_organization}/_apis/projects?api-version=7.0";
+                if (top > 0)
+                {
+                    url += $"&$top={top}";
+                }
+                if (!string.IsNullOrEmpty(continuationToken))
+                {
+                    url += $"&continuationToken={continuationToken}";
+                }
+
+                var response = await _httpClient.GetAsync(url);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _lastError = $"List projects failed: {response.StatusCode} {response.ReasonPhrase}";
+                    return null;
+                }
+
+                var content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var result = JsonSerializer.Deserialize<AzureDevOpsProjectListResponse>(content, options);
+
+                if (result == null || result.Value == null)
+                {
+                    return new List<AzureDevOpsProject>();
+                }
+
+                return result.Value.Select(p => new AzureDevOpsProject
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Description = p.Description,
+                    Url = p.Url,
+                    State = p.State
+                }).ToList();
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Exception listing projects: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets details for a specific project.
+        /// </summary>
+        /// <param name="projectId">Project ID or name.</param>
+        /// <returns>Project details, or null if not found.</returns>
+        public async Task<AzureDevOpsProject?> GetProjectAsync(string projectId)
+        {
+            try
+            {
+                var url = $"https://dev.azure.com/{_organization}/_apis/projects/{projectId}?api-version=7.0";
+                var response = await _httpClient.GetAsync(url);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _lastError = $"Get project failed: {response.StatusCode} {response.ReasonPhrase}";
+                    return null;
+                }
+
+                var content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var projectData = JsonSerializer.Deserialize<AzureDevOpsProjectResponse>(content, options);
+
+                if (projectData == null)
+                {
+                    return null;
+                }
+
+                return new AzureDevOpsProject
+                {
+                    Id = projectData.Id,
+                    Name = projectData.Name,
+                    Description = projectData.Description,
+                    Url = projectData.Url,
+                    State = projectData.State
+                };
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Exception getting project: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Lists repositories in a project.
+        /// </summary>
+        /// <param name="projectId">Project ID or name.</param>
+        /// <param name="top">Maximum number of repositories to return. Default: 0 (all).</param>
+        /// <returns>List of repositories, or null if operation failed.</returns>
+        public async Task<List<Models.Repository>?> ListRepositoriesAsync(string projectId, int top = 0)
+        {
+            try
+            {
+                var url = $"https://dev.azure.com/{_organization}/{projectId}/_apis/git/repositories?api-version=7.0";
+                if (top > 0)
+                {
+                    url += $"&$top={top}";
+                }
+
+                var response = await _httpClient.GetAsync(url);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _lastError = $"List repositories failed: {response.StatusCode} {response.ReasonPhrase}";
+                    return null;
+                }
+
+                var content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var result = JsonSerializer.Deserialize<AzureDevOpsRepositoryListResponse>(content, options);
+
+                if (result == null || result.Value == null)
+                {
+                    return new List<Models.Repository>();
+                }
+
+                return result.Value.Select(r => new Models.Repository
+                {
+                    Name = r.Name,
+                    Url = r.WebUrl,
+                    DefaultBranch = r.DefaultBranch,
+                    PlatformId = r.Id,
+                    Owner = _organization
+                }).ToList();
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Exception listing repositories: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets details for a specific repository.
+        /// </summary>
+        /// <param name="projectId">Project ID or name.</param>
+        /// <param name="repositoryId">Repository ID or name.</param>
+        /// <returns>Repository details, or null if not found.</returns>
+        public async Task<Models.Repository?> GetRepositoryAsync(string projectId, string repositoryId)
+        {
+            try
+            {
+                var url = $"https://dev.azure.com/{_organization}/{projectId}/_apis/git/repositories/{repositoryId}?api-version=7.0";
+                var response = await _httpClient.GetAsync(url);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    _lastError = $"Get repository failed ({response.StatusCode}): {response.ReasonPhrase}\n{errorContent}";
+                    return null;
+                }
+
+                var content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var repoData = JsonSerializer.Deserialize<AzureDevOpsRepositoryResponse>(content, options);
+
+                if (repoData == null)
+                {
+                    _lastError = "Failed to parse repository response";
+                    return null;
+                }
+
+                return new Models.Repository
+                {
+                    Name = repoData.Name,
+                    Url = repoData.WebUrl,
+                    DefaultBranch = repoData.DefaultBranch,
+                    PlatformId = repoData.Id,
+                    Owner = _organization
+                };
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Exception getting repository: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Creates a new Git repository in a project.
+        /// </summary>
+        /// <param name="projectId">Project ID or name.</param>
+        /// <param name="repositoryName">Name for the new repository.</param>
+        /// <returns>Created repository details, or null if creation failed.</returns>
+        public async Task<Models.Repository?> CreateRepositoryAsync(string projectId, string repositoryName)
+        {
+            try
+            {
+                var url = $"https://dev.azure.com/{_organization}/{projectId}/_apis/git/repositories?api-version=7.0";
+
+                var createData = new
+                {
+                    name = repositoryName,
+                    project = new { id = projectId }
+                };
+
+                var content = JsonSerializer.Serialize(createData);
+                var request = new StringContent(content, System.Text.Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync(url, request);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    _lastError = $"Create repository failed ({response.StatusCode}): {response.ReasonPhrase}\n{errorContent}";
+                    return null;
+                }
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var repoData = JsonSerializer.Deserialize<AzureDevOpsRepositoryResponse>(responseContent, options);
+
+                if (repoData == null)
+                {
+                    _lastError = "Failed to parse repository response";
+                    return null;
+                }
+
+                return new Models.Repository
+                {
+                    Name = repoData.Name,
+                    Url = repoData.WebUrl,
+                    DefaultBranch = repoData.DefaultBranch,
+                    PlatformId = repoData.Id,
+                    Owner = _organization
+                };
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Exception creating repository: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Deletes a Git repository.
+        /// </summary>
+        /// <param name="projectId">Project ID or name.</param>
+        /// <param name="repositoryId">Repository ID or name.</param>
+        /// <returns>True if deletion was successful, false otherwise.</returns>
+        public async Task<bool> DeleteRepositoryAsync(string projectId, string repositoryId)
+        {
+            try
+            {
+                var url = $"https://dev.azure.com/{_organization}/{projectId}/_apis/git/repositories/{repositoryId}?api-version=7.0";
+                var response = await _httpClient.DeleteAsync(url);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    _lastError = $"Delete repository failed ({response.StatusCode}): {response.ReasonPhrase}\n{errorContent}";
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Exception deleting repository: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Updates repository settings.
+        /// </summary>
+        /// <param name="projectId">Project ID or name.</param>
+        /// <param name="repositoryId">Repository ID or name.</param>
+        /// <param name="defaultBranch">New default branch name (optional).</param>
+        /// <returns>Updated repository details, or null if update failed.</returns>
+        public async Task<Models.Repository?> UpdateRepositoryAsync(string projectId, string repositoryId,
+            string? defaultBranch = null)
+        {
+            try
+            {
+                var url = $"https://dev.azure.com/{_organization}/{projectId}/_apis/git/repositories/{repositoryId}?api-version=7.0";
+
+                var updateData = new Dictionary<string, object?>();
+                if (!string.IsNullOrEmpty(defaultBranch))
+                {
+                    updateData["defaultBranch"] = defaultBranch;
+                }
+
+                var content = JsonSerializer.Serialize(updateData);
+                var request = new StringContent(content, System.Text.Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PatchAsync(url, request);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    _lastError = $"Update repository failed: {response.StatusCode} {response.ReasonPhrase}\n{errorContent}";
+                    return null;
+                }
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var repoData = JsonSerializer.Deserialize<AzureDevOpsRepositoryResponse>(responseContent, options);
+
+                if (repoData == null)
+                {
+                    return null;
+                }
+
+                return new Models.Repository
+                {
+                    Name = repoData.Name,
+                    Url = repoData.WebUrl,
+                    DefaultBranch = repoData.DefaultBranch,
+                    PlatformId = repoData.Id,
+                    Owner = _organization
+                };
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Exception updating repository: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return null;
+            }
+        }
+
+        /// <summary>
         /// Disposes the HTTP client.
         /// </summary>
         public void Dispose()
         {
             _httpClient.Dispose();
         }
+    }
+
+    /// <summary>
+    /// Represents an Azure DevOps project.
+    /// </summary>
+    public class AzureDevOpsProject
+    {
+        /// <summary>
+        /// Gets or sets the project ID.
+        /// </summary>
+        public string? Id { get; set; }
+
+        /// <summary>
+        /// Gets or sets the project name.
+        /// </summary>
+        public string? Name { get; set; }
+
+        /// <summary>
+        /// Gets or sets the project description.
+        /// </summary>
+        public string? Description { get; set; }
+
+        /// <summary>
+        /// Gets or sets the project URL.
+        /// </summary>
+        public string? Url { get; set; }
+
+        /// <summary>
+        /// Gets or sets the project state (e.g., 'wellFormed').
+        /// </summary>
+        public string? State { get; set; }
+    }
+
+    /// <summary>
+    /// Represents an Azure DevOps project API response.
+    /// </summary>
+    public class AzureDevOpsProjectResponse
+    {
+        /// <summary>
+        /// Gets or sets the project ID.
+        /// </summary>
+        public string? Id { get; set; }
+
+        /// <summary>
+        /// Gets or sets the project name.
+        /// </summary>
+        public string? Name { get; set; }
+
+        /// <summary>
+        /// Gets or sets the project description.
+        /// </summary>
+        public string? Description { get; set; }
+
+        /// <summary>
+        /// Gets or sets the project URL.
+        /// </summary>
+        public string? Url { get; set; }
+
+        /// <summary>
+        /// Gets or sets the project state.
+        /// </summary>
+        public string? State { get; set; }
+    }
+
+    /// <summary>
+    /// Represents a list of Azure DevOps projects API response.
+    /// </summary>
+    public class AzureDevOpsProjectListResponse
+    {
+        /// <summary>
+        /// Gets or sets the list of projects.
+        /// </summary>
+        public List<AzureDevOpsProjectResponse>? Value { get; set; }
+
+        /// <summary>
+        /// Gets or sets the continuation token for pagination.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("continuationToken")]
+        public string? ContinuationToken { get; set; }
+    }
+
+    /// <summary>
+    /// Represents an Azure DevOps Git repository API response.
+    /// </summary>
+    public class AzureDevOpsRepositoryResponse
+    {
+        /// <summary>
+        /// Gets or sets the repository ID.
+        /// </summary>
+        public string? Id { get; set; }
+
+        /// <summary>
+        /// Gets or sets the repository name.
+        /// </summary>
+        public string? Name { get; set; }
+
+        /// <summary>
+        /// Gets or sets the repository URL.
+        /// </summary>
+        public string? Url { get; set; }
+
+        /// <summary>
+        /// Gets or sets the repository web URL.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("webUrl")]
+        public string? WebUrl { get; set; }
+
+        /// <summary>
+        /// Gets or sets the default branch name.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("defaultBranch")]
+        public string? DefaultBranch { get; set; }
+
+        /// <summary>
+        /// Gets or sets the repository size in bytes.
+        /// </summary>
+        public long Size { get; set; }
+    }
+
+    /// <summary>
+    /// Represents a list of Azure DevOps Git repositories API response.
+    /// </summary>
+    public class AzureDevOpsRepositoryListResponse
+    {
+        /// <summary>
+        /// Gets or sets the list of repositories.
+        /// </summary>
+        public List<AzureDevOpsRepositoryResponse>? Value { get; set; }
+
+        /// <summary>
+        /// Gets or sets the continuation token for pagination.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("continuationToken")]
+        public string? ContinuationToken { get; set; }
     }
 
     /// <summary>

@@ -53,6 +53,41 @@ namespace Sdo.Models
         public string? PlatformId { get; set; }
 
         /// <summary>
+        /// Gets or sets the number of stargazers (GitHub only).
+        /// </summary>
+        public int StargazersCount { get; set; }
+
+        /// <summary>
+        /// Gets or sets the number of watchers (GitHub only).
+        /// </summary>
+        public int WatchersCount { get; set; }
+
+        /// <summary>
+        /// Gets or sets the number of forks (GitHub only).
+        /// </summary>
+        public int ForksCount { get; set; }
+
+        /// <summary>
+        /// Gets or sets the repository topics/tags (GitHub only).
+        /// </summary>
+        public List<string>? Topics { get; set; }
+
+        /// <summary>
+        /// Gets or sets the repository size in bytes (Azure DevOps only).
+        /// </summary>
+        public long Size { get; set; }
+
+        /// <summary>
+        /// Gets or sets the remote URL (Azure DevOps only).
+        /// </summary>
+        public string? RemoteUrl { get; set; }
+
+        /// <summary>
+        /// Gets or sets the project ID (Azure DevOps only).
+        /// </summary>
+        public string? ProjectId { get; set; }
+
+        /// <summary>
         /// Validates the repository data.
         /// </summary>
         /// <returns>True if the repository is valid, false otherwise.</returns>

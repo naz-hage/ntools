@@ -277,12 +277,361 @@ namespace Sdo.Services
         }
 
         /// <summary>
+        /// Lists repositories for the authenticated user or a specific organization.
+        /// </summary>
+        /// <param name="organization">Optional organization name. If null, lists authenticated user's repositories.</param>
+        /// <param name="visibility">Filter by visibility: 'all', 'public', or 'private'. Default: 'all'.</param>
+        /// <param name="perPage">Number of results per page (1-100). Default: 30.</param>
+        /// <param name="top">Maximum number of results to return. Default: 0 (all).</param>
+        /// <returns>List of repositories, or null if operation failed.</returns>
+        public async Task<List<Models.Repository>?> ListRepositoriesAsync(string? organization = null,
+            string visibility = "all", int perPage = 30, int top = 0)
+        {
+            try
+            {
+                // Clamp perPage to valid GitHub API range (1-100)
+                perPage = Math.Max(1, Math.Min(100, perPage));
+
+                // Determine the URL based on whether we're querying user or org repos
+                string baseUrl = string.IsNullOrEmpty(organization)
+                    ? "https://api.github.com/user/repos"
+                    : $"https://api.github.com/orgs/{organization}/repos";
+
+                var allRepos = new List<Models.Repository>();
+                int page = 1;
+
+                while (true)
+                {
+                    var url = $"{baseUrl}?page={page}&per_page={perPage}";
+                    if (visibility != "all")
+                    {
+                        url += $"&visibility={visibility}";
+                    }
+
+                    var response = await _httpClient.GetAsync(url);
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"GitHub API error: {response.StatusCode} {response.ReasonPhrase}");
+                        return null;
+                    }
+
+                    var content = await response.Content.ReadAsStringAsync();
+                    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                    var repos = JsonSerializer.Deserialize<List<GitHubRepositoryResponse>>(content, options);
+
+                    if (repos == null || repos.Count == 0)
+                    {
+                        // No more results
+                        break;
+                    }
+
+                    // Convert to Repository model
+                    allRepos.AddRange(repos.Select(r => new Models.Repository
+                    {
+                        Name = r.Name,
+                        Description = r.Description,
+                        Owner = r.Owner?.Login,
+                        Url = r.HtmlUrl,
+                        IsPrivate = r.Private,
+                        DefaultBranch = r.DefaultBranch,
+                        PlatformId = r.Id.ToString()
+                    }));
+
+                    // Check if we've reached the requested limit
+                    if (top > 0 && allRepos.Count >= top)
+                    {
+                        allRepos = allRepos.Take(top).ToList();
+                        break;
+                    }
+
+                    // If we got fewer items than pageSize, we've reached the end
+                    if (repos.Count < perPage)
+                    {
+                        break;
+                    }
+
+                    page++;
+                }
+
+                return allRepos;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error listing GitHub repositories: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets details for a specific repository.
+        /// </summary>
+        /// <param name="owner">Repository owner.</param>
+        /// <param name="repo">Repository name.</param>
+        /// <returns>Repository details, or null if not found.</returns>
+        public async Task<Models.Repository?> GetRepositoryAsync(string owner, string repo)
+        {
+            try
+            {
+                var url = $"https://api.github.com/repos/{owner}/{repo}";
+                var response = await _httpClient.GetAsync(url);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    System.Diagnostics.Debug.WriteLine($"GitHub API error: {response.StatusCode} {response.ReasonPhrase}");
+                    return null;
+                }
+
+                var content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var repoData = JsonSerializer.Deserialize<GitHubRepositoryResponse>(content, options);
+
+                if (repoData == null)
+                {
+                    return null;
+                }
+
+                return new Models.Repository
+                {
+                    Name = repoData.Name,
+                    Description = repoData.Description,
+                    Owner = repoData.Owner?.Login,
+                    Url = repoData.HtmlUrl,
+                    IsPrivate = repoData.Private,
+                    DefaultBranch = repoData.DefaultBranch,
+                    PlatformId = repoData.Id.ToString()
+                };
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error getting GitHub repository: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Creates a new repository for the authenticated user.
+        /// </summary>
+        /// <param name="name">Repository name (required).</param>
+        /// <param name="description">Repository description (optional).</param>
+        /// <param name="isPrivate">Whether the repository should be private.</param>
+        /// <returns>Created repository details, or null if creation failed.</returns>
+        public async Task<Models.Repository?> CreateRepositoryAsync(string name, string? description = null, bool isPrivate = false)
+        {
+            try
+            {
+                var url = "https://api.github.com/user/repos";
+
+                var createData = new
+                {
+                    name,
+                    description,
+                    @private = isPrivate,
+                    auto_init = true
+                };
+
+                var content = JsonSerializer.Serialize(createData);
+                var request = new StringContent(content, System.Text.Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync(url, request);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    throw new InvalidOperationException($"GitHub API error ({response.StatusCode}): {response.ReasonPhrase}. {errorContent}");
+                }
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var repoData = JsonSerializer.Deserialize<GitHubRepositoryResponse>(responseContent, options);
+
+                if (repoData == null)
+                {
+                    throw new InvalidOperationException("Failed to parse GitHub API response");
+                }
+
+                return new Models.Repository
+                {
+                    Name = repoData.Name,
+                    Description = repoData.Description,
+                    Owner = repoData.Owner?.Login,
+                    Url = repoData.HtmlUrl,
+                    IsPrivate = repoData.Private,
+                    DefaultBranch = repoData.DefaultBranch,
+                    PlatformId = repoData.Id.ToString()
+                };
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error creating GitHub repository: {ex.Message}");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Deletes a repository.
+        /// </summary>
+        /// <param name="owner">Repository owner.</param>
+        /// <param name="repo">Repository name.</param>
+        /// <returns>True if deletion was successful, false otherwise.</returns>
+        public async Task<bool> DeleteRepositoryAsync(string owner, string repo)
+        {
+            try
+            {
+                var url = $"https://api.github.com/repos/{owner}/{repo}";
+                var response = await _httpClient.DeleteAsync(url);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    throw new InvalidOperationException($"GitHub API error ({response.StatusCode}): {response.ReasonPhrase}. {errorContent}");
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error deleting GitHub repository: {ex.Message}");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Updates repository settings.
+        /// </summary>
+        /// <param name="owner">Repository owner.</param>
+        /// <param name="repo">Repository name.</param>
+        /// <param name="description">New repository description (optional).</param>
+        /// <param name="isPrivate">New privacy setting (optional).</param>
+        /// <returns>Updated repository details, or null if update failed.</returns>
+        public async Task<Models.Repository?> UpdateRepositoryAsync(string owner, string repo,
+            string? description = null, bool? isPrivate = null)
+        {
+            try
+            {
+                var url = $"https://api.github.com/repos/{owner}/{repo}";
+
+                var updateData = new Dictionary<string, object?>();
+                if (!string.IsNullOrEmpty(description))
+                {
+                    updateData["description"] = description;
+                }
+                if (isPrivate.HasValue)
+                {
+                    updateData["private"] = isPrivate.Value;
+                }
+
+                var content = JsonSerializer.Serialize(updateData);
+                var request = new StringContent(content, System.Text.Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PatchAsync(url, request);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    System.Diagnostics.Debug.WriteLine($"GitHub API error: {response.StatusCode} {response.ReasonPhrase}");
+                    return null;
+                }
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var repoData = JsonSerializer.Deserialize<GitHubRepositoryResponse>(responseContent, options);
+
+                if (repoData == null)
+                {
+                    return null;
+                }
+
+                return new Models.Repository
+                {
+                    Name = repoData.Name,
+                    Description = repoData.Description,
+                    Owner = repoData.Owner?.Login,
+                    Url = repoData.HtmlUrl,
+                    IsPrivate = repoData.Private,
+                    DefaultBranch = repoData.DefaultBranch,
+                    PlatformId = repoData.Id.ToString()
+                };
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error updating GitHub repository: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
         /// Disposes the HTTP client.
         /// </summary>
         public void Dispose()
         {
             _httpClient.Dispose();
         }
+    }
+
+    /// <summary>
+    /// Represents a GitHub repository API response.
+    /// </summary>
+    public class GitHubRepositoryResponse
+    {
+        /// <summary>
+        /// Gets or sets the repository ID.
+        /// </summary>
+        public int Id { get; set; }
+
+        /// <summary>
+        /// Gets or sets the repository name.
+        /// </summary>
+        public string? Name { get; set; }
+
+        /// <summary>
+        /// Gets or sets the repository description.
+        /// </summary>
+        public string? Description { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether the repository is private.
+        /// </summary>
+        public bool Private { get; set; }
+
+        /// <summary>
+        /// Gets or sets the default branch name.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("default_branch")]
+        public string? DefaultBranch { get; set; }
+
+        /// <summary>
+        /// Gets or sets the HTML URL of the repository.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("html_url")]
+        public string? HtmlUrl { get; set; }
+
+        /// <summary>
+        /// Gets or sets the repository owner.
+        /// </summary>
+        public GitHubUser? Owner { get; set; }
+
+        /// <summary>
+        /// Gets or sets the number of stargazers.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("stargazers_count")]
+        public int StargazersCount { get; set; }
+
+        /// <summary>
+        /// Gets or sets the number of watchers.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("watchers_count")]
+        public int WatchersCount { get; set; }
+
+        /// <summary>
+        /// Gets or sets the number of forks.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("forks_count")]
+        public int ForksCount { get; set; }
+
+        /// <summary>
+        /// Gets or sets the repository topics/tags.
+        /// </summary>
+        public List<string>? Topics { get; set; }
     }
 
     /// <summary>

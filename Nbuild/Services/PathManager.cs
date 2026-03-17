@@ -3,6 +3,8 @@
 // Purpose: Centralizes all PATH environment variable operations to provide
 //          safe, testable, and consistent PATH manipulation.
 // -----------------------------------------------------------------------------
+using Nbuild.Helpers;
+
 namespace Nbuild.Services
 {
     /// <summary>

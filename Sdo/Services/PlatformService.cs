@@ -19,6 +19,7 @@ namespace Sdo.Services
         private Platform _detectedPlatform = Platform.Unknown;
         private string? _organization;
         private string? _project;
+        private string? _repository;
 
         /// <summary>
         /// Detects the DevOps platform by analyzing Git remote URLs.
@@ -83,21 +84,38 @@ namespace Sdo.Services
         }
 
         /// <summary>
-        /// Gets the repository information for GitHub repositories.
+        /// Gets the repository information for GitHub and Azure DevOps repositories.
         /// </summary>
-        /// <returns>RepositoryInfo with owner and repo, or null if not a GitHub repository.</returns>
+        /// <returns>RepositoryInfo with owner and repo, or null if platform detection failed.</returns>
         public RepositoryInfo? GetRepositoryInfo()
         {
-            if (DetectPlatform() != Platform.GitHub)
+            try
+            {
+                var platform = DetectPlatform();
+
+                if (platform == Platform.GitHub)
+                {
+                    return new RepositoryInfo
+                    {
+                        Owner = _organization,
+                        Repo = _project
+                    };
+                }
+                else if (platform == Platform.AzureDevOps)
+                {
+                    return new RepositoryInfo
+                    {
+                        Owner = _organization,
+                        Repo = _repository ?? _project
+                    };
+                }
+
+                return null;
+            }
+            catch
             {
                 return null;
             }
-
-            return new RepositoryInfo
-            {
-                Owner = _organization,
-                Repo = _project
-            };
         }
 
         /// <summary>
@@ -191,21 +209,21 @@ namespace Sdo.Services
                 else if (_detectedPlatform == Platform.AzureDevOps)
                 {
                     // Azure DevOps formats:
-                    // dev.azure.com/organization/project/_git/repository
-                    // organization.visualstudio.com/project/_git/repository
+                    // dev.azure.com/organization/project/_git/repository (5 parts)
+                    // organization.visualstudio.com/project/_git/repository (4 parts)
                     var parts = cleanUrl.Split('/');
-                    if (parts.Length >= 5)
+
+                    if (parts[0].Contains("dev.azure.com") && parts.Length >= 5)
                     {
-                        if (parts[0].Contains("dev.azure.com"))
-                        {
-                            _organization = parts[1];
-                            _project = parts[2]; // Project is parts[2], repository is parts[4]
-                        }
-                        else if (parts[0].Contains("visualstudio.com"))
-                        {
-                            _organization = parts[0].Split('.').First();
-                            _project = parts[1]; // Project is parts[1] for visualstudio.com format
-                        }
+                        _organization = parts[1];
+                        _project = parts[2]; // Project is parts[2]
+                        _repository = parts[4].Replace(".git", ""); // Repository is parts[4]
+                    }
+                    else if (parts[0].Contains("visualstudio.com") && parts.Length >= 4)
+                    {
+                        _organization = parts[0].Split('.').First();
+                        _project = parts[1]; // Project is parts[1] for visualstudio.com format
+                        _repository = parts[3].Replace(".git", ""); // Repository is parts[3] for visualstudio.com format
                     }
                 }
             }

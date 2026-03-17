@@ -1,4 +1,4 @@
-namespace Nbuild;
+namespace Nbuild.Helpers;
 
 public static class ConsoleHelper
 {

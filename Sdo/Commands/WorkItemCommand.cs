@@ -7,6 +7,7 @@
 // across GitHub Issues and Azure DevOps work items.
 
 using System.CommandLine;
+using Nbuild.Helpers;
 using Sdo.Interfaces;
 using Sdo.Services;
 
@@ -207,14 +208,14 @@ namespace Sdo.Commands
             {
                 if (verbose)
                 {
-                    Console.WriteLine($"Detecting platform and retrieving work item {id}...");
+                    ConsoleHelper.WriteLine($"Detecting platform and retrieving work item {id}...", ConsoleColor.Green);
                 }
 
                 var platform = _platformDetector.DetectPlatform();
 
                 if (verbose)
                 {
-                    Console.WriteLine($"Detected platform: {platform}");
+                    ConsoleHelper.WriteLine($"Detected platform: {platform}", ConsoleColor.Green);
                 }
 
                 if (platform == Platform.GitHub)
@@ -227,23 +228,21 @@ namespace Sdo.Commands
                 }
                 else
                 {
-                    Console.WriteLine("✗ Unsupported platform detected");
+                    ConsoleHelper.WriteLine("X Unsupported platform detected", ConsoleColor.Red);
                     return 1;
                 }
             }
             catch (InvalidOperationException ex)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"X {ex.Message}");
-                Console.ResetColor();
+                ConsoleHelper.WriteLine($"X {ex.Message}", ConsoleColor.Red);
                 return 1;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"✗ Error: {ex.Message}");
+                ConsoleHelper.WriteLine($"X Error: {ex.Message}", ConsoleColor.Red);
                 if (verbose)
                 {
-                    Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                    ConsoleHelper.WriteLine($"Stack trace: {ex.StackTrace}", ConsoleColor.Red);
                 }
                 return 1;
             }
@@ -261,20 +260,20 @@ namespace Sdo.Commands
 
                 if (string.IsNullOrEmpty(repoInfo?.Owner) || string.IsNullOrEmpty(repoInfo?.Repo))
                 {
-                    Console.WriteLine("✗ Could not determine GitHub repository from Git remote");
+                    ConsoleHelper.WriteLine("X Could not determine GitHub repository from Git remote", ConsoleColor.Red);
                     return 1;
                 }
 
                 if (verbose)
                 {
-                    Console.WriteLine($"Fetching GitHub issue: {repoInfo.Owner}/{repoInfo.Repo}#{issueNumber}");
+                    ConsoleHelper.WriteLine($"Fetching GitHub issue: {repoInfo.Owner}/{repoInfo.Repo}#{issueNumber}", ConsoleColor.Green);
                 }
 
                 var issue = await client.GetIssueAsync(repoInfo.Owner, repoInfo.Repo, issueNumber);
 
                 if (issue == null)
                 {
-                    Console.WriteLine($"✗ Issue #{issueNumber} not found");
+                    ConsoleHelper.WriteLine($"X Issue #{issueNumber} not found", ConsoleColor.Red);
                     return 1;
                 }
 
@@ -283,7 +282,7 @@ namespace Sdo.Commands
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"✗ Failed to fetch GitHub issue: {ex.Message}");
+                ConsoleHelper.WriteLine($"X Failed to fetch GitHub issue: {ex.Message}", ConsoleColor.Red);
                 return 1;
             }
         }
@@ -298,14 +297,14 @@ namespace Sdo.Commands
                 var pat = Environment.GetEnvironmentVariable("AZURE_DEVOPS_PAT");
                 if (string.IsNullOrEmpty(pat))
                 {
-                    Console.WriteLine("✗ AZURE_DEVOPS_PAT environment variable not set");
+                    ConsoleHelper.WriteLine("X AZURE_DEVOPS_PAT environment variable not set", ConsoleColor.Red);
                     return 1;
                 }
 
                 var organization = _platformDetector.GetOrganization();
                 if (string.IsNullOrEmpty(organization))
                 {
-                    Console.WriteLine("✗ Could not determine Azure DevOps organization from Git remote");
+                    ConsoleHelper.WriteLine("X Could not determine Azure DevOps organization from Git remote", ConsoleColor.Red);
                     return 1;
                 }
 
@@ -320,7 +319,7 @@ namespace Sdo.Commands
 
                 if (workItem == null)
                 {
-                    Console.WriteLine($"✗ Work item #{workItemId} not found");
+                    ConsoleHelper.WriteLine($"X Work item #{workItemId} not found", ConsoleColor.Red);
                     return 1;
                 }
 
@@ -329,7 +328,7 @@ namespace Sdo.Commands
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"✗ Failed to fetch Azure DevOps work item: {ex.Message}");
+                ConsoleHelper.WriteLine($"X Failed to fetch Azure DevOps work item: {ex.Message}", ConsoleColor.Red);
                 return 1;
             }
         }
@@ -373,23 +372,21 @@ namespace Sdo.Commands
                 }
                 else
                 {
-                    Console.WriteLine("✗ Unsupported platform detected");
+                    ConsoleHelper.WriteLine("X Unsupported platform detected", ConsoleColor.Red);
                     return 1;
                 }
             }
             catch (InvalidOperationException ex)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"X {ex.Message}");
-                Console.ResetColor();
+                ConsoleHelper.WriteLine($"X {ex.Message}", ConsoleColor.Red);
                 return 1;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"✗ Error: {ex.Message}");
+                ConsoleHelper.WriteLine($"X Error: {ex.Message}", ConsoleColor.Red);
                 if (verbose)
                 {
-                    Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                    ConsoleHelper.WriteLine($"Stack trace: {ex.StackTrace}", ConsoleColor.Red);
                 }
                 return 1;
             }
@@ -408,13 +405,13 @@ namespace Sdo.Commands
 
                 if (string.IsNullOrEmpty(repoInfo?.Owner) || string.IsNullOrEmpty(repoInfo?.Repo))
                 {
-                    Console.WriteLine("✗ Could not determine GitHub repository from Git remote");
+                    ConsoleHelper.WriteLine("X Could not determine GitHub repository from Git remote", ConsoleColor.Red);
                     return 1;
                 }
 
                 if (verbose)
                 {
-                    Console.WriteLine($"Fetching GitHub issues: {repoInfo.Owner}/{repoInfo.Repo}");
+                    ConsoleHelper.WriteLine($"Fetching GitHub issues: {repoInfo.Owner}/{repoInfo.Repo}", ConsoleColor.Green);
                 }
 
                 // Determine page size: use larger page when filtering to ensure sufficient filtered results
@@ -422,7 +419,7 @@ namespace Sdo.Commands
                 int pageSize = Math.Max(100, top);
                 if (verbose)
                 {
-                    Console.WriteLine($"Fetching with perPage={pageSize} (filtering results to {top})");
+                    ConsoleHelper.WriteLine($"Fetching with perPage={pageSize} (filtering results to {top})", ConsoleColor.Green);
                 }
 
                 var issues = await client.ListIssuesAsync(repoInfo.Owner, repoInfo.Repo, pageSize);
@@ -431,9 +428,9 @@ namespace Sdo.Commands
                 {
                     if (verbose)
                     {
-                        Console.WriteLine("API returned null");
+                        ConsoleHelper.WriteLine("API returned null", ConsoleColor.Red);
                     }
-                    Console.WriteLine("No issues found");
+                    ConsoleHelper.WriteLine("No issues found", ConsoleColor.Red);
                     return 0;
                 }
 
@@ -457,7 +454,7 @@ namespace Sdo.Commands
 
                 if (!issues.Any())
                 {
-                    Console.WriteLine("No issues found");
+                    ConsoleHelper.WriteLine("No issues found", ConsoleColor.Red);
                     return 0;
                 }
 
@@ -466,7 +463,7 @@ namespace Sdo.Commands
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"✗ Failed to list GitHub issues: {ex.Message}");
+                ConsoleHelper.WriteLine($"X Failed to list GitHub issues: {ex.Message}", ConsoleColor.Red);
                 return 1;
             }
         }
@@ -482,14 +479,14 @@ namespace Sdo.Commands
                 var pat = Environment.GetEnvironmentVariable("AZURE_DEVOPS_PAT");
                 if (string.IsNullOrEmpty(pat))
                 {
-                    Console.WriteLine("✗ AZURE_DEVOPS_PAT environment variable not set");
+                    ConsoleHelper.WriteLine("X AZURE_DEVOPS_PAT environment variable not set", ConsoleColor.Red);
                     return 1;
                 }
 
                 var organization = _platformDetector.GetOrganization();
                 if (string.IsNullOrEmpty(organization))
                 {
-                    Console.WriteLine("✗ Could not determine Azure DevOps organization from Git remote");
+                    ConsoleHelper.WriteLine("X Could not determine Azure DevOps organization from Git remote", ConsoleColor.Red);
                     return 1;
                 }
 
@@ -526,32 +523,32 @@ namespace Sdo.Commands
                 {
                     if (verbose)
                     {
-                        Console.WriteLine("✗ Failed to retrieve work items from Azure DevOps");
+                        ConsoleHelper.WriteLine("X Failed to retrieve work items from Azure DevOps", ConsoleColor.Red);
                         if (!string.IsNullOrEmpty(client.LastError))
                         {
-                            Console.WriteLine($"  Error: {client.LastError}");
+                            ConsoleHelper.WriteLine($"  Error: {client.LastError}", ConsoleColor.Red);
                             
                             // Provide specific guidance for common errors
                             if (client.LastError.Contains("Unauthorized"))
                             {
-                                Console.WriteLine("  ");
-                                Console.WriteLine("  This typically means:");
-                                Console.WriteLine("    1. The AZURE_DEVOPS_PAT token doesn't have 'Work Item Query' permissions");
-                                Console.WriteLine("    2. The PAT scope doesn't include 'vso.work_read'");
-                                Console.WriteLine("    3. The project has work items disabled");
-                                Console.WriteLine("  ");
-                                Console.WriteLine("  Solution: Create a PAT with these scopes:");
-                                Console.WriteLine("    - Work Item > Read");
-                                Console.WriteLine("    - Code > Read");
+                                ConsoleHelper.WriteLine("  ", ConsoleColor.Red);
+                                ConsoleHelper.WriteLine("  This typically means:", ConsoleColor.Red);
+                                ConsoleHelper.WriteLine("    1. The AZURE_DEVOPS_PAT token doesn't have 'Work Item Query' permissions", ConsoleColor.Red);
+                                ConsoleHelper.WriteLine("    2. The PAT scope doesn't include 'vso.work_read'", ConsoleColor.Red);
+                                ConsoleHelper.WriteLine("    3. The project has work items disabled", ConsoleColor.Red);
+                                ConsoleHelper.WriteLine("  ", ConsoleColor.Red);
+                                ConsoleHelper.WriteLine("  Solution: Create a PAT with these scopes:", ConsoleColor.Red);
+                                ConsoleHelper.WriteLine("    - Work Item > Read", ConsoleColor.Red);
+                                ConsoleHelper.WriteLine("    - Code > Read", ConsoleColor.Red);
                             }
                         }
                         else
                         {
-                            Console.WriteLine("  Possible causes:");
-                            Console.WriteLine("    - AZURE_DEVOPS_PAT token permissions are insufficient");
-                            Console.WriteLine("    - Work items feature is disabled in the project");
-                            Console.WriteLine($"  Organization: {organization}");
-                            Console.WriteLine($"  Project: {project ?? "(not specified)"}");
+                            ConsoleHelper.WriteLine("  Possible causes:", ConsoleColor.Red);
+                            ConsoleHelper.WriteLine("    - AZURE_DEVOPS_PAT token permissions are insufficient", ConsoleColor.Red);
+                            ConsoleHelper.WriteLine("    - Work items feature is disabled in the project", ConsoleColor.Red);
+                            ConsoleHelper.WriteLine($"  Organization: {organization}", ConsoleColor.Red);
+                            ConsoleHelper.WriteLine($"  Project: {project ?? "(not specified)"}", ConsoleColor.Red);
                         }
                     }
                     else
@@ -579,7 +576,7 @@ namespace Sdo.Commands
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"✗ Failed to list Azure DevOps work items: {ex.Message}");
+                ConsoleHelper.WriteLine($"X Failed to list Azure DevOps work items: {ex.Message}", ConsoleColor.Red);
                 return 1;
             }
         }
@@ -600,27 +597,27 @@ namespace Sdo.Commands
             {
                 if (id <= 0)
                 {
-                    Console.WriteLine("✗ Work item ID must be positive");
+                    ConsoleHelper.WriteLine("X Work item ID must be positive", ConsoleColor.Red);
                     return 1;
                 }
 
                 if (string.IsNullOrEmpty(title) && string.IsNullOrEmpty(state) &&
                     string.IsNullOrEmpty(assignee) && string.IsNullOrEmpty(description))
                 {
-                    Console.WriteLine("✗ At least one property must be specified for update (--title, --state, --assignee, --description)");
+                    ConsoleHelper.WriteLine("X At least one property must be specified for update (--title, --state, --assignee, --description)", ConsoleColor.Red);
                     return 1;
                 }
 
                 if (verbose)
                 {
-                    Console.WriteLine($"Detecting platform and updating work item {id}...");
+                    ConsoleHelper.WriteLine($"Detecting platform and updating work item {id}...", ConsoleColor.Yellow);
                 }
 
                 var platform = _platformDetector.DetectPlatform();
 
                 if (verbose)
                 {
-                    Console.WriteLine($"Detected platform: {platform}");
+                    ConsoleHelper.WriteLine($"Detected platform: {platform}", ConsoleColor.Yellow);
                 }
 
                 if (platform == Platform.GitHub)
@@ -629,7 +626,7 @@ namespace Sdo.Commands
                     var repoInfo = _platformDetector.GetRepositoryInfo();
                     if (repoInfo == null || repoInfo.Owner == null || repoInfo.Repo == null)
                     {
-                        Console.WriteLine("✗ Could not determine GitHub repository from Git remote");
+                        ConsoleHelper.WriteLine("X Could not determine GitHub repository from Git remote", ConsoleColor.Red);
                         return 1;
                     }
 
@@ -637,24 +634,24 @@ namespace Sdo.Commands
 
                     if (verbose)
                     {
-                        Console.WriteLine($"Updating GitHub issue #{id} in {repoInfo.Owner}/{repoInfo.Repo}...");
+                        ConsoleHelper.WriteLine($"Updating GitHub issue #{id} in {repoInfo.Owner}/{repoInfo.Repo}...", ConsoleColor.Yellow);
                     }
 
                     var result = await client.UpdateIssueAsync(repoInfo.Owner!, repoInfo.Repo!, id, title, state, description, assignee);
 
                     if (result != null)
                     {
-                        Console.WriteLine($"✓ GitHub issue #{id} updated successfully");
+                        ConsoleHelper.WriteLine($"✓ GitHub issue #{id} updated successfully", ConsoleColor.Green);
                         if (verbose)
                         {
-                            Console.WriteLine($"  Title: {result.Title}");
-                            Console.WriteLine($"  State: {result.State}");
+                            ConsoleHelper.WriteLine($"  Title: {result.Title}", ConsoleColor.Yellow);
+                            ConsoleHelper.WriteLine($"  State: {result.State}", ConsoleColor.Yellow);
                         }
                         return 0;
                     }
                     else
                     {
-                        Console.WriteLine($"✗ Failed to update GitHub issue #{id}");
+                        ConsoleHelper.WriteLine($"X Failed to update GitHub issue #{id}", ConsoleColor.Red);
                         return 1;
                     }
                 }
@@ -664,14 +661,14 @@ namespace Sdo.Commands
                     var pat = Environment.GetEnvironmentVariable("AZURE_DEVOPS_PAT");
                     if (string.IsNullOrEmpty(pat))
                     {
-                        Console.WriteLine("✗ AZURE_DEVOPS_PAT environment variable not set");
+                        ConsoleHelper.WriteLine("X AZURE_DEVOPS_PAT environment variable not set", ConsoleColor.Red);
                         return 1;
                     }
 
                     var organization = _platformDetector.GetOrganization();
                     if (string.IsNullOrEmpty(organization))
                     {
-                        Console.WriteLine("✗ Could not determine Azure DevOps organization");
+                        ConsoleHelper.WriteLine("X Could not determine Azure DevOps organization", ConsoleColor.Red);
                         return 1;
                     }
 
@@ -681,50 +678,48 @@ namespace Sdo.Commands
 
                     if (verbose)
                     {
-                        Console.WriteLine($"Updating Azure DevOps work item {id} in {organization}...");
+                        ConsoleHelper.WriteLine($"Updating Azure DevOps work item {id} in {organization}...", ConsoleColor.Yellow);
                     }
 
                     var result = await client.UpdateWorkItemAsync(id, title, state, assignee, description);
 
                     if (result != null)
                     {
-                        Console.WriteLine($"✓ Work item {id} updated successfully");
+                        ConsoleHelper.WriteLine($"✓ Work item {id} updated successfully", ConsoleColor.Green);
                         if (verbose)
                         {
-                            Console.WriteLine($"  Title: {result.Title}");
-                            Console.WriteLine($"  State: {result.State}");
+                            ConsoleHelper.WriteLine($"  Title: {result.Title}", ConsoleColor.Yellow);
+                            ConsoleHelper.WriteLine($"  State: {result.State}", ConsoleColor.Yellow);
                         }
                         return 0;
                     }
                     else
                     {
-                        Console.WriteLine($"✗ Failed to update work item {id}");
+                        ConsoleHelper.WriteLine($"X Failed to update work item {id}", ConsoleColor.Red);
                         if (!string.IsNullOrEmpty(client.LastError))
                         {
-                            Console.WriteLine($"  Error: {client.LastError}");
+                            ConsoleHelper.WriteLine($"  Error: {client.LastError}", ConsoleColor.Red);
                         }
                         return 1;
                     }
                 }
                 else
                 {
-                    Console.WriteLine("✗ Unsupported platform detected");
+                    ConsoleHelper.WriteLine("X Unsupported platform detected", ConsoleColor.Red);
                     return 1;
                 }
             }
             catch (InvalidOperationException ex)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"X {ex.Message}");
-                Console.ResetColor();
+                ConsoleHelper.WriteLine($"X {ex.Message}", ConsoleColor.Red);
                 return 1;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"✗ Error: {ex.Message}");
+                ConsoleHelper.WriteLine($"X Error: {ex.Message}", ConsoleColor.Red);
                 if (verbose)
                 {
-                    Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                    ConsoleHelper.WriteLine($"Stack trace: {ex.StackTrace}", ConsoleColor.Red);
                 }
                 return 1;
             }
@@ -743,26 +738,26 @@ namespace Sdo.Commands
             {
                 if (id <= 0)
                 {
-                    Console.WriteLine("✗ Work item ID must be positive");
+                    ConsoleHelper.WriteLine("X Work item ID must be positive", ConsoleColor.Red);
                     return 1;
                 }
 
                 if (string.IsNullOrEmpty(message))
                 {
-                    Console.WriteLine("✗ Comment message cannot be empty");
+                    ConsoleHelper.WriteLine("X Comment message cannot be empty", ConsoleColor.Red);
                     return 1;
                 }
 
                 if (verbose)
                 {
-                    Console.WriteLine($"Detecting platform and adding comment to work item {id}...");
+                    ConsoleHelper.WriteLine($"Detecting platform and adding comment to work item {id}...", ConsoleColor.Gray);
                 }
 
                 var platform = _platformDetector.DetectPlatform();
 
                 if (verbose)
                 {
-                    Console.WriteLine($"Detected platform: {platform}");
+                    ConsoleHelper.WriteLine($"Detected platform: {platform}", ConsoleColor.Gray);
                 }
 
                 if (platform == Platform.GitHub)
@@ -771,7 +766,7 @@ namespace Sdo.Commands
                     var repoInfo = _platformDetector.GetRepositoryInfo();
                     if (repoInfo == null || repoInfo.Owner == null || repoInfo.Repo == null)
                     {
-                        Console.WriteLine("✗ Could not determine GitHub repository from Git remote");
+                        ConsoleHelper.WriteLine("X Could not determine GitHub repository from Git remote", ConsoleColor.Red);
                         return 1;
                     }
 
@@ -779,19 +774,19 @@ namespace Sdo.Commands
 
                     if (verbose)
                     {
-                        Console.WriteLine($"Adding comment to GitHub issue #{id} in {repoInfo.Owner}/{repoInfo.Repo}...");
+                        ConsoleHelper.WriteLine($"Adding comment to GitHub issue #{id} in {repoInfo.Owner}/{repoInfo.Repo}...", ConsoleColor.Gray);
                     }
 
                     var success = await client.AddCommentAsync(repoInfo.Owner!, repoInfo.Repo!, id, message);
 
                     if (success)
                     {
-                        Console.WriteLine($"✓ Comment added to GitHub issue #{id}");
+                        ConsoleHelper.WriteLine($"✓ Comment added to GitHub issue #{id}", ConsoleColor.Green);
                         return 0;
                     }
                     else
                     {
-                        Console.WriteLine($"✗ Failed to add comment to GitHub issue #{id}");
+                        ConsoleHelper.WriteLine($"X Failed to add comment to GitHub issue #{id}", ConsoleColor.Red);
                         return 1;
                     }
                 }
@@ -801,14 +796,14 @@ namespace Sdo.Commands
                     var pat = Environment.GetEnvironmentVariable("AZURE_DEVOPS_PAT");
                     if (string.IsNullOrEmpty(pat))
                     {
-                        Console.WriteLine("✗ AZURE_DEVOPS_PAT environment variable not set");
+                        ConsoleHelper.WriteLine("X AZURE_DEVOPS_PAT environment variable not set", ConsoleColor.Red);
                         return 1;
                     }
 
                     var organization = _platformDetector.GetOrganization();
                     if (string.IsNullOrEmpty(organization))
                     {
-                        Console.WriteLine("✗ Could not determine Azure DevOps organization");
+                        ConsoleHelper.WriteLine("X Could not determine Azure DevOps organization", ConsoleColor.Red);
                         return 1;
                     }
 
@@ -830,33 +825,31 @@ namespace Sdo.Commands
                     }
                     else
                     {
-                        Console.WriteLine($"✗ Failed to add comment to work item {id}");
+                        ConsoleHelper.WriteLine($"X Failed to add comment to work item {id}", ConsoleColor.Red);
                         if (!string.IsNullOrEmpty(client.LastError))
                         {
-                            Console.WriteLine($"  Error: {client.LastError}");
+                            ConsoleHelper.WriteLine($"  Error: {client.LastError}", ConsoleColor.Red);
                         }
                         return 1;
                     }
                 }
                 else
                 {
-                    Console.WriteLine("✗ Unsupported platform detected");
+                    ConsoleHelper.WriteLine("X Unsupported platform detected", ConsoleColor.Red);
                     return 1;
                 }
             }
             catch (InvalidOperationException ex)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"X {ex.Message}");
-                Console.ResetColor();
+                ConsoleHelper.WriteLine($"X {ex.Message}", ConsoleColor.Red);
                 return 1;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"✗ Error: {ex.Message}");
+                ConsoleHelper.WriteLine($"X Error: {ex.Message}", ConsoleColor.Red);
                 if (verbose)
                 {
-                    Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                    ConsoleHelper.WriteLine($"Stack trace: {ex.StackTrace}", ConsoleColor.Red);
                 }
                 return 1;
             }
@@ -877,19 +870,19 @@ namespace Sdo.Commands
             {
                 if (string.IsNullOrEmpty(title))
                 {
-                    Console.WriteLine("✗ Title is required for creating a work item");
+                    ConsoleHelper.WriteLine("X Title is required for creating a work item", ConsoleColor.Red);
                     return 1;
                 }
 
                 if (string.IsNullOrEmpty(type))
                 {
-                    Console.WriteLine("✗ Type is required for creating a work item (PBI, Bug, Task, etc.)");
+                    ConsoleHelper.WriteLine("X Type is required for creating a work item (PBI, Bug, Task, etc.)", ConsoleColor.Red);
                     return 1;
                 }
 
                 if (verbose)
                 {
-                    Console.WriteLine($"Detecting platform and creating new work item...");
+                    ConsoleHelper.WriteLine($"Detecting platform and creating new work item...", ConsoleColor.Gray);
                 }
 
                 var platform = _platformDetector.DetectPlatform();
@@ -905,7 +898,7 @@ namespace Sdo.Commands
                     var repoInfo = _platformDetector.GetRepositoryInfo();
                     if (repoInfo == null || repoInfo.Owner == null || repoInfo.Repo == null)
                     {
-                        Console.WriteLine("✗ Could not determine GitHub repository from Git remote");
+                        ConsoleHelper.WriteLine("X Could not determine GitHub repository from Git remote", ConsoleColor.Red);
                         return 1;
                     }
 
@@ -913,16 +906,16 @@ namespace Sdo.Commands
 
                     if (verbose)
                     {
-                        Console.WriteLine($"Creating GitHub issue in {repoInfo.Owner}/{repoInfo.Repo}...");
-                        Console.WriteLine($"  Title: {title}");
-                        Console.WriteLine($"  Description: {description ?? "(none)"}");
+                        ConsoleHelper.WriteLine($"Creating GitHub issue in {repoInfo.Owner}/{repoInfo.Repo}...", ConsoleColor.Gray);
+                        ConsoleHelper.WriteLine($"  Title: {title}", ConsoleColor.Gray);
+                        ConsoleHelper.WriteLine($"  Description: {description ?? "(none)"}", ConsoleColor.Gray);
                     }
 
                     // TODO: Implement GitHub issue creation in Phase 3.2
-                    Console.WriteLine("ℹ GitHub issue creation endpoint would be called here");
-                    Console.WriteLine($"  Title: {title}");
-                    Console.WriteLine($"  Description: {description ?? "(none)"}");
-                    Console.WriteLine("✓ GitHub issue created (placeholder - not yet implemented)");
+                    ConsoleHelper.WriteLine("ℹ GitHub issue creation endpoint would be called here", ConsoleColor.Gray);
+                    ConsoleHelper.WriteLine($"  Title: {title}", ConsoleColor.Gray);
+                    ConsoleHelper.WriteLine($"  Description: {description ?? "(none)"}", ConsoleColor.Gray);
+                    ConsoleHelper.WriteLine("✓ GitHub issue created (placeholder - not yet implemented)", ConsoleColor.Green);
                     return 0;
                 }
                 else if (platform == Platform.AzureDevOps)
@@ -931,14 +924,14 @@ namespace Sdo.Commands
                     var pat = Environment.GetEnvironmentVariable("AZURE_DEVOPS_PAT");
                     if (string.IsNullOrEmpty(pat))
                     {
-                        Console.WriteLine("✗ AZURE_DEVOPS_PAT environment variable not set");
+                        ConsoleHelper.WriteLine("X AZURE_DEVOPS_PAT environment variable not set", ConsoleColor.Red);
                         return 1;
                     }
 
                     var organization = _platformDetector.GetOrganization();
                     if (string.IsNullOrEmpty(organization))
                     {
-                        Console.WriteLine("✗ Could not determine Azure DevOps organization");
+                        ConsoleHelper.WriteLine("X Could not determine Azure DevOps organization", ConsoleColor.Red);
                         return 1;
                     }
 
@@ -948,41 +941,39 @@ namespace Sdo.Commands
 
                     if (verbose)
                     {
-                        Console.WriteLine($"Creating Azure DevOps work item in {organization}/{project ?? "default"}...");
-                        Console.WriteLine($"  Title: {title}");
-                        Console.WriteLine($"  Type: {type}");
-                        Console.WriteLine($"  Description: {description ?? "(none)"}");
-                        if (!string.IsNullOrEmpty(assignee)) Console.WriteLine($"  Assignee: {assignee}");
+                        ConsoleHelper.WriteLine($"Creating Azure DevOps work item in {organization}/{project ?? "default"}...", ConsoleColor.Gray);
+                        ConsoleHelper.WriteLine($"  Title: {title}", ConsoleColor.Gray);
+                        ConsoleHelper.WriteLine($"  Type: {type}", ConsoleColor.Gray);
+                        ConsoleHelper.WriteLine($"  Description: {description ?? "(none)"}", ConsoleColor.Gray);
+                        if (!string.IsNullOrEmpty(assignee)) ConsoleHelper.WriteLine($"  Assignee: {assignee}", ConsoleColor.Gray);
                     }
 
                     // TODO: Implement Azure DevOps work item creation in Phase 3.2
-                    Console.WriteLine("ℹ Azure DevOps work item creation endpoint would be called here");
-                    Console.WriteLine($"  Title: {title}");
-                    Console.WriteLine($"  Type: {type}");
-                    Console.WriteLine($"  Description: {description ?? "(none)"}");
-                    if (!string.IsNullOrEmpty(assignee)) Console.WriteLine($"  Assignee: {assignee}");
-                    Console.WriteLine("✓ Azure DevOps work item created (placeholder - not yet implemented)");
+                    ConsoleHelper.WriteLine("ℹ Azure DevOps work item creation endpoint would be called here", ConsoleColor.Gray);
+                    ConsoleHelper.WriteLine($"  Title: {title}", ConsoleColor.Gray);
+                    ConsoleHelper.WriteLine($"  Type: {type}", ConsoleColor.Gray);
+                    ConsoleHelper.WriteLine($"  Description: {description ?? "(none)"}", ConsoleColor.Gray);
+                    if (!string.IsNullOrEmpty(assignee)) ConsoleHelper.WriteLine($"  Assignee: {assignee}", ConsoleColor.Gray);
+                    ConsoleHelper.WriteLine("✓ Azure DevOps work item created (placeholder - not yet implemented)", ConsoleColor.Green);
                     return 0;
                 }
                 else
                 {
-                    Console.WriteLine("✗ Unsupported platform detected");
+                    ConsoleHelper.WriteLine("X Unsupported platform detected", ConsoleColor.Red);
                     return 1;
                 }
             }
             catch (InvalidOperationException ex)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"X {ex.Message}");
-                Console.ResetColor();
+                ConsoleHelper.WriteLine($"X {ex.Message}", ConsoleColor.Red);
                 return 1;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"✗ Error: {ex.Message}");
+                ConsoleHelper.WriteLine($"X Error: {ex.Message}", ConsoleColor.Red);
                 if (verbose)
                 {
-                    Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                    ConsoleHelper.WriteLine($"Stack trace: {ex.StackTrace}", ConsoleColor.Red);
                 }
                 return 1;
             }
