@@ -255,7 +255,7 @@
 
 		<Message Text="" Importance="high" />
 		<Message Text=">>> 1a. sdo workitem list (Python GitHub - ntools)" Importance="high" />
-		<Exec Command="sdo workitem list" WorkingDirectory="$(SolutionDir)" ContinueOnError="true" />
+		<Exec Command="sdo workitem list" WorkingDirectory="$(SolutionDir)" EnvironmentVariables="PYTHONIOENCODING=UTF-8" ContinueOnError="true" />
 
 		<Message Text="" Importance="high" />
 		<Message Text=">>> 1b. sdo.exe wi list (C# GitHub - ntools)" Importance="high" />
@@ -263,7 +263,7 @@
 
 		<Message Text="" Importance="high" />
 		<Message Text=">>> 1c. sdo workitem list (Python Azure - ConsoleApp1)" Importance="high" />
-		<Exec Command="sdo workitem list" WorkingDirectory="C:\source\ConsoleApp1" ContinueOnError="true" />
+		<Exec Command="sdo workitem list" WorkingDirectory="C:\source\ConsoleApp1" EnvironmentVariables="PYTHONIOENCODING=UTF-8" ContinueOnError="true" />
 
 		<Message Text="" Importance="high" />
 		<Message Text=">>> 1d. sdo.exe wi list (C# Azure - ConsoleApp1)" Importance="high" />
@@ -277,19 +277,19 @@
 
 		<Message Text="" Importance="high" />
 		<Message Text=">>> 2a. sdo workitem show --id 1 (Python GitHub - ntools)" Importance="high" />
-		<Exec Command="sdo workitem show --id 1" WorkingDirectory="$(SolutionDir)" ContinueOnError="true" />
+		<Exec Command="sdo workitem show --id 1" WorkingDirectory="$(SolutionDir)" EnvironmentVariables="PYTHONIOENCODING=UTF-8" ContinueOnError="true" />
 
 		<Message Text="" Importance="high" />
 		<Message Text=">>> 2b. sdo.exe wi show --id 1 (C# GitHub - ntools)" Importance="high" />
 		<Exec Command="$(SolutionDir)\Sdo\bin\Release\sdo.exe wi show --id 1" WorkingDirectory="$(SolutionDir)" ContinueOnError="true" />
 
 		<Message Text="" Importance="high" />
-		<Message Text=">>> 2c. sdo workitem show --id 1 (Python Azure - ConsoleApp1)" Importance="high" />
-		<Exec Command="sdo workitem show --id 1" WorkingDirectory="C:\source\ConsoleApp1" ContinueOnError="true" />
+		<Message Text=">>> 2c. sdo workitem show --id 159 (Python Azure - ConsoleApp1)" Importance="high" />
+		<Exec Command="sdo workitem show --id 159" WorkingDirectory="C:\source\ConsoleApp1" EnvironmentVariables="PYTHONIOENCODING=UTF-8" ContinueOnError="true" />
 
 		<Message Text="" Importance="high" />
-		<Message Text=">>> 2d. sdo.exe wi show --id 1 (C# Azure - ConsoleApp1)" Importance="high" />
-		<Exec Command="$(SolutionDir)\Sdo\bin\Release\sdo.exe wi show --id 1" WorkingDirectory="C:\source\ConsoleApp1" ContinueOnError="true" />
+		<Message Text=">>> 2d. sdo.exe wi show --id 159 (C# Azure - ConsoleApp1)" Importance="high" />
+		<Exec Command="$(SolutionDir)\Sdo\bin\Release\sdo.exe wi show --id 159" WorkingDirectory="C:\source\ConsoleApp1" ContinueOnError="true" />
 
 		<!-- Command 3: Pull Request List -->
 		<Message Text="" Importance="high" />
@@ -299,7 +299,7 @@
 
 		<Message Text="" Importance="high" />
 		<Message Text=">>> 3a. sdo pr ls (Python GitHub - ntools)" Importance="high" />
-		<Exec Command="sdo pr ls" WorkingDirectory="$(SolutionDir)" ContinueOnError="true" />
+		<Exec Command="sdo pr ls" WorkingDirectory="$(SolutionDir)" EnvironmentVariables="PYTHONIOENCODING=UTF-8" ContinueOnError="true" />
 
 		<Message Text="" Importance="high" />
 		<Message Text=">>> 3b. sdo.exe pr ls (C# GitHub - ntools)" Importance="high" />
@@ -307,7 +307,7 @@
 
 		<Message Text="" Importance="high" />
 		<Message Text=">>> 3c. sdo pr ls (Python Azure - ConsoleApp1)" Importance="high" />
-		<Exec Command="sdo pr ls" WorkingDirectory="C:\source\ConsoleApp1" ContinueOnError="true" />
+		<Exec Command="sdo pr ls" WorkingDirectory="C:\source\ConsoleApp1" EnvironmentVariables="PYTHONIOENCODING=UTF-8" ContinueOnError="true" />
 
 		<Message Text="" Importance="high" />
 		<Message Text=">>> 3d. sdo.exe pr ls (C# Azure - ConsoleApp1)" Importance="high" />
@@ -321,19 +321,19 @@
 
 		<Message Text="" Importance="high" />
 		<Message Text=">>> 4a. sdo pr status 253 (Python GitHub - ntools)" Importance="high" />
-		<Exec Command="sdo pr status 253" WorkingDirectory="$(SolutionDir)" ContinueOnError="true" />
+		<Exec Command="sdo pr status 253" WorkingDirectory="$(SolutionDir)" EnvironmentVariables="PYTHONIOENCODING=UTF-8" ContinueOnError="true" />
 
 		<Message Text="" Importance="high" />
 		<Message Text=">>> 4b. sdo.exe pr status 253 (C# GitHub - ntools)" Importance="high" />
 		<Exec Command="$(SolutionDir)\Sdo\bin\Release\sdo.exe pr status 253" WorkingDirectory="$(SolutionDir)" ContinueOnError="true" />
 
 		<Message Text="" Importance="high" />
-		<Message Text=">>> 4c. sdo pr status 1 (Python Azure - ConsoleApp1)" Importance="high" />
-		<Exec Command="sdo pr status 1" WorkingDirectory="C:\source\ConsoleApp1" ContinueOnError="true" />
+		<Message Text=">>> 4c. sdo pr status 46 (Python Azure - ConsoleApp1)" Importance="high" />
+		<Exec Command="sdo pr status 46" WorkingDirectory="C:\source\ConsoleApp1" EnvironmentVariables="PYTHONIOENCODING=UTF-8" ContinueOnError="true" />
 
 		<Message Text="" Importance="high" />
-		<Message Text=">>> 4d. sdo.exe pr status 1 (C# Azure - ConsoleApp1)" Importance="high" />
-		<Exec Command="$(SolutionDir)\Sdo\bin\Release\sdo.exe pr status 1" WorkingDirectory="C:\source\ConsoleApp1" ContinueOnError="true" />
+		<Message Text=">>> 4d. sdo.exe pr status 46 (C# Azure - ConsoleApp1)" Importance="high" />
+		<Exec Command="$(SolutionDir)\Sdo\bin\Release\sdo.exe pr status 46" WorkingDirectory="C:\source\ConsoleApp1" ContinueOnError="true" />
 
 		<!-- Command 5: Repository List -->
 		<Message Text="" Importance="high" />
@@ -343,7 +343,7 @@
 
 		<Message Text="" Importance="high" />
 		<Message Text=">>> 5a. sdo repo list --top 5 (Python GitHub - ntools)" Importance="high" />
-		<Exec Command="sdo repo list --top 5" WorkingDirectory="$(SolutionDir)" ContinueOnError="true" />
+		<Exec Command="sdo repo list --top 5" WorkingDirectory="$(SolutionDir)" EnvironmentVariables="PYTHONIOENCODING=UTF-8" ContinueOnError="true" />
 
 		<Message Text="" Importance="high" />
 		<Message Text=">>> 5b. sdo.exe repo list --top 5 (C# GitHub - ntools)" Importance="high" />
@@ -351,7 +351,7 @@
 
 		<Message Text="" Importance="high" />
 		<Message Text=">>> 5c. sdo repo list --top 5 (Python Azure - ConsoleApp1)" Importance="high" />
-		<Exec Command="sdo repo list --top 5" WorkingDirectory="C:\source\ConsoleApp1" ContinueOnError="true" />
+		<Exec Command="sdo repo list --top 5" WorkingDirectory="C:\source\ConsoleApp1" EnvironmentVariables="PYTHONIOENCODING=UTF-8" ContinueOnError="true" />
 
 		<Message Text="" Importance="high" />
 		<Message Text=">>> 5d. sdo.exe repo list --top 5 (C# Azure - ConsoleApp1)" Importance="high" />

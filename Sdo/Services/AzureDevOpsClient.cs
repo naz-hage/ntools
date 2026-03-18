@@ -981,7 +981,7 @@ namespace Sdo.Services
 
                 if (queryParams.Count > 0)
                 {
-                    url += "?" + string.Join("&", queryParams);
+                    url += "&" + string.Join("&", queryParams);
                 }
 
                 var response = await _httpClient.GetAsync(url);
