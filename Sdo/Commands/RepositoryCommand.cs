@@ -171,19 +171,20 @@ namespace Sdo.Commands
                     if (repos == null) return 1;
 
                     // Display header
-                    Console.WriteLine($"Repositories in GITHUB account '{owner}' ({repos.Count} total):");
-                    Console.WriteLine(new string('-', 80));
+                    Console.WriteLine($"Active Repositories ({repos.Count} found):");
+                    Console.WriteLine(new string('-', 70));
 
                     // Display each repository
                     foreach (var repo in repos)
                     {
-                        Console.WriteLine($"  {repo.Name}");
+                        Console.WriteLine($" -  {repo.Name}");
                         Console.WriteLine($"    URL: {repo.Url}");
                         if (!string.IsNullOrEmpty(repo.DefaultBranch))
-                            Console.WriteLine($"    Default Branch: {repo.DefaultBranch}");
+                        {
+                            Console.WriteLine($"    Branch: {repo.DefaultBranch}");
+                        }
                         string visibility = repo.IsPrivate ? "Private" : "Public";
                         Console.WriteLine($"    Visibility: {visibility}");
-                        Console.WriteLine();
                     }
                     return 0;
                 }
@@ -209,17 +210,18 @@ namespace Sdo.Commands
                     if (repos == null) return 1;
 
                     // Display header
-                    Console.WriteLine($"Repositories in AZURE_DEVOPS project '{project}' ({repos.Count} total):");
-                    Console.WriteLine(new string('-', 80));
+                    Console.WriteLine($"Active Repositories ({repos.Count} found):");
+                    Console.WriteLine(new string('-', 70));
 
                     // Display each repository
                     foreach (var repo in repos)
                     {
-                        Console.WriteLine($"  {repo.Name}");
+                        Console.WriteLine($" -  {repo.Name}");
                         Console.WriteLine($"    URL: {repo.Url}");
                         if (!string.IsNullOrEmpty(repo.DefaultBranch))
-                            Console.WriteLine($"    Default Branch: {repo.DefaultBranch}");
-                        Console.WriteLine();
+                        {
+                            Console.WriteLine($"    Branch: {repo.DefaultBranch}");
+                        }
                     }
                     return 0;
                 }

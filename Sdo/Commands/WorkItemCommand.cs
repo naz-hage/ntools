@@ -1081,28 +1081,19 @@ namespace Sdo.Commands
         private void DisplayIssuesList(IEnumerable<GitHubIssue> issues)
         {
             var issueList = issues.ToList();
-            
-            Console.WriteLine();
-            Console.WriteLine($"📋 Issues ({issueList.Count} found):");
-            Console.WriteLine("-".PadRight(120, '-'));
-            Console.WriteLine($"{"#",-6} {"Title",-45} {"State",-7} {"Labels",-30} {"Assignee",-15}");
-            Console.WriteLine("-".PadRight(120, '-'));
+
+            Console.WriteLine($"Active Issues ({issueList.Count} found):");
+            Console.WriteLine(new string('-', 70));
 
             foreach (var issue in issueList)
             {
-                var title = (issue.Title ?? "").Length > 45 ? (issue.Title ?? "").Substring(0, 42) + "..." : issue.Title ?? "";
-                var state = (issue.State ?? "unknown").ToUpper();
-                var labels = issue.Labels != null && issue.Labels.Any() 
-                    ? string.Join(", ", issue.Labels.Select(l => l.Name)) 
-                    : "";
-                labels = labels.Length > 30 ? labels.Substring(0, 27) + "..." : labels;
-                var assignee = issue.Assignee?.Login ?? "Unassigned";
-                
-                Console.WriteLine($"#{issue.Number,-5} {title,-45} {state,-7} {labels,-30} {assignee,-15}");
+                Console.WriteLine($" #  {issue.Number} | {issue.Title}");
+                Console.WriteLine($"    State: {issue.State} | Assignee: {issue.Assignee?.Login ?? "Unassigned"}");
+                if (issue.Labels != null && issue.Labels.Any())
+                {
+                    Console.WriteLine($"    Labels: {string.Join(", ", issue.Labels.Select(l => l.Name))}");
+                }
             }
-            
-            Console.WriteLine("-".PadRight(120, '-'));
-            Console.WriteLine($"\n📊 Total: {issueList.Count} issue(s)");
         }
 
         /// <summary>
@@ -1111,34 +1102,22 @@ namespace Sdo.Commands
         private void DisplayWorkItemsList(IEnumerable<AzureDevOpsWorkItem> workItems)
         {
             var itemList = workItems.ToList();
-            
-            Console.WriteLine();
-            Console.WriteLine($"📋 Work Items ({itemList.Count} found):");
-            Console.WriteLine("-".PadRight(140, '-'));
-            Console.WriteLine($"{"ID",-6} {"Type",-20} {"Title",-35} {"State",-12} {"Sprint",-20} {"Assigned To",-15}");
-            Console.WriteLine("-".PadRight(140, '-'));
+
+            Console.WriteLine($"Active Work Items ({itemList.Count} found):");
+            Console.WriteLine(new string('-', 70));
 
             foreach (var item in itemList)
             {
-                var type = (item.Type ?? "N/A");
-                var title = (item.Title ?? "").Length > 35 ? (item.Title ?? "").Substring(0, 32) + "..." : item.Title ?? "";
-                var state = (item.State ?? "N/A");
-                var sprint = item.Sprint ?? "";
-                sprint = sprint.Length > 20 ? sprint.Substring(0, 17) + "..." : sprint;
-                var assignedTo = item.AssignedTo ?? "Unassigned";
-                assignedTo = assignedTo.Length > 15 ? assignedTo.Substring(0, 12) + "..." : assignedTo;
-                
-                Console.WriteLine($"{item.Id,-6} {type,-20} {title,-35} {state,-12} {sprint,-20} {assignedTo,-15}");
-            }
-            
-            Console.WriteLine("-".PadRight(140, '-'));
-            Console.WriteLine($"\n📊 Summary:");
-
-            // Summary by type
-            var typeCounts = itemList.GroupBy(x => x.Type ?? "Unknown").OrderBy(g => g.Key);
-            foreach (var typeGroup in typeCounts)
-            {
-                Console.WriteLine($"  {typeGroup.Key}: {typeGroup.Count()}");
+                Console.WriteLine($" #  {item.Id} | {item.Title}");
+                Console.WriteLine($"    Type: {item.Type} | State: {item.State}");
+                if (!string.IsNullOrEmpty(item.Sprint))
+                {
+                    Console.WriteLine($"    Sprint: {item.Sprint} | Assigned To: {item.AssignedTo ?? "Unassigned"}");
+                }
+                else
+                {
+                    Console.WriteLine($"    Assigned To: {item.AssignedTo ?? "Unassigned"}");
+                }
             }
         }
 

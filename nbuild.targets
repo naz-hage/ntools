@@ -241,25 +241,130 @@
 	</Target>
 
 	<!-- Test sdo.exe output format from ntools and ConsoleApp1 -->
+		<!-- Test sdo.exe output format from ntools and ConsoleApp1 -->
 	<Target Name="current-test" DependsOnTargets="BUILD">
 		<Message Text="========================================" Importance="high" />
-		<Message Text="Testing sdo.exe output format" Importance="high" />
+		<Message Text="C# vs Python SDO Output Format Comparison" Importance="high" />
 		<Message Text="========================================" Importance="high" />
-		
+
+		<!-- Command 1: Work Item List -->
 		<Message Text="" Importance="high" />
-		<Message Text="Test 1: GitHub Issues from ntools repo" Importance="high" />
-		<Message Text="========================================" Importance="high" />
-		<Exec Command="$(SolutionDir)\Sdo\bin\Release\sdo.exe wi list" WorkingDirectory="$(SolutionDir)" />
-		
+		<Message Text="╔════════════════════════════════════════╗" Importance="high" />
+		<Message Text="║ Command: sdo workitem list             ║" Importance="high" />
+		<Message Text="╚════════════════════════════════════════╝" Importance="high" />
+
 		<Message Text="" Importance="high" />
-		<Message Text="Test 2: Azure DevOps from ConsoleApp1 repo" Importance="high" />
-		<Message Text="========================================" Importance="high" />
-		<Exec Command="$(SolutionDir)\Sdo\bin\Release\sdo.exe wi list --verbose" WorkingDirectory="C:\source\ConsoleApp1" />
-		
+		<Message Text=">>> 1a. sdo workitem list (Python GitHub - ntools)" Importance="high" />
+		<Exec Command="sdo workitem list" WorkingDirectory="$(SolutionDir)" ContinueOnError="true" />
+
 		<Message Text="" Importance="high" />
-		<Message Text="========================================" Importance="high" />
-		<Message Text="✓ All tests passed" Importance="high" />
-		<Message Text="========================================" Importance="high" />
+		<Message Text=">>> 1b. sdo.exe wi list (C# GitHub - ntools)" Importance="high" />
+		<Exec Command="$(SolutionDir)\Sdo\bin\Release\sdo.exe wi list" WorkingDirectory="$(SolutionDir)" ContinueOnError="true" />
+
+		<Message Text="" Importance="high" />
+		<Message Text=">>> 1c. sdo workitem list (Python Azure - ConsoleApp1)" Importance="high" />
+		<Exec Command="sdo workitem list" WorkingDirectory="C:\source\ConsoleApp1" ContinueOnError="true" />
+
+		<Message Text="" Importance="high" />
+		<Message Text=">>> 1d. sdo.exe wi list (C# Azure - ConsoleApp1)" Importance="high" />
+		<Exec Command="$(SolutionDir)\Sdo\bin\Release\sdo.exe wi list --verbose" WorkingDirectory="C:\source\ConsoleApp1" ContinueOnError="true" />
+
+		<!-- Command 2: Work Item Show -->
+		<Message Text="" Importance="high" />
+		<Message Text="╔════════════════════════════════════════╗" Importance="high" />
+		<Message Text="║ Command: sdo workitem show --id 1      ║" Importance="high" />
+		<Message Text="╚════════════════════════════════════════╝" Importance="high" />
+
+		<Message Text="" Importance="high" />
+		<Message Text=">>> 2a. sdo workitem show --id 1 (Python GitHub - ntools)" Importance="high" />
+		<Exec Command="sdo workitem show --id 1" WorkingDirectory="$(SolutionDir)" ContinueOnError="true" />
+
+		<Message Text="" Importance="high" />
+		<Message Text=">>> 2b. sdo.exe wi show --id 1 (C# GitHub - ntools)" Importance="high" />
+		<Exec Command="$(SolutionDir)\Sdo\bin\Release\sdo.exe wi show --id 1" WorkingDirectory="$(SolutionDir)" ContinueOnError="true" />
+
+		<Message Text="" Importance="high" />
+		<Message Text=">>> 2c. sdo workitem show --id 1 (Python Azure - ConsoleApp1)" Importance="high" />
+		<Exec Command="sdo workitem show --id 1" WorkingDirectory="C:\source\ConsoleApp1" ContinueOnError="true" />
+
+		<Message Text="" Importance="high" />
+		<Message Text=">>> 2d. sdo.exe wi show --id 1 (C# Azure - ConsoleApp1)" Importance="high" />
+		<Exec Command="$(SolutionDir)\Sdo\bin\Release\sdo.exe wi show --id 1" WorkingDirectory="C:\source\ConsoleApp1" ContinueOnError="true" />
+
+		<!-- Command 3: Pull Request List -->
+		<Message Text="" Importance="high" />
+		<Message Text="╔════════════════════════════════════════╗" Importance="high" />
+		<Message Text="║ Command: sdo pr ls                     ║" Importance="high" />
+		<Message Text="╚════════════════════════════════════════╝" Importance="high" />
+
+		<Message Text="" Importance="high" />
+		<Message Text=">>> 3a. sdo pr ls (Python GitHub - ntools)" Importance="high" />
+		<Exec Command="sdo pr ls" WorkingDirectory="$(SolutionDir)" ContinueOnError="true" />
+
+		<Message Text="" Importance="high" />
+		<Message Text=">>> 3b. sdo.exe pr ls (C# GitHub - ntools)" Importance="high" />
+		<Exec Command="$(SolutionDir)\Sdo\bin\Release\sdo.exe pr ls" WorkingDirectory="$(SolutionDir)" ContinueOnError="true" />
+
+		<Message Text="" Importance="high" />
+		<Message Text=">>> 3c. sdo pr ls (Python Azure - ConsoleApp1)" Importance="high" />
+		<Exec Command="sdo pr ls" WorkingDirectory="C:\source\ConsoleApp1" ContinueOnError="true" />
+
+		<Message Text="" Importance="high" />
+		<Message Text=">>> 3d. sdo.exe pr ls (C# Azure - ConsoleApp1)" Importance="high" />
+		<Exec Command="$(SolutionDir)\Sdo\bin\Release\sdo.exe pr ls" WorkingDirectory="C:\source\ConsoleApp1" ContinueOnError="true" />
+
+		<!-- Command 4: Pull Request Status -->
+		<Message Text="" Importance="high" />
+		<Message Text="╔════════════════════════════════════════╗" Importance="high" />
+		<Message Text="║ Command: sdo pr status                 ║" Importance="high" />
+		<Message Text="╚════════════════════════════════════════╝" Importance="high" />
+
+		<Message Text="" Importance="high" />
+		<Message Text=">>> 4a. sdo pr status 253 (Python GitHub - ntools)" Importance="high" />
+		<Exec Command="sdo pr status 253" WorkingDirectory="$(SolutionDir)" ContinueOnError="true" />
+
+		<Message Text="" Importance="high" />
+		<Message Text=">>> 4b. sdo.exe pr status 253 (C# GitHub - ntools)" Importance="high" />
+		<Exec Command="$(SolutionDir)\Sdo\bin\Release\sdo.exe pr status 253" WorkingDirectory="$(SolutionDir)" ContinueOnError="true" />
+
+		<Message Text="" Importance="high" />
+		<Message Text=">>> 4c. sdo pr status 1 (Python Azure - ConsoleApp1)" Importance="high" />
+		<Exec Command="sdo pr status 1" WorkingDirectory="C:\source\ConsoleApp1" ContinueOnError="true" />
+
+		<Message Text="" Importance="high" />
+		<Message Text=">>> 4d. sdo.exe pr status 1 (C# Azure - ConsoleApp1)" Importance="high" />
+		<Exec Command="$(SolutionDir)\Sdo\bin\Release\sdo.exe pr status 1" WorkingDirectory="C:\source\ConsoleApp1" ContinueOnError="true" />
+
+		<!-- Command 5: Repository List -->
+		<Message Text="" Importance="high" />
+		<Message Text="╔════════════════════════════════════════╗" Importance="high" />
+		<Message Text="║ Command: sdo repo list --top 5         ║" Importance="high" />
+		<Message Text="╚════════════════════════════════════════╝" Importance="high" />
+
+		<Message Text="" Importance="high" />
+		<Message Text=">>> 5a. sdo repo list --top 5 (Python GitHub - ntools)" Importance="high" />
+		<Exec Command="sdo repo list --top 5" WorkingDirectory="$(SolutionDir)" ContinueOnError="true" />
+
+		<Message Text="" Importance="high" />
+		<Message Text=">>> 5b. sdo.exe repo list --top 5 (C# GitHub - ntools)" Importance="high" />
+		<Exec Command="$(SolutionDir)\Sdo\bin\Release\sdo.exe repo list --top 5" WorkingDirectory="$(SolutionDir)" ContinueOnError="true" />
+
+		<Message Text="" Importance="high" />
+		<Message Text=">>> 5c. sdo repo list --top 5 (Python Azure - ConsoleApp1)" Importance="high" />
+		<Exec Command="sdo repo list --top 5" WorkingDirectory="C:\source\ConsoleApp1" ContinueOnError="true" />
+
+		<Message Text="" Importance="high" />
+		<Message Text=">>> 5d. sdo.exe repo list --top 5 (C# Azure - ConsoleApp1)" Importance="high" />
+		<Exec Command="$(SolutionDir)\Sdo\bin\Release\sdo.exe repo list --top 5" WorkingDirectory="C:\source\ConsoleApp1" ContinueOnError="true" />
+
+		<!-- Summary -->
+		<Message Text="" Importance="high" />
+		<Message Text="╔════════════════════════════════════════╗" Importance="high" />
+		<Message Text="║ ✓ Output format comparison complete    ║" Importance="high" />
+		<Message Text="╚════════════════════════════════════════╝" Importance="high" />
+		<Message Text="" Importance="high" />
+		<Message Text="Pattern: a=Python GitHub | b=C# GitHub | c=Python Azure | d=C# Azure" Importance="high" />
+		<Message Text="Review above to verify C# matches Python format on both platforms" Importance="high" />
 	</Target>
 
 	<!-- Update ntools locally for testing -->
