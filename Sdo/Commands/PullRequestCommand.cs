@@ -236,8 +236,7 @@ namespace Sdo.Commands
 
                 if (verbose)
                 {
-                    var prefix = pat.Length > 4 ? pat.Substring(0, 4) : "????";
-                    Console.WriteLine($"DEBUG: Token type: {prefix}... (length: {pat.Length})");
+                    ConsoleHelper.WriteLine("✓ Authentication token retrieved successfully", ConsoleColor.Green);
                 }
 
                 if (platform == Platform.GitHub)
@@ -357,11 +356,15 @@ namespace Sdo.Commands
                         return 0;
                     }
 
-                    Console.WriteLine($"Pull Requests in {repoInfo.Owner}/{repoInfo.Repo} ({prs.Count} total):");
+                    // Display header in Python-compatible format
+                    Console.WriteLine($"Active Pull Requests ({prs.Count} found):");
+                    Console.WriteLine(new string('-', 70));
+
                     foreach (var pr in prs)
                     {
-                        Console.WriteLine($"  #{pr.Number}: {pr.Title}");
-                        Console.WriteLine($"    Status: {pr.Status}, Author: {pr.Author}");
+                        Console.WriteLine($" #  {pr.Number} | {pr.Title}");
+                        Console.WriteLine($"    Author: {pr.Author} | Status: {pr.Status}");
+                        Console.WriteLine($"    URL: {pr.Url}");
                     }
                     return 0;
                 }
@@ -392,11 +395,18 @@ namespace Sdo.Commands
                         return 0;
                     }
 
-                    Console.WriteLine($"Pull Requests in {project}/{repoInfo.Repo} ({prs.Count} total):");
+                    // Display header in consistent format
+                    Console.WriteLine($"Active Pull Requests ({prs.Count} found):");
+                    Console.WriteLine(new string('-', 70));
+
                     foreach (var pr in prs)
                     {
-                        Console.WriteLine($"  #{pr.Number}: {pr.Title}");
-                        Console.WriteLine($"    Status: {pr.Status}, Author: {pr.Author}");
+                        Console.WriteLine($" #  {pr.Number} | {pr.Title}");
+                        Console.WriteLine($"    Author: {pr.Author} | Status: {pr.Status}");
+                        if (!string.IsNullOrEmpty(pr.Url))
+                        {
+                            Console.WriteLine($"    URL: {pr.Url}");
+                        }
                     }
                     return 0;
                 }
@@ -443,17 +453,28 @@ namespace Sdo.Commands
                         return 1;
                     }
 
-                    Console.WriteLine($"Pull Request #{pr.Number}: {pr.Title}");
-                    Console.WriteLine($"  Author: {pr.Author}");
-                    Console.WriteLine($"  Status: {pr.Status}");
-                    Console.WriteLine($"  Branches: {pr.SourceBranch} → {pr.TargetBranch}");
-                    Console.WriteLine($"  Created: {pr.CreatedAt}");
-                    Console.WriteLine($"  Updated: {pr.UpdatedAt}");
-                    if (!string.IsNullOrEmpty(pr.Description))
+                    // Display PR information in Python-style format
+                    var statusUpper = pr.Status?.ToUpper() ?? "UNKNOWN";
+                    Console.WriteLine($"PR #{pr.Number}: {statusUpper}");
+                    Console.WriteLine($"Title: {pr.Title}");
+                    Console.WriteLine($"Author: {pr.Author}");
+                    Console.WriteLine($"Branch: {pr.SourceBranch} -> {pr.TargetBranch}");
+
+                    // Fetch and display CI/CD checks
+                    if (!string.IsNullOrEmpty(pr.HeadSha))
                     {
-                        Console.WriteLine($"  Description: {pr.Description}");
+                        Console.WriteLine();
+                        var checks = await client.GetCheckRunsAsync(repoInfo.Owner, repoInfo.Repo, pr.HeadSha);
+                        if (checks != null && checks.Count > 0)
+                        {
+                            Console.WriteLine("CI/CD Checks:");
+                            foreach (var (name, status, duration, url) in checks)
+                            {
+                                Console.WriteLine($"{name,-20} {status,-10} {duration,-8} {url}");
+                            }
+                        }
                     }
-                    Console.WriteLine($"  URL: {pr.Url}");
+
                     return 0;
                 }
                 else if (platform == Platform.AzureDevOps)
@@ -476,17 +497,13 @@ namespace Sdo.Commands
                         return 1;
                     }
 
-                    Console.WriteLine($"Pull Request #{pr.Number}: {pr.Title}");
-                    Console.WriteLine($"  Author: {pr.Author}");
-                    Console.WriteLine($"  Status: {pr.Status}");
-                    Console.WriteLine($"  Branches: {pr.SourceBranch} → {pr.TargetBranch}");
-                    Console.WriteLine($"  Created: {pr.CreatedAt}");
-                    Console.WriteLine($"  Updated: {pr.UpdatedAt}");
-                    if (!string.IsNullOrEmpty(pr.Description))
-                    {
-                        Console.WriteLine($"  Description: {pr.Description}");
-                    }
-                    Console.WriteLine($"  URL: {pr.Url}");
+                    // Display PR information in consistent format
+                    var statusUpper = pr.Status?.ToUpper() ?? "UNKNOWN";
+                    Console.WriteLine($"PR #{pr.Number}: {statusUpper}");
+                    Console.WriteLine($"Title: {pr.Title}");
+                    Console.WriteLine($"Author: {pr.Author}");
+                    Console.WriteLine($"Branch: {pr.SourceBranch} -> {pr.TargetBranch}");
+
                     return 0;
                 }
                 else

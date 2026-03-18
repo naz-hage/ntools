@@ -51,6 +51,11 @@ namespace Sdo.Models
         public string? SourceBranch { get; set; }
 
         /// <summary>
+        /// Gets or sets the source branch head commit SHA (GitHub-specific).
+        /// </summary>
+        public string? HeadSha { get; set; }
+
+        /// <summary>
         /// Gets or sets the target branch.
         /// </summary>
         public string? TargetBranch { get; set; }

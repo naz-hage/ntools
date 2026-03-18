@@ -6,6 +6,8 @@
 // GitHub API client for authentication verification and basic operations.
 // Reuses GitHubRelease authentication logic for token retrieval.
 
+using Nbuild;
+using Nbuild.Helpers;
 using System.Net.Http.Headers;
 using System.Text.Json;
 
@@ -143,7 +145,7 @@ namespace Sdo.Services
 
                     if (!response.IsSuccessStatusCode)
                     {
-                        System.Diagnostics.Debug.WriteLine($"GitHub API error: {response.StatusCode} {response.ReasonPhrase}");
+                        ConsoleHelper.WriteLine($"GitHub API error: {response.StatusCode} {response.ReasonPhrase}", ConsoleColor.Red);
                         // Return what we have so far if first page succeeded
                         return allIssues.Count > 0 ? allIssues : null;
                     }
@@ -615,6 +617,7 @@ namespace Sdo.Services
                     Url = prData.HtmlUrl,
                     Author = prData.User?.Login,
                     SourceBranch = prData.Head?.Ref,
+                    HeadSha = prData.Head?.Sha,
                     TargetBranch = prData.Base?.Ref,
                     CreatedAt = prData.CreatedAt,
                     UpdatedAt = prData.UpdatedAt,
@@ -668,6 +671,7 @@ namespace Sdo.Services
                     Url = prData.HtmlUrl,
                     Author = prData.User?.Login,
                     SourceBranch = prData.Head?.Ref,
+                    HeadSha = prData.Head?.Sha,
                     TargetBranch = prData.Base?.Ref,
                     CreatedAt = prData.CreatedAt,
                     UpdatedAt = prData.UpdatedAt,
@@ -734,6 +738,7 @@ namespace Sdo.Services
                         Url = pr.HtmlUrl,
                         Author = pr.User?.Login,
                         SourceBranch = pr.Head?.Ref,
+                        HeadSha = pr.Head?.Sha,
                         TargetBranch = pr.Base?.Ref,
                         CreatedAt = pr.CreatedAt,
                         UpdatedAt = pr.UpdatedAt,
@@ -899,6 +904,7 @@ namespace Sdo.Services
                     Url = prData.HtmlUrl,
                     Author = prData.User?.Login,
                     SourceBranch = prData.Head?.Ref,
+                    HeadSha = prData.Head?.Sha,
                     TargetBranch = prData.Base?.Ref,
                     CreatedAt = prData.CreatedAt,
                     UpdatedAt = prData.UpdatedAt,
@@ -910,6 +916,80 @@ namespace Sdo.Services
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error updating GitHub pull request: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets check runs for a specific commit/PR head.
+        /// </summary>
+        /// <param name="owner">Repository owner.</param>
+        /// <param name="repo">Repository name.</param>
+        /// <param name="headSha">The commit SHA of the PR head.</param>
+        /// <returns>List of check runs with name, status, and URL, or null if operation failed.</returns>
+        public async Task<List<(string Name, string Status, string Duration, string Url)>?> GetCheckRunsAsync(
+            string owner, string repo, string headSha)
+        {
+            try
+            {
+                var url = $"https://api.github.com/repos/{owner}/{repo}/commits/{headSha}/check-runs";
+                var response = await _httpClient.GetAsync(url);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    System.Diagnostics.Debug.WriteLine($"GitHub API error getting check runs: {response.StatusCode}");
+                    return null;
+                }
+
+                var content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var result = JsonSerializer.Deserialize<CheckRunsResponse>(content, options);
+
+                if (result?.CheckRuns == null || result.CheckRuns.Count == 0)
+                {
+                    return new List<(string, string, string, string)>();
+                }
+
+                var checks = new List<(string, string, string, string)>();
+                foreach (var check in result.CheckRuns)
+                {
+                    // Calculate duration
+                    string duration = "pending";
+                    if (check.CompletedAt.HasValue && check.StartedAt.HasValue)
+                    {
+                        var span = check.CompletedAt.Value - check.StartedAt.Value;
+                        if (span.TotalSeconds < 60)
+                        {
+                            duration = $"{span.TotalSeconds:F0}s";
+                        }
+                        else if (span.TotalMinutes < 60)
+                        {
+                            duration = $"{span.TotalMinutes:F0}m{span.Seconds}s";
+                        }
+                        else
+                        {
+                            duration = $"{span.Hours}h{span.Minutes}m";
+                        }
+                    }
+
+                    // Map conclusion to status
+                    var status = check.Conclusion ?? "pending";
+                    if (check.Status == "in_progress")
+                    {
+                        status = "running";
+                    }
+
+                    // Get the details URL - GitHub checks have a details_url
+                    var checkUrl = check.DetailsUrl ?? $"https://github.com/{owner}/{repo}/pull";
+
+                    checks.Add((check.Name ?? "Unknown", status, duration, checkUrl));
+                }
+
+                return checks;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error getting check runs: {ex.Message}");
                 return null;
             }
         }
@@ -1197,5 +1277,61 @@ namespace Sdo.Services
         /// </summary>
         [System.Text.Json.Serialization.JsonPropertyName("ref")]
         public string? Ref { get; set; }
+
+        /// <summary>
+        /// Gets or sets the commit SHA.
+        /// </summary>
+        public string? Sha { get; set; }
+    }
+
+    /// <summary>
+    /// Represents the check runs response from GitHub API.
+    /// </summary>
+    public class CheckRunsResponse
+    {
+        /// <summary>
+        /// Gets or sets the list of check runs.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("check_runs")]
+        public List<CheckRun>? CheckRuns { get; set; }
+    }
+
+    /// <summary>
+    /// Represents a GitHub check run.
+    /// </summary>
+    public class CheckRun
+    {
+        /// <summary>
+        /// Gets or sets the check run name.
+        /// </summary>
+        public string? Name { get; set; }
+
+        /// <summary>
+        /// Gets or sets the check run status.
+        /// </summary>
+        public string? Status { get; set; }
+
+        /// <summary>
+        /// Gets or sets the check run conclusion.
+        /// </summary>
+        public string? Conclusion { get; set; }
+
+        /// <summary>
+        /// Gets or sets the start time.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("started_at")]
+        public DateTime? StartedAt { get; set; }
+
+        /// <summary>
+        /// Gets or sets the completion time.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("completed_at")]
+        public DateTime? CompletedAt { get; set; }
+
+        /// <summary>
+        /// Gets or sets the details URL.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("details_url")]
+        public string? DetailsUrl { get; set; }
     }
 }

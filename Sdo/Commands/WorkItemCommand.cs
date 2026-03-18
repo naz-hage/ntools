@@ -255,7 +255,14 @@ namespace Sdo.Commands
         {
             try
             {
-                var client = new GitHubClient();
+                var token = await GetAuthenticationTokenAsync(Platform.GitHub);
+                if (string.IsNullOrEmpty(token))
+                {
+                    ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
+                    return 1;
+                }
+
+                var client = new GitHubClient(token);
                 var repoInfo = _platformDetector.GetRepositoryInfo();
 
                 if (string.IsNullOrEmpty(repoInfo?.Owner) || string.IsNullOrEmpty(repoInfo?.Repo))
@@ -400,7 +407,14 @@ namespace Sdo.Commands
         {
             try
             {
-                var client = new GitHubClient();
+                var token = await GetAuthenticationTokenAsync(Platform.GitHub);
+                if (string.IsNullOrEmpty(token))
+                {
+                    ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
+                    return 1;
+                }
+
+                var client = new GitHubClient(token);
                 var repoInfo = _platformDetector.GetRepositoryInfo();
 
                 if (string.IsNullOrEmpty(repoInfo?.Owner) || string.IsNullOrEmpty(repoInfo?.Repo))
@@ -630,7 +644,14 @@ namespace Sdo.Commands
                         return 1;
                     }
 
-                    using var client = new GitHubClient();
+                    var token = await GetAuthenticationTokenAsync(Platform.GitHub);
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
+                        return 1;
+                    }
+
+                    using var client = new GitHubClient(token);
 
                     if (verbose)
                     {
@@ -770,7 +791,14 @@ namespace Sdo.Commands
                         return 1;
                     }
 
-                    using var client = new GitHubClient();
+                    var token = await GetAuthenticationTokenAsync(Platform.GitHub);
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
+                        return 1;
+                    }
+
+                    using var client = new GitHubClient(token);
 
                     if (verbose)
                     {
@@ -902,7 +930,14 @@ namespace Sdo.Commands
                         return 1;
                     }
 
-                    using var client = new GitHubClient();
+                    var token = await GetAuthenticationTokenAsync(Platform.GitHub);
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
+                        return 1;
+                    }
+
+                    using var client = new GitHubClient(token);
 
                     if (verbose)
                     {

@@ -156,10 +156,17 @@ namespace Sdo.Commands
 
                 if (platform == Platform.GitHub)
                 {
+                    var token = await GetAuthenticationTokenAsync(Platform.GitHub);
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
+                        return 1;
+                    }
+
                     var repoInfo = _platformDetector.GetRepositoryInfo();
                     var owner = repoInfo?.Owner ?? "unknown";
 
-                    using var client = new GitHubClient();
+                    using var client = new GitHubClient(token);
                     var repos = await client.ListRepositoriesAsync(null, "all", 30, top);
                     if (repos == null) return 1;
 
@@ -244,7 +251,14 @@ namespace Sdo.Commands
 
                 if (platform == Platform.GitHub)
                 {
-                    using var client = new GitHubClient();
+                    var token = await GetAuthenticationTokenAsync(Platform.GitHub);
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
+                        return 1;
+                    }
+
+                    using var client = new GitHubClient(token);
                     var repo = await client.GetRepositoryAsync(repoInfo.Owner ?? "", repoInfo.Repo ?? "");
                     if (repo == null)
                     {
@@ -309,7 +323,14 @@ namespace Sdo.Commands
                 if (platform == Platform.GitHub)
                 {
                     if (verbose) Console.WriteLine("Creating GitHub repository...");
-                    using var client = new GitHubClient();
+                    var token = await GetAuthenticationTokenAsync(Platform.GitHub);
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
+                        return 1;
+                    }
+
+                    using var client = new GitHubClient(token);
                     var repo = await client.CreateRepositoryAsync(name, description, isPrivate);
                     ConsoleHelper.WriteLine($"✓ Repository '{repo!.Name}' created successfully", ConsoleColor.Green);
                     Console.WriteLine($"  URL: {repo.Url}");
@@ -404,7 +425,14 @@ namespace Sdo.Commands
 
                 if (platform == Platform.GitHub)
                 {
-                    using var client = new GitHubClient();
+                    var token = await GetAuthenticationTokenAsync(Platform.GitHub);
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
+                        return 1;
+                    }
+
+                    using var client = new GitHubClient(token);
                     await client.DeleteRepositoryAsync(repoInfo.Owner ?? "", repoInfo.Repo ?? "");
                     ConsoleHelper.WriteLine($"✓ Repository '{repoInfo.Repo}' deleted successfully", ConsoleColor.Green);
                     return 0;
