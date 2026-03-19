@@ -6,10 +6,15 @@
 // This file contains the WorkItemCommand class for managing work items
 // across GitHub Issues and Azure DevOps work items.
 
+using System;
+using System.IO;
+using System.Linq;
+using System.Collections.Generic;
 using System.CommandLine;
 using Nbuild.Helpers;
 using Sdo.Interfaces;
 using Sdo.Services;
+using Sdo.Models;
 
 namespace Sdo.Commands
 {
@@ -169,27 +174,22 @@ namespace Sdo.Commands
         private void AddCreateCommand(Option<bool> verboseOption)
         {
             var createCommand = new Command("create", "Create a new work item");
+            // Only allow markdown-file-driven creation; all fields must be in the file
+            var filePathOption = new Option<string?>("--file-path", new[] { "-f" }) { Description = "Path to markdown file containing work item details" };
+            var dryRunOption = new Option<bool>("--dry-run") { Description = "Parse and preview work item creation without creating it" };
 
-            var titleOption = new Option<string>("--title") { Description = "Work item title (required)" };
-            var typeOption = new Option<string>("--type") { Description = "Work item type (PBI, Bug, Task, etc.)" };
-            var descriptionOption = new Option<string?>("--description") { Description = "Work item description" };
-            var assigneeOption = new Option<string?>("--assignee") { Description = "Assign to user" };
-
-            createCommand.Add(titleOption);
-            createCommand.Add(typeOption);
-            createCommand.Add(descriptionOption);
-            createCommand.Add(assigneeOption);
+            createCommand.Add(filePathOption);
+            createCommand.Add(dryRunOption);
             createCommand.Add(verboseOption);
 
             createCommand.SetAction(async (parseResult) =>
             {
-                var title = parseResult.GetValue(titleOption);
-                var type = parseResult.GetValue(typeOption);
-                var description = parseResult.GetValue(descriptionOption);
-                var assignee = parseResult.GetValue(assigneeOption);
+                var filePath = parseResult.GetValue(filePathOption);
+                var dryRun = parseResult.GetValue(dryRunOption);
                 var verbose = parseResult.GetValue(verboseOption);
 
-                return await CreateWorkItem(title!, type!, description, assignee, verbose);
+                // Title/type/description/assignee must come from the markdown file
+                return await CreateWorkItem(null, null, null, null, verbose, filePath, dryRun);
             });
 
             Subcommands.Add(createCommand);
@@ -449,15 +449,15 @@ namespace Sdo.Commands
                 }
 
                 // Filter issues by state
-                if (string.IsNullOrEmpty(state))
+                if (!string.IsNullOrEmpty(state))
                 {
-                    // Default: exclude closed issues
-                    issues = issues.Where(i => i.State?.ToLower() != "closed").ToList();
+                    // Filter to specific state when requested
+                    issues = issues.Where(i => i.State?.ToLower() == state.ToLower()).ToList();
                 }
                 else
                 {
-                    // Filter to specific state
-                    issues = issues.Where(i => i.State?.ToLower() == state.ToLower()).ToList();
+                    // Default: exclude closed issues
+                    issues = issues.Where(i => i.State?.ToLower() != "closed").ToList();
                 }
 
                 // Limit to requested number
@@ -572,11 +572,16 @@ namespace Sdo.Commands
                     return 0;
                 }
 
-                // Filter by state (only filter if explicitly requested)
+                // Filter by state
                 if (!string.IsNullOrEmpty(state))
                 {
-                    // Filter to specific state
+                    // Filter to specific state when requested
                     workItems = workItems.Where(w => w.State?.ToLower() == state.ToLower()).ToList();
+                }
+                else
+                {
+                    // Default: exclude done and closed items
+                    workItems = workItems.Where(w => w.State?.ToLower() is not ("done" or "closed")).ToList();
                 }
 
                 if (!workItems.Any())
@@ -658,11 +663,34 @@ namespace Sdo.Commands
                         ConsoleHelper.WriteLine($"Updating GitHub issue #{id} in {repoInfo.Owner}/{repoInfo.Repo}...", ConsoleColor.Yellow);
                     }
 
-                    var result = await client.UpdateIssueAsync(repoInfo.Owner!, repoInfo.Repo!, id, title, state, description, assignee);
+                    // Translate state to GitHub API format
+                    string? ghState = null;
+                    if (!string.IsNullOrEmpty(state))
+                    {
+                        var parsedState = WorkItemStateTranslator.ParseState(state);
+                        if (parsedState.HasValue)
+                        {
+                            ghState = WorkItemStateTranslator.ToGitHubState(parsedState.Value);
+                        }
+                        else
+                        {
+                            ConsoleHelper.WriteLine($"X Invalid state '{state}'. Valid states: {WorkItemStateTranslator.GetValidStatesForHelp()}", ConsoleColor.Red);
+                            return 1;
+                        }
+                    }
+
+                    var result = await client.UpdateIssueAsync(repoInfo.Owner!, repoInfo.Repo!, id, title, ghState, description, assignee);
 
                     if (result != null)
                     {
-                        ConsoleHelper.WriteLine($"✓ GitHub issue #{id} updated successfully", ConsoleColor.Green);
+                        if (!string.IsNullOrEmpty(ghState))
+                        {
+                            ConsoleHelper.WriteLine($"✓ GitHub issue #{id} updated successfully to state: {ghState}", ConsoleColor.Green);
+                        }
+                        else
+                        {
+                            ConsoleHelper.WriteLine($"✓ GitHub issue #{id} updated successfully", ConsoleColor.Green);
+                        }
                         if (verbose)
                         {
                             ConsoleHelper.WriteLine($"  Title: {result.Title}", ConsoleColor.Yellow);
@@ -673,6 +701,10 @@ namespace Sdo.Commands
                     else
                     {
                         ConsoleHelper.WriteLine($"X Failed to update GitHub issue #{id}", ConsoleColor.Red);
+                        if (!string.IsNullOrEmpty(ghState))
+                        {
+                            ConsoleHelper.WriteLine($"  Supported GitHub states: open, closed", ConsoleColor.Gray);
+                        }
                         return 1;
                     }
                 }
@@ -702,11 +734,34 @@ namespace Sdo.Commands
                         ConsoleHelper.WriteLine($"Updating Azure DevOps work item {id} in {organization}...", ConsoleColor.Yellow);
                     }
 
-                    var result = await client.UpdateWorkItemAsync(id, title, state, assignee, description);
+                    // Translate state to Azure DevOps format
+                    string? adoState = null;
+                    if (!string.IsNullOrEmpty(state))
+                    {
+                        var parsedState = WorkItemStateTranslator.ParseState(state);
+                        if (parsedState.HasValue)
+                        {
+                            adoState = WorkItemStateTranslator.ToAzureDevOpsState(parsedState.Value);
+                        }
+                        else
+                        {
+                            ConsoleHelper.WriteLine($"X Invalid state '{state}'. Valid states: {WorkItemStateTranslator.GetValidStatesForHelp()}", ConsoleColor.Red);
+                            return 1;
+                        }
+                    }
+
+                    var result = await client.UpdateWorkItemAsync(id, title, adoState, assignee, description);
 
                     if (result != null)
                     {
-                        ConsoleHelper.WriteLine($"✓ Work item {id} updated successfully", ConsoleColor.Green);
+                        if (!string.IsNullOrEmpty(adoState))
+                        {
+                            ConsoleHelper.WriteLine($"✓ Work item {id} updated successfully to state: {adoState}", ConsoleColor.Green);
+                        }
+                        else
+                        {
+                            ConsoleHelper.WriteLine($"✓ Work item {id} updated successfully", ConsoleColor.Green);
+                        }
                         if (verbose)
                         {
                             ConsoleHelper.WriteLine($"  Title: {result.Title}", ConsoleColor.Yellow);
@@ -717,9 +772,9 @@ namespace Sdo.Commands
                     else
                     {
                         ConsoleHelper.WriteLine($"X Failed to update work item {id}", ConsoleColor.Red);
-                        if (!string.IsNullOrEmpty(client.LastError))
+                        if (!string.IsNullOrEmpty(adoState))
                         {
-                            ConsoleHelper.WriteLine($"  Error: {client.LastError}", ConsoleColor.Red);
+                            ConsoleHelper.WriteLine($"  Supported states: {WorkItemStateTranslator.GetValidStatesForHelp()}", ConsoleColor.Gray);
                         }
                         return 1;
                     }
@@ -892,20 +947,27 @@ namespace Sdo.Commands
         /// <param name="assignee">The assignee (optional).</param>
         /// <param name="verbose">Whether to enable verbose output.</param>
         /// <returns>Exit code.</returns>
-        private async Task<int> CreateWorkItem(string title, string type, string? description, string? assignee, bool verbose)
+        private async Task<int> CreateWorkItem(string? title, string? type, string? description, string? assignee, bool verbose, string? filePath = null, bool dryRun = false)
         {
             try
             {
-                if (string.IsNullOrEmpty(title))
+                // If a markdown file was provided, parse it and override values where present
+                List<string>? acceptanceCriteria = null;
+                WorkItemParseResult? parsed = null;
+                if (!string.IsNullOrEmpty(filePath))
                 {
-                    ConsoleHelper.WriteLine("X Title is required for creating a work item", ConsoleColor.Red);
-                    return 1;
-                }
+                    parsed = ParseWorkItemFromMarkdown(filePath);
+                    if (parsed == null)
+                    {
+                        ConsoleHelper.WriteLine($"X Failed to parse markdown file: {filePath}", ConsoleColor.Red);
+                        return 1;
+                    }
 
-                if (string.IsNullOrEmpty(type))
-                {
-                    ConsoleHelper.WriteLine("X Type is required for creating a work item (PBI, Bug, Task, etc.)", ConsoleColor.Red);
-                    return 1;
+                    if (!string.IsNullOrEmpty(parsed.Title)) title = parsed.Title;
+                    if (!string.IsNullOrEmpty(parsed.Description)) description = parsed.Description;
+                    if (string.IsNullOrEmpty(type) && parsed.Metadata != null && parsed.Metadata.TryGetValue("work_item_type", out var mt)) type = mt;
+                    if (!string.IsNullOrEmpty(parsed.Metadata?.GetValueOrDefault("assignee"))) assignee = parsed.Metadata.GetValueOrDefault("assignee");
+                    acceptanceCriteria = parsed.AcceptanceCriteria;
                 }
 
                 if (verbose)
@@ -915,9 +977,31 @@ namespace Sdo.Commands
 
                 var platform = _platformDetector.DetectPlatform();
 
+                // Allow the markdown file to override detected platform via metadata 'target' or 'platform'
+                if (parsed?.Metadata != null)
+                {
+                    string? target = null;
+                    if (parsed.Metadata.TryGetValue("target", out var t1) && !string.IsNullOrEmpty(t1)) target = t1;
+                    else if (parsed.Metadata.TryGetValue("platform", out var t2) && !string.IsNullOrEmpty(t2)) target = t2;
+
+                    if (!string.IsNullOrEmpty(target))
+                    {
+                        var tl = target.ToLowerInvariant();
+                        if (tl.Contains("azdo") || tl.Contains("azure") || tl.Contains("devops")) platform = Platform.AzureDevOps;
+                        else if (tl.Contains("github") || tl.Contains("gh") || tl.Contains("git")) platform = Platform.GitHub;
+                    }
+                }
+
                 if (verbose)
                 {
                     Console.WriteLine($"Detected platform: {platform}");
+                }
+
+                // Validate required fields after parsing markdown
+                if (string.IsNullOrEmpty(title))
+                {
+                    ConsoleHelper.WriteLine("X Title is required for creating a work item (provide via markdown file)", ConsoleColor.Red);
+                    return 1;
                 }
 
                 if (platform == Platform.GitHub)
@@ -946,12 +1030,65 @@ namespace Sdo.Commands
                         ConsoleHelper.WriteLine($"  Description: {description ?? "(none)"}", ConsoleColor.Gray);
                     }
 
-                    // TODO: Implement GitHub issue creation in Phase 3.2
-                    ConsoleHelper.WriteLine("ℹ GitHub issue creation endpoint would be called here", ConsoleColor.Gray);
-                    ConsoleHelper.WriteLine($"  Title: {title}", ConsoleColor.Gray);
-                    ConsoleHelper.WriteLine($"  Description: {description ?? "(none)"}", ConsoleColor.Gray);
-                    ConsoleHelper.WriteLine("✓ GitHub issue created (placeholder - not yet implemented)", ConsoleColor.Green);
-                    return 0;
+                    // Structured dry-run preview similar to Python CLI
+                    var labelsRaw = parsed?.Metadata?.GetValueOrDefault("labels");
+                    var labels = !string.IsNullOrEmpty(labelsRaw)
+                        ? labelsRaw.Split(',').Select(s => s.Trim()).Where(s => !string.IsNullOrEmpty(s)).ToArray()
+                        : Array.Empty<string>();
+
+                    if (dryRun)
+                    {
+                        ConsoleHelper.WriteLine("[dry-run] Would create GitHub issue with:", ConsoleColor.Gray);
+                        ConsoleHelper.WriteLine($"  Repository: {repoInfo.Owner}/{repoInfo.Repo}", ConsoleColor.Gray);
+                        ConsoleHelper.WriteLine($"  Title: {title}", ConsoleColor.Gray);
+                        ConsoleHelper.WriteLine($"  Labels: {(labels.Any() ? string.Join(", ", labels) : "(none)")}", ConsoleColor.Gray);
+                        ConsoleHelper.WriteLine("  Body:", ConsoleColor.Gray);
+                        if (!string.IsNullOrEmpty(description))
+                        {
+                            Console.WriteLine(description);
+                        }
+                        else
+                        {
+                            Console.WriteLine();
+                        }
+
+                        if (acceptanceCriteria != null && acceptanceCriteria.Any())
+                        {
+                            Console.WriteLine();
+                            ConsoleHelper.WriteLine("## Acceptance Criteria", ConsoleColor.Gray);
+                            foreach (var ac in acceptanceCriteria)
+                            {
+                                ConsoleHelper.WriteLine($"- [ ] {ac}", ConsoleColor.Gray);
+                            }
+                        }
+
+                        return 0;
+                    }
+
+                    // Build issue body with acceptance criteria appended (GitHub uses markdown)
+                    var issueBody = description ?? string.Empty;
+                    if (acceptanceCriteria != null && acceptanceCriteria.Any())
+                    {
+                        var acMarkdown = string.Join("\n", acceptanceCriteria.Select(ac => $"- [ ] {ac}"));
+                        if (!string.IsNullOrEmpty(issueBody))
+                            issueBody += $"\n\n## Acceptance Criteria\n{acMarkdown}";
+                        else
+                            issueBody = $"## Acceptance Criteria\n{acMarkdown}";
+                    }
+
+                    // Create the GitHub issue
+                    var createdIssue = await client.CreateIssueAsync(repoInfo.Owner!, repoInfo.Repo!, title, issueBody, labels.Any() ? labels : null);
+
+                    if (createdIssue != null)
+                    {
+                        ConsoleHelper.WriteLine($"✓ Created GitHub issue #{createdIssue.Number}: {title}", ConsoleColor.Green);
+                        if (!string.IsNullOrEmpty(createdIssue.HtmlUrl))
+                            ConsoleHelper.WriteLine($"   URL: {createdIssue.HtmlUrl}", ConsoleColor.Green);
+                        return 0;
+                    }
+
+                    ConsoleHelper.WriteLine("✗ Failed to create GitHub issue", ConsoleColor.Red);
+                    return 1;
                 }
                 else if (platform == Platform.AzureDevOps)
                 {
@@ -983,14 +1120,44 @@ namespace Sdo.Commands
                         if (!string.IsNullOrEmpty(assignee)) ConsoleHelper.WriteLine($"  Assignee: {assignee}", ConsoleColor.Gray);
                     }
 
-                    // TODO: Implement Azure DevOps work item creation in Phase 3.2
-                    ConsoleHelper.WriteLine("ℹ Azure DevOps work item creation endpoint would be called here", ConsoleColor.Gray);
-                    ConsoleHelper.WriteLine($"  Title: {title}", ConsoleColor.Gray);
-                    ConsoleHelper.WriteLine($"  Type: {type}", ConsoleColor.Gray);
-                    ConsoleHelper.WriteLine($"  Description: {description ?? "(none)"}", ConsoleColor.Gray);
-                    if (!string.IsNullOrEmpty(assignee)) ConsoleHelper.WriteLine($"  Assignee: {assignee}", ConsoleColor.Gray);
-                    ConsoleHelper.WriteLine("✓ Azure DevOps work item created (placeholder - not yet implemented)", ConsoleColor.Green);
-                    return 0;
+                    // Use new AzureDevOpsClient.CreateWorkItemAsync implementation
+                    if (verbose)
+                    {
+                        ConsoleHelper.WriteLine($"Creating Azure DevOps work item in {organization}/{project ?? "default"}...", ConsoleColor.Gray);
+                    }
+
+                    // Provide area/iteration if available in parsed metadata
+                    string? area = parsed?.Metadata?.GetValueOrDefault("area") ?? parsed?.Metadata?.GetValueOrDefault("area_path");
+                    string? iteration = parsed?.Metadata?.GetValueOrDefault("iteration") ?? parsed?.Metadata?.GetValueOrDefault("iteration_path");
+
+                    var result = await client.CreateWorkItemAsync(project ?? string.Empty, type ?? "PBI", title, description ?? string.Empty, acceptanceCriteria, assignee, area, iteration, dryRun, verbose);
+
+                    if (result != null)
+                    {
+                        // Dry-run preview returns a dictionary with 'dry_run' key
+                        if (result.TryGetValue("dry_run", out var dr) && dr is bool drb && drb)
+                        {
+                            ConsoleHelper.WriteLine("[dry-run] Azure DevOps preview complete", ConsoleColor.Gray);
+                            return 0;
+                        }
+
+                        if (result.TryGetValue("id", out var idObj))
+                        {
+                            ConsoleHelper.WriteLine($"✓ Work item {idObj} created successfully", ConsoleColor.Green);
+                            if (result.TryGetValue("url", out var urlObj) && urlObj != null)
+                            {
+                                ConsoleHelper.WriteLine($"  URL: {urlObj}", ConsoleColor.Yellow);
+                            }
+                            return 0;
+                        }
+                    }
+
+                    ConsoleHelper.WriteLine("X Failed to create work item", ConsoleColor.Red);
+                    if (!string.IsNullOrEmpty(client.LastError))
+                    {
+                        ConsoleHelper.WriteLine($"  Error: {client.LastError}", ConsoleColor.Red);
+                    }
+                    return 1;
                 }
                 else
                 {
@@ -1118,6 +1285,136 @@ namespace Sdo.Commands
                 {
                     Console.WriteLine($"    Assigned To: {item.AssignedTo ?? "Unassigned"}");
                 }
+            }
+        }
+
+
+
+        private WorkItemParseResult? ParseWorkItemFromMarkdown(string filePath)
+        {
+            try
+            {
+                if (!File.Exists(filePath)) return null;
+
+                var lines = File.ReadAllLines(filePath);
+                var result = new WorkItemParseResult();
+
+                // Simple YAML frontmatter parse
+                int idx = 0;
+                if (lines.Length > 0 && lines[0].Trim() == "---")
+                {
+                    idx = 1;
+                    for (; idx < lines.Length; idx++)
+                    {
+                        var l = lines[idx];
+                        if (l.Trim() == "---") { idx++; break; }
+                        var sep = l.IndexOf(":");
+                        if (sep > 0)
+                        {
+                            var k = l.Substring(0, sep).Trim();
+                            var v = l.Substring(sep + 1).Trim().Trim('"');
+                            result.Metadata[k] = v;
+                        }
+                    }
+                }
+
+                // Title: first H1 or first non-empty line
+                for (int i = idx; i < lines.Length; i++)
+                {
+                    var l = lines[i].Trim();
+                    if (string.IsNullOrEmpty(result.Title) && l.StartsWith("# "))
+                    {
+                        result.Title = l.Substring(2).Trim();
+                        idx = i + 1;
+                        break;
+                    }
+                    if (string.IsNullOrEmpty(result.Title) && !string.IsNullOrEmpty(l) && !l.StartsWith("#"))
+                    {
+                        // treat first paragraph as title if no explicit H1
+                        result.Title = l;
+                        idx = i + 1;
+                        break;
+                    }
+                }
+
+                // After title, accept metadata lines in the form '## Key: Value'
+                int metaIndex = idx;
+                for (; metaIndex < lines.Length; metaIndex++)
+                {
+                    var line = lines[metaIndex].Trim();
+                    if (string.IsNullOrEmpty(line)) continue;
+                    if (line.StartsWith("##") && line.Contains(":"))
+                    {
+                        // Parse key/value and normalize key
+                        var kv = line.Substring(2).Trim();
+                        var sep = kv.IndexOf(":");
+                        if (sep > 0)
+                        {
+                            var key = kv.Substring(0, sep).Trim();
+                            var val = kv.Substring(sep + 1).Trim().Trim('"');
+                            var normKey = key.ToLowerInvariant().Replace(" ", "_");
+                            result.Metadata[normKey] = val;
+                            continue;
+                        }
+                    }
+                    // stop metadata block when encountering a non-meta line
+                    break;
+                }
+
+                // Collect description until 'Acceptance Criteria' header or end
+                var descLines = new List<string>();
+                for (int i = metaIndex; i < lines.Length; i++)
+                {
+                    var l = lines[i];
+                    if (l.Trim().StartsWith("##") && l.ToLower().Contains("acceptance"))
+                    {
+                        // parse acceptance criteria from following lines
+                        i++;
+                        for (; i < lines.Length; i++)
+                        {
+                            var ac = lines[i].Trim();
+                            if (string.IsNullOrEmpty(ac)) continue;
+                            if (ac.StartsWith("- [") || ac.StartsWith("- ") || ac.StartsWith("* [") || ac.StartsWith("*"))
+                            {
+                                // normalize checkbox formatting
+                                var cleaned = ac;
+                                // remove list marker
+                                if (cleaned.StartsWith("- ")) cleaned = cleaned.Substring(2).Trim();
+                                else if (cleaned.StartsWith("* ")) cleaned = cleaned.Substring(2).Trim();
+                                // remove checkbox
+                                if (cleaned.StartsWith("[ ]") || cleaned.StartsWith("[x]") || cleaned.StartsWith("[X]"))
+                                {
+                                    cleaned = cleaned.Substring(3).Trim();
+                                }
+                                // remove leading checkbox like [ ]
+                                if (cleaned.StartsWith("["))
+                                {
+                                    var r = cleaned.IndexOf(']');
+                                    if (r > 0) cleaned = cleaned.Substring(r + 1).Trim();
+                                }
+                                if (!string.IsNullOrEmpty(cleaned)) result.AcceptanceCriteria.Add(cleaned);
+                            }
+                            else if (lines[i].Trim().StartsWith("## "))
+                            {
+                                // next section
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                    else
+                    {
+                        descLines.Add(l);
+                    }
+                }
+
+                result.Description = string.Join(Environment.NewLine, descLines).Trim();
+
+                return result;
+            }
+            catch
+            {
+                return null;
             }
         }
 

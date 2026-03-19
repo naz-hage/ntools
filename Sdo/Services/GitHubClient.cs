@@ -279,6 +279,60 @@ namespace Sdo.Services
         }
 
         /// <summary>
+        /// Creates a new GitHub issue.
+        /// </summary>
+        /// <param name="owner">Repository owner.</param>
+        /// <param name="repo">Repository name.</param>
+        /// <param name="title">Issue title (required).</param>
+        /// <param name="body">Issue body/description (optional).</param>
+        /// <param name="labels">Labels to assign to the issue (optional).</param>
+        /// <param name="assignee">Assignee login name (optional).</param>
+        /// <returns>The created GitHub issue, or null if creation failed.</returns>
+        public async Task<GitHubIssue?> CreateIssueAsync(string owner, string repo, string title, 
+            string? body = null, string[]? labels = null, string? assignee = null)
+        {
+            try
+            {
+                var url = $"https://api.github.com/repos/{owner}/{repo}/issues";
+
+                var issueData = new Dictionary<string, object>
+                {
+                    { "title", title }
+                };
+
+                if (!string.IsNullOrEmpty(body))
+                    issueData["body"] = body;
+
+                if (labels != null && labels.Length > 0)
+                    issueData["labels"] = labels;
+
+                if (!string.IsNullOrEmpty(assignee))
+                    issueData["assignee"] = assignee;
+
+                var content = JsonSerializer.Serialize(issueData);
+                var request = new StringContent(content, System.Text.Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync(url, request);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    System.Diagnostics.Debug.WriteLine($"GitHub API error: {response.StatusCode} {response.ReasonPhrase}");
+                    return null;
+                }
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var issue = JsonSerializer.Deserialize<GitHubIssue>(responseContent, options);
+                return issue;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error creating GitHub issue: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
         /// Lists repositories for the authenticated user or a specific organization.
         /// </summary>
         /// <param name="organization">Optional organization name. If null, lists authenticated user's repositories.</param>

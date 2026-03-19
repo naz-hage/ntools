@@ -414,6 +414,40 @@ namespace Sdo.Services
                 var url = $"https://dev.azure.com/{_organization}/_apis/wit/workitems/{workItemId}?api-version=7.0";
 
                 var content = JsonSerializer.Serialize(operations);
+                if (verbose)
+                {
+                    Console.WriteLine("[VERBOSE] JSON patch payload (per operation):");
+                    var optionsPretty = new JsonSerializerOptions { WriteIndented = true, PropertyNameCaseInsensitive = true };
+                    for (int i = 0; i < operations.Count; i++)
+                    {
+                        try
+                        {
+                            var opJson = JsonSerializer.Serialize(operations[i], optionsPretty);
+                            Console.WriteLine($"--- operation {i + 1} ---");
+                            Console.WriteLine(opJson);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"[VERBOSE] Failed to serialize operation {i + 1}: {ex.Message}");
+                        }
+                    }
+
+                    Console.WriteLine("[VERBOSE] Full payload string:");
+                    Console.WriteLine(content);
+
+                    try
+                    {
+                        var tmpPath = "C:\\temp\\sdo_create_payload.json";
+                        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(tmpPath)!);
+                        System.IO.File.WriteAllText(tmpPath, content);
+                        Console.WriteLine($"[VERBOSE] Wrote payload to {tmpPath}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[VERBOSE] Failed to write payload file: {ex.Message}");
+                    }
+                }
+
                 var request = new StringContent(content, System.Text.Encoding.UTF8, "application/json-patch+json");
 
                 if (verbose)
@@ -424,7 +458,8 @@ namespace Sdo.Services
                 if (!response.IsSuccessStatusCode)
                 {
                     var errorContent = await response.Content.ReadAsStringAsync();
-                    _lastError = $"Update failed: {response.StatusCode} {response.ReasonPhrase}\n{errorContent}";
+                    var errorMessage = ExtractErrorMessage(errorContent);
+                    _lastError = $"Update failed: {response.StatusCode} {response.ReasonPhrase}\n{errorMessage}";
                     if (verbose)
                         Console.WriteLine($"[VERBOSE] {_lastError}");
                     return null;
@@ -466,6 +501,28 @@ namespace Sdo.Services
                 var url = $"https://dev.azure.com/{_organization}/_apis/wit/workitems/{workItemId}?api-version=7.0";
 
                 var content = JsonSerializer.Serialize(operations);
+                if (verbose)
+                {
+                    Console.WriteLine("[VERBOSE] JSON patch payload (per operation):");
+                    var optionsPretty = new JsonSerializerOptions { WriteIndented = true, PropertyNameCaseInsensitive = true };
+                    for (int i = 0; i < operations.Count; i++)
+                    {
+                        try
+                        {
+                            var opJson = JsonSerializer.Serialize(operations[i], optionsPretty);
+                            Console.WriteLine($"--- operation {i + 1} ---");
+                            Console.WriteLine(opJson);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"[VERBOSE] Failed to serialize operation {i + 1}: {ex.Message}");
+                        }
+                    }
+
+                    Console.WriteLine("[VERBOSE] Full payload string:");
+                    Console.WriteLine(content);
+                }
+
                 var request = new StringContent(content, System.Text.Encoding.UTF8, "application/json-patch+json");
 
                 if (verbose)
@@ -589,6 +646,179 @@ namespace Sdo.Services
             catch (Exception ex)
             {
                 _lastError = $"Exception getting project: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Creates a new work item in the specified project.
+        /// </summary>
+        public async Task<Dictionary<string, object>?> CreateWorkItemAsync(
+            string project,
+            string workItemType,
+            string title,
+            string description,
+            List<string>? acceptanceCriteria = null,
+            string? assignee = null,
+            string? areaPath = null,
+            string? iterationPath = null,
+            bool dryRun = false,
+            bool verbose = false)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(project))
+                {
+                    _lastError = "Project must be specified for work item creation";
+                    return null;
+                }
+
+                // Normalize work item type
+                var encodedType = Uri.EscapeDataString(string.IsNullOrEmpty(workItemType) ? "PBI" : workItemType);
+
+                // Format description: remove markdown headers (##, ###, etc.) and convert markdown to HTML
+                var formattedDesc = description ?? string.Empty;
+                // Remove markdown headers (##, #, etc.)
+                formattedDesc = System.Text.RegularExpressions.Regex.Replace(formattedDesc, @"^#+\s+", "", System.Text.RegularExpressions.RegexOptions.Multiline);
+                // Convert **bold** to <strong>bold</strong>
+                formattedDesc = System.Text.RegularExpressions.Regex.Replace(formattedDesc, @"\*\*(.+?)\*\*", "<strong>$1</strong>");
+                // Replace line breaks with <br/>
+                formattedDesc = System.Text.RegularExpressions.Regex.Replace(formattedDesc, @"\r?\n", "<br/>");
+                var repoStepsHtml = formattedDesc;
+                
+                var acceptanceCriteriaHtml = string.Empty;
+                
+                if (acceptanceCriteria != null && acceptanceCriteria.Any())
+                {
+                    acceptanceCriteriaHtml = "<ul>" + string.Join("\n", acceptanceCriteria.Select(ac => $"<li>{System.Net.WebUtility.HtmlEncode(ac)}</li>")) + "</ul>";
+                }
+
+                if (dryRun)
+                {
+                    Console.WriteLine("[dry-run] Would create Azure DevOps work item with:");
+                    Console.WriteLine($"  Project: {project}");
+                    Console.WriteLine($"  Type: {workItemType}");
+                    Console.WriteLine($"  Title: {title}");
+                    Console.WriteLine("  Description/Repro Steps:");
+                    Console.WriteLine(repoStepsHtml);
+                    if (!string.IsNullOrEmpty(assignee)) Console.WriteLine($"  Assignee: {assignee}");
+                    if (acceptanceCriteria != null && acceptanceCriteria.Any())
+                    {
+                        Console.WriteLine($"  Acceptance Criteria: {acceptanceCriteria.Count} items");
+                        if (verbose)
+                        {
+                            for (int i = 0; i < acceptanceCriteria.Count; i++) Console.WriteLine($"   {i + 1}. {acceptanceCriteria[i]}");
+                        }
+                    }
+
+                    return new Dictionary<string, object> { { "dry_run", true }, { "title", title }, { "project", project } };
+                }
+
+                // Build JSON patch operations - write to form-displayed fields
+                var operations = new List<object>
+                {
+                    new { op = "add", path = "/fields/System.Title", value = title },
+                    new { op = "add", path = "/fields/Microsoft.VSTS.TCM.ReproSteps", value = repoStepsHtml }
+                };
+
+                // Add acceptance criteria to its own field (displayed in form)
+                if (!string.IsNullOrEmpty(acceptanceCriteriaHtml))
+                {
+                    operations.Add(new { op = "add", path = "/fields/Microsoft.VSTS.Common.AcceptanceCriteria", value = acceptanceCriteriaHtml });
+                }
+
+                // Only set AreaPath/IterationPath when explicitly provided
+                if (!string.IsNullOrEmpty(areaPath))
+                {
+                    operations.Add(new { op = "add", path = "/fields/System.AreaPath", value = areaPath });
+                }
+
+                if (!string.IsNullOrEmpty(iterationPath))
+                {
+                    operations.Add(new { op = "add", path = "/fields/System.IterationPath", value = iterationPath });
+                }
+
+                if (!string.IsNullOrEmpty(assignee))
+                {
+                    operations.Add(new { op = "add", path = "/fields/System.AssignedTo", value = assignee });
+                }
+
+                var url = $"https://dev.azure.com/{_organization}/{project}/_apis/wit/workitems/${encodedType}?api-version=7.1";
+
+                if (verbose)
+                {
+                    Console.WriteLine($"[VERBOSE] Creating work item via: {url}");
+                    Console.WriteLine($"[VERBOSE] Operations: {operations.Count}");
+                }
+
+                var content = JsonSerializer.Serialize(operations);
+                if (verbose)
+                {
+                    Console.WriteLine("[VERBOSE] JSON patch payload (per operation):");
+                    var optionsPretty = new JsonSerializerOptions { WriteIndented = true, PropertyNameCaseInsensitive = true };
+                    for (int i = 0; i < operations.Count; i++)
+                    {
+                        try
+                        {
+                            var opJson = JsonSerializer.Serialize(operations[i], optionsPretty);
+                            Console.WriteLine($"--- operation {i + 1} ---");
+                            Console.WriteLine(opJson);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"[VERBOSE] Failed to serialize operation {i + 1}: {ex.Message}");
+                        }
+                    }
+
+                    Console.WriteLine("[VERBOSE] Full payload string:");
+                    Console.WriteLine(content);
+                }
+
+                var request = new StringContent(content, System.Text.Encoding.UTF8, "application/json-patch+json");
+
+                var response = await _httpClient.PostAsync(url, request);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    var errorMessage = ExtractErrorMessage(error);
+                    _lastError = $"Create failed: {response.StatusCode} {response.ReasonPhrase}\n{errorMessage}";
+                    if (verbose) Console.WriteLine($"[VERBOSE] {_lastError}");
+                    return null;
+                }
+
+                var responseBody = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var doc = JsonSerializer.Deserialize<JsonElement>(responseBody, options);
+
+                int? id = null;
+                string? link = null;
+                try
+                {
+                    if (doc.TryGetProperty("id", out var idProp) && idProp.ValueKind == JsonValueKind.Number) id = idProp.GetInt32();
+                    if (doc.TryGetProperty("_links", out var links) && links.ValueKind == JsonValueKind.Object && links.TryGetProperty("html", out var html) && html.TryGetProperty("href", out var href)) link = href.GetString();
+                }
+                catch { }
+
+                if (id.HasValue)
+                {
+                    Console.WriteLine($"✅ Created {workItemType} #{id}: {title}");
+                    if (!string.IsNullOrEmpty(link)) Console.WriteLine($"   URL: {link}");
+                    var result = new Dictionary<string, object>();
+                    result["id"] = id.Value;
+                    if (!string.IsNullOrEmpty(link)) result["url"] = link;
+                    result["type"] = workItemType;
+                    result["title"] = title;
+                    return result;
+                }
+
+                _lastError = "Failed to parse work item creation response";
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Exception creating work item: {ex.Message}";
                 System.Diagnostics.Debug.WriteLine(_lastError);
                 return null;
             }
@@ -1177,6 +1407,61 @@ namespace Sdo.Services
                 _lastError = $"Exception updating pull request: {ex.Message}";
                 System.Diagnostics.Debug.WriteLine(_lastError);
                 return null;
+            }
+        }
+
+        /// <summary>
+        /// Extracts a user-friendly error message from Azure DevOps API error responses.
+        /// </summary>
+        /// <param name="errorJson">The full JSON error response from Azure DevOps API.</param>
+        /// <returns>A concise error message suitable for display to users.</returns>
+        private string ExtractErrorMessage(string errorJson)
+        {
+            try
+            {
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var doc = JsonSerializer.Deserialize<JsonElement>(errorJson, options);
+
+                // Try to extract the main "message" field first
+                if (doc.TryGetProperty("message", out var msg) && msg.ValueKind == JsonValueKind.String)
+                {
+                    var msgValue = msg.GetString();
+                    if (!string.IsNullOrEmpty(msgValue))
+                        return msgValue;
+                }
+
+                // Try customProperties.ErrorMessage
+                if (doc.TryGetProperty("customProperties", out var customProps) && 
+                    customProps.TryGetProperty("ErrorMessage", out var errorMsg) &&
+                    errorMsg.ValueKind == JsonValueKind.String)
+                {
+                    var errorMsgValue = errorMsg.GetString();
+                    if (!string.IsNullOrEmpty(errorMsgValue))
+                        return errorMsgValue;
+                }
+
+                // Try the first rule validation error message
+                if (doc.TryGetProperty("customProperties", out var cp2) &&
+                    cp2.TryGetProperty("RuleValidationErrors", out var ruleErrors) &&
+                    ruleErrors.ValueKind == JsonValueKind.Array)
+                {
+                    var firstError = ruleErrors.EnumerateArray().FirstOrDefault();
+                    if (firstError.TryGetProperty("errorMessage", out var firstErrorMsg) &&
+                        firstErrorMsg.ValueKind == JsonValueKind.String)
+                    {
+                        var firstErrorMsgValue = firstErrorMsg.GetString();
+                        if (!string.IsNullOrEmpty(firstErrorMsgValue))
+                            return firstErrorMsgValue;
+                    }
+                }
+
+                // Fallback: return truncated response
+                return errorJson.Length > 300 ? errorJson.Substring(0, 300) + "..." : errorJson;
+            }
+            catch
+            {
+                // If JSON parsing fails, return original
+                return errorJson;
             }
         }
 
