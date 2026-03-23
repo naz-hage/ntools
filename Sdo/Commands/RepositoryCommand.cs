@@ -19,14 +19,18 @@ namespace Sdo.Commands
     public class RepositoryCommand : System.CommandLine.Command
     {
         private readonly PlatformService _platformDetector;
+        private readonly Sdo.Mapping.IMappingGenerator _mappingGenerator;
+        private readonly Sdo.Mapping.IMappingPresenter _mappingPresenter;
 
         /// <summary>
         /// Initializes a new instance of the RepositoryCommand class.
         /// </summary>
         /// <param name="verboseOption">Option for verbose output.</param>
-        public RepositoryCommand(Option<bool> verboseOption) : base("repo", "Repository management commands")
+        public RepositoryCommand(Option<bool> verboseOption, Sdo.Mapping.IMappingGenerator? mappingGenerator = null, Sdo.Mapping.IMappingPresenter? mappingPresenter = null) : base("repo", "Repository management commands")
         {
             _platformDetector = new PlatformService();
+            _mappingGenerator = mappingGenerator ?? new Sdo.Mapping.MappingGenerator();
+            _mappingPresenter = mappingPresenter ?? new Sdo.Mapping.ConsoleMappingPresenter();
 
             // Add subcommands (in alphabetical order)
             AddCreateCommand(verboseOption);
@@ -156,36 +160,49 @@ namespace Sdo.Commands
 
                 if (platform == Platform.GitHub)
                 {
+                    var token = await GetAuthenticationTokenAsync(Platform.GitHub);
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
+                        return 1;
+                    }
+
                     var repoInfo = _platformDetector.GetRepositoryInfo();
                     var owner = repoInfo?.Owner ?? "unknown";
 
-                    using var client = new GitHubClient();
+                    using var client = new GitHubClient(token);
+                    // Show external mapping command when verbose
+                    if (verbose)
+                    {
+                        _mappingPresenter.Present(_mappingGenerator.RepoListGitHub(owner, top));
+                    }
                     var repos = await client.ListRepositoriesAsync(null, "all", 30, top);
                     if (repos == null) return 1;
 
                     // Display header
-                    Console.WriteLine($"Repositories in GITHUB account '{owner}' ({repos.Count} total):");
-                    Console.WriteLine(new string('-', 80));
+                    Console.WriteLine($"Active Repositories ({repos.Count} found):");
+                    Console.WriteLine(new string('-', 70));
 
                     // Display each repository
                     foreach (var repo in repos)
                     {
-                        Console.WriteLine($"  {repo.Name}");
+                        Console.WriteLine($" -  {repo.Name}");
                         Console.WriteLine($"    URL: {repo.Url}");
                         if (!string.IsNullOrEmpty(repo.DefaultBranch))
-                            Console.WriteLine($"    Default Branch: {repo.DefaultBranch}");
+                        {
+                            Console.WriteLine($"    Branch: {repo.DefaultBranch}");
+                        }
                         string visibility = repo.IsPrivate ? "Private" : "Public";
                         Console.WriteLine($"    Visibility: {visibility}");
-                        Console.WriteLine();
                     }
                     return 0;
                 }
                 else if (platform == Platform.AzureDevOps)
                 {
-                    var pat = Environment.GetEnvironmentVariable("AZURE_DEVOPS_PAT");
+                    var pat = await GetAuthenticationTokenAsync(Platform.AzureDevOps);
                     if (string.IsNullOrEmpty(pat))
                     {
-                        ConsoleHelper.WriteError("X AZURE_DEVOPS_PAT environment variable not set");
+                        ConsoleHelper.WriteError("X Error: No authentication token found. Run 'sdo auth' to setup authentication.");
                         return 1;
                     }
 
@@ -198,21 +215,27 @@ namespace Sdo.Commands
                     }
 
                     using var client = new AzureDevOpsClient(pat, organization, project);
+                    // Show external mapping command when verbose
+                    if (verbose)
+                    {
+                        _mappingPresenter.Present(_mappingGenerator.RepoListAzure(project, organization, top));
+                    }
                     var repos = await client.ListRepositoriesAsync(project, top);
                     if (repos == null) return 1;
 
                     // Display header
-                    Console.WriteLine($"Repositories in AZURE_DEVOPS project '{project}' ({repos.Count} total):");
-                    Console.WriteLine(new string('-', 80));
+                    Console.WriteLine($"Active Repositories ({repos.Count} found):");
+                    Console.WriteLine(new string('-', 70));
 
                     // Display each repository
                     foreach (var repo in repos)
                     {
-                        Console.WriteLine($"  {repo.Name}");
+                        Console.WriteLine($" -  {repo.Name}");
                         Console.WriteLine($"    URL: {repo.Url}");
                         if (!string.IsNullOrEmpty(repo.DefaultBranch))
-                            Console.WriteLine($"    Default Branch: {repo.DefaultBranch}");
-                        Console.WriteLine();
+                        {
+                            Console.WriteLine($"    Branch: {repo.DefaultBranch}");
+                        }
                     }
                     return 0;
                 }
@@ -244,7 +267,14 @@ namespace Sdo.Commands
 
                 if (platform == Platform.GitHub)
                 {
-                    using var client = new GitHubClient();
+                    var token = await GetAuthenticationTokenAsync(Platform.GitHub);
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
+                        return 1;
+                    }
+
+                    using var client = new GitHubClient(token);
                     var repo = await client.GetRepositoryAsync(repoInfo.Owner ?? "", repoInfo.Repo ?? "");
                     if (repo == null)
                     {
@@ -260,10 +290,10 @@ namespace Sdo.Commands
                 }
                 else if (platform == Platform.AzureDevOps)
                 {
-                    var pat = Environment.GetEnvironmentVariable("AZURE_DEVOPS_PAT");
+                    var pat = await GetAuthenticationTokenAsync(Platform.AzureDevOps);
                     if (string.IsNullOrEmpty(pat))
                     {
-                        ConsoleHelper.WriteError("X AZURE_DEVOPS_PAT environment variable not set");
+                        ConsoleHelper.WriteError("X Error: No authentication token found. Run 'sdo auth' to setup authentication.");
                         return 1;
                     }
 
@@ -309,7 +339,19 @@ namespace Sdo.Commands
                 if (platform == Platform.GitHub)
                 {
                     if (verbose) Console.WriteLine("Creating GitHub repository...");
-                    using var client = new GitHubClient();
+                    var token = await GetAuthenticationTokenAsync(Platform.GitHub);
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
+                        return 1;
+                    }
+
+                    using var client = new GitHubClient(token);
+                    // Show external mapping command when verbose
+                    if (verbose)
+                    {
+                        _mappingPresenter.Present(_mappingGenerator.RepoCreateGitHub(name, isPrivate, description!));
+                    }
                     var repo = await client.CreateRepositoryAsync(name, description, isPrivate);
                     ConsoleHelper.WriteLine($"✓ Repository '{repo!.Name}' created successfully", ConsoleColor.Green);
                     Console.WriteLine($"  URL: {repo.Url}");
@@ -319,10 +361,10 @@ namespace Sdo.Commands
                 {
                     if (verbose) Console.WriteLine("Creating Azure DevOps repository...");
 
-                    var pat = Environment.GetEnvironmentVariable("AZURE_DEVOPS_PAT");
+                    var pat = await GetAuthenticationTokenAsync(Platform.AzureDevOps);
                     if (string.IsNullOrEmpty(pat))
                     {
-                        ConsoleHelper.WriteError("X AZURE_DEVOPS_PAT environment variable not set");
+                        ConsoleHelper.WriteError("X Error: No authentication token found. Run 'sdo auth' to setup authentication.");
                         return 1;
                     }
 
@@ -335,6 +377,13 @@ namespace Sdo.Commands
                     }
 
                     using var client = new AzureDevOpsClient(pat, organization, project);
+
+                    // Show external mapping command when verbose
+                    if (verbose)
+                    {
+                        var mapping = $"az repos create --name \"{name}\" --project \"{project}\" --organization \"{organization}\"";
+                        ConsoleHelper.WriteLine(mapping, ConsoleColor.Yellow);
+                    }
 
                     // Get the project ID (required by Create API)
                     if (verbose) Console.WriteLine($"  Fetching project ID for '{project}'...");
@@ -404,17 +453,24 @@ namespace Sdo.Commands
 
                 if (platform == Platform.GitHub)
                 {
-                    using var client = new GitHubClient();
+                    var token = await GetAuthenticationTokenAsync(Platform.GitHub);
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
+                        return 1;
+                    }
+
+                    using var client = new GitHubClient(token);
                     await client.DeleteRepositoryAsync(repoInfo.Owner ?? "", repoInfo.Repo ?? "");
                     ConsoleHelper.WriteLine($"✓ Repository '{repoInfo.Repo}' deleted successfully", ConsoleColor.Green);
                     return 0;
                 }
                 else if (platform == Platform.AzureDevOps)
                 {
-                    var pat = Environment.GetEnvironmentVariable("AZURE_DEVOPS_PAT");
+                    var pat = await GetAuthenticationTokenAsync(Platform.AzureDevOps);
                     if (string.IsNullOrEmpty(pat))
                     {
-                        ConsoleHelper.WriteError("X AZURE_DEVOPS_PAT environment variable not set");
+                        ConsoleHelper.WriteError("X Error: No authentication token found. Run 'sdo auth' to setup authentication.");
                         return 1;
                     }
 
@@ -467,6 +523,20 @@ namespace Sdo.Commands
                 ConsoleHelper.WriteError($"X Error: {errorMsg}");
                 return 1;
             }
+        }
+
+        private async Task<string?> GetAuthenticationTokenAsync(Platform platform)
+        {
+            var auth = new AuthenticationService();
+            if (platform == Platform.GitHub)
+            {
+                return await auth.GetGitHubTokenAsync();
+            }
+            else if (platform == Platform.AzureDevOps)
+            {
+                return await auth.GetAzureDevOpsTokenAsync();
+            }
+            return null;
         }
     }
 }
