@@ -45,6 +45,179 @@ namespace Sdo.Services
         }
 
         /// <summary>
+        /// Adds a hyperlink relation to a work item pointing to a pull request web URL.
+        /// </summary>
+        /// <param name="workItemId">Work item numeric ID.</param>
+        /// <param name="prWebUrl">The user-facing pull request web URL.</param>
+        /// <returns>True if the link was added successfully, false otherwise.</returns>
+        public async Task<bool> LinkWorkItemAsync(int workItemId, int prId, string repositoryId)
+        {
+            // Try az CLI first (preferred - creates Development link)
+            try
+            {
+                var azArgs = $"repos pr work-item add --id {prId} --work-items {workItemId} --org https://dev.azure.com/{_organization} --project {System.Uri.EscapeDataString(_project ?? string.Empty)}";
+
+                var psi = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "az",
+                    Arguments = azArgs,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                using var proc = System.Diagnostics.Process.Start(psi);
+                if (proc != null)
+                {
+                    var stdout = await proc.StandardOutput.ReadToEndAsync();
+                    var stderr = await proc.StandardError.ReadToEndAsync();
+                    await proc.WaitForExitAsync();
+
+                    if (proc.ExitCode == 0)
+                    {
+                        return true;
+                    }
+
+                    // az failed - capture error and fall back to REST patch
+                    _lastError = $"az CLI failed: {stderr.Trim()}";
+                }
+                else
+                {
+                    _lastError = "Failed to start az CLI process";
+                }
+            }
+            catch (System.ComponentModel.Win32Exception)
+            {
+                _lastError = "Azure CLI (az) not found in PATH";
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"az CLI call exception: {ex.Message}";
+            }
+
+            // Fallback: try to create a Development-style ArtifactLink via REST (preferred over a plain Hyperlink)
+            try
+            {
+                if (string.IsNullOrEmpty(_project))
+                {
+                    _lastError = "Project not specified; cannot create ArtifactLink via REST fallback";
+                }
+                else
+                {
+                    // Fetch project GUID
+                    var projUrl = $"https://dev.azure.com/{_organization}/_apis/projects/{Uri.EscapeDataString(_project)}?api-version=7.0";
+                    var projResp = await _httpClient.GetAsync(projUrl);
+                    if (projResp.IsSuccessStatusCode)
+                    {
+                        var projContent = await projResp.Content.ReadAsStringAsync();
+                        var projObj = JsonSerializer.Deserialize<JsonElement>(projContent);
+                        var projectGuid = projObj.GetProperty("id").GetString();
+
+                        // Fetch repository GUID (repositoryId may be name or id)
+                        var repoUrl = $"https://dev.azure.com/{_organization}/{Uri.EscapeDataString(_project)}/_apis/git/repositories/{Uri.EscapeDataString(repositoryId)}?api-version=7.0";
+                        var repoResp = await _httpClient.GetAsync(repoUrl);
+                        if (repoResp.IsSuccessStatusCode)
+                        {
+                            var repoContent = await repoResp.Content.ReadAsStringAsync();
+                            var repoObj = JsonSerializer.Deserialize<JsonElement>(repoContent);
+                            var repoGuid = repoObj.GetProperty("id").GetString();
+
+                            if (!string.IsNullOrEmpty(projectGuid) && !string.IsNullOrEmpty(repoGuid))
+                            {
+                                // Construct ArtifactLink URL expected by Azure DevOps
+                                var artifactUrl = $"vstfs:///Git/PullRequestId/{projectGuid}%2F{repoGuid}%2F{prId}";
+                                var patchDoc = new[]
+                                {
+                                    new
+                                    {
+                                        op = "add",
+                                        path = "/relations/-",
+                                        value = new
+                                        {
+                                            rel = "ArtifactLink",
+                                            url = artifactUrl,
+                                            attributes = new { name = "Pull Request" }
+                                        }
+                                    }
+                                };
+
+                                var url = $"https://dev.azure.com/{_organization}/_apis/wit/workitems/{workItemId}?api-version=7.0";
+                                var content = new StringContent(JsonSerializer.Serialize(patchDoc), System.Text.Encoding.UTF8, "application/json-patch+json");
+                                var response = await _httpClient.PatchAsync(url, content);
+                                if (response.IsSuccessStatusCode)
+                                {
+                                    return true;
+                                }
+
+                                var errorContent = await response.Content.ReadAsStringAsync();
+                                _lastError = $"ArtifactLink patch failed ({response.StatusCode}): {response.ReasonPhrase}\n{errorContent}";
+                            }
+                            else
+                            {
+                                _lastError = "Failed to obtain project or repository GUIDs for ArtifactLink creation";
+                            }
+                        }
+                        else
+                        {
+                            var rc = await repoResp.Content.ReadAsStringAsync();
+                            _lastError = $"Failed to fetch repository info: {repoResp.StatusCode} {repoResp.ReasonPhrase}\n{rc}";
+                        }
+                    }
+                    else
+                    {
+                        var pc = await projResp.Content.ReadAsStringAsync();
+                        _lastError = $"Failed to fetch project info: {projResp.StatusCode} {projResp.ReasonPhrase}\n{pc}";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Exception linking work item (artifact fallback): {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+            }
+
+            // Final fallback: add a plain Hyperlink relation so the work item still points to the PR
+            try
+            {
+                var webUrl = $"https://dev.azure.com/{_organization}/{_project}/_git/{repositoryId}/pullrequest/{prId}";
+                var url = $"https://dev.azure.com/{_organization}/_apis/wit/workitems/{workItemId}?api-version=7.0";
+
+                var patchDoc = new[]
+                {
+                    new
+                    {
+                        op = "add",
+                        path = "/relations/-",
+                        value = new
+                        {
+                            rel = "Hyperlink",
+                            url = webUrl,
+                            attributes = new { comment = "Linked from SDO pull request" }
+                        }
+                    }
+                };
+
+                var content = new StringContent(JsonSerializer.Serialize(patchDoc), System.Text.Encoding.UTF8, "application/json-patch+json");
+                var response = await _httpClient.PatchAsync(url, content);
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    _lastError = $"Link work item failed ({response.StatusCode}): {response.ReasonPhrase}\n{errorContent}";
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Exception linking work item (fallback): {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Verifies the authentication token by making a request to the Azure DevOps API.
         /// </summary>
         /// <returns>True if authentication is successful, false otherwise.</returns>
@@ -251,6 +424,62 @@ namespace Sdo.Services
             {
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Gets work items linked to a pull request.
+        /// </summary>
+        /// <param name="projectId">Project ID or name.</param>
+        /// <param name="repositoryId">Repository ID or name.</param>
+        /// <param name="prId">Pull request ID.</param>
+        /// <returns>List of linked work items (may be empty).</returns>
+        public async Task<List<AzureDevOpsWorkItem>> GetPullRequestWorkItemsAsync(string projectId, string repositoryId, int prId)
+        {
+            var result = new List<AzureDevOpsWorkItem>();
+            try
+            {
+                var url = $"https://dev.azure.com/{_organization}/{projectId}/_apis/git/repositories/{repositoryId}/pullRequests/{prId}/workitems?api-version=7.0";
+                var response = await _httpClient.GetAsync(url);
+                if (!response.IsSuccessStatusCode)
+                {
+                    System.Diagnostics.Debug.WriteLine($"GetPullRequestWorkItemsAsync failed: {response.StatusCode} {response.ReasonPhrase}");
+                    return result;
+                }
+
+                var content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var doc = JsonSerializer.Deserialize<JsonElement>(content);
+                if (doc.ValueKind == JsonValueKind.Object && doc.TryGetProperty("value", out var arr) && arr.ValueKind == JsonValueKind.Array)
+                {
+                    foreach (var item in arr.EnumerateArray())
+                    {
+                        int id = 0;
+                        if (item.TryGetProperty("id", out var idProp) && idProp.ValueKind == JsonValueKind.Number)
+                        {
+                            id = idProp.GetInt32();
+                        }
+                        else if (item.TryGetProperty("url", out var urlProp) && urlProp.ValueKind == JsonValueKind.String)
+                        {
+                            var u = urlProp.GetString() ?? string.Empty;
+                            // extract trailing numeric id
+                            var parts = u.TrimEnd('/').Split('/');
+                            if (int.TryParse(parts.Last(), out var parsed)) id = parsed;
+                        }
+
+                        if (id > 0)
+                        {
+                            var wi = await GetWorkItemAsync(id);
+                            if (wi != null) result.Add(wi);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Exception in GetPullRequestWorkItemsAsync: {ex.Message}");
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -1483,13 +1712,16 @@ namespace Sdo.Services
                     return null;
                 }
 
+                // Construct a user-facing web URL instead of returning the API/REST URL
+                var webUrl = $"https://dev.azure.com/{_organization}/{projectId}/_git/{repositoryId}/pullrequest/{prData.PullRequestId}";
+
                 return new Models.PullRequest
                 {
                     Number = prData.PullRequestId,
                     Title = prData.Title,
                     Description = prData.Description,
                     Status = prData.Status,
-                    Url = prData.Url,
+                    Url = webUrl,
                     Author = prData.CreatedBy?.DisplayName,
                     SourceBranch = prData.SourceRefName,
                     TargetBranch = prData.TargetRefName,

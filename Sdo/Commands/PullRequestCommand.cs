@@ -151,7 +151,7 @@ namespace Sdo.Commands
                 var title = parseResult.GetValue(titleOption);
                 var status = parseResult.GetValue(statusOption);
                 var verbose = parseResult.GetValue(verboseOption);
-                return await UpdatePullRequest(prId, title, status, verbose);
+                return await UpdatePullRequest(prId, file, title, status, verbose);
             });
 
             Subcommands.Add(updateCommand);
@@ -367,6 +367,19 @@ namespace Sdo.Commands
 
                     Console.WriteLine("[OK] Pull request created successfully!");
                     Console.WriteLine($"URL: {pr.Url}");
+                    // If a work item ID was provided, attempt to link it to the created PR
+                    if (workItem > 0)
+                    {
+                        var linked = await client.LinkWorkItemAsync(workItem, pr.Number, repoInfo.Repo);
+                        if (!linked)
+                        {
+                            ConsoleHelper.WriteError($"Warning: Failed to link work item #{workItem} to PR {pr.Number}: {client.LastError}");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Linked work item #{workItem} to PR {pr.Number}");
+                        }
+                    }
                     if (verbose)
                     {
                         Console.WriteLine("Platform: Azure DevOps");
@@ -599,6 +612,25 @@ namespace Sdo.Commands
                     Console.WriteLine($"Author: {pr.Author}");
                     Console.WriteLine($"Branch: {pr.SourceBranch} -> {pr.TargetBranch}");
 
+                    // Fetch and display linked work items (if any)
+                    try
+                    {
+                        var linked = await client.GetPullRequestWorkItemsAsync(project, repoInfo.Repo, prId);
+                        if (linked != null && linked.Count > 0)
+                        {
+                            Console.WriteLine();
+                            Console.WriteLine("Linked Work Items:");
+                            foreach (var wi in linked)
+                            {
+                                Console.WriteLine($"  - #{wi.Id} {wi.Type ?? ""}: {wi.Title}");
+                            }
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        // Non-fatal: do not block showing PR if fetching work items fails
+                    }
+
                     return 0;
                 }
                 else
@@ -614,11 +646,54 @@ namespace Sdo.Commands
             }
         }
 
-        private async Task<int> UpdatePullRequest(int prId, string? title, string? status, bool verbose)
+        private async Task<int> UpdatePullRequest(int prId, string? file, string? title, string? status, bool verbose)
         {
             try
             {
                 if (verbose) Console.WriteLine($"Updating pull request #{prId}...");
+
+                string? body = null;
+                // If a file was provided, parse title/body from the markdown file
+                if (!string.IsNullOrEmpty(file))
+                {
+                    if (!System.IO.File.Exists(file))
+                    {
+                        ConsoleHelper.WriteError($"X Error: File not found: {file}");
+                        return 1;
+                    }
+
+                    var content = System.IO.File.ReadAllText(file);
+                    var lines = content.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+
+                    string? titleFromFile = null;
+                    int bodyStartIndex = 0;
+                    for (int i = 0; i < lines.Length; i++)
+                    {
+                        if (lines[i].StartsWith("# "))
+                        {
+                            titleFromFile = lines[i].Substring(2).Trim();
+                            bodyStartIndex = i + 1;
+                            break;
+                        }
+                    }
+
+                    if (string.IsNullOrEmpty(titleFromFile) && lines.Length > 0)
+                    {
+                        titleFromFile = lines[0];
+                        bodyStartIndex = 1;
+                    }
+
+                    if (bodyStartIndex < lines.Length)
+                    {
+                        body = string.Join(Environment.NewLine, lines.Skip(bodyStartIndex)).Trim();
+                    }
+
+                    // CLI title overrides file title
+                    if (string.IsNullOrEmpty(title) && !string.IsNullOrEmpty(titleFromFile))
+                    {
+                        title = titleFromFile;
+                    }
+                }
 
                 var platform = _platformDetector.DetectPlatform();
                 var pat = await GetAuthenticationTokenAsync(platform);
@@ -642,13 +717,14 @@ namespace Sdo.Commands
                         var parts = new System.Collections.Generic.List<string>();
                         parts.Add($"gh pr edit -R {repoInfo.Owner}/{repoInfo.Repo} {prId}");
                         if (!string.IsNullOrEmpty(title)) parts.Add($"--title \"{title}\"");
+                        if (!string.IsNullOrEmpty(body)) parts.Add($"--body \"{body}\"");
                         if (!string.IsNullOrEmpty(status)) parts.Add($"--state {status}");
                         var mapping = string.Join(" ", parts);
                         _mappingPresenter.Present(mapping);
                     }
 
                     using var client = new GitHubClient(pat);
-                    var pr = await client.UpdatePullRequestAsync(repoInfo.Owner, repoInfo.Repo, prId, title, null, status);
+                    var pr = await client.UpdatePullRequestAsync(repoInfo.Owner, repoInfo.Repo, prId, title, body, status);
                     if (pr == null)
                     {
                         ConsoleHelper.WriteError($"X Error: Failed to update pull request #{prId}");
@@ -656,6 +732,7 @@ namespace Sdo.Commands
                     }
 
                     ConsoleHelper.WriteLine($"✓ Successfully updated pull request #{pr.Number}", ConsoleColor.Green);
+                    ConsoleHelper.WriteLine($"PR URL: {pr.Url}");
                     return 0;
                 }
                 else if (platform == Platform.AzureDevOps)
@@ -673,12 +750,12 @@ namespace Sdo.Commands
                     // Show mapping when verbose
                     if (verbose)
                     {
-                        var mapping = _mappingGenerator.PrUpdateAzure(organization, project, repoInfo.Repo, prId, title, status, null);
+                        var mapping = _mappingGenerator.PrUpdateAzure(organization, project, repoInfo.Repo, prId, title, status, body);
                         _mappingPresenter.Present(mapping);
                     }
 
                     using var client = new AzureDevOpsClient(pat, organization, project);
-                    var pr = await client.UpdatePullRequestAsync(project, repoInfo.Repo, prId, title, null, status);
+                    var pr = await client.UpdatePullRequestAsync(project, repoInfo.Repo, prId, title, body, status);
                     if (pr == null)
                     {
                         ConsoleHelper.WriteError($"X Error: {client.LastError ?? "Failed to update pull request"}");
@@ -686,6 +763,7 @@ namespace Sdo.Commands
                     }
 
                     ConsoleHelper.WriteLine($"✓ Successfully updated pull request #{pr.Number}", ConsoleColor.Green);
+                    ConsoleHelper.WriteLine($"PR URL: {pr.Url}");
                     return 0;
                 }
                 else
