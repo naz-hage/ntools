@@ -135,7 +135,7 @@ namespace SdoTests
             projField.SetValue(platInstance, "repoB");
 
             var method = typeof(PullRequestCommand).GetMethod("UpdatePullRequest", BindingFlags.NonPublic | BindingFlags.Instance);
-            var task = (Task<int>)method.Invoke(cmd, new object[] { 321, "New Title", "closed", true })!;
+            var task = (Task<int>)method.Invoke(cmd, new object[] { 321, null, "New Title", "closed", true })!;
             var result = await task;
 
             var expectedStart = $"gh pr edit -R ownerA/repoB 321";
