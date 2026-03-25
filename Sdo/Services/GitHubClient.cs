@@ -6,6 +6,8 @@
 // GitHub API client for authentication verification and basic operations.
 // Reuses GitHubRelease authentication logic for token retrieval.
 
+using Nbuild;
+using Nbuild.Helpers;
 using System.Net.Http.Headers;
 using System.Text.Json;
 
@@ -34,7 +36,7 @@ namespace Sdo.Services
             var authToken = _overrideToken ?? GitHubRelease.Credentials.GetTokenOrDefault();
             if (!string.IsNullOrEmpty(authToken))
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("token", authToken);
             }
         }
 
@@ -143,7 +145,7 @@ namespace Sdo.Services
 
                     if (!response.IsSuccessStatusCode)
                     {
-                        System.Diagnostics.Debug.WriteLine($"GitHub API error: {response.StatusCode} {response.ReasonPhrase}");
+                        ConsoleHelper.WriteLine($"GitHub API error: {response.StatusCode} {response.ReasonPhrase}", ConsoleColor.Red);
                         // Return what we have so far if first page succeeded
                         return allIssues.Count > 0 ? allIssues : null;
                     }
@@ -273,6 +275,60 @@ namespace Sdo.Services
             {
                 System.Diagnostics.Debug.WriteLine($"Error adding GitHub issue comment: {ex.Message}");
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// Creates a new GitHub issue.
+        /// </summary>
+        /// <param name="owner">Repository owner.</param>
+        /// <param name="repo">Repository name.</param>
+        /// <param name="title">Issue title (required).</param>
+        /// <param name="body">Issue body/description (optional).</param>
+        /// <param name="labels">Labels to assign to the issue (optional).</param>
+        /// <param name="assignee">Assignee login name (optional).</param>
+        /// <returns>The created GitHub issue, or null if creation failed.</returns>
+        public async Task<GitHubIssue?> CreateIssueAsync(string owner, string repo, string title, 
+            string? body = null, string[]? labels = null, string? assignee = null)
+        {
+            try
+            {
+                var url = $"https://api.github.com/repos/{owner}/{repo}/issues";
+
+                var issueData = new Dictionary<string, object>
+                {
+                    { "title", title }
+                };
+
+                if (!string.IsNullOrEmpty(body))
+                    issueData["body"] = body;
+
+                if (labels != null && labels.Length > 0)
+                    issueData["labels"] = labels;
+
+                if (!string.IsNullOrEmpty(assignee))
+                    issueData["assignee"] = assignee;
+
+                var content = JsonSerializer.Serialize(issueData);
+                var request = new StringContent(content, System.Text.Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync(url, request);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    System.Diagnostics.Debug.WriteLine($"GitHub API error: {response.StatusCode} {response.ReasonPhrase}");
+                    return null;
+                }
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var issue = JsonSerializer.Deserialize<GitHubIssue>(responseContent, options);
+                return issue;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error creating GitHub issue: {ex.Message}");
+                return null;
             }
         }
 
@@ -560,6 +616,439 @@ namespace Sdo.Services
         }
 
         /// <summary>
+        /// Creates a new pull request.
+        /// </summary>
+        /// <param name="owner">Repository owner.</param>
+        /// <param name="repo">Repository name.</param>
+        /// <param name="title">Pull request title (required).</param>
+        /// <param name="body">Pull request description (optional).</param>
+        /// <param name="head">Branch name or commit SHA to merge from (required).</param>
+        /// <param name="baseRef">Branch name to merge into (required).</param>
+        /// <param name="draft">Whether the PR should be a draft (optional).</param>
+        /// <returns>Created pull request details, or null if creation failed.</returns>
+        public async Task<Models.PullRequest?> CreatePullRequestAsync(string owner, string repo, string title,
+            string head, string baseRef, string? body = null, bool draft = false)
+        {
+            try
+            {
+                var url = $"https://api.github.com/repos/{owner}/{repo}/pulls";
+
+                var createData = new
+                {
+                    title,
+                    head,
+                    @base = baseRef,
+                    body,
+                    draft
+                };
+
+                var content = JsonSerializer.Serialize(createData);
+                var request = new StringContent(content, System.Text.Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync(url, request);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    throw new InvalidOperationException($"GitHub API error ({response.StatusCode}): {response.ReasonPhrase}. {errorContent}");
+                }
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var prData = JsonSerializer.Deserialize<GitHubPullRequest>(responseContent, options);
+
+                if (prData == null)
+                {
+                    throw new InvalidOperationException("Failed to parse GitHub API response");
+                }
+
+                return new Models.PullRequest
+                {
+                    Number = prData.Number,
+                    Title = prData.Title,
+                    Description = prData.Body,
+                    Status = prData.State,
+                    Url = prData.HtmlUrl,
+                    Author = prData.User?.Login,
+                    SourceBranch = prData.Head?.Ref,
+                    HeadSha = prData.Head?.Sha,
+                    TargetBranch = prData.Base?.Ref,
+                    CreatedAt = prData.CreatedAt,
+                    UpdatedAt = prData.UpdatedAt,
+                    IsDraft = prData.Draft,
+                    MergedAt = prData.MergedAt,
+                    IsMerged = prData.Merged
+                };
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error creating GitHub pull request: {ex.Message}");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Gets details for a specific pull request.
+        /// </summary>
+        /// <param name="owner">Repository owner.</param>
+        /// <param name="repo">Repository name.</param>
+        /// <param name="prNumber">Pull request number.</param>
+        /// <returns>Pull request details, or null if not found.</returns>
+        public async Task<Models.PullRequest?> GetPullRequestAsync(string owner, string repo, int prNumber)
+        {
+            try
+            {
+                var url = $"https://api.github.com/repos/{owner}/{repo}/pulls/{prNumber}";
+                var response = await _httpClient.GetAsync(url);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    System.Diagnostics.Debug.WriteLine($"GitHub API error: {response.StatusCode} {response.ReasonPhrase}");
+                    return null;
+                }
+
+                var content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var prData = JsonSerializer.Deserialize<GitHubPullRequest>(content, options);
+
+                if (prData == null)
+                {
+                    return null;
+                }
+
+                return new Models.PullRequest
+                {
+                    Number = prData.Number,
+                    Title = prData.Title,
+                    Description = prData.Body,
+                    Status = prData.State,
+                    Url = prData.HtmlUrl,
+                    Author = prData.User?.Login,
+                    SourceBranch = prData.Head?.Ref,
+                    HeadSha = prData.Head?.Sha,
+                    TargetBranch = prData.Base?.Ref,
+                    CreatedAt = prData.CreatedAt,
+                    UpdatedAt = prData.UpdatedAt,
+                    IsDraft = prData.Draft,
+                    MergedAt = prData.MergedAt,
+                    IsMerged = prData.Merged
+                };
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error getting GitHub pull request: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Lists pull requests for a repository.
+        /// </summary>
+        /// <param name="owner">Repository owner.</param>
+        /// <param name="repo">Repository name.</param>
+        /// <param name="state">Filter by state: 'open', 'closed', or 'all'. Default: 'open'.</param>
+        /// <param name="perPage">Number of results per page (1-100). Default: 30.</param>
+        /// <param name="top">Maximum number of results to return. Default: 0 (all).</param>
+        /// <returns>List of pull requests, or null if operation failed.</returns>
+        public async Task<List<Models.PullRequest>?> ListPullRequestsAsync(string owner, string repo,
+            string state = "open", int perPage = 30, int top = 0)
+        {
+            try
+            {
+                // Clamp perPage to GitHub API limits (1-100)
+                perPage = Math.Max(1, Math.Min(100, perPage));
+
+                var allPRs = new List<Models.PullRequest>();
+                int page = 1;
+
+                while (true)
+                {
+                    var url = $"https://api.github.com/repos/{owner}/{repo}/pulls?per_page={perPage}&page={page}&state={state}";
+                    var response = await _httpClient.GetAsync(url);
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"GitHub API error: {response.StatusCode} {response.ReasonPhrase}");
+                        return null;
+                    }
+
+                    var content = await response.Content.ReadAsStringAsync();
+                    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                    var prs = JsonSerializer.Deserialize<List<GitHubPullRequest>>(content, options);
+
+                    if (prs == null || prs.Count == 0)
+                    {
+                        // No more results
+                        break;
+                    }
+
+                    // Convert to PullRequest model
+                    allPRs.AddRange(prs.Select(pr => new Models.PullRequest
+                    {
+                        Number = pr.Number,
+                        Title = pr.Title,
+                        Description = pr.Body,
+                        Status = pr.State,
+                        Url = pr.HtmlUrl,
+                        Author = pr.User?.Login,
+                        SourceBranch = pr.Head?.Ref,
+                        HeadSha = pr.Head?.Sha,
+                        TargetBranch = pr.Base?.Ref,
+                        CreatedAt = pr.CreatedAt,
+                        UpdatedAt = pr.UpdatedAt,
+                        IsDraft = pr.Draft,
+                        MergedAt = pr.MergedAt,
+                        IsMerged = pr.Merged
+                    }));
+
+                    // Check if we've reached the requested limit
+                    if (top > 0 && allPRs.Count >= top)
+                    {
+                        allPRs = allPRs.Take(top).ToList();
+                        break;
+                    }
+
+                    // If we got fewer items than perPage, we've reached the end
+                    if (prs.Count < perPage)
+                    {
+                        break;
+                    }
+
+                    page++;
+                }
+
+                return allPRs;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error listing GitHub pull requests: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Approves a pull request by creating a review.
+        /// </summary>
+        /// <param name="owner">Repository owner.</param>
+        /// <param name="repo">Repository name.</param>
+        /// <param name="prNumber">Pull request number.</param>
+        /// <returns>True if approval was successful, false otherwise.</returns>
+        public async Task<bool> ApprovePullRequestAsync(string owner, string repo, int prNumber)
+        {
+            try
+            {
+                var url = $"https://api.github.com/repos/{owner}/{repo}/pulls/{prNumber}/reviews";
+
+                var reviewData = new
+                {
+                    @event = "APPROVE"
+                };
+
+                var content = JsonSerializer.Serialize(reviewData);
+                var request = new StringContent(content, System.Text.Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync(url, request);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    System.Diagnostics.Debug.WriteLine($"GitHub API error: {response.StatusCode} {response.ReasonPhrase}");
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error approving GitHub pull request: {ex.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Merges a pull request.
+        /// </summary>
+        /// <param name="owner">Repository owner.</param>
+        /// <param name="repo">Repository name.</param>
+        /// <param name="prNumber">Pull request number.</param>
+        /// <param name="mergeMethod">Merge method: 'merge', 'squash', or 'rebase'. Default: 'merge'.</param>
+        /// <returns>True if merge was successful, false otherwise.</returns>
+        public async Task<bool> MergePullRequestAsync(string owner, string repo, int prNumber,
+            string mergeMethod = "merge")
+        {
+            try
+            {
+                var url = $"https://api.github.com/repos/{owner}/{repo}/pulls/{prNumber}/merge";
+
+                var mergeData = new
+                {
+                    merge_method = mergeMethod
+                };
+
+                var content = JsonSerializer.Serialize(mergeData);
+                var request = new StringContent(content, System.Text.Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PutAsync(url, request);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    System.Diagnostics.Debug.WriteLine($"GitHub API error: {response.StatusCode} {response.ReasonPhrase}");
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error merging GitHub pull request: {ex.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Updates a pull request.
+        /// </summary>
+        /// <param name="owner">Repository owner.</param>
+        /// <param name="repo">Repository name.</param>
+        /// <param name="prNumber">Pull request number.</param>
+        /// <param name="title">New pull request title (optional).</param>
+        /// <param name="body">New pull request body (optional).</param>
+        /// <param name="state">New pull request state: 'open' or 'closed' (optional).</param>
+        /// <returns>Updated pull request details, or null if update failed.</returns>
+        public async Task<Models.PullRequest?> UpdatePullRequestAsync(string owner, string repo, int prNumber,
+            string? title = null, string? body = null, string? state = null)
+        {
+            try
+            {
+                var url = $"https://api.github.com/repos/{owner}/{repo}/pulls/{prNumber}";
+
+                var updateData = new Dictionary<string, object?>();
+                if (!string.IsNullOrEmpty(title))
+                    updateData["title"] = title;
+                if (!string.IsNullOrEmpty(body))
+                    updateData["body"] = body;
+                if (!string.IsNullOrEmpty(state))
+                    updateData["state"] = state;
+
+                var content = JsonSerializer.Serialize(updateData);
+                var request = new StringContent(content, System.Text.Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PatchAsync(url, request);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    System.Diagnostics.Debug.WriteLine($"GitHub API error: {response.StatusCode} {response.ReasonPhrase}");
+                    return null;
+                }
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var prData = JsonSerializer.Deserialize<GitHubPullRequest>(responseContent, options);
+
+                if (prData == null)
+                {
+                    return null;
+                }
+
+                return new Models.PullRequest
+                {
+                    Number = prData.Number,
+                    Title = prData.Title,
+                    Description = prData.Body,
+                    Status = prData.State,
+                    Url = prData.HtmlUrl,
+                    Author = prData.User?.Login,
+                    SourceBranch = prData.Head?.Ref,
+                    HeadSha = prData.Head?.Sha,
+                    TargetBranch = prData.Base?.Ref,
+                    CreatedAt = prData.CreatedAt,
+                    UpdatedAt = prData.UpdatedAt,
+                    IsDraft = prData.Draft,
+                    MergedAt = prData.MergedAt,
+                    IsMerged = prData.Merged
+                };
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error updating GitHub pull request: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets check runs for a specific commit/PR head.
+        /// </summary>
+        /// <param name="owner">Repository owner.</param>
+        /// <param name="repo">Repository name.</param>
+        /// <param name="headSha">The commit SHA of the PR head.</param>
+        /// <returns>List of check runs with name, status, and URL, or null if operation failed.</returns>
+        public async Task<List<(string Name, string Status, string Duration, string Url)>?> GetCheckRunsAsync(
+            string owner, string repo, string headSha)
+        {
+            try
+            {
+                var url = $"https://api.github.com/repos/{owner}/{repo}/commits/{headSha}/check-runs";
+                var response = await _httpClient.GetAsync(url);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    System.Diagnostics.Debug.WriteLine($"GitHub API error getting check runs: {response.StatusCode}");
+                    return null;
+                }
+
+                var content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var result = JsonSerializer.Deserialize<CheckRunsResponse>(content, options);
+
+                if (result?.CheckRuns == null || result.CheckRuns.Count == 0)
+                {
+                    return new List<(string, string, string, string)>();
+                }
+
+                var checks = new List<(string, string, string, string)>();
+                foreach (var check in result.CheckRuns)
+                {
+                    // Calculate duration
+                    string duration = "pending";
+                    if (check.CompletedAt.HasValue && check.StartedAt.HasValue)
+                    {
+                        var span = check.CompletedAt.Value - check.StartedAt.Value;
+                        if (span.TotalSeconds < 60)
+                        {
+                            duration = $"{span.TotalSeconds:F0}s";
+                        }
+                        else if (span.TotalMinutes < 60)
+                        {
+                            duration = $"{span.TotalMinutes:F0}m{span.Seconds}s";
+                        }
+                        else
+                        {
+                            duration = $"{span.Hours}h{span.Minutes}m";
+                        }
+                    }
+
+                    // Map conclusion to status
+                    var status = check.Conclusion ?? "pending";
+                    if (check.Status == "in_progress")
+                    {
+                        status = "running";
+                    }
+
+                    // Get the details URL - GitHub checks have a details_url
+                    var checkUrl = check.DetailsUrl ?? $"https://github.com/{owner}/{repo}/pull";
+
+                    checks.Add((check.Name ?? "Unknown", status, duration, checkUrl));
+                }
+
+                return checks;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error getting check runs: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
         /// Disposes the HTTP client.
         /// </summary>
         public void Dispose()
@@ -750,5 +1239,153 @@ namespace Sdo.Services
         /// Gets or sets the label description.
         /// </summary>
         public string? Description { get; set; }
+    }
+
+    /// <summary>
+    /// Represents a GitHub pull request API response.
+    /// </summary>
+    public class GitHubPullRequest
+    {
+        /// <summary>
+        /// Gets or sets the pull request ID.
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// Gets or sets the pull request number.
+        /// </summary>
+        public int Number { get; set; }
+
+        /// <summary>
+        /// Gets or sets the pull request title.
+        /// </summary>
+        public string? Title { get; set; }
+
+        /// <summary>
+        /// Gets or sets the pull request body/description.
+        /// </summary>
+        public string? Body { get; set; }
+
+        /// <summary>
+        /// Gets or sets the pull request state (open, closed).
+        /// </summary>
+        public string? State { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether the pull request is a draft.
+        /// </summary>
+        public bool Draft { get; set; }
+
+        /// <summary>
+        /// Gets or sets the creation date.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("created_at")]
+        public DateTime CreatedAt { get; set; }
+
+        /// <summary>
+        /// Gets or sets the last update date.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("updated_at")]
+        public DateTime UpdatedAt { get; set; }
+
+        /// <summary>
+        /// Gets or sets the merge date (if merged).
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("merged_at")]
+        public DateTime? MergedAt { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether the pull request is merged.
+        /// </summary>
+        public bool Merged { get; set; }
+
+        /// <summary>
+        /// Gets or sets the HTML URL of the pull request.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("html_url")]
+        public string? HtmlUrl { get; set; }
+
+        /// <summary>
+        /// Gets or sets the pull request author/user.
+        /// </summary>
+        public GitHubUser? User { get; set; }
+
+        /// <summary>
+        /// Gets or sets the source branch information.
+        /// </summary>
+        public GitHubRef? Head { get; set; }
+
+        /// <summary>
+        /// Gets or sets the target branch information.
+        /// </summary>
+        public GitHubRef? Base { get; set; }
+    }
+
+    /// <summary>
+    /// Represents a GitHub ref (branch) reference.
+    /// </summary>
+    public class GitHubRef
+    {
+        /// <summary>
+        /// Gets or sets the ref name (branch name).
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("ref")]
+        public string? Ref { get; set; }
+
+        /// <summary>
+        /// Gets or sets the commit SHA.
+        /// </summary>
+        public string? Sha { get; set; }
+    }
+
+    /// <summary>
+    /// Represents the check runs response from GitHub API.
+    /// </summary>
+    public class CheckRunsResponse
+    {
+        /// <summary>
+        /// Gets or sets the list of check runs.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("check_runs")]
+        public List<CheckRun>? CheckRuns { get; set; }
+    }
+
+    /// <summary>
+    /// Represents a GitHub check run.
+    /// </summary>
+    public class CheckRun
+    {
+        /// <summary>
+        /// Gets or sets the check run name.
+        /// </summary>
+        public string? Name { get; set; }
+
+        /// <summary>
+        /// Gets or sets the check run status.
+        /// </summary>
+        public string? Status { get; set; }
+
+        /// <summary>
+        /// Gets or sets the check run conclusion.
+        /// </summary>
+        public string? Conclusion { get; set; }
+
+        /// <summary>
+        /// Gets or sets the start time.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("started_at")]
+        public DateTime? StartedAt { get; set; }
+
+        /// <summary>
+        /// Gets or sets the completion time.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("completed_at")]
+        public DateTime? CompletedAt { get; set; }
+
+        /// <summary>
+        /// Gets or sets the details URL.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("details_url")]
+        public string? DetailsUrl { get; set; }
     }
 }

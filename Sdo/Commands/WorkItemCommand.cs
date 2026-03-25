@@ -6,10 +6,16 @@
 // This file contains the WorkItemCommand class for managing work items
 // across GitHub Issues and Azure DevOps work items.
 
+using System;
+using System.IO;
+using System.Linq;
+using System.Collections.Generic;
 using System.CommandLine;
 using Nbuild.Helpers;
 using Sdo.Interfaces;
 using Sdo.Services;
+using Sdo.Models;
+using Sdo.Mapping;
 
 namespace Sdo.Commands
 {
@@ -19,14 +25,18 @@ namespace Sdo.Commands
     public class WorkItemCommand : Command
     {
         private readonly PlatformService _platformDetector;
+        private readonly Sdo.Mapping.IMappingGenerator _mappingGenerator;
+        private readonly Sdo.Mapping.IMappingPresenter _mappingPresenter;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WorkItemCommand"/> class.
         /// </summary>
         /// <param name="verboseOption">The global verbose option.</param>
-        public WorkItemCommand(Option<bool> verboseOption) : base("wi", "Work item management commands")
+        public WorkItemCommand(Option<bool> verboseOption, Sdo.Mapping.IMappingGenerator? mappingGenerator = null, Sdo.Mapping.IMappingPresenter? mappingPresenter = null) : base("wi", "Work item management commands")
         {
             _platformDetector = new PlatformService();
+            _mappingGenerator = mappingGenerator ?? new Sdo.Mapping.MappingGenerator();
+            _mappingPresenter = mappingPresenter ?? new Sdo.Mapping.ConsoleMappingPresenter();
 
             // Add subcommands (in alphabetical order for help display)
             AddCommentCommand(verboseOption);
@@ -75,12 +85,16 @@ namespace Sdo.Commands
             var stateOption = new Option<string?>("--state") { Description = "Filter by state (New, Approved, Committed, Done, To Do, In Progress)" };
             var assignedToOption = new Option<string?>("--assigned-to") { Description = "Filter by assigned user (email or display name)" };
             var assignedToMeOption = new Option<bool>("--assigned-to-me") { Description = "Filter by work items assigned to current user" };
+            var areaOption = new Option<string?>("--area") { Description = "Filter by area path (Azure DevOps only). Example: 'Project\\Area\\SubArea'" };
+            var iterationOption = new Option<string?>("--iteration") { Description = "Filter by iteration (Azure DevOps only). Example: 'Project\\Sprint 1'" };
             var topOption = new Option<int>("--top") { Description = "Maximum number of items to return (default: 50)" };
 
             listCommand.Add(typeOption);
             listCommand.Add(stateOption);
             listCommand.Add(assignedToOption);
             listCommand.Add(assignedToMeOption);
+            listCommand.Add(areaOption);
+            listCommand.Add(iterationOption);
             listCommand.Add(topOption);
             listCommand.Add(verboseOption);
 
@@ -90,10 +104,12 @@ namespace Sdo.Commands
                 var state = parseResult.GetValue(stateOption);
                 var assignedTo = parseResult.GetValue(assignedToOption);
                 var assignedToMe = parseResult.GetValue(assignedToMeOption);
+                var area = parseResult.GetValue(areaOption);
+                var iteration = parseResult.GetValue(iterationOption);
                 var top = parseResult.GetValue(topOption);
                 var verbose = parseResult.GetValue(verboseOption);
 
-                return await ListWorkItems(type, state, assignedTo, assignedToMe, top, verbose);
+                return await ListWorkItems(type, state, assignedTo, assignedToMe, area, iteration, top, verbose);
             });
 
             Subcommands.Add(listCommand);
@@ -169,27 +185,22 @@ namespace Sdo.Commands
         private void AddCreateCommand(Option<bool> verboseOption)
         {
             var createCommand = new Command("create", "Create a new work item");
+            // Only allow markdown-file-driven creation; all fields must be in the file
+            var filePathOption = new Option<string?>("--file-path", new[] { "-f" }) { Description = "Path to markdown file containing work item details" };
+            var dryRunOption = new Option<bool>("--dry-run") { Description = "Parse and preview work item creation without creating it" };
 
-            var titleOption = new Option<string>("--title") { Description = "Work item title (required)" };
-            var typeOption = new Option<string>("--type") { Description = "Work item type (PBI, Bug, Task, etc.)" };
-            var descriptionOption = new Option<string?>("--description") { Description = "Work item description" };
-            var assigneeOption = new Option<string?>("--assignee") { Description = "Assign to user" };
-
-            createCommand.Add(titleOption);
-            createCommand.Add(typeOption);
-            createCommand.Add(descriptionOption);
-            createCommand.Add(assigneeOption);
+            createCommand.Add(filePathOption);
+            createCommand.Add(dryRunOption);
             createCommand.Add(verboseOption);
 
             createCommand.SetAction(async (parseResult) =>
             {
-                var title = parseResult.GetValue(titleOption);
-                var type = parseResult.GetValue(typeOption);
-                var description = parseResult.GetValue(descriptionOption);
-                var assignee = parseResult.GetValue(assigneeOption);
+                var filePath = parseResult.GetValue(filePathOption);
+                var dryRun = parseResult.GetValue(dryRunOption);
                 var verbose = parseResult.GetValue(verboseOption);
 
-                return await CreateWorkItem(title!, type!, description, assignee, verbose);
+                // Title/type/description/assignee must come from the markdown file
+                return await CreateWorkItem(null, null, null, null, verbose, filePath, dryRun);
             });
 
             Subcommands.Add(createCommand);
@@ -215,6 +226,31 @@ namespace Sdo.Commands
 
                 if (verbose)
                 {
+                    // Build and display the equivalent external command mapping for 'show'
+                    string mappingCmd = string.Empty;
+                    if (platform == Platform.GitHub)
+                    {
+                        var repoInfo = _platformDetector.GetRepositoryInfo();
+                        if (repoInfo != null && !string.IsNullOrEmpty(repoInfo.Owner) && !string.IsNullOrEmpty(repoInfo.Repo))
+                        {
+                            mappingCmd = _mappingGenerator.IssueShowGitHub(repoInfo.Owner, repoInfo.Repo, id);
+                        }
+                    }
+                    else if (platform == Platform.AzureDevOps)
+                    {
+                        var org = _platformDetector.GetOrganization();
+                        var project = _platformDetector.GetProject();
+                        if (!string.IsNullOrEmpty(org) && !string.IsNullOrEmpty(project))
+                        {
+                            mappingCmd = _mappingGenerator.WorkItemShowAzure(org, project, id);
+                        }
+                    }
+
+                    if (!string.IsNullOrEmpty(mappingCmd))
+                    {
+                        _mappingPresenter.Present(mappingCmd);
+                    }
+
                     ConsoleHelper.WriteLine($"Detected platform: {platform}", ConsoleColor.Green);
                 }
 
@@ -255,7 +291,14 @@ namespace Sdo.Commands
         {
             try
             {
-                var client = new GitHubClient();
+                var token = await GetAuthenticationTokenAsync(Platform.GitHub);
+                if (string.IsNullOrEmpty(token))
+                {
+                    ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
+                    return 1;
+                }
+
+                var client = new GitHubClient(token);
                 var repoInfo = _platformDetector.GetRepositoryInfo();
 
                 if (string.IsNullOrEmpty(repoInfo?.Owner) || string.IsNullOrEmpty(repoInfo?.Repo))
@@ -294,10 +337,10 @@ namespace Sdo.Commands
         {
             try
             {
-                var pat = Environment.GetEnvironmentVariable("AZURE_DEVOPS_PAT");
+                var pat = await GetAuthenticationTokenAsync(Platform.AzureDevOps);
                 if (string.IsNullOrEmpty(pat))
                 {
-                    ConsoleHelper.WriteLine("X AZURE_DEVOPS_PAT environment variable not set", ConsoleColor.Red);
+                    ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
                     return 1;
                 }
 
@@ -337,13 +380,9 @@ namespace Sdo.Commands
         /// Handles listing work items with filtering.
         /// </summary>
         private async Task<int> ListWorkItems(string? type, string? state, string? assignedTo, 
-            bool assignedToMe, int top, bool verbose)
+            bool assignedToMe, string? areaPath, string? iteration, int top, bool verbose)
         {
-            // Use default value of 50 if top is not specified (0 is the default for int)
-            if (top <= 0)
-            {
-                top = 50;
-            }
+            // Do not assign a blanket default here; choose per-platform after detection
 
             try
             {
@@ -353,6 +392,43 @@ namespace Sdo.Commands
                 }
 
                 var platform = _platformDetector.DetectPlatform();
+                // Build and display equivalent external command mapping (gh / az) when verbose
+                string mappingCmd = string.Empty;
+                if (platform == Platform.GitHub)
+                {
+                    var repoInfo = _platformDetector.GetRepositoryInfo();
+                    var repoPart = repoInfo != null && !string.IsNullOrEmpty(repoInfo.Owner) && !string.IsNullOrEmpty(repoInfo.Repo)
+                        ? $"--repo {repoInfo.Owner}/{repoInfo.Repo}"
+                        : string.Empty;
+
+                    string ghState = "open";
+                    if (!string.IsNullOrEmpty(state))
+                    {
+                        var parsed = WorkItemStateTranslator.ParseState(state);
+                        ghState = parsed.HasValue ? WorkItemStateTranslator.ToGitHubState(parsed.Value).ToLower() : state.ToLower();
+                    }
+
+                    if (repoInfo != null && !string.IsNullOrEmpty(repoInfo.Owner) && !string.IsNullOrEmpty(repoInfo.Repo))
+                    {
+                        mappingCmd = _mappingGenerator.IssueListGitHub(repoInfo.Owner, repoInfo.Repo, ghState, top);
+                    }
+                    else
+                    {
+                        mappingCmd = string.Empty;
+                    }
+                }
+                else if (platform == Platform.AzureDevOps)
+                {
+                    var org = _platformDetector.GetOrganization() ?? "(organization)";
+                    var project = _platformDetector.GetProject() ?? "(project)";
+                    var wiql = "SELECT [System.Id], [System.WorkItemType], [System.Title], [System.State], [System.CreatedDate], [System.ChangedDate] FROM WorkItems ORDER BY [System.ChangedDate] DESC";
+                    mappingCmd = _mappingGenerator.BoardsQueryAzure(org, project, wiql, top);
+                }
+
+                if (verbose && !string.IsNullOrEmpty(mappingCmd))
+                {
+                    ConsoleHelper.WriteLine(mappingCmd, ConsoleColor.Yellow);
+                }
 
                 if (verbose)
                 {
@@ -364,11 +440,19 @@ namespace Sdo.Commands
 
                 if (platform == Platform.GitHub)
                 {
+                    if (!string.IsNullOrEmpty(areaPath))
+                    {
+                        ConsoleHelper.WriteLine("✗ --area-path is only supported for Azure DevOps", ConsoleColor.Yellow);
+                    }
+                    if (!string.IsNullOrEmpty(iteration))
+                    {
+                        ConsoleHelper.WriteLine("✗ --iteration is only supported for Azure DevOps", ConsoleColor.Yellow);
+                    }
                     return await ListGitHubIssues(type, state, assignedTo, assignedToMe, top, verbose);
                 }
                 else if (platform == Platform.AzureDevOps)
                 {
-                    return await ListAzureDevOpsWorkItems(type, state, assignedTo, assignedToMe, top, verbose);
+                    return await ListAzureDevOpsWorkItems(type, state, assignedTo, assignedToMe, areaPath, iteration, top, verbose);
                 }
                 else
                 {
@@ -400,7 +484,14 @@ namespace Sdo.Commands
         {
             try
             {
-                var client = new GitHubClient();
+                var token = await GetAuthenticationTokenAsync(Platform.GitHub);
+                if (string.IsNullOrEmpty(token))
+                {
+                    ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
+                    return 1;
+                }
+
+                var client = new GitHubClient(token);
                 var repoInfo = _platformDetector.GetRepositoryInfo();
 
                 if (string.IsNullOrEmpty(repoInfo?.Owner) || string.IsNullOrEmpty(repoInfo?.Repo))
@@ -422,7 +513,23 @@ namespace Sdo.Commands
                     ConsoleHelper.WriteLine($"Fetching with perPage={pageSize} (filtering results to {top})", ConsoleColor.Green);
                 }
 
-                var issues = await client.ListIssuesAsync(repoInfo.Owner, repoInfo.Repo, pageSize);
+                // Determine which GitHub API state to request (open/closed/all)
+                string ghApiState = "open";
+                if (!string.IsNullOrEmpty(state))
+                {
+                    var parsed = WorkItemStateTranslator.ParseState(state);
+                    if (parsed.HasValue)
+                    {
+                        ghApiState = WorkItemStateTranslator.ToGitHubState(parsed.Value).ToLower();
+                    }
+                    else
+                    {
+                        // If user provided an API-valid value like 'closed' or 'all', use it
+                        ghApiState = state.ToLower();
+                    }
+                }
+
+                var issues = await client.ListIssuesAsync(repoInfo.Owner, repoInfo.Repo, pageSize, ghApiState, top);
 
                 if (issues == null)
                 {
@@ -435,15 +542,54 @@ namespace Sdo.Commands
                 }
 
                 // Filter issues by state
-                if (string.IsNullOrEmpty(state))
+                if (!string.IsNullOrEmpty(state))
                 {
-                    // Default: exclude closed issues
-                    issues = issues.Where(i => i.State?.ToLower() != "closed").ToList();
+                    // Map user-provided state (e.g., Done) to GitHub state (open/closed)
+                    var parsedState = WorkItemStateTranslator.ParseState(state);
+                    if (parsedState.HasValue)
+                    {
+                        var ghState = WorkItemStateTranslator.ToGitHubState(parsedState.Value).ToLower();
+                        issues = issues.Where(i => (i.State ?? "").ToLower() == ghState).ToList();
+                    }
+                    else
+                    {
+                        // Fallback to literal comparison if parsing failed
+                        issues = issues.Where(i => (i.State ?? "").ToLower() == state.ToLower()).ToList();
+                    }
                 }
                 else
                 {
-                    // Filter to specific state
-                    issues = issues.Where(i => i.State?.ToLower() == state.ToLower()).ToList();
+                    // Default: exclude closed issues
+                    issues = issues.Where(i => (i.State ?? "").ToLower() != "closed").ToList();
+                }
+
+                // Filter by type if specified (for GitHub, type could be used with labels in future)
+                if (!string.IsNullOrEmpty(type))
+                {
+                    // For now, type filter on GitHub is a no-op as GitHub doesn't have issue types like Azure DevOps
+                    // This is here for consistency and future enhancement when labels are used as types
+                    if (verbose)
+                    {
+                        ConsoleHelper.WriteLine($"Note: --type filter not fully implemented for GitHub issues", ConsoleColor.Yellow);
+                    }
+                }
+
+                // Filter by assigned-to if specified
+                if (!string.IsNullOrEmpty(assignedTo))
+                {
+                    issues = issues.Where(i => !string.IsNullOrEmpty(i.Assignee?.Login) &&
+                        i.Assignee.Login.Equals(assignedTo, StringComparison.OrdinalIgnoreCase)).ToList();
+                }
+
+                // Filter by assigned-to-me if specified
+                if (assignedToMe)
+                {
+                    var currentUser = await client.GetUserAsync();
+                    if (!string.IsNullOrEmpty(currentUser?.Login))
+                    {
+                        issues = issues.Where(i => !string.IsNullOrEmpty(i.Assignee?.Login) &&
+                            i.Assignee.Login.Equals(currentUser.Login, StringComparison.OrdinalIgnoreCase)).ToList();
+                    }
                 }
 
                 // Limit to requested number
@@ -451,13 +597,14 @@ namespace Sdo.Commands
                 {
                     issues = issues.Take(top).ToList();
                 }
-
-                if (!issues.Any())
+                // If there are no issues after filtering, report and exit
+                if (issues == null || !issues.Any())
                 {
-                    ConsoleHelper.WriteLine("No issues found", ConsoleColor.Red);
+                    Console.WriteLine("No issues found");
                     return 0;
                 }
 
+                // Display results
                 DisplayIssuesList(issues);
                 return 0;
             }
@@ -466,20 +613,20 @@ namespace Sdo.Commands
                 ConsoleHelper.WriteLine($"X Failed to list GitHub issues: {ex.Message}", ConsoleColor.Red);
                 return 1;
             }
-        }
 
+        }
         /// <summary>
         /// Lists Azure DevOps work items with filtering.
         /// </summary>
         private async Task<int> ListAzureDevOpsWorkItems(string? type, string? state, string? assignedTo,
-            bool assignedToMe, int top, bool verbose)
+            bool assignedToMe, string? areaPath, string? iteration, int top, bool verbose)
         {
             try
             {
-                var pat = Environment.GetEnvironmentVariable("AZURE_DEVOPS_PAT");
+                var pat = await GetAuthenticationTokenAsync(Platform.AzureDevOps);
                 if (string.IsNullOrEmpty(pat))
                 {
-                    ConsoleHelper.WriteLine("X AZURE_DEVOPS_PAT environment variable not set", ConsoleColor.Red);
+                    ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
                     return 1;
                 }
 
@@ -517,7 +664,7 @@ namespace Sdo.Commands
                     }
                 }
 
-                var workItems = await client.ListWorkItemsAsync(top);
+                var workItems = await client.ListWorkItemsAsync(top, areaPath, iteration, verbose);
 
                 if (workItems == null)
                 {
@@ -558,11 +705,43 @@ namespace Sdo.Commands
                     return 0;
                 }
 
-                // Filter by state (only filter if explicitly requested)
+                // Filter by state
                 if (!string.IsNullOrEmpty(state))
                 {
-                    // Filter to specific state
+                    // Filter to specific state when requested
                     workItems = workItems.Where(w => w.State?.ToLower() == state.ToLower()).ToList();
+                }
+                else
+                {
+                    // Default: exclude done and closed items
+                    workItems = workItems.Where(w => w.State?.ToLower() is not ("done" or "closed")).ToList();
+                }
+
+                // Filter by type if specified
+                if (!string.IsNullOrEmpty(type))
+                {
+                    var normalizedType = NormalizeWorkItemType(type);
+                    workItems = workItems.Where(w => NormalizeWorkItemType(w.Type ?? "").Equals(normalizedType, StringComparison.OrdinalIgnoreCase)).ToList();
+                }
+
+                // Filter by assigned-to if specified
+                if (!string.IsNullOrEmpty(assignedTo))
+                {
+                    workItems = workItems.Where(w => !string.IsNullOrEmpty(w.AssignedTo) && 
+                        w.AssignedTo.Equals(assignedTo, StringComparison.OrdinalIgnoreCase)).ToList();
+                }
+
+                // Filter by assigned-to-me if specified
+                if (assignedToMe)
+                {
+                    workItems = workItems.Where(w => !string.IsNullOrEmpty(w.AssignedTo)).ToList();
+                    // Note: Actual filtering based on current user identity would require additional context
+                }
+
+                // Limit to requested number
+                if (top > 0 && workItems.Count > top)
+                {
+                    workItems = workItems.Take(top).ToList();
                 }
 
                 if (!workItems.Any())
@@ -630,18 +809,54 @@ namespace Sdo.Commands
                         return 1;
                     }
 
-                    using var client = new GitHubClient();
+                    var token = await GetAuthenticationTokenAsync(Platform.GitHub);
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
+                        return 1;
+                    }
+
+                    using var client = new GitHubClient(token);
 
                     if (verbose)
                     {
                         ConsoleHelper.WriteLine($"Updating GitHub issue #{id} in {repoInfo.Owner}/{repoInfo.Repo}...", ConsoleColor.Yellow);
                     }
 
-                    var result = await client.UpdateIssueAsync(repoInfo.Owner!, repoInfo.Repo!, id, title, state, description, assignee);
+                    // Translate state to GitHub API format
+                    string? ghState = null;
+                    if (!string.IsNullOrEmpty(state))
+                    {
+                        var parsedState = WorkItemStateTranslator.ParseState(state);
+                        if (parsedState.HasValue)
+                        {
+                            ghState = WorkItemStateTranslator.ToGitHubState(parsedState.Value);
+                        }
+                        else
+                        {
+                            ConsoleHelper.WriteLine($"X Invalid state '{state}'. Valid states: {WorkItemStateTranslator.GetValidStatesForHelp()}", ConsoleColor.Red);
+                            return 1;
+                        }
+                    }
+
+                    if (verbose)
+                    {
+                        var mappingCmd = _mappingGenerator.IssueUpdateGitHub(repoInfo.Owner!, repoInfo.Repo!, id, title, ghState, description, assignee);
+                        if (!string.IsNullOrEmpty(mappingCmd)) _mappingPresenter.Present(mappingCmd);
+                    }
+
+                    var result = await client.UpdateIssueAsync(repoInfo.Owner!, repoInfo.Repo!, id, title, ghState, description, assignee);
 
                     if (result != null)
                     {
-                        ConsoleHelper.WriteLine($"✓ GitHub issue #{id} updated successfully", ConsoleColor.Green);
+                        if (!string.IsNullOrEmpty(ghState))
+                        {
+                            ConsoleHelper.WriteLine($"✓ GitHub issue #{id} updated successfully to state: {ghState}", ConsoleColor.Green);
+                        }
+                        else
+                        {
+                            ConsoleHelper.WriteLine($"✓ GitHub issue #{id} updated successfully", ConsoleColor.Green);
+                        }
                         if (verbose)
                         {
                             ConsoleHelper.WriteLine($"  Title: {result.Title}", ConsoleColor.Yellow);
@@ -652,16 +867,20 @@ namespace Sdo.Commands
                     else
                     {
                         ConsoleHelper.WriteLine($"X Failed to update GitHub issue #{id}", ConsoleColor.Red);
+                        if (!string.IsNullOrEmpty(ghState))
+                        {
+                            ConsoleHelper.WriteLine($"  Supported GitHub states: open, closed", ConsoleColor.Gray);
+                        }
                         return 1;
                     }
                 }
                 else if (platform == Platform.AzureDevOps)
                 {
                     // Get Azure DevOps configuration
-                    var pat = Environment.GetEnvironmentVariable("AZURE_DEVOPS_PAT");
+                    var pat = await GetAuthenticationTokenAsync(Platform.AzureDevOps);
                     if (string.IsNullOrEmpty(pat))
                     {
-                        ConsoleHelper.WriteLine("X AZURE_DEVOPS_PAT environment variable not set", ConsoleColor.Red);
+                        ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
                         return 1;
                     }
 
@@ -681,11 +900,40 @@ namespace Sdo.Commands
                         ConsoleHelper.WriteLine($"Updating Azure DevOps work item {id} in {organization}...", ConsoleColor.Yellow);
                     }
 
-                    var result = await client.UpdateWorkItemAsync(id, title, state, assignee, description);
+                    // Translate state to Azure DevOps format
+                    string? adoState = null;
+                    if (!string.IsNullOrEmpty(state))
+                    {
+                        var parsedState = WorkItemStateTranslator.ParseState(state);
+                        if (parsedState.HasValue)
+                        {
+                            adoState = WorkItemStateTranslator.ToAzureDevOpsState(parsedState.Value);
+                        }
+                        else
+                        {
+                            ConsoleHelper.WriteLine($"X Invalid state '{state}'. Valid states: {WorkItemStateTranslator.GetValidStatesForHelp()}", ConsoleColor.Red);
+                            return 1;
+                        }
+                    }
+
+                    if (verbose)
+                    {
+                        var mappingCmd = _mappingGenerator.WorkItemUpdateAzure(organization, project ?? string.Empty, id, title, adoState, assignee, description);
+                        if (!string.IsNullOrEmpty(mappingCmd)) _mappingPresenter.Present(mappingCmd);
+                    }
+
+                    var result = await client.UpdateWorkItemAsync(id, title, adoState, assignee, description);
 
                     if (result != null)
                     {
-                        ConsoleHelper.WriteLine($"✓ Work item {id} updated successfully", ConsoleColor.Green);
+                        if (!string.IsNullOrEmpty(adoState))
+                        {
+                            ConsoleHelper.WriteLine($"✓ Work item {id} updated successfully to state: {adoState}", ConsoleColor.Green);
+                        }
+                        else
+                        {
+                            ConsoleHelper.WriteLine($"✓ Work item {id} updated successfully", ConsoleColor.Green);
+                        }
                         if (verbose)
                         {
                             ConsoleHelper.WriteLine($"  Title: {result.Title}", ConsoleColor.Yellow);
@@ -696,9 +944,9 @@ namespace Sdo.Commands
                     else
                     {
                         ConsoleHelper.WriteLine($"X Failed to update work item {id}", ConsoleColor.Red);
-                        if (!string.IsNullOrEmpty(client.LastError))
+                        if (!string.IsNullOrEmpty(adoState))
                         {
-                            ConsoleHelper.WriteLine($"  Error: {client.LastError}", ConsoleColor.Red);
+                            ConsoleHelper.WriteLine($"  Supported states: {WorkItemStateTranslator.GetValidStatesForHelp()}", ConsoleColor.Gray);
                         }
                         return 1;
                     }
@@ -770,7 +1018,14 @@ namespace Sdo.Commands
                         return 1;
                     }
 
-                    using var client = new GitHubClient();
+                    var token = await GetAuthenticationTokenAsync(Platform.GitHub);
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
+                        return 1;
+                    }
+
+                    using var client = new GitHubClient(token);
 
                     if (verbose)
                     {
@@ -793,10 +1048,10 @@ namespace Sdo.Commands
                 else if (platform == Platform.AzureDevOps)
                 {
                     // Get Azure DevOps configuration
-                    var pat = Environment.GetEnvironmentVariable("AZURE_DEVOPS_PAT");
+                    var pat = await GetAuthenticationTokenAsync(Platform.AzureDevOps);
                     if (string.IsNullOrEmpty(pat))
                     {
-                        ConsoleHelper.WriteLine("X AZURE_DEVOPS_PAT environment variable not set", ConsoleColor.Red);
+                        ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
                         return 1;
                     }
 
@@ -864,20 +1119,27 @@ namespace Sdo.Commands
         /// <param name="assignee">The assignee (optional).</param>
         /// <param name="verbose">Whether to enable verbose output.</param>
         /// <returns>Exit code.</returns>
-        private async Task<int> CreateWorkItem(string title, string type, string? description, string? assignee, bool verbose)
+        private async Task<int> CreateWorkItem(string? title, string? type, string? description, string? assignee, bool verbose, string? filePath = null, bool dryRun = false)
         {
             try
             {
-                if (string.IsNullOrEmpty(title))
+                // If a markdown file was provided, parse it and override values where present
+                List<string>? acceptanceCriteria = null;
+                WorkItemParseResult? parsed = null;
+                if (!string.IsNullOrEmpty(filePath))
                 {
-                    ConsoleHelper.WriteLine("X Title is required for creating a work item", ConsoleColor.Red);
-                    return 1;
-                }
+                    parsed = ParseWorkItemFromMarkdown(filePath);
+                    if (parsed == null)
+                    {
+                        ConsoleHelper.WriteLine($"X Failed to parse markdown file: {filePath}", ConsoleColor.Red);
+                        return 1;
+                    }
 
-                if (string.IsNullOrEmpty(type))
-                {
-                    ConsoleHelper.WriteLine("X Type is required for creating a work item (PBI, Bug, Task, etc.)", ConsoleColor.Red);
-                    return 1;
+                    if (!string.IsNullOrEmpty(parsed.Title)) title = parsed.Title;
+                    if (!string.IsNullOrEmpty(parsed.Description)) description = parsed.Description;
+                    if (string.IsNullOrEmpty(type) && parsed.Metadata != null && parsed.Metadata.TryGetValue("work_item_type", out var mt)) type = mt;
+                    if (!string.IsNullOrEmpty(parsed.Metadata?.GetValueOrDefault("assignee"))) assignee = parsed.Metadata.GetValueOrDefault("assignee");
+                    acceptanceCriteria = parsed.AcceptanceCriteria;
                 }
 
                 if (verbose)
@@ -887,9 +1149,31 @@ namespace Sdo.Commands
 
                 var platform = _platformDetector.DetectPlatform();
 
+                // Allow the markdown file to override detected platform via metadata 'target' or 'platform'
+                if (parsed?.Metadata != null)
+                {
+                    string? target = null;
+                    if (parsed.Metadata.TryGetValue("target", out var t1) && !string.IsNullOrEmpty(t1)) target = t1;
+                    else if (parsed.Metadata.TryGetValue("platform", out var t2) && !string.IsNullOrEmpty(t2)) target = t2;
+
+                    if (!string.IsNullOrEmpty(target))
+                    {
+                        var tl = target.ToLowerInvariant();
+                        if (tl.Contains("azdo") || tl.Contains("azure") || tl.Contains("devops")) platform = Platform.AzureDevOps;
+                        else if (tl.Contains("github") || tl.Contains("gh") || tl.Contains("git")) platform = Platform.GitHub;
+                    }
+                }
+
                 if (verbose)
                 {
                     Console.WriteLine($"Detected platform: {platform}");
+                }
+
+                // Validate required fields after parsing markdown
+                if (string.IsNullOrEmpty(title))
+                {
+                    ConsoleHelper.WriteLine("X Title is required for creating a work item (provide via markdown file)", ConsoleColor.Red);
+                    return 1;
                 }
 
                 if (platform == Platform.GitHub)
@@ -902,7 +1186,14 @@ namespace Sdo.Commands
                         return 1;
                     }
 
-                    using var client = new GitHubClient();
+                    var token = await GetAuthenticationTokenAsync(Platform.GitHub);
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
+                        return 1;
+                    }
+
+                    using var client = new GitHubClient(token);
 
                     if (verbose)
                     {
@@ -911,20 +1202,84 @@ namespace Sdo.Commands
                         ConsoleHelper.WriteLine($"  Description: {description ?? "(none)"}", ConsoleColor.Gray);
                     }
 
-                    // TODO: Implement GitHub issue creation in Phase 3.2
-                    ConsoleHelper.WriteLine("ℹ GitHub issue creation endpoint would be called here", ConsoleColor.Gray);
-                    ConsoleHelper.WriteLine($"  Title: {title}", ConsoleColor.Gray);
-                    ConsoleHelper.WriteLine($"  Description: {description ?? "(none)"}", ConsoleColor.Gray);
-                    ConsoleHelper.WriteLine("✓ GitHub issue created (placeholder - not yet implemented)", ConsoleColor.Green);
-                    return 0;
+                    // Show external mapping command when verbose (helpful for users migrating from CLI)
+                    if (verbose)
+                    {
+                        var mappingCmd = !string.IsNullOrEmpty(filePath)
+                            ? _mappingGenerator.IssueCreateGitHub(repoInfo.Owner, repoInfo.Repo, title, filePath, true)
+                            : _mappingGenerator.IssueCreateGitHub(repoInfo.Owner, repoInfo.Repo, title, description ?? string.Empty, false);
+
+                        if (!string.IsNullOrEmpty(mappingCmd))
+                            _mappingPresenter.Present(mappingCmd);
+                    }
+
+                    // Structured dry-run preview similar to Python CLI
+                    var labelsRaw = parsed?.Metadata?.GetValueOrDefault("labels");
+                    var labels = !string.IsNullOrEmpty(labelsRaw)
+                        ? labelsRaw.Split(',').Select(s => s.Trim()).Where(s => !string.IsNullOrEmpty(s)).ToArray()
+                        : Array.Empty<string>();
+
+                    if (dryRun)
+                    {
+                        ConsoleHelper.WriteLine("[dry-run] Would create GitHub issue with:", ConsoleColor.Gray);
+                        ConsoleHelper.WriteLine($"  Repository: {repoInfo.Owner}/{repoInfo.Repo}", ConsoleColor.Gray);
+                        ConsoleHelper.WriteLine($"  Title: {title}", ConsoleColor.Gray);
+                        ConsoleHelper.WriteLine($"  Labels: {(labels.Any() ? string.Join(", ", labels) : "(none)")}", ConsoleColor.Gray);
+                        ConsoleHelper.WriteLine("  Body:", ConsoleColor.Gray);
+                        if (!string.IsNullOrEmpty(description))
+                        {
+                            Console.WriteLine(description);
+                        }
+                        else
+                        {
+                            Console.WriteLine();
+                        }
+
+                        if (acceptanceCriteria != null && acceptanceCriteria.Any())
+                        {
+                            Console.WriteLine();
+                            ConsoleHelper.WriteLine("## Acceptance Criteria", ConsoleColor.Gray);
+                            foreach (var ac in acceptanceCriteria)
+                            {
+                                ConsoleHelper.WriteLine($"- [ ] {ac}", ConsoleColor.Gray);
+                            }
+                        }
+
+                        return 0;
+                    }
+
+                    // Build issue body with acceptance criteria appended (GitHub uses markdown)
+                    var issueBody = description ?? string.Empty;
+                    if (acceptanceCriteria != null && acceptanceCriteria.Any())
+                    {
+                        var acMarkdown = string.Join("\n", acceptanceCriteria.Select(ac => $"- [ ] {ac}"));
+                        if (!string.IsNullOrEmpty(issueBody))
+                            issueBody += $"\n\n## Acceptance Criteria\n{acMarkdown}";
+                        else
+                            issueBody = $"## Acceptance Criteria\n{acMarkdown}";
+                    }
+
+                    // Create the GitHub issue
+                    var createdIssue = await client.CreateIssueAsync(repoInfo.Owner!, repoInfo.Repo!, title, issueBody, labels.Any() ? labels : null);
+
+                    if (createdIssue != null)
+                    {
+                        ConsoleHelper.WriteLine($"✓ Created GitHub issue #{createdIssue.Number}: {title}", ConsoleColor.Green);
+                        if (!string.IsNullOrEmpty(createdIssue.HtmlUrl))
+                            ConsoleHelper.WriteLine($"   URL: {createdIssue.HtmlUrl}", ConsoleColor.Green);
+                        return 0;
+                    }
+
+                    ConsoleHelper.WriteLine("✗ Failed to create GitHub issue", ConsoleColor.Red);
+                    return 1;
                 }
                 else if (platform == Platform.AzureDevOps)
                 {
                     // Get Azure DevOps configuration
-                    var pat = Environment.GetEnvironmentVariable("AZURE_DEVOPS_PAT");
+                    var pat = await GetAuthenticationTokenAsync(Platform.AzureDevOps);
                     if (string.IsNullOrEmpty(pat))
                     {
-                        ConsoleHelper.WriteLine("X AZURE_DEVOPS_PAT environment variable not set", ConsoleColor.Red);
+                        ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
                         return 1;
                     }
 
@@ -948,14 +1303,53 @@ namespace Sdo.Commands
                         if (!string.IsNullOrEmpty(assignee)) ConsoleHelper.WriteLine($"  Assignee: {assignee}", ConsoleColor.Gray);
                     }
 
-                    // TODO: Implement Azure DevOps work item creation in Phase 3.2
-                    ConsoleHelper.WriteLine("ℹ Azure DevOps work item creation endpoint would be called here", ConsoleColor.Gray);
-                    ConsoleHelper.WriteLine($"  Title: {title}", ConsoleColor.Gray);
-                    ConsoleHelper.WriteLine($"  Type: {type}", ConsoleColor.Gray);
-                    ConsoleHelper.WriteLine($"  Description: {description ?? "(none)"}", ConsoleColor.Gray);
-                    if (!string.IsNullOrEmpty(assignee)) ConsoleHelper.WriteLine($"  Assignee: {assignee}", ConsoleColor.Gray);
-                    ConsoleHelper.WriteLine("✓ Azure DevOps work item created (placeholder - not yet implemented)", ConsoleColor.Green);
-                    return 0;
+                    // Show external mapping command when verbose
+                    if (verbose)
+                    {
+                        var mappingCmd = $"az boards work-item create --title \"{title}\" --type \"{type}\" --org \"{organization}\"";
+                        if (!string.IsNullOrEmpty(project)) mappingCmd += $" --project \"{project}\"";
+                        if (!string.IsNullOrEmpty(assignee)) mappingCmd += $" --assigned-to \"{assignee}\"";
+                        ConsoleHelper.WriteLine(mappingCmd, ConsoleColor.Yellow);
+                    }
+
+                    // Use new AzureDevOpsClient.CreateWorkItemAsync implementation
+                    if (verbose)
+                    {
+                        ConsoleHelper.WriteLine($"Creating Azure DevOps work item in {organization}/{project ?? "default"}...", ConsoleColor.Gray);
+                    }
+
+                    // Provide area/iteration if available in parsed metadata
+                    string? area = parsed?.Metadata?.GetValueOrDefault("area") ?? parsed?.Metadata?.GetValueOrDefault("area_path");
+                    string? iteration = parsed?.Metadata?.GetValueOrDefault("iteration") ?? parsed?.Metadata?.GetValueOrDefault("iteration_path");
+
+                    var result = await client.CreateWorkItemAsync(project ?? string.Empty, type ?? "PBI", title, description ?? string.Empty, acceptanceCriteria, assignee, area, iteration, dryRun, verbose);
+
+                    if (result != null)
+                    {
+                        // Dry-run preview returns a dictionary with 'dry_run' key
+                        if (result.TryGetValue("dry_run", out var dr) && dr is bool drb && drb)
+                        {
+                            ConsoleHelper.WriteLine("[dry-run] Azure DevOps preview complete", ConsoleColor.Gray);
+                            return 0;
+                        }
+
+                        if (result.TryGetValue("id", out var idObj))
+                        {
+                            ConsoleHelper.WriteLine($"✓ Work item {idObj} created successfully", ConsoleColor.Green);
+                            if (result.TryGetValue("url", out var urlObj) && urlObj != null)
+                            {
+                                ConsoleHelper.WriteLine($"  URL: {urlObj}", ConsoleColor.Yellow);
+                            }
+                            return 0;
+                        }
+                    }
+
+                    ConsoleHelper.WriteLine("X Failed to create work item", ConsoleColor.Red);
+                    if (!string.IsNullOrEmpty(client.LastError))
+                    {
+                        ConsoleHelper.WriteLine($"  Error: {client.LastError}", ConsoleColor.Red);
+                    }
+                    return 1;
                 }
                 else
                 {
@@ -1046,28 +1440,72 @@ namespace Sdo.Commands
         private void DisplayIssuesList(IEnumerable<GitHubIssue> issues)
         {
             var issueList = issues.ToList();
-            
-            Console.WriteLine();
-            Console.WriteLine($"📋 Issues ({issueList.Count} found):");
-            Console.WriteLine("-".PadRight(120, '-'));
-            Console.WriteLine($"{"#",-6} {"Title",-45} {"State",-7} {"Labels",-30} {"Assignee",-15}");
-            Console.WriteLine("-".PadRight(120, '-'));
 
+            Console.WriteLine($"gh Issues ({issueList.Count} found):");
+
+            // Define column widths for GitHub issues
+            const int numberWidth = 7;
+            const int titleWidth = 60;
+            const int stateWidth = 12;
+            const int labelsWidth = 30;
+            const int assigneeWidth = 15;
+            
+            int totalWidth = numberWidth + titleWidth + stateWidth + labelsWidth + assigneeWidth + 5; // +5 for separators
+
+            // Print header separator
+            Console.WriteLine(new string('-', totalWidth));
+
+            // Print column headers
+            Console.Write("#".PadRight(numberWidth));
+            Console.Write("Title".PadRight(titleWidth));
+            Console.Write("State".PadRight(stateWidth));
+            Console.Write("Labels".PadRight(labelsWidth));
+            Console.Write("Assignee".PadRight(assigneeWidth));
+            Console.WriteLine();
+
+            // Print header separator
+            Console.WriteLine(new string('-', totalWidth));
+
+            // Print data rows
             foreach (var issue in issueList)
             {
-                var title = (issue.Title ?? "").Length > 45 ? (issue.Title ?? "").Substring(0, 42) + "..." : issue.Title ?? "";
-                var state = (issue.State ?? "unknown").ToUpper();
-                var labels = issue.Labels != null && issue.Labels.Any() 
-                    ? string.Join(", ", issue.Labels.Select(l => l.Name)) 
+                // Truncate title if too long
+                string title = issue.Title ?? "";
+                string displayTitle = title.Length > titleWidth - 3
+                    ? title.Substring(0, titleWidth - 4) + "..."
+                    : title;
+
+                string labels = (issue.Labels != null && issue.Labels.Any())
+                    ? string.Join(", ", issue.Labels.Take(3).Select(l => l.Name))
                     : "";
-                labels = labels.Length > 30 ? labels.Substring(0, 27) + "..." : labels;
-                var assignee = issue.Assignee?.Login ?? "Unassigned";
-                
-                Console.WriteLine($"#{issue.Number,-5} {title,-45} {state,-7} {labels,-30} {assignee,-15}");
+                if (labels.Length > labelsWidth - 3)
+                {
+                    labels = labels.Substring(0, labelsWidth - 4) + "...";
+                }
+
+                string assignee = issue.Assignee?.Login ?? "Unassigned";
+
+                Console.Write(issue.Number.ToString().PadRight(numberWidth));
+                Console.Write(displayTitle.PadRight(titleWidth));
+                Console.Write((issue.State ?? "").ToUpper().PadRight(stateWidth));
+                Console.Write(labels.PadRight(labelsWidth));
+                Console.Write(assignee.PadRight(assigneeWidth));
+                Console.WriteLine();
             }
-            
-            Console.WriteLine("-".PadRight(120, '-'));
-            Console.WriteLine($"\n📊 Total: {issueList.Count} issue(s)");
+
+            // Print footer separator
+            Console.WriteLine(new string('-', totalWidth));
+
+            // Print summary by state
+            Console.WriteLine("\n Summary:");
+            var grouped = issueList.GroupBy(i => i.State ?? "Unknown")
+                .OrderByDescending(g => g.Count())
+                .ThenBy(g => g.Key);
+
+            foreach (var group in grouped)
+            {
+                Console.WriteLine($"  {group.Key.ToUpper()}: {group.Count()}");
+            }
         }
 
         /// <summary>
@@ -1076,35 +1514,234 @@ namespace Sdo.Commands
         private void DisplayWorkItemsList(IEnumerable<AzureDevOpsWorkItem> workItems)
         {
             var itemList = workItems.ToList();
-            
-            Console.WriteLine();
-            Console.WriteLine($"📋 Work Items ({itemList.Count} found):");
-            Console.WriteLine("-".PadRight(140, '-'));
-            Console.WriteLine($"{"ID",-6} {"Type",-20} {"Title",-35} {"State",-12} {"Sprint",-20} {"Assigned To",-15}");
-            Console.WriteLine("-".PadRight(140, '-'));
 
+            Console.WriteLine($"azdo Work Items ({itemList.Count} found):");
+
+            // Define column widths
+            const int idWidth = 7;
+            const int typeWidth = 21;
+            const int titleWidth = 35;
+            const int stateWidth = 12;
+            const int sprintWidth = 20;
+            const int assignedToWidth = 15;
+            
+            int totalWidth = idWidth + typeWidth + titleWidth + stateWidth + sprintWidth + assignedToWidth + 6; // +6 for separators
+
+            // Print header separator
+            Console.WriteLine(new string('-', totalWidth));
+
+            // Print column headers
+            Console.Write("ID".PadRight(idWidth));
+            Console.Write("Type".PadRight(typeWidth));
+            Console.Write("Title".PadRight(titleWidth));
+            Console.Write("State".PadRight(stateWidth));
+            Console.Write("Sprint".PadRight(sprintWidth));
+            Console.Write("Assigned To".PadRight(assignedToWidth));
+            Console.WriteLine();
+
+            // Print header separator
+            Console.WriteLine(new string('-', totalWidth));
+
+            // Print data rows
             foreach (var item in itemList)
             {
-                var type = (item.Type ?? "N/A");
-                var title = (item.Title ?? "").Length > 35 ? (item.Title ?? "").Substring(0, 32) + "..." : item.Title ?? "";
-                var state = (item.State ?? "N/A");
-                var sprint = item.Sprint ?? "";
-                sprint = sprint.Length > 20 ? sprint.Substring(0, 17) + "..." : sprint;
-                var assignedTo = item.AssignedTo ?? "Unassigned";
-                assignedTo = assignedTo.Length > 15 ? assignedTo.Substring(0, 12) + "..." : assignedTo;
-                
-                Console.WriteLine($"{item.Id,-6} {type,-20} {title,-35} {state,-12} {sprint,-20} {assignedTo,-15}");
+                // Truncate title if too long
+                string title = item.Title ?? "";
+                string displayTitle = title.Length > titleWidth - 3
+                    ? title.Substring(0, titleWidth - 4) + "..."
+                    : title;
+
+                string sprint = string.IsNullOrEmpty(item.Sprint) ? "Proto" : item.Sprint;
+                string assignedTo = item.AssignedTo ?? "Unassigned";
+
+                Console.Write(item.Id.ToString().PadRight(idWidth));
+                Console.Write((item.Type ?? "").PadRight(typeWidth));
+                Console.Write(displayTitle.PadRight(titleWidth));
+                Console.Write((item.State ?? "").PadRight(stateWidth));
+                Console.Write(sprint.PadRight(sprintWidth));
+                Console.Write(assignedTo.PadRight(assignedToWidth));
+                Console.WriteLine();
             }
-            
-            Console.WriteLine("-".PadRight(140, '-'));
-            Console.WriteLine($"\n📊 Summary:");
-            
-            // Summary by type
-            var typeCounts = itemList.GroupBy(x => x.Type ?? "Unknown").OrderBy(g => g.Key);
-            foreach (var typeGroup in typeCounts)
+
+            // Print footer separator
+            Console.WriteLine(new string('-', totalWidth));
+
+            // Print summary by type
+            Console.WriteLine("\n Summary:");
+            var grouped = itemList.GroupBy(w => w.Type ?? "Unknown")
+                .OrderByDescending(g => g.Count())
+                .ThenBy(g => g.Key);
+
+            foreach (var group in grouped)
             {
-                Console.WriteLine($"  {typeGroup.Key}: {typeGroup.Count()}");
+                Console.WriteLine($"  {group.Key}: {group.Count()}");
             }
+        }
+
+
+
+        private WorkItemParseResult? ParseWorkItemFromMarkdown(string filePath)
+        {
+            try
+            {
+                if (!File.Exists(filePath)) return null;
+
+                var lines = File.ReadAllLines(filePath);
+                var result = new WorkItemParseResult();
+
+                // Simple YAML frontmatter parse
+                int idx = 0;
+                if (lines.Length > 0 && lines[0].Trim() == "---")
+                {
+                    idx = 1;
+                    for (; idx < lines.Length; idx++)
+                    {
+                        var l = lines[idx];
+                        if (l.Trim() == "---") { idx++; break; }
+                        var sep = l.IndexOf(":");
+                        if (sep > 0)
+                        {
+                            var k = l.Substring(0, sep).Trim();
+                            var v = l.Substring(sep + 1).Trim().Trim('"');
+                            result.Metadata[k] = v;
+                        }
+                    }
+                }
+
+                // Title: first H1 or first non-empty line
+                for (int i = idx; i < lines.Length; i++)
+                {
+                    var l = lines[i].Trim();
+                    if (string.IsNullOrEmpty(result.Title) && l.StartsWith("# "))
+                    {
+                        result.Title = l.Substring(2).Trim();
+                        idx = i + 1;
+                        break;
+                    }
+                    if (string.IsNullOrEmpty(result.Title) && !string.IsNullOrEmpty(l) && !l.StartsWith("#"))
+                    {
+                        // treat first paragraph as title if no explicit H1
+                        result.Title = l;
+                        idx = i + 1;
+                        break;
+                    }
+                }
+
+                // After title, accept metadata lines in the form '## Key: Value'
+                int metaIndex = idx;
+                for (; metaIndex < lines.Length; metaIndex++)
+                {
+                    var line = lines[metaIndex].Trim();
+                    if (string.IsNullOrEmpty(line)) continue;
+                    if (line.StartsWith("##") && line.Contains(":"))
+                    {
+                        // Parse key/value and normalize key
+                        var kv = line.Substring(2).Trim();
+                        var sep = kv.IndexOf(":");
+                        if (sep > 0)
+                        {
+                            var key = kv.Substring(0, sep).Trim();
+                            var val = kv.Substring(sep + 1).Trim().Trim('"');
+                            var normKey = key.ToLowerInvariant().Replace(" ", "_");
+                            result.Metadata[normKey] = val;
+                            continue;
+                        }
+                    }
+                    // stop metadata block when encountering a non-meta line
+                    break;
+                }
+
+                // Collect description until 'Acceptance Criteria' header or end
+                var descLines = new List<string>();
+                for (int i = metaIndex; i < lines.Length; i++)
+                {
+                    var l = lines[i];
+                    if (l.Trim().StartsWith("##") && l.ToLower().Contains("acceptance"))
+                    {
+                        // parse acceptance criteria from following lines
+                        i++;
+                        for (; i < lines.Length; i++)
+                        {
+                            var ac = lines[i].Trim();
+                            if (string.IsNullOrEmpty(ac)) continue;
+                            if (ac.StartsWith("- [") || ac.StartsWith("- ") || ac.StartsWith("* [") || ac.StartsWith("*"))
+                            {
+                                // normalize checkbox formatting
+                                var cleaned = ac;
+                                // remove list marker
+                                if (cleaned.StartsWith("- ")) cleaned = cleaned.Substring(2).Trim();
+                                else if (cleaned.StartsWith("* ")) cleaned = cleaned.Substring(2).Trim();
+                                // remove checkbox
+                                if (cleaned.StartsWith("[ ]") || cleaned.StartsWith("[x]") || cleaned.StartsWith("[X]"))
+                                {
+                                    cleaned = cleaned.Substring(3).Trim();
+                                }
+                                // remove leading checkbox like [ ]
+                                if (cleaned.StartsWith("["))
+                                {
+                                    var r = cleaned.IndexOf(']');
+                                    if (r > 0) cleaned = cleaned.Substring(r + 1).Trim();
+                                }
+                                if (!string.IsNullOrEmpty(cleaned)) result.AcceptanceCriteria.Add(cleaned);
+                            }
+                            else if (lines[i].Trim().StartsWith("## "))
+                            {
+                                // next section
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                    else
+                    {
+                        descLines.Add(l);
+                    }
+                }
+
+                result.Description = string.Join(Environment.NewLine, descLines).Trim();
+
+                return result;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Normalizes work item type names to support aliases.
+        /// Maps abbreviations like "PBI" to their full names like "Product Backlog Item".
+        /// </summary>
+        private string NormalizeWorkItemType(string type)
+        {
+            if (string.IsNullOrEmpty(type))
+                return string.Empty;
+
+            return type.ToLower() switch
+            {
+                "pbi" => "product backlog item",
+                "task" => "task",
+                "bug" => "bug",
+                "epic" => "epic",
+                "spike" => "spike",
+                "feature" => "feature",
+                // Default: return lowercase for case-insensitive comparison
+                _ => type.ToLower()
+            };
+        }
+
+        private async Task<string?> GetAuthenticationTokenAsync(Platform platform)
+        {
+            var auth = new AuthenticationService();
+            if (platform == Platform.GitHub)
+            {
+                return await auth.GetGitHubTokenAsync();
+            }
+            else if (platform == Platform.AzureDevOps)
+            {
+                return await auth.GetAzureDevOpsTokenAsync();
+            }
+            return null;
         }
     }
 }

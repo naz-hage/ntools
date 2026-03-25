@@ -7,6 +7,8 @@
 // Sdo is a Simple DevOps Operations tool that provides unified operations
 // for Azure DevOps and GitHub work item and repository management.
 
+using Nbuild.Helpers;
+using NbuildTasks;
 using System.CommandLine;
 
 namespace Sdo
@@ -27,6 +29,8 @@ namespace Sdo
         /// <returns>Exit code: 0 for success, non-zero for errors.</returns>
         public static int Main(params string[] args)
         {
+            ConsoleHelper.WriteLine($"{Nversion.Get()}\n", ConsoleColor.Yellow);
+
             // Create the root command
             var rootCommand = new RootCommand("Simple DevOps Operations CLI tool for Azure DevOps and GitHub");
 
@@ -38,6 +42,7 @@ namespace Sdo
             // Add commands
             rootCommand.Subcommands.Add(new Commands.MapCommand(verboseOption));
             rootCommand.Subcommands.Add(new Commands.AuthCommand(verboseOption));
+            rootCommand.Subcommands.Add(new Commands.PullRequestCommand(verboseOption));
             rootCommand.Subcommands.Add(new Commands.RepositoryCommand(verboseOption));
             rootCommand.Subcommands.Add(new Commands.WorkItemCommand(verboseOption));
 

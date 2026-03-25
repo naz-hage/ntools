@@ -45,6 +45,179 @@ namespace Sdo.Services
         }
 
         /// <summary>
+        /// Adds a hyperlink relation to a work item pointing to a pull request web URL.
+        /// </summary>
+        /// <param name="workItemId">Work item numeric ID.</param>
+        /// <param name="prWebUrl">The user-facing pull request web URL.</param>
+        /// <returns>True if the link was added successfully, false otherwise.</returns>
+        public async Task<bool> LinkWorkItemAsync(int workItemId, int prId, string repositoryId)
+        {
+            // Try az CLI first (preferred - creates Development link)
+            try
+            {
+                var azArgs = $"repos pr work-item add --id {prId} --work-items {workItemId} --org https://dev.azure.com/{_organization} --project {System.Uri.EscapeDataString(_project ?? string.Empty)}";
+
+                var psi = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "az",
+                    Arguments = azArgs,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                using var proc = System.Diagnostics.Process.Start(psi);
+                if (proc != null)
+                {
+                    var stdout = await proc.StandardOutput.ReadToEndAsync();
+                    var stderr = await proc.StandardError.ReadToEndAsync();
+                    await proc.WaitForExitAsync();
+
+                    if (proc.ExitCode == 0)
+                    {
+                        return true;
+                    }
+
+                    // az failed - capture error and fall back to REST patch
+                    _lastError = $"az CLI failed: {stderr.Trim()}";
+                }
+                else
+                {
+                    _lastError = "Failed to start az CLI process";
+                }
+            }
+            catch (System.ComponentModel.Win32Exception)
+            {
+                _lastError = "Azure CLI (az) not found in PATH";
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"az CLI call exception: {ex.Message}";
+            }
+
+            // Fallback: try to create a Development-style ArtifactLink via REST (preferred over a plain Hyperlink)
+            try
+            {
+                if (string.IsNullOrEmpty(_project))
+                {
+                    _lastError = "Project not specified; cannot create ArtifactLink via REST fallback";
+                }
+                else
+                {
+                    // Fetch project GUID
+                    var projUrl = $"https://dev.azure.com/{_organization}/_apis/projects/{Uri.EscapeDataString(_project)}?api-version=7.0";
+                    var projResp = await _httpClient.GetAsync(projUrl);
+                    if (projResp.IsSuccessStatusCode)
+                    {
+                        var projContent = await projResp.Content.ReadAsStringAsync();
+                        var projObj = JsonSerializer.Deserialize<JsonElement>(projContent);
+                        var projectGuid = projObj.GetProperty("id").GetString();
+
+                        // Fetch repository GUID (repositoryId may be name or id)
+                        var repoUrl = $"https://dev.azure.com/{_organization}/{Uri.EscapeDataString(_project)}/_apis/git/repositories/{Uri.EscapeDataString(repositoryId)}?api-version=7.0";
+                        var repoResp = await _httpClient.GetAsync(repoUrl);
+                        if (repoResp.IsSuccessStatusCode)
+                        {
+                            var repoContent = await repoResp.Content.ReadAsStringAsync();
+                            var repoObj = JsonSerializer.Deserialize<JsonElement>(repoContent);
+                            var repoGuid = repoObj.GetProperty("id").GetString();
+
+                            if (!string.IsNullOrEmpty(projectGuid) && !string.IsNullOrEmpty(repoGuid))
+                            {
+                                // Construct ArtifactLink URL expected by Azure DevOps
+                                var artifactUrl = $"vstfs:///Git/PullRequestId/{projectGuid}%2F{repoGuid}%2F{prId}";
+                                var patchDoc = new[]
+                                {
+                                    new
+                                    {
+                                        op = "add",
+                                        path = "/relations/-",
+                                        value = new
+                                        {
+                                            rel = "ArtifactLink",
+                                            url = artifactUrl,
+                                            attributes = new { name = "Pull Request" }
+                                        }
+                                    }
+                                };
+
+                                var url = $"https://dev.azure.com/{_organization}/_apis/wit/workitems/{workItemId}?api-version=7.0";
+                                var content = new StringContent(JsonSerializer.Serialize(patchDoc), System.Text.Encoding.UTF8, "application/json-patch+json");
+                                var response = await _httpClient.PatchAsync(url, content);
+                                if (response.IsSuccessStatusCode)
+                                {
+                                    return true;
+                                }
+
+                                var errorContent = await response.Content.ReadAsStringAsync();
+                                _lastError = $"ArtifactLink patch failed ({response.StatusCode}): {response.ReasonPhrase}\n{errorContent}";
+                            }
+                            else
+                            {
+                                _lastError = "Failed to obtain project or repository GUIDs for ArtifactLink creation";
+                            }
+                        }
+                        else
+                        {
+                            var rc = await repoResp.Content.ReadAsStringAsync();
+                            _lastError = $"Failed to fetch repository info: {repoResp.StatusCode} {repoResp.ReasonPhrase}\n{rc}";
+                        }
+                    }
+                    else
+                    {
+                        var pc = await projResp.Content.ReadAsStringAsync();
+                        _lastError = $"Failed to fetch project info: {projResp.StatusCode} {projResp.ReasonPhrase}\n{pc}";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Exception linking work item (artifact fallback): {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+            }
+
+            // Final fallback: add a plain Hyperlink relation so the work item still points to the PR
+            try
+            {
+                var webUrl = $"https://dev.azure.com/{_organization}/{_project}/_git/{repositoryId}/pullrequest/{prId}";
+                var url = $"https://dev.azure.com/{_organization}/_apis/wit/workitems/{workItemId}?api-version=7.0";
+
+                var patchDoc = new[]
+                {
+                    new
+                    {
+                        op = "add",
+                        path = "/relations/-",
+                        value = new
+                        {
+                            rel = "Hyperlink",
+                            url = webUrl,
+                            attributes = new { comment = "Linked from SDO pull request" }
+                        }
+                    }
+                };
+
+                var content = new StringContent(JsonSerializer.Serialize(patchDoc), System.Text.Encoding.UTF8, "application/json-patch+json");
+                var response = await _httpClient.PatchAsync(url, content);
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    _lastError = $"Link work item failed ({response.StatusCode}): {response.ReasonPhrase}\n{errorContent}";
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Exception linking work item (fallback): {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Verifies the authentication token by making a request to the Azure DevOps API.
         /// </summary>
         /// <returns>True if authentication is successful, false otherwise.</returns>
@@ -121,11 +294,13 @@ namespace Sdo.Services
         }
 
         /// <summary>
-        /// Gets multiple work items in a single batch API call (more efficient than individual calls).
+        /// Gets multiple work items in batched API calls (avoiding URL length limits).
+        /// Splits large requests into chunks to stay under the HTTP URL length limit.
         /// </summary>
         /// <param name="workItemIds">The work item IDs to fetch.</param>
+        /// <param name="verbose">Whether to log verbose output to console.</param>
         /// <returns>List of work items.</returns>
-        private async Task<List<AzureDevOpsWorkItem>> GetWorkItemsBatchAsync(List<int> workItemIds)
+        private async Task<List<AzureDevOpsWorkItem>> GetWorkItemsBatchAsync(List<int> workItemIds, bool verbose = false)
         {
             try
             {
@@ -134,33 +309,90 @@ namespace Sdo.Services
                     return new List<AzureDevOpsWorkItem>();
                 }
 
-                // Azure DevOps batch API: GET /workitems?ids=1,2,3,...&$expand=all
-                var idsString = string.Join(",", workItemIds);
-                var url = $"https://dev.azure.com/{_organization}/_apis/wit/workitems?ids={idsString}&api-version=7.0&$expand=all";
+                // Azure DevOps batch API has URL length limits (~2000-8000 chars depending on server configuration)
+                // Each work item ID is 1-5 characters, plus a comma separator
+                // A conservative estimate: ~100-200 IDs per request is safe
+                const int batchSize = 100;
+                var allWorkItems = new List<AzureDevOpsWorkItem>();
+                var totalBatches = (workItemIds.Count + batchSize - 1) / batchSize;
 
-                var response = await _httpClient.GetAsync(url);
-
-                if (!response.IsSuccessStatusCode)
+                System.Diagnostics.Debug.WriteLine($"[GetWorkItemsBatchAsync] Fetching {workItemIds.Count} work items in {totalBatches} batch(es)");
+                if (verbose)
                 {
-                    System.Diagnostics.Debug.WriteLine($"Batch API error: {response.StatusCode}");
-                    return new List<AzureDevOpsWorkItem>();
+                    Console.WriteLine($"[GetWorkItemsBatchAsync] Fetching {workItemIds.Count} work items in {totalBatches} batch(es)");
                 }
 
-                var content = await response.Content.ReadAsStringAsync();
-                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                var result = JsonSerializer.Deserialize<BatchWorkItemsResponse>(content, options);
-
-                if (result?.Value == null)
+                // Process in batches to avoid URL length errors
+                for (int i = 0; i < workItemIds.Count; i += batchSize)
                 {
-                    return new List<AzureDevOpsWorkItem>();
+                    var batchIds = workItemIds.Skip(i).Take(batchSize).ToList();
+                    var batchNum = (i / batchSize) + 1;
+
+                    System.Diagnostics.Debug.WriteLine($"[GetWorkItemsBatchAsync] Processing batch {batchNum}/{totalBatches} ({batchIds.Count} items)");
+
+                    // Azure DevOps batch API: GET /workitems?ids=1,2,3,...&$expand=all
+                    // Include project in URL if specified (for proper access control)
+                    var idsString = string.Join(",", batchIds);
+                    string url;
+                    if (!string.IsNullOrEmpty(_project))
+                    {
+                        url = $"https://dev.azure.com/{_organization}/{_project}/_apis/wit/workitems?ids={idsString}&api-version=7.0&$expand=all";
+                    }
+                    else
+                    {
+                        url = $"https://dev.azure.com/{_organization}/_apis/wit/workitems?ids={idsString}&api-version=7.0&$expand=all";
+                    }
+
+                    System.Diagnostics.Debug.WriteLine($"[GetWorkItemsBatchAsync] Batch {batchNum} URL length: {url.Length} chars");
+
+                    var response = await _httpClient.GetAsync(url);
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        var errorContent = await response.Content.ReadAsStringAsync();
+                        var errorMsg = $"Batch API error on batch {batchNum}/{totalBatches}: {response.StatusCode} {response.ReasonPhrase}";
+                        System.Diagnostics.Debug.WriteLine($"[GetWorkItemsBatchAsync] {errorMsg}");
+                        System.Diagnostics.Debug.WriteLine($"[GetWorkItemsBatchAsync] Response: {errorContent}");
+                        if (verbose)
+                        {
+                            Console.WriteLine($"[GetWorkItemsBatchAsync] {errorMsg}");
+                        }
+                        // Continue with other batches instead of failing completely
+                        continue;
+                    }
+
+                    var content = await response.Content.ReadAsStringAsync();
+                    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                    var result = JsonSerializer.Deserialize<BatchWorkItemsResponse>(content, options);
+
+                    if (result?.Value != null && result.Value.Count > 0)
+                    {
+                        var batchItems = result.Value.Select(r => r.ToWorkItem()).ToList();
+                        allWorkItems.AddRange(batchItems);
+                        System.Diagnostics.Debug.WriteLine($"[GetWorkItemsBatchAsync] Batch {batchNum} fetched {batchItems.Count} items");
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine($"[GetWorkItemsBatchAsync] Batch {batchNum} returned no items");
+                    }
                 }
 
-                // Convert WorkItemResponse objects to AzureDevOpsWorkItem
-                return result.Value.Select(r => r.ToWorkItem()).ToList();
+                System.Diagnostics.Debug.WriteLine($"[GetWorkItemsBatchAsync] Total fetched: {allWorkItems.Count} work items");
+                if (verbose)
+                {
+                    Console.WriteLine($"[GetWorkItemsBatchAsync] Total fetched: {allWorkItems.Count} work items from {totalBatches} batch(es)");
+                }
+
+                return allWorkItems;
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error in batch fetch: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"[GetWorkItemsBatchAsync] Error in batch fetch: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"[GetWorkItemsBatchAsync] Exception: {ex}");
+                if (verbose)
+                {
+                    Console.WriteLine($"[GetWorkItemsBatchAsync] Error in batch fetch: {ex.Message}");
+                }
                 return new List<AzureDevOpsWorkItem>();
             }
         }
@@ -195,18 +427,93 @@ namespace Sdo.Services
         }
 
         /// <summary>
+        /// Gets work items linked to a pull request.
+        /// </summary>
+        /// <param name="projectId">Project ID or name.</param>
+        /// <param name="repositoryId">Repository ID or name.</param>
+        /// <param name="prId">Pull request ID.</param>
+        /// <returns>List of linked work items (may be empty).</returns>
+        public async Task<List<AzureDevOpsWorkItem>> GetPullRequestWorkItemsAsync(string projectId, string repositoryId, int prId)
+        {
+            var result = new List<AzureDevOpsWorkItem>();
+            try
+            {
+                var url = $"https://dev.azure.com/{_organization}/{projectId}/_apis/git/repositories/{repositoryId}/pullRequests/{prId}/workitems?api-version=7.0";
+                var response = await _httpClient.GetAsync(url);
+                if (!response.IsSuccessStatusCode)
+                {
+                    System.Diagnostics.Debug.WriteLine($"GetPullRequestWorkItemsAsync failed: {response.StatusCode} {response.ReasonPhrase}");
+                    return result;
+                }
+
+                var content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var doc = JsonSerializer.Deserialize<JsonElement>(content);
+                if (doc.ValueKind == JsonValueKind.Object && doc.TryGetProperty("value", out var arr) && arr.ValueKind == JsonValueKind.Array)
+                {
+                    foreach (var item in arr.EnumerateArray())
+                    {
+                        int id = 0;
+                        if (item.TryGetProperty("id", out var idProp) && idProp.ValueKind == JsonValueKind.Number)
+                        {
+                            id = idProp.GetInt32();
+                        }
+                        else if (item.TryGetProperty("url", out var urlProp) && urlProp.ValueKind == JsonValueKind.String)
+                        {
+                            var u = urlProp.GetString() ?? string.Empty;
+                            // extract trailing numeric id
+                            var parts = u.TrimEnd('/').Split('/');
+                            if (int.TryParse(parts.Last(), out var parsed)) id = parsed;
+                        }
+
+                        if (id > 0)
+                        {
+                            var wi = await GetWorkItemAsync(id);
+                            if (wi != null) result.Add(wi);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Exception in GetPullRequestWorkItemsAsync: {ex.Message}");
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// Lists Azure DevOps work items.
         /// </summary>
         /// <param name="top">Maximum number of items to return.</param>
+        /// <param name="areaPath">Optional area path filter (e.g., 'Project\Area\SubArea').</param>
+        /// <param name="iteration">Optional iteration path filter (e.g., 'Project\Sprint 1').</param>
+        /// <param name="verbose">Whether to log verbose output to console.</param>
         /// <returns>List of work items.</returns>
-        public async Task<List<AzureDevOpsWorkItem>?> ListWorkItemsAsync(int top = 50)
+        public async Task<List<AzureDevOpsWorkItem>?> ListWorkItemsAsync(int top = 50, string? areaPath = null, string? iteration = null, bool verbose = false)
         {
             try
             {
                 // Use WIQL query to get recent work items
+                var conditions = new List<string>();
+                
+                if (!string.IsNullOrEmpty(areaPath))
+                {
+                    // Use UNDER operator to include the area and all sub-areas
+                    conditions.Add($"[System.AreaPath] UNDER '{areaPath}'");
+                }
+                
+                if (!string.IsNullOrEmpty(iteration))
+                {
+                    // Use UNDER operator to include the iteration and all sub-iterations
+                    conditions.Add($"[System.IterationPath] UNDER '{iteration}'");
+                }
+
+                string whereClause = conditions.Count > 0 ? " WHERE " + string.Join(" AND ", conditions) : string.Empty;
+
                 var wiql = new
                 {
-                    query = $"SELECT [System.Id], [System.WorkItemType], [System.Title], [System.State], [System.CreatedDate], [System.ChangedDate] FROM WorkItems ORDER BY [System.ChangedDate] DESC"
+                    query = $"SELECT [System.Id], [System.WorkItemType], [System.Title], [System.State], [System.CreatedDate], [System.ChangedDate] FROM WorkItems{whereClause} ORDER BY [System.ChangedDate] DESC"
                 };
 
                 // Include project in URL if specified
@@ -239,23 +546,40 @@ namespace Sdo.Services
                 }
 
                 var responseContent = await response.Content.ReadAsStringAsync();
+                System.Diagnostics.Debug.WriteLine($"[ListWorkItemsAsync] Response Status: {response.StatusCode}");
                 System.Diagnostics.Debug.WriteLine($"[ListWorkItemsAsync] Response Content Length: {responseContent.Length}");
+                if (verbose)
+                {
+                    Console.WriteLine($"[ListWorkItemsAsync] Response Status: {response.StatusCode}");
+                    Console.WriteLine("[ListWorkItemsAsync] Response (truncated):");
+                    var preview = responseContent.Length > 2000 ? responseContent.Substring(0, 2000) + "..." : responseContent;
+                    Console.WriteLine(preview);
+                }
                 
                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                var queryResult = JsonSerializer.Deserialize<WorkItemQueryResult>(responseContent, options);
+                var queryResult = JsonSerializer.Deserialize<WorkItemQueryResult?>(responseContent, options);
 
-                System.Diagnostics.Debug.WriteLine($"[ListWorkItemsAsync] WorkItems Count: {queryResult?.WorkItems?.Count ?? 0}");
-
-                if (queryResult?.WorkItems == null || !queryResult.WorkItems.Any())
+                System.Diagnostics.Debug.WriteLine($"[ListWorkItemsAsync] WorkItems Count (wiql): {queryResult?.WorkItems?.Count ?? 0}");
+                if (verbose)
                 {
-                    return new List<AzureDevOpsWorkItem>();
+                    Console.WriteLine($"[ListWorkItemsAsync] WorkItems Count (wiql): {queryResult?.WorkItems?.Count ?? 0}");
                 }
 
-                // Fetch full details using batch API (more efficient than sequential calls)
-                var workItemIds = queryResult.WorkItems.Take(top).Select(w => w.Id).ToList();
-                var workItems = await GetWorkItemsBatchAsync(workItemIds);
+                // If WIQL returned a set of work item references, use them
+                if (queryResult?.WorkItems != null && queryResult.WorkItems.Any())
+                {
+                    var workItemIds = queryResult.WorkItems.Take(top > 0 ? top : queryResult.WorkItems.Count).Select(w => w.Id).ToList();
+                    var workItems = await GetWorkItemsBatchAsync(workItemIds, verbose);
+                    if (verbose)
+                    {
+                        Console.WriteLine($"[ListWorkItemsAsync] Fetched {workItems.Count} work items via batch API");
+                    }
+                    return workItems;
+                }
 
-                return workItems;
+                // If WIQL didn't return references, and parsing didn't yield items, return empty list
+                System.Diagnostics.Debug.WriteLine("[ListWorkItemsAsync] No work items parsed from WIQL response");
+                return new List<AzureDevOpsWorkItem>();
             }
             catch (Exception ex)
             {
@@ -414,6 +738,40 @@ namespace Sdo.Services
                 var url = $"https://dev.azure.com/{_organization}/_apis/wit/workitems/{workItemId}?api-version=7.0";
 
                 var content = JsonSerializer.Serialize(operations);
+                if (verbose)
+                {
+                    Console.WriteLine("[VERBOSE] JSON patch payload (per operation):");
+                    var optionsPretty = new JsonSerializerOptions { WriteIndented = true, PropertyNameCaseInsensitive = true };
+                    for (int i = 0; i < operations.Count; i++)
+                    {
+                        try
+                        {
+                            var opJson = JsonSerializer.Serialize(operations[i], optionsPretty);
+                            Console.WriteLine($"--- operation {i + 1} ---");
+                            Console.WriteLine(opJson);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"[VERBOSE] Failed to serialize operation {i + 1}: {ex.Message}");
+                        }
+                    }
+
+                    Console.WriteLine("[VERBOSE] Full payload string:");
+                    Console.WriteLine(content);
+
+                    try
+                    {
+                        var tmpPath = "C:\\temp\\sdo_create_payload.json";
+                        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(tmpPath)!);
+                        System.IO.File.WriteAllText(tmpPath, content);
+                        Console.WriteLine($"[VERBOSE] Wrote payload to {tmpPath}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[VERBOSE] Failed to write payload file: {ex.Message}");
+                    }
+                }
+
                 var request = new StringContent(content, System.Text.Encoding.UTF8, "application/json-patch+json");
 
                 if (verbose)
@@ -424,7 +782,8 @@ namespace Sdo.Services
                 if (!response.IsSuccessStatusCode)
                 {
                     var errorContent = await response.Content.ReadAsStringAsync();
-                    _lastError = $"Update failed: {response.StatusCode} {response.ReasonPhrase}\n{errorContent}";
+                    var errorMessage = ExtractErrorMessage(errorContent);
+                    _lastError = $"Update failed: {response.StatusCode} {response.ReasonPhrase}\n{errorMessage}";
                     if (verbose)
                         Console.WriteLine($"[VERBOSE] {_lastError}");
                     return null;
@@ -466,6 +825,28 @@ namespace Sdo.Services
                 var url = $"https://dev.azure.com/{_organization}/_apis/wit/workitems/{workItemId}?api-version=7.0";
 
                 var content = JsonSerializer.Serialize(operations);
+                if (verbose)
+                {
+                    Console.WriteLine("[VERBOSE] JSON patch payload (per operation):");
+                    var optionsPretty = new JsonSerializerOptions { WriteIndented = true, PropertyNameCaseInsensitive = true };
+                    for (int i = 0; i < operations.Count; i++)
+                    {
+                        try
+                        {
+                            var opJson = JsonSerializer.Serialize(operations[i], optionsPretty);
+                            Console.WriteLine($"--- operation {i + 1} ---");
+                            Console.WriteLine(opJson);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"[VERBOSE] Failed to serialize operation {i + 1}: {ex.Message}");
+                        }
+                    }
+
+                    Console.WriteLine("[VERBOSE] Full payload string:");
+                    Console.WriteLine(content);
+                }
+
                 var request = new StringContent(content, System.Text.Encoding.UTF8, "application/json-patch+json");
 
                 if (verbose)
@@ -589,6 +970,179 @@ namespace Sdo.Services
             catch (Exception ex)
             {
                 _lastError = $"Exception getting project: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Creates a new work item in the specified project.
+        /// </summary>
+        public async Task<Dictionary<string, object>?> CreateWorkItemAsync(
+            string project,
+            string workItemType,
+            string title,
+            string description,
+            List<string>? acceptanceCriteria = null,
+            string? assignee = null,
+            string? areaPath = null,
+            string? iterationPath = null,
+            bool dryRun = false,
+            bool verbose = false)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(project))
+                {
+                    _lastError = "Project must be specified for work item creation";
+                    return null;
+                }
+
+                // Normalize work item type
+                var encodedType = Uri.EscapeDataString(string.IsNullOrEmpty(workItemType) ? "PBI" : workItemType);
+
+                // Format description: remove markdown headers (##, ###, etc.) and convert markdown to HTML
+                var formattedDesc = description ?? string.Empty;
+                // Remove markdown headers (##, #, etc.)
+                formattedDesc = System.Text.RegularExpressions.Regex.Replace(formattedDesc, @"^#+\s+", "", System.Text.RegularExpressions.RegexOptions.Multiline);
+                // Convert **bold** to <strong>bold</strong>
+                formattedDesc = System.Text.RegularExpressions.Regex.Replace(formattedDesc, @"\*\*(.+?)\*\*", "<strong>$1</strong>");
+                // Replace line breaks with <br/>
+                formattedDesc = System.Text.RegularExpressions.Regex.Replace(formattedDesc, @"\r?\n", "<br/>");
+                var repoStepsHtml = formattedDesc;
+                
+                var acceptanceCriteriaHtml = string.Empty;
+                
+                if (acceptanceCriteria != null && acceptanceCriteria.Any())
+                {
+                    acceptanceCriteriaHtml = "<ul>" + string.Join("\n", acceptanceCriteria.Select(ac => $"<li>{System.Net.WebUtility.HtmlEncode(ac)}</li>")) + "</ul>";
+                }
+
+                if (dryRun)
+                {
+                    Console.WriteLine("[dry-run] Would create Azure DevOps work item with:");
+                    Console.WriteLine($"  Project: {project}");
+                    Console.WriteLine($"  Type: {workItemType}");
+                    Console.WriteLine($"  Title: {title}");
+                    Console.WriteLine("  Description/Repro Steps:");
+                    Console.WriteLine(repoStepsHtml);
+                    if (!string.IsNullOrEmpty(assignee)) Console.WriteLine($"  Assignee: {assignee}");
+                    if (acceptanceCriteria != null && acceptanceCriteria.Any())
+                    {
+                        Console.WriteLine($"  Acceptance Criteria: {acceptanceCriteria.Count} items");
+                        if (verbose)
+                        {
+                            for (int i = 0; i < acceptanceCriteria.Count; i++) Console.WriteLine($"   {i + 1}. {acceptanceCriteria[i]}");
+                        }
+                    }
+
+                    return new Dictionary<string, object> { { "dry_run", true }, { "title", title }, { "project", project } };
+                }
+
+                // Build JSON patch operations - write to form-displayed fields
+                var operations = new List<object>
+                {
+                    new { op = "add", path = "/fields/System.Title", value = title },
+                    new { op = "add", path = "/fields/Microsoft.VSTS.TCM.ReproSteps", value = repoStepsHtml }
+                };
+
+                // Add acceptance criteria to its own field (displayed in form)
+                if (!string.IsNullOrEmpty(acceptanceCriteriaHtml))
+                {
+                    operations.Add(new { op = "add", path = "/fields/Microsoft.VSTS.Common.AcceptanceCriteria", value = acceptanceCriteriaHtml });
+                }
+
+                // Only set AreaPath/IterationPath when explicitly provided
+                if (!string.IsNullOrEmpty(areaPath))
+                {
+                    operations.Add(new { op = "add", path = "/fields/System.AreaPath", value = areaPath });
+                }
+
+                if (!string.IsNullOrEmpty(iterationPath))
+                {
+                    operations.Add(new { op = "add", path = "/fields/System.IterationPath", value = iterationPath });
+                }
+
+                if (!string.IsNullOrEmpty(assignee))
+                {
+                    operations.Add(new { op = "add", path = "/fields/System.AssignedTo", value = assignee });
+                }
+
+                var url = $"https://dev.azure.com/{_organization}/{project}/_apis/wit/workitems/${encodedType}?api-version=7.1";
+
+                if (verbose)
+                {
+                    Console.WriteLine($"[VERBOSE] Creating work item via: {url}");
+                    Console.WriteLine($"[VERBOSE] Operations: {operations.Count}");
+                }
+
+                var content = JsonSerializer.Serialize(operations);
+                if (verbose)
+                {
+                    Console.WriteLine("[VERBOSE] JSON patch payload (per operation):");
+                    var optionsPretty = new JsonSerializerOptions { WriteIndented = true, PropertyNameCaseInsensitive = true };
+                    for (int i = 0; i < operations.Count; i++)
+                    {
+                        try
+                        {
+                            var opJson = JsonSerializer.Serialize(operations[i], optionsPretty);
+                            Console.WriteLine($"--- operation {i + 1} ---");
+                            Console.WriteLine(opJson);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"[VERBOSE] Failed to serialize operation {i + 1}: {ex.Message}");
+                        }
+                    }
+
+                    Console.WriteLine("[VERBOSE] Full payload string:");
+                    Console.WriteLine(content);
+                }
+
+                var request = new StringContent(content, System.Text.Encoding.UTF8, "application/json-patch+json");
+
+                var response = await _httpClient.PostAsync(url, request);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    var errorMessage = ExtractErrorMessage(error);
+                    _lastError = $"Create failed: {response.StatusCode} {response.ReasonPhrase}\n{errorMessage}";
+                    if (verbose) Console.WriteLine($"[VERBOSE] {_lastError}");
+                    return null;
+                }
+
+                var responseBody = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var doc = JsonSerializer.Deserialize<JsonElement>(responseBody, options);
+
+                int? id = null;
+                string? link = null;
+                try
+                {
+                    if (doc.TryGetProperty("id", out var idProp) && idProp.ValueKind == JsonValueKind.Number) id = idProp.GetInt32();
+                    if (doc.TryGetProperty("_links", out var links) && links.ValueKind == JsonValueKind.Object && links.TryGetProperty("html", out var html) && html.TryGetProperty("href", out var href)) link = href.GetString();
+                }
+                catch { }
+
+                if (id.HasValue)
+                {
+                    Console.WriteLine($"✅ Created {workItemType} #{id}: {title}");
+                    if (!string.IsNullOrEmpty(link)) Console.WriteLine($"   URL: {link}");
+                    var result = new Dictionary<string, object>();
+                    result["id"] = id.Value;
+                    if (!string.IsNullOrEmpty(link)) result["url"] = link;
+                    result["type"] = workItemType;
+                    result["title"] = title;
+                    return result;
+                }
+
+                _lastError = "Failed to parse work item creation response";
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Exception creating work item: {ex.Message}";
                 System.Diagnostics.Debug.WriteLine(_lastError);
                 return null;
             }
@@ -833,6 +1387,408 @@ namespace Sdo.Services
                 _lastError = $"Exception updating repository: {ex.Message}";
                 System.Diagnostics.Debug.WriteLine(_lastError);
                 return null;
+            }
+        }
+
+        /// <summary>
+        /// Creates a new pull request.
+        /// </summary>
+        /// <param name="projectId">Project ID or name.</param>
+        /// <param name="repositoryId">Repository ID or name.</param>
+        /// <param name="title">Pull request title (required).</param>
+        /// <param name="sourceRefName">Source branch name (required).</param>
+        /// <param name="targetRefName">Target branch name (required).</param>
+        /// <param name="description">Pull request description (optional).</param>
+        /// <returns>Created pull request details, or null if creation failed.</returns>
+        public async Task<Models.PullRequest?> CreatePullRequestAsync(string projectId, string repositoryId,
+            string title, string sourceRefName, string targetRefName, string? description = null)
+        {
+            try
+            {
+                var url = $"https://dev.azure.com/{_organization}/{projectId}/_apis/git/repositories/{repositoryId}/pullrequests?api-version=7.0";
+
+                var createData = new
+                {
+                    sourceRefName,
+                    targetRefName,
+                    title,
+                    description
+                };
+
+                var content = JsonSerializer.Serialize(createData);
+                var request = new StringContent(content, System.Text.Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync(url, request);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    _lastError = $"Create pull request failed ({response.StatusCode}): {response.ReasonPhrase}\n{errorContent}";
+                    return null;
+                }
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var prData = JsonSerializer.Deserialize<AzureDevOpsPullRequestResponse>(responseContent, options);
+
+                if (prData == null)
+                {
+                    _lastError = "Failed to parse pull request response";
+                    return null;
+                }
+
+                return new Models.PullRequest
+                {
+                    Number = prData.PullRequestId,
+                    Title = prData.Title,
+                    Description = prData.Description,
+                    Status = prData.Status,
+                    Url = $"https://dev.azure.com/{_organization}/{projectId}/_git/{repositoryId}/pullrequest/{prData.PullRequestId}",
+                    Author = prData.CreatedBy?.DisplayName,
+                    SourceBranch = prData.SourceRefName,
+                    TargetBranch = prData.TargetRefName,
+                    CreatedAt = prData.CreationDate,
+                    UpdatedAt = prData.CreationDate
+                };
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Exception creating pull request: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets details for a specific pull request.
+        /// </summary>
+        /// <param name="projectId">Project ID or name.</param>
+        /// <param name="repositoryId">Repository ID or name.</param>
+        /// <param name="prId">Pull request ID.</param>
+        /// <returns>Pull request details, or null if not found.</returns>
+        public async Task<Models.PullRequest?> GetPullRequestAsync(string projectId, string repositoryId, int prId)
+        {
+            try
+            {
+                var url = $"https://dev.azure.com/{_organization}/{projectId}/_apis/git/repositories/{repositoryId}/pullrequests/{prId}?api-version=7.0";
+                var response = await _httpClient.GetAsync(url);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    _lastError = $"Get pull request failed ({response.StatusCode}): {response.ReasonPhrase}\n{errorContent}";
+                    return null;
+                }
+
+                var content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var prData = JsonSerializer.Deserialize<AzureDevOpsPullRequestResponse>(content, options);
+
+                if (prData == null)
+                {
+                    _lastError = "Failed to parse pull request response";
+                    return null;
+                }
+
+                return new Models.PullRequest
+                {
+                    Number = prData.PullRequestId,
+                    Title = prData.Title,
+                    Description = prData.Description,
+                    Status = prData.Status,
+                    Url = $"https://dev.azure.com/{_organization}/{projectId}/_git/{repositoryId}/pullrequest/{prData.PullRequestId}",
+                    Author = prData.CreatedBy?.DisplayName,
+                    SourceBranch = prData.SourceRefName,
+                    TargetBranch = prData.TargetRefName,
+                    CreatedAt = prData.CreationDate,
+                    UpdatedAt = prData.CreationDate
+                };
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Exception getting pull request: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Lists pull requests for a repository.
+        /// </summary>
+        /// <param name="projectId">Project ID or name.</param>
+        /// <param name="repositoryId">Repository ID or name.</param>
+        /// <param name="status">Filter by status: 'active', 'completed', 'abandoned', 'all'. Default: 'active'.</param>
+        /// <param name="top">Maximum number of results to return. Default: 0 (all).</param>
+        /// <returns>List of pull requests, or null if operation failed.</returns>
+        public async Task<List<Models.PullRequest>?> ListPullRequestsAsync(string projectId, string repositoryId,
+            string status = "active", int top = 0)
+        {
+            try
+            {
+                var url = $"https://dev.azure.com/{_organization}/{projectId}/_apis/git/repositories/{repositoryId}/pullrequests?api-version=7.0";
+
+                var queryParams = new List<string> { $"searchCriteria.status={status}" };
+                if (top > 0)
+                {
+                    queryParams.Add($"$top={top}");
+                }
+
+                if (queryParams.Count > 0)
+                {
+                    url += "&" + string.Join("&", queryParams);
+                }
+
+                var response = await _httpClient.GetAsync(url);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _lastError = $"List pull requests failed: {response.StatusCode} {response.ReasonPhrase}";
+                    return null;
+                }
+
+                var content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var result = JsonSerializer.Deserialize<AzureDevOpsPullRequestListResponse>(content, options);
+
+                if (result == null || result.Value == null)
+                {
+                    return new List<Models.PullRequest>();
+                }
+
+                return result.Value.Select(pr => new Models.PullRequest
+                {
+                    Number = pr.PullRequestId,
+                    Title = pr.Title,
+                    Description = pr.Description,
+                    Status = pr.Status,
+                    Url = $"https://dev.azure.com/{_organization}/{projectId}/_git/{repositoryId}/pullrequest/{pr.PullRequestId}",
+                    Author = pr.CreatedBy?.DisplayName,
+                    SourceBranch = pr.SourceRefName,
+                    TargetBranch = pr.TargetRefName,
+                    CreatedAt = pr.CreationDate,
+                    UpdatedAt = pr.CreationDate
+                }).ToList();
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Exception listing pull requests: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Approves a pull request.
+        /// </summary>
+        /// <param name="projectId">Project ID or name.</param>
+        /// <param name="repositoryId">Repository ID or name.</param>
+        /// <param name="prId">Pull request ID.</param>
+        /// <returns>True if approval was successful, false otherwise.</returns>
+        public async Task<bool> ApprovePullRequestAsync(string projectId, string repositoryId, int prId)
+        {
+            try
+            {
+                var url = $"https://dev.azure.com/{_organization}/{projectId}/_apis/git/repositories/{repositoryId}/pullrequests/{prId}/reviewers?api-version=7.0";
+
+                // Get current user first to add as reviewer with approved vote
+                var userUrl = $"https://dev.azure.com/{_organization}/_apis/connectiondata?api-version=7.0";
+                var userResponse = await _httpClient.GetAsync(userUrl);
+
+                if (!userResponse.IsSuccessStatusCode)
+                {
+                    _lastError = "Failed to get current user for approval";
+                    return false;
+                }
+
+                var userData = await userResponse.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var connData = JsonSerializer.Deserialize<ConnectionData>(userData, options);
+
+                if (connData?.AuthenticatedUser?.Id == null)
+                {
+                    _lastError = "Could not determine current user ID";
+                    return false;
+                }
+
+                var reviewData = new { vote = 10 }; // 10 = approved in Azure DevOps
+                var content = JsonSerializer.Serialize(reviewData);
+                var request = new StringContent(content, System.Text.Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PutAsync(url, request);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _lastError = $"Approve pull request failed: {response.StatusCode} {response.ReasonPhrase}";
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Exception approving pull request: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Merges a pull request.
+        /// </summary>
+        /// <param name="projectId">Project ID or name.</param>
+        /// <param name="repositoryId">Repository ID or name.</param>
+        /// <param name="prId">Pull request ID.</param>
+        /// <returns>True if merge was successful, false otherwise.</returns>
+        public async Task<bool> MergePullRequestAsync(string projectId, string repositoryId, int prId)
+        {
+            try
+            {
+                var url = $"https://dev.azure.com/{_organization}/{projectId}/_apis/git/repositories/{repositoryId}/pullrequests/{prId}?api-version=7.0";
+
+                var mergeData = new { status = "completed" };
+                var content = JsonSerializer.Serialize(mergeData);
+                var request = new StringContent(content, System.Text.Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PatchAsync(url, request);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _lastError = $"Merge pull request failed: {response.StatusCode} {response.ReasonPhrase}";
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Exception merging pull request: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Updates a pull request.
+        /// </summary>
+        /// <param name="projectId">Project ID or name.</param>
+        /// <param name="repositoryId">Repository ID or name.</param>
+        /// <param name="prId">Pull request ID.</param>
+        /// <param name="title">New pull request title (optional).</param>
+        /// <param name="description">New pull request description (optional).</param>
+        /// <param name="status">New pull request status (optional).</param>
+        /// <returns>Updated pull request details, or null if update failed.</returns>
+        public async Task<Models.PullRequest?> UpdatePullRequestAsync(string projectId, string repositoryId,
+            int prId, string? title = null, string? description = null, string? status = null)
+        {
+            try
+            {
+                var url = $"https://dev.azure.com/{_organization}/{projectId}/_apis/git/repositories/{repositoryId}/pullrequests/{prId}?api-version=7.0";
+
+                var updateData = new Dictionary<string, object?>();
+                if (!string.IsNullOrEmpty(title))
+                    updateData["title"] = title;
+                if (!string.IsNullOrEmpty(description))
+                    updateData["description"] = description;
+                if (!string.IsNullOrEmpty(status))
+                    updateData["status"] = status;
+
+                var content = JsonSerializer.Serialize(updateData);
+                var request = new StringContent(content, System.Text.Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PatchAsync(url, request);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _lastError = $"Update pull request failed: {response.StatusCode} {response.ReasonPhrase}";
+                    return null;
+                }
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var prData = JsonSerializer.Deserialize<AzureDevOpsPullRequestResponse>(responseContent, options);
+
+                if (prData == null)
+                {
+                    return null;
+                }
+
+                // Construct a user-facing web URL instead of returning the API/REST URL
+                var webUrl = $"https://dev.azure.com/{_organization}/{projectId}/_git/{repositoryId}/pullrequest/{prData.PullRequestId}";
+
+                return new Models.PullRequest
+                {
+                    Number = prData.PullRequestId,
+                    Title = prData.Title,
+                    Description = prData.Description,
+                    Status = prData.Status,
+                    Url = webUrl,
+                    Author = prData.CreatedBy?.DisplayName,
+                    SourceBranch = prData.SourceRefName,
+                    TargetBranch = prData.TargetRefName,
+                    CreatedAt = prData.CreationDate,
+                    UpdatedAt = prData.CreationDate
+                };
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Exception updating pull request: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Extracts a user-friendly error message from Azure DevOps API error responses.
+        /// </summary>
+        /// <param name="errorJson">The full JSON error response from Azure DevOps API.</param>
+        /// <returns>A concise error message suitable for display to users.</returns>
+        private string ExtractErrorMessage(string errorJson)
+        {
+            try
+            {
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var doc = JsonSerializer.Deserialize<JsonElement>(errorJson, options);
+
+                // Try to extract the main "message" field first
+                if (doc.TryGetProperty("message", out var msg) && msg.ValueKind == JsonValueKind.String)
+                {
+                    var msgValue = msg.GetString();
+                    if (!string.IsNullOrEmpty(msgValue))
+                        return msgValue;
+                }
+
+                // Try customProperties.ErrorMessage
+                if (doc.TryGetProperty("customProperties", out var customProps) && 
+                    customProps.TryGetProperty("ErrorMessage", out var errorMsg) &&
+                    errorMsg.ValueKind == JsonValueKind.String)
+                {
+                    var errorMsgValue = errorMsg.GetString();
+                    if (!string.IsNullOrEmpty(errorMsgValue))
+                        return errorMsgValue;
+                }
+
+                // Try the first rule validation error message
+                if (doc.TryGetProperty("customProperties", out var cp2) &&
+                    cp2.TryGetProperty("RuleValidationErrors", out var ruleErrors) &&
+                    ruleErrors.ValueKind == JsonValueKind.Array)
+                {
+                    var firstError = ruleErrors.EnumerateArray().FirstOrDefault();
+                    if (firstError.TryGetProperty("errorMessage", out var firstErrorMsg) &&
+                        firstErrorMsg.ValueKind == JsonValueKind.String)
+                    {
+                        var firstErrorMsgValue = firstErrorMsg.GetString();
+                        if (!string.IsNullOrEmpty(firstErrorMsgValue))
+                            return firstErrorMsgValue;
+                    }
+                }
+
+                // Fallback: return truncated response
+                return errorJson.Length > 300 ? errorJson.Substring(0, 300) + "..." : errorJson;
+            }
+            catch
+            {
+                // If JSON parsing fails, return original
+                return errorJson;
             }
         }
 
@@ -1212,5 +2168,78 @@ namespace Sdo.Services
         /// Gets or sets the email address.
         /// </summary>
         public string? PreferredEmail { get; set; }
+    }
+
+    /// <summary>
+    /// Represents an Azure DevOps pull request API response.
+    /// </summary>
+    public class AzureDevOpsPullRequestResponse
+    {
+        /// <summary>
+        /// Gets or sets the pull request ID.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("pullRequestId")]
+        public int PullRequestId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the pull request title.
+        /// </summary>
+        public string? Title { get; set; }
+
+        /// <summary>
+        /// Gets or sets the pull request description.
+        /// </summary>
+        public string? Description { get; set; }
+
+        /// <summary>
+        /// Gets or sets the pull request status.
+        /// </summary>
+        public string? Status { get; set; }
+
+        /// <summary>
+        /// Gets or sets the source ref name (branch).
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("sourceRefName")]
+        public string? SourceRefName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the target ref name (branch).
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("targetRefName")]
+        public string? TargetRefName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the pull request URL.
+        /// </summary>
+        public string? Url { get; set; }
+
+        /// <summary>
+        /// Gets or sets creation date.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("creationDate")]
+        public DateTime CreationDate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the user who created the pull request.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("createdBy")]
+        public AzureDevOpsUser? CreatedBy { get; set; }
+    }
+
+    /// <summary>
+    /// Represents a list of Azure DevOps pull requests API response.
+    /// </summary>
+    public class AzureDevOpsPullRequestListResponse
+    {
+        /// <summary>
+        /// Gets or sets the list of pull requests.
+        /// </summary>
+        public List<AzureDevOpsPullRequestResponse>? Value { get; set; }
+
+        /// <summary>
+        /// Gets or sets the continuation token for pagination.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("continuationToken")]
+        public string? ContinuationToken { get; set; }
     }
 }

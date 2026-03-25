@@ -642,41 +642,43 @@ public class WorkItemCommandTests
     }
 
     [Fact]
-    public void CreateSubcommand_HasTitleOption()
+    public void CreateSubcommand_HasFilePathOption()
     {
         // Act
         var command = new WorkItemCommand(_verboseOption);
         var createCmd = Assert.Single(command.Subcommands, s => s.Name == "create");
 
         // Assert
-        var titleOption = Assert.Single(createCmd.Options, o => o.Name == "--title");
-        Assert.NotNull(titleOption);
+        var filePathOption = Assert.Single(createCmd.Options, o => o.Name == "--file-path");
+        Assert.NotNull(filePathOption);
+        Assert.Equal("Path to markdown file containing work item details", filePathOption.Description);
     }
 
     [Fact]
-    public void CreateSubcommand_HasTypeOption()
+    public void CreateSubcommand_HasDryRunOption()
     {
         // Act
         var command = new WorkItemCommand(_verboseOption);
         var createCmd = Assert.Single(command.Subcommands, s => s.Name == "create");
 
         // Assert
-        var typeOption = Assert.Single(createCmd.Options, o => o.Name == "--type");
-        Assert.NotNull(typeOption);
+        var dryRunOption = Assert.Single(createCmd.Options, o => o.Name == "--dry-run");
+        Assert.NotNull(dryRunOption);
+        Assert.Equal("Parse and preview work item creation without creating it", dryRunOption.Description);
     }
 
     [Fact]
-    public void CreateSubcommand_WithValidArguments_ReturnsExitCode()
+    public void CreateSubcommand_AcceptsFilePathAndDryRunTogether()
     {
         // Arrange
         var command = new WorkItemCommand(_verboseOption);
-        var args = new[] { "create", "--title", "New Issue", "--type", "Bug" };
+        var args = new[] { "create", "--file-path", "test-work-item.md", "--dry-run" };
 
         // Act
-        var result = command.Parse(args).Invoke();
-
+        var parseResult = command.Parse(args);
+        
         // Assert
-        Assert.True(result == 0 || result == 1, $"Expected exit code 0 or 1, got {result}");
+        Assert.Empty(parseResult.Errors); // Arguments should parse successfully
     }
 
     #endregion
