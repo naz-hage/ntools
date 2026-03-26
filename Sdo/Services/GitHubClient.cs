@@ -1049,6 +1049,89 @@ namespace Sdo.Services
         }
 
         /// <summary>
+        /// Lists workflows in a GitHub repository.
+        /// </summary>
+        /// <param name="owner">Repository owner.</param>
+        /// <param name="repo">Repository name.</param>
+        /// <returns>List of GitHub workflows, or null if request fails.</returns>
+        public async Task<List<GitHubWorkflow>?> ListWorkflowsAsync(string owner, string repo)
+        {
+            try
+            {
+                var url = $"https://api.github.com/repos/{owner}/{repo}/actions/workflows";
+                var response = await _httpClient.GetAsync(url);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    System.Diagnostics.Debug.WriteLine($"GitHub API error: {response.StatusCode} {response.ReasonPhrase}");
+                    return null;
+                }
+
+                var content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var workflowsResponse = JsonSerializer.Deserialize<WorkflowsResponse>(content, options);
+
+                return workflowsResponse?.Workflows;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error fetching GitHub workflows: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Creates a new GitHub Actions workflow from a YAML definition file.
+        /// Note: GitHub API does not provide direct workflow creation endpoint.
+        /// Returns true if file would be created (validation only); actual creation requires git commit/push.
+        /// </summary>
+        /// <param name="owner">The repository owner/organization.</param>
+        /// <param name="repo">The repository name.</param>
+        /// <param name="workflowName">The name for the workflow file (without path).</param>
+        /// <param name="yamlFilePath">The path to the workflow YAML file to be created.</param>
+        /// <returns>True if validation passed and workflow can be created via git commit, false otherwise.</returns>
+        public async Task<bool> CreateWorkflowAsync(string owner, string repo, string workflowName, string yamlFilePath)
+        {
+            try
+            {
+                // GitHub doesn't have a direct API to create workflows
+                // Workflows are created by committing YAML files to .github/workflows/
+                // This method validates that such a file can be created
+
+                if (!File.Exists(yamlFilePath))
+                {
+                    System.Diagnostics.Debug.WriteLine($"YAML file not found: {yamlFilePath}");
+                    return false;
+                }
+
+                var yamlContent = await File.ReadAllTextAsync(yamlFilePath);
+
+                if (string.IsNullOrWhiteSpace(yamlContent))
+                {
+                    System.Diagnostics.Debug.WriteLine("YAML file is empty");
+                    return false;
+                }
+
+                // Validate the repository exists and is accessible
+                var repoCheck = await GetRepositoryAsync(owner, repo);
+                if (repoCheck == null)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Repository {owner}/{repo} not found or not accessible");
+                    return false;
+                }
+
+                // Validation passed - workflow can be created
+                // The actual creation will happen when the file is committed and pushed to .github/workflows/
+                return true;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error validating workflow creation: {ex.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Disposes the HTTP client.
         /// </summary>
         public void Dispose()
@@ -1387,5 +1470,72 @@ namespace Sdo.Services
         /// </summary>
         [System.Text.Json.Serialization.JsonPropertyName("details_url")]
         public string? DetailsUrl { get; set; }
+    }
+
+    /// <summary>
+    /// Represents the workflows list response from GitHub API.
+    /// </summary>
+    public class WorkflowsResponse
+    {
+        /// <summary>
+        /// Gets or sets the list of workflows.
+        /// </summary>
+        public List<GitHubWorkflow>? Workflows { get; set; }
+    }
+
+    /// <summary>
+    /// Represents a GitHub Actions workflow.
+    /// </summary>
+    public class GitHubWorkflow
+    {
+        /// <summary>
+        /// Gets or sets the workflow ID.
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// Gets or sets the workflow node ID.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("node_id")]
+        public string? NodeId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the workflow name.
+        /// </summary>
+        public string? Name { get; set; }
+
+        /// <summary>
+        /// Gets or sets the workflow path.
+        /// </summary>
+        public string? Path { get; set; }
+
+        /// <summary>
+        /// Gets or sets the workflow state.
+        /// </summary>
+        public string? State { get; set; }
+
+        /// <summary>
+        /// Gets or sets the creation date.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("created_at")]
+        public DateTime? CreatedAt { get; set; }
+
+        /// <summary>
+        /// Gets or sets the last update date.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("updated_at")]
+        public DateTime? UpdatedAt { get; set; }
+
+        /// <summary>
+        /// Gets or sets the HTML URL.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("html_url")]
+        public string? HtmlUrl { get; set; }
+
+        /// <summary>
+        /// Gets or sets the badge URL.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("badge_url")]
+        public string? BadgeUrl { get; set; }
     }
 }

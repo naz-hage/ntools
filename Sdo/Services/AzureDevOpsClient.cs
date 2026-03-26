@@ -671,21 +671,21 @@ namespace Sdo.Services
                 // Test organization access
                 var orgUrl = $"https://dev.azure.com/{_organization}/_apis/projects?api-version=7.0";
                 var response = await _httpClient.GetAsync(orgUrl);
-                result["Organization Access"] = response.IsSuccessStatusCode ? "✓ Allowed" : "✗ Denied";
+                result["Organization Access"] = response.IsSuccessStatusCode ? "✓ Allowed" : "X Denied";
 
                 // Test project access if specified
                 if (!string.IsNullOrEmpty(_project))
                 {
                     var projectUrl = $"https://dev.azure.com/{_organization}/{_project}/_apis/teams?api-version=7.0";
                     var projectResponse = await _httpClient.GetAsync(projectUrl);
-                    result["Project Access"] = projectResponse.IsSuccessStatusCode ? "✓ Allowed" : "✗ Denied";
+                    result["Project Access"] = projectResponse.IsSuccessStatusCode ? "✓ Allowed" : "X Denied";
                 }
 
                 // Test Work Item Query access - this is what fails in workitem list
                 var wiqlUrl = $"https://dev.azure.com/{_organization}/_apis/wit/wiql?api-version=7.0";
                 var wiqlRequest = new StringContent("{\"query\":\"SELECT [System.Id] FROM WorkItems LIMIT 0\"}", System.Text.Encoding.UTF8, "application/json");
                 var wiqlResponse = await _httpClient.PostAsync(wiqlUrl, wiqlRequest);
-                result["Work Item Query Access"] = wiqlResponse.IsSuccessStatusCode ? "✓ Allowed" : "✗ Denied";
+                result["Work Item Query Access"] = wiqlResponse.IsSuccessStatusCode ? "✓ Allowed" : "X Denied";
 
                 return result;
             }
@@ -1793,6 +1793,108 @@ namespace Sdo.Services
         }
 
         /// <summary>
+        /// Creates a new build pipeline from a YAML definition.
+        /// </summary>
+        /// <param name="project">The project name.</param>
+        /// <param name="pipelineName">The name for the new pipeline.</param>
+        /// <param name="yamlFilePath">The path to the pipeline YAML file.</param>
+        /// <returns>The created build definition ID, or -1 if creation fails.</returns>
+        public async Task<int> CreatePipelineAsync(string project, string pipelineName, string yamlFilePath)
+        {
+            try
+            {
+                // Read YAML content
+                if (!File.Exists(yamlFilePath))
+                {
+                    _lastError = $"YAML file not found: {yamlFilePath}";
+                    return -1;
+                }
+
+                var yamlContent = await File.ReadAllTextAsync(yamlFilePath);
+
+                var url = $"https://dev.azure.com/{_organization}/{System.Uri.EscapeDataString(project)}/_apis/build/definitions?api-version=7.0";
+
+                // Create the build definition request body
+                var createData = new
+                {
+                    name = pipelineName,
+                    type = "build",
+                    process = new
+                    {
+                        yamlFilename = yamlFilePath,
+                        type = 2  // YAML process type
+                    },
+                    repository = new
+                    {
+                        type = "TfsGit"  // Azure DevOps Git repository
+                    }
+                };
+
+                var content = JsonSerializer.Serialize(createData);
+                var request = new StringContent(content, System.Text.Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync(url, request);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    _lastError = $"Create pipeline failed ({response.StatusCode}): {response.ReasonPhrase}\n{errorContent}";
+                    return -1;
+                }
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var pipelineData = JsonSerializer.Deserialize<AzureDevOpsBuildDefinition>(responseContent, options);
+
+                if (pipelineData == null)
+                {
+                    _lastError = "Failed to parse pipeline response";
+                    return -1;
+                }
+
+                return pipelineData.Id;
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Exception creating pipeline: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return -1;
+            }
+        }
+
+        /// <summary>
+        /// Lists build pipelines in a project.
+        /// </summary>
+        /// <param name="project">The project name.</param>
+        /// <returns>List of Azure DevOps build pipelines, or null if request fails.</returns>
+        public async Task<List<AzureDevOpsBuildDefinition>?> ListPipelinesAsync(string project)
+        {
+            try
+            {
+                var url = $"https://dev.azure.com/{_organization}/{System.Uri.EscapeDataString(project)}/_apis/build/definitions?api-version=7.0";
+                var response = await _httpClient.GetAsync(url);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _lastError = $"GitHub API error: {response.StatusCode} {response.ReasonPhrase}";
+                    return null;
+                }
+
+                var content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var pipelinesResponse = JsonSerializer.Deserialize<AzureDevOpsBuildDefinitionListResponse>(content, options);
+
+                return pipelinesResponse?.Value;
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Error fetching Azure DevOps pipelines: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return null;
+            }
+        }
+
+        /// <summary>
         /// Disposes the HTTP client.
         /// </summary>
         public void Dispose()
@@ -2235,6 +2337,82 @@ namespace Sdo.Services
         /// Gets or sets the list of pull requests.
         /// </summary>
         public List<AzureDevOpsPullRequestResponse>? Value { get; set; }
+
+        /// <summary>
+        /// Gets or sets the continuation token for pagination.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("continuationToken")]
+        public string? ContinuationToken { get; set; }
+    }
+
+    /// <summary>
+    /// Represents an Azure DevOps build definition (pipeline).
+    /// </summary>
+    public class AzureDevOpsBuildDefinition
+    {
+        /// <summary>
+        /// Gets or sets the pipeline ID.
+        /// </summary>
+        public int Id { get; set; }
+
+        /// <summary>
+        /// Gets or sets the pipeline name.
+        /// </summary>
+        public string? Name { get; set; }
+
+        /// <summary>
+        /// Gets or sets the pipeline folder path.
+        /// </summary>
+        public string? Path { get; set; }
+
+        /// <summary>
+        /// Gets or sets the pipeline type (e.g., "build").
+        /// </summary>
+        public string? Type { get; set; }
+
+        /// <summary>
+        /// Gets or sets the URL to the pipeline definition.
+        /// </summary>
+        public string? Url { get; set; }
+
+        /// <summary>
+        /// Gets or sets the revision number.
+        /// </summary>
+        public int Revision { get; set; }
+
+        /// <summary>
+        /// Gets or sets the quality level.
+        /// </summary>
+        public string? Quality { get; set; }
+
+        /// <summary>
+        /// Gets or sets the queue status (e.g., "enabled").
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("queueStatus")]
+        public string? QueueStatus { get; set; }
+
+        /// <summary>
+        /// Gets or sets the creation date.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("createdDate")]
+        public DateTime? CreatedDate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the last modified date.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("modifiedDate")]
+        public DateTime? ModifiedDate { get; set; }
+    }
+
+    /// <summary>
+    /// Represents a list of Azure DevOps build definitions API response.
+    /// </summary>
+    public class AzureDevOpsBuildDefinitionListResponse
+    {
+        /// <summary>
+        /// Gets or sets the list of build definitions.
+        /// </summary>
+        public List<AzureDevOpsBuildDefinition>? Value { get; set; }
 
         /// <summary>
         /// Gets or sets the continuation token for pagination.

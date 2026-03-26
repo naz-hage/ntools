@@ -106,7 +106,10 @@ namespace Sdo.Services
                     return new RepositoryInfo
                     {
                         Owner = _organization,
-                        Repo = _repository ?? _project
+                        Repo = _repository ?? _project,
+                        Organization = _organization,
+                        Project = _project,
+                        Repository = _repository ?? _project
                     };
                 }
 

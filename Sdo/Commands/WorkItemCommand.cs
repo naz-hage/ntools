@@ -442,11 +442,11 @@ namespace Sdo.Commands
                 {
                     if (!string.IsNullOrEmpty(areaPath))
                     {
-                        ConsoleHelper.WriteLine("✗ --area-path is only supported for Azure DevOps", ConsoleColor.Yellow);
+                        ConsoleHelper.WriteLine("X --area-path is only supported for Azure DevOps", ConsoleColor.Yellow);
                     }
                     if (!string.IsNullOrEmpty(iteration))
                     {
-                        ConsoleHelper.WriteLine("✗ --iteration is only supported for Azure DevOps", ConsoleColor.Yellow);
+                        ConsoleHelper.WriteLine("X --iteration is only supported for Azure DevOps", ConsoleColor.Yellow);
                     }
                     return await ListGitHubIssues(type, state, assignedTo, assignedToMe, top, verbose);
                 }
@@ -1270,7 +1270,7 @@ namespace Sdo.Commands
                         return 0;
                     }
 
-                    ConsoleHelper.WriteLine("✗ Failed to create GitHub issue", ConsoleColor.Red);
+                    ConsoleHelper.WriteLine("X Failed to create GitHub issue", ConsoleColor.Red);
                     return 1;
                 }
                 else if (platform == Platform.AzureDevOps)
