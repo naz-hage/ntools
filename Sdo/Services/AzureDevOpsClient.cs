@@ -1876,7 +1876,7 @@ namespace Sdo.Services
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    _lastError = $"GitHub API error: {response.StatusCode} {response.ReasonPhrase}";
+                    _lastError = $"Azure DevOps API error: {response.StatusCode} {response.ReasonPhrase}";
                     return null;
                 }
 
@@ -1895,529 +1895,324 @@ namespace Sdo.Services
         }
 
         /// <summary>
+        /// Gets a specific pipeline definition by ID.
+        /// </summary>
+        /// <param name="project">The project name.</param>
+        /// <param name="pipelineId">The pipeline definition ID.</param>
+        /// <returns>The pipeline definition, or null if request fails.</returns>
+        public async Task<AzureDevOpsBuildDefinition?> GetPipelineAsync(string project, int pipelineId)
+        {
+            try
+            {
+                var url = $"https://dev.azure.com/{_organization}/{System.Uri.EscapeDataString(project)}/_apis/build/definitions/{pipelineId}?api-version=7.0";
+                var response = await _httpClient.GetAsync(url);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _lastError = $"Get pipeline failed ({response.StatusCode}): {response.ReasonPhrase}";
+                    return null;
+                }
+
+                var content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                return JsonSerializer.Deserialize<AzureDevOpsBuildDefinition>(content, options);
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Error fetching Azure DevOps pipeline {pipelineId}: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets a specific pipeline definition by ID or exact name.
+        /// </summary>
+        /// <param name="project">The project name.</param>
+        /// <param name="pipelineIdOrName">Pipeline ID (numeric) or name.</param>
+        /// <returns>The pipeline definition, or null if not found.</returns>
+        public async Task<AzureDevOpsBuildDefinition?> GetPipelineAsync(string project, string pipelineIdOrName)
+        {
+            if (string.IsNullOrWhiteSpace(pipelineIdOrName))
+            {
+                _lastError = "Pipeline ID or name is required.";
+                return null;
+            }
+
+            if (int.TryParse(pipelineIdOrName, out var pipelineId))
+            {
+                return await GetPipelineAsync(project, pipelineId);
+            }
+
+            var pipelines = await ListPipelinesAsync(project);
+            if (pipelines == null || pipelines.Count == 0)
+            {
+                if (string.IsNullOrEmpty(_lastError))
+                {
+                    _lastError = "No pipelines found in this project.";
+                }
+                return null;
+            }
+
+            var match = pipelines.FirstOrDefault(p =>
+                string.Equals(p.Name, pipelineIdOrName, StringComparison.OrdinalIgnoreCase));
+
+            if (match == null)
+            {
+                _lastError = $"Pipeline not found by name: {pipelineIdOrName}";
+            }
+
+            return match;
+        }
+
+        /// <summary>
+        /// Deletes a build definition (pipeline) by numeric ID.
+        /// </summary>
+        /// <param name="project">The project name.</param>
+        /// <param name="pipelineId">The build definition ID.</param>
+        /// <returns>True if deletion succeeded (HTTP 204), false otherwise.</returns>
+        public async Task<bool> DeletePipelineAsync(string project, int pipelineId)
+        {
+            try
+            {
+                var url = $"https://dev.azure.com/{_organization}/{project}/_apis/build/definitions/{pipelineId}?api-version=7.0";
+                var response = await _httpClient.DeleteAsync(url);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    _lastError = $"Delete pipeline failed ({response.StatusCode}): {response.ReasonPhrase}\n{errorContent}";
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Exception deleting pipeline: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Deletes a build definition (pipeline) by numeric ID or name.
+        /// </summary>
+        /// <param name="project">The project name.</param>
+        /// <param name="pipelineIdOrName">Pipeline ID (numeric) or name.</param>
+        /// <returns>True if deletion succeeded, false otherwise.</returns>
+        public async Task<bool> DeletePipelineAsync(string project, string pipelineIdOrName)
+        {
+            if (string.IsNullOrWhiteSpace(pipelineIdOrName))
+            {
+                _lastError = "Pipeline ID or name is required.";
+                return false;
+            }
+
+            if (int.TryParse(pipelineIdOrName, out var pipelineId))
+            {
+                return await DeletePipelineAsync(project, pipelineId);
+            }
+
+            var pipeline = await GetPipelineAsync(project, pipelineIdOrName);
+            if (pipeline == null)
+            {
+                if (string.IsNullOrEmpty(_lastError))
+                {
+                    _lastError = $"Pipeline not found by name: {pipelineIdOrName}";
+                }
+                return false;
+            }
+
+            return await DeletePipelineAsync(project, pipeline.Id);
+        }
+
+        /// <summary>
+        /// Gets a specific build by ID.
+        /// </summary>
+        /// <param name="project">The project name.</param>
+        /// <param name="buildId">The build ID.</param>
+        /// <returns>Build details, or null if request fails.</returns>
+        public async Task<AzureDevOpsBuild?> GetBuildAsync(string project, int buildId)
+        {
+            try
+            {
+                var url = $"https://dev.azure.com/{_organization}/{System.Uri.EscapeDataString(project)}/_apis/build/builds/{buildId}?api-version=7.0";
+                var response = await _httpClient.GetAsync(url);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _lastError = $"Get build failed ({response.StatusCode}): {response.ReasonPhrase}";
+                    return null;
+                }
+
+                var content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                return JsonSerializer.Deserialize<AzureDevOpsBuild>(content, options);
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Error fetching Azure DevOps build {buildId}: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Lists builds in a project, optionally filtered by definition.
+        /// </summary>
+        /// <param name="project">The project name.</param>
+        /// <param name="top">Maximum number of builds to return.</param>
+        /// <param name="definitionId">Optional pipeline definition ID filter.</param>
+        /// <returns>List of builds, or null if request fails.</returns>
+        public async Task<List<AzureDevOpsBuild>?> ListBuildsAsync(string project, int top = 10, int? definitionId = null)
+        {
+            try
+            {
+                var safeTop = Math.Max(1, top);
+                var url = $"https://dev.azure.com/{_organization}/{System.Uri.EscapeDataString(project)}/_apis/build/builds?api-version=7.0&$top={safeTop}";
+                if (definitionId.HasValue)
+                {
+                    url += $"&definitions={definitionId.Value}";
+                }
+
+                var response = await _httpClient.GetAsync(url);
+                if (!response.IsSuccessStatusCode)
+                {
+                    _lastError = $"List builds failed ({response.StatusCode}): {response.ReasonPhrase}";
+                    return null;
+                }
+
+                var content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var buildsResponse = JsonSerializer.Deserialize<AzureDevOpsBuildListResponse>(content, options);
+                return buildsResponse?.Value;
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Error listing Azure DevOps builds: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Queues a new build for the specified pipeline definition.
+        /// </summary>
+        /// <param name="project">Project name.</param>
+        /// <param name="definitionId">Pipeline definition ID.</param>
+        /// <param name="branch">Branch to run (e.g. 'main' or 'refs/heads/main').</param>
+        /// <param name="parameters">Optional parameters dictionary (will be serialized to JSON string).</param>
+        /// <returns>New build ID on success, or -1 on failure.</returns>
+        public async Task<int> RunPipelineAsync(string project, int definitionId, string? branch = null, Dictionary<string, string>? parameters = null)
+        {
+            try
+            {
+                var url = $"https://dev.azure.com/{_organization}/{System.Uri.EscapeDataString(project)}/_apis/build/builds?api-version=7.0";
+
+                var payload = new Dictionary<string, object>
+                {
+                    ["definition"] = new { id = definitionId }
+                };
+
+                if (!string.IsNullOrWhiteSpace(branch))
+                {
+                    var refName = branch.StartsWith("refs/") ? branch : $"refs/heads/{branch}";
+                    payload["sourceBranch"] = refName;
+                }
+
+                if (parameters != null && parameters.Any())
+                {
+                    // Azure DevOps expects parameters as a JSON string
+                    payload["parameters"] = JsonSerializer.Serialize(parameters);
+                }
+
+                var content = new StringContent(JsonSerializer.Serialize(payload), System.Text.Encoding.UTF8, "application/json");
+                var response = await _httpClient.PostAsync(url, content);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    _lastError = $"Queue build failed ({response.StatusCode}): {response.ReasonPhrase}\n{errorContent}";
+                    return -1;
+                }
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var build = JsonSerializer.Deserialize<AzureDevOpsBuild>(responseContent, options);
+
+                return build?.Id ?? -1;
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Exception queuing build: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return -1;
+            }
+        }
+
+        /// <summary>
+        /// Retrieves and concatenates logs for a given build.
+        /// </summary>
+        /// <param name="project">Project name.</param>
+        /// <param name="buildId">Build/run ID.</param>
+        /// <returns>Concatenated log text, or null if failed.</returns>
+        public async Task<string?> GetBuildLogsAsync(string project, int buildId)
+        {
+            try
+            {
+                var listUrl = $"https://dev.azure.com/{_organization}/{System.Uri.EscapeDataString(project)}/_apis/build/builds/{buildId}/logs?api-version=7.0";
+                var listResp = await _httpClient.GetAsync(listUrl);
+                if (!listResp.IsSuccessStatusCode)
+                {
+                    var err = await listResp.Content.ReadAsStringAsync();
+                    _lastError = $"Failed to list logs for build {buildId}: {listResp.StatusCode} {listResp.ReasonPhrase}\n{err}";
+                    return null;
+                }
+
+                var listContent = await listResp.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var doc = JsonSerializer.Deserialize<JsonElement>(listContent, options);
+
+                if (!doc.TryGetProperty("value", out var arr) || arr.ValueKind != JsonValueKind.Array)
+                {
+                    _lastError = "No logs found for this build.";
+                    return null;
+                }
+
+                var sb = new System.Text.StringBuilder();
+                foreach (var item in arr.EnumerateArray())
+                {
+                    if (item.TryGetProperty("id", out var idProp) && idProp.ValueKind == JsonValueKind.Number)
+                    {
+                        var id = idProp.GetInt32();
+                        var logUrl = $"https://dev.azure.com/{_organization}/{System.Uri.EscapeDataString(project)}/_apis/build/builds/{buildId}/logs/{id}?api-version=7.0";
+                        var logResp = await _httpClient.GetAsync(logUrl);
+                        if (logResp.IsSuccessStatusCode)
+                        {
+                            var logText = await logResp.Content.ReadAsStringAsync();
+                            sb.AppendLine($"===== Log {id} =====");
+                            sb.AppendLine(logText);
+                        }
+                    }
+                }
+
+                return sb.ToString();
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Exception retrieving build logs: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return null;
+            }
+        }
+
+        /// <summary>
         /// Disposes the HTTP client.
         /// </summary>
         public void Dispose()
         {
             _httpClient.Dispose();
         }
-    }
-
-    /// <summary>
-    /// Represents an Azure DevOps project.
-    /// </summary>
-    public class AzureDevOpsProject
-    {
-        /// <summary>
-        /// Gets or sets the project ID.
-        /// </summary>
-        public string? Id { get; set; }
-
-        /// <summary>
-        /// Gets or sets the project name.
-        /// </summary>
-        public string? Name { get; set; }
-
-        /// <summary>
-        /// Gets or sets the project description.
-        /// </summary>
-        public string? Description { get; set; }
-
-        /// <summary>
-        /// Gets or sets the project URL.
-        /// </summary>
-        public string? Url { get; set; }
-
-        /// <summary>
-        /// Gets or sets the project state (e.g., 'wellFormed').
-        /// </summary>
-        public string? State { get; set; }
-    }
-
-    /// <summary>
-    /// Represents an Azure DevOps project API response.
-    /// </summary>
-    public class AzureDevOpsProjectResponse
-    {
-        /// <summary>
-        /// Gets or sets the project ID.
-        /// </summary>
-        public string? Id { get; set; }
-
-        /// <summary>
-        /// Gets or sets the project name.
-        /// </summary>
-        public string? Name { get; set; }
-
-        /// <summary>
-        /// Gets or sets the project description.
-        /// </summary>
-        public string? Description { get; set; }
-
-        /// <summary>
-        /// Gets or sets the project URL.
-        /// </summary>
-        public string? Url { get; set; }
-
-        /// <summary>
-        /// Gets or sets the project state.
-        /// </summary>
-        public string? State { get; set; }
-    }
-
-    /// <summary>
-    /// Represents a list of Azure DevOps projects API response.
-    /// </summary>
-    public class AzureDevOpsProjectListResponse
-    {
-        /// <summary>
-        /// Gets or sets the list of projects.
-        /// </summary>
-        public List<AzureDevOpsProjectResponse>? Value { get; set; }
-
-        /// <summary>
-        /// Gets or sets the continuation token for pagination.
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("continuationToken")]
-        public string? ContinuationToken { get; set; }
-    }
-
-    /// <summary>
-    /// Represents an Azure DevOps Git repository API response.
-    /// </summary>
-    public class AzureDevOpsRepositoryResponse
-    {
-        /// <summary>
-        /// Gets or sets the repository ID.
-        /// </summary>
-        public string? Id { get; set; }
-
-        /// <summary>
-        /// Gets or sets the repository name.
-        /// </summary>
-        public string? Name { get; set; }
-
-        /// <summary>
-        /// Gets or sets the repository URL.
-        /// </summary>
-        public string? Url { get; set; }
-
-        /// <summary>
-        /// Gets or sets the repository web URL.
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("webUrl")]
-        public string? WebUrl { get; set; }
-
-        /// <summary>
-        /// Gets or sets the default branch name.
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("defaultBranch")]
-        public string? DefaultBranch { get; set; }
-
-        /// <summary>
-        /// Gets or sets the repository size in bytes.
-        /// </summary>
-        public long Size { get; set; }
-    }
-
-    /// <summary>
-    /// Represents a list of Azure DevOps Git repositories API response.
-    /// </summary>
-    public class AzureDevOpsRepositoryListResponse
-    {
-        /// <summary>
-        /// Gets or sets the list of repositories.
-        /// </summary>
-        public List<AzureDevOpsRepositoryResponse>? Value { get; set; }
-
-        /// <summary>
-        /// Gets or sets the continuation token for pagination.
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("continuationToken")]
-        public string? ContinuationToken { get; set; }
-    }
-
-    /// <summary>
-    /// Represents a work item query result.
-    /// </summary>
-    public class WorkItemQueryResult
-    {
-        /// <summary>
-        /// Gets or sets the list of work items.
-        /// </summary>
-        public List<WorkItemReference>? WorkItems { get; set; }
-    }
-
-    /// <summary>
-    /// Represents a work item reference from a query.
-    /// </summary>
-    public class WorkItemReference
-    {
-        /// <summary>
-        /// Gets or sets the work item ID.
-        /// </summary>
-        public int Id { get; set; }
-
-        /// <summary>
-        /// Gets or sets the work item URL.
-        /// </summary>
-        public string? Url { get; set; }
-    }
-
-    /// <summary>
-    /// Represents the API response for a work item.
-    /// </summary>
-    public class WorkItemResponse
-    {
-        /// <summary>
-        /// Gets or sets the work item ID.
-        /// </summary>
-        public int Id { get; set; }
-
-        /// <summary>
-        /// Gets or sets the work item URL (top-level property from API response).
-        /// </summary>
-        public string? Url { get; set; }
-
-        /// <summary>
-        /// Gets or sets the work item fields.
-        /// </summary>
-        public Dictionary<string, object?>? Fields { get; set; }
-
-        /// <summary>
-        /// Converts to AzureDevOpsWorkItem.
-        /// </summary>
-        public AzureDevOpsWorkItem ToWorkItem()
-        {
-            var item = new AzureDevOpsWorkItem
-            {
-                Id = Id,
-                // Prefer top-level Url property, fall back to Fields if not available
-                Url = !string.IsNullOrEmpty(Url) ? Url :
-                    (Fields?.ContainsKey("System.Url") == true ? Fields["System.Url"]?.ToString() : null),
-            };
-
-            if (Fields != null)
-            {
-                item.Title = Fields.ContainsKey("System.Title") ? Fields["System.Title"]?.ToString() ?? "Unknown" : "Unknown";
-                item.Type = Fields.ContainsKey("System.WorkItemType") ? Fields["System.WorkItemType"]?.ToString() ?? "Unknown" : "Unknown";
-                item.State = Fields.ContainsKey("System.State") ? Fields["System.State"]?.ToString() ?? "New" : "New";
-                item.Description = Fields.ContainsKey("System.Description") ? Fields["System.Description"]?.ToString() : null;
-                
-                if (Fields.ContainsKey("System.CreatedDate") && DateTime.TryParse(Fields["System.CreatedDate"]?.ToString(), out var createdDate))
-                {
-                    item.CreatedDate = createdDate;
-                }
-
-                if (Fields.ContainsKey("System.ChangedDate") && DateTime.TryParse(Fields["System.ChangedDate"]?.ToString(), out var changedDate))
-                {
-                    item.ChangedDate = changedDate;
-                }
-
-                // Extract sprint/iteration path - get the last component after backslash
-                if (Fields.ContainsKey("System.IterationPath"))
-                {
-                    var iterationPath = Fields["System.IterationPath"]?.ToString();
-                    if (!string.IsNullOrEmpty(iterationPath) && iterationPath.Contains("\\"))
-                    {
-                        item.Sprint = iterationPath.Split("\\").LastOrDefault();
-                    }
-                    else if (!string.IsNullOrEmpty(iterationPath))
-                    {
-                        item.Sprint = iterationPath;
-                    }
-                }
-
-                // Extract assigned to user name
-                if (Fields.ContainsKey("System.AssignedTo"))
-                {
-                    var assignedToField = Fields["System.AssignedTo"];
-                    if (assignedToField != null)
-                    {
-                        // Try to handle as JsonElement with displayName property
-                        if (assignedToField is JsonElement jElement)
-                        {
-                            if (jElement.TryGetProperty("displayName", out var displayName))
-                            {
-                                item.AssignedTo = displayName.GetString();
-                            }
-                            else if (jElement.ValueKind == JsonValueKind.String)
-                            {
-                                item.AssignedTo = jElement.GetString();
-                            }
-                        }
-                        else
-                        {
-                            // Fallback: just convert to string
-                            item.AssignedTo = assignedToField.ToString();
-                        }
-                    }
-                }
-
-                // Comments count is typically in comments section, defaulting to 0
-                item.CommentCount = 0;
-            }
-
-            return item;
-        }
-    }
-
-    /// <summary>
-    /// Represents the batch API response for multiple work items.
-    /// </summary>
-    public class BatchWorkItemsResponse
-    {
-        /// <summary>
-        /// Gets or sets the list of work item responses.
-        /// </summary>
-        [JsonPropertyName("value")]
-        public List<WorkItemResponse>? Value { get; set; }
-    }
-
-    /// <summary>
-    /// Represents an Azure DevOps work item.
-    /// </summary>
-    public class AzureDevOpsWorkItem
-    {
-        /// <summary>
-        /// Gets or sets the work item ID.
-        /// </summary>
-        public int Id { get; set; }
-
-        /// <summary>
-        /// Gets or sets the work item title.
-        /// </summary>
-        public string? Title { get; set; }
-
-        /// <summary>
-        /// Gets or sets the work item type (PBI, Task, Bug, etc.).
-        /// </summary>
-        public string? Type { get; set; }
-
-        /// <summary>
-        /// Gets or sets the work item state (New, Approved, Committed, Done, etc.).
-        /// </summary>
-        public string? State { get; set; }
-
-        /// <summary>
-        /// Gets or sets the work item description.
-        /// </summary>
-        public string? Description { get; set; }
-
-        /// <summary>
-        /// Gets or sets the creation date.
-        /// </summary>
-        public DateTime CreatedDate { get; set; }
-
-        /// <summary>
-        /// Gets or sets the last change date.
-        /// </summary>
-        public DateTime ChangedDate { get; set; }
-
-        /// <summary>
-        /// Gets or sets the number of comments.
-        /// </summary>
-        public int CommentCount { get; set; }
-
-        /// <summary>
-        /// Gets or sets the work item URL.
-        /// </summary>
-        public string? Url { get; set; }
-
-        /// <summary>
-        /// Gets or sets the sprint/iteration name.
-        /// </summary>
-        public string? Sprint { get; set; }
-
-        /// <summary>
-        /// Gets or sets the assigned to user name.
-        /// </summary>
-        public string? AssignedTo { get; set; }
-    }
-
-    /// <summary>
-    /// Represents Azure DevOps connection data.
-    /// </summary>
-    public class ConnectionData
-    {
-        /// <summary>
-        /// Gets or sets the authenticated user.
-        /// </summary>
-        public AzureDevOpsUser? AuthenticatedUser { get; set; }
-    }
-
-    /// <summary>
-    /// Represents an Azure DevOps user.
-    /// </summary>
-    public class AzureDevOpsUser
-    {
-        /// <summary>
-        /// Gets or sets the user ID.
-        /// </summary>
-        public string? Id { get; set; }
-
-        /// <summary>
-        /// Gets or sets the username.
-        /// </summary>
-        public string? UniqueName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the display name.
-        /// </summary>
-        public string? DisplayName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the email address.
-        /// </summary>
-        public string? PreferredEmail { get; set; }
-    }
-
-    /// <summary>
-    /// Represents an Azure DevOps pull request API response.
-    /// </summary>
-    public class AzureDevOpsPullRequestResponse
-    {
-        /// <summary>
-        /// Gets or sets the pull request ID.
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("pullRequestId")]
-        public int PullRequestId { get; set; }
-
-        /// <summary>
-        /// Gets or sets the pull request title.
-        /// </summary>
-        public string? Title { get; set; }
-
-        /// <summary>
-        /// Gets or sets the pull request description.
-        /// </summary>
-        public string? Description { get; set; }
-
-        /// <summary>
-        /// Gets or sets the pull request status.
-        /// </summary>
-        public string? Status { get; set; }
-
-        /// <summary>
-        /// Gets or sets the source ref name (branch).
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("sourceRefName")]
-        public string? SourceRefName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the target ref name (branch).
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("targetRefName")]
-        public string? TargetRefName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the pull request URL.
-        /// </summary>
-        public string? Url { get; set; }
-
-        /// <summary>
-        /// Gets or sets creation date.
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("creationDate")]
-        public DateTime CreationDate { get; set; }
-
-        /// <summary>
-        /// Gets or sets the user who created the pull request.
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("createdBy")]
-        public AzureDevOpsUser? CreatedBy { get; set; }
-    }
-
-    /// <summary>
-    /// Represents a list of Azure DevOps pull requests API response.
-    /// </summary>
-    public class AzureDevOpsPullRequestListResponse
-    {
-        /// <summary>
-        /// Gets or sets the list of pull requests.
-        /// </summary>
-        public List<AzureDevOpsPullRequestResponse>? Value { get; set; }
-
-        /// <summary>
-        /// Gets or sets the continuation token for pagination.
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("continuationToken")]
-        public string? ContinuationToken { get; set; }
-    }
-
-    /// <summary>
-    /// Represents an Azure DevOps build definition (pipeline).
-    /// </summary>
-    public class AzureDevOpsBuildDefinition
-    {
-        /// <summary>
-        /// Gets or sets the pipeline ID.
-        /// </summary>
-        public int Id { get; set; }
-
-        /// <summary>
-        /// Gets or sets the pipeline name.
-        /// </summary>
-        public string? Name { get; set; }
-
-        /// <summary>
-        /// Gets or sets the pipeline folder path.
-        /// </summary>
-        public string? Path { get; set; }
-
-        /// <summary>
-        /// Gets or sets the pipeline type (e.g., "build").
-        /// </summary>
-        public string? Type { get; set; }
-
-        /// <summary>
-        /// Gets or sets the URL to the pipeline definition.
-        /// </summary>
-        public string? Url { get; set; }
-
-        /// <summary>
-        /// Gets or sets the revision number.
-        /// </summary>
-        public int Revision { get; set; }
-
-        /// <summary>
-        /// Gets or sets the quality level.
-        /// </summary>
-        public string? Quality { get; set; }
-
-        /// <summary>
-        /// Gets or sets the queue status (e.g., "enabled").
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("queueStatus")]
-        public string? QueueStatus { get; set; }
-
-        /// <summary>
-        /// Gets or sets the creation date.
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("createdDate")]
-        public DateTime? CreatedDate { get; set; }
-
-        /// <summary>
-        /// Gets or sets the last modified date.
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("modifiedDate")]
-        public DateTime? ModifiedDate { get; set; }
-    }
-
-    /// <summary>
-    /// Represents a list of Azure DevOps build definitions API response.
-    /// </summary>
-    public class AzureDevOpsBuildDefinitionListResponse
-    {
-        /// <summary>
-        /// Gets or sets the list of build definitions.
-        /// </summary>
-        public List<AzureDevOpsBuildDefinition>? Value { get; set; }
-
-        /// <summary>
-        /// Gets or sets the continuation token for pagination.
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("continuationToken")]
-        public string? ContinuationToken { get; set; }
     }
 }

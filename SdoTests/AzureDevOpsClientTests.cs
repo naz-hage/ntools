@@ -93,4 +93,44 @@ public class AzureDevOpsClientTests
         // Assert
         Assert.Null(user);
     }
+
+    [Fact]
+    public async Task AdHoc_GetPipelineAsync_WithConfiguredEnvironment_ReturnsPipeline()
+    {
+        // Arrange (ad hoc integration style)
+        var token = Environment.GetEnvironmentVariable("AZURE_DEVOPS_PAT");
+        var organization = Environment.GetEnvironmentVariable("AZURE_DEVOPS_ORG");
+        var project = Environment.GetEnvironmentVariable("AZURE_DEVOPS_PROJECT");
+
+        if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(organization) || string.IsNullOrEmpty(project))
+        {
+            return; // Skip if environment not configured
+        }
+
+        using var client = new AzureDevOpsClient(token, organization, project);
+
+        // Pick the first pipeline from live data, then fetch it by ID
+        var pipelines = await client.ListPipelinesAsync(project);
+        if (pipelines == null || pipelines.Count == 0)
+        {
+            return; // Skip if project has no pipelines
+        }
+
+        var first = pipelines[0];
+
+        // Act
+        var byId = await client.GetPipelineAsync(project, first.Id);
+        var byName = string.IsNullOrWhiteSpace(first.Name)
+            ? null
+            : await client.GetPipelineAsync(project, first.Name);
+
+        // Assert
+        Assert.NotNull(byId);
+        Assert.Equal(first.Id, byId!.Id);
+        if (!string.IsNullOrWhiteSpace(first.Name))
+        {
+            Assert.NotNull(byName);
+            Assert.Equal(first.Id, byName!.Id);
+        }
+    }
 }

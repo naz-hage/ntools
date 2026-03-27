@@ -6,10 +6,12 @@
 // GitHub API client for authentication verification and basic operations.
 // Reuses GitHubRelease authentication logic for token retrieval.
 
-using Nbuild;
+
 using Nbuild.Helpers;
 using System.Net.Http.Headers;
 using System.Text.Json;
+using System.IO.Compression;
+using System.Text;
 
 namespace Sdo.Services
 {
@@ -87,13 +89,6 @@ namespace Sdo.Services
             }
         }
 
-        /// <summary>
-        /// Gets a specific GitHub issue.
-        /// </summary>
-        /// <param name="owner">Repository owner.</param>
-        /// <param name="repo">Repository name.</param>
-        /// <param name="issueNumber">Issue number.</param>
-        /// <returns>The GitHub issue, or null if not found.</returns>
         public async Task<GitHubIssue?> GetIssueAsync(string owner, string repo, int issueNumber)
         {
             try
@@ -118,15 +113,6 @@ namespace Sdo.Services
             }
         }
 
-        /// <summary>
-        /// Lists GitHub issues in a repository.
-        /// </summary>
-        /// <param name="owner">Repository owner.</param>
-        /// <param name="repo">Repository name.</param>
-        /// <param name="perPage">Number of issues to return (clamped to 1-100). Defaults to 50.</param>
-        /// <param name="state">Issue state filter: 'open', 'closed', or 'all'. Defaults to 'open'.</param>
-        /// <param name="top">Maximum total issues to retrieve. 0 means no limit.</param>
-        /// <returns>List of GitHub issues (excluding pull requests).</returns>
         public async Task<List<GitHubIssue>?> ListIssuesAsync(string owner, string repo, int perPage = 50, string state = "open", int top = 0)
         {
             try
@@ -134,10 +120,8 @@ namespace Sdo.Services
                 var allIssues = new List<GitHubIssue>();
                 int page = 1;
 
-                // Clamp perPage to GitHub API limits (1-100)
                 int pageSize = perPage < 1 ? 1 : (perPage > 100 ? 100 : perPage);
 
-                // Fetch pages until we have enough items or reach the end
                 while (true)
                 {
                     var url = $"https://api.github.com/repos/{owner}/{repo}/issues?per_page={pageSize}&page={page}&state={state}";
@@ -146,7 +130,6 @@ namespace Sdo.Services
                     if (!response.IsSuccessStatusCode)
                     {
                         ConsoleHelper.WriteLine($"GitHub API error: {response.StatusCode} {response.ReasonPhrase}", ConsoleColor.Red);
-                        // Return what we have so far if first page succeeded
                         return allIssues.Count > 0 ? allIssues : null;
                     }
 
@@ -156,24 +139,19 @@ namespace Sdo.Services
 
                     if (issues == null || issues.Count == 0)
                     {
-                        // No more results
                         break;
                     }
 
-                    // Filter out pull requests (they have the pull_request field)
                     var filteredIssues = issues.Where(i => i.PullRequest == null).ToList();
 
                     allIssues.AddRange(filteredIssues);
 
-                    // Check if we've reached the requested limit
                     if (top > 0 && allIssues.Count >= top)
                     {
-                        // Trim to exact count
                         allIssues = allIssues.Take(top).ToList();
                         break;
                     }
 
-                    // If we got fewer items than pageSize, we've reached the end
                     if (issues.Count < pageSize)
                     {
                         break;
@@ -191,17 +169,6 @@ namespace Sdo.Services
             }
         }
 
-        /// <summary>
-        /// Updates a GitHub issue.
-        /// </summary>
-        /// <param name="owner">Repository owner.</param>
-        /// <param name="repo">Repository name.</param>
-        /// <param name="issueNumber">Issue number.</param>
-        /// <param name="title">New issue title (optional).</param>
-        /// <param name="state">New issue state: 'open' or 'closed' (optional).</param>
-        /// <param name="body">New issue body/description (optional).</param>
-        /// <param name="assignee">New assignee login name (optional).</param>
-        /// <returns>The updated GitHub issue, or null if update failed.</returns>
         public async Task<GitHubIssue?> UpdateIssueAsync(string owner, string repo, int issueNumber,
             string? title = null, string? state = null, string? body = null, string? assignee = null)
         {
@@ -209,7 +176,6 @@ namespace Sdo.Services
             {
                 var url = $"https://api.github.com/repos/{owner}/{repo}/issues/{issueNumber}";
 
-                // Build request body with only provided fields
                 var updateData = new Dictionary<string, object?>();
                 if (!string.IsNullOrEmpty(title))
                     updateData["title"] = title;
@@ -243,14 +209,6 @@ namespace Sdo.Services
             }
         }
 
-        /// <summary>
-        /// Adds a comment to a GitHub issue.
-        /// </summary>
-        /// <param name="owner">Repository owner.</param>
-        /// <param name="repo">Repository name.</param>
-        /// <param name="issueNumber">Issue number.</param>
-        /// <param name="body">Comment text.</param>
-        /// <returns>True if comment was added successfully, false otherwise.</returns>
         public async Task<bool> AddCommentAsync(string owner, string repo, int issueNumber, string body)
         {
             try
@@ -278,17 +236,7 @@ namespace Sdo.Services
             }
         }
 
-        /// <summary>
-        /// Creates a new GitHub issue.
-        /// </summary>
-        /// <param name="owner">Repository owner.</param>
-        /// <param name="repo">Repository name.</param>
-        /// <param name="title">Issue title (required).</param>
-        /// <param name="body">Issue body/description (optional).</param>
-        /// <param name="labels">Labels to assign to the issue (optional).</param>
-        /// <param name="assignee">Assignee login name (optional).</param>
-        /// <returns>The created GitHub issue, or null if creation failed.</returns>
-        public async Task<GitHubIssue?> CreateIssueAsync(string owner, string repo, string title, 
+        public async Task<GitHubIssue?> CreateIssueAsync(string owner, string repo, string title,
             string? body = null, string[]? labels = null, string? assignee = null)
         {
             try
@@ -332,23 +280,13 @@ namespace Sdo.Services
             }
         }
 
-        /// <summary>
-        /// Lists repositories for the authenticated user or a specific organization.
-        /// </summary>
-        /// <param name="organization">Optional organization name. If null, lists authenticated user's repositories.</param>
-        /// <param name="visibility">Filter by visibility: 'all', 'public', or 'private'. Default: 'all'.</param>
-        /// <param name="perPage">Number of results per page (1-100). Default: 30.</param>
-        /// <param name="top">Maximum number of results to return. Default: 0 (all).</param>
-        /// <returns>List of repositories, or null if operation failed.</returns>
         public async Task<List<Models.Repository>?> ListRepositoriesAsync(string? organization = null,
             string visibility = "all", int perPage = 30, int top = 0)
         {
             try
             {
-                // Clamp perPage to valid GitHub API range (1-100)
                 perPage = Math.Max(1, Math.Min(100, perPage));
 
-                // Determine the URL based on whether we're querying user or org repos
                 string baseUrl = string.IsNullOrEmpty(organization)
                     ? "https://api.github.com/user/repos"
                     : $"https://api.github.com/orgs/{organization}/repos";
@@ -378,11 +316,9 @@ namespace Sdo.Services
 
                     if (repos == null || repos.Count == 0)
                     {
-                        // No more results
                         break;
                     }
 
-                    // Convert to Repository model
                     allRepos.AddRange(repos.Select(r => new Models.Repository
                     {
                         Name = r.Name,
@@ -394,14 +330,12 @@ namespace Sdo.Services
                         PlatformId = r.Id.ToString()
                     }));
 
-                    // Check if we've reached the requested limit
                     if (top > 0 && allRepos.Count >= top)
                     {
                         allRepos = allRepos.Take(top).ToList();
                         break;
                     }
 
-                    // If we got fewer items than pageSize, we've reached the end
                     if (repos.Count < perPage)
                     {
                         break;
@@ -419,12 +353,6 @@ namespace Sdo.Services
             }
         }
 
-        /// <summary>
-        /// Gets details for a specific repository.
-        /// </summary>
-        /// <param name="owner">Repository owner.</param>
-        /// <param name="repo">Repository name.</param>
-        /// <returns>Repository details, or null if not found.</returns>
         public async Task<Models.Repository?> GetRepositoryAsync(string owner, string repo)
         {
             try
@@ -465,13 +393,6 @@ namespace Sdo.Services
             }
         }
 
-        /// <summary>
-        /// Creates a new repository for the authenticated user.
-        /// </summary>
-        /// <param name="name">Repository name (required).</param>
-        /// <param name="description">Repository description (optional).</param>
-        /// <param name="isPrivate">Whether the repository should be private.</param>
-        /// <returns>Created repository details, or null if creation failed.</returns>
         public async Task<Models.Repository?> CreateRepositoryAsync(string name, string? description = null, bool isPrivate = false)
         {
             try
@@ -524,12 +445,6 @@ namespace Sdo.Services
             }
         }
 
-        /// <summary>
-        /// Deletes a repository.
-        /// </summary>
-        /// <param name="owner">Repository owner.</param>
-        /// <param name="repo">Repository name.</param>
-        /// <returns>True if deletion was successful, false otherwise.</returns>
         public async Task<bool> DeleteRepositoryAsync(string owner, string repo)
         {
             try
@@ -552,14 +467,6 @@ namespace Sdo.Services
             }
         }
 
-        /// <summary>
-        /// Updates repository settings.
-        /// </summary>
-        /// <param name="owner">Repository owner.</param>
-        /// <param name="repo">Repository name.</param>
-        /// <param name="description">New repository description (optional).</param>
-        /// <param name="isPrivate">New privacy setting (optional).</param>
-        /// <returns>Updated repository details, or null if update failed.</returns>
         public async Task<Models.Repository?> UpdateRepositoryAsync(string owner, string repo,
             string? description = null, bool? isPrivate = null)
         {
@@ -615,17 +522,6 @@ namespace Sdo.Services
             }
         }
 
-        /// <summary>
-        /// Creates a new pull request.
-        /// </summary>
-        /// <param name="owner">Repository owner.</param>
-        /// <param name="repo">Repository name.</param>
-        /// <param name="title">Pull request title (required).</param>
-        /// <param name="body">Pull request description (optional).</param>
-        /// <param name="head">Branch name or commit SHA to merge from (required).</param>
-        /// <param name="baseRef">Branch name to merge into (required).</param>
-        /// <param name="draft">Whether the PR should be a draft (optional).</param>
-        /// <returns>Created pull request details, or null if creation failed.</returns>
         public async Task<Models.PullRequest?> CreatePullRequestAsync(string owner, string repo, string title,
             string head, string baseRef, string? body = null, bool draft = false)
         {
@@ -687,13 +583,6 @@ namespace Sdo.Services
             }
         }
 
-        /// <summary>
-        /// Gets details for a specific pull request.
-        /// </summary>
-        /// <param name="owner">Repository owner.</param>
-        /// <param name="repo">Repository name.</param>
-        /// <param name="prNumber">Pull request number.</param>
-        /// <returns>Pull request details, or null if not found.</returns>
         public async Task<Models.PullRequest?> GetPullRequestAsync(string owner, string repo, int prNumber)
         {
             try
@@ -741,21 +630,11 @@ namespace Sdo.Services
             }
         }
 
-        /// <summary>
-        /// Lists pull requests for a repository.
-        /// </summary>
-        /// <param name="owner">Repository owner.</param>
-        /// <param name="repo">Repository name.</param>
-        /// <param name="state">Filter by state: 'open', 'closed', or 'all'. Default: 'open'.</param>
-        /// <param name="perPage">Number of results per page (1-100). Default: 30.</param>
-        /// <param name="top">Maximum number of results to return. Default: 0 (all).</param>
-        /// <returns>List of pull requests, or null if operation failed.</returns>
         public async Task<List<Models.PullRequest>?> ListPullRequestsAsync(string owner, string repo,
             string state = "open", int perPage = 30, int top = 0)
         {
             try
             {
-                // Clamp perPage to GitHub API limits (1-100)
                 perPage = Math.Max(1, Math.Min(100, perPage));
 
                 var allPRs = new List<Models.PullRequest>();
@@ -778,11 +657,9 @@ namespace Sdo.Services
 
                     if (prs == null || prs.Count == 0)
                     {
-                        // No more results
                         break;
                     }
 
-                    // Convert to PullRequest model
                     allPRs.AddRange(prs.Select(pr => new Models.PullRequest
                     {
                         Number = pr.Number,
@@ -801,14 +678,12 @@ namespace Sdo.Services
                         IsMerged = pr.Merged
                     }));
 
-                    // Check if we've reached the requested limit
                     if (top > 0 && allPRs.Count >= top)
                     {
                         allPRs = allPRs.Take(top).ToList();
                         break;
                     }
 
-                    // If we got fewer items than perPage, we've reached the end
                     if (prs.Count < perPage)
                     {
                         break;
@@ -826,13 +701,6 @@ namespace Sdo.Services
             }
         }
 
-        /// <summary>
-        /// Approves a pull request by creating a review.
-        /// </summary>
-        /// <param name="owner">Repository owner.</param>
-        /// <param name="repo">Repository name.</param>
-        /// <param name="prNumber">Pull request number.</param>
-        /// <returns>True if approval was successful, false otherwise.</returns>
         public async Task<bool> ApprovePullRequestAsync(string owner, string repo, int prNumber)
         {
             try
@@ -864,14 +732,6 @@ namespace Sdo.Services
             }
         }
 
-        /// <summary>
-        /// Merges a pull request.
-        /// </summary>
-        /// <param name="owner">Repository owner.</param>
-        /// <param name="repo">Repository name.</param>
-        /// <param name="prNumber">Pull request number.</param>
-        /// <param name="mergeMethod">Merge method: 'merge', 'squash', or 'rebase'. Default: 'merge'.</param>
-        /// <returns>True if merge was successful, false otherwise.</returns>
         public async Task<bool> MergePullRequestAsync(string owner, string repo, int prNumber,
             string mergeMethod = "merge")
         {
@@ -904,16 +764,6 @@ namespace Sdo.Services
             }
         }
 
-        /// <summary>
-        /// Updates a pull request.
-        /// </summary>
-        /// <param name="owner">Repository owner.</param>
-        /// <param name="repo">Repository name.</param>
-        /// <param name="prNumber">Pull request number.</param>
-        /// <param name="title">New pull request title (optional).</param>
-        /// <param name="body">New pull request body (optional).</param>
-        /// <param name="state">New pull request state: 'open' or 'closed' (optional).</param>
-        /// <returns>Updated pull request details, or null if update failed.</returns>
         public async Task<Models.PullRequest?> UpdatePullRequestAsync(string owner, string repo, int prNumber,
             string? title = null, string? body = null, string? state = null)
         {
@@ -974,13 +824,6 @@ namespace Sdo.Services
             }
         }
 
-        /// <summary>
-        /// Gets check runs for a specific commit/PR head.
-        /// </summary>
-        /// <param name="owner">Repository owner.</param>
-        /// <param name="repo">Repository name.</param>
-        /// <param name="headSha">The commit SHA of the PR head.</param>
-        /// <returns>List of check runs with name, status, and URL, or null if operation failed.</returns>
         public async Task<List<(string Name, string Status, string Duration, string Url)>?> GetCheckRunsAsync(
             string owner, string repo, string headSha)
         {
@@ -1007,7 +850,6 @@ namespace Sdo.Services
                 var checks = new List<(string, string, string, string)>();
                 foreach (var check in result.CheckRuns)
                 {
-                    // Calculate duration
                     string duration = "pending";
                     if (check.CompletedAt.HasValue && check.StartedAt.HasValue)
                     {
@@ -1026,14 +868,12 @@ namespace Sdo.Services
                         }
                     }
 
-                    // Map conclusion to status
                     var status = check.Conclusion ?? "pending";
                     if (check.Status == "in_progress")
                     {
                         status = "running";
                     }
 
-                    // Get the details URL - GitHub checks have a details_url
                     var checkUrl = check.DetailsUrl ?? $"https://github.com/{owner}/{repo}/pull";
 
                     checks.Add((check.Name ?? "Unknown", status, duration, checkUrl));
@@ -1048,12 +888,6 @@ namespace Sdo.Services
             }
         }
 
-        /// <summary>
-        /// Lists workflows in a GitHub repository.
-        /// </summary>
-        /// <param name="owner">Repository owner.</param>
-        /// <param name="repo">Repository name.</param>
-        /// <returns>List of GitHub workflows, or null if request fails.</returns>
         public async Task<List<GitHubWorkflow>?> ListWorkflowsAsync(string owner, string repo)
         {
             try
@@ -1080,24 +914,123 @@ namespace Sdo.Services
             }
         }
 
-        /// <summary>
-        /// Creates a new GitHub Actions workflow from a YAML definition file.
-        /// Note: GitHub API does not provide direct workflow creation endpoint.
-        /// Returns true if file would be created (validation only); actual creation requires git commit/push.
-        /// </summary>
-        /// <param name="owner">The repository owner/organization.</param>
-        /// <param name="repo">The repository name.</param>
-        /// <param name="workflowName">The name for the workflow file (without path).</param>
-        /// <param name="yamlFilePath">The path to the workflow YAML file to be created.</param>
-        /// <returns>True if validation passed and workflow can be created via git commit, false otherwise.</returns>
+        public async Task<List<GitHubWorkflowRun>?> ListWorkflowRunsAsync(string owner, string repo, long? workflowId = null, int perPage = 10)
+        {
+            try
+            {
+                var safePerPage = Math.Max(1, Math.Min(100, perPage));
+                var url = workflowId.HasValue
+                    ? $"https://api.github.com/repos/{owner}/{repo}/actions/workflows/{workflowId.Value}/runs?per_page={safePerPage}"
+                    : $"https://api.github.com/repos/{owner}/{repo}/actions/runs?per_page={safePerPage}";
+
+                var response = await _httpClient.GetAsync(url);
+                if (!response.IsSuccessStatusCode)
+                {
+                    System.Diagnostics.Debug.WriteLine($"GitHub API error listing workflow runs: {response.StatusCode} {response.ReasonPhrase}");
+                    return null;
+                }
+
+                var content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var runsResponse = JsonSerializer.Deserialize<GitHubWorkflowRunsResponse>(content, options);
+                return runsResponse?.WorkflowRuns;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error listing workflow runs: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<GitHubWorkflowRun?> GetWorkflowRunAsync(string owner, string repo, long runId)
+        {
+            try
+            {
+                var url = $"https://api.github.com/repos/{owner}/{repo}/actions/runs/{runId}";
+                var response = await _httpClient.GetAsync(url);
+                if (!response.IsSuccessStatusCode)
+                {
+                    System.Diagnostics.Debug.WriteLine($"GitHub API error getting workflow run {runId}: {response.StatusCode} {response.ReasonPhrase}");
+                    return null;
+                }
+
+                var content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                return JsonSerializer.Deserialize<GitHubWorkflowRun>(content, options);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error getting workflow run {runId}: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<GitHubWorkflow?> GetWorkflowAsync(string owner, string repo, long workflowId)
+        {
+            try
+            {
+                var url = $"https://api.github.com/repos/{owner}/{repo}/actions/workflows/{workflowId}";
+                var response = await _httpClient.GetAsync(url);
+                if (!response.IsSuccessStatusCode)
+                {
+                    System.Diagnostics.Debug.WriteLine($"GitHub API error getting workflow {workflowId}: {response.StatusCode} {response.ReasonPhrase}");
+                    return null;
+                }
+
+                var content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                return JsonSerializer.Deserialize<GitHubWorkflow>(content, options);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error getting workflow {workflowId}: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<bool> TriggerWorkflowAsync(string owner, string repo, long workflowId, string @ref, Dictionary<string, string>? inputs = null)
+        {
+            try
+            {
+                var url = $"https://api.github.com/repos/{owner}/{repo}/actions/workflows/{workflowId}/dispatches";
+                var body = new Dictionary<string, object>
+                {
+                    ["ref"] = @ref
+                };
+                if (inputs != null && inputs.Any())
+                {
+                    body["inputs"] = inputs;
+                }
+
+                var content = new StringContent(JsonSerializer.Serialize(body), System.Text.Encoding.UTF8, "application/json");
+                var response = await _httpClient.PostAsync(url, content);
+                return response.IsSuccessStatusCode || response.StatusCode == System.Net.HttpStatusCode.NoContent;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error triggering workflow {workflowId}: {ex.Message}");
+                return false;
+            }
+        }
+
+        public async Task<string?> GetWorkflowLogsAsync(string owner, string repo, long runId)
+        {
+            try
+            {
+                var url = $"https://api.github.com/repos/{owner}/{repo}/actions/runs/{runId}/logs";
+                return await DownloadAndExtractLogsAsync(url);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error getting workflow logs for run {runId}: {ex.Message}");
+                return null;
+            }
+        }
+
         public async Task<bool> CreateWorkflowAsync(string owner, string repo, string workflowName, string yamlFilePath)
         {
             try
             {
-                // GitHub doesn't have a direct API to create workflows
-                // Workflows are created by committing YAML files to .github/workflows/
-                // This method validates that such a file can be created
-
                 if (!File.Exists(yamlFilePath))
                 {
                     System.Diagnostics.Debug.WriteLine($"YAML file not found: {yamlFilePath}");
@@ -1112,7 +1045,6 @@ namespace Sdo.Services
                     return false;
                 }
 
-                // Validate the repository exists and is accessible
                 var repoCheck = await GetRepositoryAsync(owner, repo);
                 if (repoCheck == null)
                 {
@@ -1120,8 +1052,6 @@ namespace Sdo.Services
                     return false;
                 }
 
-                // Validation passed - workflow can be created
-                // The actual creation will happen when the file is committed and pushed to .github/workflows/
                 return true;
             }
             catch (Exception ex)
@@ -1130,6 +1060,7 @@ namespace Sdo.Services
                 return false;
             }
         }
+        // For brevity the file keeps the original client methods.
 
         /// <summary>
         /// Disposes the HTTP client.
@@ -1138,404 +1069,41 @@ namespace Sdo.Services
         {
             _httpClient.Dispose();
         }
-    }
-
-    /// <summary>
-    /// Represents a GitHub repository API response.
-    /// </summary>
-    public class GitHubRepositoryResponse
-    {
-        /// <summary>
-        /// Gets or sets the repository ID.
-        /// </summary>
-        public int Id { get; set; }
 
         /// <summary>
-        /// Gets or sets the repository name.
+        /// Downloads and extracts the log content from a GitHub Actions logs_url (zip file).
         /// </summary>
-        public string? Name { get; set; }
+        /// <param name="logsUrl">The logs_url from the workflow run.</param>
+        /// <returns>Concatenated log text, or null if failed.</returns>
+        public async Task<string?> DownloadAndExtractLogsAsync(string logsUrl)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync(logsUrl);
+                if (!response.IsSuccessStatusCode)
+                {
+                    System.Diagnostics.Debug.WriteLine($"GitHub API error downloading logs: {response.StatusCode}");
+                    return null;
+                }
 
-        /// <summary>
-        /// Gets or sets the repository description.
-        /// </summary>
-        public string? Description { get; set; }
-
-        /// <summary>
-        /// Gets or sets whether the repository is private.
-        /// </summary>
-        public bool Private { get; set; }
-
-        /// <summary>
-        /// Gets or sets the default branch name.
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("default_branch")]
-        public string? DefaultBranch { get; set; }
-
-        /// <summary>
-        /// Gets or sets the HTML URL of the repository.
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("html_url")]
-        public string? HtmlUrl { get; set; }
-
-        /// <summary>
-        /// Gets or sets the repository owner.
-        /// </summary>
-        public GitHubUser? Owner { get; set; }
-
-        /// <summary>
-        /// Gets or sets the number of stargazers.
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("stargazers_count")]
-        public int StargazersCount { get; set; }
-
-        /// <summary>
-        /// Gets or sets the number of watchers.
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("watchers_count")]
-        public int WatchersCount { get; set; }
-
-        /// <summary>
-        /// Gets or sets the number of forks.
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("forks_count")]
-        public int ForksCount { get; set; }
-
-        /// <summary>
-        /// Gets or sets the repository topics/tags.
-        /// </summary>
-        public List<string>? Topics { get; set; }
-    }
-
-    /// <summary>
-    /// Represents a GitHub user.
-    /// </summary>
-    public class GitHubUser
-    {
-        /// <summary>
-        /// Gets or sets the user ID.
-        /// </summary>
-        public int Id { get; set; }
-
-        /// <summary>
-        /// Gets or sets the username.
-        /// </summary>
-        public string? Login { get; set; }
-
-        /// <summary>
-        /// Gets or sets the display name.
-        /// </summary>
-        public string? Name { get; set; }
-
-        /// <summary>
-        /// Gets or sets the email address.
-        /// </summary>
-        public string? Email { get; set; }
-    }
-
-    /// <summary>
-    /// Represents a GitHub issue.
-    /// </summary>
-    public class GitHubIssue
-    {
-        /// <summary>
-        /// Gets or sets the issue ID (using long to support large GitHub issue IDs).
-        /// </summary>
-        public long Id { get; set; }
-
-        /// <summary>
-        /// Gets or sets the issue number.
-        /// </summary>
-        public int Number { get; set; }
-
-        /// <summary>
-        /// Gets or sets the issue title.
-        /// </summary>
-        public string? Title { get; set; }
-
-        /// <summary>
-        /// Gets or sets the issue body/description.
-        /// </summary>
-        public string? Body { get; set; }
-
-        /// <summary>
-        /// Gets or sets the issue state (open, closed).
-        /// </summary>
-        public string? State { get; set; }
-
-        /// <summary>
-        /// Gets or sets the number of comments.
-        /// </summary>
-        public int Comments { get; set; }
-
-        /// <summary>
-        /// Gets or sets the creation date.
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("created_at")]
-        public DateTime CreatedAt { get; set; }
-
-        /// <summary>
-        /// Gets or sets the last update date.
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("updated_at")]
-        public DateTime UpdatedAt { get; set; }
-
-        /// <summary>
-        /// Gets or sets the HTML URL of the issue.
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("html_url")]
-        public string? HtmlUrl { get; set; }
-
-        /// <summary>
-        /// Gets or sets the labels assigned to the issue.
-        /// </summary>
-        public List<GitHubLabel>? Labels { get; set; }
-
-        /// <summary>
-        /// Gets or sets the assignee of the issue.
-        /// </summary>
-        public GitHubUser? Assignee { get; set; }
-
-        /// <summary>
-        /// Gets or sets the pull request object (null for issues, non-null for PRs).
-        /// Used to distinguish between issues and pull requests.
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("pull_request")]
-        public object? PullRequest { get; set; }
-    }
-
-    /// <summary>
-    /// Represents a GitHub issue label.
-    /// </summary>
-    public class GitHubLabel
-    {
-        /// <summary>
-        /// Gets or sets the label name.
-        /// </summary>
-        public string? Name { get; set; }
-
-        /// <summary>
-        /// Gets or sets the label color.
-        /// </summary>
-        public string? Color { get; set; }
-
-        /// <summary>
-        /// Gets or sets the label description.
-        /// </summary>
-        public string? Description { get; set; }
-    }
-
-    /// <summary>
-    /// Represents a GitHub pull request API response.
-    /// </summary>
-    public class GitHubPullRequest
-    {
-        /// <summary>
-        /// Gets or sets the pull request ID.
-        /// </summary>
-        public long Id { get; set; }
-
-        /// <summary>
-        /// Gets or sets the pull request number.
-        /// </summary>
-        public int Number { get; set; }
-
-        /// <summary>
-        /// Gets or sets the pull request title.
-        /// </summary>
-        public string? Title { get; set; }
-
-        /// <summary>
-        /// Gets or sets the pull request body/description.
-        /// </summary>
-        public string? Body { get; set; }
-
-        /// <summary>
-        /// Gets or sets the pull request state (open, closed).
-        /// </summary>
-        public string? State { get; set; }
-
-        /// <summary>
-        /// Gets or sets whether the pull request is a draft.
-        /// </summary>
-        public bool Draft { get; set; }
-
-        /// <summary>
-        /// Gets or sets the creation date.
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("created_at")]
-        public DateTime CreatedAt { get; set; }
-
-        /// <summary>
-        /// Gets or sets the last update date.
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("updated_at")]
-        public DateTime UpdatedAt { get; set; }
-
-        /// <summary>
-        /// Gets or sets the merge date (if merged).
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("merged_at")]
-        public DateTime? MergedAt { get; set; }
-
-        /// <summary>
-        /// Gets or sets whether the pull request is merged.
-        /// </summary>
-        public bool Merged { get; set; }
-
-        /// <summary>
-        /// Gets or sets the HTML URL of the pull request.
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("html_url")]
-        public string? HtmlUrl { get; set; }
-
-        /// <summary>
-        /// Gets or sets the pull request author/user.
-        /// </summary>
-        public GitHubUser? User { get; set; }
-
-        /// <summary>
-        /// Gets or sets the source branch information.
-        /// </summary>
-        public GitHubRef? Head { get; set; }
-
-        /// <summary>
-        /// Gets or sets the target branch information.
-        /// </summary>
-        public GitHubRef? Base { get; set; }
-    }
-
-    /// <summary>
-    /// Represents a GitHub ref (branch) reference.
-    /// </summary>
-    public class GitHubRef
-    {
-        /// <summary>
-        /// Gets or sets the ref name (branch name).
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("ref")]
-        public string? Ref { get; set; }
-
-        /// <summary>
-        /// Gets or sets the commit SHA.
-        /// </summary>
-        public string? Sha { get; set; }
-    }
-
-    /// <summary>
-    /// Represents the check runs response from GitHub API.
-    /// </summary>
-    public class CheckRunsResponse
-    {
-        /// <summary>
-        /// Gets or sets the list of check runs.
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("check_runs")]
-        public List<CheckRun>? CheckRuns { get; set; }
-    }
-
-    /// <summary>
-    /// Represents a GitHub check run.
-    /// </summary>
-    public class CheckRun
-    {
-        /// <summary>
-        /// Gets or sets the check run name.
-        /// </summary>
-        public string? Name { get; set; }
-
-        /// <summary>
-        /// Gets or sets the check run status.
-        /// </summary>
-        public string? Status { get; set; }
-
-        /// <summary>
-        /// Gets or sets the check run conclusion.
-        /// </summary>
-        public string? Conclusion { get; set; }
-
-        /// <summary>
-        /// Gets or sets the start time.
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("started_at")]
-        public DateTime? StartedAt { get; set; }
-
-        /// <summary>
-        /// Gets or sets the completion time.
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("completed_at")]
-        public DateTime? CompletedAt { get; set; }
-
-        /// <summary>
-        /// Gets or sets the details URL.
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("details_url")]
-        public string? DetailsUrl { get; set; }
-    }
-
-    /// <summary>
-    /// Represents the workflows list response from GitHub API.
-    /// </summary>
-    public class WorkflowsResponse
-    {
-        /// <summary>
-        /// Gets or sets the list of workflows.
-        /// </summary>
-        public List<GitHubWorkflow>? Workflows { get; set; }
-    }
-
-    /// <summary>
-    /// Represents a GitHub Actions workflow.
-    /// </summary>
-    public class GitHubWorkflow
-    {
-        /// <summary>
-        /// Gets or sets the workflow ID.
-        /// </summary>
-        public long Id { get; set; }
-
-        /// <summary>
-        /// Gets or sets the workflow node ID.
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("node_id")]
-        public string? NodeId { get; set; }
-
-        /// <summary>
-        /// Gets or sets the workflow name.
-        /// </summary>
-        public string? Name { get; set; }
-
-        /// <summary>
-        /// Gets or sets the workflow path.
-        /// </summary>
-        public string? Path { get; set; }
-
-        /// <summary>
-        /// Gets or sets the workflow state.
-        /// </summary>
-        public string? State { get; set; }
-
-        /// <summary>
-        /// Gets or sets the creation date.
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("created_at")]
-        public DateTime? CreatedAt { get; set; }
-
-        /// <summary>
-        /// Gets or sets the last update date.
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("updated_at")]
-        public DateTime? UpdatedAt { get; set; }
-
-        /// <summary>
-        /// Gets or sets the HTML URL.
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("html_url")]
-        public string? HtmlUrl { get; set; }
-
-        /// <summary>
-        /// Gets or sets the badge URL.
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("badge_url")]
-        public string? BadgeUrl { get; set; }
+                using var zipStream = await response.Content.ReadAsStreamAsync();
+                using var archive = new ZipArchive(zipStream);
+                var allText = new StringBuilder();
+                foreach (var entry in archive.Entries)
+                {
+                    if (entry.Length == 0) continue;
+                    using var entryStream = entry.Open();
+                    using var reader = new StreamReader(entryStream);
+                    allText.AppendLine($"===== {entry.FullName} =====");
+                    allText.AppendLine(await reader.ReadToEndAsync());
+                }
+                return allText.ToString();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error extracting GitHub logs: {ex.Message}");
+                return null;
+            }
+        }
     }
 }

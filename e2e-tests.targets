@@ -2,12 +2,129 @@
 
 	<!-- E2E test targets for end-to-end testing -->
 
-	<!-- Placeholder for E2E tests - can be expanded as needed -->
-	<Target Name="E2E" DependsOnTargets="ARTIFACTS">
-		<Message Text="Running E2E tests..." Importance="high" />
-		<!-- Add E2E test execution commands here when E2E tests are implemented -->
-		<Message Text="No E2E tests configured yet" Importance="normal" />
-		<Message Text="E2E tests completed" Importance="high" />
+	<PropertyGroup>
+		<!-- Define any global properties needed for E2E tests here -->
+		<E2ELogFile>$(SolutionDir)e2e-test.log</E2ELogFile> <!-- E2E test log file -->
+	</PropertyGroup>
+	
+	<!-- Delete E2E log file -->
+	<Target Name="DELETE_E2E_LOG" DependsOnTargets="PROPERTIES">
+		<Message Text="Attempting to delete log file: $(E2ELogFile)" Importance="High" />
+		<Message Text="File exists: $([System.IO.File]::Exists('$(E2ELogFile)'))" Importance="High" />
+		<Delete Files="$(E2ELogFile)" ContinueOnError="true">
+			<Output TaskParameter="DeletedFiles" ItemName="DeletedFiles" />
+		</Delete>
+		<Message Text="Deleted log file: $(E2ELogFile)" Importance="High" Condition="'@(DeletedFiles)' != ''" />
+		<Message Text="No log file found to delete" Importance="High" Condition="'@(DeletedFiles)' == ''" />
+	</Target>
+
+	<!-- Build test-framework library -->
+	<Target Name="BUILD_E2E_FRAMEWORK" DependsOnTargets="PROPERTIES">
+		<Message Text="Building test-framework library..." Importance="high" />
+		<Exec Command="dotnet build test-framework\test-framework.csproj --configuration Debug"
+		      WorkingDirectory="$(SolutionDir)"
+		      ContinueOnError="false" />
+		<Message Text="✓ test-framework built successfully" Importance="high" />
+	</Target>
+
+	<!-- Build Sdo executable -->
+	<Target Name="BUILD_SDO_E2E" DependsOnTargets="BUILD_E2E_FRAMEWORK">
+		<Message Text="Building Sdo.net executable..." Importance="high" />
+		<Exec Command="dotnet build Sdo\Sdo.csproj --configuration Debug"
+		      WorkingDirectory="$(SolutionDir)"
+		      ContinueOnError="false" />
+		<Message Text="✓ Sdo.net executable built successfully" Importance="high" />
+	</Target>
+
+	<!-- Build sdo-e2e-test executable -->
+	<Target Name="BUILD_SDO_E2E_TESTS" DependsOnTargets="BUILD_SDO_E2E">
+		<Message Text="Building sdo-e2e-test executable..." Importance="high" />
+		<Exec Command="dotnet build sdo-e2e-test\sdo-e2e-test.csproj --configuration Debug"
+		      WorkingDirectory="$(SolutionDir)"
+		      ContinueOnError="false" />
+		<Message Text="✓ sdo-e2e-test executable built successfully" Importance="high" />
+	</Target>
+
+	<!-- Copy sdo.net executable to test output directory -->
+	<Target Name="COPY_SDO_EXECUTABLE" DependsOnTargets="BUILD_SDO_E2E_TESTS">
+		<Message Text="Copying sdo.net executable and all required dependencies to test output directory..." Importance="high" />
+		<ItemGroup>
+			<!-- Copy sdo.net and its dependencies -->
+			<SdoFiles Include="$(SolutionDir)\Sdo\bin\Debug\sdo.net.exe" />
+			<SdoFiles Include="$(SolutionDir)\Sdo\bin\Debug\sdo.net.dll" />
+			<SdoFiles Include="$(SolutionDir)\Sdo\bin\Debug\nb.dll" />
+			<SdoFiles Include="$(SolutionDir)\Sdo\bin\Debug\NbuildTasks.dll" />
+			<SdoFiles Include="$(SolutionDir)\Sdo\bin\Debug\GitHubRelease.dll" />
+			<SdoFiles Include="$(SolutionDir)\Sdo\bin\Debug\Launcher.dll" />
+			<SdoFiles Include="$(SolutionDir)\Sdo\bin\Debug\System.Configuration.ConfigurationManager.dll" />
+			<SdoFiles Include="$(SolutionDir)\Sdo\bin\Debug\System.Diagnostics.EventLog.dll" />
+			<SdoFiles Include="$(SolutionDir)\Sdo\bin\Debug\System.Security.Cryptography.Pkcs.dll" />
+			<SdoFiles Include="$(SolutionDir)\Sdo\bin\Debug\System.Security.Cryptography.ProtectedData.dll" />
+			<SdoFiles Include="$(SolutionDir)\Sdo\bin\Debug\Microsoft.Build.Framework.dll" />
+			<SdoFiles Include="$(SolutionDir)\Sdo\bin\Debug\Microsoft.Build.Utilities.Core.dll" />
+			<SdoFiles Include="$(SolutionDir)\Sdo\bin\Debug\Microsoft.NET.StringTools.dll" />
+			<SdoFiles Include="$(SolutionDir)\Sdo\bin\Debug\sdo.net.deps.json" />
+			<!-- NOTE: Do NOT copy sdo.net.runtimeconfig.json as it will overwrite sdo-e2e-test.runtimeconfig.json -->
+		</ItemGroup>
+		<Copy SourceFiles="@(SdoFiles)"
+		      DestinationFolder="$(SolutionDir)\sdo-e2e-test\bin\Debug\net10.0\"
+		      SkipUnchangedFiles="true" />
+		<Message Text="✓ sdo.net executable and dependencies copied to test directory" Importance="high" />
+	</Target>
+
+	<!-- Run SDO E2E tests -->
+	<Target Name="RUN_SDO_E2E_TESTS" DependsOnTargets="COPY_SDO_EXECUTABLE">
+		<Message Text="Running SDO E2E tests..." Importance="high" />
+		<PropertyGroup>
+			<SdoE2eTestExe>.\sdo-e2e-test.exe</SdoE2eTestExe>
+			<SdoE2eTestDir>$(SolutionDir)\sdo-e2e-test\bin\Debug\net10.0\</SdoE2eTestDir>
+		</PropertyGroup>
+		<Exec Command="$(SdoE2eTestExe) test --verbose"
+		      WorkingDirectory="$(SdoE2eTestDir)"
+		      EnvironmentVariables="SOLUTION_DIR=$(SolutionDir)" />
+		<Message Text="✓ SDO E2E tests completed" Importance="high" />
+	</Target>
+
+	<!-- Run GitHub Pipeline Creation test -->
+	<Target Name="RUN_GITHUB_PIPELINE_TEST" DependsOnTargets="COPY_SDO_EXECUTABLE">
+		<Message Text="Running GitHub Pipeline Creation test..." Importance="high" />
+		<PropertyGroup>
+			<SdoE2eTestExe>.\sdo-e2e-test.exe</SdoE2eTestExe>
+			<SdoE2eTestDir>$(SolutionDir)\sdo-e2e-test\bin\Debug\net10.0\</SdoE2eTestDir>
+		</PropertyGroup>
+		<Exec Command="$(SdoE2eTestExe) test --verbose --test-case PipelineCreate_GitHub_CreateAndVerify"
+		      WorkingDirectory="$(SdoE2eTestDir)"
+		      EnvironmentVariables="SOLUTION_DIR=$(SolutionDir)" />
+		<Message Text="✓ GitHub Pipeline Creation test completed" Importance="high" />
+	</Target>
+
+	<!-- Run Azure DevOps Pipeline Creation test -->
+	<Target Name="RUN_AZDO_PIPELINE_TEST" DependsOnTargets="COPY_SDO_EXECUTABLE">
+		<Message Text="Running Azure DevOps Pipeline Creation test..." Importance="high" />
+		<PropertyGroup>
+			<SdoE2eTestExe>.\sdo-e2e-test.exe</SdoE2eTestExe>
+			<SdoE2eTestDir>$(SolutionDir)\sdo-e2e-test\bin\Debug\net10.0\</SdoE2eTestDir>
+		</PropertyGroup>
+		<Exec Command="$(SdoE2eTestExe) test --verbose --test-case PipelineCreate_AzureDevOps_CreateAndVerify"
+		      WorkingDirectory="$(SdoE2eTestDir)"
+		      EnvironmentVariables="SOLUTION_DIR=$(SolutionDir)" />
+		<Message Text="✓ Azure DevOps Pipeline Creation test completed" Importance="high" />
+	</Target>
+
+	<!-- Main E2E Pipeline target - runs both pipeline creation tests -->
+	<Target Name="E2E_PIPELINES" DependsOnTargets="ARTIFACTS;DELETE_E2E_LOG;RUN_GITHUB_PIPELINE_TEST;RUN_AZDO_PIPELINE_TEST">
+		<Message Text="======================================" Importance="high" />
+		<Message Text="✓ All Pipeline Creation tests completed successfully" Importance="high" />
+		<Message Text="======================================" Importance="high" />
+		<Message Text="Test output log: $(E2ELogFile)" Importance="normal" />
+	</Target>
+
+	<!-- Main E2E target - builds and runs all E2E tests -->
+	<Target Name="E2E" DependsOnTargets="ARTIFACTS;DELETE_E2E_LOG;RUN_SDO_E2E_TESTS">
+		<Message Text="======================================" Importance="high" />
+		<Message Text="✓ All E2E tests completed successfully" Importance="high" />
+		<Message Text="======================================" Importance="high" />
+		<Message Text="Test output log: $(E2ELogFile)" Importance="normal" />
 	</Target>
 
 </Project>
