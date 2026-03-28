@@ -438,12 +438,12 @@ namespace Sdo.Commands
                     Console.WriteLine($"Filter: {filterDisplay}");
                 }
 
-                // Fetch workflows from GitHub API
+                // Fetch neutral pipeline definitions from GitHub API
                 using (var client = new Sdo.Services.GitHubClient())
                 {
-                    var workflows = await client.ListWorkflowsAsync(owner, repo);
+                    var definitions = await client.ListPipelineDefinitionsAsync(owner, repo);
 
-                    if (workflows == null || workflows.Count == 0)
+                    if (definitions == null || definitions.Count == 0)
                     {
                         ConsoleHelper.WriteLine("No workflows found in this repository.", ConsoleColor.Yellow);
                         return 0;
@@ -452,12 +452,12 @@ namespace Sdo.Commands
                     // Apply repository name filter if specified
                     if (!string.IsNullOrEmpty(filterRepo))
                     {
-                        workflows = workflows.Where(w =>
+                        definitions = definitions.Where(w =>
                             (w.Name ?? "").Contains(filterRepo, StringComparison.OrdinalIgnoreCase) ||
                             (w.Path ?? "").Contains(filterRepo, StringComparison.OrdinalIgnoreCase)
                         ).ToList();
 
-                        if (workflows.Count == 0)
+                        if (definitions.Count == 0)
                         {
                             ConsoleHelper.WriteLine($"No workflows found matching repository filter: {filterRepo}", ConsoleColor.Yellow);
                             return 0;
@@ -470,15 +470,15 @@ namespace Sdo.Commands
                     Console.WriteLine($"{"Name",-40} {"State",-10} {"ID"}");
                     Console.WriteLine(new string('-', 60));
 
-                    foreach (var workflow in workflows)
+                    foreach (var def in definitions)
                     {
-                        var name = workflow.Name ?? "Unnamed Workflow";
+                        var name = def.Name ?? "Unnamed Workflow";
                         if (name.Length > 38)
                         {
                             name = name.Substring(0, 35) + "...";
                         }
 
-                        Console.WriteLine($"{name,-40} {workflow.State,-10} {workflow.Id}");
+                        Console.WriteLine($"{name,-40} {def.State,-10} {def.PlatformId}");
                     }
                 }
 
@@ -526,7 +526,7 @@ namespace Sdo.Commands
 
                 using (var client = new Sdo.Services.AzureDevOpsClient(pat, organization, project))
                 {
-                    var pipelines = await client.ListPipelinesAsync(project);
+                    var pipelines = await client.ListPipelineDefinitionsAsync(project);
 
                     if (pipelines == null || pipelines.Count == 0)
                     {
@@ -563,8 +563,8 @@ namespace Sdo.Commands
                             name = name.Substring(0, 35) + "...";
                         }
 
-                        var status = pipeline.QueueStatus ?? "unknown";
-                        Console.WriteLine($"{name,-40} {status,-15} {pipeline.Id}");
+                        var status = pipeline.State ?? "unknown";
+                        Console.WriteLine($"{name,-40} {status,-15} {pipeline.PlatformId}");
                     }
                 }
 
@@ -648,7 +648,7 @@ namespace Sdo.Commands
 
                     using var client = new Sdo.Services.GitHubClient();
 
-                    // Resolve workflow id
+                    // Resolve workflow id (long) from numeric input or by name
                     long? workflowId = null;
                     if (!string.IsNullOrWhiteSpace(pipelineName) && long.TryParse(pipelineName, out var parsedId))
                     {
@@ -656,8 +656,8 @@ namespace Sdo.Commands
                     }
                     else
                     {
-                        var workflows = await client.ListWorkflowsAsync(repoInfo.Owner, repoInfo.Repo);
-                        if (workflows == null || workflows.Count == 0)
+                        var defs = await client.ListPipelineDefinitionsAsync(repoInfo.Owner, repoInfo.Repo);
+                        if (defs == null || defs.Count == 0)
                         {
                             ConsoleHelper.WriteError("X No workflows found in repository");
                             return 1;
@@ -665,15 +665,20 @@ namespace Sdo.Commands
 
                         if (!string.IsNullOrWhiteSpace(pipelineName))
                         {
-                            var match = workflows.FirstOrDefault(w => string.Equals(w.Name, pipelineName, StringComparison.OrdinalIgnoreCase) || (w.Path ?? "").Contains(pipelineName, StringComparison.OrdinalIgnoreCase));
-                            if (match != null) workflowId = match.Id;
+                            var match = defs.FirstOrDefault(d => string.Equals(d.Name, pipelineName, StringComparison.OrdinalIgnoreCase) || (d.Path ?? "").Contains(pipelineName, StringComparison.OrdinalIgnoreCase));
+                            if (match != null && long.TryParse(match.PlatformId, out var mid)) workflowId = mid;
                         }
 
                         // fallback: pick first active workflow
                         if (!workflowId.HasValue)
                         {
-                            var first = workflows.FirstOrDefault(w => string.Equals(w.State, "active", StringComparison.OrdinalIgnoreCase)) ?? workflows.First();
-                            workflowId = first.Id;
+                            var first = defs.FirstOrDefault(d => string.Equals(d.State, "active", StringComparison.OrdinalIgnoreCase)) ?? defs.First();
+                            if (!long.TryParse(first.PlatformId, out var fid))
+                            {
+                                ConsoleHelper.WriteError("X Could not parse workflow id");
+                                return 1;
+                            }
+                            workflowId = fid;
                         }
                     }
 
@@ -684,7 +689,7 @@ namespace Sdo.Commands
                     }
 
                     var branchRef = branch.StartsWith("refs/") ? branch : branch;
-                    var triggered = await client.TriggerWorkflowAsync(repoInfo.Owner, repoInfo.Repo, workflowId.Value, branchRef);
+                    var triggered = await client.TriggerPipelineAsync(repoInfo.Owner, repoInfo.Repo, workflowId.Value, branchRef);
                     if (!triggered)
                     {
                         ConsoleHelper.WriteError("X Failed to trigger GitHub workflow");
@@ -694,11 +699,11 @@ namespace Sdo.Commands
                     ConsoleHelper.WriteLine($"[OK] Workflow dispatch triggered (workflow id: {workflowId.Value})", ConsoleColor.Green);
 
                     // Try to find the created run
-                    var runs = await client.ListWorkflowRunsAsync(repoInfo.Owner, repoInfo.Repo, workflowId, 5);
-                    var run = runs?.FirstOrDefault(r => string.Equals(r.HeadBranch, branch, StringComparison.OrdinalIgnoreCase)) ?? runs?.OrderByDescending(r => r.CreatedAt).FirstOrDefault();
+                    var runs = await client.ListPipelineRunsAsync(repoInfo.Owner, repoInfo.Repo, workflowId, 5);
+                    var run = runs?.FirstOrDefault(r => string.Equals(r.Branch, branch, StringComparison.OrdinalIgnoreCase)) ?? runs?.OrderByDescending(r => r.FinishedAt ?? r.StartedAt).FirstOrDefault();
                     if (run != null)
                     {
-                        Console.WriteLine($"Run ID: {run.Id}  Status: {run.Status ?? "unknown"}  URL: {run.HtmlUrl}");
+                        Console.WriteLine($"Run ID: {run.PlatformId}  Status: {run.Status ?? "unknown"}  URL: {run.Url}");
                     }
 
                     return 0;
@@ -728,7 +733,7 @@ namespace Sdo.Commands
                     }
                     else
                     {
-                        var pipelines = await client.ListPipelinesAsync(repoInfo.Project);
+                        var pipelines = await client.ListPipelineDefinitionsAsync(repoInfo.Project);
                         if (pipelines == null || pipelines.Count == 0)
                         {
                             ConsoleHelper.WriteError("X No pipelines found in project");
@@ -738,20 +743,25 @@ namespace Sdo.Commands
                         if (!string.IsNullOrWhiteSpace(pipelineName))
                         {
                             var match = pipelines.FirstOrDefault(p => string.Equals(p.Name, pipelineName, StringComparison.OrdinalIgnoreCase) || (p.Path ?? "").Contains(pipelineName, StringComparison.OrdinalIgnoreCase));
-                            if (match != null) definitionId = match.Id;
+                            if (match != null && int.TryParse(match.PlatformId, out var mid)) definitionId = mid;
                         }
 
                         if (!definitionId.HasValue)
                         {
                             // Try to find pipeline matching repository name
                             var repoMatch = pipelines.FirstOrDefault(p => (p.Name ?? "").Contains(repoInfo.Repository ?? string.Empty, StringComparison.OrdinalIgnoreCase));
-                            if (repoMatch != null) definitionId = repoMatch.Id;
+                            if (repoMatch != null && int.TryParse(repoMatch.PlatformId, out var rmid)) definitionId = rmid;
                         }
 
                         if (!definitionId.HasValue)
                         {
                             // Fallback to first pipeline
-                            definitionId = pipelines.First().Id;
+                            if (!int.TryParse(pipelines.First().PlatformId, out var fid))
+                            {
+                                ConsoleHelper.WriteError("X Failed to resolve pipeline id");
+                                return 1;
+                            }
+                            definitionId = fid;
                         }
                     }
 
@@ -772,7 +782,15 @@ namespace Sdo.Commands
                     var build = await client.GetBuildAsync(repoInfo.Project, buildId);
                     if (build != null)
                     {
-                        Console.WriteLine($"  Pipeline: {build.Definition?.Name}  Build Number: {build.BuildNumber}  Status: {build.Status}");
+                        var run = build.ToPipelineRun();
+                        if (run != null)
+                        {
+                            Console.WriteLine($"  Pipeline: {run.Name}  Build Number: {run.Name}  Status: {run.Status}");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"  Pipeline: {build.Definition?.Name}  Build Number: {build.BuildNumber}  Status: {build.Status}");
+                        }
                     }
 
                     return 0;
@@ -845,12 +863,12 @@ namespace Sdo.Commands
                     Console.WriteLine($"Workflows location: .github/workflows/");
                 }
 
-                // Fetch workflows from GitHub API
+                // Fetch neutral pipeline definitions from GitHub API
                 using (var client = new Sdo.Services.GitHubClient())
                 {
-                    var workflows = await client.ListWorkflowsAsync(owner, repo);
+                    var definitions = await client.ListPipelineDefinitionsAsync(owner, repo);
 
-                    if (workflows == null || workflows.Count == 0)
+                    if (definitions == null || definitions.Count == 0)
                     {
                         ConsoleHelper.WriteLine("No workflows found in this repository.", ConsoleColor.Yellow);
                         return 0;
@@ -860,15 +878,15 @@ namespace Sdo.Commands
                     ConsoleHelper.WriteLine("✓ Workflows in this repository:", ConsoleColor.Cyan);
                     Console.WriteLine();
 
-                    foreach (var workflow in workflows)
+                    foreach (var def in definitions)
                     {
-                        var stateColor = workflow.State == "active" ? ConsoleColor.Green : ConsoleColor.Yellow;
-                        ConsoleHelper.WriteLine($"  • {workflow.Name ?? "Unnamed Workflow"}", stateColor);
-                        Console.WriteLine($"    State: {workflow.State}");
-                        Console.WriteLine($"    ID: {workflow.Id}");
-                        if (!string.IsNullOrEmpty(workflow.Path))
+                        var stateColor = (def.State ?? "").Equals("active", StringComparison.OrdinalIgnoreCase) ? ConsoleColor.Green : ConsoleColor.Yellow;
+                        ConsoleHelper.WriteLine($"  • {def.Name ?? "Unnamed Workflow"}", stateColor);
+                        Console.WriteLine($"    State: {def.State}");
+                        Console.WriteLine($"    ID: {def.PlatformId}");
+                        if (!string.IsNullOrEmpty(def.Path))
                         {
-                            Console.WriteLine($"    Path: {workflow.Path}");
+                            Console.WriteLine($"    Path: {def.Path}");
                         }
                     }
                 }
@@ -913,7 +931,7 @@ namespace Sdo.Commands
                 {
                     if (!string.IsNullOrWhiteSpace(pipelineIdOrName))
                     {
-                        var pipeline = await client.GetPipelineAsync(project, pipelineIdOrName);
+                        var pipeline = await client.GetPipelineDefinitionAsync(project, pipelineIdOrName);
                         if (pipeline == null)
                         {
                             var details = string.IsNullOrEmpty(client.LastError) ? string.Empty : $": {client.LastError}";
@@ -924,26 +942,26 @@ namespace Sdo.Commands
                         Console.WriteLine();
                         ConsoleHelper.WriteLine("✓ Pipeline details:", ConsoleColor.Cyan);
                         Console.WriteLine($"  Name: {pipeline.Name ?? "Unnamed Pipeline"}");
-                        Console.WriteLine($"  ID: {pipeline.Id}");
-                        Console.WriteLine($"  Status: {pipeline.QueueStatus ?? "unknown"}");
+                        Console.WriteLine($"  ID: {pipeline.PlatformId}");
+                        Console.WriteLine($"  Status: {pipeline.State ?? "unknown"}");
                         Console.WriteLine($"  Type: {pipeline.Type ?? "unknown"}");
                         if (!string.IsNullOrEmpty(pipeline.Path))
                         {
                             Console.WriteLine($"  Path: {pipeline.Path}");
                         }
-                        if (pipeline.CreatedDate.HasValue)
+                        if (pipeline.CreatedAt.HasValue)
                         {
-                            Console.WriteLine($"  Created: {pipeline.CreatedDate:g}");
+                            Console.WriteLine($"  Created: {pipeline.CreatedAt:g}");
                         }
-                        if (pipeline.ModifiedDate.HasValue)
+                        if (pipeline.UpdatedAt.HasValue)
                         {
-                            Console.WriteLine($"  Modified: {pipeline.ModifiedDate:g}");
+                            Console.WriteLine($"  Modified: {pipeline.UpdatedAt:g}");
                         }
 
                         return 0;
                     }
 
-                    var pipelines = await client.ListPipelinesAsync(project);
+                    var pipelines = await client.ListPipelineDefinitionsAsync(project);
 
                     if (pipelines == null || pipelines.Count == 0)
                     {
@@ -957,17 +975,17 @@ namespace Sdo.Commands
 
                     foreach (var pipeline in pipelines)
                     {
-                        var statusColor = pipeline.QueueStatus == "enabled" ? ConsoleColor.Green : ConsoleColor.Yellow;
+                        var statusColor = (pipeline.State ?? "") == "enabled" ? ConsoleColor.Green : ConsoleColor.Yellow;
                         ConsoleHelper.WriteLine($"  • {pipeline.Name ?? "Unnamed Pipeline"}", statusColor);
-                        Console.WriteLine($"    ID: {pipeline.Id}");
-                        Console.WriteLine($"    Status: {pipeline.QueueStatus}");
+                        Console.WriteLine($"    ID: {pipeline.PlatformId}");
+                        Console.WriteLine($"    Status: {pipeline.State}");
                         if (!string.IsNullOrEmpty(pipeline.Path))
                         {
                             Console.WriteLine($"    Path: {pipeline.Path}");
                         }
-                        if (pipeline.CreatedDate.HasValue)
+                        if (pipeline.CreatedAt.HasValue)
                         {
-                            Console.WriteLine($"    Created: {pipeline.CreatedDate:g}");
+                            Console.WriteLine($"    Created: {pipeline.CreatedAt:g}");
                         }
                     }
                 }
@@ -1107,10 +1125,10 @@ namespace Sdo.Commands
                     Console.WriteLine($"Workflows location: .github/workflows/");
                 }
 
-                // Fetch recent workflow runs directly
+                // Fetch recent pipeline runs (neutral) from GitHub
                 using (var client = new Sdo.Services.GitHubClient())
                 {
-                    var runs = await client.ListWorkflowRunsAsync(owner, repo, null, 10);
+                    var runs = await client.ListPipelineRunsAsync(owner, repo, null, 10);
 
                     if (runs == null || runs.Count == 0)
                     {
@@ -1130,10 +1148,10 @@ namespace Sdo.Commands
                         if (name.Length > 33)
                             name = name.Substring(0, 30) + "...";
 
-                        var lastRun = run.UpdatedAt.HasValue ? run.UpdatedAt.Value.ToString("g") : "Unknown";
+                        var lastRun = run.FinishedAt.HasValue ? run.FinishedAt.Value.ToString("g") : (run.StartedAt.HasValue ? run.StartedAt.Value.ToString("g") : "Unknown");
                         var status = run.Status ?? "unknown";
-                        var result = run.Conclusion ?? "pending";
-                        Console.WriteLine($"{run.Id,-12} {name,-35} {lastRun,-20} {status,-12} {result}");
+                        var result = run.Result ?? "pending";
+                        Console.WriteLine($"{run.PlatformId,-12} {name,-35} {lastRun,-20} {status,-12} {result}");
                     }
                 }
 
@@ -1441,11 +1459,11 @@ namespace Sdo.Commands
                 ConsoleHelper.WriteLine($"✓ GitHub Repository: {owner}/{repo}", ConsoleColor.Green);
 
                 using var client = new Sdo.Services.GitHubClient();
-                GitHubWorkflowRun? run;
+                PipelineRun? run;
 
                 if (buildId.HasValue)
                 {
-                    run = await client.GetWorkflowRunAsync(owner, repo, buildId.Value);
+                    run = await client.GetPipelineRunAsync(owner, repo, buildId.Value);
                     if (run == null)
                     {
                         ConsoleHelper.WriteError($"X Workflow run not found for ID {buildId.Value}");
@@ -1454,7 +1472,7 @@ namespace Sdo.Commands
                 }
                 else
                 {
-                    var runs = await client.ListWorkflowRunsAsync(owner, repo, null, 1);
+                    var runs = await client.ListPipelineRunsAsync(owner, repo, null, 1);
                     run = runs?.FirstOrDefault();
                     if (run == null)
                     {
@@ -1465,24 +1483,22 @@ namespace Sdo.Commands
 
                 Console.WriteLine();
                 ConsoleHelper.WriteLine("✓ Workflow Run Status", ConsoleColor.Cyan);
-                Console.WriteLine($"  Run ID:     {run.Id}");
+                Console.WriteLine($"  Run ID:     {run.PlatformId}");
                 Console.WriteLine($"  Name:       {run.Name ?? "unknown"}");
-                Console.WriteLine($"  Run Number: {run.RunNumber}");
-                Console.WriteLine($"  Branch:     {run.HeadBranch ?? "unknown"}");
-                Console.WriteLine($"  Event:      {run.Event ?? "unknown"}");
+                Console.WriteLine($"  Branch:     {run.Branch ?? "unknown"}");
                 Console.WriteLine($"  Status:     {run.Status ?? "unknown"}");
-                Console.WriteLine($"  Result:     {run.Conclusion ?? "pending"}");
-                if (run.RunStartedAt.HasValue)
+                Console.WriteLine($"  Result:     {run.Result ?? "pending"}");
+                if (run.StartedAt.HasValue)
                 {
-                    Console.WriteLine($"  Started:    {run.RunStartedAt.Value:g}");
+                    Console.WriteLine($"  Started:    {run.StartedAt.Value:g}");
                 }
-                if (run.UpdatedAt.HasValue)
+                if (run.FinishedAt.HasValue)
                 {
-                    Console.WriteLine($"  Updated:    {run.UpdatedAt.Value:g}");
+                    Console.WriteLine($"  Finished:   {run.FinishedAt.Value:g}");
                 }
-                if (!string.IsNullOrEmpty(run.HtmlUrl))
+                if (!string.IsNullOrEmpty(run.Url))
                 {
-                    Console.WriteLine($"  URL:        {run.HtmlUrl}");
+                    Console.WriteLine($"  URL:        {run.Url}");
                 }
 
                 return 0;
@@ -1516,12 +1532,12 @@ namespace Sdo.Commands
                 }
 
                 using var client = new Sdo.Services.AzureDevOpsClient(pat, organization, project);
-                AzureDevOpsBuild? build;
+                PipelineRun? run;
 
                 if (buildId.HasValue)
                 {
-                    build = await client.GetBuildAsync(project, (int)buildId.Value);
-                    if (build == null)
+                    run = await client.GetPipelineRunAsync(project, (int)buildId.Value);
+                    if (run == null)
                     {
                         ConsoleHelper.WriteError($"X Build not found for ID {buildId.Value}");
                         return 1;
@@ -1529,9 +1545,9 @@ namespace Sdo.Commands
                 }
                 else
                 {
-                    var builds = await client.ListBuildsAsync(project, 1);
-                    build = builds?.FirstOrDefault();
-                    if (build == null)
+                    var runs = await client.ListPipelineRunsAsync(project, 1, null);
+                    run = runs?.FirstOrDefault();
+                    if (run == null)
                     {
                         ConsoleHelper.WriteLine("No builds found in this project.", ConsoleColor.Yellow);
                         return 0;
@@ -1540,23 +1556,19 @@ namespace Sdo.Commands
 
                 Console.WriteLine();
                 ConsoleHelper.WriteLine("✓ Build Status", ConsoleColor.Cyan);
-                Console.WriteLine($"  Build ID:    {build.Id}");
-                Console.WriteLine($"  Number:      {build.BuildNumber ?? "unknown"}");
-                Console.WriteLine($"  Pipeline:    {build.Definition?.Name ?? "unknown"}");
-                Console.WriteLine($"  Status:      {build.Status ?? "unknown"}");
-                Console.WriteLine($"  Result:      {build.Result ?? "pending"}");
-                Console.WriteLine($"  Branch:      {build.SourceBranch ?? "unknown"}");
-                if (build.QueueTime.HasValue)
+                Console.WriteLine($"  Build ID:    {run.PlatformId}");
+                Console.WriteLine($"  Number:      {run.Name ?? "unknown"}");
+                Console.WriteLine($"  Pipeline:    {run.Name ?? "unknown"}");
+                Console.WriteLine($"  Status:      {run.Status ?? "unknown"}");
+                Console.WriteLine($"  Result:      {run.Result ?? "pending"}");
+                Console.WriteLine($"  Branch:      {run.Branch ?? "unknown"}");
+                if (run.StartedAt.HasValue)
                 {
-                    Console.WriteLine($"  Queued:      {build.QueueTime.Value:g}");
+                    Console.WriteLine($"  Started:     {run.StartedAt.Value:g}");
                 }
-                if (build.StartTime.HasValue)
+                if (run.FinishedAt.HasValue)
                 {
-                    Console.WriteLine($"  Started:     {build.StartTime.Value:g}");
-                }
-                if (build.FinishTime.HasValue)
-                {
-                    Console.WriteLine($"  Finished:    {build.FinishTime.Value:g}");
+                    Console.WriteLine($"  Finished:    {run.FinishedAt.Value:g}");
                 }
 
                 return 0;
@@ -1575,11 +1587,11 @@ namespace Sdo.Commands
                 ConsoleHelper.WriteLine($"✓ GitHub Repository: {owner}/{repo}", ConsoleColor.Green);
 
                 using var client = new Sdo.Services.GitHubClient();
-                GitHubWorkflowRun? run;
+                PipelineRun? run;
 
                 if (buildId.HasValue)
                 {
-                    run = await client.GetWorkflowRunAsync(owner, repo, buildId.Value);
+                    run = await client.GetPipelineRunAsync(owner, repo, buildId.Value);
                     if (run == null)
                     {
                         ConsoleHelper.WriteError($"X Workflow run not found for ID {buildId.Value}");
@@ -1588,7 +1600,7 @@ namespace Sdo.Commands
                 }
                 else
                 {
-                    var runs = await client.ListWorkflowRunsAsync(owner, repo, null, 1);
+                    var runs = await client.ListPipelineRunsAsync(owner, repo, null, 1);
                     run = runs?.FirstOrDefault();
                     if (run == null)
                     {
@@ -1599,19 +1611,19 @@ namespace Sdo.Commands
 
                 Console.WriteLine();
                 ConsoleHelper.WriteLine("✓ Workflow Run Logs", ConsoleColor.Cyan);
-                Console.WriteLine($"  Run ID:      {run.Id}");
+                Console.WriteLine($"  Run ID:      {run.PlatformId}");
                 Console.WriteLine($"  Name:        {run.Name ?? "unknown"}");
                 Console.WriteLine($"  Status:      {run.Status ?? "unknown"}");
-                Console.WriteLine($"  Result:      {run.Conclusion ?? "pending"}");
-                Console.WriteLine($"  Logs URL:    {run.LogsUrl ?? "not available"}");
-                Console.WriteLine($"  Details URL: {run.HtmlUrl ?? "not available"}");
+                Console.WriteLine($"  Result:      {run.Result ?? "pending"}");
+                Console.WriteLine($"  Details URL: {run.Url ?? "not available"}");
 
-                // Download and print log content if available
-                if (!string.IsNullOrWhiteSpace(run.LogsUrl))
+                // Download and print log content
+                long runId;
+                if (long.TryParse(run.PlatformId, out runId))
                 {
                     Console.WriteLine();
                     ConsoleHelper.WriteLine("--- Log Content ---", ConsoleColor.Yellow);
-                    var logText = await client.DownloadAndExtractLogsAsync(run.LogsUrl);
+                    var logText = await client.GetPipelineRunLogsAsync(owner, repo, runId);
                     if (!string.IsNullOrWhiteSpace(logText))
                     {
                         Console.WriteLine(logText.TrimEnd());
@@ -1623,7 +1635,7 @@ namespace Sdo.Commands
                 }
                 else
                 {
-                    Console.WriteLine("[No logs_url available for this run]");
+                    Console.WriteLine("[No run id available to download logs]");
                 }
 
                 return 0;
@@ -1657,12 +1669,12 @@ namespace Sdo.Commands
                 }
 
                 using var client = new Sdo.Services.AzureDevOpsClient(pat, organization, project);
-                AzureDevOpsBuild? build;
+                PipelineRun? run;
 
                 if (buildId.HasValue)
                 {
-                    build = await client.GetBuildAsync(project, (int)buildId.Value);
-                    if (build == null)
+                    run = await client.GetPipelineRunAsync(project, (int)buildId.Value);
+                    if (run == null)
                     {
                         ConsoleHelper.WriteError($"X Build not found for ID {buildId.Value}");
                         return 1;
@@ -1670,9 +1682,9 @@ namespace Sdo.Commands
                 }
                 else
                 {
-                    var builds = await client.ListBuildsAsync(project, 1);
-                    build = builds?.FirstOrDefault();
-                    if (build == null)
+                    var runs = await client.ListPipelineRunsAsync(project, 1, null);
+                    run = runs?.FirstOrDefault();
+                    if (run == null)
                     {
                         ConsoleHelper.WriteLine("No builds found in this project.", ConsoleColor.Yellow);
                         return 0;
@@ -1681,26 +1693,32 @@ namespace Sdo.Commands
 
                 Console.WriteLine();
                 ConsoleHelper.WriteLine("✓ Build Logs", ConsoleColor.Cyan);
-                Console.WriteLine($"  Build ID:    {build.Id}");
-                Console.WriteLine($"  Number:      {build.BuildNumber ?? "unknown"}");
-                Console.WriteLine($"  Status:      {build.Status ?? "unknown"}");
-                Console.WriteLine($"  Result:      {build.Result ?? "pending"}");
-                Console.WriteLine($"  Logs URL:    {build.Logs?.Url ?? "not available"}");
-                Console.WriteLine($"  Build URL:   {build.Url ?? "not available"}");
+                Console.WriteLine($"  Build ID:    {run.PlatformId}");
+                Console.WriteLine($"  Number:      {run.Name ?? "unknown"}");
+                Console.WriteLine($"  Status:      {run.Status ?? "unknown"}");
+                Console.WriteLine($"  Result:      {run.Result ?? "pending"}");
+                Console.WriteLine($"  Build URL:   {run.Url ?? "not available"}");
 
                 // Attempt to download and display log content
                 try
                 {
-                    var logText = await client.GetBuildLogsAsync(project, build.Id);
-                    if (!string.IsNullOrWhiteSpace(logText))
+                    if (int.TryParse(run.PlatformId, out var intId))
                     {
-                        Console.WriteLine();
-                        ConsoleHelper.WriteLine("--- Log Content ---", ConsoleColor.Yellow);
-                        Console.WriteLine(logText.TrimEnd());
+                        var logText = await client.GetPipelineRunLogsAsync(project, intId);
+                        if (!string.IsNullOrWhiteSpace(logText))
+                        {
+                            Console.WriteLine();
+                            ConsoleHelper.WriteLine("--- Log Content ---", ConsoleColor.Yellow);
+                            Console.WriteLine(logText.TrimEnd());
+                        }
+                        else
+                        {
+                            Console.WriteLine("[No log content available or failed to download]");
+                        }
                     }
                     else
                     {
-                        Console.WriteLine("[No log content available or failed to download]");
+                        Console.WriteLine("[No valid build id available to download logs]");
                     }
                 }
                 catch (Exception ex)

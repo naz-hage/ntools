@@ -45,6 +45,20 @@ namespace Sdo.Services
         }
 
         /// <summary>
+        /// Test-friendly constructor that accepts a preconfigured HttpClient.
+        /// </summary>
+        /// <param name="httpClient">The HttpClient to use for requests (test/mocked).</param>
+        /// <param name="organization">Azure DevOps organization.</param>
+        /// <param name="project">Optional project name.</param>
+        public AzureDevOpsClient(HttpClient httpClient, string organization, string? project = null)
+        {
+            _pat = string.Empty;
+            _organization = organization;
+            _project = project;
+            _httpClient = httpClient ?? throw new System.ArgumentNullException(nameof(httpClient));
+        }
+
+        /// <summary>
         /// Adds a hyperlink relation to a work item pointing to a pull request web URL.
         /// </summary>
         /// <param name="workItemId">Work item numeric ID.</param>
@@ -1892,6 +1906,47 @@ namespace Sdo.Services
                 System.Diagnostics.Debug.WriteLine(_lastError);
                 return null;
             }
+        }
+
+        // ------------------ Neutral model wrappers ------------------
+
+        public async Task<List<PipelineDefinition>?> ListPipelineDefinitionsAsync(string project)
+        {
+            var defs = await ListPipelinesAsync(project);
+            if (defs == null) return null;
+            return defs.Select(d => d.ToPipelineDefinition()).Where(p => p != null).Select(p => p!).ToList();
+        }
+
+        public async Task<PipelineDefinition?> GetPipelineDefinitionAsync(string project, int pipelineId)
+        {
+            var def = await GetPipelineAsync(project, pipelineId);
+            return def?.ToPipelineDefinition();
+        }
+
+        public async Task<PipelineDefinition?> GetPipelineDefinitionAsync(string project, string pipelineIdOrName)
+        {
+            if (string.IsNullOrWhiteSpace(pipelineIdOrName)) return null;
+            if (int.TryParse(pipelineIdOrName, out var id)) return await GetPipelineDefinitionAsync(project, id);
+            var def = await GetPipelineAsync(project, pipelineIdOrName);
+            return def?.ToPipelineDefinition();
+        }
+
+        public async Task<List<PipelineRun>?> ListPipelineRunsAsync(string project, int top = 10, int? definitionId = null)
+        {
+            var builds = await ListBuildsAsync(project, top, definitionId);
+            if (builds == null) return null;
+            return builds.Select(b => b.ToPipelineRun()).Where(p => p != null).Select(p => p!).ToList();
+        }
+
+        public async Task<PipelineRun?> GetPipelineRunAsync(string project, int buildId)
+        {
+            var build = await GetBuildAsync(project, buildId);
+            return build?.ToPipelineRun();
+        }
+
+        public async Task<string?> GetPipelineRunLogsAsync(string project, int buildId)
+        {
+            return await GetBuildLogsAsync(project, buildId);
         }
 
         /// <summary>

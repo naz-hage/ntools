@@ -1043,6 +1043,44 @@ namespace Sdo.Services
             }
         }
 
+        // ------------------ Neutral model wrappers ------------------
+
+        public async Task<List<PipelineDefinition>?> ListPipelineDefinitionsAsync(string owner, string repo)
+        {
+            var workflows = await ListWorkflowsAsync(owner, repo);
+            if (workflows == null) return null;
+            return workflows.Select(w => w.ToPipelineDefinition()).Where(p => p != null).Select(p => p!).ToList();
+        }
+
+        public async Task<List<PipelineRun>?> ListPipelineRunsAsync(string owner, string repo, long? workflowId = null, int perPage = 10)
+        {
+            var runs = await ListWorkflowRunsAsync(owner, repo, workflowId, perPage);
+            if (runs == null) return null;
+            return runs.Select(r => r.ToPipelineRun()).Where(p => p != null).Select(p => p!).ToList();
+        }
+
+        public async Task<PipelineDefinition?> GetPipelineDefinitionAsync(string owner, string repo, long workflowId)
+        {
+            var wf = await GetWorkflowAsync(owner, repo, workflowId);
+            return wf?.ToPipelineDefinition();
+        }
+
+        public async Task<PipelineRun?> GetPipelineRunAsync(string owner, string repo, long runId)
+        {
+            var run = await GetWorkflowRunAsync(owner, repo, runId);
+            return run?.ToPipelineRun();
+        }
+
+        public async Task<bool> TriggerPipelineAsync(string owner, string repo, long workflowId, string @ref, Dictionary<string, string>? inputs = null)
+        {
+            return await TriggerWorkflowAsync(owner, repo, workflowId, @ref, inputs);
+        }
+
+        public async Task<string?> GetPipelineRunLogsAsync(string owner, string repo, long runId)
+        {
+            return await GetWorkflowLogsAsync(owner, repo, runId);
+        }
+
         public async Task<bool> CreateWorkflowAsync(string owner, string repo, string workflowName, string yamlFilePath)
         {
             try
