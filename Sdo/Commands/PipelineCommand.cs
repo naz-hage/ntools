@@ -1688,6 +1688,26 @@ namespace Sdo.Commands
                 Console.WriteLine($"  Logs URL:    {build.Logs?.Url ?? "not available"}");
                 Console.WriteLine($"  Build URL:   {build.Url ?? "not available"}");
 
+                // Attempt to download and display log content
+                try
+                {
+                    var logText = await client.GetBuildLogsAsync(project, build.Id);
+                    if (!string.IsNullOrWhiteSpace(logText))
+                    {
+                        Console.WriteLine();
+                        ConsoleHelper.WriteLine("--- Log Content ---", ConsoleColor.Yellow);
+                        Console.WriteLine(logText.TrimEnd());
+                    }
+                    else
+                    {
+                        Console.WriteLine("[No log content available or failed to download]");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ConsoleHelper.WriteError($"X Error downloading build logs: {ex.Message}");
+                }
+
                 return 0;
             }
             catch (Exception ex)

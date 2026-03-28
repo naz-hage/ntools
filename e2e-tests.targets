@@ -265,6 +265,28 @@
 		<Message Text=">>> 6d. sdo.net.exe pipeline list (C# Azure - ConsoleApp1)" Importance="high" />
 		<Exec Command="$(SolutionDir)\Sdo\bin\Debug\sdo.net.exe pipeline list" WorkingDirectory="C:\source\ConsoleApp1" ContinueOnError="true" />
 		
+		<!-- Command 7: Pipeline Logs -->
+		<Message Text="" Importance="high" />
+		<Message Text="╔════════════════════════════════════════╗" Importance="high" />
+		<Message Text="║ Command: sdo pipeline logs             ║" Importance="high" />
+		<Message Text="╚════════════════════════════════════════╝" Importance="high" />
+
+		<Message Text="" Importance="high" />
+		<Message Text=">>> 7a. sdo pipeline logs (Python GitHub - ntools)" Importance="high" />
+		<Exec Command="sdo pipeline logs" WorkingDirectory="$(SolutionDir)" EnvironmentVariables="PYTHONIOENCODING=UTF-8" ContinueOnError="true" />
+
+		<Message Text="" Importance="high" />
+		<Message Text=">>> 7b. sdo.net.exe pipeline logs (C# GitHub - ntools)" Importance="high" />
+		<Exec Command="$(SolutionDir)\Sdo\bin\Debug\sdo.net.exe pipeline logs" WorkingDirectory="$(SolutionDir)" ContinueOnError="true" />
+
+		<Message Text="" Importance="high" />
+		<Message Text=">>> 7c. sdo pipeline logs (Python Azure - ConsoleApp1)" Importance="high" />
+		<Exec Command="sdo pipeline logs" WorkingDirectory="C:\source\ConsoleApp1" EnvironmentVariables="PYTHONIOENCODING=UTF-8" ContinueOnError="true" />
+
+		<Message Text="" Importance="high" />
+		<Message Text=">>> 7d. sdo.net.exe pipeline logs (C# Azure - ConsoleApp1)" Importance="high" />
+		<Exec Command="$(SolutionDir)\Sdo\bin\Debug\sdo.net.exe pipeline logs --verbose" WorkingDirectory="C:\source\ConsoleApp1" ContinueOnError="true" />
+
 		<!-- Summary -->
 		<Message Text="" Importance="high" />
 		<Message Text="╔═════════════════════════════════════════════════╗" Importance="high" />

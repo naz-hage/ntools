@@ -7,6 +7,7 @@
 // Reuses GitHubRelease authentication logic for token retrieval.
 
 
+using System;
 using Nbuild.Helpers;
 using System.Net.Http.Headers;
 using System.Text.Json;
@@ -22,6 +23,7 @@ namespace Sdo.Services
     {
         private readonly HttpClient _httpClient;
         private readonly string? _overrideToken;
+        private readonly bool _disposeHttpClient;
 
         /// <summary>
         /// Initializes a new instance of the GitHubClient class.
@@ -31,6 +33,7 @@ namespace Sdo.Services
         {
             _overrideToken = token;
             _httpClient = new HttpClient();
+            _disposeHttpClient = true;
             _httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("sdo-cli", "1.0"));
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
 
@@ -40,6 +43,19 @@ namespace Sdo.Services
             {
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("token", authToken);
             }
+        }
+
+        /// <summary>
+        /// Constructs a GitHubClient using an externally provided HttpClient.
+        /// This is useful for unit testing where a mocked HttpMessageHandler can be supplied.
+        /// </summary>
+        /// <param name="httpClient">Pre-configured HttpClient instance.</param>
+        /// <param name="token">Optional token override.</param>
+        public GitHubClient(HttpClient httpClient, string? token = null)
+        {
+            _overrideToken = token;
+            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+            _disposeHttpClient = false; // caller owns the provided HttpClient
         }
 
         /// <summary>
@@ -1063,11 +1079,14 @@ namespace Sdo.Services
         // For brevity the file keeps the original client methods.
 
         /// <summary>
-        /// Disposes the HTTP client.
+        /// Disposes the HTTP client if this instance owns it.
         /// </summary>
         public void Dispose()
         {
-            _httpClient.Dispose();
+            if (_disposeHttpClient)
+            {
+                _httpClient.Dispose();
+            }
         }
 
         /// <summary>
