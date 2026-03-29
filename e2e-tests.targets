@@ -70,6 +70,11 @@
 		      DestinationFolder="$(SolutionDir)\sdo-e2e-test\bin\Debug\net10.0\"
 		      SkipUnchangedFiles="true" />
 		<Message Text="✓ sdo.net executable and dependencies copied to test directory" Importance="high" />
+		<!-- Ensure runtimeconfig exists for sdo.net when running tests. Only copy if missing to avoid overwriting test runtimeconfig. -->
+		<Copy SourceFiles="$(SolutionDir)\Sdo\bin\Debug\sdo.net.runtimeconfig.json"
+		      DestinationFiles="$(SolutionDir)\sdo-e2e-test\bin\Debug\net10.0\sdo.net.runtimeconfig.json"
+		      SkipUnchangedFiles="true"
+		      Condition="!Exists('$(SolutionDir)\sdo-e2e-test\bin\Debug\net10.0\sdo.net.runtimeconfig.json')" />
 	</Target>
 
 	<!-- Run SDO E2E tests -->

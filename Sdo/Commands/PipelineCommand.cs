@@ -207,12 +207,25 @@ namespace Sdo.Commands
         private void AddUpdateCommand(Option<bool> verboseOption)
         {
             var updateCommand = new System.CommandLine.Command("update", "Update pipeline configuration");
+            var fileOption = new Option<string?>("--file") { Description = "Path to pipeline/workflow YAML file to update in repository" };
+            var pipelineOption = new Option<string?>("--pipeline") { Description = "Pipeline/workflow ID or name (optional)" };
+            var messageOption = new Option<string?>("--message") { Description = "Commit message to use when updating the file" };
+            var branchOption = new Option<string?>("--branch") { Description = "Branch to push the update to" };
+
+            updateCommand.Add(fileOption);
+            updateCommand.Add(pipelineOption);
+            updateCommand.Add(messageOption);
+            updateCommand.Add(branchOption);
             updateCommand.Add(verboseOption);
 
             updateCommand.SetAction(async (parseResult) =>
             {
+                var file = parseResult.GetValue(fileOption);
+                var pipeline = parseResult.GetValue(pipelineOption);
+                var message = parseResult.GetValue(messageOption);
+                var branch = parseResult.GetValue(branchOption);
                 var verbose = parseResult.GetValue(verboseOption);
-                return await UpdatePipeline(verbose);
+                return await UpdatePipeline(file, pipeline, message, branch, verbose);
             });
 
             Subcommands.Add(updateCommand);
@@ -779,15 +792,18 @@ namespace Sdo.Commands
                     }
 
                     ConsoleHelper.WriteLine($"[OK] Build queued (ID: {buildId})", ConsoleColor.Green);
-                    var build = await client.GetBuildAsync(repoInfo.Project, buildId);
-                    if (build != null)
+
+                    // Prefer neutral pipeline run wrapper
+                    var run = await client.GetPipelineRunAsync(repoInfo.Project, buildId);
+                    if (run != null)
                     {
-                        var run = build.ToPipelineRun();
-                        if (run != null)
-                        {
-                            Console.WriteLine($"  Pipeline: {run.Name}  Build Number: {run.Name}  Status: {run.Status}");
-                        }
-                        else
+                        Console.WriteLine($"  Pipeline: {run.Name}  Build Number: {run.Name}  Status: {run.Status}");
+                    }
+                    else
+                    {
+                        // Fallback to raw build DTO if wrapper failed to convert
+                        var build = await client.GetBuildAsync(repoInfo.Project, buildId);
+                        if (build != null)
                         {
                             Console.WriteLine($"  Pipeline: {build.Definition?.Name}  Build Number: {build.BuildNumber}  Status: {build.Status}");
                         }
@@ -1193,7 +1209,8 @@ namespace Sdo.Commands
 
                 using (var client = new Sdo.Services.AzureDevOpsClient(pat, organization, project))
                 {
-                    var pipelines = await client.ListPipelinesAsync(project);
+                    // Use neutral pipeline definitions API
+                    var pipelines = await client.ListPipelineDefinitionsAsync(project);
 
                     if (pipelines == null || pipelines.Count == 0)
                     {
@@ -1223,8 +1240,8 @@ namespace Sdo.Commands
                             name = name.Substring(0, 35) + "...";
                         }
 
-                        var lastBuild = pipeline.ModifiedDate.HasValue ? pipeline.ModifiedDate.Value.ToString("g") : "Never";
-                        Console.WriteLine($"{name,-40} {lastBuild,-20} {pipeline.QueueStatus}");
+                        var lastBuild = pipeline.UpdatedAt.HasValue ? pipeline.UpdatedAt.Value.ToString("g") : "Never";
+                        Console.WriteLine($"{name,-40} {lastBuild,-20} {pipeline.State}");
                     }
                 }
 
@@ -1735,7 +1752,7 @@ namespace Sdo.Commands
             }
         }
 
-        private async Task<int> UpdatePipeline(bool verbose)
+        private async Task<int> UpdatePipeline(string? filePath, string? pipelineId, string? commitMessage, string? branch, bool verbose)
         {
             try
             {
@@ -1750,42 +1767,181 @@ namespace Sdo.Commands
                     return 1;
                 }
 
-                if (platform == Platform.GitHub)
+                // If no file provided, fall back to guidance (non-destructive)
+                if (string.IsNullOrWhiteSpace(filePath))
                 {
-                    if (verbose) DisplayGitHubMapping("workflow update");
-                    ConsoleHelper.WriteLine("[INFO] To update GitHub workflow, modify the .github/workflows/<file>.yml and commit/push the change.", ConsoleColor.Yellow);
-                    Console.WriteLine("  Steps:");
-                    Console.WriteLine("    1. Edit .github/workflows/<workflow-file>.yml");
-                    Console.WriteLine("    2. git add <file> && git commit -m 'Update workflow' && git push");
-                    return 0;
-                }
-                else if (platform == Platform.AzureDevOps)
-                {
-                    if (string.IsNullOrEmpty(repoInfo.Organization) || string.IsNullOrEmpty(repoInfo.Project))
+                    if (platform == Platform.GitHub)
                     {
-                        ConsoleHelper.WriteError("X Organization and project are required for Azure DevOps");
-                        return 1;
+                        if (verbose) DisplayGitHubMapping("workflow update");
+                        ConsoleHelper.WriteLine("[INFO] To update GitHub workflow, modify the .github/workflows/<file>.yml and commit/push the change.", ConsoleColor.Yellow);
+                        Console.WriteLine("  Steps:");
+                        Console.WriteLine("    1. Edit .github/workflows/<workflow-file>.yml");
+                        Console.WriteLine("    2. git add <file> && git commit -m 'Update workflow' && git push");
+                        return 0;
+                    }
+                    else if (platform == Platform.AzureDevOps)
+                    {
+                        if (verbose) DisplayAzureDevOpsMapping("pipeline update");
+                        ConsoleHelper.WriteLine("[INFO] To update an Azure DevOps pipeline, update the YAML in your repository and commit/push. Alternatively, update the pipeline definition via Azure DevOps REST API.", ConsoleColor.Yellow);
+                        Console.WriteLine("  Steps:");
+                        Console.WriteLine("    1. Edit azure-pipelines/<pipeline>.yml");
+                        Console.WriteLine("    2. git add <file> && git commit -m 'Update pipeline' && git push");
+                        Console.WriteLine("    3. If pipeline uses pipeline definition in UI, update via Azure DevOps portal or REST API");
+                        return 0;
                     }
 
-                    var pat = AzureDevOpsCredentials.GetTokenOrDefault();
-                    if (string.IsNullOrEmpty(pat))
-                    {
-                        ConsoleHelper.WriteError("X Azure DevOps authentication required.");
-                        Console.WriteLine("Please set AZURE_DEVOPS_PAT environment variable or run: sdo.net auth azdo");
-                        return 1;
-                    }
-
-                    using var client = new Sdo.Services.AzureDevOpsClient(pat, repoInfo.Organization, repoInfo.Project);
-                    ConsoleHelper.WriteLine("[INFO] To update an Azure DevOps pipeline, update the YAML in your repository and commit/push. Alternatively, update the pipeline definition via Azure DevOps REST API.", ConsoleColor.Yellow);
-                    Console.WriteLine("  Steps:");
-                    Console.WriteLine("    1. Edit azure-pipelines/<pipeline>.yml");
-                    Console.WriteLine("    2. git add <file> && git commit -m 'Update pipeline' && git push");
-                    Console.WriteLine("    3. If pipeline uses pipeline definition in UI, update via Azure DevOps portal or REST API");
-                    return 0;
+                    ConsoleHelper.WriteError("X Unable to detect platform from Git remote");
+                    return 1;
                 }
 
-                ConsoleHelper.WriteError("X Unable to detect platform from Git remote");
-                return 1;
+                // Validate file
+                if (!File.Exists(filePath))
+                {
+                    ConsoleHelper.WriteError($"X File not found: {filePath}");
+                    return 1;
+                }
+
+                var ext = Path.GetExtension(filePath).ToLowerInvariant();
+                if (ext != ".yml" && ext != ".yaml")
+                {
+                    ConsoleHelper.WriteError("X Pipeline definition file must be YAML (.yml or .yaml)");
+                    return 1;
+                }
+
+                var message = string.IsNullOrWhiteSpace(commitMessage) ? (platform == Platform.GitHub ? "Update workflow via sdo" : "Update pipeline via sdo") : commitMessage;
+
+                // Stage, commit, push locally. This approach updates YAML-backed pipelines for both GitHub and Azure DevOps.
+                if (verbose) Console.WriteLine($"[INFO] Staging file: {filePath}");
+
+                var addPsi = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "git",
+                    Arguments = $"add \"{filePath}\"",
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                using (var addProc = System.Diagnostics.Process.Start(addPsi))
+                {
+                    if (addProc != null)
+                    {
+                        var aOut = await addProc.StandardOutput.ReadToEndAsync();
+                        var aErr = await addProc.StandardError.ReadToEndAsync();
+                        await addProc.WaitForExitAsync();
+                        if (addProc.ExitCode != 0)
+                        {
+                            ConsoleHelper.WriteError($"X git add failed: {aErr.Trim()}");
+                            return 1;
+                        }
+                    }
+                }
+
+                var commitPsi = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "git",
+                    Arguments = $"commit -m \"{message.Replace("\"", "'\"")}\"",
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                using (var commitProc = System.Diagnostics.Process.Start(commitPsi))
+                {
+                    if (commitProc != null)
+                    {
+                        var cOut = await commitProc.StandardOutput.ReadToEndAsync();
+                        var cErr = await commitProc.StandardError.ReadToEndAsync();
+                        await commitProc.WaitForExitAsync();
+                        if (commitProc.ExitCode != 0)
+                        {
+                            // If there's nothing to commit, continue
+                            if (cOut.Contains("nothing to commit", StringComparison.OrdinalIgnoreCase) || cErr.Contains("nothing to commit", StringComparison.OrdinalIgnoreCase))
+                            {
+                                Console.WriteLine("[INFO] No changes to commit.");
+                            }
+                            else
+                            {
+                                ConsoleHelper.WriteError($"X git commit failed: {cErr.Trim()}");
+                                return 1;
+                            }
+                        }
+                    }
+                }
+
+                var pushArgs = string.IsNullOrWhiteSpace(branch) ? "push" : $"push origin {branch}";
+                var pushPsi = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "git",
+                    Arguments = pushArgs,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                using (var pushProc = System.Diagnostics.Process.Start(pushPsi))
+                {
+                    if (pushProc != null)
+                    {
+                        var pOut = await pushProc.StandardOutput.ReadToEndAsync();
+                        var pErr = await pushProc.StandardError.ReadToEndAsync();
+                        await pushProc.WaitForExitAsync();
+                        if (pushProc.ExitCode != 0)
+                        {
+                            ConsoleHelper.WriteError($"X git push failed: {pErr.Trim()}");
+                            return 1;
+                        }
+                    }
+                }
+
+                ConsoleHelper.WriteLine("[OK] Pipeline/workflow file updated and pushed.", ConsoleColor.Green);
+
+                // Attempt API-driven update for Azure DevOps definitions when a pipeline id was provided
+                if (platform == Platform.AzureDevOps && !string.IsNullOrWhiteSpace(pipelineId))
+                {
+                    if (int.TryParse(pipelineId, out var defId))
+                    {
+                        var pat = AzureDevOpsCredentials.GetTokenOrDefault();
+                        if (!string.IsNullOrEmpty(pat))
+                        {
+                            var org = repoInfo?.Organization ?? repoInfo?.Owner ?? string.Empty;
+                            if (string.IsNullOrWhiteSpace(org) || string.IsNullOrWhiteSpace(repoInfo?.Project))
+                            {
+                                ConsoleHelper.WriteLine("[WARN] Unable to determine Azure DevOps organization/project; skipping REST update.", ConsoleColor.Yellow);
+                            }
+                            else
+                            {
+                                try
+                                {
+                                    using var client = new Sdo.Services.AzureDevOpsClient(pat, org, repoInfo.Project);
+                                    var ok = await client.UpdatePipelineDefinitionYamlAsync(repoInfo.Project, defId, filePath!);
+                                    if (ok)
+                                    {
+                                        ConsoleHelper.WriteLine("[OK] Azure DevOps pipeline definition updated via REST API.", ConsoleColor.Green);
+                                    }
+                                    else
+                                    {
+                                        ConsoleHelper.WriteLine($"[WARN] Azure DevOps REST update failed: {client.LastError}", ConsoleColor.Yellow);
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    ConsoleHelper.WriteLine($"[WARN] Exception calling Azure DevOps REST update: {ex.Message}", ConsoleColor.Yellow);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            ConsoleHelper.WriteLine("[INFO] AZURE_DEVOPS_PAT not found; skipping REST update.", ConsoleColor.Yellow);
+                        }
+                    }
+                }
+
+                // Note: For Azure DevOps UI-backed definitions, further REST API updates may be required. Consider adding UpdatePipelineDefinitionAsync in AzureDevOpsClient when needed.
+                return 0;
             }
             catch (Exception ex)
             {

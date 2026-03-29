@@ -7,6 +7,7 @@
 
 using System.Net.Http.Headers;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 namespace Sdo.Services
@@ -1873,6 +1874,68 @@ namespace Sdo.Services
                 _lastError = $"Exception creating pipeline: {ex.Message}";
                 System.Diagnostics.Debug.WriteLine(_lastError);
                 return -1;
+            }
+        }
+
+        /// <summary>
+        /// Updates an existing pipeline definition to reference the specified YAML filename.
+        /// This performs a GET of the current definition, replaces the process.yamlFilename and process.type,
+        /// then PUTs the modified definition back to Azure DevOps.
+        /// </summary>
+        /// <param name="project">Azure DevOps project name.</param>
+        /// <param name="pipelineId">Numeric pipeline/definition id.</param>
+        /// <param name="yamlFilePath">Repository-relative YAML file path (e.g. "azure-pipelines/ci.yml").</param>
+        /// <returns>True if update succeeded, false otherwise.</returns>
+        public async Task<bool> UpdatePipelineDefinitionYamlAsync(string project, int pipelineId, string yamlFilePath)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(project))
+                {
+                    _lastError = "Project is required to update pipeline definition.";
+                    return false;
+                }
+
+                var url = $"https://dev.azure.com/{_organization}/{System.Uri.EscapeDataString(project)}/_apis/build/definitions/{pipelineId}?api-version=7.0";
+
+                // Fetch existing definition
+                var getResp = await _httpClient.GetAsync(url);
+                if (!getResp.IsSuccessStatusCode)
+                {
+                    var err = await getResp.Content.ReadAsStringAsync();
+                    _lastError = $"Failed to fetch pipeline definition ({getResp.StatusCode}): {getResp.ReasonPhrase}\n{err}";
+                    return false;
+                }
+
+                var originalJson = await getResp.Content.ReadAsStringAsync();
+                var node = JsonNode.Parse(originalJson)?.AsObject();
+                if (node == null)
+                {
+                    _lastError = "Failed to parse pipeline definition JSON.";
+                    return false;
+                }
+
+                var processNode = node["process"] as JsonObject ?? new JsonObject();
+                processNode["yamlFilename"] = yamlFilePath;
+                processNode["type"] = 2; // YAML process type
+                node["process"] = processNode;
+
+                var putContent = new StringContent(node.ToJsonString(), System.Text.Encoding.UTF8, "application/json");
+                var putResp = await _httpClient.PutAsync(url, putContent);
+                if (!putResp.IsSuccessStatusCode)
+                {
+                    var putErr = await putResp.Content.ReadAsStringAsync();
+                    _lastError = $"Update pipeline failed ({putResp.StatusCode}): {putResp.ReasonPhrase}\n{putErr}";
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Exception updating pipeline definition: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return false;
             }
         }
 
