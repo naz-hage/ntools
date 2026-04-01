@@ -4,6 +4,11 @@
 	
 	<Import Project="$(ProgramFiles)\Nbuild\common.targets"/>
 	<Import Project="unit-tests.targets"/>
+	<Import Project="e2e-tests.targets"/>
+
+	<!-- Update documentation versions from JSON configuration files -->
+	<UsingTask TaskName="NbuildTasks.UpdateVersionsInDocs" AssemblyFile="C:\source\ntools\Release\NbuildTasks.dll" />
+	<UsingTask TaskName="NbuildTasks.GenerateCommitMessage" AssemblyFile="C:\source\ntools\Release\NbuildTasks.dll" />
 
 	<PropertyGroup>
 		<!-- This is the folder where the *.sln resides-->
@@ -54,7 +59,6 @@
 		<Message Text="==> DONE"/>
 	</Target>
 
-		
 	<!-- Test for FileVersion task and powershell file-version.ps1-->
 	<Target Name="FILE_VERSIONS"  DependsOnTargets="ARTIFACTS">
 		<PropertyGroup>
@@ -126,14 +130,13 @@
 		<Message Text="==> DONE" />
 	</Target>
 
-  <!-- Run nbTests and generate code coverage report -->
-  <Target Name="RUN_NBTESTS_COVERAGE" DependsOnTargets="INSTALL_REPORTGENERATOR">
+	<!-- Run nbTests and generate code coverage report -->
+	<Target Name="RUN_NBTESTS_COVERAGE" DependsOnTargets="INSTALL_REPORTGENERATOR">
 	<Exec Command="dotnet test &quot;$(SolutionDir)\nbTests\nbTests.csproj&quot; --collect:\&quot;XPlat Code Coverage\&quot;" WorkingDirectory="$(SolutionDir)" />
 	<Exec Command="&quot;$(ReportGeneratorExe)&quot; -reports:$(SolutionDir)\TestResults\**\coverage.cobertura.xml -targetdir:$(SolutionDir)\TestResults\CoverageReport" />
 	<Message Text="nbTests executed and code coverage report generated in TestResults\CoverageReport." />
 	<Message Text="==> DONE" />
   </Target>
-
 
 	<!-- mkdocs deploy locally -->
 	<Target Name="MKDOCS_DEPLOY" AfterTargets="MKDOCS">
@@ -221,7 +224,6 @@
 		<Message Text="==> DONE"/>
 	</Target>
 
-
 	<!-- Build the solution alias solution target -->
     <Target Name="BUILD" >
         <CallTarget Targets="solution" />
@@ -238,133 +240,6 @@
 		</PropertyGroup>
 		<Message Text="API_GITHUB_KEY length: $(GitHubKeyLength)" Condition="'$(API_GITHUB_KEY)' != ''" Importance="high" />
 		<Message Text="==> CHECK_GITHUB_KEY done" Importance="high" />
-	</Target>
-
-	<!-- Test sdo.net.exe output format from ntools and ConsoleApp1 -->
-		<!-- Test sdo.net.exe output format from ntools and ConsoleApp1 -->
-	<Target Name="current-test" DependsOnTargets="BUILD">
-		<Message Text="========================================" Importance="high" />
-		<Message Text="C# vs Python SDO Output Format Comparison" Importance="high" />
-		<Message Text="========================================" Importance="high" />
-
-		<!-- Command 1: Work Item List -->
-		<Message Text="" Importance="high" />
-		<Message Text="╔════════════════════════════════════════╗" Importance="high" />
-		<Message Text="║ Command: sdo workitem list             ║" Importance="high" />
-		<Message Text="╚════════════════════════════════════════╝" Importance="high" />
-
-		<Message Text="" Importance="high" />
-		<Message Text=">>> 1a. sdo workitem list (Python GitHub - ntools)" Importance="high" />
-		<Exec Command="sdo workitem list" WorkingDirectory="$(SolutionDir)" EnvironmentVariables="PYTHONIOENCODING=UTF-8" ContinueOnError="true" />
-
-		<Message Text="" Importance="high" />
-		<Message Text=">>> 1b. sdo.net.exe wi list (C# GitHub - ntools)" Importance="high" />
-		<Exec Command="$(SolutionDir)\Sdo\bin\Release\sdo.net.exe wi list" WorkingDirectory="$(SolutionDir)" ContinueOnError="true" />
-
-		<Message Text="" Importance="high" />
-		<Message Text=">>> 1c. sdo workitem list (Python Azure - ConsoleApp1)" Importance="high" />
-		<Exec Command="sdo workitem list" WorkingDirectory="C:\source\ConsoleApp1" EnvironmentVariables="PYTHONIOENCODING=UTF-8" ContinueOnError="true" />
-
-		<Message Text="" Importance="high" />
-		<Message Text=">>> 1d. sdo.net.exe wi list (C# Azure - ConsoleApp1)" Importance="high" />
-		<Exec Command="$(SolutionDir)\Sdo\bin\Release\sdo.net.exe wi list --verbose" WorkingDirectory="C:\source\ConsoleApp1" ContinueOnError="true" />
-
-		<!-- Command 2: Work Item Show -->
-		<Message Text="" Importance="high" />
-		<Message Text="╔════════════════════════════════════════╗" Importance="high" />
-		<Message Text="║ Command: sdo workitem show --id 1      ║" Importance="high" />
-		<Message Text="╚════════════════════════════════════════╝" Importance="high" />
-
-		<Message Text="" Importance="high" />
-		<Message Text=">>> 2a. sdo workitem show --id 1 (Python GitHub - ntools)" Importance="high" />
-		<Exec Command="sdo workitem show --id 1" WorkingDirectory="$(SolutionDir)" EnvironmentVariables="PYTHONIOENCODING=UTF-8" ContinueOnError="true" />
-
-		<Message Text="" Importance="high" />
-		<Message Text=">>> 2b. sdo.net.exe wi show --id 1 (C# GitHub - ntools)" Importance="high" />
-		<Exec Command="$(SolutionDir)\Sdo\bin\Release\sdo.net.exe wi show --id 1" WorkingDirectory="$(SolutionDir)" ContinueOnError="true" />
-
-		<Message Text="" Importance="high" />
-		<Message Text=">>> 2c. sdo workitem show --id 159 (Python Azure - ConsoleApp1)" Importance="high" />
-		<Exec Command="sdo workitem show --id 159" WorkingDirectory="C:\source\ConsoleApp1" EnvironmentVariables="PYTHONIOENCODING=UTF-8" ContinueOnError="true" />
-
-		<Message Text="" Importance="high" />
-		<Message Text=">>> 2d. sdo.net.exe wi show --id 159 (C# Azure - ConsoleApp1)" Importance="high" />
-		<Exec Command="$(SolutionDir)\Sdo\bin\Release\sdo.net.exe wi show --id 159" WorkingDirectory="C:\source\ConsoleApp1" ContinueOnError="true" />
-
-		<!-- Command 3: Pull Request List -->
-		<Message Text="" Importance="high" />
-		<Message Text="╔════════════════════════════════════════╗" Importance="high" />
-		<Message Text="║ Command: sdo pr ls                     ║" Importance="high" />
-		<Message Text="╚════════════════════════════════════════╝" Importance="high" />
-
-		<Message Text="" Importance="high" />
-		<Message Text=">>> 3a. sdo pr ls (Python GitHub - ntools)" Importance="high" />
-		<Exec Command="sdo pr ls" WorkingDirectory="$(SolutionDir)" EnvironmentVariables="PYTHONIOENCODING=UTF-8" ContinueOnError="true" />
-
-		<Message Text="" Importance="high" />
-		<Message Text=">>> 3b. sdo.net.exe pr list (C# GitHub - ntools)" Importance="high" />
-		<Exec Command="$(SolutionDir)\Sdo\bin\Release\sdo.net.exe pr list" WorkingDirectory="$(SolutionDir)" ContinueOnError="true" />
-
-		<Message Text="" Importance="high" />
-		<Message Text=">>> 3c. sdo pr ls (Python Azure - ConsoleApp1)" Importance="high" />
-		<Exec Command="sdo pr ls" WorkingDirectory="C:\source\ConsoleApp1" EnvironmentVariables="PYTHONIOENCODING=UTF-8" ContinueOnError="true" />
-
-		<Message Text="" Importance="high" />
-		<Message Text=">>> 3d. sdo.net.exe pr list (C# Azure - ConsoleApp1)" Importance="high" />
-		<Exec Command="$(SolutionDir)\Sdo\bin\Release\sdo.net.exe pr list" WorkingDirectory="C:\source\ConsoleApp1" ContinueOnError="true" />
-
-		<!-- Command 4: Pull Request Status -->
-		<Message Text="" Importance="high" />
-		<Message Text="╔════════════════════════════════════════╗" Importance="high" />
-		<Message Text="║ Command: sdo pr status                 ║" Importance="high" />
-		<Message Text="╚════════════════════════════════════════╝" Importance="high" />
-
-		<Message Text="" Importance="high" />
-		<Message Text=">>> 4a. sdo pr status 253 (Python GitHub - ntools)" Importance="high" />
-		<Exec Command="sdo pr status 253" WorkingDirectory="$(SolutionDir)" EnvironmentVariables="PYTHONIOENCODING=UTF-8" ContinueOnError="true" />
-
-		<Message Text="" Importance="high" />
-		<Message Text=">>> 4b. sdo.net.exe pr status 253 (C# GitHub - ntools)" Importance="high" />
-		<Exec Command="$(SolutionDir)\Sdo\bin\Release\sdo.net.exe pr status 253" WorkingDirectory="$(SolutionDir)" ContinueOnError="true" />
-
-		<Message Text="" Importance="high" />
-		<Message Text=">>> 4c. sdo pr status 46 (Python Azure - ConsoleApp1)" Importance="high" />
-		<Exec Command="sdo pr status 46" WorkingDirectory="C:\source\ConsoleApp1" EnvironmentVariables="PYTHONIOENCODING=UTF-8" ContinueOnError="true" />
-
-		<Message Text="" Importance="high" />
-		<Message Text=">>> 4d. sdo.net.exe pr status 46 (C# Azure - ConsoleApp1)" Importance="high" />
-		<Exec Command="$(SolutionDir)\Sdo\bin\Release\sdo.net.exe pr status 46" WorkingDirectory="C:\source\ConsoleApp1" ContinueOnError="true" />
-
-		<!-- Command 5: Repository List -->
-		<Message Text="" Importance="high" />
-		<Message Text="╔════════════════════════════════════════╗" Importance="high" />
-		<Message Text="║ Command: sdo pr ls --top 5             ║" Importance="high" />
-		<Message Text="╚════════════════════════════════════════╝" Importance="high" />
-
-		<Message Text="" Importance="high" />
-		<Message Text=">>> 5a. sdo pr ls --top 5 (Python GitHub - ntools)" Importance="high" />
-		<Exec Command="sdo pr ls --top 5" WorkingDirectory="$(SolutionDir)" EnvironmentVariables="PYTHONIOENCODING=UTF-8" ContinueOnError="true" />
-
-		<Message Text="" Importance="high" />
-		<Message Text=">>> 5b. sdo.net.exe repo list --top 5 (C# GitHub - ntools)" Importance="high" />
-		<Exec Command="$(SolutionDir)\Sdo\bin\Release\sdo.net.exe repo list --top 5" WorkingDirectory="$(SolutionDir)" ContinueOnError="true" />
-
-		<Message Text="" Importance="high" />
-		<Message Text=">>> 5c. sdo pr ls --top 5 (Python Azure - ConsoleApp1)" Importance="high" />
-		<Exec Command="sdo pr ls --top 5" WorkingDirectory="C:\source\ConsoleApp1" EnvironmentVariables="PYTHONIOENCODING=UTF-8" ContinueOnError="true" />
-
-		<Message Text="" Importance="high" />
-		<Message Text=">>> 5d. sdo.net.exe repo list --top 5 (C# Azure - ConsoleApp1)" Importance="high" />
-		<Exec Command="$(SolutionDir)\Sdo\bin\Release\sdo.net.exe repo list --top 5" WorkingDirectory="C:\source\ConsoleApp1" ContinueOnError="true" />
-
-		<!-- Summary -->
-		<Message Text="" Importance="high" />
-		<Message Text="╔════════════════════════════════════════╗" Importance="high" />
-		<Message Text="║ ✓ Output format comparison complete    ║" Importance="high" />
-		<Message Text="╚════════════════════════════════════════╝" Importance="high" />
-		<Message Text="" Importance="high" />
-		<Message Text="Pattern: a=Python GitHub | b=C# GitHub | c=Python Azure | d=C# Azure" Importance="high" />
-		<Message Text="Review above to verify C# matches Python format on both platforms" Importance="high" />
 	</Target>
 
 	<!-- Update ntools locally for testing -->
@@ -436,9 +311,6 @@
 		<Message Text="==> DONE"/>
 	</Target>
 
-	<!-- Update documentation versions from JSON configuration files -->
-	<UsingTask TaskName="NbuildTasks.UpdateVersionsInDocs" AssemblyFile="C:\source\ntools\Release\NbuildTasks.dll" />
-	<UsingTask TaskName="NbuildTasks.GenerateCommitMessage" AssemblyFile="C:\source\ntools\Release\NbuildTasks.dll" />
 	
 	<Target Name="UPDATE_DOC_VERSIONS" DependsOnTargets="PROPERTIES">
 		<UpdateVersionsInDocs 
@@ -808,6 +680,18 @@
 			<SdoSourceDir>$(SolutionDir)\atools</SdoSourceDir>
 		</PropertyGroup>
 
+		<!-- Install SDO dependencies first -->
+		<Message Text="Installing SDO dependencies..." Importance="high" />
+		<Exec Command='$(PythonExe) -m pip install requests click pyyaml' ContinueOnError="true" />
+
+		<!-- Build and install SDO in development mode to generate executable -->
+		<Message Text="Building SDO executable using pip install -e..." Importance="high" />
+		<Exec Command='$(PythonExe) -m pip install -e "$(SdoSourceDir)"' />
+
+		<!-- Use Python to find and copy sdo.exe -->
+		<Message Text="Locating and copying SDO executable..." Importance="high" />
+		<Exec Command='$(PythonExe) -c "import shutil, sysconfig, os; scripts = sysconfig.get_path(&apos;scripts&apos;); src = os.path.join(scripts, &apos;sdo.exe&apos;); dst = os.path.join(&apos;$(ArtifactsFolder)&apos;, &apos;sdo.exe&apos;); os.path.exists(src) and shutil.copy2(src, dst) or print(f&apos;Warning: sdo.exe not found at {src}&apos;)"' ContinueOnError="true" />
+
 		<!-- Copy SDO installation script and documentation -->
 		<Message Text="Copying SDO installation files..." Importance="high" />
 		<Copy SourceFiles="$(SdoSourceDir)\install-sdo.py" DestinationFiles="$(ArtifactsFolder)\install-sdo.py" />
@@ -820,7 +704,7 @@
 		</ItemGroup>
 		<Copy SourceFiles="@(SdoPackageFiles)" DestinationFiles="@(SdoPackageFiles->'$(ArtifactsFolder)\sdo_package\%(RecursiveDir)%(Filename)%(Extension)')" />
 
-		<Message Text="SDO package built successfully with virtual environment installer" Importance="high" />
+		<Message Text="SDO package built successfully with executable" Importance="high" />
 		<Message Text="==> BUILD_SDO DONE"/>
 	</Target>
 

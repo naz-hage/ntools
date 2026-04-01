@@ -282,7 +282,7 @@ namespace Sdo.Commands
                             return 1;
                         }
 
-                        Console.WriteLine("[OK] Pull request created successfully!");
+                        Console.WriteLine("✓ Pull request created successfully!");
                         Console.WriteLine($"URL: {pr.Url}");
                         if (verbose)
                         {
@@ -365,7 +365,7 @@ namespace Sdo.Commands
                         return 1;
                     }
 
-                    Console.WriteLine("[OK] Pull request created successfully!");
+                    Console.WriteLine("✓ Pull request created successfully!");
                     Console.WriteLine($"URL: {pr.Url}");
                     // If a work item ID was provided, attempt to link it to the created PR
                     if (workItem > 0)

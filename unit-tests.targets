@@ -87,6 +87,20 @@
         <Message Text="Unit tests for RepositoryCommand complete." />
     </Target>
 
+    <!-- Unit tests for PipelineCommand -->
+    <Target Name="UNIT_TEST_PIPELINE_COMMAND">
+        <Message Text="Running unit tests for PipelineCommand..." />
+        <Exec Command='dotnet test "$(SolutionDir)\SdoTests\SdoTests.csproj" --filter "FullyQualifiedName~PipelineCommandTests" --logger trx' WorkingDirectory="$(SolutionDir)" />
+        <Message Text="Unit tests for PipelineCommand complete." />
+    </Target>
+
+    <!-- Ad hoc integration-style test for AzureDevOpsClient.GetPipelineAsync -->
+    <Target Name="UNIT_TEST_ADHOC_GET_PIPELINE_ASYNC">
+        <Message Text="Running ad hoc test for AzureDevOpsClient.GetPipelineAsync..." />
+        <Exec Command='dotnet test "$(SolutionDir)\SdoTests\SdoTests.csproj" --filter "FullyQualifiedName~AdHoc_GetPipelineAsync_WithConfiguredEnvironment_ReturnsPipeline" --logger trx' WorkingDirectory="$(SolutionDir)" />
+        <Message Text="Ad hoc GetPipelineAsync test complete." />
+    </Target>
+
     <!-- Unit tests for PullRequestCommand -->
     <Target Name="UNIT_TEST_PULL_REQUEST_COMMAND">
         <Message Text="Running unit tests for PullRequestCommand..." />
@@ -116,7 +130,7 @@
     </Target>
 
     <!-- Run all unit tests -->
-    <Target Name="UNIT_TEST_ALL" DependsOnTargets="UNIT_TEST_CLI_VALIDATION;UNIT_TEST_BUILD_STARTER;UNIT_TEST_CLI;UNIT_TEST_COMMAND;UNIT_TEST_NB_COMMAND;UNIT_TEST_GIT_CLONE_COMMAND;UNIT_TEST_NTOOLS_JSON;UNIT_TEST_RELEASE_SERVICE_FACTORY;UNIT_TEST_RESOURCE_HELPER;UNIT_TEST_WORKITEM_COMMAND;UNIT_TEST_WORKITEM_STATE_TRANSLATOR">
+    <Target Name="UNIT_TEST_ALL" DependsOnTargets="UNIT_TEST_CLI_VALIDATION;UNIT_TEST_BUILD_STARTER;UNIT_TEST_CLI;UNIT_TEST_COMMAND;UNIT_TEST_NB_COMMAND;UNIT_TEST_GIT_CLONE_COMMAND;UNIT_TEST_NTOOLS_JSON;UNIT_TEST_RELEASE_SERVICE_FACTORY;UNIT_TEST_RESOURCE_HELPER;UNIT_TEST_WORKITEM_COMMAND;UNIT_TEST_PIPELINE_COMMAND;UNIT_TEST_WORKITEM_STATE_TRANSLATOR">
         <Message Text="All unit tests completed." />
     </Target>
 
