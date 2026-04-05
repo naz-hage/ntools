@@ -309,12 +309,12 @@ sdo.net wi comment --id 243 --message "Looks good!" --verbose
 
 ### pr — Pull Request Operations
 
-List, show, create, and manage pull requests on GitHub and Azure DevOps.
+List, show, create, and manage pull requests on GitHub and Azure DevOps. `pr create` uses markdown files similar to `wi create`.
 
 **Subcommands:**
 - `list` — List pull requests
 - `show` — Display PR details
-- `create` — Create pull request
+- `create` — Create pull request from markdown file
 - `status` — Check PR status
 - `update` — Update PR properties
 
@@ -329,11 +329,11 @@ Usage:
   sdo.net pr [command] [options]
 
 Commands:
-  create  Create a new pull request
-  list    List pull requests
-  show    Display pull request information
-  status  Check pull request status
-  update  Update pull request properties
+  create  Create a pull request from markdown file
+  list    List pull requests in the current repository
+  show    Show detailed information about a pull request
+  status  Show status of a pull request
+  update  Update an existing pull request
 ```
 
 #### pr list
@@ -342,16 +342,16 @@ List pull requests with optional filtering.
 
 **Usage:**
 ```bash
-sdo.net pr list                         # List open PRs
-sdo.net pr list --state closed         # List closed PRs
-sdo.net pr list --state merged         # List merged PRs
+sdo.net pr list                         # List active PRs (default)
+sdo.net pr list --status closed         # List closed PRs
+sdo.net pr list --status merged         # List merged PRs
 sdo.net pr list --top 20               # Limit to 20
 sdo.net pr list --verbose              # Show API commands
 ```
 
 **Options:**
-- `--state <state>` — Filter: `open`, `closed`, `merged`
-- `--top <N>` — Maximum results
+- `--status <status>` — Filter by status: `active`, `closed`, `merged` (default: active)
+- `--top <N>` — Maximum results (default: 10)
 - `--verbose` — Show mapping
 
 #### pr show
@@ -360,31 +360,58 @@ Display pull request details.
 
 **Usage:**
 ```bash
-sdo.net pr show --id 12                # Show PR #12
-sdo.net pr show --id 12 --verbose      # Show API command
+sdo.net pr show 12                # Show PR #12
+sdo.net pr show 12 --verbose      # Show API command
 ```
 
 **Options:**
-- `--id <id>` — PR ID/number (required)
+- `<pr-id>` — PR ID/number (required)
 - `--verbose` — Show mapping
 
 #### pr create
 
-Create a new pull request.
+Create a new pull request from markdown file.
 
 **Usage:**
 ```bash
-sdo.net pr create --title "Fix bug" --description "Details" --source feature-branch --target main
-sdo.net pr create --title "Feature" --source dev --target main --draft
+sdo.net pr create --file pr.md                        # Create from file
+sdo.net pr create -f pr.md                            # Short option
+sdo.net pr create --file pr.md --work-item 243        # Link to work item
+sdo.net pr create --file pr.md --draft                # Create as draft
+sdo.net pr create --file pr.md --dry-run              # Preview
+sdo.net pr create --file pr.md --verbose              # Show mapping
 ```
 
 **Options:**
-- `--title <text>` — PR title (required)
-- `--description <text>` — PR description
-- `--source <branch>` — Source branch
-- `--target <branch>` — Target branch
-- `--draft` — Create as draft (GitHub)
+- `--file <path>` — Path to markdown file (required)
+- `-f <path>` — Short alias
+- `--work-item <id>` — Work item ID to link to PR
+- `--draft` — Create as draft pull request
+- `--dry-run` — Preview without creating
 - `--verbose` — Show mapping
+
+**Markdown Format:**
+```markdown
+# PR Title
+
+This is the pull request description.
+
+## Changes
+- Change 1
+- Change 2
+```
+
+Optional YAML metadata:
+```markdown
+---
+target_branch: main
+source_branch: feature
+reviewers: "user1, user2"
+---
+
+# Title
+...
+```
 
 #### pr status
 
@@ -392,12 +419,12 @@ Check pull request status.
 
 **Usage:**
 ```bash
-sdo.net pr status --id 12              # Check PR status
-sdo.net pr status --id 12 --verbose    # Show full details
+sdo.net pr status 12              # Check PR status
+sdo.net pr status 12 --verbose    # Show full details
 ```
 
 **Options:**
-- `--id <id>` — PR ID/number (required)
+- `<pr-id>` — PR ID/number (required)
 - `--verbose` — Show mapping
 
 #### pr update
@@ -406,15 +433,19 @@ Update pull request properties.
 
 **Usage:**
 ```bash
-sdo.net pr update --id 12 --title "Updated title"
-sdo.net pr update --id 12 --state closed
+sdo.net pr update --pr-id 12 --title "Updated title"
+sdo.net pr update --pr-id 12 --file updated.md
+sdo.net pr update --pr-id 12 --status closed
+sdo.net pr update --pr-id 12 --title "New title" --status merged
 ```
 
 **Options:**
-- `--id <id>` — PR ID/number (required)
+- `--pr-id <id>` — PR ID to update (required)
+- `--file <path>` — Markdown file with updated details
+- `-f <path>` — Short alias for `--file`
 - `--title <text>` — New title
-- `--description <text>` — New description
-- `--state <state>` — New state (`open`, `closed`)
+- `-t <text>` — Short alias for `--title`
+- `--status <status>` — New status (`active`, `closed`, `merged`)
 - `--verbose` — Show mapping
 
 ---
