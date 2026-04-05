@@ -13,21 +13,26 @@
       
       
       
+        <link rel="prev" href="../issue-gh-example/">
+      
+      
+      
+        
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.31">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.4">
     
     
       
-        <title>sdo.exe - Simple DevOps Operations Tool (C# Version) - Ntools - Work in Progress</title>
+        <title>SDO.NET - Ntools - Work in Progress</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.3cba04c6.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -46,11 +51,10 @@
       
     
     
-    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
-    
     
     
   </head>
@@ -72,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#sdoexe-simple-devops-operations-tool-c-version" class="md-skip">
+        <a href="#sdonet-simple-devops-operations-tool-c-version" class="md-skip">
           Skip to content
         </a>
       
@@ -89,12 +93,12 @@
     <a href="../.." title="Ntools - Work in Progress" class="md-header__button md-logo" aria-label="Ntools - Work in Progress" data-md-component="logo">
       
   
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
       
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
     </label>
     <div class="md-header__title" data-md-component="header-title">
       <div class="md-header__ellipsis">
@@ -106,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              sdo.exe - Simple DevOps Operations Tool (C# Version)
+              SDO.NET
             
           </span>
         </div>
@@ -126,30 +130,32 @@
       
     
     
-      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
     
     
     
-      <label class="md-header__button md-icon" for="__search">
-        
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
-      </label>
-      <div class="md-search" data-md-component="search" role="dialog">
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
     <form class="md-search__form" name="search">
       <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
       <label class="md-search__icon md-icon" for="__search">
         
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
         
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
       </label>
       <nav class="md-search__options" aria-label="Search">
         
         <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
           
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
         </button>
       </nav>
       
@@ -168,13 +174,14 @@
     </div>
   </div>
 </div>
+      
     
     
       <div class="md-header__source">
         <a href="https://github.com/naz-hage/ntools" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
   </div>
   <div class="md-source__repository">
     ntools
@@ -200,11 +207,13 @@
   
   
   
+  
     
     
       <li class="md-tabs__item">
         <a href="../.." class="md-tabs__link">
           
+  
   
   Getting Started
 
@@ -218,11 +227,13 @@
   
   
   
+  
     
     
       <li class="md-tabs__item">
         <a href="../../ntools/nbuild/" class="md-tabs__link">
           
+  
   
   List of Tools
 
@@ -236,11 +247,13 @@
   
   
   
+  
     
     
       <li class="md-tabs__item">
         <a href="../../ntools/nbuildtasks/" class="md-tabs__link">
           
+  
   
   Custom Build Tasks
 
@@ -254,11 +267,13 @@
   
   
   
+  
     
     
       <li class="md-tabs__item">
         <a href="../../version-automation-guide/" class="md-tabs__link">
           
+  
   
   Developer setup
 
@@ -272,11 +287,13 @@
   
   
   
+  
     
     
       <li class="md-tabs__item">
         <a href="../../ntools/code-coverage/" class="md-tabs__link">
           
+  
   
   Build System Features
 
@@ -290,17 +307,59 @@
   
   
   
+  
+    <li class="md-tabs__item">
+      <a href="../../todo.md" class="md-tabs__link">
+        
+  
+  
+    
+  
+  TODO
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
     
     
       <li class="md-tabs__item">
         <a href="../" class="md-tabs__link">
           
   
+  
   atools
 
         </a>
       </li>
     
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  SDO.NET
+
+      </a>
+    </li>
   
 
       
@@ -331,7 +390,7 @@
     <a href="../.." title="Ntools - Work in Progress" class="md-nav__button md-logo" aria-label="Ntools - Work in Progress" data-md-component="logo">
       
   
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
     Ntools - Work in Progress
@@ -341,7 +400,7 @@
       <a href="https://github.com/naz-hage/ntools" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
   </div>
   <div class="md-source__repository">
     ntools
@@ -357,6 +416,7 @@
   
   
   
+    
     
     
     
@@ -376,9 +436,16 @@
           <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
             
   
+  
   <span class="md-ellipsis">
+    
+  
     Getting Started
+  
+
+    
   </span>
+  
   
 
             <span class="md-nav__icon md-icon"></span>
@@ -387,7 +454,11 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_1">
             <span class="md-nav__icon md-icon"></span>
-            Getting Started
+            
+  
+    Getting Started
+  
+
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -401,9 +472,16 @@
       <a href="../.." class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Overview
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -422,9 +500,16 @@
       <a href="../../installation/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Installation
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -443,9 +528,16 @@
       <a href="../../usage/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Practice
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -464,9 +556,16 @@
       <a href="../../setup/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Setup your project
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -485,9 +584,16 @@
       <a href="../../buildtypes/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Build Types
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -506,9 +612,16 @@
       <a href="../../versioning/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Versioning
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -530,6 +643,7 @@
   
   
   
+    
     
     
     
@@ -549,9 +663,16 @@
           <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
             
   
+  
   <span class="md-ellipsis">
+    
+  
     List of Tools
+  
+
+    
   </span>
+  
   
 
             <span class="md-nav__icon md-icon"></span>
@@ -560,7 +681,11 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
-            List of Tools
+            
+  
+    List of Tools
+  
+
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -574,9 +699,16 @@
       <a href="../../ntools/nbuild/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Nbuild (nb.exe)
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -595,9 +727,16 @@
       <a href="../../ntools/lf/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     lf (lf.exe)
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -616,9 +755,16 @@
       <a href="../../ntools/nbackup/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Nbackup (nbackup.exe)
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -637,9 +783,16 @@
       <a href="../../ntools/github-release/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Github Release
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -661,6 +814,7 @@
   
   
   
+    
     
     
     
@@ -680,9 +834,16 @@
           <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
             
   
+  
   <span class="md-ellipsis">
+    
+  
     Custom Build Tasks
+  
+
+    
   </span>
+  
   
 
             <span class="md-nav__icon md-icon"></span>
@@ -691,7 +852,11 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
-            Custom Build Tasks
+            
+  
+    Custom Build Tasks
+  
+
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -705,9 +870,16 @@
       <a href="../../ntools/nbuildtasks/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Nbuild Tasks
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -729,6 +901,7 @@
   
   
   
+    
     
     
     
@@ -748,9 +921,16 @@
           <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
             
   
+  
   <span class="md-ellipsis">
+    
+  
     Developer setup
+  
+
+    
   </span>
+  
   
 
             <span class="md-nav__icon md-icon"></span>
@@ -759,7 +939,11 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
-            Developer setup
+            
+  
+    Developer setup
+  
+
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -773,9 +957,16 @@
       <a href="../../version-automation-guide/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Version Automation Guide
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -794,9 +985,16 @@
       <a href="../../ntools/ntools/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Development Tools
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -811,6 +1009,7 @@
   
   
   
+    
     
     
     
@@ -830,9 +1029,16 @@
           <label class="md-nav__link" for="__nav_4_3" id="__nav_4_3_label" tabindex="0">
             
   
+  
   <span class="md-ellipsis">
+    
+  
     ntools-scripts module
+  
+
+    
   </span>
+  
   
 
             <span class="md-nav__icon md-icon"></span>
@@ -841,7 +1047,11 @@
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4_3">
             <span class="md-nav__icon md-icon"></span>
-            ntools-scripts module
+            
+  
+    ntools-scripts module
+  
+
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -855,9 +1065,16 @@
       <a href="../../ntools/ntools-scripts-module/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Module
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -876,9 +1093,16 @@
       <a href="../../ntools/ntools-scripts-module-api/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     API
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -908,6 +1132,7 @@
   
   
   
+    
     
     
     
@@ -927,9 +1152,16 @@
           <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
             
   
+  
   <span class="md-ellipsis">
+    
+  
     Build System Features
+  
+
+    
   </span>
+  
   
 
             <span class="md-nav__icon md-icon"></span>
@@ -938,7 +1170,11 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
-            Build System Features
+            
+  
+    Build System Features
+  
+
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -952,9 +1188,16 @@
       <a href="../../ntools/code-coverage/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Code Coverage
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -973,9 +1216,16 @@
       <a href="../../ntools/nbuild-targets/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     MSBuild Targets
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -997,6 +1247,34 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="../../todo.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TODO
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
     
     
     
@@ -1010,24 +1288,35 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
         
           
-          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
             
   
+  
   <span class="md-ellipsis">
+    
+  
     atools
+  
+
+    
   </span>
+  
   
 
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_6">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
             <span class="md-nav__icon md-icon"></span>
-            atools
+            
+  
+    atools
+  
+
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -1041,9 +1330,16 @@
       <a href="../" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Overview
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -1061,6 +1357,7 @@
     
     
     
+    
       
       
         
@@ -1071,24 +1368,35 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_2" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7_2" >
         
           
-          <label class="md-nav__link" for="__nav_6_2" id="__nav_6_2_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_7_2" id="__nav_7_2_label" tabindex="0">
             
   
+  
   <span class="md-ellipsis">
+    
+  
     List of tools
+  
+
+    
   </span>
+  
   
 
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_6_2">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_2">
             <span class="md-nav__icon md-icon"></span>
-            List of tools
+            
+  
+    List of tools
+  
+
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -1102,9 +1410,16 @@
       <a href="../sdo/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     SDO (Simple DevOps Operations)
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -1123,9 +1438,16 @@
       <a href="../sdo-installation/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     SDO Installation
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -1144,9 +1466,16 @@
       <a href="../install-ntools/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Install NTools
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -1173,9 +1502,16 @@
       <a href="../../devops-tools-suite-architecture/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     DevOps Tools Suite Architecture
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -1194,9 +1530,208 @@
       <a href="../azdo_payloads/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     AzDO payloads
+  
+
+    
   </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_5" id="__nav_7_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Examples
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Examples
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../issue-azdo-bug-example/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AzDO Bug Example
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../issue-azdo-epic-example/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AzDO Epic Example
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../issue-azdo-pbi-example/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AzDO PBI Example
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../issue-azdo-task-example/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AzDO Task Example
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../issue-gh-example/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub Issue Example
+  
+
+    
+  </span>
+  
   
 
       </a>
@@ -1207,6 +1742,577 @@
             
           </ul>
         </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SDO.NET
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SDO.NET
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#key-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#main-help" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Main Help
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#help-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Help Output
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Help Output">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#wi-command-help" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        wi Command Help
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#show-subcommand-help" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Show Subcommand Help
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#list-subcommand-help" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        List Subcommand Help
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Prerequisites">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authentication
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Authentication">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#github" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GitHub
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#azure-devops" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Azure DevOps
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#git-repository-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Git Repository Context
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Usage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#authentication-verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authentication Verification
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#work-item-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Work Item Management
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Work Item Management">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#list-work-items" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        List Work Items
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-work-item" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create Work Item
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#update-work-item" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Update Work Item
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#add-comment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add Comment
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#show-work-item-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Show Work Item Details
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#command-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Command Reference
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Command Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#map-show-native-cli-mappings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        map — Show native CLI mappings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#auth-verify-authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        auth — Verify authentication
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wi-work-item-issue-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        wi — Work item (issue) commands
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#repo-repository-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        repo — Repository commands
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pr-pull-request-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        pr — Pull request commands
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pipeline-pipeline-workflow-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        pipeline — Pipeline / workflow commands
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#user-user-and-permissions-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        user — User and permissions commands
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#platform-detection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Platform Detection
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#no-issues-found" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "No issues found"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#could-not-determine-github-repository-from-git-remote" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "Could not determine GitHub repository from Git remote"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#authentication-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authentication Errors
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#state-validation-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        State Validation Errors
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#manual-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Manual Testing
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#development" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Development
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Development">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#building-from-source" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Building from Source
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -1222,48 +2328,92 @@
           
           
             <div class="md-content" data-md-component="content">
+              
               <article class="md-content__inner md-typeset">
                 
                   
 
+
   
   
 
 
-<h1 id="sdoexe-simple-devops-operations-tool-c-version">sdo.exe - Simple DevOps Operations Tool (C# Version)<a class="headerlink" href="#sdoexe-simple-devops-operations-tool-c-version" title="Anchor link to this section for reference">&para;</a></h1>
-<p>This page documents the <code>sdo.exe</code> CLI tool - the C# migration of Simple DevOps Operations. Use this page for detailed usage examples, prerequisites, and command reference.</p>
+<h1 id="sdonet-simple-devops-operations-tool-c-version">sdo.net - Simple DevOps Operations Tool (C# Version)<a class="headerlink" href="#sdonet-simple-devops-operations-tool-c-version" title="Anchor link to this section for reference">&para;</a></h1>
+<p>This page documents the <code>sdo.net</code> CLI tool - the C# migration of Simple DevOps Operations. Use this page for detailed usage examples, prerequisites, and command reference.</p>
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Anchor link to this section for reference">&para;</a></h2>
-<p><code>sdo.exe</code> (Simple DevOps Operations) is a C# implementation providing unified operations for work items across Azure DevOps and GitHub platforms. It automatically detects the target platform from Git remote configuration.</p>
-<h3 id="key-features-phase-31-complete">Key Features (Phase 3.1 Complete)<a class="headerlink" href="#key-features-phase-31-complete" title="Anchor link to this section for reference">&para;</a></h3>
+<p><code>sdo.net</code> (Simple DevOps Operations) is a C# implementation providing unified operations for work items across Azure DevOps and GitHub platforms. It automatically detects the target platform from Git remote configuration.</p>
+<h3 id="key-features">Key Features<a class="headerlink" href="#key-features" title="Anchor link to this section for reference">&para;</a></h3>
 <ul>
 <li><strong>Work Item Management</strong>:</li>
-<li><code>wi show</code>: Display detailed work item information (GitHub issues or Azure DevOps work items)</li>
-<li><code>wi list</code>: List work items with filtering and pagination (excludes done/closed by default)</li>
-<li><code>wi create</code>: Create new work items from markdown files with title, description, and acceptance criteria</li>
-<li><code>wi update</code>: Update work item properties (title, state, description, assignee) with platform-aware state translation</li>
-<li><code>wi comment</code>: Add comments/discussion to work items</li>
-<li><strong>Multi-Platform Support</strong>: Seamless operations across Azure DevOps and GitHub</li>
-<li><strong>Automatic Platform Detection</strong>: Detects platform from Git remote configuration</li>
-<li><strong>State Management</strong>: Canonical work item states (New, Approved, Committed, Done, To Do, In Progress) with automatic platform translation</li>
-<li><strong>Clean Output Formatting</strong>: Native table display with emoji headers and proper column alignment</li>
-<li><strong>Comprehensive Error Handling</strong>: Platform-specific error messages with state guidance</li>
+<li>
+<p><code>wi</code> commands for listing, showing, creating, updating and commenting on work items (GitHub issues/Azure DevOps work items) with cross-platform state translation</p>
+</li>
+<li>
+<p><strong>Pull Request (PR) Commands</strong>:</p>
+</li>
+<li>
+<p><code>pr</code> commands for listing, showing, creating and updating pull requests (merge/approve planned as advanced ops)</p>
+</li>
+<li>
+<p><strong>Pipeline / Workflow Commands</strong>:</p>
+</li>
+<li>
+<p><code>pipeline</code> commands to list, show, create, run, check status, view logs and manage pipeline definitions</p>
+</li>
+<li>
+<p><strong>Repository Commands</strong>:</p>
+</li>
+<li>
+<p><code>repo</code> commands to list, show and manage repositories with consistent cross-platform output</p>
+</li>
+<li>
+<p><strong>User &amp; Permissions Commands</strong>:</p>
+</li>
+<li>
+<p><code>user</code> subcommands: <code>list</code>, <code>show</code>, <code>search</code>, <code>permissions</code> — useful for audits and parity checks</p>
+</li>
+<li>
+<p><strong>Map / Native CLI Mappings</strong>:</p>
+</li>
+<li>
+<p><code>map</code> shows how SDO commands map to native platform CLIs (<code>gh</code>, <code>az</code>), and with <code>--verbose</code> prints the exact native API commands (copy/paste ready)</p>
+</li>
+<li>
+<p><strong>Platform Auto-Detection</strong>: Extracts org/project from Git remotes and selects GitHub or Azure DevOps automatically</p>
+</li>
+<li>
+<p><strong>State Management &amp; Translation</strong>:</p>
+</li>
+<li>
+<p>Canonical work item states: <code>New</code>, <code>Approved</code>, <code>Committed</code>, <code>Done</code>, <code>To Do</code>, <code>In Progress</code> with automatic translation to GitHub <code>open|closed</code> where appropriate</p>
+</li>
+<li>
+<p><strong>Performance &amp; API Improvements</strong>:</p>
+</li>
+<li>
+<p>Pagination and batch API optimizations for GitHub and Azure DevOps (reduced O(n) calls)</p>
+</li>
+<li>
+<p><strong>Testing &amp; CI Targets</strong>:</p>
+</li>
+<li>
+<p>Comprehensive unit test suites (work item, repo, PR tests) and specific <code>UNIT_TEST_*</code> targets for CI and local verification</p>
+</li>
+<li>
+<p><strong>UX &amp; Output</strong>:</p>
+</li>
+<li>Clean, emoji-enhanced table output and concise error messages; verbose mode exposes request/response and mapping information for debugging</li>
 </ul>
-<h3 id="planned-features-phase-32">Planned Features (Phase 3.2+)<a class="headerlink" href="#planned-features-phase-32" title="Anchor link to this section for reference">&para;</a></h3>
-<ul>
-<li>Additional commands: <code>pipeline</code>, <code>pr</code> (pull request), <code>repo</code> (repository) management</li>
-</ul>
-<h2 id="help-output">Help Output<a class="headerlink" href="#help-output" title="Anchor link to this section for reference">&para;</a></h2>
-<p>View the available commands and options:</p>
 <h3 id="main-help">Main Help<a class="headerlink" href="#main-help" title="Anchor link to this section for reference">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>$ sdo --help
+<div class="highlight"><pre><span></span><code>$ sdo.net --help
 
-Simple DevOps Operations (SDO) - C# Migration
-============================================
+sdo.net v1.72.6 - Simple DevOps Operations by naz-hage (2020-2026)
+
 Description:
   Simple DevOps Operations CLI tool for Azure DevOps and GitHub
 
 Usage:
-  sdo [command] [options]
+  sdo.net [command] [options]
 
 Options:
   --verbose       Enable verbose output
@@ -1271,20 +2421,26 @@ Options:
   --version       Show version information
 
 Commands:
-  map       Show command mappings between SDO and native CLI tools
+  map       Show command mappings between sdo.net and native CLI tools
   auth      Verify authentication with GitHub or Azure DevOps
-  wi  Work item management commands
+  pipeline  Pipeline/workflow management commands (create, show, list, run, status, logs, delete, lastbuild, update)
+  pr        Pull request operations
+  repo      Repository management commands
+  wi        Work item management commands
+  user      User management commands for GitHub and Azure DevOps
 </code></pre></div>
+<h2 id="help-output">Help Output<a class="headerlink" href="#help-output" title="Anchor link to this section for reference">&para;</a></h2>
+<p>View the available commands and options:</p>
 <h3 id="wi-command-help">wi Command Help<a class="headerlink" href="#wi-command-help" title="Anchor link to this section for reference">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>$ sdo wi --help
+<div class="highlight"><pre><span></span><code>$ sdo.net wi --help
 
-Simple DevOps Operations (SDO) - C# Migration
+Simple DevOps Operations (sdo.net) - C# Migration
 ============================================
 Description:
   Work item management commands
 
 Usage:
-  sdo wi [command] [options]
+  sdo.net wi [command] [options]
 
 Options:
   -?, -h, --help  Show help and usage information
@@ -1297,15 +2453,15 @@ Commands:
   update   Update work item properties
 </code></pre></div>
 <h3 id="show-subcommand-help">Show Subcommand Help<a class="headerlink" href="#show-subcommand-help" title="Anchor link to this section for reference">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>$ sdo wi show --help
+<div class="highlight"><pre><span></span><code>$ sdo.net wi show --help
 
-Simple DevOps Operations (SDO) - C# Migration
+Simple DevOps Operations (sdo.net) - C# Migration
 ============================================
 Description:
   Display detailed work item information
 
 Usage:
-  sdo wi show [options]
+  sdo.net wi show [options]
 
 Options:
   --id &lt;id&gt;       Work item ID (required)
@@ -1314,15 +2470,15 @@ Options:
   -?, -h, --help  Show help and usage information
 </code></pre></div>
 <h3 id="list-subcommand-help">List Subcommand Help<a class="headerlink" href="#list-subcommand-help" title="Anchor link to this section for reference">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>$ sdo wi list --help
+<div class="highlight"><pre><span></span><code>$ sdo.net wi list --help
 
-Simple DevOps Operations (SDO) - C# Migration
+Simple DevOps Operations (sdo.net) - C# Migration
 ============================================
 Description:
   List work items with optional filtering
 
 Usage:
-  sdo wi list [options]
+  sdo.net wi list [options]
 
 Options:
   --type &lt;type&gt;                Filter by work item type (PBI, Bug, Task, Spike,
@@ -1353,8 +2509,8 @@ Options:
 - <strong>GitHub</strong>: Detected from remotes like <code>https://github.com/owner/repo</code>
 - <strong>Azure DevOps</strong>: Detected from remotes like <code>https://dev.azure.com/org/project/_git/repo</code></p>
 <h2 id="installation">Installation<a class="headerlink" href="#installation" title="Anchor link to this section for reference">&para;</a></h2>
-<p>Place <code>sdo.exe</code> in your PATH or run directly from:
-<div class="highlight"><pre><span></span><code>C:\source\ntools\Sdo\bin\Release\sdo.exe
+<p>Place <code>sdo.net</code> in your PATH or run directly from:
+<div class="highlight"><pre><span></span><code>C:\source\ntools\sdo.net\bin\Release\sdo.net
 </code></pre></div></p>
 <p>Build from source:
 <div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>C:<span class="se">\s</span>ource<span class="se">\n</span>tools
@@ -1363,8 +2519,8 @@ nb<span class="w"> </span>build
 <h2 id="usage">Usage<a class="headerlink" href="#usage" title="Anchor link to this section for reference">&para;</a></h2>
 <h3 id="authentication-verification">Authentication Verification<a class="headerlink" href="#authentication-verification" title="Anchor link to this section for reference">&para;</a></h3>
 <p>Verify your authentication is configured correctly:</p>
-<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>auth<span class="w"> </span>gh<span class="w">              </span><span class="c1"># Verify GitHub authentication</span>
-sdo<span class="w"> </span>auth<span class="w"> </span>devops<span class="w">          </span><span class="c1"># Verify Azure DevOps authentication</span>
+<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>auth<span class="w"> </span>gh<span class="w">              </span><span class="c1"># Verify GitHub authentication</span>
+sdo.net<span class="w"> </span>auth<span class="w"> </span>devops<span class="w">          </span><span class="c1"># Verify Azure DevOps authentication</span>
 </code></pre></div>
 <p>Success output:
 <div class="highlight"><pre><span></span><code>√ GitHub authentication successful
@@ -1373,22 +2529,22 @@ sdo<span class="w"> </span>auth<span class="w"> </span>devops<span class="w">   
 <h4 id="list-work-items">List Work Items<a class="headerlink" href="#list-work-items" title="Anchor link to this section for reference">&para;</a></h4>
 <p>List work items from the current repository (defaults to GitHub). By default, shows all work items <strong>EXCEPT closed (GitHub) or done/closed (Azure DevOps)</strong> to display active work-in-progress items.</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># List active work items (excludes closed/done by default)</span>
-sdo<span class="w"> </span>wi<span class="w"> </span>list
+sdo.net<span class="w"> </span>wi<span class="w"> </span>list
 
 <span class="c1"># List specific number of items</span>
-sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--top<span class="w"> </span><span class="m">20</span>
+sdo.net<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--top<span class="w"> </span><span class="m">20</span>
 
 <span class="c1"># Show only done items</span>
-sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--state<span class="w"> </span>Done
+sdo.net<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--state<span class="w"> </span>Done
 
 <span class="c1"># Show items in a specific state</span>
-sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--state<span class="w"> </span><span class="s2">&quot;In Progress&quot;</span>
+sdo.net<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--state<span class="w"> </span><span class="s2">&quot;In Progress&quot;</span>
 
 <span class="c1"># Show all items including done/closed</span>
-sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--state<span class="w"> </span>closed
+sdo.net<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--state<span class="w"> </span>closed
 
 <span class="c1"># Verbose output with debugging information</span>
-sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--verbose
+sdo.net<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--verbose
 </code></pre></div>
 <p><strong>Default Behavior:</strong>
 - <strong>GitHub</strong>: Shows all issues EXCEPT <code>closed</code>
@@ -1401,7 +2557,7 @@ sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span
 ------------------------------------------------------------------------------------------------------------------------
 #      Title                                    State      Labels                         Assignee
 ------------------------------------------------------------------------------------------------------------------------
-#246   Phase 6: Deployment &amp; Transition (CI,... OPEN       backlog, sdo-migration         Unassigned
+#246   Phase 6: Deployment &amp; Transition (CI,... OPEN       backlog, sdo.net-migration         Unassigned
 #245   Phase 5: Testing &amp; Validation (Unit, ... OPEN       backlog, testing               Unassigned
 #243   Phase 3: Command Implementation (Migr... OPEN       enhancement, backlog           Unassigned
 ...
@@ -1421,13 +2577,13 @@ sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span
 <h4 id="create-work-item">Create Work Item<a class="headerlink" href="#create-work-item" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Create new work items from markdown files:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Create from markdown file</span>
-sdo<span class="w"> </span>wi<span class="w"> </span>create<span class="w"> </span>--file-path<span class="w"> </span>work-item.md
+sdo.net<span class="w"> </span>wi<span class="w"> </span>create<span class="w"> </span>--file-path<span class="w"> </span>work-item.md
 
 <span class="c1"># Create with dry-run (preview without creating)</span>
-sdo<span class="w"> </span>wi<span class="w"> </span>create<span class="w"> </span>--file-path<span class="w"> </span>work-item.md<span class="w"> </span>--dry-run
+sdo.net<span class="w"> </span>wi<span class="w"> </span>create<span class="w"> </span>--file-path<span class="w"> </span>work-item.md<span class="w"> </span>--dry-run
 
 <span class="c1"># Verbose output with JSON payload</span>
-sdo<span class="w"> </span>wi<span class="w"> </span>create<span class="w"> </span>--file-path<span class="w"> </span>work-item.md<span class="w"> </span>--verbose
+sdo.net<span class="w"> </span>wi<span class="w"> </span>create<span class="w"> </span>--file-path<span class="w"> </span>work-item.md<span class="w"> </span>--verbose
 </code></pre></div>
 <p><strong>Markdown Format:</strong>
 <div class="highlight"><pre><span></span><code><span class="gh"># Work Item Title</span>
@@ -1442,17 +2598,17 @@ This is the work item description.
 <h4 id="update-work-item">Update Work Item<a class="headerlink" href="#update-work-item" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Update work item properties:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Update state</span>
-sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--state<span class="w"> </span>Done
+sdo.net<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--state<span class="w"> </span>Done
 
 <span class="c1"># Update title</span>
-sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--title<span class="w"> </span><span class="s2">&quot;Updated Title&quot;</span>
+sdo.net<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--title<span class="w"> </span><span class="s2">&quot;Updated Title&quot;</span>
 
 <span class="c1"># Update state with success message showing new state</span>
-sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">166</span><span class="w"> </span>--state<span class="w"> </span><span class="k">done</span>
+sdo.net<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">166</span><span class="w"> </span>--state<span class="w"> </span><span class="k">done</span>
 <span class="c1"># Output: √ Work item 166 updated successfully to state: Done</span>
 
 <span class="c1"># Update with verbose output</span>
-sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--state<span class="w"> </span><span class="s2">&quot;In Progress&quot;</span><span class="w"> </span>--verbose
+sdo.net<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--state<span class="w"> </span><span class="s2">&quot;In Progress&quot;</span><span class="w"> </span>--verbose
 </code></pre></div>
 <p><strong>Valid States:</strong>
 - <code>New</code>, <code>Approved</code>, <code>Committed</code>, <code>Done</code>, <code>To Do</code>, <code>In Progress</code> (case-insensitive)
@@ -1460,21 +2616,21 @@ sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </sp
 <h4 id="add-comment">Add Comment<a class="headerlink" href="#add-comment" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Add comments to work items:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Add comment to issue</span>
-sdo<span class="w"> </span>wi<span class="w"> </span>comment<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--message<span class="w"> </span><span class="s2">&quot;This is my comment&quot;</span>
+sdo.net<span class="w"> </span>wi<span class="w"> </span>comment<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--message<span class="w"> </span><span class="s2">&quot;This is my comment&quot;</span>
 
 <span class="c1"># Verbose output</span>
-sdo<span class="w"> </span>wi<span class="w"> </span>comment<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--message<span class="w"> </span><span class="s2">&quot;Great work!&quot;</span><span class="w"> </span>--verbose
+sdo.net<span class="w"> </span>wi<span class="w"> </span>comment<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--message<span class="w"> </span><span class="s2">&quot;Great work!&quot;</span><span class="w"> </span>--verbose
 </code></pre></div>
 <h4 id="show-work-item-details">Show Work Item Details<a class="headerlink" href="#show-work-item-details" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Display full details of a specific work item:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Show GitHub issue #243</span>
-sdo<span class="w"> </span>wi<span class="w"> </span>show<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span>
+sdo.net<span class="w"> </span>wi<span class="w"> </span>show<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span>
 
 <span class="c1"># Show with verbose output</span>
-sdo<span class="w"> </span>wi<span class="w"> </span>show<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--verbose
+sdo.net<span class="w"> </span>wi<span class="w"> </span>show<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--verbose
 
 <span class="c1"># Show with comments (when available)</span>
-sdo<span class="w"> </span>wi<span class="w"> </span>show<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--comments
+sdo.net<span class="w"> </span>wi<span class="w"> </span>show<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--comments
 </code></pre></div>
 <p><strong>Output Format:</strong></p>
 <div class="highlight"><pre><span></span><code>Issue #243
@@ -1485,8 +2641,8 @@ Created:     2026-03-01T22:48:29.0000000Z
 Updated:     2026-03-01T22:48:29.0000000Z
 
 Description:
-Phase 3 focuses on migrating the Python SDO command implementations to the new C# 
-`Sdo` project. This covers pipeline, PR, and user commands and ensures behavior parity with the Python tool.
+Phase 3 focuses on migrating the Python sdo.net command implementations to the new C# 
+`sdo.net` project. This covers pipeline, PR, and user commands and ensures behavior parity with the Python tool.
 
 - [ ] Implement pipeline commands: `create`, `show`, `list`, `update`, `run`, `status`, `logs`, `lastbuild`, `delete`
 - [ ] Implement PR commands: `merge`, `approve`
@@ -1502,6 +2658,101 @@ URL: https://github.com/naz-hage/ntools/issues/243
 <li><code>--comments</code>: Include comments/discussion items</li>
 <li><code>--verbose</code>: Show detailed diagnostic information</li>
 </ul>
+<h2 id="command-reference">Command Reference<a class="headerlink" href="#command-reference" title="Anchor link to this section for reference">&para;</a></h2>
+<p>This section documents the primary commands introduced in Phase 1 (foundation), Phase 2 (service/auth), and Phase 4 (advanced features). Commands are read-only where applicable and follow the same patterns used across the CLI.</p>
+<h3 id="map-show-native-cli-mappings">map — Show native CLI mappings<a class="headerlink" href="#map-show-native-cli-mappings" title="Anchor link to this section for reference">&para;</a></h3>
+<p>Description: show how sdo.net commands map to native platform CLIs (<code>gh</code> for GitHub, <code>az</code> / <code>az repos</code> for Azure DevOps).</p>
+<p>Options:
+- <code>--platform &lt;gh|azdo&gt;</code>: restrict to a single platform mapping
+- <code>--all</code> : show all mappings for both platforms</p>
+<p>Examples:
+<div class="highlight"><pre><span></span><code>sdo.net map
+sdo.net map --platform gh
+sdo.net map --platform azdo --all
+</code></pre></div></p>
+<p>Behavior: with <code>--verbose</code> many commands print the equivalent native command (e.g. <code>gh api repos/owner/repo/collaborators?per_page=100</code>) in yellow for easy copy/paste.</p>
+<h3 id="auth-verify-authentication">auth — Verify authentication<a class="headerlink" href="#auth-verify-authentication" title="Anchor link to this section for reference">&para;</a></h3>
+<p>Description: validate available credentials for the detected platform.</p>
+<p>Options:
+- <code>gh</code> : verify GitHub auth (checks <code>GITHUB_TOKEN</code>, <code>gh auth</code>, Windows credential store)
+- <code>azdo</code> : verify Azure DevOps PAT (<code>AZURE_DEVOPS_PAT</code>)
+- <code>--verbose</code> : show token detection details and any scope information</p>
+<p>Examples:
+<div class="highlight"><pre><span></span><code>sdo.net auth gh
+sdo.net auth azdo --verbose
+</code></pre></div></p>
+<h3 id="wi-work-item-issue-commands">wi — Work item (issue) commands<a class="headerlink" href="#wi-work-item-issue-commands" title="Anchor link to this section for reference">&para;</a></h3>
+<p>Description: CRUD and comment operations for GitHub issues and Azure DevOps work items. Options are translated between platforms.</p>
+<p>Common Options:
+- <code>--id &lt;number&gt;</code> : identifier for show/update/comment
+- <code>--top &lt;n&gt;</code> : limit number of results for <code>list</code> (default: 50)
+- <code>--state &lt;state&gt;</code> : filter or set state (Azure states: <code>New, Approved, Committed, Done, To Do, In Progress</code>; GitHub: <code>open|closed</code>)
+- <code>--assigned-to &lt;user&gt;</code> : filter by assignee (planned)
+- <code>--file-path &lt;path&gt;</code> : markdown file for <code>create</code>
+- <code>--comments</code> : include comments in <code>show</code>
+- <code>--verbose</code> : show mapping and extra diagnostics</p>
+<p>Examples:
+<div class="highlight"><pre><span></span><code>sdo.net wi list
+sdo.net wi list --top 20 --state &quot;In Progress&quot;
+sdo.net wi show --id 243 --comments
+sdo.net wi create --file-path ./work-item.md --verbose
+sdo.net wi update --id 243 --state Done
+sdo.net wi comment --id 243 --message &quot;Looks good to me&quot;
+</code></pre></div></p>
+<p>Notes:
+- <code>create</code> accepts a markdown document with Title, Description and Acceptance Criteria (see examples earlier in this doc).
+- <code>update --state</code> performs platform-aware translation (Azure DevOps -&gt; GitHub open/closed mapping where appropriate).</p>
+<h3 id="repo-repository-commands">repo — Repository commands<a class="headerlink" href="#repo-repository-commands" title="Anchor link to this section for reference">&para;</a></h3>
+<p>Description: list and inspect repositories for the authenticated user or detected organization.</p>
+<p>Options:
+- <code>--top &lt;n&gt;</code> : limit results
+- <code>--org &lt;organization&gt;</code> : specify organization (Azure/GitHub)
+- <code>--verbose</code> : show mapping and API request details</p>
+<p>Examples:
+<div class="highlight"><pre><span></span><code>sdo.net repo list --top 5
+sdo.net repo show --name naz-hage/ntools --verbose
+</code></pre></div></p>
+<h3 id="pr-pull-request-commands">pr — Pull request commands<a class="headerlink" href="#pr-pull-request-commands" title="Anchor link to this section for reference">&para;</a></h3>
+<p>Description: list, show and operate on pull requests. Merge/approve operations are considered advanced and require write permissions.</p>
+<p>Options:
+- <code>--id &lt;id&gt;</code> : pull request id/number
+- <code>--state &lt;open|closed|merged&gt;</code> : filter PR list
+- <code>--merge-method &lt;merge|squash|rebase&gt;</code> : merge strategy (GitHub)
+- <code>--verbose</code> : show mapping and API details</p>
+<p>Examples:
+<div class="highlight"><pre><span></span><code>sdo.net pr list --state open
+sdo.net pr show --id 12
+sdo.net pr merge --id 12 --merge-method squash --verbose
+</code></pre></div></p>
+<h3 id="pipeline-pipeline-workflow-commands">pipeline — Pipeline / workflow commands<a class="headerlink" href="#pipeline-pipeline-workflow-commands" title="Anchor link to this section for reference">&para;</a></h3>
+<p>Description: manage CI pipelines / workflows. Read-only operations are safe for E2E parity checks; trigger/update operations are advanced.</p>
+<p>Options:
+- <code>--id &lt;id&gt;</code> : pipeline or run id
+- <code>--top &lt;n&gt;</code> : limit list results
+- <code>--org</code>, <code>--project</code> : Azure DevOps scoping
+- <code>--verbose</code> : show equivalent <code>gh/az</code> commands and API payloads</p>
+<p>Examples:
+<div class="highlight"><pre><span></span><code>sdo.net pipeline list
+sdo.net pipeline status --id 1234
+sdo.net pipeline logs --id 1234 --verbose
+</code></pre></div></p>
+<h3 id="user-user-and-permissions-commands">user — User and permissions commands<a class="headerlink" href="#user-user-and-permissions-commands" title="Anchor link to this section for reference">&para;</a></h3>
+<p>Description: list/search users and show permission summaries for a user or identity. Useful for audits and E2E parity checks.</p>
+<p>Options:
+- <code>--login &lt;login&gt;</code> : GitHub login or Azure identity shorthand
+- <code>--user &lt;login|descriptor&gt;</code> : user identifier for permissions queries
+- <code>--query &lt;term&gt;</code> : search term for <code>search</code>
+- <code>--top &lt;n&gt;</code> : limit results
+- <code>--verbose</code> : show mapping and the exact API calls performed</p>
+<p>Examples:
+<div class="highlight"><pre><span></span><code>sdo.net user list --top 50
+sdo.net user show --login naz-hage --verbose
+sdo.net user search --query &quot;naz&quot; --top 20
+sdo.net user permissions --user naz-hage --verbose
+</code></pre></div></p>
+<p>Notes:
+- Many Phase 4 commands are implemented to match Python behavior and are included where ready; others are planned or gated behind integration tests.
+- Use <code>--verbose</code> on most commands to display an equivalent native CLI mapping (e.g., <code>gh</code> or <code>az</code>), request/response dumps, and extra diagnostics.</p>
 <h2 id="platform-detection">Platform Detection<a class="headerlink" href="#platform-detection" title="Anchor link to this section for reference">&para;</a></h2>
 <p>The tool automatically detects which platform to use based on your Git remote:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># List remotes</span>
@@ -1518,7 +2769,7 @@ git<span class="w"> </span>remote<span class="w"> </span>-v
 <h3 id="no-issues-found">"No issues found"<a class="headerlink" href="#no-issues-found" title="Anchor link to this section for reference">&para;</a></h3>
 <p><strong>Cause</strong>: Authentication failed or no open issues in repository</p>
 <p><strong>Solution</strong>:
-1. Verify authentication: <code>sdo auth gh</code>
+1. Verify authentication: <code>sdo.net auth gh</code>
 2. Check repository has issues: <code>gh issue list --repo owner/repo</code>
 3. Try with <code>--state closed</code> to verify API is working
 4. Use <code>--verbose</code> flag to see detailed error messages</p>
@@ -1555,111 +2806,32 @@ gh<span class="w"> </span>auth<span class="w"> </span>login
 <p><strong>Solution</strong>:
 1. Use one of the supported states: <code>New</code>, <code>Approved</code>, <code>Committed</code>, <code>Done</code>, <code>To Do</code>, <code>In Progress</code>
 2. Check your project workflow: Some Azure DevOps projects may have different state configurations
-3. Verify the exact state name: Use <code>sdo wi list --state Done</code> (capital D) instead of lowercase</p>
+3. Verify the exact state name: Use <code>sdo.net wi list --state Done</code> (capital D) instead of lowercase</p>
 <p><strong>Examples</strong>:
 <div class="highlight"><pre><span></span><code><span class="c1"># Correct - uses valid state with exact casing</span>
-sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">170</span><span class="w"> </span>--state<span class="w"> </span>Done
+sdo.net<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">170</span><span class="w"> </span>--state<span class="w"> </span>Done
 
 <span class="c1"># Correct - alternative form</span>
-sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">170</span><span class="w"> </span>--state<span class="w"> </span><span class="s2">&quot;In Progress&quot;</span>
+sdo.net<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">170</span><span class="w"> </span>--state<span class="w"> </span><span class="s2">&quot;In Progress&quot;</span>
 
 <span class="c1"># Also works - case-insensitive input</span>
-sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">170</span><span class="w"> </span>--state<span class="w"> </span><span class="k">done</span>
+sdo.net<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">170</span><span class="w"> </span>--state<span class="w"> </span><span class="k">done</span>
 </code></pre></div></p>
 <h2 id="testing">Testing<a class="headerlink" href="#testing" title="Anchor link to this section for reference">&para;</a></h2>
-<h3 id="unit-tests">Unit Tests<a class="headerlink" href="#unit-tests" title="Anchor link to this section for reference">&para;</a></h3>
-<p>All commands have comprehensive unit test coverage:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Run all wi command tests</span>
-<span class="nb">cd</span><span class="w"> </span>C:<span class="se">\s</span>ource<span class="se">\n</span>tools
-nb<span class="w"> </span>UNIT_TEST_WORKITEM_COMMAND
-
-<span class="c1"># Output shows tests for create, update, comment, list, show</span>
-Passed!<span class="w">  </span>-<span class="w"> </span>Failed:<span class="w"> </span><span class="m">0</span>,<span class="w"> </span>Passed:<span class="w"> </span><span class="m">78</span>,<span class="w"> </span>Skipped:<span class="w"> </span><span class="m">0</span>,<span class="w"> </span>Total:<span class="w"> </span><span class="m">78</span>
-</code></pre></div>
-<h3 id="state-translator-tests">State Translator Tests<a class="headerlink" href="#state-translator-tests" title="Anchor link to this section for reference">&para;</a></h3>
-<p>Test state handling and translation:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Run state translator tests</span>
-<span class="nb">cd</span><span class="w"> </span>C:<span class="se">\s</span>ource<span class="se">\n</span>tools
-nb<span class="w"> </span>UNIT_TEST_WORKITEM_STATE_TRANSLATOR
-
-<span class="c1"># Output shows 48 tests for parse, GitHub translation, Azure DevOps translation</span>
-Passed!<span class="w">  </span>-<span class="w"> </span>Failed:<span class="w"> </span><span class="m">0</span>,<span class="w"> </span>Passed:<span class="w"> </span><span class="m">48</span>,<span class="w"> </span>Skipped:<span class="w"> </span><span class="m">0</span>,<span class="w"> </span>Total:<span class="w"> </span><span class="m">48</span>
-</code></pre></div>
 <h3 id="manual-testing">Manual Testing<a class="headerlink" href="#manual-testing" title="Anchor link to this section for reference">&para;</a></h3>
 <p>Test with real repositories:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Test with ntools repository</span>
 <span class="nb">cd</span><span class="w"> </span>C:<span class="se">\s</span>ource<span class="se">\n</span>tools
-sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--top<span class="w"> </span><span class="m">5</span>
-sdo<span class="w"> </span>wi<span class="w"> </span>show<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span>
-sdo<span class="w"> </span>wi<span class="w"> </span>create<span class="w"> </span>--file-path<span class="w"> </span>test.md<span class="w"> </span>--dry-run
-sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--state<span class="w"> </span>Done
+sdo.net<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--top<span class="w"> </span><span class="m">5</span>
+sdo.net<span class="w"> </span>wi<span class="w"> </span>show<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span>
+sdo.net<span class="w"> </span>wi<span class="w"> </span>create<span class="w"> </span>--file-path<span class="w"> </span>test.md<span class="w"> </span>--dry-run
+sdo.net<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--state<span class="w"> </span>Done
 
 <span class="c1"># Test with different repository</span>
 <span class="nb">cd</span><span class="w"> </span>Path<span class="se">\T</span>o<span class="se">\Y</span>our<span class="se">\R</span>epo
-sdo<span class="w"> </span>wi<span class="w"> </span>list
-sdo<span class="w"> </span>wi<span class="w"> </span>show<span class="w"> </span>--id<span class="w"> </span>&lt;issue_number&gt;
+sdo.net<span class="w"> </span>wi<span class="w"> </span>list
+sdo.net<span class="w"> </span>wi<span class="w"> </span>show<span class="w"> </span>--id<span class="w"> </span>&lt;issue_number&gt;
 </code></pre></div>
-<h2 id="phase-status">Phase Status<a class="headerlink" href="#phase-status" title="Anchor link to this section for reference">&para;</a></h2>
-<h3 id="phase-31-work-item-commands-complete">Phase 3.1 - ✅ Work Item Commands (COMPLETE)<a class="headerlink" href="#phase-31-work-item-commands-complete" title="Anchor link to this section for reference">&para;</a></h3>
-<h4 id="show-list">Show &amp; List<a class="headerlink" href="#show-list" title="Anchor link to this section for reference">&para;</a></h4>
-<ul>
-<li>✅ Implement <code>wi show</code> subcommand - Display detailed work item information</li>
-<li>✅ Implement <code>wi list</code> subcommand - List work items with filtering</li>
-<li>✅ Default filtering (excludes done/closed to show active work)</li>
-<li>✅ Support GitHub issues with full metadata</li>
-<li>✅ Proper date deserialization and formatting</li>
-<li>✅ Labels and assignee display</li>
-<li>✅ 33 unit tests passing</li>
-<li>✅ Real data verified with GitHub API</li>
-<li>✅ Clean output formatting matching Python SDO</li>
-</ul>
-<h4 id="create-update-comment">Create, Update, Comment<a class="headerlink" href="#create-update-comment" title="Anchor link to this section for reference">&para;</a></h4>
-<ul>
-<li>✅ Implement <code>wi create</code> subcommand - Create work items from markdown files</li>
-<li>✅ Implement <code>wi update</code> subcommand - Update work item properties with state translation</li>
-<li>✅ Implement <code>wi comment</code> subcommand - Add comments to work items</li>
-<li>✅ Markdown parsing (title, description, acceptance criteria)</li>
-<li>✅ JSON-patch API integration for Azure DevOps</li>
-<li>✅ Platform-aware state translation (New/Approved/Committed/Done/To Do/In Progress)</li>
-<li>✅ Dry-run support for preview before creation</li>
-<li>✅ Verbose logging and success messages with state acknowledgement</li>
-<li>✅ Comprehensive error handling with state guidance</li>
-<li>✅ 48 unit tests for WorkItemStateTranslator</li>
-<li>✅ GitHub and Azure DevOps API integration</li>
-</ul>
-<h3 id="phase-32-pending">Phase 3.2 - Pending<a class="headerlink" href="#phase-32-pending" title="Anchor link to this section for reference">&para;</a></h3>
-<ul>
-<li>⏳ Add filtering options (--type, --assigned-to, --assigned-to-me)</li>
-<li>⏳ Enhanced query capabilities</li>
-</ul>
-<h3 id="phase-33-35-planned">Phase 3.3-3.5 - Planned<a class="headerlink" href="#phase-33-35-planned" title="Anchor link to this section for reference">&para;</a></h3>
-<ul>
-<li>Repository commands (<code>repo create</code>, <code>repo list</code>, <code>repo show</code>, <code>repo delete</code>)</li>
-<li>Pull request commands (<code>pr merge</code>, <code>pr approve</code>, <code>pr list</code>, <code>pr show</code>)</li>
-<li>Pipeline commands (<code>pipeline create</code>, <code>pipeline run</code>, <code>pipeline status</code>, etc.)</li>
-<li>User/Permission commands (<code>user show</code>, <code>user list</code>, <code>user search</code>, <code>permissions</code>)</li>
-</ul>
-<h2 id="implementation-notes">Implementation Notes<a class="headerlink" href="#implementation-notes" title="Anchor link to this section for reference">&para;</a></h2>
-<p><strong>Phase 3.1 Show &amp; List (March 11, 2026)</strong>:
-- ✅ <strong>GitHub API Pagination</strong>: Full pagination implemented to fetch all issues across multiple pages
-- ✅ <strong>State Filtering</strong>: Default behavior excludes closed items; <code>--state closed</code> retrieves closed issues<br />
-- ✅ <strong>Result Limiting</strong>: <code>--top</code> parameter correctly limits results after filtering
-- ✅ All 33 unit tests passing with pagination
-- ✅ Verified with real data: <code>wi list</code> returns all open issues</p>
-<p><strong>Phase 3.1 State Management (March 18, 2026)</strong>:
-- ✅ <strong>Canonical State Definitions</strong>: 6 states from Python SDO (New, Approved, Committed, Done, To Do, In Progress)
-- ✅ <strong>State Translation</strong>: Automatic conversion between Azure DevOps and GitHub states
-- ✅ <strong>WorkItemStateTranslator</strong>: Centralized state handling with 48 unit tests
-- ✅ <strong>Error Handling</strong>: Platform-specific error messages with supported states guidance
-- ✅ <strong>Success Messages</strong>: Update commands show the state being changed to
-- ✅ <strong>Create from Markdown</strong>: Support for file-driven creation with acceptance criteria
-- ✅ <strong>Dry-run Support</strong>: Preview work items before creation
-- ✅ <strong>Comment Support</strong>: Add discussion to work items on both platforms</p>
-<p><strong>Platform State Handling</strong>:
-- <strong>Azure DevOps</strong>: Uses exact state names with proper casing ("To Do", "In Progress")
-- <strong>GitHub</strong>: Translates states to open/closed binary model
-- <strong>Default List Behavior</strong>: Excludes done/closed items to show active work
-- <strong>With --state</strong>: Allows viewing items in any state including done/closed</p>
 <h2 id="development">Development<a class="headerlink" href="#development" title="Anchor link to this section for reference">&para;</a></h2>
 <h3 id="building-from-source">Building from Source<a class="headerlink" href="#building-from-source" title="Anchor link to this section for reference">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>C:<span class="se">\s</span>ource<span class="se">\n</span>tools
@@ -1668,39 +2840,6 @@ nb<span class="w"> </span><span class="nb">test</span><span class="w">          
 nb<span class="w"> </span>UNIT_TEST_WORKITEM_COMMAND<span class="w">              </span><span class="c1"># Run wi command tests</span>
 nb<span class="w"> </span>UNIT_TEST_WORKITEM_STATE_TRANSLATOR<span class="w">     </span><span class="c1"># Run state translator tests</span>
 </code></pre></div>
-<h3 id="source-code">Source Code<a class="headerlink" href="#source-code" title="Anchor link to this section for reference">&para;</a></h3>
-<ul>
-<li><strong>Main Command</strong>: <a href="../../Sdo/Commands/WorkItemCommand.cs">Sdo/Commands/WorkItemCommand.cs</a></li>
-<li><strong>GitHub Client</strong>: <a href="../../Sdo/Services/GitHubClient.cs">Sdo/Services/GitHubClient.cs</a></li>
-<li><strong>Azure DevOps Client</strong>: <a href="../../Sdo/Services/AzureDevOpsClient.cs">Sdo/Services/AzureDevOpsClient.cs</a></li>
-<li><strong>State Management</strong>: <a href="../../Sdo/Models/WorkItemState.cs">Sdo/Models/WorkItemState.cs</a></li>
-<li><strong>Command Tests</strong>: <a href="../../SdoTests/WorkItemCommandTests.cs">SdoTests/WorkItemCommandTests.cs</a></li>
-<li><strong>State Translator Tests</strong>: <a href="../../SdoTests/WorkItemStateTranslatorTests.cs">SdoTests/WorkItemStateTranslatorTests.cs</a></li>
-</ul>
-<h3 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Anchor link to this section for reference">&para;</a></h3>
-<p>The C# implementation follows the <code>System.CommandLine</code> framework for CLI parsing and includes:</p>
-<ul>
-<li>Automatic platform detection via <code>PlatformDetector</code></li>
-<li>Async API calls via <code>GitHubClient</code> and <code>AzureDevOpsClient</code></li>
-<li>Centralized state management via <code>WorkItemStateTranslator</code> with 6 canonical states</li>
-<li>Platform-aware state translation (Azure DevOps ↔ GitHub)</li>
-<li>Comprehensive error handling with platform-specific messages and state guidance</li>
-<li>Clean separation of concerns: Commands → Services → API Clients</li>
-<li>Markdown parsing for structured work item creation</li>
-<li>JSON-patch operations for Azure DevOps updates</li>
-</ul>
-<h2 id="related-documentation">Related Documentation<a class="headerlink" href="#related-documentation" title="Anchor link to this section for reference">&para;</a></h2>
-<ul>
-<li><a href="../sdo-installation/">sdo Installation Guide</a> - Python version setup</li>
-<li><a href="sdo-migration-plan.md">sdo-migration-plan.md</a> - Full migration roadmap</li>
-<li><a href="../nbuild/README.md">NBuild System</a> - Build automation tool</li>
-</ul>
-<h2 id="see-also">See Also<a class="headerlink" href="#see-also" title="Anchor link to this section for reference">&para;</a></h2>
-<ul>
-<li>GitHub: https://github.com/naz-hage/ntools</li>
-<li>Azure DevOps: https://dev.azure.com/naz-hage/ntools</li>
-<li>Issue #243: Phase 3 Command Implementation</li>
-</ul>
 
 
 
@@ -1747,10 +2886,13 @@ nb<span class="w"> </span>UNIT_TEST_WORKITEM_STATE_TRANSLATOR<span class="w">   
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.sections", "toc.integrate", "search.suggest", "search.highlight"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "toc.integrate", "search.suggest", "search.highlight"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.fe8b6f2b.min.js"></script>
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
     
   </body>
