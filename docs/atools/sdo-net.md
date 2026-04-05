@@ -70,7 +70,7 @@ git remote -v
 ```
 $ sdo.net --help
 
-sdo.net v1.72.6 - Simple DevOps Operations by naz-hage (2020-2026)
+sdo.net v1.73.7 - Simple DevOps Operations by naz-hage (2020-2026)
 
 Description:
   Simple DevOps Operations CLI tool for Azure DevOps and GitHub
@@ -84,9 +84,9 @@ Options:
   --version       Show version information
 
 Commands:
-  map       Show command mappings between sdo.net and native CLI tools
+  map       Show command mappings between SDO and native CLI tools
   auth      Verify authentication with GitHub or Azure DevOps
-  pipeline  Pipeline/workflow management commands
+  pipeline  Pipeline/workflow management commands (create, show, list, run, status, logs, delete, lastbuild, update)
   pr        Pull request operations
   repo      Repository management commands
   wi        Work item management commands
@@ -193,7 +193,7 @@ Usage:
 
 Commands:
   comment  Add comment to a work item
-  create   Create a new work item from markdown file
+  create   Create a new work item
   list     List work items with optional filtering
   show     Display detailed work item information
   update   Update work item properties
@@ -222,13 +222,13 @@ sdo.net wi list --verbose                         # Show API commands
 - GitHub: `open`, `closed` (auto-translated)
 
 **Options:**
-- `--top <N>` — Maximum results (default: 50)
-- `--state <state>` — Filter by state
-- `--type <type>` — Filter by type (PBI, Bug, Task, Spike, Epic)
-- `--assigned-to <user>` — Filter by assignee
-- `--assigned-to-me` — Your items
-- `--area <path>` — Filter by area path (Azure DevOps)
-- `--iteration <path>` — Filter by iteration (Azure DevOps)
+- `--type <type>` — Filter by work item type (PBI, Bug, Task, Spike, Epic)
+- `--state <state>` — Filter by state (New, Approved, Committed, Done, To Do, In Progress)
+- `--assigned-to <assigned-to>` — Filter by assigned user (email or display name)
+- `--assigned-to-me` — Filter by work items assigned to current user
+- `--area <area>` — Filter by area path (Azure DevOps only). Example: 'Project\Area\SubArea'
+- `--iteration <iteration>` — Filter by iteration (Azure DevOps only). Example: 'Project\Sprint 1'
+- `--top <top>` — Maximum number of items to return (default: 50)
 - `--verbose` — Show mapping and diagnostics
 
 **Output Example:**
@@ -257,8 +257,7 @@ sdo.net wi show --id 243 --verbose      # Show API command
 
 **Options:**
 - `--id <id>` — Work item ID (required)
-- `--comments` — Include comments/discussion
-- `-c` — Short alias for `--comments`
+- `-c, --comments` — Show comments/discussion
 - `--verbose` — Show mapping
 
 #### wi create
@@ -274,9 +273,8 @@ sdo.net wi create --file-path work-item.md --verbose   # Show mapping
 ```
 
 **Options:**
-- `--file-path <path>` — Path to markdown file (required)
-- `-f <path>` — Short alias
-- `--dry-run` — Preview without creating
+- `-f, --file-path <file-path>` — Path to markdown file containing work item details (required)
+- `--dry-run` — Parse and preview work item creation without creating it
 - `--verbose` — Show mapping
 
 **Markdown Format:**
@@ -319,10 +317,10 @@ sdo.net wi update --id 243 --state done                   # Case-insensitive
 
 **Options:**
 - `--id <id>` — Work item ID (required)
-- `--state <state>` — New state
-- `--title <text>` — New title
-- `--assignee <user>` — New assignee
-- `--description <text>` — New description
+- `--title <title>` — Update work item title
+- `--state <state>` — Update work item state
+- `--assignee <assignee>` — Update assigned user
+- `--description <description>` — Update work item description
 - `--verbose` — Show mapping
 
 **Valid States** (case-insensitive):
@@ -340,7 +338,7 @@ sdo.net wi comment --id 243 --message "Looks good!" --verbose
 
 **Options:**
 - `--id <id>` — Work item ID (required)
-- `--message <text>` — Comment text (required)
+- `--message <message>` — Comment message (required)
 - `--verbose` — Show mapping
 
 ---
@@ -367,44 +365,12 @@ Usage:
   sdo.net pr [command] [options]
 
 Commands:
-  create  Create a pull request from markdown file
-  list    List pull requests in the current repository
-  show    Show detailed information about a pull request
-  status  Show status of a pull request
-  update  Update an existing pull request
+  create          Create a pull request from markdown file
+  list            List pull requests in the current repository
+  show <pr-id>    Show detailed information about a pull request
+  status <pr-id>  Show status of a pull request
+  update          Update an existing pull request
 ```
-
-#### pr list
-
-List pull requests with optional filtering.
-
-**Usage:**
-```bash
-sdo.net pr list                         # List active PRs (default)
-sdo.net pr list --status closed         # List closed PRs
-sdo.net pr list --status merged         # List merged PRs
-sdo.net pr list --top 20               # Limit to 20
-sdo.net pr list --verbose              # Show API commands
-```
-
-**Options:**
-- `--status <status>` — Filter by status: `active`, `closed`, `merged` (default: active)
-- `--top <N>` — Maximum results (default: 10)
-- `--verbose` — Show mapping
-
-#### pr show
-
-Display pull request details.
-
-**Usage:**
-```bash
-sdo.net pr show 12                # Show PR #12
-sdo.net pr show 12 --verbose      # Show API command
-```
-
-**Options:**
-- `<pr-id>` — PR ID/number (required)
-- `--verbose` — Show mapping
 
 #### pr create
 
@@ -421,35 +387,43 @@ sdo.net pr create --file pr.md --verbose              # Show mapping
 ```
 
 **Options:**
-- `--file <path>` — Path to markdown file (required)
-- `-f <path>` — Short alias
-- `--work-item <id>` — Work item ID to link to PR
+- `-f, --file <file>` — Path to markdown file (required)
+- `--work-item <work-item>` — Work item ID to link to PR
 - `--draft` — Create as draft pull request
 - `--dry-run` — Preview without creating
 - `--verbose` — Show mapping
 
-**Markdown Format:**
-```markdown
-# PR Title
+#### pr list
 
-This is the pull request description.
+List pull requests with optional filtering.
 
-## Changes
-- Change 1
-- Change 2
+**Usage:**
+```bash
+sdo.net pr list                         # List active PRs (default)
+sdo.net pr list --status closed         # List closed PRs
+sdo.net pr list --status merged         # List merged PRs
+sdo.net pr list --top 20               # Limit to 20
+sdo.net pr list --verbose              # Show API commands
 ```
 
-Optional YAML metadata:
-```markdown
----
-target_branch: main
-source_branch: feature
-reviewers: "user1, user2"
----
+**Options:**
+- `--status <status>` — Filter PRs by status (default: active)
+- `--top <top>` — Maximum number of PRs to show (default: 10)
+- `--verbose` — Show mapping
 
-# Title
-...
+#### pr show
+
+Display pull request details.
+
+**Usage:**
+```bash
+sdo.net pr show 12                # Show PR #12
+sdo.net pr show 12 --verbose      # Show API command
 ```
+
+**Options:**
+- `<pr-id>` — Pull request number/ID (required)
+- `--verbose` — Show mapping
 
 #### pr status
 
@@ -462,7 +436,7 @@ sdo.net pr status 12 --verbose    # Show full details
 ```
 
 **Options:**
-- `<pr-id>` — PR ID/number (required)
+- `<pr-id>` — Pull request number/ID (required)
 - `--verbose` — Show mapping
 
 #### pr update
@@ -478,12 +452,10 @@ sdo.net pr update --pr-id 12 --title "New title" --status merged
 ```
 
 **Options:**
-- `--pr-id <id>` — PR ID to update (required)
-- `--file <path>` — Markdown file with updated details
-- `-f <path>` — Short alias for `--file`
-- `--title <text>` — New title
-- `-t <text>` — Short alias for `--title`
-- `--status <status>` — New status (`active`, `closed`, `merged`)
+- `--pr-id <pr-id>` — PR ID to update (required)
+- `-f, --file <file>` — Markdown file with updated details
+- `-t, --title <title>` — New title
+- `--status <status>` — New status
 - `--verbose` — Show mapping
 
 ---
@@ -509,10 +481,10 @@ Usage:
   sdo.net repo [command] [options]
 
 Commands:
-  create      Create a new repository
-  delete      Delete a repository
-  list        List repositories
-  show        Display repository information from current Git remote
+  create <name>  Create a new repository
+  delete         Delete a repository
+  list           List repositories
+  show           Display repository information from current Git remote
 ```
 
 #### repo list
@@ -522,24 +494,22 @@ List repositories for your organization.
 **Usage:**
 ```bash
 sdo.net repo list                       # List repos
-sdo.net repo list --top 10             # Limit to 10
-sdo.net repo list --org myorg          # Specific organization
-sdo.net repo list --verbose            # Show API commands
+sdo.net repo list --top 10              # Limit to 10
+sdo.net repo list --verbose             # Show API commands
 ```
 
 **Options:**
-- `--top <N>` — Maximum results (default: 50)
-- `--org <org>` — Organization name
+- `--top <top>` — Return top N repositories
 - `--verbose` — Show mapping
 
 #### repo show
 
-Display repository details from current Git remote.
+Display repository information from current Git remote.
 
 **Usage:**
 ```bash
-sdo.net repo show                      # Show current repo
-sdo.net repo show --verbose            # Show API command
+sdo.net repo show                       # Show current repo
+sdo.net repo show --verbose             # Show API command
 ```
 
 **Options:**
@@ -559,7 +529,7 @@ sdo.net repo create myrepo --private --verbose      # With mapping
 
 **Options:**
 - `<name>` — Repository name (required)
-- `--description <text>` — Repository description
+- `--description <description>` — Repository description
 - `--private` — Make repository private
 - `--verbose` — Show mapping
 
@@ -569,9 +539,9 @@ Delete a repository.
 
 **Usage:**
 ```bash
-sdo.net repo delete                    # Delete (with prompt)
-sdo.net repo delete --force            # Delete (no prompt)
-sdo.net repo delete --force --verbose  # Show mapping
+sdo.net repo delete                     # Delete (with prompt)
+sdo.net repo delete --force             # Delete (no prompt)
+sdo.net repo delete --force --verbose   # Show mapping
 ```
 
 **Options:**
@@ -588,33 +558,33 @@ Manage GitHub Actions workflows and Azure Pipelines. **Read-only operations** ar
 - `list` — List pipelines/workflows
 - `show` — Display pipeline details
 - `create` — Create pipeline from YAML file
-- `run` — Trigger pipeline run
-- `status` — Check pipeline status
-- `logs` — View pipeline logs
+- `run` — Execute/trigger a pipeline
+- `status` — Query pipeline build/run status
+- `logs` — Retrieve pipeline execution logs
 - `lastbuild` — Show last build/run
-- `update` — Update pipeline
-- `delete` — Delete pipeline
+- `update` — Update pipeline configuration
+- `delete` — Delete pipeline/workflow
 
 **Help:**
 ```
 $ sdo.net pipeline --help
 
 Description:
-  Pipeline/workflow management commands
+  Pipeline/workflow management commands (create, show, list, run, status, logs, delete, lastbuild, update)
 
 Usage:
   sdo.net pipeline [command] [options]
 
 Commands:
-  create     Create a new pipeline/workflow from YAML definition file
-  delete     Delete a pipeline/workflow
-  lastbuild  Show last build/run for a pipeline
-  list       List pipelines/workflows
-  logs       Display pipeline/workflow logs
-  run        Trigger a pipeline run
-  show       Display pipeline/workflow information
-  status     Check pipeline run status
-  update     Update a pipeline/workflow
+  create <file-path>          Create a new pipeline/workflow from YAML definition file
+  delete <pipeline-id>        Delete a pipeline/workflow
+  lastbuild <pipeline-name>   Show last build/run for a pipeline
+  list                        List pipelines/workflows
+  logs <build-id>             Retrieve pipeline execution logs
+  run <pipeline-name>         Execute/trigger a pipeline
+  show <pipeline-id-or-name>  Display pipeline/workflow details
+  status <build-id>           Query pipeline build/run status
+  update                      Update pipeline configuration
 ```
 
 #### pipeline list
@@ -624,14 +594,14 @@ List pipelines/workflows in repository.
 **Usage:**
 ```bash
 sdo.net pipeline list                   # List pipelines
-sdo.net pipeline list --top 10          # Limit to 10
+sdo.net pipeline list --repo myrepo     # Filter by repository
+sdo.net pipeline list --all             # Show all pipelines in project
 sdo.net pipeline list --verbose         # Show API commands
 ```
 
 **Options:**
-- `--top <N>` — Maximum results (default: 50)
-- `--org <org>` — Organization (Azure DevOps)
-- `--project <project>` — Project name (Azure DevOps)
+- `--repo <repo>` — Filter by repository name
+- `--all` — Show all pipelines in the project
 - `--verbose` — Show mapping
 
 #### pipeline show
@@ -640,12 +610,13 @@ Display pipeline/workflow details.
 
 **Usage:**
 ```bash
-sdo.net pipeline show --id 1234         # Show pipeline
-sdo.net pipeline show --id 1234 --verbose  # Show API command
+sdo.net pipeline show 1234              # Show pipeline by ID
+sdo.net pipeline show myworkflow        # Show pipeline by name
+sdo.net pipeline show --verbose         # Show API command
 ```
 
 **Options:**
-- `--id <id>` — Pipeline or workflow ID (required)
+- `<pipeline-id-or-name>` — Pipeline ID or name (optional; Azure DevOps only)
 - `--verbose` — Show mapping
 
 #### pipeline create
@@ -654,7 +625,7 @@ Create a new pipeline/workflow from YAML file.
 
 **Usage:**
 ```bash
-sdo.net pipeline create --file-path .github/workflows/ci.yml
+sdo.net pipeline create .github/workflows/ci.yml
 sdo.net pipeline create .github/workflows/ci.yml --verbose
 ```
 
@@ -664,44 +635,50 @@ sdo.net pipeline create .github/workflows/ci.yml --verbose
 
 #### pipeline run
 
-Trigger a pipeline run.
+Execute/trigger a pipeline.
 
 **Usage:**
 ```bash
-sdo.net pipeline run --id 1234          # Trigger run
-sdo.net pipeline run --id 1234 --verbose  # Show details
+sdo.net pipeline run myworkflow         # Trigger run
+sdo.net pipeline run myworkflow -b main # Run on specific branch
+sdo.net pipeline run myworkflow --branch develop --verbose
 ```
 
 **Options:**
-- `--id <id>` — Pipeline ID (required)
+- `<pipeline-name>` — Pipeline name (optional, uses current repo if not provided)
+- `-b, --branch <branch>` — Branch to run the pipeline on
 - `--verbose` — Show mapping
 
 #### pipeline status
 
-Check pipeline run status.
+Query pipeline build/run status.
 
 **Usage:**
 ```bash
-sdo.net pipeline status --id 1234       # Check status
-sdo.net pipeline status --id 1234 --verbose  # Show details
+sdo.net pipeline status                 # Show latest build status
+sdo.net pipeline status 1234            # Check specific build
+sdo.net pipeline status 1234 --verbose  # Show details
 ```
 
 **Options:**
-- `--id <id>` — Pipeline or run ID (required)
+- `<build-id>` — Build/run ID (optional, shows latest if not provided)
 - `--verbose` — Show mapping
 
 #### pipeline logs
 
-View pipeline/workflow logs.
+Retrieve pipeline execution logs.
 
 **Usage:**
 ```bash
-sdo.net pipeline logs --id 1234         # Show logs
-sdo.net pipeline logs --id 1234 --verbose  # Show logs with API
+sdo.net pipeline logs                     # Show latest logs
+sdo.net pipeline logs 1234                # Show logs for specific build
+sdo.net pipeline logs --build-id 1234     # Explicit build ID
+sdo.net pipeline logs 1234 --verbose      # Show with details
 ```
 
 **Options:**
-- `--id <id>` — Pipeline or run ID (required)
+- `<build-id>` — Build/run ID (optional, shows latest if not provided)
+- `--build-id <build-id>` — Build/run ID
 - `--verbose` — Show mapping and API commands
 
 #### pipeline lastbuild
@@ -710,7 +687,8 @@ Show last build/run for pipeline.
 
 **Usage:**
 ```bash
-sdo.net pipeline lastbuild myworkflow       # Show last build
+sdo.net pipeline lastbuild              # Last build for current repo
+sdo.net pipeline lastbuild myworkflow   # Last build for specific pipeline
 sdo.net pipeline lastbuild myworkflow --verbose  # Show details
 ```
 
@@ -720,17 +698,20 @@ sdo.net pipeline lastbuild myworkflow --verbose  # Show details
 
 #### pipeline update
 
-Update a pipeline/workflow.
+Update pipeline configuration.
 
 **Usage:**
 ```bash
-sdo.net pipeline update --id 1234 --file-path updated.yml
-sdo.net pipeline update --id 1234 --file-path updated.yml --verbose
+sdo.net pipeline update --file updated.yml
+sdo.net pipeline update --file updated.yml --pipeline myworkflow
+sdo.net pipeline update --file updated.yml --message "Update CI config" --branch main
 ```
 
 **Options:**
-- `--id <id>` — Pipeline ID (required)
-- `--file-path <path>` — Updated YAML file (required)
+- `--file <file>` — Path to pipeline/workflow YAML file to update (required)
+- `--pipeline <pipeline>` — Pipeline/workflow ID or name (optional)
+- `--message <message>` — Commit message to use when updating
+- `--branch <branch>` — Branch to push the update to
 - `--verbose` — Show mapping
 
 #### pipeline delete
@@ -739,12 +720,13 @@ Delete a pipeline/workflow.
 
 **Usage:**
 ```bash
-sdo.net pipeline delete --id 1234       # Delete (with prompt)
-sdo.net pipeline delete --id 1234 --force  # Delete (no prompt)
+sdo.net pipeline delete 1234            # Delete (with prompt)
+sdo.net pipeline delete 1234 --force    # Delete (no prompt)
+sdo.net pipeline delete 1234 --force --verbose
 ```
 
 **Options:**
-- `<pipeline-id>` — Pipeline ID (optional, uses current repo if not provided)
+- `<pipeline-id>` — Pipeline/workflow ID or name (optional, uses current repo if not provided)
 - `--force` — Skip confirmation prompt
 - `--verbose` — Show mapping
 
