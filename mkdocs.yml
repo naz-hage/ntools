@@ -23,7 +23,6 @@ plugins:
   - search
 
 markdown_extensions:
-  - pymdownx.highlight
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
