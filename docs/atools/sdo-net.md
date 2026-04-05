@@ -99,17 +99,31 @@ Commands:
 
 Show how `sdo.net` commands map to native platform CLIs (`gh` for GitHub, `az` for Azure DevOps).
 
-**Description:**
-Useful for understanding equivalent commands and learning native CLI syntax.
-
 **Usage:**
 ```bash
 sdo.net map                              # Show all mappings
 sdo.net map --platform gh               # GitHub mappings only
-sdo.net map --platform azdo --all       # All Azure DevOps mappings
+sdo.net map --platform azdo             # Azure DevOps mappings only
+sdo.net map --all                       # Show all mappings for both platforms
+sdo.net map --verbose                   # Show with verbose output
 ```
 
-**Verbose Mode:**
+**Help:**
+```
+$ sdo.net map --help
+
+Description:
+  Show command mappings between SDO and native CLI tools
+
+Usage:
+  sdo.net map [options]
+
+Options:
+  --platform <platform>  Platform to show mappings for (gh=github, azdo=azure-devops, leave empty for auto-detect)
+  --all                  Show all mappings for both platforms
+  -?, -h, --help         Show help and usage information
+```
+
 With `--verbose`, displays exact native API commands for copy/paste.
 
 ---
@@ -118,11 +132,35 @@ With `--verbose`, displays exact native API commands for copy/paste.
 
 Validate credentials are configured for your platform.
 
+**Subcommands:**
+- `gh` — Verify GitHub authentication
+- `azdo` — Verify Azure DevOps authentication
+
+**Help:**
+```
+$ sdo.net auth --help
+
+Description:
+  Verify authentication with GitHub or Azure DevOps
+
+Usage:
+  sdo.net auth [command] [options]
+
+Options:
+  --verbose       Enable verbose output
+  -?, -h, --help  Show help and usage information
+
+Commands:
+  gh    Verify GitHub authentication
+  azdo  Verify Azure DevOps authentication
+```
+
 **Usage:**
 ```bash
 sdo.net auth gh                  # Verify GitHub
 sdo.net auth azdo               # Verify Azure DevOps
 sdo.net auth gh --verbose       # Show token source details
+sdo.net auth azdo --verbose     # Show token source details
 ```
 
 **Success Output:**

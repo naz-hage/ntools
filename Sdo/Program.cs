@@ -35,8 +35,10 @@ namespace Sdo
             var rootCommand = new RootCommand("Simple DevOps Operations CLI tool for Azure DevOps and GitHub");
 
             // Add global options
-            var verboseOption = new Option<bool>("--verbose");
-            verboseOption.Description = "Enable verbose output";
+            var verboseOption = new Option<bool>("--verbose")
+            {
+                Description = "Enable verbose output"
+            };
             rootCommand.Options.Add(verboseOption);
 
             // Add commands
@@ -48,15 +50,12 @@ namespace Sdo
             rootCommand.Subcommands.Add(new Commands.WorkItemCommand(verboseOption));
             rootCommand.Subcommands.Add(new Commands.UserCommand(verboseOption));
 
-            // TODO: Add subcommands for users
-            // Phase 3.6: User Commands
-
-            // For now, just show a placeholder message
+            // Set a default action for the root command when no subcommand is specified
             rootCommand.SetAction((parseResult) =>
             {
-                Console.WriteLine("SDO C# migration starting point.");
-                Console.WriteLine("Commands will be implemented based on the Python sdo functionality.");
-                return 0;
+                Console.WriteLine("Error: Please specify a command (map, auth, pipeline, pr, repo, wi, user)");
+                Console.WriteLine("Run 'sdo.net --help' for usage information.");
+                return 1;
             });
 
             // Parse and execute
