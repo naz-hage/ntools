@@ -557,15 +557,15 @@ sdo.net wi update --id 170 --state done
 ### Main Help
 
 ```
-$ sdo.net.net --help
+$ sdo.net --help
 
-sdo.net.net v1.72.6 - Simple DevOps Operations by naz-hage (2020-2026)
+sdo.net v1.72.6 - Simple DevOps Operations by naz-hage (2020-2026)
 
 Description:
   Simple DevOps Operations CLI tool for Azure DevOps and GitHub
 
 Usage:
-  sdo.net.net [command] [options]
+  sdo.net [command] [options]
 
 Options:
   --verbose       Enable verbose output
@@ -579,6 +579,7 @@ Commands:
   pr        Pull request operations
   repo      Repository management commands
   wi        Work item management commands
+  user      User management commands for GitHub and Azure DevOps
 ```
 Passed!  - Failed: 0, Passed: 48, Skipped: 0, Total: 48
 ```
