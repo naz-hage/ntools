@@ -422,3 +422,5 @@ docs/todo.md
 /build-errors.txt
 /test-pipeline.txt
 /test-workflow.yml
+/test-framework
+/sdo-e2e-test
