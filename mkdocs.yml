@@ -60,6 +60,7 @@ nav:
   - Build System Features:
     - Code Coverage: ntools/code-coverage.md
     - MSBuild Targets: ntools/nbuild-targets.md
+  - TODO: todo.md
   - atools:
     - Overview: atools/index.md
     - List of tools:
@@ -68,3 +69,10 @@ nav:
       - Install NTools: atools/install-ntools.md
     - DevOps Tools Suite Architecture: devops-tools-suite-architecture.md
     - AzDO payloads: atools/azdo_payloads.md
+    - Examples:
+      - AzDO Bug Example: atools/issue-azdo-bug-example.md
+      - AzDO Epic Example: atools/issue-azdo-epic-example.md
+      - AzDO PBI Example: atools/issue-azdo-pbi-example.md
+      - AzDO Task Example: atools/issue-azdo-task-example.md
+      - GitHub Issue Example: atools/issue-gh-example.md
+  - SDO.NET: atools/sdo-net.md

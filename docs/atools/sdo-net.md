@@ -6,35 +6,48 @@ This page documents the `sdo.net` CLI tool - the C# migration of Simple DevOps O
 
 `sdo.net` (Simple DevOps Operations) is a C# implementation providing unified operations for work items across Azure DevOps and GitHub platforms. It automatically detects the target platform from Git remote configuration.
 
-### Key Features (Phase 3.1 Complete)
+### Key Features
 
 - **Work Item Management**:
-  - `wi show`: Display detailed work item information (GitHub issues or Azure DevOps work items)
-  - `wi list`: List work items with filtering and pagination (excludes done/closed by default)
-  - `wi create`: Create new work items from markdown files with title, description, and acceptance criteria
-  - `wi update`: Update work item properties (title, state, description, assignee) with platform-aware state translation
-  - `wi comment`: Add comments/discussion to work items
-- **Multi-Platform Support**: Seamless operations across Azure DevOps and GitHub
-- **Automatic Platform Detection**: Detects platform from Git remote configuration
-- **State Management**: Canonical work item states (New, Approved, Committed, Done, To Do, In Progress) with automatic platform translation
-- **Clean Output Formatting**: Native table display with emoji headers and proper column alignment
-- **Comprehensive Error Handling**: Platform-specific error messages with state guidance
+  - `wi` commands for listing, showing, creating, updating and commenting on work items (GitHub issues/Azure DevOps work items) with cross-platform state translation
 
-### Planned Features (Phase 3.2+)
+- **Pull Request (PR) Commands**:
+  - `pr` commands for listing, showing, creating and updating pull requests (merge/approve planned as advanced ops)
 
-- Additional commands: `pipeline`, `pr` (pull request), `repo` (repository) management
+- **Pipeline / Workflow Commands**:
+  - `pipeline` commands to list, show, create, run, check status, view logs and manage pipeline definitions
 
-## Help Output
+- **Repository Commands**:
+  - `repo` commands to list, show and manage repositories with consistent cross-platform output
 
-View the available commands and options:
+- **User & Permissions Commands**:
+  - `user` subcommands: `list`, `show`, `search`, `permissions` — useful for audits and parity checks
+
+- **Map / Native CLI Mappings**:
+  - `map` shows how SDO commands map to native platform CLIs (`gh`, `az`), and with `--verbose` prints the exact native API commands (copy/paste ready)
+
+- **Platform Auto-Detection**: Extracts org/project from Git remotes and selects GitHub or Azure DevOps automatically
+
+- **State Management & Translation**:
+  - Canonical work item states: `New`, `Approved`, `Committed`, `Done`, `To Do`, `In Progress` with automatic translation to GitHub `open|closed` where appropriate
+
+- **Performance & API Improvements**:
+  - Pagination and batch API optimizations for GitHub and Azure DevOps (reduced O(n) calls)
+
+- **Testing & CI Targets**:
+  - Comprehensive unit test suites (work item, repo, PR tests) and specific `UNIT_TEST_*` targets for CI and local verification
+
+- **UX & Output**:
+  - Clean, emoji-enhanced table output and concise error messages; verbose mode exposes request/response and mapping information for debugging
+
 
 ### Main Help
 
 ```
 $ sdo.net --help
 
-Simple DevOps Operations (sdo.net) - C# Migration
-============================================
+sdo.net v1.72.6 - Simple DevOps Operations by naz-hage (2020-2026)
+
 Description:
   Simple DevOps Operations CLI tool for Azure DevOps and GitHub
 
@@ -49,9 +62,18 @@ Options:
 Commands:
   map       Show command mappings between sdo.net and native CLI tools
   auth      Verify authentication with GitHub or Azure DevOps
-  wi  Work item management commands
+  pipeline  Pipeline/workflow management commands (create, show, list, run, status, logs, delete, lastbuild, update)
+  pr        Pull request operations
+  repo      Repository management commands
+  wi        Work item management commands
+  user      User management commands for GitHub and Azure DevOps
 ```
 
+## Help Output
+
+View the available commands and options:
+
+ 
 ### wi Command Help
 
 ```
@@ -334,7 +356,7 @@ URL: https://github.com/naz-hage/ntools/issues/243
 - `--comments`: Include comments/discussion items
 - `--verbose`: Show detailed diagnostic information
 
-## Command Reference (Phases 1, 2 & 4)
+## Command Reference
 
 This section documents the primary commands introduced in Phase 1 (foundation), Phase 2 (service/auth), and Phase 4 (advanced features). Commands are read-only where applicable and follow the same patterns used across the CLI.
 
@@ -554,35 +576,6 @@ sdo.net wi update --id 170 --state done
 
 ## Testing
 
-### Main Help
-
-```
-$ sdo.net --help
-
-sdo.net v1.72.6 - Simple DevOps Operations by naz-hage (2020-2026)
-
-Description:
-  Simple DevOps Operations CLI tool for Azure DevOps and GitHub
-
-Usage:
-  sdo.net [command] [options]
-
-Options:
-  --verbose       Enable verbose output
-  -?, -h, --help  Show help and usage information
-  --version       Show version information
-
-Commands:
-  map       Show command mappings between sdo.net and native CLI tools
-  auth      Verify authentication with GitHub or Azure DevOps
-  pipeline  Pipeline/workflow management commands (create, show, list, run, status, logs, delete, lastbuild, update)
-  pr        Pull request operations
-  repo      Repository management commands
-  wi        Work item management commands
-  user      User management commands for GitHub and Azure DevOps
-```
-Passed!  - Failed: 0, Passed: 48, Skipped: 0, Total: 48
-```
 
 ### Manual Testing
 
@@ -614,17 +607,4 @@ nb test                                     # Run all tests
 nb UNIT_TEST_WORKITEM_COMMAND              # Run wi command tests
 nb UNIT_TEST_WORKITEM_STATE_TRANSLATOR     # Run state translator tests
 ```
-
-### Architecture
-
-The C# implementation follows the `System.CommandLine` framework for CLI parsing and includes:
-
-- Automatic platform detection via `PlatformDetector`
-- Async API calls via `GitHubClient` and `AzureDevOpsClient`
-- Centralized state management via `WorkItemStateTranslator` with 6 canonical states
-- Platform-aware state translation (Azure DevOps ↔ GitHub)
-- Comprehensive error handling with platform-specific messages and state guidance
-- Clean separation of concerns: Commands → Services → API Clients
-- Markdown parsing for structured work item creation
-- JSON-patch operations for Azure DevOps updates
 

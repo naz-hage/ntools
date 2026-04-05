@@ -88,7 +88,7 @@ class ClickArgs:
         return None
 
 
-@click.group(help=CLI_DOCSTRING)
+@click.group(invoke_without_command=True, help=CLI_DOCSTRING)
 @click.option("--verbose", "-v", is_flag=True, help="Show detailed API error information")
 @click.version_option(version=__version__, prog_name="SDO")
 @click.pass_context
@@ -96,6 +96,10 @@ def cli(ctx, verbose):
     # Store global options in context
     ctx.ensure_object(dict)
     ctx.obj["verbose"] = verbose
+    # If no subcommand was provided, print the CLI header and return success
+    if ctx.invoked_subcommand is None:
+        click.echo(CLI_DOCSTRING)
+        return
 
 
 @cli.group()
