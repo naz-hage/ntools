@@ -2666,11 +2666,11 @@ sdo.net<span class="w"> </span>wi<span class="w"> </span>comment<span class="w">
 - <code>--verbose</code> — Show mapping</p>
 <hr />
 <h3 id="pr-pull-request-operations">pr — Pull Request Operations<a class="headerlink" href="#pr-pull-request-operations" title="Anchor link to this section for reference">&para;</a></h3>
-<p>List, show, create, and manage pull requests on GitHub and Azure DevOps.</p>
+<p>List, show, create, and manage pull requests on GitHub and Azure DevOps. <code>pr create</code> uses markdown files similar to <code>wi create</code>.</p>
 <p><strong>Subcommands:</strong>
 - <code>list</code> — List pull requests
 - <code>show</code> — Display PR details
-- <code>create</code> — Create pull request
+- <code>create</code> — Create pull request from markdown file
 - <code>status</code> — Check PR status
 - <code>update</code> — Update PR properties</p>
 <p><strong>Help:</strong>
@@ -2683,67 +2683,94 @@ Usage:
   sdo.net pr [command] [options]
 
 Commands:
-  create  Create a new pull request
-  list    List pull requests
-  show    Display pull request information
-  status  Check pull request status
-  update  Update pull request properties
+  create  Create a pull request from markdown file
+  list    List pull requests in the current repository
+  show    Show detailed information about a pull request
+  status  Show status of a pull request
+  update  Update an existing pull request
 </code></pre></div></p>
 <h4 id="pr-list">pr list<a class="headerlink" href="#pr-list" title="Anchor link to this section for reference">&para;</a></h4>
 <p>List pull requests with optional filtering.</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>pr<span class="w"> </span>list<span class="w">                         </span><span class="c1"># List open PRs</span>
-sdo.net<span class="w"> </span>pr<span class="w"> </span>list<span class="w"> </span>--state<span class="w"> </span>closed<span class="w">         </span><span class="c1"># List closed PRs</span>
-sdo.net<span class="w"> </span>pr<span class="w"> </span>list<span class="w"> </span>--state<span class="w"> </span>merged<span class="w">         </span><span class="c1"># List merged PRs</span>
+<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>pr<span class="w"> </span>list<span class="w">                         </span><span class="c1"># List active PRs (default)</span>
+sdo.net<span class="w"> </span>pr<span class="w"> </span>list<span class="w"> </span>--status<span class="w"> </span>closed<span class="w">         </span><span class="c1"># List closed PRs</span>
+sdo.net<span class="w"> </span>pr<span class="w"> </span>list<span class="w"> </span>--status<span class="w"> </span>merged<span class="w">         </span><span class="c1"># List merged PRs</span>
 sdo.net<span class="w"> </span>pr<span class="w"> </span>list<span class="w"> </span>--top<span class="w"> </span><span class="m">20</span><span class="w">               </span><span class="c1"># Limit to 20</span>
 sdo.net<span class="w"> </span>pr<span class="w"> </span>list<span class="w"> </span>--verbose<span class="w">              </span><span class="c1"># Show API commands</span>
 </code></pre></div></p>
 <p><strong>Options:</strong>
-- <code>--state &lt;state&gt;</code> — Filter: <code>open</code>, <code>closed</code>, <code>merged</code>
-- <code>--top &lt;N&gt;</code> — Maximum results
+- <code>--status &lt;status&gt;</code> — Filter by status: <code>active</code>, <code>closed</code>, <code>merged</code> (default: active)
+- <code>--top &lt;N&gt;</code> — Maximum results (default: 10)
 - <code>--verbose</code> — Show mapping</p>
 <h4 id="pr-show">pr show<a class="headerlink" href="#pr-show" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Display pull request details.</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>pr<span class="w"> </span>show<span class="w"> </span>--id<span class="w"> </span><span class="m">12</span><span class="w">                </span><span class="c1"># Show PR #12</span>
-sdo.net<span class="w"> </span>pr<span class="w"> </span>show<span class="w"> </span>--id<span class="w"> </span><span class="m">12</span><span class="w"> </span>--verbose<span class="w">      </span><span class="c1"># Show API command</span>
+<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>pr<span class="w"> </span>show<span class="w"> </span><span class="m">12</span><span class="w">                </span><span class="c1"># Show PR #12</span>
+sdo.net<span class="w"> </span>pr<span class="w"> </span>show<span class="w"> </span><span class="m">12</span><span class="w"> </span>--verbose<span class="w">      </span><span class="c1"># Show API command</span>
 </code></pre></div></p>
 <p><strong>Options:</strong>
-- <code>--id &lt;id&gt;</code> — PR ID/number (required)
+- <code>&lt;pr-id&gt;</code> — PR ID/number (required)
 - <code>--verbose</code> — Show mapping</p>
 <h4 id="pr-create">pr create<a class="headerlink" href="#pr-create" title="Anchor link to this section for reference">&para;</a></h4>
-<p>Create a new pull request.</p>
+<p>Create a new pull request from markdown file.</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span>--title<span class="w"> </span><span class="s2">&quot;Fix bug&quot;</span><span class="w"> </span>--description<span class="w"> </span><span class="s2">&quot;Details&quot;</span><span class="w"> </span>--source<span class="w"> </span>feature-branch<span class="w"> </span>--target<span class="w"> </span>main
-sdo.net<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span>--title<span class="w"> </span><span class="s2">&quot;Feature&quot;</span><span class="w"> </span>--source<span class="w"> </span>dev<span class="w"> </span>--target<span class="w"> </span>main<span class="w"> </span>--draft
+<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span>--file<span class="w"> </span>pr.md<span class="w">                        </span><span class="c1"># Create from file</span>
+sdo.net<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>pr.md<span class="w">                            </span><span class="c1"># Short option</span>
+sdo.net<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span>--file<span class="w"> </span>pr.md<span class="w"> </span>--work-item<span class="w"> </span><span class="m">243</span><span class="w">        </span><span class="c1"># Link to work item</span>
+sdo.net<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span>--file<span class="w"> </span>pr.md<span class="w"> </span>--draft<span class="w">                </span><span class="c1"># Create as draft</span>
+sdo.net<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span>--file<span class="w"> </span>pr.md<span class="w"> </span>--dry-run<span class="w">              </span><span class="c1"># Preview</span>
+sdo.net<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span>--file<span class="w"> </span>pr.md<span class="w"> </span>--verbose<span class="w">              </span><span class="c1"># Show mapping</span>
 </code></pre></div></p>
 <p><strong>Options:</strong>
-- <code>--title &lt;text&gt;</code> — PR title (required)
-- <code>--description &lt;text&gt;</code> — PR description
-- <code>--source &lt;branch&gt;</code> — Source branch
-- <code>--target &lt;branch&gt;</code> — Target branch
-- <code>--draft</code> — Create as draft (GitHub)
+- <code>--file &lt;path&gt;</code> — Path to markdown file (required)
+- <code>-f &lt;path&gt;</code> — Short alias
+- <code>--work-item &lt;id&gt;</code> — Work item ID to link to PR
+- <code>--draft</code> — Create as draft pull request
+- <code>--dry-run</code> — Preview without creating
 - <code>--verbose</code> — Show mapping</p>
+<p><strong>Markdown Format:</strong>
+<div class="highlight"><pre><span></span><code><span class="gh"># PR Title</span>
+
+This is the pull request description.
+
+<span class="gu">## Changes</span>
+<span class="k">-</span><span class="w"> </span>Change 1
+<span class="k">-</span><span class="w"> </span>Change 2
+</code></pre></div></p>
+<p>Optional YAML metadata:
+<div class="highlight"><pre><span></span><code>---
+target_branch: main
+source_branch: feature
+<span class="gu">reviewers: &quot;user1, user2&quot;</span>
+<span class="gu">---</span>
+
+<span class="gh"># Title</span>
+...
+</code></pre></div></p>
 <h4 id="pr-status">pr status<a class="headerlink" href="#pr-status" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Check pull request status.</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>pr<span class="w"> </span>status<span class="w"> </span>--id<span class="w"> </span><span class="m">12</span><span class="w">              </span><span class="c1"># Check PR status</span>
-sdo.net<span class="w"> </span>pr<span class="w"> </span>status<span class="w"> </span>--id<span class="w"> </span><span class="m">12</span><span class="w"> </span>--verbose<span class="w">    </span><span class="c1"># Show full details</span>
+<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>pr<span class="w"> </span>status<span class="w"> </span><span class="m">12</span><span class="w">              </span><span class="c1"># Check PR status</span>
+sdo.net<span class="w"> </span>pr<span class="w"> </span>status<span class="w"> </span><span class="m">12</span><span class="w"> </span>--verbose<span class="w">    </span><span class="c1"># Show full details</span>
 </code></pre></div></p>
 <p><strong>Options:</strong>
-- <code>--id &lt;id&gt;</code> — PR ID/number (required)
+- <code>&lt;pr-id&gt;</code> — PR ID/number (required)
 - <code>--verbose</code> — Show mapping</p>
 <h4 id="pr-update">pr update<a class="headerlink" href="#pr-update" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Update pull request properties.</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>pr<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">12</span><span class="w"> </span>--title<span class="w"> </span><span class="s2">&quot;Updated title&quot;</span>
-sdo.net<span class="w"> </span>pr<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">12</span><span class="w"> </span>--state<span class="w"> </span>closed
+<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>pr<span class="w"> </span>update<span class="w"> </span>--pr-id<span class="w"> </span><span class="m">12</span><span class="w"> </span>--title<span class="w"> </span><span class="s2">&quot;Updated title&quot;</span>
+sdo.net<span class="w"> </span>pr<span class="w"> </span>update<span class="w"> </span>--pr-id<span class="w"> </span><span class="m">12</span><span class="w"> </span>--file<span class="w"> </span>updated.md
+sdo.net<span class="w"> </span>pr<span class="w"> </span>update<span class="w"> </span>--pr-id<span class="w"> </span><span class="m">12</span><span class="w"> </span>--status<span class="w"> </span>closed
+sdo.net<span class="w"> </span>pr<span class="w"> </span>update<span class="w"> </span>--pr-id<span class="w"> </span><span class="m">12</span><span class="w"> </span>--title<span class="w"> </span><span class="s2">&quot;New title&quot;</span><span class="w"> </span>--status<span class="w"> </span>merged
 </code></pre></div></p>
 <p><strong>Options:</strong>
-- <code>--id &lt;id&gt;</code> — PR ID/number (required)
+- <code>--pr-id &lt;id&gt;</code> — PR ID to update (required)
+- <code>--file &lt;path&gt;</code> — Markdown file with updated details
+- <code>-f &lt;path&gt;</code> — Short alias for <code>--file</code>
 - <code>--title &lt;text&gt;</code> — New title
-- <code>--description &lt;text&gt;</code> — New description
-- <code>--state &lt;state&gt;</code> — New state (<code>open</code>, <code>closed</code>)
+- <code>-t &lt;text&gt;</code> — Short alias for <code>--title</code>
+- <code>--status &lt;status&gt;</code> — New status (<code>active</code>, <code>closed</code>, <code>merged</code>)
 - <code>--verbose</code> — Show mapping</p>
 <hr />
 <h3 id="repo-repository-management">repo — Repository Management<a class="headerlink" href="#repo-repository-management" title="Anchor link to this section for reference">&para;</a></h3>
