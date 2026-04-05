@@ -334,6 +334,134 @@ URL: https://github.com/naz-hage/ntools/issues/243
 - `--comments`: Include comments/discussion items
 - `--verbose`: Show detailed diagnostic information
 
+## Command Reference (Phases 1, 2 & 4)
+
+This section documents the primary commands introduced in Phase 1 (foundation), Phase 2 (service/auth), and Phase 4 (advanced features). Commands are read-only where applicable and follow the same patterns used across the CLI.
+
+### map — Show native CLI mappings
+Description: show how SDO commands map to native platform CLIs (`gh` for GitHub, `az` / `az repos` for Azure DevOps).
+
+Options:
+- `--platform <gh|azdo>`: restrict to a single platform mapping
+- `--all` : show all mappings for both platforms
+
+Examples:
+```
+sdo map
+sdo map --platform gh
+sdo map --platform azdo --all
+```
+
+Behavior: with `--verbose` many commands print the equivalent native command (e.g. `gh api repos/owner/repo/collaborators?per_page=100`) in yellow for easy copy/paste.
+
+### auth — Verify authentication
+Description: validate available credentials for the detected platform.
+
+Options:
+- `gh` : verify GitHub auth (checks `GITHUB_TOKEN`, `gh auth`, Windows credential store)
+- `azdo` : verify Azure DevOps PAT (`AZURE_DEVOPS_PAT`)
+- `--verbose` : show token detection details and any scope information
+
+Examples:
+```
+sdo auth gh
+sdo auth azdo --verbose
+```
+
+### wi — Work item (issue) commands
+Description: CRUD and comment operations for GitHub issues and Azure DevOps work items. Options are translated between platforms.
+
+Common Options:
+- `--id <number>` : identifier for show/update/comment
+- `--top <n>` : limit number of results for `list` (default: 50)
+- `--state <state>` : filter or set state (Azure states: `New, Approved, Committed, Done, To Do, In Progress`; GitHub: `open|closed`)
+- `--assigned-to <user>` : filter by assignee (planned)
+- `--file-path <path>` : markdown file for `create`
+- `--comments` : include comments in `show`
+- `--verbose` : show mapping and extra diagnostics
+
+Examples:
+```
+sdo wi list
+sdo wi list --top 20 --state "In Progress"
+sdo wi show --id 243 --comments
+sdo wi create --file-path ./work-item.md --verbose
+sdo wi update --id 243 --state Done
+sdo wi comment --id 243 --message "Looks good to me"
+```
+
+Notes:
+- `create` accepts a markdown document with Title, Description and Acceptance Criteria (see examples earlier in this doc).
+- `update --state` performs platform-aware translation (Azure DevOps -> GitHub open/closed mapping where appropriate).
+
+### repo — Repository commands
+Description: list and inspect repositories for the authenticated user or detected organization.
+
+Options:
+- `--top <n>` : limit results
+- `--org <organization>` : specify organization (Azure/GitHub)
+- `--verbose` : show mapping and API request details
+
+Examples:
+```
+sdo repo list --top 5
+sdo repo show --name naz-hage/ntools --verbose
+```
+
+### pr — Pull request commands
+Description: list, show and operate on pull requests. Merge/approve operations are considered advanced and require write permissions.
+
+Options:
+- `--id <id>` : pull request id/number
+- `--state <open|closed|merged>` : filter PR list
+- `--merge-method <merge|squash|rebase>` : merge strategy (GitHub)
+- `--verbose` : show mapping and API details
+
+Examples:
+```
+sdo pr list --state open
+sdo pr show --id 12
+sdo pr merge --id 12 --merge-method squash --verbose
+```
+
+### pipeline — Pipeline / workflow commands
+Description: manage CI pipelines / workflows. Read-only operations are safe for E2E parity checks; trigger/update operations are advanced.
+
+Options:
+- `--id <id>` : pipeline or run id
+- `--top <n>` : limit list results
+- `--org`, `--project` : Azure DevOps scoping
+- `--verbose` : show equivalent `gh/az` commands and API payloads
+
+Examples:
+```
+sdo pipeline list
+sdo pipeline status --id 1234
+sdo pipeline logs --id 1234 --verbose
+```
+
+### user — User and permissions commands
+Description: list/search users and show permission summaries for a user or identity. Useful for audits and E2E parity checks.
+
+Options:
+- `--login <login>` : GitHub login or Azure identity shorthand
+- `--user <login|descriptor>` : user identifier for permissions queries
+- `--query <term>` : search term for `search`
+- `--top <n>` : limit results
+- `--verbose` : show mapping and the exact API calls performed
+
+Examples:
+```
+sdo user list --top 50
+sdo user show --login naz-hage --verbose
+sdo user search --query "naz" --top 20
+sdo user permissions --user naz-hage --verbose
+```
+
+Notes:
+- Many Phase 4 commands are implemented to match Python behavior and are included where ready; others are planned or gated behind integration tests.
+- Use `--verbose` on most commands to display an equivalent native CLI mapping (e.g., `gh` or `az`), request/response dumps, and extra diagnostics.
+
 ## Platform Detection
 
 The tool automatically detects which platform to use based on your Git remote:
@@ -426,29 +554,32 @@ sdo wi update --id 170 --state done
 
 ## Testing
 
-### Unit Tests
+### Main Help
 
-All commands have comprehensive unit test coverage:
-
-```bash
-# Run all wi command tests
-cd C:\source\ntools
-nb UNIT_TEST_WORKITEM_COMMAND
-
-# Output shows tests for create, update, comment, list, show
-Passed!  - Failed: 0, Passed: 78, Skipped: 0, Total: 78
 ```
+$ sdo.net --help
 
-### State Translator Tests
+sdo.net v1.72.6 - Simple DevOps Operations by naz-hage (2020-2026)
 
-Test state handling and translation:
+Description:
+  Simple DevOps Operations CLI tool for Azure DevOps and GitHub
 
-```bash
-# Run state translator tests
-cd C:\source\ntools
-nb UNIT_TEST_WORKITEM_STATE_TRANSLATOR
+Usage:
+  sdo.net [command] [options]
 
-# Output shows 48 tests for parse, GitHub translation, Azure DevOps translation
+Options:
+  --verbose       Enable verbose output
+  -?, -h, --help  Show help and usage information
+  --version       Show version information
+
+Commands:
+  map       Show command mappings between SDO and native CLI tools
+  auth      Verify authentication with GitHub or Azure DevOps
+  pipeline  Pipeline/workflow management commands (create, show, list, run, status, logs, delete, lastbuild, update)
+  pr        Pull request operations
+  repo      Repository management commands
+  wi        Work item management commands
+```
 Passed!  - Failed: 0, Passed: 48, Skipped: 0, Total: 48
 ```
 
@@ -470,70 +601,6 @@ sdo wi list
 sdo wi show --id <issue_number>
 ```
 
-## Phase Status
-
-### Phase 3.1 - ✅ Work Item Commands (COMPLETE)
-
-#### Show & List
-- ✅ Implement `wi show` subcommand - Display detailed work item information
-- ✅ Implement `wi list` subcommand - List work items with filtering
-- ✅ Default filtering (excludes done/closed to show active work)
-- ✅ Support GitHub issues with full metadata
-- ✅ Proper date deserialization and formatting
-- ✅ Labels and assignee display
-- ✅ 33 unit tests passing
-- ✅ Real data verified with GitHub API
-- ✅ Clean output formatting matching Python SDO
-
-#### Create, Update, Comment
-- ✅ Implement `wi create` subcommand - Create work items from markdown files
-- ✅ Implement `wi update` subcommand - Update work item properties with state translation
-- ✅ Implement `wi comment` subcommand - Add comments to work items
-- ✅ Markdown parsing (title, description, acceptance criteria)
-- ✅ JSON-patch API integration for Azure DevOps
-- ✅ Platform-aware state translation (New/Approved/Committed/Done/To Do/In Progress)
-- ✅ Dry-run support for preview before creation
-- ✅ Verbose logging and success messages with state acknowledgement
-- ✅ Comprehensive error handling with state guidance
-- ✅ 48 unit tests for WorkItemStateTranslator
-- ✅ GitHub and Azure DevOps API integration
-
-### Phase 3.2 - Pending
-
-- ⏳ Add filtering options (--type, --assigned-to, --assigned-to-me)
-- ⏳ Enhanced query capabilities
-
-### Phase 3.3-3.5 - Planned
-
-- Repository commands (`repo create`, `repo list`, `repo show`, `repo delete`)
-- Pull request commands (`pr merge`, `pr approve`, `pr list`, `pr show`)
-- Pipeline commands (`pipeline create`, `pipeline run`, `pipeline status`, etc.)
-- User/Permission commands (`user show`, `user list`, `user search`, `permissions`)
-
-## Implementation Notes
-
-**Phase 3.1 Show & List (March 11, 2026)**:
-- ✅ **GitHub API Pagination**: Full pagination implemented to fetch all issues across multiple pages
-- ✅ **State Filtering**: Default behavior excludes closed items; `--state closed` retrieves closed issues  
-- ✅ **Result Limiting**: `--top` parameter correctly limits results after filtering
-- ✅ All 33 unit tests passing with pagination
-- ✅ Verified with real data: `wi list` returns all open issues
-
-**Phase 3.1 State Management (March 18, 2026)**:
-- ✅ **Canonical State Definitions**: 6 states from Python SDO (New, Approved, Committed, Done, To Do, In Progress)
-- ✅ **State Translation**: Automatic conversion between Azure DevOps and GitHub states
-- ✅ **WorkItemStateTranslator**: Centralized state handling with 48 unit tests
-- ✅ **Error Handling**: Platform-specific error messages with supported states guidance
-- ✅ **Success Messages**: Update commands show the state being changed to
-- ✅ **Create from Markdown**: Support for file-driven creation with acceptance criteria
-- ✅ **Dry-run Support**: Preview work items before creation
-- ✅ **Comment Support**: Add discussion to work items on both platforms
-
-**Platform State Handling**:
-- **Azure DevOps**: Uses exact state names with proper casing ("To Do", "In Progress")
-- **GitHub**: Translates states to open/closed binary model
-- **Default List Behavior**: Excludes done/closed items to show active work
-- **With --state**: Allows viewing items in any state including done/closed
 
 ## Development
 

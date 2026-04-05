@@ -46,6 +46,7 @@ namespace Sdo
             rootCommand.Subcommands.Add(new Commands.PullRequestCommand(verboseOption));
             rootCommand.Subcommands.Add(new Commands.RepositoryCommand(verboseOption));
             rootCommand.Subcommands.Add(new Commands.WorkItemCommand(verboseOption));
+            rootCommand.Subcommands.Add(new Commands.UserCommand(verboseOption));
 
             // TODO: Add subcommands for users
             // Phase 3.6: User Commands

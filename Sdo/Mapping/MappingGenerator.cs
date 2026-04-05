@@ -123,6 +123,47 @@ namespace Sdo.Mapping
             return $"az boards query --org {organization} --project \"{project}\" --wiql \"{wiql}\"{topPart}";
         }
 
+        public string RepoPermissionGitHub(string owner, string repo, string user)
+        {
+            if (string.IsNullOrEmpty(owner) || string.IsNullOrEmpty(repo)) return string.Empty;
+            // Use gh repo view to get collaborators and filter by login with --jq
+            var jq = $".collaborators[] | select(.login==\"{user}\") | .permission";
+            return $"gh repo view -R {owner}/{repo} --json collaborators --jq \"{jq}\"";
+        }
+
+        public string UserPermissionsAzure(string organization, string project, string user)
+        {
+            // Prefer az devops commands where possible. Exact namespace query may require namespace id.
+            // Provide a helpful az devops CLI example that queries security permissions for a subject.
+            return $"az devops security permission list --organization https://dev.azure.com/{organization} --project \"{project}\" --subject \"{user}\"";
+        }
+
+        public string CollaboratorsListGitHub(string owner, string repo, int top)
+        {
+            if (string.IsNullOrEmpty(owner) || string.IsNullOrEmpty(repo)) return string.Empty;
+            var limit = top > 0 ? top : 100;
+            // Use gh repo view to get collaborators and limit output via --limit is not available for this json output,
+            // so advise piping and jq; show simple gh command to list collaborators
+            // Use the query parameter `per_page` which `gh api` accepts in the endpoint URL.
+            // Alternatively users can use `--paginate` to retrieve all pages.
+            return $"gh api repos/{owner}/{repo}/collaborators?per_page={limit}";
+        }
+
+        public string SearchUsersGitHub(string query, int top)
+        {
+            if (string.IsNullOrEmpty(query)) return string.Empty;
+            var qEscaped = query.Replace("\"", "\\\"");
+            var topPart = top > 0 ? $" --limit {top}" : string.Empty;
+            return $"gh search users \"{qEscaped}\"{topPart}";
+        }
+
+        public string ListUsersAzure(string organization, string project, int top)
+        {
+            var topPart = top > 0 ? $" --top {top}" : string.Empty;
+            // az devops users list requires extension; provide example using az devops user or graph users
+            return $"az devops user list --organization https://dev.azure.com/{organization}{topPart}";
+        }
+
         public string WorkItemShowAzure(string organization, string project, int id)
         {
             if (string.IsNullOrEmpty(organization) || string.IsNullOrEmpty(project)) return string.Empty;
