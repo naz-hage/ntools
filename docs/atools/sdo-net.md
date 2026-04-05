@@ -1,10 +1,10 @@
-# sdo.exe - Simple DevOps Operations Tool (C# Version)
+# sdo.net - Simple DevOps Operations Tool (C# Version)
 
-This page documents the `sdo.exe` CLI tool - the C# migration of Simple DevOps Operations. Use this page for detailed usage examples, prerequisites, and command reference.
+This page documents the `sdo.net` CLI tool - the C# migration of Simple DevOps Operations. Use this page for detailed usage examples, prerequisites, and command reference.
 
 ## Overview
 
-`sdo.exe` (Simple DevOps Operations) is a C# implementation providing unified operations for work items across Azure DevOps and GitHub platforms. It automatically detects the target platform from Git remote configuration.
+`sdo.net` (Simple DevOps Operations) is a C# implementation providing unified operations for work items across Azure DevOps and GitHub platforms. It automatically detects the target platform from Git remote configuration.
 
 ### Key Features (Phase 3.1 Complete)
 
@@ -31,15 +31,15 @@ View the available commands and options:
 ### Main Help
 
 ```
-$ sdo --help
+$ sdo.net --help
 
-Simple DevOps Operations (SDO) - C# Migration
+Simple DevOps Operations (sdo.net) - C# Migration
 ============================================
 Description:
   Simple DevOps Operations CLI tool for Azure DevOps and GitHub
 
 Usage:
-  sdo [command] [options]
+  sdo.net [command] [options]
 
 Options:
   --verbose       Enable verbose output
@@ -47,7 +47,7 @@ Options:
   --version       Show version information
 
 Commands:
-  map       Show command mappings between SDO and native CLI tools
+  map       Show command mappings between sdo.net and native CLI tools
   auth      Verify authentication with GitHub or Azure DevOps
   wi  Work item management commands
 ```
@@ -55,15 +55,15 @@ Commands:
 ### wi Command Help
 
 ```
-$ sdo wi --help
+$ sdo.net wi --help
 
-Simple DevOps Operations (SDO) - C# Migration
+Simple DevOps Operations (sdo.net) - C# Migration
 ============================================
 Description:
   Work item management commands
 
 Usage:
-  sdo wi [command] [options]
+  sdo.net wi [command] [options]
 
 Options:
   -?, -h, --help  Show help and usage information
@@ -79,15 +79,15 @@ Commands:
 ### Show Subcommand Help
 
 ```
-$ sdo wi show --help
+$ sdo.net wi show --help
 
-Simple DevOps Operations (SDO) - C# Migration
+Simple DevOps Operations (sdo.net) - C# Migration
 ============================================
 Description:
   Display detailed work item information
 
 Usage:
-  sdo wi show [options]
+  sdo.net wi show [options]
 
 Options:
   --id <id>       Work item ID (required)
@@ -99,15 +99,15 @@ Options:
 ### List Subcommand Help
 
 ```
-$ sdo wi list --help
+$ sdo.net wi list --help
 
-Simple DevOps Operations (SDO) - C# Migration
+Simple DevOps Operations (sdo.net) - C# Migration
 ============================================
 Description:
   List work items with optional filtering
 
 Usage:
-  sdo wi list [options]
+  sdo.net wi list [options]
 
 Options:
   --type <type>                Filter by work item type (PBI, Bug, Task, Spike,
@@ -142,9 +142,9 @@ The tool automatically detects the platform from your current Git remote:
 
 ## Installation
 
-Place `sdo.exe` in your PATH or run directly from:
+Place `sdo.net` in your PATH or run directly from:
 ```
-C:\source\ntools\Sdo\bin\Release\sdo.exe
+C:\source\ntools\sdo.net\bin\Release\sdo.net
 ```
 
 Build from source:
@@ -160,8 +160,8 @@ nb build
 Verify your authentication is configured correctly:
 
 ```bash
-sdo auth gh              # Verify GitHub authentication
-sdo auth devops          # Verify Azure DevOps authentication
+sdo.net auth gh              # Verify GitHub authentication
+sdo.net auth devops          # Verify Azure DevOps authentication
 ```
 
 Success output:
@@ -177,22 +177,22 @@ List work items from the current repository (defaults to GitHub). By default, sh
 
 ```bash
 # List active work items (excludes closed/done by default)
-sdo wi list
+sdo.net wi list
 
 # List specific number of items
-sdo wi list --top 20
+sdo.net wi list --top 20
 
 # Show only done items
-sdo wi list --state Done
+sdo.net wi list --state Done
 
 # Show items in a specific state
-sdo wi list --state "In Progress"
+sdo.net wi list --state "In Progress"
 
 # Show all items including done/closed
-sdo wi list --state closed
+sdo.net wi list --state closed
 
 # Verbose output with debugging information
-sdo wi list --verbose
+sdo.net wi list --verbose
 ```
 
 **Default Behavior:**
@@ -210,7 +210,7 @@ sdo wi list --verbose
 ------------------------------------------------------------------------------------------------------------------------
 #      Title                                    State      Labels                         Assignee
 ------------------------------------------------------------------------------------------------------------------------
-#246   Phase 6: Deployment & Transition (CI,... OPEN       backlog, sdo-migration         Unassigned
+#246   Phase 6: Deployment & Transition (CI,... OPEN       backlog, sdo.net-migration         Unassigned
 #245   Phase 5: Testing & Validation (Unit, ... OPEN       backlog, testing               Unassigned
 #243   Phase 3: Command Implementation (Migr... OPEN       enhancement, backlog           Unassigned
 ...
@@ -234,13 +234,13 @@ Create new work items from markdown files:
 
 ```bash
 # Create from markdown file
-sdo wi create --file-path work-item.md
+sdo.net wi create --file-path work-item.md
 
 # Create with dry-run (preview without creating)
-sdo wi create --file-path work-item.md --dry-run
+sdo.net wi create --file-path work-item.md --dry-run
 
 # Verbose output with JSON payload
-sdo wi create --file-path work-item.md --verbose
+sdo.net wi create --file-path work-item.md --verbose
 ```
 
 **Markdown Format:**
@@ -261,17 +261,17 @@ Update work item properties:
 
 ```bash
 # Update state
-sdo wi update --id 243 --state Done
+sdo.net wi update --id 243 --state Done
 
 # Update title
-sdo wi update --id 243 --title "Updated Title"
+sdo.net wi update --id 243 --title "Updated Title"
 
 # Update state with success message showing new state
-sdo wi update --id 166 --state done
+sdo.net wi update --id 166 --state done
 # Output: √ Work item 166 updated successfully to state: Done
 
 # Update with verbose output
-sdo wi update --id 243 --state "In Progress" --verbose
+sdo.net wi update --id 243 --state "In Progress" --verbose
 ```
 
 **Valid States:**
@@ -284,10 +284,10 @@ Add comments to work items:
 
 ```bash
 # Add comment to issue
-sdo wi comment --id 243 --message "This is my comment"
+sdo.net wi comment --id 243 --message "This is my comment"
 
 # Verbose output
-sdo wi comment --id 243 --message "Great work!" --verbose
+sdo.net wi comment --id 243 --message "Great work!" --verbose
 ```
 
 #### Show Work Item Details
@@ -296,13 +296,13 @@ Display full details of a specific work item:
 
 ```bash
 # Show GitHub issue #243
-sdo wi show --id 243
+sdo.net wi show --id 243
 
 # Show with verbose output
-sdo wi show --id 243 --verbose
+sdo.net wi show --id 243 --verbose
 
 # Show with comments (when available)
-sdo wi show --id 243 --comments
+sdo.net wi show --id 243 --comments
 ```
 
 **Output Format:**
@@ -316,8 +316,8 @@ Created:     2026-03-01T22:48:29.0000000Z
 Updated:     2026-03-01T22:48:29.0000000Z
 
 Description:
-Phase 3 focuses on migrating the Python SDO command implementations to the new C# 
-`Sdo` project. This covers pipeline, PR, and user commands and ensures behavior parity with the Python tool.
+Phase 3 focuses on migrating the Python sdo.net command implementations to the new C# 
+`sdo.net` project. This covers pipeline, PR, and user commands and ensures behavior parity with the Python tool.
 
 - [ ] Implement pipeline commands: `create`, `show`, `list`, `update`, `run`, `status`, `logs`, `lastbuild`, `delete`
 - [ ] Implement PR commands: `merge`, `approve`
@@ -339,7 +339,7 @@ URL: https://github.com/naz-hage/ntools/issues/243
 This section documents the primary commands introduced in Phase 1 (foundation), Phase 2 (service/auth), and Phase 4 (advanced features). Commands are read-only where applicable and follow the same patterns used across the CLI.
 
 ### map — Show native CLI mappings
-Description: show how SDO commands map to native platform CLIs (`gh` for GitHub, `az` / `az repos` for Azure DevOps).
+Description: show how sdo.net commands map to native platform CLIs (`gh` for GitHub, `az` / `az repos` for Azure DevOps).
 
 Options:
 - `--platform <gh|azdo>`: restrict to a single platform mapping
@@ -347,9 +347,9 @@ Options:
 
 Examples:
 ```
-sdo map
-sdo map --platform gh
-sdo map --platform azdo --all
+sdo.net map
+sdo.net map --platform gh
+sdo.net map --platform azdo --all
 ```
 
 Behavior: with `--verbose` many commands print the equivalent native command (e.g. `gh api repos/owner/repo/collaborators?per_page=100`) in yellow for easy copy/paste.
@@ -364,8 +364,8 @@ Options:
 
 Examples:
 ```
-sdo auth gh
-sdo auth azdo --verbose
+sdo.net auth gh
+sdo.net auth azdo --verbose
 ```
 
 ### wi — Work item (issue) commands
@@ -382,12 +382,12 @@ Common Options:
 
 Examples:
 ```
-sdo wi list
-sdo wi list --top 20 --state "In Progress"
-sdo wi show --id 243 --comments
-sdo wi create --file-path ./work-item.md --verbose
-sdo wi update --id 243 --state Done
-sdo wi comment --id 243 --message "Looks good to me"
+sdo.net wi list
+sdo.net wi list --top 20 --state "In Progress"
+sdo.net wi show --id 243 --comments
+sdo.net wi create --file-path ./work-item.md --verbose
+sdo.net wi update --id 243 --state Done
+sdo.net wi comment --id 243 --message "Looks good to me"
 ```
 
 Notes:
@@ -404,8 +404,8 @@ Options:
 
 Examples:
 ```
-sdo repo list --top 5
-sdo repo show --name naz-hage/ntools --verbose
+sdo.net repo list --top 5
+sdo.net repo show --name naz-hage/ntools --verbose
 ```
 
 ### pr — Pull request commands
@@ -419,9 +419,9 @@ Options:
 
 Examples:
 ```
-sdo pr list --state open
-sdo pr show --id 12
-sdo pr merge --id 12 --merge-method squash --verbose
+sdo.net pr list --state open
+sdo.net pr show --id 12
+sdo.net pr merge --id 12 --merge-method squash --verbose
 ```
 
 ### pipeline — Pipeline / workflow commands
@@ -435,9 +435,9 @@ Options:
 
 Examples:
 ```
-sdo pipeline list
-sdo pipeline status --id 1234
-sdo pipeline logs --id 1234 --verbose
+sdo.net pipeline list
+sdo.net pipeline status --id 1234
+sdo.net pipeline logs --id 1234 --verbose
 ```
 
 ### user — User and permissions commands
@@ -452,10 +452,10 @@ Options:
 
 Examples:
 ```
-sdo user list --top 50
-sdo user show --login naz-hage --verbose
-sdo user search --query "naz" --top 20
-sdo user permissions --user naz-hage --verbose
+sdo.net user list --top 50
+sdo.net user show --login naz-hage --verbose
+sdo.net user search --query "naz" --top 20
+sdo.net user permissions --user naz-hage --verbose
 ```
 
 Notes:
@@ -486,7 +486,7 @@ To override platform detection (planned):
 **Cause**: Authentication failed or no open issues in repository
 
 **Solution**:
-1. Verify authentication: `sdo auth gh`
+1. Verify authentication: `sdo.net auth gh`
 2. Check repository has issues: `gh issue list --repo owner/repo`
 3. Try with `--state closed` to verify API is working
 4. Use `--verbose` flag to see detailed error messages
@@ -538,18 +538,18 @@ $env:AZURE_DEVOPS_PAT = "your_token"
 **Solution**:
 1. Use one of the supported states: `New`, `Approved`, `Committed`, `Done`, `To Do`, `In Progress`
 2. Check your project workflow: Some Azure DevOps projects may have different state configurations
-3. Verify the exact state name: Use `sdo wi list --state Done` (capital D) instead of lowercase
+3. Verify the exact state name: Use `sdo.net wi list --state Done` (capital D) instead of lowercase
 
 **Examples**:
 ```bash
 # Correct - uses valid state with exact casing
-sdo wi update --id 170 --state Done
+sdo.net wi update --id 170 --state Done
 
 # Correct - alternative form
-sdo wi update --id 170 --state "In Progress"
+sdo.net wi update --id 170 --state "In Progress"
 
 # Also works - case-insensitive input
-sdo wi update --id 170 --state done
+sdo.net wi update --id 170 --state done
 ```
 
 ## Testing
@@ -557,15 +557,15 @@ sdo wi update --id 170 --state done
 ### Main Help
 
 ```
-$ sdo.net --help
+$ sdo.net.net --help
 
-sdo.net v1.72.6 - Simple DevOps Operations by naz-hage (2020-2026)
+sdo.net.net v1.72.6 - Simple DevOps Operations by naz-hage (2020-2026)
 
 Description:
   Simple DevOps Operations CLI tool for Azure DevOps and GitHub
 
 Usage:
-  sdo.net [command] [options]
+  sdo.net.net [command] [options]
 
 Options:
   --verbose       Enable verbose output
@@ -573,7 +573,7 @@ Options:
   --version       Show version information
 
 Commands:
-  map       Show command mappings between SDO and native CLI tools
+  map       Show command mappings between sdo.net and native CLI tools
   auth      Verify authentication with GitHub or Azure DevOps
   pipeline  Pipeline/workflow management commands (create, show, list, run, status, logs, delete, lastbuild, update)
   pr        Pull request operations
@@ -590,15 +590,15 @@ Test with real repositories:
 ```bash
 # Test with ntools repository
 cd C:\source\ntools
-sdo wi list --top 5
-sdo wi show --id 243
-sdo wi create --file-path test.md --dry-run
-sdo wi update --id 243 --state Done
+sdo.net wi list --top 5
+sdo.net wi show --id 243
+sdo.net wi create --file-path test.md --dry-run
+sdo.net wi update --id 243 --state Done
 
 # Test with different repository
 cd Path\To\Your\Repo
-sdo wi list
-sdo wi show --id <issue_number>
+sdo.net wi list
+sdo.net wi show --id <issue_number>
 ```
 
 
@@ -614,15 +614,6 @@ nb UNIT_TEST_WORKITEM_COMMAND              # Run wi command tests
 nb UNIT_TEST_WORKITEM_STATE_TRANSLATOR     # Run state translator tests
 ```
 
-### Source Code
-
-- **Main Command**: [Sdo/Commands/WorkItemCommand.cs](../../Sdo/Commands/WorkItemCommand.cs)
-- **GitHub Client**: [Sdo/Services/GitHubClient.cs](../../Sdo/Services/GitHubClient.cs)
-- **Azure DevOps Client**: [Sdo/Services/AzureDevOpsClient.cs](../../Sdo/Services/AzureDevOpsClient.cs)
-- **State Management**: [Sdo/Models/WorkItemState.cs](../../Sdo/Models/WorkItemState.cs)
-- **Command Tests**: [SdoTests/WorkItemCommandTests.cs](../../SdoTests/WorkItemCommandTests.cs)
-- **State Translator Tests**: [SdoTests/WorkItemStateTranslatorTests.cs](../../SdoTests/WorkItemStateTranslatorTests.cs)
-
 ### Architecture
 
 The C# implementation follows the `System.CommandLine` framework for CLI parsing and includes:
@@ -636,14 +627,3 @@ The C# implementation follows the `System.CommandLine` framework for CLI parsing
 - Markdown parsing for structured work item creation
 - JSON-patch operations for Azure DevOps updates
 
-## Related Documentation
-
-- [sdo Installation Guide](sdo-installation.md) - Python version setup
-- [sdo-migration-plan.md](sdo-migration-plan.md) - Full migration roadmap
-- [NBuild System](../nbuild/README.md) - Build automation tool
-
-## See Also
-
-- GitHub: https://github.com/naz-hage/ntools
-- Azure DevOps: https://dev.azure.com/naz-hage/ntools
-- Issue #243: Phase 3 Command Implementation
