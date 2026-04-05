@@ -1,47 +1,71 @@
 # sdo.net - Simple DevOps Operations Tool (C# Version)
 
-This page documents the `sdo.net` CLI tool - the C# migration of Simple DevOps Operations. Use this page for detailed usage examples, prerequisites, and command reference.
+Unified CLI for managing work items, pull requests, pipelines, and repositories across **GitHub** and **Azure DevOps**.
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Prerequisites](#prerequisites)
+- [Key Features](#key-features)
+- [Main Help](#main-help)
+- [Command Reference](#command-reference)
+  - [map — CLI Mappings](#map--cli-mappings)
+  - [auth — Verify Authentication](#auth--verify-authentication)
+  - [wi — Work Item Management](#wi--work-item-management)
+  - [pr — Pull Request Operations](#pr--pull-request-operations)
+  - [pipeline — Pipeline/Workflow Management](#pipeline--pipelineworkflow-management)
+  - [repo — Repository Management](#repo--repository-management)
+  - [user — User Management](#user--user-management)
+- [Troubleshooting](#troubleshooting)
 
 ## Overview
 
-`sdo.net` (Simple DevOps Operations) is a C# implementation providing unified operations for work items across Azure DevOps and GitHub platforms. It automatically detects the target platform from Git remote configuration.
+`sdo.net` (Simple DevOps Operations) is a C# CLI tool providing unified operations across Azure DevOps and GitHub. It:
+- Automatically detects your platform from Git remote configuration
+- Translates work item states and operations between GitHub and Azure DevOps
+- Maps `sdo.net` commands to native platform CLIs for reference and learning
+- Provides consistent cross-platform tooling for teams
 
-### Key Features
+## Prerequisites
 
-- **Work Item Management**:
-  - `wi` commands for listing, showing, creating, updating and commenting on work items (GitHub issues/Azure DevOps work items) with cross-platform state translation
+### Authentication
 
-- **Pull Request (PR) Commands**:
-  - `pr` commands for listing, showing, creating and updating pull requests (merge/approve planned as advanced ops)
+**GitHub**:
+- Install GitHub CLI: `gh auth login`
+- Or set `GITHUB_TOKEN` environment variable
+- Or store credentials in Windows Credential Manager under `gh:github.com:`
 
-- **Pipeline / Workflow Commands**:
-  - `pipeline` commands to list, show, create, run, check status, view logs and manage pipeline definitions
+**Azure DevOps**:
+- Set `AZURE_DEVOPS_PAT` environment variable (Personal Access Token)
+- Or store credentials in Windows Credential Manager under `GitAzureDevOps`
+- PAT must have scopes: Work Item Read, Code Read
 
-- **Repository Commands**:
-  - `repo` commands to list, show and manage repositories with consistent cross-platform output
+### Git Repository Context
 
-- **User & Permissions Commands**:
-  - `user` subcommands: `list`, `show`, `search`, `permissions` — useful for audits and parity checks
+The tool auto-detects your platform from Git remote:
+- **GitHub**: `https://github.com/owner/repo`
+- **Azure DevOps**: `https://dev.azure.com/org/project/_git/repo`
 
-- **Map / Native CLI Mappings**:
-  - `map` shows how SDO commands map to native platform CLIs (`gh`, `az`), and with `--verbose` prints the exact native API commands (copy/paste ready)
+Verify your remote:
+```bash
+git remote -v
+# origin  https://github.com/naz-hage/ntools (fetch)  -> Uses GitHub
+# origin  https://dev.azure.com/org/project/_git/repo (fetch)  -> Uses Azure DevOps
+```
 
-- **Platform Auto-Detection**: Extracts org/project from Git remotes and selects GitHub or Azure DevOps automatically
+## Key Features
 
-- **State Management & Translation**:
-  - Canonical work item states: `New`, `Approved`, `Committed`, `Done`, `To Do`, `In Progress` with automatic translation to GitHub `open|closed` where appropriate
+- **Work Item Management** — Create, list, show, update work items with cross-platform state translation
+- **Pull Requests** — List, show, create pull requests
+- **Pipelines/Workflows** — Create, list, show, run, view logs for GitHub Actions and Azure Pipelines
+- **Repositories** — List and inspect repositories
+- **Users & Permissions** — List users, check permissions, search
+- **Platform Auto-Detection** — Automatically detects GitHub or Azure DevOps from Git remote
+- **CLI Mapping** — Shows sdo.net command equivalents in native CLIs (`gh`, `az`)
+- **State Translation** — Automatically maps work item states between platforms
+- **Clean Output** — Emoji-enhanced tables and concise error messages
 
-- **Performance & API Improvements**:
-  - Pagination and batch API optimizations for GitHub and Azure DevOps (reduced O(n) calls)
-
-- **Testing & CI Targets**:
-  - Comprehensive unit test suites (work item, repo, PR tests) and specific `UNIT_TEST_*` targets for CI and local verification
-
-- **UX & Output**:
-  - Clean, emoji-enhanced table output and concise error messages; verbose mode exposes request/response and mapping information for debugging
-
-
-### Main Help
+## Main Help
 
 ```
 $ sdo.net --help
@@ -62,33 +86,72 @@ Options:
 Commands:
   map       Show command mappings between sdo.net and native CLI tools
   auth      Verify authentication with GitHub or Azure DevOps
-  pipeline  Pipeline/workflow management commands (create, show, list, run, status, logs, delete, lastbuild, update)
+  pipeline  Pipeline/workflow management commands
   pr        Pull request operations
   repo      Repository management commands
   wi        Work item management commands
   user      User management commands for GitHub and Azure DevOps
 ```
 
-## Help Output
+## Command Reference
 
-View the available commands and options:
+### map — CLI Mappings
 
- 
-### wi Command Help
+Show how `sdo.net` commands map to native platform CLIs (`gh` for GitHub, `az` for Azure DevOps).
 
+**Description:**
+Useful for understanding equivalent commands and learning native CLI syntax.
+
+**Usage:**
+```bash
+sdo.net map                              # Show all mappings
+sdo.net map --platform gh               # GitHub mappings only
+sdo.net map --platform azdo --all       # All Azure DevOps mappings
+```
+
+**Verbose Mode:**
+With `--verbose`, displays exact native API commands for copy/paste.
+
+---
+
+### auth — Verify Authentication
+
+Validate credentials are configured for your platform.
+
+**Usage:**
+```bash
+sdo.net auth gh                  # Verify GitHub
+sdo.net auth azdo               # Verify Azure DevOps
+sdo.net auth gh --verbose       # Show token source details
+```
+
+**Success Output:**
+```
+✓ GitHub authentication successful
+```
+
+---
+
+### wi — Work Item Management
+
+Create, list, show, update work items and add comments. Supports GitHub issues and Azure DevOps work items with automatic state translation.
+
+**Subcommands:**
+- `list` — List work items with filtering
+- `show` — Display work item details
+- `create` — Create new work item from markdown file
+- `update` — Update work item properties
+- `comment` — Add comment to work item
+
+**Help:**
 ```
 $ sdo.net wi --help
 
-Simple DevOps Operations (sdo.net) - C# Migration
-============================================
 Description:
   Work item management commands
 
 Usage:
   sdo.net wi [command] [options]
-
-Options:
-  -?, -h, --help  Show help and usage information
 
 Commands:
   comment  Add comment to a work item
@@ -98,178 +161,91 @@ Commands:
   update   Update work item properties
 ```
 
-### Show Subcommand Help
+#### wi list
 
-```
-$ sdo.net wi show --help
+List work items with optional filtering. By default, shows **active** items (excludes closed/done).
 
-Simple DevOps Operations (sdo.net) - C# Migration
-============================================
-Description:
-  Display detailed work item information
-
-Usage:
-  sdo.net wi show [options]
-
-Options:
-  --id <id>       Work item ID (required)
-  -c, --comments  Show comments/discussion
-  --verbose       Enable verbose output
-  -?, -h, --help  Show help and usage information
-```
-
-### List Subcommand Help
-
-```
-$ sdo.net wi list --help
-
-Simple DevOps Operations (sdo.net) - C# Migration
-============================================
-Description:
-  List work items with optional filtering
-
-Usage:
-  sdo.net wi list [options]
-
-Options:
-  --type <type>                Filter by work item type (PBI, Bug, Task, Spike,
-                               Epic)
-  --state <state>              Filter by state (New, Approved, Committed, Done,
-                               To Do, In Progress)
-  --assigned-to <assigned-to>  Filter by assigned user (email or display name)
-  --assigned-to-me             Filter by work items assigned to current user
-  --top <top>                  Maximum number of items to return (default: 50)
-  --verbose                    Enable verbose output
-  -?, -h, --help               Show help and usage information
-```
-
-## Prerequisites
-
-### Authentication
-
-#### GitHub
-- GitHub CLI (`gh`) must be installed and authenticated: `gh auth login`
-- Alternatively, set `GITHUB_TOKEN` environment variable
-- Or store credentials in Windows Credential Manager under `gh:github.com:` target
-
-#### Azure DevOps
-- Set `AZURE_DEVOPS_PAT` environment variable
-- Or store credentials in Windows Credential Manager under `GitAzureDevOps` target
-
-### Git Repository Context
-
-The tool automatically detects the platform from your current Git remote:
-- **GitHub**: Detected from remotes like `https://github.com/owner/repo`
-- **Azure DevOps**: Detected from remotes like `https://dev.azure.com/org/project/_git/repo`
-
-## Installation
-
-Place `sdo.net` in your PATH or run directly from:
-```
-C:\source\ntools\sdo.net\bin\Release\sdo.net
-```
-
-Build from source:
+**Usage:**
 ```bash
-cd C:\source\ntools
-nb build
+sdo.net wi list                                    # List active items
+sdo.net wi list --top 20                           # Limit to 20 items
+sdo.net wi list --state Done                       # Show Done items
+sdo.net wi list --state "In Progress" --top 10    # Show In Progress, limit 10
+sdo.net wi list --assigned-to user@example.com    # Filter by assignee
+sdo.net wi list --assigned-to-me                  # Your items
+sdo.net wi list --type PBI                         # Filter by type (Azure DevOps)
+sdo.net wi list --area "Project\Area"             # Filter by area (Azure DevOps)
+sdo.net wi list --iteration "Project\Sprint 1"    # Filter by iteration (Azure DevOps)
+sdo.net wi list --verbose                         # Show API commands
 ```
-
-## Usage
-
-### Authentication Verification
-
-Verify your authentication is configured correctly:
-
-```bash
-sdo.net auth gh              # Verify GitHub authentication
-sdo.net auth devops          # Verify Azure DevOps authentication
-```
-
-Success output:
-```
-√ GitHub authentication successful
-```
-
-### Work Item Management
-
-#### List Work Items
-
-List work items from the current repository (defaults to GitHub). By default, shows all work items **EXCEPT closed (GitHub) or done/closed (Azure DevOps)** to display active work-in-progress items.
-
-```bash
-# List active work items (excludes closed/done by default)
-sdo.net wi list
-
-# List specific number of items
-sdo.net wi list --top 20
-
-# Show only done items
-sdo.net wi list --state Done
-
-# Show items in a specific state
-sdo.net wi list --state "In Progress"
-
-# Show all items including done/closed
-sdo.net wi list --state closed
-
-# Verbose output with debugging information
-sdo.net wi list --verbose
-```
-
-**Default Behavior:**
-- **GitHub**: Shows all issues EXCEPT `closed`
-- **Azure DevOps**: Shows all work items EXCEPT `done` or `closed`
 
 **Valid States:**
-- Azure DevOps: `New`, `Approved`, `Committed`, `Done`, `To Do`, `In Progress`
-- GitHub: `open`, `closed` (automatically translated from Azure DevOps states)
+- Azure DevOps: `New`, `Approved`, `Committed`, `Done`, `To Do`, `In Progress` (case-insensitive)
+- GitHub: `open`, `closed` (auto-translated)
 
-**Output Format:**
+**Options:**
+- `--top <N>` — Maximum results (default: 50)
+- `--state <state>` — Filter by state
+- `--type <type>` — Filter by type (PBI, Bug, Task, Spike, Epic)
+- `--assigned-to <user>` — Filter by assignee
+- `--assigned-to-me` — Your items
+- `--area <path>` — Filter by area path (Azure DevOps)
+- `--iteration <path>` — Filter by iteration (Azure DevOps)
+- `--verbose` — Show mapping and diagnostics
 
+**Output Example:**
 ```
-📋 Issues (18 found):
-------------------------------------------------------------------------------------------------------------------------
-#      Title                                    State      Labels                         Assignee
-------------------------------------------------------------------------------------------------------------------------
-#246   Phase 6: Deployment & Transition (CI,... OPEN       backlog, sdo.net-migration         Unassigned
-#245   Phase 5: Testing & Validation (Unit, ... OPEN       backlog, testing               Unassigned
-#243   Phase 3: Command Implementation (Migr... OPEN       enhancement, backlog           Unassigned
-...
-------------------------------------------------------------------------------------------------------------------------
+gh Issues (18 found):
+---
+#      Title                                State      Labels                Assignee
+---
+#246   Phase 6: Deployment & Transition    OPEN       backlog, sdo-net      Unassigned
+#245   Phase 5: Testing & Validation       OPEN       backlog, testing      Unassigned
+---
+Summary:
+  OPEN: 18
+```
 
-📊 Total: 18 issue(s)
+#### wi show
+
+Display full details of a work item.
+
+**Usage:**
+```bash
+sdo.net wi show --id 243                # Show item details
+sdo.net wi show --id 243 --comments     # Include comments
+sdo.net wi show --id 243 --verbose      # Show API command
 ```
 
 **Options:**
+- `--id <id>` — Work item ID (required)
+- `--comments` — Include comments/discussion
+- `-c` — Short alias for `--comments`
+- `--verbose` — Show mapping
 
-- `--top <N>`: Maximum number of items to return (default: 50)
-- `--state <state>`: Filter by specific state (e.g., "open", "closed", "In Progress", "Done"). Omit to show all EXCEPT closed/done
-- `--type <type>`: Filter by type (PBI, Bug, Task, etc.) - planned for Phase 3.2
-- `--assigned-to <user>`: Filter by assignee email or name - planned for Phase 3.2
-- `--assigned-to-me`: Filter items assigned to current user - planned for Phase 3.2
-- `--verbose`: Show detailed diagnostic information
+#### wi create
 
-#### Create Work Item
+Create new work item from markdown file.
 
-Create new work items from markdown files:
-
+**Usage:**
 ```bash
-# Create from markdown file
-sdo.net wi create --file-path work-item.md
-
-# Create with dry-run (preview without creating)
-sdo.net wi create --file-path work-item.md --dry-run
-
-# Verbose output with JSON payload
-sdo.net wi create --file-path work-item.md --verbose
+sdo.net wi create --file-path work-item.md              # Create
+sdo.net wi create -f work-item.md                       # Short option
+sdo.net wi create --file-path work-item.md --dry-run   # Preview
+sdo.net wi create --file-path work-item.md --verbose   # Show mapping
 ```
+
+**Options:**
+- `--file-path <path>` — Path to markdown file (required)
+- `-f <path>` — Short alias
+- `--dry-run` — Preview without creating
+- `--verbose` — Show mapping
 
 **Markdown Format:**
 ```markdown
 # Work Item Title
 
-This is the work item description.
+This is the description.
 
 ## Acceptance Criteria
 - Criterion 1
@@ -277,334 +253,641 @@ This is the work item description.
 - Criterion 3
 ```
 
-#### Update Work Item
+Optional YAML metadata:
+```markdown
+---
+work_item_type: PBI
+assignee: user@example.com
+labels: "feature, backlog"
+target: "github"  # or "azdo"
+---
 
-Update work item properties:
+# Title
+...
+```
 
+#### wi update
+
+Update work item properties.
+
+**Usage:**
 ```bash
-# Update state
-sdo.net wi update --id 243 --state Done
-
-# Update title
-sdo.net wi update --id 243 --title "Updated Title"
-
-# Update state with success message showing new state
-sdo.net wi update --id 166 --state done
-# Output: √ Work item 166 updated successfully to state: Done
-
-# Update with verbose output
-sdo.net wi update --id 243 --state "In Progress" --verbose
-```
-
-**Valid States:**
-- `New`, `Approved`, `Committed`, `Done`, `To Do`, `In Progress` (case-insensitive)
-- GitHub only supports: `open`, `closed`
-
-#### Add Comment
-
-Add comments to work items:
-
-```bash
-# Add comment to issue
-sdo.net wi comment --id 243 --message "This is my comment"
-
-# Verbose output
-sdo.net wi comment --id 243 --message "Great work!" --verbose
-```
-
-#### Show Work Item Details
-
-Display full details of a specific work item:
-
-```bash
-# Show GitHub issue #243
-sdo.net wi show --id 243
-
-# Show with verbose output
-sdo.net wi show --id 243 --verbose
-
-# Show with comments (when available)
-sdo.net wi show --id 243 --comments
-```
-
-**Output Format:**
-
-```
-Issue #243
-======================================================================
-Title:       Phase 3: Command Implementation (Migrate CLI Commands to C#)
-State:       open
-Created:     2026-03-01T22:48:29.0000000Z
-Updated:     2026-03-01T22:48:29.0000000Z
-
-Description:
-Phase 3 focuses on migrating the Python sdo.net command implementations to the new C# 
-`sdo.net` project. This covers pipeline, PR, and user commands and ensures behavior parity with the Python tool.
-
-- [ ] Implement pipeline commands: `create`, `show`, `list`, `update`, `run`, `status`, `logs`, `lastbuild`, `delete`
-- [ ] Implement PR commands: `merge`, `approve`
-- [ ] Implement user commands: `show`, `list`, `search`, `permissions`
-- [ ] Add command-specific unit tests and integration tests
-- [ ] Ensure command-line option parity with Python implementation
-
-URL: https://github.com/naz-hage/ntools/issues/243
+sdo.net wi update --id 243 --state Done                    # Update state
+sdo.net wi update --id 243 --title "New Title"            # Update title
+sdo.net wi update --id 243 --assignee user@example.com    # Change assignee
+sdo.net wi update --id 243 --state Done --title "Title"   # Multiple fields
+sdo.net wi update --id 243 --state done                   # Case-insensitive
 ```
 
 **Options:**
+- `--id <id>` — Work item ID (required)
+- `--state <state>` — New state
+- `--title <text>` — New title
+- `--assignee <user>` — New assignee
+- `--description <text>` — New description
+- `--verbose` — Show mapping
 
-- `--id <number>`: Work item ID (required)
-- `--comments`: Include comments/discussion items
-- `--verbose`: Show detailed diagnostic information
+**Valid States** (case-insensitive):
+- `New`, `Approved`, `Committed`, `Done`, `To Do`, `In Progress`
 
-## Command Reference
+#### wi comment
 
-This section documents the primary commands introduced in Phase 1 (foundation), Phase 2 (service/auth), and Phase 4 (advanced features). Commands are read-only where applicable and follow the same patterns used across the CLI.
+Add comment to work item.
 
-### map — Show native CLI mappings
-Description: show how sdo.net commands map to native platform CLIs (`gh` for GitHub, `az` / `az repos` for Azure DevOps).
-
-Options:
-- `--platform <gh|azdo>`: restrict to a single platform mapping
-- `--all` : show all mappings for both platforms
-
-Examples:
-```
-sdo.net map
-sdo.net map --platform gh
-sdo.net map --platform azdo --all
-```
-
-Behavior: with `--verbose` many commands print the equivalent native command (e.g. `gh api repos/owner/repo/collaborators?per_page=100`) in yellow for easy copy/paste.
-
-### auth — Verify authentication
-Description: validate available credentials for the detected platform.
-
-Options:
-- `gh` : verify GitHub auth (checks `GITHUB_TOKEN`, `gh auth`, Windows credential store)
-- `azdo` : verify Azure DevOps PAT (`AZURE_DEVOPS_PAT`)
-- `--verbose` : show token detection details and any scope information
-
-Examples:
-```
-sdo.net auth gh
-sdo.net auth azdo --verbose
-```
-
-### wi — Work item (issue) commands
-Description: CRUD and comment operations for GitHub issues and Azure DevOps work items. Options are translated between platforms.
-
-Common Options:
-- `--id <number>` : identifier for show/update/comment
-- `--top <n>` : limit number of results for `list` (default: 50)
-- `--state <state>` : filter or set state (Azure states: `New, Approved, Committed, Done, To Do, In Progress`; GitHub: `open|closed`)
-- `--assigned-to <user>` : filter by assignee (planned)
-- `--file-path <path>` : markdown file for `create`
-- `--comments` : include comments in `show`
-- `--verbose` : show mapping and extra diagnostics
-
-Examples:
-```
-sdo.net wi list
-sdo.net wi list --top 20 --state "In Progress"
-sdo.net wi show --id 243 --comments
-sdo.net wi create --file-path ./work-item.md --verbose
-sdo.net wi update --id 243 --state Done
-sdo.net wi comment --id 243 --message "Looks good to me"
-```
-
-Notes:
-- `create` accepts a markdown document with Title, Description and Acceptance Criteria (see examples earlier in this doc).
-- `update --state` performs platform-aware translation (Azure DevOps -> GitHub open/closed mapping where appropriate).
-
-### repo — Repository commands
-Description: list and inspect repositories for the authenticated user or detected organization.
-
-Options:
-- `--top <n>` : limit results
-- `--org <organization>` : specify organization (Azure/GitHub)
-- `--verbose` : show mapping and API request details
-
-Examples:
-```
-sdo.net repo list --top 5
-sdo.net repo show --name naz-hage/ntools --verbose
-```
-
-### pr — Pull request commands
-Description: list, show and operate on pull requests. Merge/approve operations are considered advanced and require write permissions.
-
-Options:
-- `--id <id>` : pull request id/number
-- `--state <open|closed|merged>` : filter PR list
-- `--merge-method <merge|squash|rebase>` : merge strategy (GitHub)
-- `--verbose` : show mapping and API details
-
-Examples:
-```
-sdo.net pr list --state open
-sdo.net pr show --id 12
-sdo.net pr merge --id 12 --merge-method squash --verbose
-```
-
-### pipeline — Pipeline / workflow commands
-Description: manage CI pipelines / workflows. Read-only operations are safe for E2E parity checks; trigger/update operations are advanced.
-
-Options:
-- `--id <id>` : pipeline or run id
-- `--top <n>` : limit list results
-- `--org`, `--project` : Azure DevOps scoping
-- `--verbose` : show equivalent `gh/az` commands and API payloads
-
-Examples:
-```
-sdo.net pipeline list
-sdo.net pipeline status --id 1234
-sdo.net pipeline logs --id 1234 --verbose
-```
-
-### user — User and permissions commands
-Description: list/search users and show permission summaries for a user or identity. Useful for audits and E2E parity checks.
-
-Options:
-- `--login <login>` : GitHub login or Azure identity shorthand
-- `--user <login|descriptor>` : user identifier for permissions queries
-- `--query <term>` : search term for `search`
-- `--top <n>` : limit results
-- `--verbose` : show mapping and the exact API calls performed
-
-Examples:
-```
-sdo.net user list --top 50
-sdo.net user show --login naz-hage --verbose
-sdo.net user search --query "naz" --top 20
-sdo.net user permissions --user naz-hage --verbose
-```
-
-Notes:
-- Many Phase 4 commands are implemented to match Python behavior and are included where ready; others are planned or gated behind integration tests.
-- Use `--verbose` on most commands to display an equivalent native CLI mapping (e.g., `gh` or `az`), request/response dumps, and extra diagnostics.
-
-## Platform Detection
-
-The tool automatically detects which platform to use based on your Git remote:
-
+**Usage:**
 ```bash
-# List remotes
-git remote -v
-
-# Output shows platform detection
-# origin  https://github.com/naz-hage/ntools (fetch) -> Uses GitHub
-# origin  https://dev.azure.com/org/project/_git/repo (fetch) -> Uses Azure DevOps
+sdo.net wi comment --id 243 --message "This is my comment"
+sdo.net wi comment --id 243 --message "Looks good!" --verbose
 ```
 
-To override platform detection (planned):
-- `--github`: Force GitHub operations
-- `--devops`: Force Azure DevOps operations
+**Options:**
+- `--id <id>` — Work item ID (required)
+- `--message <text>` — Comment text (required)
+- `--verbose` — Show mapping
+
+---
+
+### pr — Pull Request Operations
+
+List, show, create, and manage pull requests on GitHub and Azure DevOps.
+
+**Subcommands:**
+- `list` — List pull requests
+- `show` — Display PR details
+- `create` — Create pull request
+- `status` — Check PR status
+- `update` — Update PR properties
+
+**Help:**
+```
+$ sdo.net pr --help
+
+Description:
+  Pull request operations
+
+Usage:
+  sdo.net pr [command] [options]
+
+Commands:
+  create  Create a new pull request
+  list    List pull requests
+  show    Display pull request information
+  status  Check pull request status
+  update  Update pull request properties
+```
+
+#### pr list
+
+List pull requests with optional filtering.
+
+**Usage:**
+```bash
+sdo.net pr list                         # List open PRs
+sdo.net pr list --state closed         # List closed PRs
+sdo.net pr list --state merged         # List merged PRs
+sdo.net pr list --top 20               # Limit to 20
+sdo.net pr list --verbose              # Show API commands
+```
+
+**Options:**
+- `--state <state>` — Filter: `open`, `closed`, `merged`
+- `--top <N>` — Maximum results
+- `--verbose` — Show mapping
+
+#### pr show
+
+Display pull request details.
+
+**Usage:**
+```bash
+sdo.net pr show --id 12                # Show PR #12
+sdo.net pr show --id 12 --verbose      # Show API command
+```
+
+**Options:**
+- `--id <id>` — PR ID/number (required)
+- `--verbose` — Show mapping
+
+#### pr create
+
+Create a new pull request.
+
+**Usage:**
+```bash
+sdo.net pr create --title "Fix bug" --description "Details" --source feature-branch --target main
+sdo.net pr create --title "Feature" --source dev --target main --draft
+```
+
+**Options:**
+- `--title <text>` — PR title (required)
+- `--description <text>` — PR description
+- `--source <branch>` — Source branch
+- `--target <branch>` — Target branch
+- `--draft` — Create as draft (GitHub)
+- `--verbose` — Show mapping
+
+#### pr status
+
+Check pull request status.
+
+**Usage:**
+```bash
+sdo.net pr status --id 12              # Check PR status
+sdo.net pr status --id 12 --verbose    # Show full details
+```
+
+**Options:**
+- `--id <id>` — PR ID/number (required)
+- `--verbose` — Show mapping
+
+#### pr update
+
+Update pull request properties.
+
+**Usage:**
+```bash
+sdo.net pr update --id 12 --title "Updated title"
+sdo.net pr update --id 12 --state closed
+```
+
+**Options:**
+- `--id <id>` — PR ID/number (required)
+- `--title <text>` — New title
+- `--description <text>` — New description
+- `--state <state>` — New state (`open`, `closed`)
+- `--verbose` — Show mapping
+
+---
+
+### repo — Repository Management
+
+Create, delete, list, and inspect repositories for your organization.
+
+**Subcommands:**
+- `list` — List repositories
+- `show` — Display repo details
+- `create` — Create new repository
+- `delete` — Delete repository
+
+**Help:**
+```
+$ sdo.net repo --help
+
+Description:
+  Repository management commands
+
+Usage:
+  sdo.net repo [command] [options]
+
+Commands:
+  create      Create a new repository
+  delete      Delete a repository
+  list        List repositories
+  show        Display repository information from current Git remote
+```
+
+#### repo list
+
+List repositories for your organization.
+
+**Usage:**
+```bash
+sdo.net repo list                       # List repos
+sdo.net repo list --top 10             # Limit to 10
+sdo.net repo list --org myorg          # Specific organization
+sdo.net repo list --verbose            # Show API commands
+```
+
+**Options:**
+- `--top <N>` — Maximum results (default: 50)
+- `--org <org>` — Organization name
+- `--verbose` — Show mapping
+
+#### repo show
+
+Display repository details from current Git remote.
+
+**Usage:**
+```bash
+sdo.net repo show                      # Show current repo
+sdo.net repo show --verbose            # Show API command
+```
+
+**Options:**
+- `--verbose` — Show mapping
+
+#### repo create
+
+Create a new repository.
+
+**Usage:**
+```bash
+sdo.net repo create myrepo                          # Create repo
+sdo.net repo create myrepo --description "My repo"  # With description
+sdo.net repo create myrepo --private                # Make private
+sdo.net repo create myrepo --private --verbose      # With mapping
+```
+
+**Options:**
+- `<name>` — Repository name (required)
+- `--description <text>` — Repository description
+- `--private` — Make repository private
+- `--verbose` — Show mapping
+
+#### repo delete
+
+Delete a repository.
+
+**Usage:**
+```bash
+sdo.net repo delete                    # Delete (with prompt)
+sdo.net repo delete --force            # Delete (no prompt)
+sdo.net repo delete --force --verbose  # Show mapping
+```
+
+**Options:**
+- `--force` — Skip confirmation prompt
+- `--verbose` — Show mapping
+
+---
+
+### pipeline — Pipeline/Workflow Management
+
+Manage GitHub Actions workflows and Azure Pipelines. **Read-only operations** are safe; **write operations** require permissions.
+
+**Subcommands:**
+- `list` — List pipelines/workflows
+- `show` — Display pipeline details
+- `create` — Create pipeline from YAML file
+- `run` — Trigger pipeline run
+- `status` — Check pipeline status
+- `logs` — View pipeline logs
+- `lastbuild` — Show last build/run
+- `update` — Update pipeline
+- `delete` — Delete pipeline
+
+**Help:**
+```
+$ sdo.net pipeline --help
+
+Description:
+  Pipeline/workflow management commands
+
+Usage:
+  sdo.net pipeline [command] [options]
+
+Commands:
+  create     Create a new pipeline/workflow from YAML definition file
+  delete     Delete a pipeline/workflow
+  lastbuild  Show last build/run for a pipeline
+  list       List pipelines/workflows
+  logs       Display pipeline/workflow logs
+  run        Trigger a pipeline run
+  show       Display pipeline/workflow information
+  status     Check pipeline run status
+  update     Update a pipeline/workflow
+```
+
+#### pipeline list
+
+List pipelines/workflows in repository.
+
+**Usage:**
+```bash
+sdo.net pipeline list                   # List pipelines
+sdo.net pipeline list --top 10          # Limit to 10
+sdo.net pipeline list --verbose         # Show API commands
+```
+
+**Options:**
+- `--top <N>` — Maximum results (default: 50)
+- `--org <org>` — Organization (Azure DevOps)
+- `--project <project>` — Project name (Azure DevOps)
+- `--verbose` — Show mapping
+
+#### pipeline show
+
+Display pipeline/workflow details.
+
+**Usage:**
+```bash
+sdo.net pipeline show --id 1234         # Show pipeline
+sdo.net pipeline show --id 1234 --verbose  # Show API command
+```
+
+**Options:**
+- `--id <id>` — Pipeline or workflow ID (required)
+- `--verbose` — Show mapping
+
+#### pipeline create
+
+Create a new pipeline/workflow from YAML file.
+
+**Usage:**
+```bash
+sdo.net pipeline create --file-path .github/workflows/ci.yml
+sdo.net pipeline create .github/workflows/ci.yml --verbose
+```
+
+**Options:**
+- `<file-path>` — Path to YAML definition file (required)
+- `--verbose` — Show mapping
+
+#### pipeline run
+
+Trigger a pipeline run.
+
+**Usage:**
+```bash
+sdo.net pipeline run --id 1234          # Trigger run
+sdo.net pipeline run --id 1234 --verbose  # Show details
+```
+
+**Options:**
+- `--id <id>` — Pipeline ID (required)
+- `--verbose` — Show mapping
+
+#### pipeline status
+
+Check pipeline run status.
+
+**Usage:**
+```bash
+sdo.net pipeline status --id 1234       # Check status
+sdo.net pipeline status --id 1234 --verbose  # Show details
+```
+
+**Options:**
+- `--id <id>` — Pipeline or run ID (required)
+- `--verbose` — Show mapping
+
+#### pipeline logs
+
+View pipeline/workflow logs.
+
+**Usage:**
+```bash
+sdo.net pipeline logs --id 1234         # Show logs
+sdo.net pipeline logs --id 1234 --verbose  # Show logs with API
+```
+
+**Options:**
+- `--id <id>` — Pipeline or run ID (required)
+- `--verbose` — Show mapping and API commands
+
+#### pipeline lastbuild
+
+Show last build/run for pipeline.
+
+**Usage:**
+```bash
+sdo.net pipeline lastbuild myworkflow       # Show last build
+sdo.net pipeline lastbuild myworkflow --verbose  # Show details
+```
+
+**Options:**
+- `<pipeline-name>` — Pipeline name (optional, uses current repo if not provided)
+- `--verbose` — Show mapping
+
+#### pipeline update
+
+Update a pipeline/workflow.
+
+**Usage:**
+```bash
+sdo.net pipeline update --id 1234 --file-path updated.yml
+sdo.net pipeline update --id 1234 --file-path updated.yml --verbose
+```
+
+**Options:**
+- `--id <id>` — Pipeline ID (required)
+- `--file-path <path>` — Updated YAML file (required)
+- `--verbose` — Show mapping
+
+#### pipeline delete
+
+Delete a pipeline/workflow.
+
+**Usage:**
+```bash
+sdo.net pipeline delete --id 1234       # Delete (with prompt)
+sdo.net pipeline delete --id 1234 --force  # Delete (no prompt)
+```
+
+**Options:**
+- `<pipeline-id>` — Pipeline ID (optional, uses current repo if not provided)
+- `--force` — Skip confirmation prompt
+- `--verbose` — Show mapping
+
+---
+
+### user — User Management
+
+List users, search, and check permissions.
+
+**Subcommands:**
+- `list` — List users
+- `show` — Display user details
+- `search` — Search users
+- `permissions` — Show user permissions
+
+**Help:**
+```
+$ sdo.net user --help
+
+Description:
+  User management commands
+
+Usage:
+  sdo.net user [command] [options]
+
+Commands:
+  list         List users
+  permissions  Show user permissions
+  search       Search for users
+  show         Display user information
+```
+
+#### user list
+
+List users in organization.
+
+**Usage:**
+```bash
+sdo.net user list                      # List users
+sdo.net user list --top 50             # Limit to 50
+sdo.net user list --verbose            # Show API commands
+```
+
+**Options:**
+- `--top <N>` — Maximum results (default: 50)
+- `--verbose` — Show mapping
+
+#### user show
+
+Display user details.
+
+**Usage:**
+```bash
+sdo.net user show --login naz-hage         # Show GitHub user
+sdo.net user show --login naz-hage --verbose  # Show API command
+```
+
+**Options:**
+- `--login <login>` — GitHub login or Azure identity (required)
+- `--verbose` — Show mapping
+
+#### user search
+
+Search for users.
+
+**Usage:**
+```bash
+sdo.net user search --query "naz"              # Search for users
+sdo.net user search --query "naz" --top 20     # Limit to 20
+sdo.net user search --query "naz" --verbose    # Show API command
+```
+
+**Options:**
+- `--query <term>` — Search term (required)
+- `--top <N>` — Maximum results (default: 50)
+- `--verbose` — Show mapping
+
+#### user permissions
+
+Show user permissions.
+
+**Usage:**
+```bash
+sdo.net user permissions --user naz-hage          # Show permissions
+sdo.net user permissions --user naz-hage --verbose  # Show detailed
+```
+
+**Options:**
+- `--user <id>` — User identifier (required)
+- `--verbose` — Show detailed mapping and API calls
+
+---
 
 ## Troubleshooting
 
-### "No issues found"
-
-**Cause**: Authentication failed or no open issues in repository
-
-**Solution**:
-1. Verify authentication: `sdo.net auth gh`
-2. Check repository has issues: `gh issue list --repo owner/repo`
-3. Try with `--state closed` to verify API is working
-4. Use `--verbose` flag to see detailed error messages
-
-### "Could not determine GitHub repository from Git remote"
-
-**Cause**: Git remote configuration is missing or incorrectly formatted
-
-**Solution**:
-1. Check remotes: `git remote -v`
-2. Ensure remotes are properly configured:
-   ```bash
-   git remote add origin https://github.com/owner/repo
-   # or for Azure DevOps
-   git remote add origin https://dev.azure.com/org/project/_git/repo
-   ```
-
 ### Authentication Errors
 
-**GitHub**:
+**Error:** `No authentication token found. Run 'sdo auth' to setup authentication.`
+
+**Causes:**
+- GitHub: `GITHUB_TOKEN` not set, `gh` not authenticated, or no Windows Credential Manager entry
+- Azure DevOps: `AZURE_DEVOPS_PAT` not set or credentials missing
+
+**Solution:**
+
+GitHub:
 ```bash
-# Verify gh CLI is installed and authenticated
+# Verify GitHub CLI is installed and authenticated
 gh auth status
 
 # Re-authenticate if needed
 gh auth login
 
-# Set token via environment variable
-$env:GITHUB_TOKEN = "your_token"
+# Or set token explicitly
+$env:GITHUB_TOKEN = "your_github_token"
 ```
 
-**Azure DevOps**:
+Azure DevOps:
 ```bash
 # Set personal access token
-$env:AZURE_DEVOPS_PAT = "your_token"
+$env:AZURE_DEVOPS_PAT = "your_azure_pat"
+```
+
+### Platform Detection Errors
+
+**Error:** `Could not determine GitHub repository from Git remote`
+
+**Causes:**
+- Git remote not configured
+- Remote URL doesn't match GitHub or Azure DevOps patterns
+
+**Solution:**
+```bash
+# Check remote configuration
+git remote -v
+
+# Add missing remote
+git remote add origin https://github.com/owner/repo
+# or
+git remote add origin https://dev.azure.com/org/project/_git/repo
 ```
 
 ### State Validation Errors
 
-**Update Fails with State Not Supported**:
+**Error:** `Failed to update work item. Supported states: New, Approved, Committed, Done, To Do, In Progress`
 
-```
-✗ Failed to update work item 158
-  Supported states: New, Approved, Committed, Done, To Do, In Progress
-```
+**Causes:**
+- Invalid state name (typo or casing)
+- Project has custom state configuration
 
-**Cause**: The state provided is not valid for your Azure DevOps project configuration
-
-**Solution**:
-1. Use one of the supported states: `New`, `Approved`, `Committed`, `Done`, `To Do`, `In Progress`
-2. Check your project workflow: Some Azure DevOps projects may have different state configurations
-3. Verify the exact state name: Use `sdo.net wi list --state Done` (capital D) instead of lowercase
-
-**Examples**:
+**Solution:**
 ```bash
-# Correct - uses valid state with exact casing
-sdo.net wi update --id 170 --state Done
-
-# Correct - alternative form
-sdo.net wi update --id 170 --state "In Progress"
-
-# Also works - case-insensitive input
-sdo.net wi update --id 170 --state done
+# Use valid state with exact casing (or lowercase)
+sdo.net wi update --id 170 --state Done          # Correct
+sdo.net wi update --id 170 --state "In Progress"  # Correct
+sdo.net wi update --id 170 --state done           # Also works (case-insensitive)
 ```
 
-## Testing
+Valid states:
+- Azure DevOps: `New`, `Approved`, `Committed`, `Done`, `To Do`, `In Progress`
+- GitHub: `open`, `closed` (auto-translated)
 
+### Azure DevOps Permissions Errors
 
-### Manual Testing
+**Error:** `Unauthorized. Insufficient permissions.`
 
-Test with real repositories:
+**Causes:**
+- PAT token doesn't have required scopes
+- Work items feature disabled in project
+
+**Solution:**
+
+Ensure PAT has these scopes:
+- Work Item > Read
+- Code > Read
+
+For write operations:
+- Work Item > Write
+- Code > Write
 
 ```bash
-# Test with ntools repository
-cd C:\source\ntools
-sdo.net wi list --top 5
+# Create new PAT with required scopes
+# https://dev.azure.com/org/_usersSettings/tokens
+```
+
+### Common Option Mistakes
+
+**Using invalid option names:**
+```bash
+# ❌ Wrong
+sdo.net wi list --assigned-to-me-filter
+
+# ✓ Correct
+sdo.net wi list --assigned-to-me
+```
+
+**Forgetting required flags:**
+```bash
+# ❌ Missing --id for show
+sdo.net wi show
+
+# ✓ Correct
 sdo.net wi show --id 243
-sdo.net wi create --file-path test.md --dry-run
-sdo.net wi update --id 243 --state Done
-
-# Test with different repository
-cd Path\To\Your\Repo
-sdo.net wi list
-sdo.net wi show --id <issue_number>
 ```
 
-
-## Development
-
-### Building from Source
-
+**Mixing GitHub and Azure DevOps states:**
 ```bash
-cd C:\source\ntools
-nb build                                    # Build solution
-nb test                                     # Run all tests
-nb UNIT_TEST_WORKITEM_COMMAND              # Run wi command tests
-nb UNIT_TEST_WORKITEM_STATE_TRANSLATOR     # Run state translator tests
+# ❌ GitHub state on Azure DevOps repo
+git remote set-url origin https://dev.azure.com/org/project/_git/repo
+sdo.net wi update --id 243 --state closed  # Won't work
+
+# ✓ Correct
+sdo.net wi update --id 243 --state Done
 ```
 
