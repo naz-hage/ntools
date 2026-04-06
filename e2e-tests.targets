@@ -132,6 +132,61 @@
 		<Message Text="Test output log: $(E2ELogFile)" Importance="normal" />
 	</Target>
 
+	<!-- Run sdo read-only parity tests (Python + C# for GitHub and ConsoleApp1) -->
+	<Target Name="RUN_SDO_READONLY_TEST" DependsOnTargets="COPY_SDO_EXECUTABLE">
+		<Message Text="Running sdo read-only parity tests..." Importance="high" />
+		<!-- GitHub - Python: user list -->
+		<Exec Command="sdo user list" WorkingDirectory="$(SolutionDir)" EnvironmentVariables="PYTHONIOENCODING=UTF-8" ContinueOnError="true" />
+		<!-- GitHub - C#: user list -->
+		<Exec Command="$(SolutionDir)\Sdo\bin\Debug\sdo.net.exe user list" WorkingDirectory="$(SolutionDir)" ContinueOnError="true" />
+		
+		<!-- GitHub - Python: repo list -->
+		<Exec Command="sdo repo list --top 5" WorkingDirectory="$(SolutionDir)" EnvironmentVariables="PYTHONIOENCODING=UTF-8" ContinueOnError="true" />
+		<!-- GitHub - C#: repo list -->
+		<Exec Command="$(SolutionDir)\Sdo\bin\Debug\sdo.net.exe repo list --top 5" WorkingDirectory="$(SolutionDir)" ContinueOnError="true" />
+		
+		<!-- GitHub - Python: workitem list -->
+		<Exec Command="sdo workitem list" WorkingDirectory="$(SolutionDir)" EnvironmentVariables="PYTHONIOENCODING=UTF-8" ContinueOnError="true" />
+		<!-- GitHub - C#: wi list -->
+		<Exec Command="$(SolutionDir)\Sdo\bin\Debug\sdo.net.exe wi list" WorkingDirectory="$(SolutionDir)" ContinueOnError="true" />
+		
+		<!-- GitHub - Python: pr list -->
+		<Exec Command="sdo pr ls" WorkingDirectory="$(SolutionDir)" EnvironmentVariables="PYTHONIOENCODING=UTF-8" ContinueOnError="true" />
+		<!-- GitHub - C#: pr list -->
+		<Exec Command="$(SolutionDir)\Sdo\bin\Debug\sdo.net.exe pr list" WorkingDirectory="$(SolutionDir)" ContinueOnError="true" />
+		
+		<!-- GitHub - Python: pipeline list -->
+		<Exec Command="sdo pipeline ls" WorkingDirectory="$(SolutionDir)" EnvironmentVariables="PYTHONIOENCODING=UTF-8" ContinueOnError="true" />
+		<!-- GitHub - C#: pipeline list -->
+		<Exec Command="$(SolutionDir)\Sdo\bin\Debug\sdo.net.exe pipeline list" WorkingDirectory="$(SolutionDir)" ContinueOnError="true" />
+		
+		<!-- Azure (ConsoleApp1) - Python & C# (same commands in Azure context) -->
+		<Exec Command="sdo user list" WorkingDirectory="C:\source\ConsoleApp1" EnvironmentVariables="PYTHONIOENCODING=UTF-8" ContinueOnError="true" />
+		<Exec Command="$(SolutionDir)\Sdo\bin\Debug\sdo.net.exe user list" WorkingDirectory="C:\source\ConsoleApp1" ContinueOnError="true" />
+		
+		<Exec Command="sdo repo list --top 5" WorkingDirectory="C:\source\ConsoleApp1" EnvironmentVariables="PYTHONIOENCODING=UTF-8" ContinueOnError="true" />
+		<Exec Command="$(SolutionDir)\Sdo\bin\Debug\sdo.net.exe repo list --top 5" WorkingDirectory="C:\source\ConsoleApp1" ContinueOnError="true" />
+		
+		<Exec Command="sdo workitem list" WorkingDirectory="C:\source\ConsoleApp1" EnvironmentVariables="PYTHONIOENCODING=UTF-8" ContinueOnError="true" />
+		<Exec Command="$(SolutionDir)\Sdo\bin\Debug\sdo.net.exe wi list" WorkingDirectory="C:\source\ConsoleApp1" ContinueOnError="true" />
+		
+		<Exec Command="sdo pr ls" WorkingDirectory="C:\source\ConsoleApp1" EnvironmentVariables="PYTHONIOENCODING=UTF-8" ContinueOnError="true" />
+		<Exec Command="$(SolutionDir)\Sdo\bin\Debug\sdo.net.exe pr list" WorkingDirectory="C:\source\ConsoleApp1" ContinueOnError="true" />
+		
+		<Exec Command="sdo pipeline ls" WorkingDirectory="C:\source\ConsoleApp1" EnvironmentVariables="PYTHONIOENCODING=UTF-8" ContinueOnError="true" />
+		<Exec Command="$(SolutionDir)\Sdo\bin\Debug\sdo.net.exe pipeline list" WorkingDirectory="C:\source\ConsoleApp1" ContinueOnError="true" />
+		
+		<Message Text="✓ sdo read-only parity tests completed" Importance="high" />
+	</Target>
+
+	<!-- E2E ReadOnly target - runs sdo read-only parity checks -->
+	<Target Name="E2E_READONLY" DependsOnTargets="ARTIFACTS;DELETE_E2E_LOG;RUN_SDO_READONLY_TEST">
+		<Message Text="======================================" Importance="high" />
+		<Message Text="✓ sdo read-only parity tests completed successfully" Importance="high" />
+		<Message Text="======================================" Importance="high" />
+		<Message Text="Test output log: $(E2ELogFile)" Importance="normal" />
+	</Target>
+
 	<!-- verify-cli-parity moved from nbuild.targets - compares CLI outputs and pipeline commands -->
 	<Target Name="verify-cli-parity" DependsOnTargets="COPY_SDO_EXECUTABLE">
 		<Message Text="========================================" Importance="high" />

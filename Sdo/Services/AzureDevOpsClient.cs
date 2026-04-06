@@ -309,6 +309,261 @@ namespace Sdo.Services
         }
 
         /// <summary>
+        /// Lists users in the organization using Graph API (basic listing).
+        /// </summary>
+        public async Task<List<AzureDevOpsUser>?> ListUsersAsync(int top = 100)
+        {
+            try
+            {
+                var perPage = Math.Max(1, Math.Min(1000, top));
+                var url = $"https://vssps.dev.azure.com/{_organization}/_apis/graph/users?api-version=7.1-preview.1&$top={perPage}";
+                var response = await _httpClient.GetAsync(url);
+                if (!response.IsSuccessStatusCode)
+                {
+                    _lastError = $"List users failed: {response.StatusCode} {response.ReasonPhrase}";
+                    return null;
+                }
+
+                var content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                using var doc = JsonDocument.Parse(content);
+                if (!doc.RootElement.TryGetProperty("value", out var arr)) return new List<AzureDevOpsUser>();
+
+                var list = new List<AzureDevOpsUser>();
+                foreach (var el in arr.EnumerateArray())
+                {
+                    var u = new AzureDevOpsUser();
+                    if (el.TryGetProperty("descriptor", out var desc)) u.Id = desc.GetString();
+                    if (el.TryGetProperty("displayName", out var dn)) u.DisplayName = dn.GetString();
+                    if (el.TryGetProperty("principalName", out var pn)) u.UniqueName = pn.GetString();
+                    if (el.TryGetProperty("mailAddress", out var ma)) u.PreferredEmail = ma.GetString();
+                    list.Add(u);
+                }
+
+                return list;
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Exception listing users: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Attempts to find a user by login/display name by scanning graph users.
+        /// </summary>
+        public async Task<AzureDevOpsUser?> GetUserAsync(string? login)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(login)) return await GetUserAsync();
+                var list = await ListUsersAsync(1000);
+                if (list == null || list.Count == 0) return null;
+                var found = list.FirstOrDefault(u => string.Equals(u.UniqueName, login, StringComparison.OrdinalIgnoreCase)
+                                                   || string.Equals(u.DisplayName, login, StringComparison.OrdinalIgnoreCase)
+                                                   || (!string.IsNullOrEmpty(u.PreferredEmail) && string.Equals(u.PreferredEmail, login, StringComparison.OrdinalIgnoreCase)));
+                return found;
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Exception in GetUserAsync(login): {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets permission summary for a user. Complex permissions model — returns null when not implemented.
+        /// </summary>
+        public async Task<Dictionary<string, string>?> GetUserPermissionsAsync(string? user, bool verbose = false)
+        {
+            try
+            {
+                // Resolve descriptor: if input looks like a descriptor (contains a dot prefix), use it.
+                string? descriptor = null;
+
+                if (!string.IsNullOrEmpty(user) && (user.Contains(".") || user.StartsWith("vssgp") || user.StartsWith("svc") || user.StartsWith("msa") || user.Contains("@")))
+                {
+                    // If user looks like an email or descriptor, try to find matching graph entry
+                    var maybe = await GetUserAsync(user);
+                    descriptor = maybe?.Id ?? user;
+                }
+                else
+                {
+                    // Try to find user via ListUsers
+                    var list = await ListUsersAsync(1000);
+                    if (list != null && list.Count > 0)
+                    {
+                        var found = list.FirstOrDefault(u => string.Equals(u.UniqueName, user, StringComparison.OrdinalIgnoreCase)
+                                                          || string.Equals(u.DisplayName, user, StringComparison.OrdinalIgnoreCase)
+                                                          || (!string.IsNullOrEmpty(u.PreferredEmail) && string.Equals(u.PreferredEmail, user, StringComparison.OrdinalIgnoreCase)));
+                        if (found != null) descriptor = found.Id;
+                    }
+                }
+
+                if (string.IsNullOrEmpty(descriptor))
+                {
+                    _lastError = "Could not resolve user descriptor";
+                    return null;
+                }
+
+                // Determine project id (GUID) for token construction
+                string? projectId = null;
+                if (!string.IsNullOrEmpty(_project))
+                {
+                    try
+                    {
+                        var projUrl = $"https://dev.azure.com/{_organization}/_apis/projects/{Uri.EscapeDataString(_project)}?api-version=7.0";
+                        if (verbose) Console.WriteLine($"[AzureDevOps] GET {projUrl}");
+                        var projResp = await _httpClient.GetAsync(projUrl);
+                        if (projResp.IsSuccessStatusCode)
+                        {
+                            var pc = await projResp.Content.ReadAsStringAsync();
+                            if (verbose) Console.WriteLine($"[AzureDevOps] Response {projResp.StatusCode}: {pc}");
+                            using var doc = JsonDocument.Parse(pc);
+                            if (doc.RootElement.TryGetProperty("id", out var idp)) projectId = idp.GetString();
+                        }
+                    }
+                    catch { /* ignore */ }
+                }
+
+                // If still no project id, try list projects and pick first
+                if (string.IsNullOrEmpty(projectId))
+                {
+                    try
+                    {
+                        var listUrl = $"https://dev.azure.com/{_organization}/_apis/projects?api-version=7.0";
+                        if (verbose) Console.WriteLine($"[AzureDevOps] GET {listUrl}");
+                        var listResp = await _httpClient.GetAsync(listUrl);
+                        if (listResp.IsSuccessStatusCode)
+                        {
+                            var lc = await listResp.Content.ReadAsStringAsync();
+                            if (verbose) Console.WriteLine($"[AzureDevOps] Response {listResp.StatusCode}: {lc}");
+                            using var doc = JsonDocument.Parse(lc);
+                            if (doc.RootElement.TryGetProperty("value", out var arr) && arr.GetArrayLength() > 0)
+                            {
+                                var first = arr.EnumerateArray().First();
+                                if (first.TryGetProperty("id", out var idp)) projectId = idp.GetString();
+                            }
+                        }
+                    }
+                    catch { }
+                }
+
+                if (string.IsNullOrEmpty(projectId))
+                {
+                    _lastError = "Could not determine project id for permission token construction";
+                    return null;
+                }
+
+                // Get security namespaces and pick ones matching Git, Build, Project
+                var namespacesUrl = $"https://dev.azure.com/{_organization}/_apis/securitynamespaces?api-version=6.0";
+                if (verbose) Console.WriteLine($"[AzureDevOps] GET {namespacesUrl}");
+                var nsResp = await _httpClient.GetAsync(namespacesUrl);
+                if (!nsResp.IsSuccessStatusCode)
+                {
+                    _lastError = $"Failed to list security namespaces: {nsResp.StatusCode} {nsResp.ReasonPhrase}";
+                    return null;
+                }
+
+                var nsContent = await nsResp.Content.ReadAsStringAsync();
+                if (verbose) Console.WriteLine($"[AzureDevOps] Response {nsResp.StatusCode}: {nsContent}");
+                using var nsDoc = JsonDocument.Parse(nsContent);
+                var nsMap = new Dictionary<string, string>(); // displayName -> namespaceId
+                if (nsDoc.RootElement.TryGetProperty("value", out var nsArr))
+                {
+                    foreach (var el in nsArr.EnumerateArray())
+                    {
+                        var name = el.GetProperty("displayName").GetString() ?? string.Empty;
+                        var id = el.GetProperty("namespaceId").GetString() ?? string.Empty;
+                        nsMap[name] = id;
+                    }
+                }
+
+                // Candidate namespaces by substring
+                var candidates = nsMap.Where(kv => kv.Key.IndexOf("git", StringComparison.OrdinalIgnoreCase) >= 0
+                                                || kv.Key.IndexOf("build", StringComparison.OrdinalIgnoreCase) >= 0
+                                                || kv.Key.IndexOf("project", StringComparison.OrdinalIgnoreCase) >= 0)
+                                      .ToList();
+
+                if (candidates.Count == 0)
+                {
+                    _lastError = "No matching security namespaces found (git/build/project)";
+                    return null;
+                }
+
+                var results = new Dictionary<string, string>();
+
+                // Construct a project-level token used by many namespaces
+                var projectToken = $"vstfs:///Framework/TeamProject/{projectId}";
+
+                foreach (var ns in candidates)
+                {
+                    var nsDisplay = ns.Key;
+                    var nsId = ns.Value;
+
+                    var aclUrl = $"https://dev.azure.com/{_organization}/_apis/accesscontrollists/{nsId}?api-version=6.0";
+                    var payload = new
+                    {
+                        tokens = new[] { projectToken },
+                        descriptors = new[] { descriptor }
+                    };
+
+                    var content = new StringContent(JsonSerializer.Serialize(payload), System.Text.Encoding.UTF8, "application/json");
+                    if (verbose) Console.WriteLine($"[AzureDevOps] POST {aclUrl} payload: {JsonSerializer.Serialize(payload)}");
+                    var aclResp = await _httpClient.PostAsync(aclUrl, content);
+                    var aclRaw = await aclResp.Content.ReadAsStringAsync();
+                    if (verbose) Console.WriteLine($"[AzureDevOps] Response {aclResp.StatusCode}: {aclRaw}");
+                    if (!aclResp.IsSuccessStatusCode)
+                    {
+                        results[$"{nsDisplay}:{projectToken}"] = $"Error querying ACL: {aclResp.StatusCode} {aclResp.ReasonPhrase}";
+                        continue;
+                    }
+                    var aclContent = aclRaw;
+                    using var aclDoc = JsonDocument.Parse(aclContent);
+                    // Parse returned access control entries
+                    if (aclDoc.RootElement.TryGetProperty("items", out var items) && items.GetArrayLength() > 0)
+                    {
+                        foreach (var item in items.EnumerateArray())
+                        {
+                            var token = item.GetProperty("token").GetString() ?? projectToken;
+                            if (item.TryGetProperty("accessControlEntries", out var aces))
+                            {
+                                foreach (var ace in aces.EnumerateArray())
+                                {
+                                    if (!ace.TryGetProperty("descriptor", out var d)) continue;
+                                    var aceDesc = d.GetString();
+                                    if (!string.Equals(aceDesc, descriptor, StringComparison.OrdinalIgnoreCase)) continue;
+
+                                    long allow = ace.TryGetProperty("allow", out var a) ? a.GetInt64() : 0;
+                                    long deny = ace.TryGetProperty("deny", out var de) ? de.GetInt64() : 0;
+                                    results[$"{nsDisplay}:{token}"] = $"allow={allow} deny={deny}";
+                                }
+                            }
+                            else
+                            {
+                                results[$"{nsDisplay}:{token}"] = "no ACEs returned";
+                            }
+                        }
+                    }
+                    else
+                    {
+                        results[$"{nsDisplay}:{projectToken}"] = "no ACL items returned";
+                    }
+                }
+
+                return results;
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Exception querying permissions: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return null;
+            }
+        }
+
+        /// <summary>
         /// Gets multiple work items in batched API calls (avoiding URL length limits).
         /// Splits large requests into chunks to stay under the HTTP URL length limit.
         /// </summary>

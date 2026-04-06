@@ -9,13 +9,13 @@ namespace SdoTests;
 public class ProgramTests
 {
     [Fact]
-    public void Main_WithNoArgs_ReturnsZero()
+    public void Main_WithNoArgs_ReturnsNonZero()
     {
-        // Act
+        // Act - No arguments should return error (1) because a command is required
         var result = Program.Main();
 
         // Assert
-        Assert.Equal(0, result);
+        Assert.Equal(1, result);
     }
 
     [Fact]

@@ -129,6 +129,144 @@ namespace Sdo.Services
             }
         }
 
+        /// <summary>
+        /// Gets a GitHub user by login.
+        /// </summary>
+        public async Task<GitHubUser?> GetUserAsync(string login)
+        {
+            try
+            {
+                var url = $"https://api.github.com/users/{Uri.EscapeDataString(login)}";
+                var response = await _httpClient.GetAsync(url);
+                if (!response.IsSuccessStatusCode)
+                    return null;
+
+                var content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var user = JsonSerializer.Deserialize<GitHubUser>(content, options);
+                return user;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Lists collaborators for a repository.
+        /// </summary>
+        public async Task<List<GitHubUser>?> ListCollaboratorsAsync(string owner, string repo, int top = 100)
+        {
+            try
+            {
+                var results = new List<GitHubUser>();
+                int page = 1;
+                int perPage = Math.Max(1, Math.Min(100, top));
+
+                while (true)
+                {
+                    var url = $"https://api.github.com/repos/{owner}/{repo}/collaborators?per_page={perPage}&page={page}";
+                    var response = await _httpClient.GetAsync(url);
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        return results.Count > 0 ? results : null;
+                    }
+
+                    var content = await response.Content.ReadAsStringAsync();
+                    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                    var users = JsonSerializer.Deserialize<List<GitHubUser>>(content, options);
+                    if (users == null || users.Count == 0) break;
+
+                    results.AddRange(users);
+                    if (results.Count >= top) break;
+                    if (users.Count < perPage) break;
+                    page++;
+                }
+
+                if (top > 0 && results.Count > top) results = results.Take(top).ToList();
+                return results;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error listing collaborators: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Searches users on GitHub using the search API.
+        /// </summary>
+        public async Task<List<GitHubUser>?> SearchUsersAsync(string query, int perPage = 30)
+        {
+            try
+            {
+                var url = $"https://api.github.com/search/users?q={Uri.EscapeDataString(query)}&per_page={perPage}";
+                var response = await _httpClient.GetAsync(url);
+                if (!response.IsSuccessStatusCode) return null;
+
+                var content = await response.Content.ReadAsStringAsync();
+                using var doc = JsonDocument.Parse(content);
+                var root = doc.RootElement;
+                if (!root.TryGetProperty("items", out var items)) return null;
+
+                var list = new List<GitHubUser>();
+                foreach (var item in items.EnumerateArray())
+                {
+                    var login = item.GetProperty("login").GetString();
+                    if (!string.IsNullOrEmpty(login))
+                    {
+                        // Try to get fuller profile; if fails, include minimal info
+                        var u = await GetUserAsync(login!);
+                        if (u != null) list.Add(u);
+                        else list.Add(new GitHubUser { Login = login });
+                    }
+                }
+
+                return list;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error searching users: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets the repository permission level for a user. If username is null, resolves current user.
+        /// </summary>
+        public async Task<string?> GetRepositoryPermissionAsync(string owner, string repo, string? username, bool verbose = false)
+        {
+            try
+            {
+                string userToQuery = username ?? string.Empty;
+                if (string.IsNullOrEmpty(userToQuery))
+                {
+                    var me = await GetUserAsync();
+                    userToQuery = me?.Login ?? string.Empty;
+                }
+
+                if (string.IsNullOrEmpty(userToQuery)) return null;
+
+                var url = $"https://api.github.com/repos/{owner}/{repo}/collaborators/{Uri.EscapeDataString(userToQuery)}/permission";
+                if (verbose) Console.WriteLine($"[GitHub] GET {url}");
+                var response = await _httpClient.GetAsync(url);
+                if (!response.IsSuccessStatusCode) return null;
+                var content = await response.Content.ReadAsStringAsync();
+                if (verbose) Console.WriteLine($"[GitHub] Response {response.StatusCode}: {content}");
+                using var doc = JsonDocument.Parse(content);
+                if (doc.RootElement.TryGetProperty("permission", out var perm))
+                {
+                    return perm.GetString();
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error getting repository permission: {ex.Message}");
+                return null;
+            }
+        }
+
         public async Task<List<GitHubIssue>?> ListIssuesAsync(string owner, string repo, int perPage = 50, string state = "open", int top = 0)
         {
             try
