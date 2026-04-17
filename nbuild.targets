@@ -673,41 +673,6 @@
 		<Message Text="VERIFY_ARTIFACTS completed" Importance="high" />
 	</Target>
 		
-	<!-- Build SDO package for inclusion in NTools distribution -->
-	<Target Name="BUILD_SDO" DependsOnTargets="ARTIFACTS">
-		<Message Text="Building SDO package..." Importance="high" />
-		<PropertyGroup>
-			<SdoSourceDir>$(SolutionDir)\atools</SdoSourceDir>
-		</PropertyGroup>
-
-		<!-- Install SDO dependencies first -->
-		<Message Text="Installing SDO dependencies..." Importance="high" />
-		<Exec Command='$(PythonExe) -m pip install requests click pyyaml' ContinueOnError="true" />
-
-		<!-- Build and install SDO in development mode to generate executable -->
-		<Message Text="Building SDO executable using pip install -e..." Importance="high" />
-		<Exec Command='$(PythonExe) -m pip install -e "$(SdoSourceDir)"' />
-
-		<!-- Use Python to find and copy sdo.exe -->
-		<Message Text="Locating and copying SDO executable..." Importance="high" />
-		<Exec Command='$(PythonExe) -c "import shutil, sysconfig, os; scripts = sysconfig.get_path(&apos;scripts&apos;); src = os.path.join(scripts, &apos;sdo.exe&apos;); dst = os.path.join(&apos;$(ArtifactsFolder)&apos;, &apos;sdo.exe&apos;); os.path.exists(src) and shutil.copy2(src, dst) or print(f&apos;Warning: sdo.exe not found at {src}&apos;)"' ContinueOnError="true" />
-
-		<!-- Copy SDO installation script and documentation -->
-		<Message Text="Copying SDO installation files..." Importance="high" />
-		<Copy SourceFiles="$(SdoSourceDir)\install-sdo.py" DestinationFiles="$(ArtifactsFolder)\install-sdo.py" />
-		<Copy SourceFiles="$(SolutionDir)\docs\atools\sdo-installation.md" DestinationFiles="$(ArtifactsFolder)\SDO_INSTALL_README.md" />
-		<Copy SourceFiles="$(SdoSourceDir)\pyproject.toml" DestinationFiles="$(ArtifactsFolder)\pyproject.toml" />
-
-		<!-- Copy SDO package directory to artifacts folder -->
-		<ItemGroup>
-			<SdoPackageFiles Include="$(SolutionDir)\atools\sdo_package\**\*.*" />
-		</ItemGroup>
-		<Copy SourceFiles="@(SdoPackageFiles)" DestinationFiles="@(SdoPackageFiles->'$(ArtifactsFolder)\sdo_package\%(RecursiveDir)%(Filename)%(Extension)')" />
-
-		<Message Text="SDO package built successfully with executable" Importance="high" />
-		<Message Text="==> BUILD_SDO DONE"/>
-	</Target>
-
 	<!-- Override the TEST target from common.targets to run individual test projects -->
 	<!-- This prevents double test execution that causes conflicts -->
 	<Target Name="TEST" DependsOnTargets="ARTIFACTS;TAG">
@@ -729,9 +694,7 @@
 		<Message Text="Publishing all non-test projects using ntools-scripts module" Importance="high" />
 		<Exec Command='pwsh -NoProfile -ExecutionPolicy Bypass -Command "Import-Module &apos;$(BuildTools)\ntools-scripts.psm1&apos; -Force; Publish-AllProjects -OutputDir &apos;$(ArtifactsFolder)&apos; -Version &apos;$(ProductVersion)&apos; -RepositoryRoot &apos;$(SolutionDir)&apos;"' WorkingDirectory="$(SolutionDir)" />
 		<Message Text="All non-test projects published to $(ArtifactsFolder)" Importance="high" />
-		
-		<CallTarget Targets="BUILD_SDO" />
-		
+
 		<Message Text="==> PUBLISH DONE"/>
 	</Target>
 </Project>

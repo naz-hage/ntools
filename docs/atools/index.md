@@ -12,11 +12,11 @@ Tools
 
 ## Note: SDO (Simple DevOps Operations)
 
-The Python-based SDO tool has been deprecated in favor of the modern C# implementation. For DevOps operations across Azure DevOps and GitHub platforms, please use **sdo.net** (C# version), which provides:
+The Python-based SDO tool has been deprecated in favor of the modern C# implementation. For DevOps operations across Azure DevOps and GitHub platforms, please use **sdo** (C# version), which provides:
 
 - Full feature parity with the Python version
 - 2x+ performance improvement
 - Better integration with .NET ecosystem
 - No additional Python runtime dependency
 
-See the main [ntools documentation](../index.md) for sdo.net usage.
+See the main [ntools documentation](../index.md) for sdo usage.

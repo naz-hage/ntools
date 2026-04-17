@@ -1,6 +1,6 @@
 # DevOps Tools Suite Architecture
 
-This document provides a comprehensive overview of the DevOps Tools Suite architecture, encompassing the .NET-based ntools suite including sdo.net (C# implementation of Simple DevOps Operations Tool). These tools provide a complete DevOps workflow from build automation to work item management across multiple platforms.
+This document provides a comprehensive overview of the DevOps Tools Suite architecture, encompassing the .NET-based ntools suite including sdo (C# implementation of Simple DevOps Operations Tool). These tools provide a complete DevOps workflow from build automation to work item management across multiple platforms.
 
 ## Suite Overview
 
@@ -9,7 +9,7 @@ The DevOps Tools Suite consists of two main components:
 ### 1. ntools Suite (.NET-based)
 A collection of build automation and utility tools written in .NET 10.0, providing core development and DevOps capabilities.
 
-### 2. sdo.net (Simple DevOps Operations Tool) (.NET/C#-based)
+### 2. sdo (Simple DevOps Operations Tool) (.NET/C#-based)
 A comprehensive CLI tool for work item creation and repository management across Azure DevOps and GitHub platforms. This is the modern C# implementation with full feature parity and 2x+ performance improvement over the deprecated Python version.
 
 ## ntools Suite Architecture
@@ -210,11 +210,11 @@ Go executables are built using the Go toolchain and custom build scripts.
 
 ---
 
-## sdo.net (C#) Architecture
+## sdo (C#) Architecture
 
 ### Overview
 
-sdo.net (Simple DevOps Operations Tool) is a modern .NET/C# command-line tool for work item creation and repository management across Azure DevOps and GitHub platforms. It provides full feature parity with the deprecated Python version while delivering 2x+ performance improvement.
+sdo (Simple DevOps Operations Tool) is a modern .NET/C# command-line tool for work item creation and repository management across Azure DevOps and GitHub platforms. It provides full feature parity with the deprecated Python version while delivering 2x+ performance improvement.
 
 ### File Structure
 
@@ -239,7 +239,7 @@ Sdo/
 
 ### Architecture Principles
 
-Both sdo.net and ntools Suite follow consistent design principles:
+Both sdo and ntools Suite follow consistent design principles:
 
 #### 1. **Separation of Concerns**
 - **CLI Layer**: User interaction and command handling
@@ -274,7 +274,7 @@ Both sdo.net and ntools Suite follow consistent design principles:
 - **CLI Framework**: System.CommandLine 2.0.1
 - **Build System**: MSBuild with custom targets
 
-#### sdo.net (C# Simple DevOps Operations Tool)
+#### sdo (C# Simple DevOps Operations Tool)
 - **Runtime**: .NET 10.0
 - **CLI Framework**: System.CommandLine
 - **API Clients**: Octokit.NET (GitHub API), Microsoft.TeamFoundationServer.Client (Azure DevOps API)

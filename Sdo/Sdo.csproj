@@ -17,7 +17,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-	<AssemblyName>sdo.net</AssemblyName>
+	<AssemblyName>sdo</AssemblyName>
   </PropertyGroup>
 
 	<ItemGroup>

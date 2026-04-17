@@ -11,7 +11,7 @@ This script performs a complete installation of NTools:
 3. **Updates** system PATH (on Windows)
 4. **Verifies** the installation
 
-**Note**: For DevOps operations, use sdo.net (C# version) which is included with ntools
+**Note**: For DevOps operations, use sdo (C# version) which is included with ntools
 
 ## Quick Usage
 
@@ -52,7 +52,7 @@ Installing NTools (Build Tools)...
 NTools is installed in: C:\Program Files\Nbuild
 You can now use 'ntools' commands from any location.
 
-Note: For DevOps operations, please use the C# version 'sdo.net' instead of the deprecated Python SDO.
+Note: For DevOps operations, please use the C# version 'sdo' instead of the deprecated Python SDO.
 ```
 
 ## Command Line Options

@@ -68,7 +68,7 @@ jobs:
       with:
         python-version: '3.13.3'
 
-    - name: Install Python dependencies for SDO
+    - name: Install Python dependencies for install-ntools
       run: |
         python -m pip install --upgrade pip
         if (Test-Path "atools/requirements.txt") {
