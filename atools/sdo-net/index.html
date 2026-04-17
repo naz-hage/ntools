@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#sdonet-simple-devops-operations-tool-c-version" class="md-skip">
+        <a href="#sdo-simple-devops-operations-tool-c-version" class="md-skip">
           Skip to content
         </a>
       
@@ -2425,7 +2425,7 @@
   
 
 
-<h1 id="sdonet-simple-devops-operations-tool-c-version">sdo.net - Simple DevOps Operations Tool (C# Version)<a class="headerlink" href="#sdonet-simple-devops-operations-tool-c-version" title="Anchor link to this section for reference">&para;</a></h1>
+<h1 id="sdo-simple-devops-operations-tool-c-version">sdo - Simple DevOps Operations Tool (C# Version)<a class="headerlink" href="#sdo-simple-devops-operations-tool-c-version" title="Anchor link to this section for reference">&para;</a></h1>
 <p>Unified CLI for managing work items, pull requests, pipelines, and repositories across <strong>GitHub</strong> and <strong>Azure DevOps</strong>.</p>
 <h2 id="table-of-contents">Table of Contents<a class="headerlink" href="#table-of-contents" title="Anchor link to this section for reference">&para;</a></h2>
 <ul>
@@ -2444,10 +2444,10 @@
 <li><a href="#troubleshooting">Troubleshooting</a></li>
 </ul>
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Anchor link to this section for reference">&para;</a></h2>
-<p><code>sdo.net</code> (Simple DevOps Operations) is a C# CLI tool providing unified operations across Azure DevOps and GitHub. It:
+<p><code>sdo</code> (Simple DevOps Operations) is a C# CLI tool providing unified operations across Azure DevOps and GitHub. It:
 - Automatically detects your platform from Git remote configuration
 - Translates work item states and operations between GitHub and Azure DevOps
-- Maps <code>sdo.net</code> commands to native platform CLIs for reference and learning
+- Maps <code>sdo</code> commands to native platform CLIs for reference and learning
 - Provides consistent cross-platform tooling for teams</p>
 <h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Anchor link to this section for reference">&para;</a></h2>
 <h3 id="authentication">Authentication<a class="headerlink" href="#authentication" title="Anchor link to this section for reference">&para;</a></h3>
@@ -2476,20 +2476,20 @@
 <li><strong>Repositories</strong> — List and inspect repositories</li>
 <li><strong>Users &amp; Permissions</strong> — List users, check permissions, search</li>
 <li><strong>Platform Auto-Detection</strong> — Automatically detects GitHub or Azure DevOps from Git remote</li>
-<li><strong>CLI Mapping</strong> — Shows sdo.net command equivalents in native CLIs (<code>gh</code>, <code>az</code>)</li>
+<li><strong>CLI Mapping</strong> — Shows sdo command equivalents in native CLIs (<code>gh</code>, <code>az</code>)</li>
 <li><strong>State Translation</strong> — Automatically maps work item states between platforms</li>
 <li><strong>Clean Output</strong> — Emoji-enhanced tables and concise error messages</li>
 </ul>
 <h2 id="main-help">Main Help<a class="headerlink" href="#main-help" title="Anchor link to this section for reference">&para;</a></h2>
-<div class="highlight"><pre><span></span><code>$ sdo.net --help
+<div class="highlight"><pre><span></span><code>$ sdo --help
 
-sdo.net v1.73.7 - Simple DevOps Operations by naz-hage (2020-2026)
+sdo v1.73.7 - Simple DevOps Operations by naz-hage (2020-2026)
 
 Description:
   Simple DevOps Operations CLI tool for Azure DevOps and GitHub
 
 Usage:
-  sdo.net [command] [options]
+  sdo [command] [options]
 
 Options:
   --verbose       Enable verbose output
@@ -2507,22 +2507,22 @@ Commands:
 </code></pre></div>
 <h2 id="command-reference">Command Reference<a class="headerlink" href="#command-reference" title="Anchor link to this section for reference">&para;</a></h2>
 <h3 id="map-cli-mappings">map — CLI Mappings<a class="headerlink" href="#map-cli-mappings" title="Anchor link to this section for reference">&para;</a></h3>
-<p>Show how <code>sdo.net</code> commands map to native platform CLIs (<code>gh</code> for GitHub, <code>az</code> for Azure DevOps).</p>
+<p>Show how <code>sdo</code> commands map to native platform CLIs (<code>gh</code> for GitHub, <code>az</code> for Azure DevOps).</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>map<span class="w">                              </span><span class="c1"># Show all mappings</span>
-sdo.net<span class="w"> </span>map<span class="w"> </span>--platform<span class="w"> </span>gh<span class="w">               </span><span class="c1"># GitHub mappings only</span>
-sdo.net<span class="w"> </span>map<span class="w"> </span>--platform<span class="w"> </span>azdo<span class="w">             </span><span class="c1"># Azure DevOps mappings only</span>
-sdo.net<span class="w"> </span>map<span class="w"> </span>--all<span class="w">                       </span><span class="c1"># Show all mappings for both platforms</span>
-sdo.net<span class="w"> </span>map<span class="w"> </span>--verbose<span class="w">                   </span><span class="c1"># Show with verbose output</span>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>map<span class="w">                              </span><span class="c1"># Show all mappings</span>
+sdo<span class="w"> </span>map<span class="w"> </span>--platform<span class="w"> </span>gh<span class="w">               </span><span class="c1"># GitHub mappings only</span>
+sdo<span class="w"> </span>map<span class="w"> </span>--platform<span class="w"> </span>azdo<span class="w">             </span><span class="c1"># Azure DevOps mappings only</span>
+sdo<span class="w"> </span>map<span class="w"> </span>--all<span class="w">                       </span><span class="c1"># Show all mappings for both platforms</span>
+sdo<span class="w"> </span>map<span class="w"> </span>--verbose<span class="w">                   </span><span class="c1"># Show with verbose output</span>
 </code></pre></div></p>
 <p><strong>Help:</strong>
-<div class="highlight"><pre><span></span><code>$ sdo.net map --help
+<div class="highlight"><pre><span></span><code>$ sdo map --help
 
 Description:
   Show command mappings between SDO and native CLI tools
 
 Usage:
-  sdo.net map [options]
+  sdo map [options]
 
 Options:
   --platform &lt;platform&gt;  Platform to show mappings for (gh=github, azdo=azure-devops, leave empty for auto-detect)
@@ -2537,13 +2537,13 @@ Options:
 - <code>gh</code> — Verify GitHub authentication
 - <code>azdo</code> — Verify Azure DevOps authentication</p>
 <p><strong>Help:</strong>
-<div class="highlight"><pre><span></span><code>$ sdo.net auth --help
+<div class="highlight"><pre><span></span><code>$ sdo auth --help
 
 Description:
   Verify authentication with GitHub or Azure DevOps
 
 Usage:
-  sdo.net auth [command] [options]
+  sdo auth [command] [options]
 
 Options:
   --verbose       Enable verbose output
@@ -2554,10 +2554,10 @@ Commands:
   azdo  Verify Azure DevOps authentication
 </code></pre></div></p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>auth<span class="w"> </span>gh<span class="w">                  </span><span class="c1"># Verify GitHub</span>
-sdo.net<span class="w"> </span>auth<span class="w"> </span>azdo<span class="w">               </span><span class="c1"># Verify Azure DevOps</span>
-sdo.net<span class="w"> </span>auth<span class="w"> </span>gh<span class="w"> </span>--verbose<span class="w">       </span><span class="c1"># Show token source details</span>
-sdo.net<span class="w"> </span>auth<span class="w"> </span>azdo<span class="w"> </span>--verbose<span class="w">     </span><span class="c1"># Show token source details</span>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>auth<span class="w"> </span>gh<span class="w">                  </span><span class="c1"># Verify GitHub</span>
+sdo<span class="w"> </span>auth<span class="w"> </span>azdo<span class="w">               </span><span class="c1"># Verify Azure DevOps</span>
+sdo<span class="w"> </span>auth<span class="w"> </span>gh<span class="w"> </span>--verbose<span class="w">       </span><span class="c1"># Show token source details</span>
+sdo<span class="w"> </span>auth<span class="w"> </span>azdo<span class="w"> </span>--verbose<span class="w">     </span><span class="c1"># Show token source details</span>
 </code></pre></div></p>
 <p><strong>Success Output:</strong>
 <div class="highlight"><pre><span></span><code>✓ GitHub authentication successful
@@ -2572,13 +2572,13 @@ sdo.net<span class="w"> </span>auth<span class="w"> </span>azdo<span class="w"> 
 - <code>update</code> — Update work item properties
 - <code>comment</code> — Add comment to work item</p>
 <p><strong>Help:</strong>
-<div class="highlight"><pre><span></span><code>$ sdo.net wi --help
+<div class="highlight"><pre><span></span><code>$ sdo wi --help
 
 Description:
   Work item management commands
 
 Usage:
-  sdo.net wi [command] [options]
+  sdo wi [command] [options]
 
 Commands:
   comment  Add comment to a work item
@@ -2590,16 +2590,16 @@ Commands:
 <h4 id="wi-list">wi list<a class="headerlink" href="#wi-list" title="Anchor link to this section for reference">&para;</a></h4>
 <p>List work items with optional filtering. By default, shows <strong>active</strong> items (excludes closed/done).</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>wi<span class="w"> </span>list<span class="w">                                    </span><span class="c1"># List active items</span>
-sdo.net<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--top<span class="w"> </span><span class="m">20</span><span class="w">                           </span><span class="c1"># Limit to 20 items</span>
-sdo.net<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--state<span class="w"> </span>Done<span class="w">                       </span><span class="c1"># Show Done items</span>
-sdo.net<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--state<span class="w"> </span><span class="s2">&quot;In Progress&quot;</span><span class="w"> </span>--top<span class="w"> </span><span class="m">10</span><span class="w">    </span><span class="c1"># Show In Progress, limit 10</span>
-sdo.net<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--assigned-to<span class="w"> </span>user@example.com<span class="w">    </span><span class="c1"># Filter by assignee</span>
-sdo.net<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--assigned-to-me<span class="w">                  </span><span class="c1"># Your items</span>
-sdo.net<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--type<span class="w"> </span>PBI<span class="w">                         </span><span class="c1"># Filter by type (Azure DevOps)</span>
-sdo.net<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--area<span class="w"> </span><span class="s2">&quot;Project\Area&quot;</span><span class="w">             </span><span class="c1"># Filter by area (Azure DevOps)</span>
-sdo.net<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--iteration<span class="w"> </span><span class="s2">&quot;Project\Sprint 1&quot;</span><span class="w">    </span><span class="c1"># Filter by iteration (Azure DevOps)</span>
-sdo.net<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--verbose<span class="w">                         </span><span class="c1"># Show API commands</span>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w">                                    </span><span class="c1"># List active items</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--top<span class="w"> </span><span class="m">20</span><span class="w">                           </span><span class="c1"># Limit to 20 items</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--state<span class="w"> </span>Done<span class="w">                       </span><span class="c1"># Show Done items</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--state<span class="w"> </span><span class="s2">&quot;In Progress&quot;</span><span class="w"> </span>--top<span class="w"> </span><span class="m">10</span><span class="w">    </span><span class="c1"># Show In Progress, limit 10</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--assigned-to<span class="w"> </span>user@example.com<span class="w">    </span><span class="c1"># Filter by assignee</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--assigned-to-me<span class="w">                  </span><span class="c1"># Your items</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--type<span class="w"> </span>PBI<span class="w">                         </span><span class="c1"># Filter by type (Azure DevOps)</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--area<span class="w"> </span><span class="s2">&quot;Project\Area&quot;</span><span class="w">             </span><span class="c1"># Filter by area (Azure DevOps)</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--iteration<span class="w"> </span><span class="s2">&quot;Project\Sprint 1&quot;</span><span class="w">    </span><span class="c1"># Filter by iteration (Azure DevOps)</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--verbose<span class="w">                         </span><span class="c1"># Show API commands</span>
 </code></pre></div></p>
 <p><strong>Valid States:</strong>
 - Azure DevOps: <code>New</code>, <code>Approved</code>, <code>Committed</code>, <code>Done</code>, <code>To Do</code>, <code>In Progress</code> (case-insensitive)
@@ -2627,9 +2627,9 @@ Summary:
 <h4 id="wi-show">wi show<a class="headerlink" href="#wi-show" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Display full details of a work item.</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>wi<span class="w"> </span>show<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w">                </span><span class="c1"># Show item details</span>
-sdo.net<span class="w"> </span>wi<span class="w"> </span>show<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--comments<span class="w">     </span><span class="c1"># Include comments</span>
-sdo.net<span class="w"> </span>wi<span class="w"> </span>show<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--verbose<span class="w">      </span><span class="c1"># Show API command</span>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>wi<span class="w"> </span>show<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w">                </span><span class="c1"># Show item details</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>show<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--comments<span class="w">     </span><span class="c1"># Include comments</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>show<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--verbose<span class="w">      </span><span class="c1"># Show API command</span>
 </code></pre></div></p>
 <p><strong>Options:</strong>
 - <code>--id &lt;id&gt;</code> — Work item ID (required)
@@ -2638,10 +2638,10 @@ sdo.net<span class="w"> </span>wi<span class="w"> </span>show<span class="w"> </
 <h4 id="wi-create">wi create<a class="headerlink" href="#wi-create" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Create new work item from markdown file.</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>wi<span class="w"> </span>create<span class="w"> </span>--file-path<span class="w"> </span>work-item.md<span class="w">              </span><span class="c1"># Create</span>
-sdo.net<span class="w"> </span>wi<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>work-item.md<span class="w">                       </span><span class="c1"># Short option</span>
-sdo.net<span class="w"> </span>wi<span class="w"> </span>create<span class="w"> </span>--file-path<span class="w"> </span>work-item.md<span class="w"> </span>--dry-run<span class="w">   </span><span class="c1"># Preview</span>
-sdo.net<span class="w"> </span>wi<span class="w"> </span>create<span class="w"> </span>--file-path<span class="w"> </span>work-item.md<span class="w"> </span>--verbose<span class="w">   </span><span class="c1"># Show mapping</span>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>wi<span class="w"> </span>create<span class="w"> </span>--file-path<span class="w"> </span>work-item.md<span class="w">              </span><span class="c1"># Create</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>work-item.md<span class="w">                       </span><span class="c1"># Short option</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>create<span class="w"> </span>--file-path<span class="w"> </span>work-item.md<span class="w"> </span>--dry-run<span class="w">   </span><span class="c1"># Preview</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>create<span class="w"> </span>--file-path<span class="w"> </span>work-item.md<span class="w"> </span>--verbose<span class="w">   </span><span class="c1"># Show mapping</span>
 </code></pre></div></p>
 <p><strong>Options:</strong>
 - <code>-f, --file-path &lt;file-path&gt;</code> — Path to markdown file containing work item details (required)
@@ -2671,11 +2671,11 @@ labels: &quot;feature, backlog&quot;
 <h4 id="wi-update">wi update<a class="headerlink" href="#wi-update" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Update work item properties.</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--state<span class="w"> </span>Done<span class="w">                    </span><span class="c1"># Update state</span>
-sdo.net<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--title<span class="w"> </span><span class="s2">&quot;New Title&quot;</span><span class="w">            </span><span class="c1"># Update title</span>
-sdo.net<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--assignee<span class="w"> </span>user@example.com<span class="w">    </span><span class="c1"># Change assignee</span>
-sdo.net<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--state<span class="w"> </span>Done<span class="w"> </span>--title<span class="w"> </span><span class="s2">&quot;Title&quot;</span><span class="w">   </span><span class="c1"># Multiple fields</span>
-sdo.net<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--state<span class="w"> </span><span class="k">done</span><span class="w">                   </span><span class="c1"># Case-insensitive</span>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--state<span class="w"> </span>Done<span class="w">                    </span><span class="c1"># Update state</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--title<span class="w"> </span><span class="s2">&quot;New Title&quot;</span><span class="w">            </span><span class="c1"># Update title</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--assignee<span class="w"> </span>user@example.com<span class="w">    </span><span class="c1"># Change assignee</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--state<span class="w"> </span>Done<span class="w"> </span>--title<span class="w"> </span><span class="s2">&quot;Title&quot;</span><span class="w">   </span><span class="c1"># Multiple fields</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--state<span class="w"> </span><span class="k">done</span><span class="w">                   </span><span class="c1"># Case-insensitive</span>
 </code></pre></div></p>
 <p><strong>Options:</strong>
 - <code>--id &lt;id&gt;</code> — Work item ID (required)
@@ -2689,8 +2689,8 @@ sdo.net<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> 
 <h4 id="wi-comment">wi comment<a class="headerlink" href="#wi-comment" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Add comment to work item.</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>wi<span class="w"> </span>comment<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--message<span class="w"> </span><span class="s2">&quot;This is my comment&quot;</span>
-sdo.net<span class="w"> </span>wi<span class="w"> </span>comment<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--message<span class="w"> </span><span class="s2">&quot;Looks good!&quot;</span><span class="w"> </span>--verbose
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>wi<span class="w"> </span>comment<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--message<span class="w"> </span><span class="s2">&quot;This is my comment&quot;</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>comment<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--message<span class="w"> </span><span class="s2">&quot;Looks good!&quot;</span><span class="w"> </span>--verbose
 </code></pre></div></p>
 <p><strong>Options:</strong>
 - <code>--id &lt;id&gt;</code> — Work item ID (required)
@@ -2706,13 +2706,13 @@ sdo.net<span class="w"> </span>wi<span class="w"> </span>comment<span class="w">
 - <code>status</code> — Check PR status
 - <code>update</code> — Update PR properties</p>
 <p><strong>Help:</strong>
-<div class="highlight"><pre><span></span><code>$ sdo.net pr --help
+<div class="highlight"><pre><span></span><code>$ sdo pr --help
 
 Description:
   Pull request operations
 
 Usage:
-  sdo.net pr [command] [options]
+  sdo pr [command] [options]
 
 Commands:
   create          Create a pull request from markdown file
@@ -2724,12 +2724,12 @@ Commands:
 <h4 id="pr-create">pr create<a class="headerlink" href="#pr-create" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Create a new pull request from markdown file.</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span>--file<span class="w"> </span>pr.md<span class="w">                        </span><span class="c1"># Create from file</span>
-sdo.net<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>pr.md<span class="w">                            </span><span class="c1"># Short option</span>
-sdo.net<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span>--file<span class="w"> </span>pr.md<span class="w"> </span>--work-item<span class="w"> </span><span class="m">243</span><span class="w">        </span><span class="c1"># Link to work item</span>
-sdo.net<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span>--file<span class="w"> </span>pr.md<span class="w"> </span>--draft<span class="w">                </span><span class="c1"># Create as draft</span>
-sdo.net<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span>--file<span class="w"> </span>pr.md<span class="w"> </span>--dry-run<span class="w">              </span><span class="c1"># Preview</span>
-sdo.net<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span>--file<span class="w"> </span>pr.md<span class="w"> </span>--verbose<span class="w">              </span><span class="c1"># Show mapping</span>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span>--file<span class="w"> </span>pr.md<span class="w">                        </span><span class="c1"># Create from file</span>
+sdo<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>pr.md<span class="w">                            </span><span class="c1"># Short option</span>
+sdo<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span>--file<span class="w"> </span>pr.md<span class="w"> </span>--work-item<span class="w"> </span><span class="m">243</span><span class="w">        </span><span class="c1"># Link to work item</span>
+sdo<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span>--file<span class="w"> </span>pr.md<span class="w"> </span>--draft<span class="w">                </span><span class="c1"># Create as draft</span>
+sdo<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span>--file<span class="w"> </span>pr.md<span class="w"> </span>--dry-run<span class="w">              </span><span class="c1"># Preview</span>
+sdo<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span>--file<span class="w"> </span>pr.md<span class="w"> </span>--verbose<span class="w">              </span><span class="c1"># Show mapping</span>
 </code></pre></div></p>
 <p><strong>Options:</strong>
 - <code>-f, --file &lt;file&gt;</code> — Path to markdown file (required)
@@ -2740,11 +2740,11 @@ sdo.net<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> 
 <h4 id="pr-list">pr list<a class="headerlink" href="#pr-list" title="Anchor link to this section for reference">&para;</a></h4>
 <p>List pull requests with optional filtering.</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>pr<span class="w"> </span>list<span class="w">                         </span><span class="c1"># List active PRs (default)</span>
-sdo.net<span class="w"> </span>pr<span class="w"> </span>list<span class="w"> </span>--status<span class="w"> </span>closed<span class="w">         </span><span class="c1"># List closed PRs</span>
-sdo.net<span class="w"> </span>pr<span class="w"> </span>list<span class="w"> </span>--status<span class="w"> </span>merged<span class="w">         </span><span class="c1"># List merged PRs</span>
-sdo.net<span class="w"> </span>pr<span class="w"> </span>list<span class="w"> </span>--top<span class="w"> </span><span class="m">20</span><span class="w">               </span><span class="c1"># Limit to 20</span>
-sdo.net<span class="w"> </span>pr<span class="w"> </span>list<span class="w"> </span>--verbose<span class="w">              </span><span class="c1"># Show API commands</span>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pr<span class="w"> </span>list<span class="w">                         </span><span class="c1"># List active PRs (default)</span>
+sdo<span class="w"> </span>pr<span class="w"> </span>list<span class="w"> </span>--status<span class="w"> </span>closed<span class="w">         </span><span class="c1"># List closed PRs</span>
+sdo<span class="w"> </span>pr<span class="w"> </span>list<span class="w"> </span>--status<span class="w"> </span>merged<span class="w">         </span><span class="c1"># List merged PRs</span>
+sdo<span class="w"> </span>pr<span class="w"> </span>list<span class="w"> </span>--top<span class="w"> </span><span class="m">20</span><span class="w">               </span><span class="c1"># Limit to 20</span>
+sdo<span class="w"> </span>pr<span class="w"> </span>list<span class="w"> </span>--verbose<span class="w">              </span><span class="c1"># Show API commands</span>
 </code></pre></div></p>
 <p><strong>Options:</strong>
 - <code>--status &lt;status&gt;</code> — Filter PRs by status (default: active)
@@ -2753,8 +2753,8 @@ sdo.net<span class="w"> </span>pr<span class="w"> </span>list<span class="w"> </
 <h4 id="pr-show">pr show<a class="headerlink" href="#pr-show" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Display pull request details.</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>pr<span class="w"> </span>show<span class="w"> </span><span class="m">12</span><span class="w">                </span><span class="c1"># Show PR #12</span>
-sdo.net<span class="w"> </span>pr<span class="w"> </span>show<span class="w"> </span><span class="m">12</span><span class="w"> </span>--verbose<span class="w">      </span><span class="c1"># Show API command</span>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pr<span class="w"> </span>show<span class="w"> </span><span class="m">12</span><span class="w">                </span><span class="c1"># Show PR #12</span>
+sdo<span class="w"> </span>pr<span class="w"> </span>show<span class="w"> </span><span class="m">12</span><span class="w"> </span>--verbose<span class="w">      </span><span class="c1"># Show API command</span>
 </code></pre></div></p>
 <p><strong>Options:</strong>
 - <code>&lt;pr-id&gt;</code> — Pull request number/ID (required)
@@ -2762,8 +2762,8 @@ sdo.net<span class="w"> </span>pr<span class="w"> </span>show<span class="w"> </
 <h4 id="pr-status">pr status<a class="headerlink" href="#pr-status" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Check pull request status.</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>pr<span class="w"> </span>status<span class="w"> </span><span class="m">12</span><span class="w">              </span><span class="c1"># Check PR status</span>
-sdo.net<span class="w"> </span>pr<span class="w"> </span>status<span class="w"> </span><span class="m">12</span><span class="w"> </span>--verbose<span class="w">    </span><span class="c1"># Show full details</span>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pr<span class="w"> </span>status<span class="w"> </span><span class="m">12</span><span class="w">              </span><span class="c1"># Check PR status</span>
+sdo<span class="w"> </span>pr<span class="w"> </span>status<span class="w"> </span><span class="m">12</span><span class="w"> </span>--verbose<span class="w">    </span><span class="c1"># Show full details</span>
 </code></pre></div></p>
 <p><strong>Options:</strong>
 - <code>&lt;pr-id&gt;</code> — Pull request number/ID (required)
@@ -2771,10 +2771,10 @@ sdo.net<span class="w"> </span>pr<span class="w"> </span>status<span class="w"> 
 <h4 id="pr-update">pr update<a class="headerlink" href="#pr-update" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Update pull request properties.</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>pr<span class="w"> </span>update<span class="w"> </span>--pr-id<span class="w"> </span><span class="m">12</span><span class="w"> </span>--title<span class="w"> </span><span class="s2">&quot;Updated title&quot;</span>
-sdo.net<span class="w"> </span>pr<span class="w"> </span>update<span class="w"> </span>--pr-id<span class="w"> </span><span class="m">12</span><span class="w"> </span>--file<span class="w"> </span>updated.md
-sdo.net<span class="w"> </span>pr<span class="w"> </span>update<span class="w"> </span>--pr-id<span class="w"> </span><span class="m">12</span><span class="w"> </span>--status<span class="w"> </span>closed
-sdo.net<span class="w"> </span>pr<span class="w"> </span>update<span class="w"> </span>--pr-id<span class="w"> </span><span class="m">12</span><span class="w"> </span>--title<span class="w"> </span><span class="s2">&quot;New title&quot;</span><span class="w"> </span>--status<span class="w"> </span>merged
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pr<span class="w"> </span>update<span class="w"> </span>--pr-id<span class="w"> </span><span class="m">12</span><span class="w"> </span>--title<span class="w"> </span><span class="s2">&quot;Updated title&quot;</span>
+sdo<span class="w"> </span>pr<span class="w"> </span>update<span class="w"> </span>--pr-id<span class="w"> </span><span class="m">12</span><span class="w"> </span>--file<span class="w"> </span>updated.md
+sdo<span class="w"> </span>pr<span class="w"> </span>update<span class="w"> </span>--pr-id<span class="w"> </span><span class="m">12</span><span class="w"> </span>--status<span class="w"> </span>closed
+sdo<span class="w"> </span>pr<span class="w"> </span>update<span class="w"> </span>--pr-id<span class="w"> </span><span class="m">12</span><span class="w"> </span>--title<span class="w"> </span><span class="s2">&quot;New title&quot;</span><span class="w"> </span>--status<span class="w"> </span>merged
 </code></pre></div></p>
 <p><strong>Options:</strong>
 - <code>--pr-id &lt;pr-id&gt;</code> — PR ID to update (required)
@@ -2791,13 +2791,13 @@ sdo.net<span class="w"> </span>pr<span class="w"> </span>update<span class="w"> 
 - <code>create</code> — Create new repository
 - <code>delete</code> — Delete repository</p>
 <p><strong>Help:</strong>
-<div class="highlight"><pre><span></span><code>$ sdo.net repo --help
+<div class="highlight"><pre><span></span><code>$ sdo repo --help
 
 Description:
   Repository management commands
 
 Usage:
-  sdo.net repo [command] [options]
+  sdo repo [command] [options]
 
 Commands:
   create &lt;name&gt;  Create a new repository
@@ -2808,9 +2808,9 @@ Commands:
 <h4 id="repo-list">repo list<a class="headerlink" href="#repo-list" title="Anchor link to this section for reference">&para;</a></h4>
 <p>List repositories for your organization.</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>repo<span class="w"> </span>list<span class="w">                       </span><span class="c1"># List repos</span>
-sdo.net<span class="w"> </span>repo<span class="w"> </span>list<span class="w"> </span>--top<span class="w"> </span><span class="m">10</span><span class="w">              </span><span class="c1"># Limit to 10</span>
-sdo.net<span class="w"> </span>repo<span class="w"> </span>list<span class="w"> </span>--verbose<span class="w">             </span><span class="c1"># Show API commands</span>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>repo<span class="w"> </span>list<span class="w">                       </span><span class="c1"># List repos</span>
+sdo<span class="w"> </span>repo<span class="w"> </span>list<span class="w"> </span>--top<span class="w"> </span><span class="m">10</span><span class="w">              </span><span class="c1"># Limit to 10</span>
+sdo<span class="w"> </span>repo<span class="w"> </span>list<span class="w"> </span>--verbose<span class="w">             </span><span class="c1"># Show API commands</span>
 </code></pre></div></p>
 <p><strong>Options:</strong>
 - <code>--top &lt;top&gt;</code> — Return top N repositories
@@ -2818,18 +2818,18 @@ sdo.net<span class="w"> </span>repo<span class="w"> </span>list<span class="w"> 
 <h4 id="repo-show">repo show<a class="headerlink" href="#repo-show" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Display repository information from current Git remote.</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>repo<span class="w"> </span>show<span class="w">                       </span><span class="c1"># Show current repo</span>
-sdo.net<span class="w"> </span>repo<span class="w"> </span>show<span class="w"> </span>--verbose<span class="w">             </span><span class="c1"># Show API command</span>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>repo<span class="w"> </span>show<span class="w">                       </span><span class="c1"># Show current repo</span>
+sdo<span class="w"> </span>repo<span class="w"> </span>show<span class="w"> </span>--verbose<span class="w">             </span><span class="c1"># Show API command</span>
 </code></pre></div></p>
 <p><strong>Options:</strong>
 - <code>--verbose</code> — Show mapping</p>
 <h4 id="repo-create">repo create<a class="headerlink" href="#repo-create" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Create a new repository.</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>repo<span class="w"> </span>create<span class="w"> </span>myrepo<span class="w">                          </span><span class="c1"># Create repo</span>
-sdo.net<span class="w"> </span>repo<span class="w"> </span>create<span class="w"> </span>myrepo<span class="w"> </span>--description<span class="w"> </span><span class="s2">&quot;My repo&quot;</span><span class="w">  </span><span class="c1"># With description</span>
-sdo.net<span class="w"> </span>repo<span class="w"> </span>create<span class="w"> </span>myrepo<span class="w"> </span>--private<span class="w">                </span><span class="c1"># Make private</span>
-sdo.net<span class="w"> </span>repo<span class="w"> </span>create<span class="w"> </span>myrepo<span class="w"> </span>--private<span class="w"> </span>--verbose<span class="w">      </span><span class="c1"># With mapping</span>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>repo<span class="w"> </span>create<span class="w"> </span>myrepo<span class="w">                          </span><span class="c1"># Create repo</span>
+sdo<span class="w"> </span>repo<span class="w"> </span>create<span class="w"> </span>myrepo<span class="w"> </span>--description<span class="w"> </span><span class="s2">&quot;My repo&quot;</span><span class="w">  </span><span class="c1"># With description</span>
+sdo<span class="w"> </span>repo<span class="w"> </span>create<span class="w"> </span>myrepo<span class="w"> </span>--private<span class="w">                </span><span class="c1"># Make private</span>
+sdo<span class="w"> </span>repo<span class="w"> </span>create<span class="w"> </span>myrepo<span class="w"> </span>--private<span class="w"> </span>--verbose<span class="w">      </span><span class="c1"># With mapping</span>
 </code></pre></div></p>
 <p><strong>Options:</strong>
 - <code>&lt;name&gt;</code> — Repository name (required)
@@ -2839,9 +2839,9 @@ sdo.net<span class="w"> </span>repo<span class="w"> </span>create<span class="w"
 <h4 id="repo-delete">repo delete<a class="headerlink" href="#repo-delete" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Delete a repository.</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>repo<span class="w"> </span>delete<span class="w">                     </span><span class="c1"># Delete (with prompt)</span>
-sdo.net<span class="w"> </span>repo<span class="w"> </span>delete<span class="w"> </span>--force<span class="w">             </span><span class="c1"># Delete (no prompt)</span>
-sdo.net<span class="w"> </span>repo<span class="w"> </span>delete<span class="w"> </span>--force<span class="w"> </span>--verbose<span class="w">   </span><span class="c1"># Show mapping</span>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>repo<span class="w"> </span>delete<span class="w">                     </span><span class="c1"># Delete (with prompt)</span>
+sdo<span class="w"> </span>repo<span class="w"> </span>delete<span class="w"> </span>--force<span class="w">             </span><span class="c1"># Delete (no prompt)</span>
+sdo<span class="w"> </span>repo<span class="w"> </span>delete<span class="w"> </span>--force<span class="w"> </span>--verbose<span class="w">   </span><span class="c1"># Show mapping</span>
 </code></pre></div></p>
 <p><strong>Options:</strong>
 - <code>--force</code> — Skip confirmation prompt
@@ -2860,13 +2860,13 @@ sdo.net<span class="w"> </span>repo<span class="w"> </span>delete<span class="w"
 - <code>update</code> — Update pipeline configuration
 - <code>delete</code> — Delete pipeline/workflow</p>
 <p><strong>Help:</strong>
-<div class="highlight"><pre><span></span><code>$ sdo.net pipeline --help
+<div class="highlight"><pre><span></span><code>$ sdo pipeline --help
 
 Description:
   Pipeline/workflow management commands (create, show, list, run, status, logs, delete, lastbuild, update)
 
 Usage:
-  sdo.net pipeline [command] [options]
+  sdo pipeline [command] [options]
 
 Commands:
   create &lt;file-path&gt;          Create a new pipeline/workflow from YAML definition file
@@ -2882,10 +2882,10 @@ Commands:
 <h4 id="pipeline-list">pipeline list<a class="headerlink" href="#pipeline-list" title="Anchor link to this section for reference">&para;</a></h4>
 <p>List pipelines/workflows in repository.</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>pipeline<span class="w"> </span>list<span class="w">                   </span><span class="c1"># List pipelines</span>
-sdo.net<span class="w"> </span>pipeline<span class="w"> </span>list<span class="w"> </span>--repo<span class="w"> </span>myrepo<span class="w">     </span><span class="c1"># Filter by repository</span>
-sdo.net<span class="w"> </span>pipeline<span class="w"> </span>list<span class="w"> </span>--all<span class="w">             </span><span class="c1"># Show all pipelines in project</span>
-sdo.net<span class="w"> </span>pipeline<span class="w"> </span>list<span class="w"> </span>--verbose<span class="w">         </span><span class="c1"># Show API commands</span>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pipeline<span class="w"> </span>list<span class="w">                   </span><span class="c1"># List pipelines</span>
+sdo<span class="w"> </span>pipeline<span class="w"> </span>list<span class="w"> </span>--repo<span class="w"> </span>myrepo<span class="w">     </span><span class="c1"># Filter by repository</span>
+sdo<span class="w"> </span>pipeline<span class="w"> </span>list<span class="w"> </span>--all<span class="w">             </span><span class="c1"># Show all pipelines in project</span>
+sdo<span class="w"> </span>pipeline<span class="w"> </span>list<span class="w"> </span>--verbose<span class="w">         </span><span class="c1"># Show API commands</span>
 </code></pre></div></p>
 <p><strong>Options:</strong>
 - <code>--repo &lt;repo&gt;</code> — Filter by repository name
@@ -2894,9 +2894,9 @@ sdo.net<span class="w"> </span>pipeline<span class="w"> </span>list<span class="
 <h4 id="pipeline-show">pipeline show<a class="headerlink" href="#pipeline-show" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Display pipeline/workflow details.</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>pipeline<span class="w"> </span>show<span class="w"> </span><span class="m">1234</span><span class="w">              </span><span class="c1"># Show pipeline by ID</span>
-sdo.net<span class="w"> </span>pipeline<span class="w"> </span>show<span class="w"> </span>myworkflow<span class="w">        </span><span class="c1"># Show pipeline by name</span>
-sdo.net<span class="w"> </span>pipeline<span class="w"> </span>show<span class="w"> </span>--verbose<span class="w">         </span><span class="c1"># Show API command</span>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pipeline<span class="w"> </span>show<span class="w"> </span><span class="m">1234</span><span class="w">              </span><span class="c1"># Show pipeline by ID</span>
+sdo<span class="w"> </span>pipeline<span class="w"> </span>show<span class="w"> </span>myworkflow<span class="w">        </span><span class="c1"># Show pipeline by name</span>
+sdo<span class="w"> </span>pipeline<span class="w"> </span>show<span class="w"> </span>--verbose<span class="w">         </span><span class="c1"># Show API command</span>
 </code></pre></div></p>
 <p><strong>Options:</strong>
 - <code>&lt;pipeline-id-or-name&gt;</code> — Pipeline ID or name (optional; Azure DevOps only)
@@ -2904,8 +2904,8 @@ sdo.net<span class="w"> </span>pipeline<span class="w"> </span>show<span class="
 <h4 id="pipeline-create">pipeline create<a class="headerlink" href="#pipeline-create" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Create a new pipeline/workflow from YAML file.</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>pipeline<span class="w"> </span>create<span class="w"> </span>.github/workflows/ci.yml
-sdo.net<span class="w"> </span>pipeline<span class="w"> </span>create<span class="w"> </span>.github/workflows/ci.yml<span class="w"> </span>--verbose
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pipeline<span class="w"> </span>create<span class="w"> </span>.github/workflows/ci.yml
+sdo<span class="w"> </span>pipeline<span class="w"> </span>create<span class="w"> </span>.github/workflows/ci.yml<span class="w"> </span>--verbose
 </code></pre></div></p>
 <p><strong>Options:</strong>
 - <code>&lt;file-path&gt;</code> — Path to YAML definition file (required)
@@ -2913,9 +2913,9 @@ sdo.net<span class="w"> </span>pipeline<span class="w"> </span>create<span class
 <h4 id="pipeline-run">pipeline run<a class="headerlink" href="#pipeline-run" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Execute/trigger a pipeline.</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>pipeline<span class="w"> </span>run<span class="w"> </span>myworkflow<span class="w">         </span><span class="c1"># Trigger run</span>
-sdo.net<span class="w"> </span>pipeline<span class="w"> </span>run<span class="w"> </span>myworkflow<span class="w"> </span>-b<span class="w"> </span>main<span class="w"> </span><span class="c1"># Run on specific branch</span>
-sdo.net<span class="w"> </span>pipeline<span class="w"> </span>run<span class="w"> </span>myworkflow<span class="w"> </span>--branch<span class="w"> </span>develop<span class="w"> </span>--verbose
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pipeline<span class="w"> </span>run<span class="w"> </span>myworkflow<span class="w">         </span><span class="c1"># Trigger run</span>
+sdo<span class="w"> </span>pipeline<span class="w"> </span>run<span class="w"> </span>myworkflow<span class="w"> </span>-b<span class="w"> </span>main<span class="w"> </span><span class="c1"># Run on specific branch</span>
+sdo<span class="w"> </span>pipeline<span class="w"> </span>run<span class="w"> </span>myworkflow<span class="w"> </span>--branch<span class="w"> </span>develop<span class="w"> </span>--verbose
 </code></pre></div></p>
 <p><strong>Options:</strong>
 - <code>&lt;pipeline-name&gt;</code> — Pipeline name (optional, uses current repo if not provided)
@@ -2924,9 +2924,9 @@ sdo.net<span class="w"> </span>pipeline<span class="w"> </span>run<span class="w
 <h4 id="pipeline-status">pipeline status<a class="headerlink" href="#pipeline-status" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Query pipeline build/run status.</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>pipeline<span class="w"> </span>status<span class="w">                 </span><span class="c1"># Show latest build status</span>
-sdo.net<span class="w"> </span>pipeline<span class="w"> </span>status<span class="w"> </span><span class="m">1234</span><span class="w">            </span><span class="c1"># Check specific build</span>
-sdo.net<span class="w"> </span>pipeline<span class="w"> </span>status<span class="w"> </span><span class="m">1234</span><span class="w"> </span>--verbose<span class="w">  </span><span class="c1"># Show details</span>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pipeline<span class="w"> </span>status<span class="w">                 </span><span class="c1"># Show latest build status</span>
+sdo<span class="w"> </span>pipeline<span class="w"> </span>status<span class="w"> </span><span class="m">1234</span><span class="w">            </span><span class="c1"># Check specific build</span>
+sdo<span class="w"> </span>pipeline<span class="w"> </span>status<span class="w"> </span><span class="m">1234</span><span class="w"> </span>--verbose<span class="w">  </span><span class="c1"># Show details</span>
 </code></pre></div></p>
 <p><strong>Options:</strong>
 - <code>&lt;build-id&gt;</code> — Build/run ID (optional, shows latest if not provided)
@@ -2934,10 +2934,10 @@ sdo.net<span class="w"> </span>pipeline<span class="w"> </span>status<span class
 <h4 id="pipeline-logs">pipeline logs<a class="headerlink" href="#pipeline-logs" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Retrieve pipeline execution logs.</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>pipeline<span class="w"> </span>logs<span class="w">                     </span><span class="c1"># Show latest logs</span>
-sdo.net<span class="w"> </span>pipeline<span class="w"> </span>logs<span class="w"> </span><span class="m">1234</span><span class="w">                </span><span class="c1"># Show logs for specific build</span>
-sdo.net<span class="w"> </span>pipeline<span class="w"> </span>logs<span class="w"> </span>--build-id<span class="w"> </span><span class="m">1234</span><span class="w">     </span><span class="c1"># Explicit build ID</span>
-sdo.net<span class="w"> </span>pipeline<span class="w"> </span>logs<span class="w"> </span><span class="m">1234</span><span class="w"> </span>--verbose<span class="w">      </span><span class="c1"># Show with details</span>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pipeline<span class="w"> </span>logs<span class="w">                     </span><span class="c1"># Show latest logs</span>
+sdo<span class="w"> </span>pipeline<span class="w"> </span>logs<span class="w"> </span><span class="m">1234</span><span class="w">                </span><span class="c1"># Show logs for specific build</span>
+sdo<span class="w"> </span>pipeline<span class="w"> </span>logs<span class="w"> </span>--build-id<span class="w"> </span><span class="m">1234</span><span class="w">     </span><span class="c1"># Explicit build ID</span>
+sdo<span class="w"> </span>pipeline<span class="w"> </span>logs<span class="w"> </span><span class="m">1234</span><span class="w"> </span>--verbose<span class="w">      </span><span class="c1"># Show with details</span>
 </code></pre></div></p>
 <p><strong>Options:</strong>
 - <code>&lt;build-id&gt;</code> — Build/run ID (optional, shows latest if not provided)
@@ -2946,9 +2946,9 @@ sdo.net<span class="w"> </span>pipeline<span class="w"> </span>logs<span class="
 <h4 id="pipeline-lastbuild">pipeline lastbuild<a class="headerlink" href="#pipeline-lastbuild" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Show last build/run for pipeline.</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>pipeline<span class="w"> </span>lastbuild<span class="w">              </span><span class="c1"># Last build for current repo</span>
-sdo.net<span class="w"> </span>pipeline<span class="w"> </span>lastbuild<span class="w"> </span>myworkflow<span class="w">   </span><span class="c1"># Last build for specific pipeline</span>
-sdo.net<span class="w"> </span>pipeline<span class="w"> </span>lastbuild<span class="w"> </span>myworkflow<span class="w"> </span>--verbose<span class="w">  </span><span class="c1"># Show details</span>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pipeline<span class="w"> </span>lastbuild<span class="w">              </span><span class="c1"># Last build for current repo</span>
+sdo<span class="w"> </span>pipeline<span class="w"> </span>lastbuild<span class="w"> </span>myworkflow<span class="w">   </span><span class="c1"># Last build for specific pipeline</span>
+sdo<span class="w"> </span>pipeline<span class="w"> </span>lastbuild<span class="w"> </span>myworkflow<span class="w"> </span>--verbose<span class="w">  </span><span class="c1"># Show details</span>
 </code></pre></div></p>
 <p><strong>Options:</strong>
 - <code>&lt;pipeline-name&gt;</code> — Pipeline name (optional, uses current repo if not provided)
@@ -2956,9 +2956,9 @@ sdo.net<span class="w"> </span>pipeline<span class="w"> </span>lastbuild<span cl
 <h4 id="pipeline-update">pipeline update<a class="headerlink" href="#pipeline-update" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Update pipeline configuration.</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>pipeline<span class="w"> </span>update<span class="w"> </span>--file<span class="w"> </span>updated.yml
-sdo.net<span class="w"> </span>pipeline<span class="w"> </span>update<span class="w"> </span>--file<span class="w"> </span>updated.yml<span class="w"> </span>--pipeline<span class="w"> </span>myworkflow
-sdo.net<span class="w"> </span>pipeline<span class="w"> </span>update<span class="w"> </span>--file<span class="w"> </span>updated.yml<span class="w"> </span>--message<span class="w"> </span><span class="s2">&quot;Update CI config&quot;</span><span class="w"> </span>--branch<span class="w"> </span>main
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pipeline<span class="w"> </span>update<span class="w"> </span>--file<span class="w"> </span>updated.yml
+sdo<span class="w"> </span>pipeline<span class="w"> </span>update<span class="w"> </span>--file<span class="w"> </span>updated.yml<span class="w"> </span>--pipeline<span class="w"> </span>myworkflow
+sdo<span class="w"> </span>pipeline<span class="w"> </span>update<span class="w"> </span>--file<span class="w"> </span>updated.yml<span class="w"> </span>--message<span class="w"> </span><span class="s2">&quot;Update CI config&quot;</span><span class="w"> </span>--branch<span class="w"> </span>main
 </code></pre></div></p>
 <p><strong>Options:</strong>
 - <code>--file &lt;file&gt;</code> — Path to pipeline/workflow YAML file to update (required)
@@ -2969,9 +2969,9 @@ sdo.net<span class="w"> </span>pipeline<span class="w"> </span>update<span class
 <h4 id="pipeline-delete">pipeline delete<a class="headerlink" href="#pipeline-delete" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Delete a pipeline/workflow.</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>pipeline<span class="w"> </span>delete<span class="w"> </span><span class="m">1234</span><span class="w">            </span><span class="c1"># Delete (with prompt)</span>
-sdo.net<span class="w"> </span>pipeline<span class="w"> </span>delete<span class="w"> </span><span class="m">1234</span><span class="w"> </span>--force<span class="w">    </span><span class="c1"># Delete (no prompt)</span>
-sdo.net<span class="w"> </span>pipeline<span class="w"> </span>delete<span class="w"> </span><span class="m">1234</span><span class="w"> </span>--force<span class="w"> </span>--verbose
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pipeline<span class="w"> </span>delete<span class="w"> </span><span class="m">1234</span><span class="w">            </span><span class="c1"># Delete (with prompt)</span>
+sdo<span class="w"> </span>pipeline<span class="w"> </span>delete<span class="w"> </span><span class="m">1234</span><span class="w"> </span>--force<span class="w">    </span><span class="c1"># Delete (no prompt)</span>
+sdo<span class="w"> </span>pipeline<span class="w"> </span>delete<span class="w"> </span><span class="m">1234</span><span class="w"> </span>--force<span class="w"> </span>--verbose
 </code></pre></div></p>
 <p><strong>Options:</strong>
 - <code>&lt;pipeline-id&gt;</code> — Pipeline/workflow ID or name (optional, uses current repo if not provided)
@@ -2986,13 +2986,13 @@ sdo.net<span class="w"> </span>pipeline<span class="w"> </span>delete<span class
 - <code>search</code> — Search users
 - <code>permissions</code> — Show user permissions</p>
 <p><strong>Help:</strong>
-<div class="highlight"><pre><span></span><code>$ sdo.net user --help
+<div class="highlight"><pre><span></span><code>$ sdo user --help
 
 Description:
   User management commands
 
 Usage:
-  sdo.net user [command] [options]
+  sdo user [command] [options]
 
 Commands:
   list         List users
@@ -3003,9 +3003,9 @@ Commands:
 <h4 id="user-list">user list<a class="headerlink" href="#user-list" title="Anchor link to this section for reference">&para;</a></h4>
 <p>List users in organization.</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>user<span class="w"> </span>list<span class="w">                      </span><span class="c1"># List users</span>
-sdo.net<span class="w"> </span>user<span class="w"> </span>list<span class="w"> </span>--top<span class="w"> </span><span class="m">50</span><span class="w">             </span><span class="c1"># Limit to 50</span>
-sdo.net<span class="w"> </span>user<span class="w"> </span>list<span class="w"> </span>--verbose<span class="w">            </span><span class="c1"># Show API commands</span>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>user<span class="w"> </span>list<span class="w">                      </span><span class="c1"># List users</span>
+sdo<span class="w"> </span>user<span class="w"> </span>list<span class="w"> </span>--top<span class="w"> </span><span class="m">50</span><span class="w">             </span><span class="c1"># Limit to 50</span>
+sdo<span class="w"> </span>user<span class="w"> </span>list<span class="w"> </span>--verbose<span class="w">            </span><span class="c1"># Show API commands</span>
 </code></pre></div></p>
 <p><strong>Options:</strong>
 - <code>--top &lt;N&gt;</code> — Maximum results (default: 50)
@@ -3013,8 +3013,8 @@ sdo.net<span class="w"> </span>user<span class="w"> </span>list<span class="w"> 
 <h4 id="user-show">user show<a class="headerlink" href="#user-show" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Display user details.</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>user<span class="w"> </span>show<span class="w"> </span>--login<span class="w"> </span>naz-hage<span class="w">         </span><span class="c1"># Show GitHub user</span>
-sdo.net<span class="w"> </span>user<span class="w"> </span>show<span class="w"> </span>--login<span class="w"> </span>naz-hage<span class="w"> </span>--verbose<span class="w">  </span><span class="c1"># Show API command</span>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>user<span class="w"> </span>show<span class="w"> </span>--login<span class="w"> </span>naz-hage<span class="w">         </span><span class="c1"># Show GitHub user</span>
+sdo<span class="w"> </span>user<span class="w"> </span>show<span class="w"> </span>--login<span class="w"> </span>naz-hage<span class="w"> </span>--verbose<span class="w">  </span><span class="c1"># Show API command</span>
 </code></pre></div></p>
 <p><strong>Options:</strong>
 - <code>--login &lt;login&gt;</code> — GitHub login or Azure identity (required)
@@ -3022,9 +3022,9 @@ sdo.net<span class="w"> </span>user<span class="w"> </span>show<span class="w"> 
 <h4 id="user-search">user search<a class="headerlink" href="#user-search" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Search for users.</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>user<span class="w"> </span>search<span class="w"> </span>--query<span class="w"> </span><span class="s2">&quot;naz&quot;</span><span class="w">              </span><span class="c1"># Search for users</span>
-sdo.net<span class="w"> </span>user<span class="w"> </span>search<span class="w"> </span>--query<span class="w"> </span><span class="s2">&quot;naz&quot;</span><span class="w"> </span>--top<span class="w"> </span><span class="m">20</span><span class="w">     </span><span class="c1"># Limit to 20</span>
-sdo.net<span class="w"> </span>user<span class="w"> </span>search<span class="w"> </span>--query<span class="w"> </span><span class="s2">&quot;naz&quot;</span><span class="w"> </span>--verbose<span class="w">    </span><span class="c1"># Show API command</span>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>user<span class="w"> </span>search<span class="w"> </span>--query<span class="w"> </span><span class="s2">&quot;naz&quot;</span><span class="w">              </span><span class="c1"># Search for users</span>
+sdo<span class="w"> </span>user<span class="w"> </span>search<span class="w"> </span>--query<span class="w"> </span><span class="s2">&quot;naz&quot;</span><span class="w"> </span>--top<span class="w"> </span><span class="m">20</span><span class="w">     </span><span class="c1"># Limit to 20</span>
+sdo<span class="w"> </span>user<span class="w"> </span>search<span class="w"> </span>--query<span class="w"> </span><span class="s2">&quot;naz&quot;</span><span class="w"> </span>--verbose<span class="w">    </span><span class="c1"># Show API command</span>
 </code></pre></div></p>
 <p><strong>Options:</strong>
 - <code>--query &lt;term&gt;</code> — Search term (required)
@@ -3033,8 +3033,8 @@ sdo.net<span class="w"> </span>user<span class="w"> </span>search<span class="w"
 <h4 id="user-permissions">user permissions<a class="headerlink" href="#user-permissions" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Show user permissions.</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo.net<span class="w"> </span>user<span class="w"> </span>permissions<span class="w"> </span>--user<span class="w"> </span>naz-hage<span class="w">          </span><span class="c1"># Show permissions</span>
-sdo.net<span class="w"> </span>user<span class="w"> </span>permissions<span class="w"> </span>--user<span class="w"> </span>naz-hage<span class="w"> </span>--verbose<span class="w">  </span><span class="c1"># Show detailed</span>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>user<span class="w"> </span>permissions<span class="w"> </span>--user<span class="w"> </span>naz-hage<span class="w">          </span><span class="c1"># Show permissions</span>
+sdo<span class="w"> </span>user<span class="w"> </span>permissions<span class="w"> </span>--user<span class="w"> </span>naz-hage<span class="w"> </span>--verbose<span class="w">  </span><span class="c1"># Show detailed</span>
 </code></pre></div></p>
 <p><strong>Options:</strong>
 - <code>--user &lt;id&gt;</code> — User identifier (required)
@@ -3082,9 +3082,9 @@ git<span class="w"> </span>remote<span class="w"> </span>add<span class="w"> </s
 - Project has custom state configuration</p>
 <p><strong>Solution:</strong>
 <div class="highlight"><pre><span></span><code><span class="c1"># Use valid state with exact casing (or lowercase)</span>
-sdo.net<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">170</span><span class="w"> </span>--state<span class="w"> </span>Done<span class="w">          </span><span class="c1"># Correct</span>
-sdo.net<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">170</span><span class="w"> </span>--state<span class="w"> </span><span class="s2">&quot;In Progress&quot;</span><span class="w">  </span><span class="c1"># Correct</span>
-sdo.net<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">170</span><span class="w"> </span>--state<span class="w"> </span><span class="k">done</span><span class="w">           </span><span class="c1"># Also works (case-insensitive)</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">170</span><span class="w"> </span>--state<span class="w"> </span>Done<span class="w">          </span><span class="c1"># Correct</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">170</span><span class="w"> </span>--state<span class="w"> </span><span class="s2">&quot;In Progress&quot;</span><span class="w">  </span><span class="c1"># Correct</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">170</span><span class="w"> </span>--state<span class="w"> </span><span class="k">done</span><span class="w">           </span><span class="c1"># Also works (case-insensitive)</span>
 </code></pre></div></p>
 <p>Valid states:
 - Azure DevOps: <code>New</code>, <code>Approved</code>, <code>Committed</code>, <code>Done</code>, <code>To Do</code>, <code>In Progress</code>
@@ -3107,25 +3107,25 @@ sdo.net<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> 
 <h3 id="common-option-mistakes">Common Option Mistakes<a class="headerlink" href="#common-option-mistakes" title="Anchor link to this section for reference">&para;</a></h3>
 <p><strong>Using invalid option names:</strong>
 <div class="highlight"><pre><span></span><code><span class="c1"># ❌ Wrong</span>
-sdo.net<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--assigned-to-me-filter
+sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--assigned-to-me-filter
 
 <span class="c1"># ✓ Correct</span>
-sdo.net<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--assigned-to-me
+sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--assigned-to-me
 </code></pre></div></p>
 <p><strong>Forgetting required flags:</strong>
 <div class="highlight"><pre><span></span><code><span class="c1"># ❌ Missing --id for show</span>
-sdo.net<span class="w"> </span>wi<span class="w"> </span>show
+sdo<span class="w"> </span>wi<span class="w"> </span>show
 
 <span class="c1"># ✓ Correct</span>
-sdo.net<span class="w"> </span>wi<span class="w"> </span>show<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>show<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span>
 </code></pre></div></p>
 <p><strong>Mixing GitHub and Azure DevOps states:</strong>
 <div class="highlight"><pre><span></span><code><span class="c1"># ❌ GitHub state on Azure DevOps repo</span>
 git<span class="w"> </span>remote<span class="w"> </span>set-url<span class="w"> </span>origin<span class="w"> </span>https://dev.azure.com/org/project/_git/repo
-sdo.net<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--state<span class="w"> </span>closed<span class="w">  </span><span class="c1"># Won&#39;t work</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--state<span class="w"> </span>closed<span class="w">  </span><span class="c1"># Won&#39;t work</span>
 
 <span class="c1"># ✓ Correct</span>
-sdo.net<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--state<span class="w"> </span>Done
+sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--state<span class="w"> </span>Done
 </code></pre></div></p>
 
 

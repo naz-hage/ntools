@@ -27,7 +27,7 @@
     
     
       
-        <title>atools — Python helper tools - Ntools - Work in Progress</title>
+        <title>atools — Helper tools - Ntools - Work in Progress</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#atools-python-helper-tools-overview" class="md-skip">
+        <a href="#atools-helper-tools-overview" class="md-skip">
           Skip to content
         </a>
       
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              atools — Python helper tools
+              atools — Helper tools
             
           </span>
         </div>
@@ -1343,6 +1343,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -1359,6 +1377,36 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#note-sdo-simple-devops-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Note: SDO (Simple DevOps Operations)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -1825,14 +1873,21 @@
   
 
 
-<h1 id="atools-python-helper-tools-overview">atools — Python helper tools (overview)<a class="headerlink" href="#atools-python-helper-tools-overview" title="Anchor link to this section for reference">&para;</a></h1>
-<p>This section gives a short overview of the small Python helper tools in the <code>atools/</code> folder. Each tool has its own
-reference page linked below with detailed usage, prerequisites, and examples.</p>
+<h1 id="atools-helper-tools-overview">atools — Helper tools (overview)<a class="headerlink" href="#atools-helper-tools-overview" title="Anchor link to this section for reference">&para;</a></h1>
+<p>This section gives a short overview of the helper tools in the <code>atools/</code> folder.</p>
 <p>Tools</p>
 <ul>
-<li><a href="sdo/">sdo</a> — Simple DevOps Operations CLI tool for work item management (GitHub issues and Azure DevOps work items), repository operations, and pull request management across multiple platforms. Supports dry-run previews and automatic platform detection.</li>
-<li><a href="install-ntools/">install-ntools.py</a> — Cross-platform installer for NTools and SDO; downloads and extracts NTools release ZIPs, then installs SDO with version synchronization; supports <code>--dry-run</code> and includes comprehensive safety checks.</li>
+<li><a href="install-ntools/">install-ntools.py</a> — Cross-platform installer for NTools; downloads and extracts NTools release ZIPs and handles deployment; supports <code>--dry-run</code> and includes comprehensive safety checks.</li>
 </ul>
+<h2 id="note-sdo-simple-devops-operations">Note: SDO (Simple DevOps Operations)<a class="headerlink" href="#note-sdo-simple-devops-operations" title="Anchor link to this section for reference">&para;</a></h2>
+<p>The Python-based SDO tool has been deprecated in favor of the modern C# implementation. For DevOps operations across Azure DevOps and GitHub platforms, please use <strong>sdo</strong> (C# version), which provides:</p>
+<ul>
+<li>Full feature parity with the Python version</li>
+<li>2x+ performance improvement</li>
+<li>Better integration with .NET ecosystem</li>
+<li>No additional Python runtime dependency</li>
+</ul>
+<p>See the main <a href="../">ntools documentation</a> for sdo usage.</p>
 
 
 

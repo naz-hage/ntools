@@ -1592,10 +1592,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#2-sdo-simple-devops-operations-tool-python-based" class="md-nav__link">
+  <a href="#2-sdo-simple-devops-operations-tool-netc-based" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. SDO (Simple DevOps Operations Tool) (Python-based)
+        2. sdo (Simple DevOps Operations Tool) (.NET/C#-based)
       
     </span>
   </a>
@@ -1780,15 +1780,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#sdo-architecture" class="md-nav__link">
+  <a href="#sdo-c-architecture" class="md-nav__link">
     <span class="md-ellipsis">
       
-        SDO Architecture
+        sdo (C#) Architecture
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="SDO Architecture">
+    <nav class="md-nav" aria-label="sdo (C#) Architecture">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1864,63 +1864,13 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#system-architecture" class="md-nav__link">
+  <a href="#key-features" class="md-nav__link">
     <span class="md-ellipsis">
       
-        System Architecture
+        Key Features
       
     </span>
   </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#key-components" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Key Components
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Key Components">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#cli-layer-clipy" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        CLI Layer (cli.py)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#business-logic-layer" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Business Logic Layer
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#platform-layer-platforms" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Platform Layer (platforms/)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -1948,10 +1898,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#sdo-tool-python" class="md-nav__link">
+  <a href="#sdo-c-simple-devops-operations-tool" class="md-nav__link">
     <span class="md-ellipsis">
       
-        SDO Tool (Python)
+        sdo (C# Simple DevOps Operations Tool)
       
     </span>
   </a>
@@ -2302,13 +2252,13 @@
 
 
 <h1 id="devops-tools-suite-architecture">DevOps Tools Suite Architecture<a class="headerlink" href="#devops-tools-suite-architecture" title="Anchor link to this section for reference">&para;</a></h1>
-<p>This document provides a comprehensive overview of the DevOps Tools Suite architecture, encompassing both the .NET-based ntools suite and the Python-based SDO (Simple DevOps Operations Tool). Together, these tools provide a complete DevOps workflow from build automation to work item management across multiple platforms.</p>
+<p>This document provides a comprehensive overview of the DevOps Tools Suite architecture, encompassing the .NET-based ntools suite including sdo (C# implementation of Simple DevOps Operations Tool). These tools provide a complete DevOps workflow from build automation to work item management across multiple platforms.</p>
 <h2 id="suite-overview">Suite Overview<a class="headerlink" href="#suite-overview" title="Anchor link to this section for reference">&para;</a></h2>
 <p>The DevOps Tools Suite consists of two main components:</p>
 <h3 id="1-ntools-suite-net-based">1. ntools Suite (.NET-based)<a class="headerlink" href="#1-ntools-suite-net-based" title="Anchor link to this section for reference">&para;</a></h3>
-<p>A collection of build automation and utility tools written in .NET 9.0, providing core development and DevOps capabilities.</p>
-<h3 id="2-sdo-simple-devops-operations-tool-python-based">2. SDO (Simple DevOps Operations Tool) (Python-based)<a class="headerlink" href="#2-sdo-simple-devops-operations-tool-python-based" title="Anchor link to this section for reference">&para;</a></h3>
-<p>A comprehensive CLI tool for work item creation and repository management across Azure DevOps and GitHub platforms.</p>
+<p>A collection of build automation and utility tools written in .NET 10.0, providing core development and DevOps capabilities.</p>
+<h3 id="2-sdo-simple-devops-operations-tool-netc-based">2. sdo (Simple DevOps Operations Tool) (.NET/C#-based)<a class="headerlink" href="#2-sdo-simple-devops-operations-tool-netc-based" title="Anchor link to this section for reference">&para;</a></h3>
+<p>A comprehensive CLI tool for work item creation and repository management across Azure DevOps and GitHub platforms. This is the modern C# implementation with full feature parity and 2x+ performance improvement over the deprecated Python version.</p>
 <h2 id="ntools-suite-architecture">ntools Suite Architecture<a class="headerlink" href="#ntools-suite-architecture" title="Anchor link to this section for reference">&para;</a></h2>
 <h3 id="executables-overview">Executables Overview<a class="headerlink" href="#executables-overview" title="Anchor link to this section for reference">&para;</a></h3>
 <p>The ntools suite consists of multiple executables that provide various development and DevOps utilities:</p>
@@ -2493,65 +2443,35 @@
 - Shared build tasks (NbuildTasks)</p>
 <p>Go executables are built using the Go toolchain and custom build scripts.</p>
 <hr />
-<h2 id="sdo-architecture">SDO Architecture<a class="headerlink" href="#sdo-architecture" title="Anchor link to this section for reference">&para;</a></h2>
+<h2 id="sdo-c-architecture">sdo (C#) Architecture<a class="headerlink" href="#sdo-c-architecture" title="Anchor link to this section for reference">&para;</a></h2>
 <h3 id="overview">Overview<a class="headerlink" href="#overview" title="Anchor link to this section for reference">&para;</a></h3>
-<p>SDO (Simple DevOps Operations Tool) is a command-line interface tool for work item creation and repository management across Azure DevOps and GitHub platforms, following a modular, extensible architecture.</p>
+<p>sdo (Simple DevOps Operations Tool) is a modern .NET/C# command-line tool for work item creation and repository management across Azure DevOps and GitHub platforms. It provides full feature parity with the deprecated Python version while delivering 2x+ performance improvement.</p>
 <h3 id="file-structure_1">File Structure<a class="headerlink" href="#file-structure_1" title="Anchor link to this section for reference">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>atools/
-├── sdo.py                          # Main entry point and CLI framework
-├── sdo_package/                    # Main package directory
-│   ├── __init__.py                 # Package initialization
-│   ├── cli.py                      # CLI command implementations
-│   ├── client.py                   # Azure DevOps REST API client
-│   ├── exceptions.py               # Custom exception classes
-│   ├── pull_requests.py            # Pull request operations (multi-platform)
-│   ├── pipelines.py                # Pipeline operations (multi-platform)
-│   ├── repositories.py             # Repository operations (multi-platform)
-│   ├── version.py                  # Version information
-│   ├── work_items.py               # Work item orchestration logic
-│   ├── parsers/                    # Content parsing modules
-│   │   ├── __init__.py
-│   │   ├── markdown_parser.py      # Markdown file parsing
-│   │   └── metadata_parser.py      # Metadata extraction and platform detection
-│   └── platforms/                  # Platform-specific implementations
-│       ├── __init__.py
-│       ├── base.py                 # Abstract base classes for platforms
-│       ├── pr_base.py              # Abstract base class for PR platforms
-│       ├── azdo_platform.py        # Azure DevOps work item operations
-│       ├── azdo_pr_platform.py     # Azure DevOps pull request operations
-│       ├── azdo_pipeline_platform.py # Azure DevOps pipeline operations
-│       ├── github_platform.py      # GitHub work item operations
-│       └── github_pr_platform.py   # GitHub pull request operations
-├── tests/                          # Test suite
-│   ├── run_sdo_tests.py            # Test runner script
-│   ├── test_azdo_platform.py       # Azure DevOps platform tests
-│   ├── test_client.py              # Client module tests
-│   ├── test_cli_comprehensive.py   # Comprehensive CLI tests
-│   ├── test_github_platform.py     # GitHub platform tests
-│   ├── test_markdown_parser.py     # Markdown parser tests
-│   ├── test_pull_requests.py       # Pull request operations tests
-│   ├── test_pipelines.py           # Pipeline operations tests
-│   ├── test_repositories.py        # Repository operations tests
-│   ├── test_sdo.py                 # Main module tests
-│   ├── test_sdo_cli.py             # CLI integration tests
-│   ├── test_sdo_workitems.py       # Work item tests
-│   └── test_sdo_pipelines.py       # Pipeline tests
-├── pyproject.toml                  # Python project configuration
-├── requirements.txt                # Production dependencies
-├── requirements-dev.txt            # Development dependencies
-├── issue-azdo-example.md           # Azure DevOps issue template
-├── issue-gh-example.md             # GitHub issue template
-└── install-sdo.py                  # Installation script
+<div class="highlight"><pre><span></span><code>Sdo/
+├── Sdo.csproj                      # C# project file
+├── Program.cs                      # Main entry point
+├── Cli/                            # CLI command implementations
+├── Services/                       # Business logic services
+│   ├── WorkItemService.cs
+│   ├── RepositoryService.cs
+│   ├── PullRequestService.cs
+│   └── PipelineService.cs
+├── Platforms/                      # Platform-specific implementations
+│   ├── IPlatform.cs               # Platform interface
+│   ├── AzureDevOpsPlatform.cs     # Azure DevOps operations
+│   └── GitHubPlatform.cs          # GitHub operations
+├── Models/                         # Data models
+├── Tests/                          # Unit and integration tests
+└── mapping.md                      # Command mappings reference
 </code></pre></div>
 <h3 id="architecture-principles">Architecture Principles<a class="headerlink" href="#architecture-principles" title="Anchor link to this section for reference">&para;</a></h3>
-<p>Both tool suites follow consistent design principles:</p>
+<p>Both sdo and ntools Suite follow consistent design principles:</p>
 <h4 id="1-separation-of-concerns">1. <strong>Separation of Concerns</strong><a class="headerlink" href="#1-separation-of-concerns" title="Anchor link to this section for reference">&para;</a></h4>
 <ul>
 <li><strong>CLI Layer</strong>: User interaction and command handling</li>
 <li><strong>Business Logic</strong>: Domain-specific orchestration and validation</li>
 <li><strong>Platform Layer</strong>: Platform-specific implementations with abstract interfaces</li>
-<li><strong>Parser Layer</strong>: Content extraction and metadata processing</li>
-<li><strong>Client Layer</strong>: API communication and authentication</li>
+<li><strong>Service Layer</strong>: High-level business operations</li>
 </ul>
 <h4 id="2-strategy-pattern">2. <strong>Strategy Pattern</strong><a class="headerlink" href="#2-strategy-pattern" title="Anchor link to this section for reference">&para;</a></h4>
 <ul>
@@ -2562,68 +2482,34 @@
 <h4 id="3-extensibility">3. <strong>Extensibility</strong><a class="headerlink" href="#3-extensibility" title="Anchor link to this section for reference">&para;</a></h4>
 <ul>
 <li>Plugin-style architecture for adding new platforms</li>
-<li>Modular parser systems for different content formats</li>
-<li>Configurable metadata extraction and processing</li>
+<li>Modular service systems for different business domains</li>
+<li>Configurable authentication and API integration</li>
 </ul>
-<h3 id="system-architecture">System Architecture<a class="headerlink" href="#system-architecture" title="Anchor link to this section for reference">&para;</a></h3>
-<p>SDO uses a domain-driven architecture with separate platform abstractions for each business domain (work items, repositories, pipelines, pull requests), where each domain has its own business logic module and platform interface.</p>
-<pre class="mermaid"><code>graph TB
-    subgraph "SDO CLI Tool"
-        SDO[SDO CLI Tool&lt;br/&gt;sdo.py Main Entry Point&lt;br/&gt;Click CLI Framework&lt;br/&gt;Command Registration&lt;br/&gt;Global Configuration]
-    end
-
-    subgraph "CLI Layer"
-        CLI[CLI Layer&lt;br/&gt;cli.py&lt;br/&gt;workitem • repo • pr • pipeline groups&lt;br/&gt;Command parsing • validation&lt;br/&gt;Verbose output • Error handling]
-    end
-
-    subgraph "Business Logic Layer"
-        BIZ[Business Logic Layer&lt;br/&gt;work_items.py • repositories.py&lt;br/&gt;pull_requests.py • pipelines.py&lt;br/&gt;Platform detection • Content processing&lt;br/&gt;Result validation • Error handling]
-    end
-
-    subgraph "Supporting Layers"
-        subgraph "Parser Layer"
-            PARSER[Parser Layer&lt;br/&gt;parsers/&lt;br/&gt;markdown_parser.py&lt;br/&gt;metadata_parser.py&lt;br/&gt;Content parsing • Metadata extraction&lt;br/&gt;Validation]
-        end
-
-        subgraph "Platform Layer"
-            PLATFORM[Platform Layer&lt;br/&gt;platforms/&lt;br/&gt;Abstract base classes&lt;br/&gt;Azure DevOps • GitHub implementations&lt;br/&gt;Work items • Repos • PRs • Pipelines]
-        end
-
-        subgraph "Client Layer"
-            CLIENT[Client Layer&lt;br/&gt;client.py&lt;br/&gt;HTTP client • Authentication&lt;br/&gt;Platform detection • Logging&lt;br/&gt;Low-level API communication]
-        end
-    end
-
-    SDO --&gt; CLI
-    CLI --&gt; BIZ
-    BIZ --&gt; PARSER
-    BIZ --&gt; PLATFORM
-    BIZ --&gt; CLIENT
-
-    style SDO fill:#e1f5fe
-    style CLI fill:#f3e5f5
-    style BIZ fill:#fff3e0
-    style PARSER fill:#e8f5e8
-    style PLATFORM fill:#fce4ec
-    style CLIENT fill:#f1f8e9</code></pre>
-<h3 id="key-components">Key Components<a class="headerlink" href="#key-components" title="Anchor link to this section for reference">&para;</a></h3>
-<h4 id="cli-layer-clipy">CLI Layer (cli.py)<a class="headerlink" href="#cli-layer-clipy" title="Anchor link to this section for reference">&para;</a></h4>
-<p>Provides hierarchical command structure for workitem, repo, pr, and pipeline operations with command parsing, validation, and error handling.</p>
-<h4 id="business-logic-layer">Business Logic Layer<a class="headerlink" href="#business-logic-layer" title="Anchor link to this section for reference">&para;</a></h4>
-<p>Core orchestration modules: work_items.py, repositories.py, pull_requests.py, and pipelines.py for domain-specific operations.</p>
-<h4 id="platform-layer-platforms">Platform Layer (platforms/)<a class="headerlink" href="#platform-layer-platforms" title="Anchor link to this section for reference">&para;</a></h4>
-<p>Abstract interfaces with platform-specific implementations for Azure DevOps (REST API) and GitHub (CLI-based) across work items, repos, PRs, and pipelines.</p>
+<h3 id="key-features">Key Features<a class="headerlink" href="#key-features" title="Anchor link to this section for reference">&para;</a></h3>
+<ul>
+<li><strong>Multi-Platform Support</strong>: Works seamlessly with Azure DevOps and GitHub</li>
+<li><strong>Work Item Management</strong>: Create, list, show, update, and comment on work items</li>
+<li><strong>Repository Operations</strong>: Create, list, delete, and manage repositories</li>
+<li><strong>Pull Request Management</strong>: Create, list, show, and update pull requests</li>
+<li><strong>Pipeline Management</strong>: Create, run, monitor, and manage CI/CD pipelines</li>
+<li><strong>Dry-Run Mode</strong>: Preview operations before execution</li>
+<li><strong>Automatic Platform Detection</strong>: Detects platform from Git remote configuration</li>
+</ul>
 <h3 id="dependencies">Dependencies<a class="headerlink" href="#dependencies" title="Anchor link to this section for reference">&para;</a></h3>
 <h4 id="ntools-suite-net">ntools Suite (.NET)<a class="headerlink" href="#ntools-suite-net" title="Anchor link to this section for reference">&para;</a></h4>
 <ul>
-<li><strong>Runtime</strong>: .NET 9.0 SDK, Go runtime</li>
-<li><strong>CLI Framework</strong>: System.CommandLine</li>
+<li><strong>Runtime</strong>: .NET 10.0 SDK</li>
+<li><strong>CLI Framework</strong>: System.CommandLine 2.0.1</li>
 <li><strong>Build System</strong>: MSBuild with custom targets</li>
 </ul>
-<h4 id="sdo-tool-python">SDO Tool (Python)<a class="headerlink" href="#sdo-tool-python" title="Anchor link to this section for reference">&para;</a></h4>
+<h4 id="sdo-c-simple-devops-operations-tool">sdo (C# Simple DevOps Operations Tool)<a class="headerlink" href="#sdo-c-simple-devops-operations-tool" title="Anchor link to this section for reference">&para;</a></h4>
 <ul>
-<li><strong>Core</strong>: <code>click&gt;=8.0.0</code> (CLI framework), <code>requests&gt;=2.25.0</code> (HTTP client), <code>pyyaml&gt;=6.0.0</code> (YAML parsing)</li>
-<li><strong>Development</strong>: <code>pytest</code>, <code>black</code>, <code>mypy</code>, <code>coverage</code></li>
+<li><strong>Runtime</strong>: .NET 10.0</li>
+<li><strong>CLI Framework</strong>: System.CommandLine</li>
+<li><strong>API Clients</strong>: Octokit.NET (GitHub API), Microsoft.TeamFoundationServer.Client (Azure DevOps API)</li>
+<li><strong>HTTP</strong>: System.Net.Http for REST calls</li>
+<li><strong>JSON</strong>: System.Text.Json for JSON processing</li>
+<li><strong>Development</strong>: xunit, Moq, Microsoft.NET.Test.Sdk</li>
 </ul>
 <h2 id="integration-points">Integration Points<a class="headerlink" href="#integration-points" title="Anchor link to this section for reference">&para;</a></h2>
 <h3 id="cross-tool-workflows">Cross-Tool Workflows<a class="headerlink" href="#cross-tool-workflows" title="Anchor link to this section for reference">&para;</a></h3>

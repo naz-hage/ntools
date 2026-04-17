@@ -1608,21 +1608,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#phase-1-ntools-installation" class="md-nav__link">
+  <a href="#installation-phase" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Phase 1: NTools Installation
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#phase-2-sdo-installation-skipped-in-dry-run" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Phase 2: SDO Installation (Skipped in Dry Run)
+        Installation Phase
       
     </span>
   </a>
@@ -2109,16 +2098,16 @@
 
 
 <h1 id="install-ntoolspy">install-ntools.py<a class="headerlink" href="#install-ntoolspy" title="Anchor link to this section for reference">&para;</a></h1>
-<p>A cross-platform Python installer that downloads, extracts, and installs NTools release ZIPs along with the SDO (Simple DevOps) tool.</p>
+<p>A cross-platform Python installer that downloads, extracts, and installs NTools release ZIPs.</p>
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Anchor link to this section for reference">&para;</a></h2>
-<p>This script performs a complete installation of both NTools and SDO:</p>
+<p>This script performs a complete installation of NTools:</p>
 <ol>
 <li><strong>Downloads</strong> the specified NTools release from GitHub</li>
 <li><strong>Extracts</strong> NTools to the deployment directory</li>
 <li><strong>Updates</strong> system PATH (on Windows)</li>
-<li><strong>Installs</strong> SDO with the same version number</li>
-<li><strong>Configures</strong> SDO for immediate use</li>
+<li><strong>Verifies</strong> the installation</li>
 </ol>
+<p><strong>Note</strong>: For DevOps operations, use sdo (C# version) which is included with ntools</p>
 <h2 id="quick-usage">Quick Usage<a class="headerlink" href="#quick-usage" title="Anchor link to this section for reference">&para;</a></h2>
 <h3 id="dry-run-recommended-first">Dry Run (Recommended First)<a class="headerlink" href="#dry-run-recommended-first" title="Anchor link to this section for reference">&para;</a></h3>
 <div class="highlight"><pre><span></span><code>python<span class="w"> </span>atools/install-ntools.py<span class="w"> </span>--version<span class="w"> </span><span class="m">1</span>.60.0<span class="w"> </span>--dry-run
@@ -2130,8 +2119,8 @@
 <div class="highlight"><pre><span></span><code>python<span class="w"> </span>atools/install-ntools.py<span class="w"> </span>--version<span class="w"> </span><span class="m">1</span>.60.0<span class="w"> </span>--deploy-path<span class="w"> </span><span class="s2">&quot;/custom/path&quot;</span>
 </code></pre></div>
 <h2 id="installation-process">Installation Process<a class="headerlink" href="#installation-process" title="Anchor link to this section for reference">&para;</a></h2>
-<p>The installer provides clear visual feedback with banners for each phase:</p>
-<h3 id="phase-1-ntools-installation">Phase 1: NTools Installation<a class="headerlink" href="#phase-1-ntools-installation" title="Anchor link to this section for reference">&para;</a></h3>
+<p>The installer provides clear visual feedback during the installation process:</p>
+<h3 id="installation-phase">Installation Phase<a class="headerlink" href="#installation-phase" title="Anchor link to this section for reference">&para;</a></h3>
 <div class="highlight"><pre><span></span><code>==================================================
 Installing NTools (Build Tools)...
 ==================================================
@@ -2142,66 +2131,21 @@ Installing NTools (Build Tools)...
 <li>Updates system PATH</li>
 <li>Verifies installation</li>
 </ul>
-<h3 id="phase-2-sdo-installation-skipped-in-dry-run">Phase 2: SDO Installation (Skipped in Dry Run)<a class="headerlink" href="#phase-2-sdo-installation-skipped-in-dry-run" title="Anchor link to this section for reference">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>==================================================
-Installing SDO (Simple DevOps) tool...
-==================================================
-</code></pre></div>
-<ul>
-<li><strong>Note</strong>: This phase is skipped in <code>--dry-run</code> mode</li>
-<li>Uninstalls any existing SDO installation</li>
-<li>Installs SDO with matching version</li>
-<li>Updates pyproject.toml version</li>
-<li>Creates launcher scripts</li>
-<li>Tests the installation</li>
-</ul>
 <h3 id="final-result">Final Result<a class="headerlink" href="#final-result" title="Anchor link to this section for reference">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>[SUCCESS] NTools and SDO installation completed successfully!
-Both tools are installed in: C:\Program Files\Nbuild
-You can now use &#39;ntools&#39; and &#39;sdo&#39; commands from any location.
+<div class="highlight"><pre><span></span><code>[SUCCESS] NTools installation completed successfully!
+NTools is installed in: C:\Program Files\Nbuild
+You can now use &#39;ntools&#39; commands from any location.
+
+Note: For DevOps operations, please use the C# version &#39;sdo&#39; instead of the deprecated Python SDO.
 </code></pre></div>
 <h2 id="command-line-options">Command Line Options<a class="headerlink" href="#command-line-options" title="Anchor link to this section for reference">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Option</th>
-<th>Description</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>--version</code></td>
-<td><strong>Required.</strong> Release version to install (e.g., <code>1.60.0</code>)</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>--dry-run</code></td>
-<td>Show what would be done without making changes</td>
-<td><code>false</code></td>
-</tr>
-<tr>
-<td><code>--deploy-path</code></td>
-<td>Custom installation directory</td>
-<td>Platform-specific default</td>
-</tr>
-<tr>
-<td><code>--downloads-dir</code></td>
-<td>Directory for ZIP downloads</td>
-<td>Platform-specific temp directory</td>
-</tr>
-<tr>
-<td><code>--json</code></td>
-<td>Path to ntools.json config file</td>
-<td><code>./dev-setup/ntools.json</code></td>
-</tr>
-<tr>
-<td><code>--no-path-update</code></td>
-<td>Skip PATH environment variable updates</td>
-<td><code>false</code></td>
-</tr>
-</tbody>
-</table>
+<p>| Option | Description | Default |
+| <code>--version</code> | <strong>Required.</strong> Release version to install (e.g., <code>1.60.0</code>) | - |
+| <code>--dry-run</code> | Show what would be done without making changes | <code>false</code> |
+| <code>--deploy-path</code> | Custom installation directory | Platform-specific default |
+| <code>--downloads-dir</code> | Directory for ZIP downloads | Platform-specific temp directory |
+| <code>--json</code> | Path to ntools.json config file | <code>./dev-setup/ntools.json</code> |
+| <code>--no-path-update</code> | Skip PATH environment variable updates | <code>false</code> |</p>
 <h2 id="safety-features">Safety Features<a class="headerlink" href="#safety-features" title="Anchor link to this section for reference">&para;</a></h2>
 <ul>
 <li><strong>Version validation</strong>: Ensures release exists before downloading</li>
