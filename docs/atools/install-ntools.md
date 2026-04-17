@@ -1,16 +1,17 @@
 # install-ntools.py
 
-A cross-platform Python installer that downloads, extracts, and installs NTools release ZIPs along with the SDO (Simple DevOps) tool.
+A cross-platform Python installer that downloads, extracts, and installs NTools release ZIPs.
 
 ## Overview
 
-This script performs a complete installation of both NTools and SDO:
+This script performs a complete installation of NTools:
 
 1. **Downloads** the specified NTools release from GitHub
 2. **Extracts** NTools to the deployment directory
 3. **Updates** system PATH (on Windows)
-4. **Installs** SDO with the same version number
-5. **Configures** SDO for immediate use
+4. **Verifies** the installation
+
+**Note**: For DevOps operations, use sdo.net (C# version) which is included with ntools
 
 ## Quick Usage
 
@@ -31,9 +32,9 @@ python atools/install-ntools.py --version 1.60.0 --deploy-path "/custom/path"
 
 ## Installation Process
 
-The installer provides clear visual feedback with banners for each phase:
+The installer provides clear visual feedback during the installation process:
 
-### Phase 1: NTools Installation
+### Installation Phase
 ```
 ==================================================
 Installing NTools (Build Tools)...
@@ -45,31 +46,18 @@ Installing NTools (Build Tools)...
 - Updates system PATH
 - Verifies installation
 
-### Phase 2: SDO Installation (Skipped in Dry Run)
-```
-==================================================
-Installing SDO (Simple DevOps) tool...
-==================================================
-```
-
-- **Note**: This phase is skipped in `--dry-run` mode
-- Uninstalls any existing SDO installation
-- Installs SDO with matching version
-- Updates pyproject.toml version
-- Creates launcher scripts
-- Tests the installation
-
 ### Final Result
 ```
-[SUCCESS] NTools and SDO installation completed successfully!
-Both tools are installed in: C:\Program Files\Nbuild
-You can now use 'ntools' and 'sdo' commands from any location.
+[SUCCESS] NTools installation completed successfully!
+NTools is installed in: C:\Program Files\Nbuild
+You can now use 'ntools' commands from any location.
+
+Note: For DevOps operations, please use the C# version 'sdo.net' instead of the deprecated Python SDO.
 ```
 
 ## Command Line Options
 
 | Option | Description | Default |
-|--------|-------------|---------|
 | `--version` | **Required.** Release version to install (e.g., `1.60.0`) | - |
 | `--dry-run` | Show what would be done without making changes | `false` |
 | `--deploy-path` | Custom installation directory | Platform-specific default |
