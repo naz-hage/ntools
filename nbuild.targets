@@ -138,9 +138,12 @@
 	<Message Text="==> DONE" />
   </Target>
 
-	<!-- mkdocs deploy locally -->
+	<!-- mkdocs deploy locally with live reload fixes -->
 	<Target Name="MKDOCS_DEPLOY" AfterTargets="MKDOCS">
-		<Exec Command='"$(MkDocsExe)" serve' WorkingDirectory="$(SolutionDir)"/>
+		<!-- Downgrade click 8.3.x which breaks live reload in MkDocs -->
+		<Exec Command='&quot;$(PythonExe)&quot; -m pip install &quot;click&lt;8.3&quot; -q' WorkingDirectory="$(SolutionDir)" ContinueOnError="true"/>
+		<!-- Start mkdocs serve with polling and explicit livereload -->
+		<Exec Command='&quot;$(PythonExe)&quot; -m mkdocs serve --livereload' WorkingDirectory="$(SolutionDir)" EnvironmentVariables="WATCHDOG_FORCE_POLLING=true"/>
 		<Message Text="==> DONE" />
 	</Target>
 
