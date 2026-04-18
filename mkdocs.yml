@@ -41,7 +41,6 @@ nav:
     - Overview: index.md
     - Architecture: devops-tools-suite-architecture.md
     - Installation: installation.md
-      - Install NTools: atools/install-ntools.md
     - Practice: usage.md
     - Setup your project: setup.md
     - Build Types: buildtypes.md
@@ -51,7 +50,8 @@ nav:
       - lf (lf.exe): ntools/lf.md
       - Nbackup (nbackup.exe): ntools/nbackup.md
       - Github Release : ntools/github-release.md
-      - Sdo (sdo.exe): atools/sdo-net.md
+      - Sdo (sdo.exe):
+        - Documentation: atools/sdo-net.md
         - Usage Examples:
           - AzDO Bug Example: atools/issue-azdo-bug-example.md
           - AzDO Epic Example: atools/issue-azdo-epic-example.md

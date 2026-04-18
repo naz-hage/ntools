@@ -32,48 +32,96 @@ Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
 Install-DevelopmentApps -JsonPath "./dev-setup/apps.json"
 ```
 
-### Option 2: NTools + SDO Installation (Cross-Platform)
+### Option 2: Cross-Platform Installation with install-ntools.py
 
-For users who want to install both NTools and SDO with automatic version synchronization:
+For a minimal, cross-platform setup, use the install-ntools.py script:
 
-```powershell
-cd ./ntools
-python atools/install-ntools.py --version 1.32.0
+```bash
+# Dry run (recommended first)
+python atools/install-ntools.py --version 1.74.0 --dry-run
+
+# Full installation
+python atools/install-ntools.py --version 1.74.0
 ```
 
-**Custom installation path:**
+#### What install-ntools.py Does
 
-```powershell
-python atools/install-ntools.py --version 1.32.0 --deploy-path "C:\MyTools\Nbuild"
+This Python script performs a complete NTools installation:
+
+1. **Downloads** the specified NTools release from GitHub
+2. **Extracts** NTools to the deployment directory
+3. **Updates** system PATH (on Windows)
+4. **Verifies** the installation
+
+#### Command Line Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--version` | **Required.** Release version to install (e.g., `1.74.0`) | - |
+| `--dry-run` | Show what would be done without making changes | `false` |
+| `--deploy-path` | Custom installation directory | Platform-specific default |
+| `--downloads-dir` | Directory for ZIP downloads | Platform-specific temp directory |
+| `--json` | Path to ntools.json config file | `./dev-setup/ntools.json` |
+| `--no-path-update` | Skip PATH environment variable updates | `false` |
+
+#### Installation Examples
+
+**Basic Installation:**
+```bash
+python atools/install-ntools.py --version 1.74.0
 ```
 
-This will install both NTools and SDO in a single command, with SDO installed in an isolated virtual environment to prevent dependency conflicts.
-
-## SDO Installation
-
-SDO is now automatically installed alongside NTools when using Option 2 above. The installer creates an isolated virtual environment for SDO to prevent dependency conflicts.
-
-**Verify installation:**
-```cmd
-sdo --version
-sdo --help
+**Development Installation with Custom Path:**
+```bash
+python atools/install-ntools.py --version 1.74.0 --deploy-path ./local-tools
 ```
 
-## What Each Option Installs
+**Offline Verification:**
+```bash
+python atools/install-ntools.py --version 1.74.0 --dry-run
+```
 
-| Component | Development Setup | NTools + SDO |
-|-----------|------------------|--------------|
-| .NET SDK | ✅ | ❌ |
-| NTools Core | ✅ | ✅ |
-| SDO Tool | ❌ | ✅ |
-| Development Apps | ✅ | ❌ |
-| Cross-Platform | ⚠️ (Windows only) | ✅ |
-| Admin Required | ✅ | ❌ (unless system paths) |
+#### Installation Process Output
+
+The installer provides clear visual feedback:
+
+```
+==================================================
+Installing NTools (Build Tools)...
+==================================================
+
+[SUCCESS] NTools installation completed successfully!
+NTools is installed in: C:\Program Files\Nbuild
+You can now use 'ntools' commands from any location.
+```
+
+#### Safety Features
+
+- **Version validation**: Ensures release exists before downloading
+- **Path safety**: Refuses to overwrite critical system directories
+- **Backup protection**: Safe removal of existing installations
+- **Network verification**: HEAD requests to verify download URLs
+- **Cross-platform**: Works on Windows, macOS, and Linux
+
+#### Troubleshooting
+
+**PATH Not Updated**
+- **Windows**: Sign out and sign back in, or restart your command prompt
+- **Unix**: Run `source ~/.bashrc` or restart your terminal
+
+**Permission Errors**
+- **Windows**: Run as Administrator
+- **Unix**: Use `sudo` or install to user directory with `--deploy-path`
+
+**Network Issues**
+- Verify internet connection
+- Check if the version exists on GitHub releases
+- Use `--dry-run` to verify URLs without downloading
 
 ## Post-Installation
 
-After the installation is complete, check out the [nbuild.targets](./ntools/nbuild-targets.md) for more all the available targets, and navigate to [Usage](usage.md) to learn how to execute a build target.
+After the installation is complete, check out the [nbuild.targets](./ntools/nbuild-targets.md) for all available targets, and navigate to [Usage](usage.md) to learn how to execute a build target.
 
-ntools is now installed on your machine, and you can start using it to learn how to build and run [additional targets](usage.md). If you have any questions or encounter any issues during the installation process, please don't hesitate to write an an [issue](https://github.com/naz-hage/NTools/issues). We're here to help!
+**Note:** For DevOps operations across Azure DevOps and GitHub, use the sdo (sdo.exe) tool which is included with ntools. See the [List of Tools](index.md) documentation for sdo usage and examples.
 
-ntools is now installed on your machine, and you can start using it to learn how to build and run [additional targets](usage.md). If you have any questions or encounter any issues during the installation process, please don't hesitate to write an an [issue](https://github.com/naz-hage/NTools/issues). We're here to help!
+ntools is now installed on your machine, and you can start using it to learn how to build and run [additional targets](usage.md). If you have any questions or encounter any issues during the installation process, please don't hesitate to create an [issue](https://github.com/naz-hage/NTools/issues). We're here to help!
