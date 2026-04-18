@@ -39,7 +39,9 @@ markdown_extensions:
 nav:
   - Getting Started: 
     - Overview: index.md
+    - Architecture: devops-tools-suite-architecture.md
     - Installation: installation.md
+      - Install NTools: atools/install-ntools.md
     - Practice: usage.md
     - Setup your project: setup.md
     - Build Types: buildtypes.md
@@ -49,6 +51,13 @@ nav:
       - lf (lf.exe): ntools/lf.md
       - Nbackup (nbackup.exe): ntools/nbackup.md
       - Github Release : ntools/github-release.md
+      - Sdo (sdo.exe): atools/sdo-net.md
+        - Usage Examples:
+          - AzDO Bug Example: atools/issue-azdo-bug-example.md
+          - AzDO Epic Example: atools/issue-azdo-epic-example.md
+          - AzDO PBI Example: atools/issue-azdo-pbi-example.md
+          - AzDO Task Example: atools/issue-azdo-task-example.md
+          - GitHub Issue Example: atools/issue-gh-example.md
   - Custom Build Tasks:
       - Nbuild Tasks: ntools/nbuildtasks.md
   - Developer setup:
@@ -60,19 +69,6 @@ nav:
   - Build System Features:
     - Code Coverage: ntools/code-coverage.md
     - MSBuild Targets: ntools/nbuild-targets.md
+  - Reference:
+    - AzDO Payloads: atools/azdo_payloads.md
   - TODO: todo.md
-  - atools:
-    - Overview: atools/index.md
-    - List of tools:
-      - SDO (Simple DevOps Operations): atools/sdo.md
-      - SDO Installation: atools/sdo-installation.md
-      - Install NTools: atools/install-ntools.md
-    - DevOps Tools Suite Architecture: devops-tools-suite-architecture.md
-    - AzDO payloads: atools/azdo_payloads.md
-    - Examples:
-      - AzDO Bug Example: atools/issue-azdo-bug-example.md
-      - AzDO Epic Example: atools/issue-azdo-epic-example.md
-      - AzDO PBI Example: atools/issue-azdo-pbi-example.md
-      - AzDO Task Example: atools/issue-azdo-task-example.md
-      - GitHub Issue Example: atools/issue-gh-example.md
-  - SDO.NET: atools/sdo-net.md
