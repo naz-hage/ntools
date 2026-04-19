@@ -568,10 +568,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#2-sdo-simple-devops-operations-tool-netc-based" class="md-nav__link">
+  <a href="#2-sdo-simple-devops-operations-tool-netc" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. sdo (Simple DevOps Operations Tool) (.NET/C#-based)
+        2. sdo (Simple DevOps Operations Tool) - .NET/C
       
     </span>
   </a>
@@ -756,15 +756,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#sdo-c-architecture" class="md-nav__link">
+  <a href="#sdo-simple-devops-operations-tool-architecture-design" class="md-nav__link">
     <span class="md-ellipsis">
       
-        sdo (C#) Architecture
+        sdo (Simple DevOps Operations Tool) - Architecture &amp; Design
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="sdo (C#) Architecture">
+    <nav class="md-nav" aria-label="sdo (Simple DevOps Operations Tool) - Architecture &amp; Design">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -772,17 +772,6 @@
     <span class="md-ellipsis">
       
         Overview
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#file-structure_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        File Structure
       
     </span>
   </a>
@@ -922,6 +911,45 @@
     <span class="md-ellipsis">
       
         Shared Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation Notes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Implementation Notes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#removal-of-python-sdo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Removal of Python SDO
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#command-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Command Mapping
       
     </span>
   </a>
@@ -2121,8 +2149,8 @@
 <p>The DevOps Tools Suite consists of two main components:</p>
 <h3 id="1-ntools-suite-net-based">1. ntools Suite (.NET-based)<a class="headerlink" href="#1-ntools-suite-net-based" title="Anchor link to this section for reference">&para;</a></h3>
 <p>A collection of build automation and utility tools written in .NET 10.0, providing core development and DevOps capabilities.</p>
-<h3 id="2-sdo-simple-devops-operations-tool-netc-based">2. sdo (Simple DevOps Operations Tool) (.NET/C#-based)<a class="headerlink" href="#2-sdo-simple-devops-operations-tool-netc-based" title="Anchor link to this section for reference">&para;</a></h3>
-<p>A comprehensive CLI tool for work item creation and repository management across Azure DevOps and GitHub platforms. This is the modern C# implementation with full feature parity and 2x+ performance improvement over the deprecated Python version.</p>
+<h3 id="2-sdo-simple-devops-operations-tool-netc">2. sdo (Simple DevOps Operations Tool) - .NET/C<a class="headerlink" href="#2-sdo-simple-devops-operations-tool-netc" title="Anchor link to this section for reference">&para;</a></h3>
+<p>A comprehensive CLI tool for work item creation and repository management across Azure DevOps and GitHub platforms, written entirely in C# for maximum performance and .NET ecosystem integration.</p>
 <h2 id="ntools-suite-architecture">ntools Suite Architecture<a class="headerlink" href="#ntools-suite-architecture" title="Anchor link to this section for reference">&para;</a></h2>
 <h3 id="executables-overview">Executables Overview<a class="headerlink" href="#executables-overview" title="Anchor link to this section for reference">&para;</a></h3>
 <p>The ntools suite consists of multiple executables that provide various development and DevOps utilities:</p>
@@ -2228,8 +2256,7 @@
 ├── ntools.sln                    # Main solution file
 ├── prebuild.bat                  # Pre-build setup script
 ├── mkdocs.yml                    # Documentation configuration
-├── pyproject.toml                # Python project configuration (for docs)
-├── docs-requirements.txt         # Documentation dependencies
+
 ├── CHANGELOG.md                  # Change log
 ├── README.md                     # Project documentation
 ├── targets.md                    # Build targets documentation
@@ -2297,7 +2324,34 @@
 ├── Debug/                        # Debug build outputs
 ├── ArtifactsFolder/              # Build artifacts
 ├── logs/                         # Build and test logs
-└── atools/                       # Additional tools
+├── atools/                       # Automated tools and installers
+│   ├── install-ntools.py         # NTools installation script
+│   ├── install-sdo.py            # SDO installation script
+│   ├── requirements.txt           # Python dependencies for installers
+│   ├── requirements-dev.txt       # Development dependencies
+│   └── sdo.cmd                   # SDO command wrapper
+│
+└── Sdo/                          # sdo (C# executable)
+    ├── Sdo.csproj                # C# project file
+    ├── Program.cs                # Main entry point and CLI setup
+    ├── Commands/                 # Command implementations
+    │   ├── WorkItemCommand.cs
+    │   ├── RepositoryCommand.cs
+    │   ├── PullRequestCommand.cs
+    │   └── PipelineCommand.cs
+    ├── Services/                 # Business logic
+    │   ├── WorkItemService.cs
+    │   ├── RepositoryService.cs
+    │   ├── PullRequestService.cs
+    │   └── PipelineService.cs
+    ├── Platforms/                # Platform implementations
+    │   ├── IPlatform.cs
+    │   ├── AzureDevOpsPlatform.cs
+    │   └── GitHubPlatform.cs
+    ├── Models/                   # Data models
+    ├── Credentials/              # Authentication handling
+    ├── Helpers/                  # Utility helpers
+    └── bin/Debug/sdo.exe         # Compiled executable
 </code></pre></div>
 <h3 id="build-system">Build System<a class="headerlink" href="#build-system" title="Anchor link to this section for reference">&para;</a></h3>
 <p>All .NET executables are built using:
@@ -2307,27 +2361,9 @@
 - Shared build tasks (NbuildTasks)</p>
 <p>Go executables are built using the Go toolchain and custom build scripts.</p>
 <hr />
-<h2 id="sdo-c-architecture">sdo (C#) Architecture<a class="headerlink" href="#sdo-c-architecture" title="Anchor link to this section for reference">&para;</a></h2>
+<h2 id="sdo-simple-devops-operations-tool-architecture-design">sdo (Simple DevOps Operations Tool) - Architecture &amp; Design<a class="headerlink" href="#sdo-simple-devops-operations-tool-architecture-design" title="Anchor link to this section for reference">&para;</a></h2>
 <h3 id="overview">Overview<a class="headerlink" href="#overview" title="Anchor link to this section for reference">&para;</a></h3>
-<p>sdo (Simple DevOps Operations Tool) is a modern .NET/C# command-line tool for work item creation and repository management across Azure DevOps and GitHub platforms. It provides full feature parity with the deprecated Python version while delivering 2x+ performance improvement.</p>
-<h3 id="file-structure_1">File Structure<a class="headerlink" href="#file-structure_1" title="Anchor link to this section for reference">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>Sdo/
-├── Sdo.csproj                      # C# project file
-├── Program.cs                      # Main entry point
-├── Cli/                            # CLI command implementations
-├── Services/                       # Business logic services
-│   ├── WorkItemService.cs
-│   ├── RepositoryService.cs
-│   ├── PullRequestService.cs
-│   └── PipelineService.cs
-├── Platforms/                      # Platform-specific implementations
-│   ├── IPlatform.cs               # Platform interface
-│   ├── AzureDevOpsPlatform.cs     # Azure DevOps operations
-│   └── GitHubPlatform.cs          # GitHub operations
-├── Models/                         # Data models
-├── Tests/                          # Unit and integration tests
-└── mapping.md                      # Command mappings reference
-</code></pre></div>
+<p>sdo is a .NET/C# command-line tool for work item creation and repository management across Azure DevOps and GitHub platforms. It provides comprehensive DevOps capabilities with high performance and native .NET ecosystem integration.</p>
 <h3 id="architecture-principles">Architecture Principles<a class="headerlink" href="#architecture-principles" title="Anchor link to this section for reference">&para;</a></h3>
 <p>Both sdo and ntools Suite follow consistent design principles:</p>
 <h4 id="1-separation-of-concerns">1. <strong>Separation of Concerns</strong><a class="headerlink" href="#1-separation-of-concerns" title="Anchor link to this section for reference">&para;</a></h4>
@@ -2368,28 +2404,38 @@
 </ul>
 <h4 id="sdo-c-simple-devops-operations-tool">sdo (C# Simple DevOps Operations Tool)<a class="headerlink" href="#sdo-c-simple-devops-operations-tool" title="Anchor link to this section for reference">&para;</a></h4>
 <ul>
-<li><strong>Runtime</strong>: .NET 10.0</li>
-<li><strong>CLI Framework</strong>: System.CommandLine</li>
+<li><strong>Runtime</strong>: .NET 10.0 (only supported implementation)</li>
+<li><strong>CLI Framework</strong>: System.CommandLine 2.0.1</li>
 <li><strong>API Clients</strong>: Octokit.NET (GitHub API), Microsoft.TeamFoundationServer.Client (Azure DevOps API)</li>
 <li><strong>HTTP</strong>: System.Net.Http for REST calls</li>
 <li><strong>JSON</strong>: System.Text.Json for JSON processing</li>
-<li><strong>Development</strong>: xunit, Moq, Microsoft.NET.Test.Sdk</li>
+<li><strong>Development &amp; Testing</strong>: xunit, Moq, Microsoft.NET.Test.Sdk</li>
+<li><strong>Installation Scripts</strong>: Python (for cross-platform installer compatibility only)</li>
 </ul>
 <h2 id="integration-points">Integration Points<a class="headerlink" href="#integration-points" title="Anchor link to this section for reference">&para;</a></h2>
 <h3 id="cross-tool-workflows">Cross-Tool Workflows<a class="headerlink" href="#cross-tool-workflows" title="Anchor link to this section for reference">&para;</a></h3>
 <ol>
-<li><strong>Build → Work Item Creation</strong>: ntools builds can trigger SDO work item creation</li>
-<li><strong>Repository Management</strong>: SDO can create repos that ntools can then build in</li>
-<li><strong>Pipeline Integration</strong>: SDO pipeline operations complement ntools build automation</li>
+<li><strong>Build → Work Item Creation</strong>: ntools builds can trigger sdo C# work item creation</li>
+<li><strong>Repository Management</strong>: sdo can create repos that ntools can then build in</li>
+<li><strong>Pipeline Integration</strong>: sdo pipeline operations complement ntools build automation</li>
+<li><strong>Work Item Tracking</strong>: sdo provides work item management alongside ntools build tracking</li>
 </ol>
 <h3 id="shared-concepts">Shared Concepts<a class="headerlink" href="#shared-concepts" title="Anchor link to this section for reference">&para;</a></h3>
 <ul>
-<li>Dual platform support (Azure DevOps and GitHub)</li>
-<li>Common authentication patterns</li>
-<li>Consistent CLI design principles</li>
-<li>Cross-platform compatibility</li>
+<li><strong>Dual Platform Support</strong>: Both tools work seamlessly with Azure DevOps and GitHub</li>
+<li><strong>Common Authentication Patterns</strong>: Shared credential management across ntools and sdo</li>
+<li><strong>Consistent CLI Design</strong>: System.CommandLine framework for both tool suites</li>
+<li><strong>Cross-Platform Compatibility</strong>: All executables run on Windows, Linux, and macOS</li>
+<li><strong>Performance First</strong>: C# implementation ensures fast, reliable DevOps operations</li>
 </ul>
-<p>This combined architecture document provides a comprehensive view of both tool suites, enabling better understanding of the complete DevOps toolchain and potential integration opportunities.</p>
+<h2 id="implementation-notes">Implementation Notes<a class="headerlink" href="#implementation-notes" title="Anchor link to this section for reference">&para;</a></h2>
+<h3 id="removal-of-python-sdo">Removal of Python SDO<a class="headerlink" href="#removal-of-python-sdo" title="Anchor link to this section for reference">&para;</a></h3>
+<p>The Python implementation of sdo has been deprecated and removed. All DevOps operations now use the high-performance C# implementation (<code>sdo.exe</code>).</p>
+<p><strong>Migration Path</strong>: Users previously using Python <code>sdo</code> commands should update to use <code>sdo.exe</code> with identical command syntax:
+- Old: <code>sdo wi list</code> (Python) → New: <code>sdo.exe wi list</code> (C#)
+- Old: <code>sdo pr ls</code> (Python) → New: <code>sdo.exe pr list</code> (C#)</p>
+<h3 id="command-mapping">Command Mapping<a class="headerlink" href="#command-mapping" title="Anchor link to this section for reference">&para;</a></h3>
+<p>For complete command mapping and usage examples, see <a href="mapping.md">Command Mappings Reference</a>.</p>
 
 
 
