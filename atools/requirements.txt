@@ -1,7 +1,4 @@
-# Python dependencies for SDO package
-# Keep this minimal; requests is optional at runtime but listed here for convenience.
+# Python dependencies for NTools
+# requests is required for downloading NTools releases
 requests==2.33.1
-click==8.3.2
-PyYAML==6.0.3
-colorama==0.4.6
 

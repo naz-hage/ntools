@@ -19,7 +19,7 @@ Set-DevelopmentEnvironment
 Install-DevelopmentApps
 ```
 
-For complete module documentation, see [ntools-scripts Module](ntools/ntools-scripts-module.md).
+For complete module documentation, see [ntools-scripts Module](./ntools-scripts-module.md).
 
 ## Overview of dev-setup Folder
 

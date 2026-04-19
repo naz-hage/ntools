@@ -1,16 +1,16 @@
 # DevOps Tools Suite Architecture
 
-This document provides a comprehensive overview of the DevOps Tools Suite architecture, encompassing both the .NET-based ntools suite and the Python-based SDO (Simple DevOps Operations Tool). Together, these tools provide a complete DevOps workflow from build automation to work item management across multiple platforms.
+This document provides a comprehensive overview of the DevOps Tools Suite architecture, encompassing the .NET-based ntools suite including sdo (C# implementation of Simple DevOps Operations Tool). These tools provide a complete DevOps workflow from build automation to work item management across multiple platforms.
 
 ## Suite Overview
 
 The DevOps Tools Suite consists of two main components:
 
 ### 1. ntools Suite (.NET-based)
-A collection of build automation and utility tools written in .NET 9.0, providing core development and DevOps capabilities.
+A collection of build automation and utility tools written in .NET 10.0, providing core development and DevOps capabilities.
 
-### 2. SDO (Simple DevOps Operations Tool) (Python-based)
-A comprehensive CLI tool for work item creation and repository management across Azure DevOps and GitHub platforms.
+### 2. sdo (Simple DevOps Operations Tool) - .NET/C#
+A comprehensive CLI tool for work item creation and repository management across Azure DevOps and GitHub platforms, written entirely in C# for maximum performance and .NET ecosystem integration.
 
 ## ntools Suite Architecture
 
@@ -21,6 +21,7 @@ The ntools suite consists of multiple executables that provide various developme
 - **nb.exe** - Main build automation and DevOps utility tool
 - **Nbackup.exe** - Backup automation tool
 - **lf.exe** - File listing and management utility
+- **sdo.exe** - Simple DevOps Operations tool for work item and repository management
 - **Go executables** - Various Go-based utilities in the `go/` directory
 
 ### Architecture Diagram
@@ -32,6 +33,7 @@ graph TB
             NB[nb.exe<br/>Nbuild]
             NBKP[Nbackup.exe<br/>nBackup]
             LF[lf.exe<br/>lf]
+            SDO[sdo.exe<br/>Simple DevOps Operations Tool]
         end
 
         subgraph "Go Executables"
@@ -47,7 +49,7 @@ graph TB
 
     subgraph "External Dependencies"
         SCL[System.CommandLine<br/>CLI framework]
-        DOTNET[.NET 9.0<br/>Runtime]
+        DOTNET[.NET 10.0<br/>Runtime]
         GO_RUNTIME[Go Runtime<br/>For Go tools]
     end
 
@@ -72,13 +74,14 @@ graph TB
     NBL --> DOTNET
     GHR --> DOTNET
     API --> DOTNET
-
+    SDO --> NBL
+    SDO --> GHR
     style NB fill:#e1f5fe
     style NBKP fill:#f3e5f5
     style LF fill:#e8f5e8
     style NBL fill:#fff3e0
     style GHR fill:#fce4ec
-    style API fill:#f1f8e9
+    style API fill:#f1f8e9  
 ```
 
 ### Executable Details
@@ -102,7 +105,14 @@ graph TB
 - **Purpose**: File listing and management utility
 - **Features**: Advanced file listing, file operations
 - **Dependencies**: NbuildTasks, System.CommandLine
-
+#### sdo.exe (Simple DevOps Operations Tool)
+- **Purpose**: Comprehensive CLI for work item creation and repository management across Azure DevOps and GitHub
+- **Features**:
+  - Work item management (create, list, show, update, comment)
+  - Repository operations (create, list, delete)
+  - Pull request management (create, list, show, update)
+  - Pipeline management (create, run, monitor)
+  - Dry-run mode for previewing operations
 #### Go Executables
 - **Purpose**: Various utilities written in Go
 - **Location**: `go/` directory
@@ -126,8 +136,7 @@ ntools/
 ├── ntools.sln                    # Main solution file
 ├── prebuild.bat                  # Pre-build setup script
 ├── mkdocs.yml                    # Documentation configuration
-├── pyproject.toml                # Python project configuration (for docs)
-├── docs-requirements.txt         # Documentation dependencies
+
 ├── CHANGELOG.md                  # Change log
 ├── README.md                     # Project documentation
 ├── targets.md                    # Build targets documentation
@@ -195,13 +204,40 @@ ntools/
 ├── Debug/                        # Debug build outputs
 ├── ArtifactsFolder/              # Build artifacts
 ├── logs/                         # Build and test logs
-└── atools/                       # Additional tools
+├── atools/                       # Automated tools and installers
+│   ├── install-ntools.py         # NTools installation script
+│   ├── install-sdo.py            # SDO installation script
+│   ├── requirements.txt           # Python dependencies for installers
+│   ├── requirements-dev.txt       # Development dependencies
+│   └── sdo.cmd                   # SDO command wrapper
+│
+└── Sdo/                          # sdo (C# executable)
+    ├── Sdo.csproj                # C# project file
+    ├── Program.cs                # Main entry point and CLI setup
+    ├── Commands/                 # Command implementations
+    │   ├── WorkItemCommand.cs
+    │   ├── RepositoryCommand.cs
+    │   ├── PullRequestCommand.cs
+    │   └── PipelineCommand.cs
+    ├── Services/                 # Business logic
+    │   ├── WorkItemService.cs
+    │   ├── RepositoryService.cs
+    │   ├── PullRequestService.cs
+    │   └── PipelineService.cs
+    ├── Platforms/                # Platform implementations
+    │   ├── IPlatform.cs
+    │   ├── AzureDevOpsPlatform.cs
+    │   └── GitHubPlatform.cs
+    ├── Models/                   # Data models
+    ├── Credentials/              # Authentication handling
+    ├── Helpers/                  # Utility helpers
+    └── bin/Debug/sdo.exe         # Compiled executable
 ```
 
 ### Build System
 
 All .NET executables are built using:
-- .NET 9.0 SDK
+- .NET 10.0 SDK
 - MSBuild
 - Custom build targets (nbuild.targets)
 - Shared build tasks (NbuildTasks)
@@ -210,72 +246,21 @@ Go executables are built using the Go toolchain and custom build scripts.
 
 ---
 
-## SDO Architecture
+## sdo (Simple DevOps Operations Tool) - Architecture & Design
 
 ### Overview
 
-SDO (Simple DevOps Operations Tool) is a command-line interface tool for work item creation and repository management across Azure DevOps and GitHub platforms, following a modular, extensible architecture.
-
-### File Structure
-
-```
-atools/
-├── sdo.py                          # Main entry point and CLI framework
-├── sdo_package/                    # Main package directory
-│   ├── __init__.py                 # Package initialization
-│   ├── cli.py                      # CLI command implementations
-│   ├── client.py                   # Azure DevOps REST API client
-│   ├── exceptions.py               # Custom exception classes
-│   ├── pull_requests.py            # Pull request operations (multi-platform)
-│   ├── pipelines.py                # Pipeline operations (multi-platform)
-│   ├── repositories.py             # Repository operations (multi-platform)
-│   ├── version.py                  # Version information
-│   ├── work_items.py               # Work item orchestration logic
-│   ├── parsers/                    # Content parsing modules
-│   │   ├── __init__.py
-│   │   ├── markdown_parser.py      # Markdown file parsing
-│   │   └── metadata_parser.py      # Metadata extraction and platform detection
-│   └── platforms/                  # Platform-specific implementations
-│       ├── __init__.py
-│       ├── base.py                 # Abstract base classes for platforms
-│       ├── pr_base.py              # Abstract base class for PR platforms
-│       ├── azdo_platform.py        # Azure DevOps work item operations
-│       ├── azdo_pr_platform.py     # Azure DevOps pull request operations
-│       ├── azdo_pipeline_platform.py # Azure DevOps pipeline operations
-│       ├── github_platform.py      # GitHub work item operations
-│       └── github_pr_platform.py   # GitHub pull request operations
-├── tests/                          # Test suite
-│   ├── run_sdo_tests.py            # Test runner script
-│   ├── test_azdo_platform.py       # Azure DevOps platform tests
-│   ├── test_client.py              # Client module tests
-│   ├── test_cli_comprehensive.py   # Comprehensive CLI tests
-│   ├── test_github_platform.py     # GitHub platform tests
-│   ├── test_markdown_parser.py     # Markdown parser tests
-│   ├── test_pull_requests.py       # Pull request operations tests
-│   ├── test_pipelines.py           # Pipeline operations tests
-│   ├── test_repositories.py        # Repository operations tests
-│   ├── test_sdo.py                 # Main module tests
-│   ├── test_sdo_cli.py             # CLI integration tests
-│   ├── test_sdo_workitems.py       # Work item tests
-│   └── test_sdo_pipelines.py       # Pipeline tests
-├── pyproject.toml                  # Python project configuration
-├── requirements.txt                # Production dependencies
-├── requirements-dev.txt            # Development dependencies
-├── issue-azdo-example.md           # Azure DevOps issue template
-├── issue-gh-example.md             # GitHub issue template
-└── install-sdo.py                  # Installation script
-```
+sdo is a .NET/C# command-line tool for work item creation and repository management across Azure DevOps and GitHub platforms. It provides comprehensive DevOps capabilities with high performance and native .NET ecosystem integration.
 
 ### Architecture Principles
 
-Both tool suites follow consistent design principles:
+Both sdo and ntools Suite follow consistent design principles:
 
 #### 1. **Separation of Concerns**
 - **CLI Layer**: User interaction and command handling
 - **Business Logic**: Domain-specific orchestration and validation
 - **Platform Layer**: Platform-specific implementations with abstract interfaces
-- **Parser Layer**: Content extraction and metadata processing
-- **Client Layer**: API communication and authentication
+- **Service Layer**: High-level business operations
 
 #### 2. **Strategy Pattern**
 - Abstract platform interfaces enable seamless switching between DevOps platforms
@@ -284,88 +269,46 @@ Both tool suites follow consistent design principles:
 
 #### 3. **Extensibility**
 - Plugin-style architecture for adding new platforms
-- Modular parser systems for different content formats
-- Configurable metadata extraction and processing
+- Modular service systems for different business domains
+- Configurable authentication and API integration
 
-### System Architecture
+### Key Features
 
-SDO uses a domain-driven architecture with separate platform abstractions for each business domain (work items, repositories, pipelines, pull requests), where each domain has its own business logic module and platform interface.
-
-```mermaid
-graph TB
-    subgraph "SDO CLI Tool"
-        SDO[SDO CLI Tool<br/>sdo.py Main Entry Point<br/>Click CLI Framework<br/>Command Registration<br/>Global Configuration]
-    end
-
-    subgraph "CLI Layer"
-        CLI[CLI Layer<br/>cli.py<br/>workitem • repo • pr • pipeline groups<br/>Command parsing • validation<br/>Verbose output • Error handling]
-    end
-
-    subgraph "Business Logic Layer"
-        BIZ[Business Logic Layer<br/>work_items.py • repositories.py<br/>pull_requests.py • pipelines.py<br/>Platform detection • Content processing<br/>Result validation • Error handling]
-    end
-
-    subgraph "Supporting Layers"
-        subgraph "Parser Layer"
-            PARSER[Parser Layer<br/>parsers/<br/>markdown_parser.py<br/>metadata_parser.py<br/>Content parsing • Metadata extraction<br/>Validation]
-        end
-
-        subgraph "Platform Layer"
-            PLATFORM[Platform Layer<br/>platforms/<br/>Abstract base classes<br/>Azure DevOps • GitHub implementations<br/>Work items • Repos • PRs • Pipelines]
-        end
-
-        subgraph "Client Layer"
-            CLIENT[Client Layer<br/>client.py<br/>HTTP client • Authentication<br/>Platform detection • Logging<br/>Low-level API communication]
-        end
-    end
-
-    SDO --> CLI
-    CLI --> BIZ
-    BIZ --> PARSER
-    BIZ --> PLATFORM
-    BIZ --> CLIENT
-
-    style SDO fill:#e1f5fe
-    style CLI fill:#f3e5f5
-    style BIZ fill:#fff3e0
-    style PARSER fill:#e8f5e8
-    style PLATFORM fill:#fce4ec
-    style CLIENT fill:#f1f8e9
-```
-
-### Key Components
-
-#### CLI Layer (cli.py)
-Provides hierarchical command structure for workitem, repo, pr, and pipeline operations with command parsing, validation, and error handling.
-
-#### Business Logic Layer
-Core orchestration modules: work_items.py, repositories.py, pull_requests.py, and pipelines.py for domain-specific operations.
-
-#### Platform Layer (platforms/)
-Abstract interfaces with platform-specific implementations for Azure DevOps (REST API) and GitHub (CLI-based) across work items, repos, PRs, and pipelines.
+- **Multi-Platform Support**: Works seamlessly with Azure DevOps and GitHub
+- **Work Item Management**: Create, list, show, update, and comment on work items
+- **Repository Operations**: Create, list, delete, and manage repositories
+- **Pull Request Management**: Create, list, show, and update pull requests
+- **Pipeline Management**: Create, run, monitor, and manage CI/CD pipelines
+- **Dry-Run Mode**: Preview operations before execution
+- **Automatic Platform Detection**: Detects platform from Git remote configuration
 
 ### Dependencies
 
 #### ntools Suite (.NET)
-- **Runtime**: .NET 9.0 SDK, Go runtime
-- **CLI Framework**: System.CommandLine
+- **Runtime**: .NET 10.0 SDK
+- **CLI Framework**: System.CommandLine 2.0.2
 - **Build System**: MSBuild with custom targets
 
-#### SDO Tool (Python)
-- **Core**: `click>=8.0.0` (CLI framework), `requests>=2.25.0` (HTTP client), `pyyaml>=6.0.0` (YAML parsing)
-- **Development**: `pytest`, `black`, `mypy`, `coverage`
+#### sdo (C# Simple DevOps Operations Tool)
+- **Runtime**: .NET 10.0 (only supported implementation)
+- **CLI Framework**: System.CommandLine 2.0.2
+- **API Clients**: Octokit.NET (GitHub API), Microsoft.TeamFoundationServer.Client (Azure DevOps API)
+- **HTTP**: System.Net.Http for REST calls
+- **JSON**: System.Text.Json for JSON processing
+- **Development & Testing**: xunit, Moq, Microsoft.NET.Test.Sdk
+- **Installation Scripts**: Python (for cross-platform installer compatibility only)
 
 ## Integration Points
 
 ### Cross-Tool Workflows
-1. **Build → Work Item Creation**: ntools builds can trigger SDO work item creation
-2. **Repository Management**: SDO can create repos that ntools can then build in
-3. **Pipeline Integration**: SDO pipeline operations complement ntools build automation
+1. **Build → Work Item Creation**: ntools builds can trigger sdo C# work item creation
+2. **Repository Management**: sdo can create repos that ntools can then build in
+3. **Pipeline Integration**: sdo pipeline operations complement ntools build automation
+4. **Work Item Tracking**: sdo provides work item management alongside ntools build tracking
 
 ### Shared Concepts
-- Dual platform support (Azure DevOps and GitHub)
-- Common authentication patterns
-- Consistent CLI design principles
-- Cross-platform compatibility
-
-This combined architecture document provides a comprehensive view of both tool suites, enabling better understanding of the complete DevOps toolchain and potential integration opportunities.
+- **Dual Platform Support**: Both tools work seamlessly with Azure DevOps and GitHub
+- **Common Authentication Patterns**: Shared credential management across ntools and sdo
+- **Consistent CLI Design**: System.CommandLine framework for both tool suites
+- **Cross-Platform Compatibility**: All executables run on Windows, Linux, and macOS
+- **Performance First**: C# implementation ensures fast, reliable DevOps operations

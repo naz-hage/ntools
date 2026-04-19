@@ -1,4 +1,4 @@
-# sdo.net - Simple DevOps Operations Tool (C# Version)
+# sdo - Simple DevOps Operations Tool (C# Version)
 
 Unified CLI for managing work items, pull requests, pipelines, and repositories across **GitHub** and **Azure DevOps**.
 
@@ -20,10 +20,10 @@ Unified CLI for managing work items, pull requests, pipelines, and repositories 
 
 ## Overview
 
-`sdo.net` (Simple DevOps Operations) is a C# CLI tool providing unified operations across Azure DevOps and GitHub. It:
+`sdo` (Simple DevOps Operations) is a C# CLI tool providing unified operations across Azure DevOps and GitHub. It:
 - Automatically detects your platform from Git remote configuration
 - Translates work item states and operations between GitHub and Azure DevOps
-- Maps `sdo.net` commands to native platform CLIs for reference and learning
+- Maps `sdo` commands to native platform CLIs for reference and learning
 - Provides consistent cross-platform tooling for teams
 
 ## Prerequisites
@@ -61,22 +61,22 @@ git remote -v
 - **Repositories** — List and inspect repositories
 - **Users & Permissions** — List users, check permissions, search
 - **Platform Auto-Detection** — Automatically detects GitHub or Azure DevOps from Git remote
-- **CLI Mapping** — Shows sdo.net command equivalents in native CLIs (`gh`, `az`)
+- **CLI Mapping** — Shows sdo command equivalents in native CLIs (`gh`, `az`)
 - **State Translation** — Automatically maps work item states between platforms
 - **Clean Output** — Emoji-enhanced tables and concise error messages
 
 ## Main Help
 
 ```
-$ sdo.net --help
+$ sdo --help
 
-sdo.net v1.73.7 - Simple DevOps Operations by naz-hage (2020-2026)
+sdo v1.73.7 - Simple DevOps Operations by naz-hage (2020-2026)
 
 Description:
   Simple DevOps Operations CLI tool for Azure DevOps and GitHub
 
 Usage:
-  sdo.net [command] [options]
+  sdo [command] [options]
 
 Options:
   --verbose       Enable verbose output
@@ -97,26 +97,26 @@ Commands:
 
 ### map — CLI Mappings
 
-Show how `sdo.net` commands map to native platform CLIs (`gh` for GitHub, `az` for Azure DevOps).
+Show how `sdo` commands map to native platform CLIs (`gh` for GitHub, `az` for Azure DevOps).
 
 **Usage:**
 ```bash
-sdo.net map                              # Show all mappings
-sdo.net map --platform gh               # GitHub mappings only
-sdo.net map --platform azdo             # Azure DevOps mappings only
-sdo.net map --all                       # Show all mappings for both platforms
-sdo.net map --verbose                   # Show with verbose output
+sdo map                              # Show all mappings
+sdo map --platform gh               # GitHub mappings only
+sdo map --platform azdo             # Azure DevOps mappings only
+sdo map --all                       # Show all mappings for both platforms
+sdo map --verbose                   # Show with verbose output
 ```
 
 **Help:**
 ```
-$ sdo.net map --help
+$ sdo map --help
 
 Description:
   Show command mappings between SDO and native CLI tools
 
 Usage:
-  sdo.net map [options]
+  sdo map [options]
 
 Options:
   --platform <platform>  Platform to show mappings for (gh=github, azdo=azure-devops, leave empty for auto-detect)
@@ -138,13 +138,13 @@ Validate credentials are configured for your platform.
 
 **Help:**
 ```
-$ sdo.net auth --help
+$ sdo auth --help
 
 Description:
   Verify authentication with GitHub or Azure DevOps
 
 Usage:
-  sdo.net auth [command] [options]
+  sdo auth [command] [options]
 
 Options:
   --verbose       Enable verbose output
@@ -157,10 +157,10 @@ Commands:
 
 **Usage:**
 ```bash
-sdo.net auth gh                  # Verify GitHub
-sdo.net auth azdo               # Verify Azure DevOps
-sdo.net auth gh --verbose       # Show token source details
-sdo.net auth azdo --verbose     # Show token source details
+sdo auth gh                  # Verify GitHub
+sdo auth azdo               # Verify Azure DevOps
+sdo auth gh --verbose       # Show token source details
+sdo auth azdo --verbose     # Show token source details
 ```
 
 **Success Output:**
@@ -183,13 +183,13 @@ Create, list, show, update work items and add comments. Supports GitHub issues a
 
 **Help:**
 ```
-$ sdo.net wi --help
+$ sdo wi --help
 
 Description:
   Work item management commands
 
 Usage:
-  sdo.net wi [command] [options]
+  sdo wi [command] [options]
 
 Commands:
   comment  Add comment to a work item
@@ -205,16 +205,16 @@ List work items with optional filtering. By default, shows **active** items (exc
 
 **Usage:**
 ```bash
-sdo.net wi list                                    # List active items
-sdo.net wi list --top 20                           # Limit to 20 items
-sdo.net wi list --state Done                       # Show Done items
-sdo.net wi list --state "In Progress" --top 10    # Show In Progress, limit 10
-sdo.net wi list --assigned-to user@example.com    # Filter by assignee
-sdo.net wi list --assigned-to-me                  # Your items
-sdo.net wi list --type PBI                         # Filter by type (Azure DevOps)
-sdo.net wi list --area "Project\Area"             # Filter by area (Azure DevOps)
-sdo.net wi list --iteration "Project\Sprint 1"    # Filter by iteration (Azure DevOps)
-sdo.net wi list --verbose                         # Show API commands
+sdo wi list                                    # List active items
+sdo wi list --top 20                           # Limit to 20 items
+sdo wi list --state Done                       # Show Done items
+sdo wi list --state "In Progress" --top 10    # Show In Progress, limit 10
+sdo wi list --assigned-to user@example.com    # Filter by assignee
+sdo wi list --assigned-to-me                  # Your items
+sdo wi list --type PBI                         # Filter by type (Azure DevOps)
+sdo wi list --area "Project\Area"             # Filter by area (Azure DevOps)
+sdo wi list --iteration "Project\Sprint 1"    # Filter by iteration (Azure DevOps)
+sdo wi list --verbose                         # Show API commands
 ```
 
 **Valid States:**
@@ -250,9 +250,9 @@ Display full details of a work item.
 
 **Usage:**
 ```bash
-sdo.net wi show --id 243                # Show item details
-sdo.net wi show --id 243 --comments     # Include comments
-sdo.net wi show --id 243 --verbose      # Show API command
+sdo wi show --id 243                # Show item details
+sdo wi show --id 243 --comments     # Include comments
+sdo wi show --id 243 --verbose      # Show API command
 ```
 
 **Options:**
@@ -266,10 +266,10 @@ Create new work item from markdown file.
 
 **Usage:**
 ```bash
-sdo.net wi create --file-path work-item.md              # Create
-sdo.net wi create -f work-item.md                       # Short option
-sdo.net wi create --file-path work-item.md --dry-run   # Preview
-sdo.net wi create --file-path work-item.md --verbose   # Show mapping
+sdo wi create --file-path work-item.md              # Create
+sdo wi create -f work-item.md                       # Short option
+sdo wi create --file-path work-item.md --dry-run   # Preview
+sdo wi create --file-path work-item.md --verbose   # Show mapping
 ```
 
 **Options:**
@@ -308,11 +308,11 @@ Update work item properties.
 
 **Usage:**
 ```bash
-sdo.net wi update --id 243 --state Done                    # Update state
-sdo.net wi update --id 243 --title "New Title"            # Update title
-sdo.net wi update --id 243 --assignee user@example.com    # Change assignee
-sdo.net wi update --id 243 --state Done --title "Title"   # Multiple fields
-sdo.net wi update --id 243 --state done                   # Case-insensitive
+sdo wi update --id 243 --state Done                    # Update state
+sdo wi update --id 243 --title "New Title"            # Update title
+sdo wi update --id 243 --assignee user@example.com    # Change assignee
+sdo wi update --id 243 --state Done --title "Title"   # Multiple fields
+sdo wi update --id 243 --state done                   # Case-insensitive
 ```
 
 **Options:**
@@ -332,8 +332,8 @@ Add comment to work item.
 
 **Usage:**
 ```bash
-sdo.net wi comment --id 243 --message "This is my comment"
-sdo.net wi comment --id 243 --message "Looks good!" --verbose
+sdo wi comment --id 243 --message "This is my comment"
+sdo wi comment --id 243 --message "Looks good!" --verbose
 ```
 
 **Options:**
@@ -356,13 +356,13 @@ List, show, create, and manage pull requests on GitHub and Azure DevOps. `pr cre
 
 **Help:**
 ```
-$ sdo.net pr --help
+$ sdo pr --help
 
 Description:
   Pull request operations
 
 Usage:
-  sdo.net pr [command] [options]
+  sdo pr [command] [options]
 
 Commands:
   create          Create a pull request from markdown file
@@ -378,12 +378,12 @@ Create a new pull request from markdown file.
 
 **Usage:**
 ```bash
-sdo.net pr create --file pr.md                        # Create from file
-sdo.net pr create -f pr.md                            # Short option
-sdo.net pr create --file pr.md --work-item 243        # Link to work item
-sdo.net pr create --file pr.md --draft                # Create as draft
-sdo.net pr create --file pr.md --dry-run              # Preview
-sdo.net pr create --file pr.md --verbose              # Show mapping
+sdo pr create --file pr.md                        # Create from file
+sdo pr create -f pr.md                            # Short option
+sdo pr create --file pr.md --work-item 243        # Link to work item
+sdo pr create --file pr.md --draft                # Create as draft
+sdo pr create --file pr.md --dry-run              # Preview
+sdo pr create --file pr.md --verbose              # Show mapping
 ```
 
 **Options:**
@@ -399,11 +399,11 @@ List pull requests with optional filtering.
 
 **Usage:**
 ```bash
-sdo.net pr list                         # List active PRs (default)
-sdo.net pr list --status closed         # List closed PRs
-sdo.net pr list --status merged         # List merged PRs
-sdo.net pr list --top 20               # Limit to 20
-sdo.net pr list --verbose              # Show API commands
+sdo pr list                         # List active PRs (default)
+sdo pr list --status closed         # List closed PRs
+sdo pr list --status merged         # List merged PRs
+sdo pr list --top 20               # Limit to 20
+sdo pr list --verbose              # Show API commands
 ```
 
 **Options:**
@@ -417,8 +417,8 @@ Display pull request details.
 
 **Usage:**
 ```bash
-sdo.net pr show 12                # Show PR #12
-sdo.net pr show 12 --verbose      # Show API command
+sdo pr show 12                # Show PR #12
+sdo pr show 12 --verbose      # Show API command
 ```
 
 **Options:**
@@ -431,8 +431,8 @@ Check pull request status.
 
 **Usage:**
 ```bash
-sdo.net pr status 12              # Check PR status
-sdo.net pr status 12 --verbose    # Show full details
+sdo pr status 12              # Check PR status
+sdo pr status 12 --verbose    # Show full details
 ```
 
 **Options:**
@@ -445,10 +445,10 @@ Update pull request properties.
 
 **Usage:**
 ```bash
-sdo.net pr update --pr-id 12 --title "Updated title"
-sdo.net pr update --pr-id 12 --file updated.md
-sdo.net pr update --pr-id 12 --status closed
-sdo.net pr update --pr-id 12 --title "New title" --status merged
+sdo pr update --pr-id 12 --title "Updated title"
+sdo pr update --pr-id 12 --file updated.md
+sdo pr update --pr-id 12 --status closed
+sdo pr update --pr-id 12 --title "New title" --status merged
 ```
 
 **Options:**
@@ -472,13 +472,13 @@ Create, delete, list, and inspect repositories for your organization.
 
 **Help:**
 ```
-$ sdo.net repo --help
+$ sdo repo --help
 
 Description:
   Repository management commands
 
 Usage:
-  sdo.net repo [command] [options]
+  sdo repo [command] [options]
 
 Commands:
   create <name>  Create a new repository
@@ -493,9 +493,9 @@ List repositories for your organization.
 
 **Usage:**
 ```bash
-sdo.net repo list                       # List repos
-sdo.net repo list --top 10              # Limit to 10
-sdo.net repo list --verbose             # Show API commands
+sdo repo list                       # List repos
+sdo repo list --top 10              # Limit to 10
+sdo repo list --verbose             # Show API commands
 ```
 
 **Options:**
@@ -508,8 +508,8 @@ Display repository information from current Git remote.
 
 **Usage:**
 ```bash
-sdo.net repo show                       # Show current repo
-sdo.net repo show --verbose             # Show API command
+sdo repo show                       # Show current repo
+sdo repo show --verbose             # Show API command
 ```
 
 **Options:**
@@ -521,10 +521,10 @@ Create a new repository.
 
 **Usage:**
 ```bash
-sdo.net repo create myrepo                          # Create repo
-sdo.net repo create myrepo --description "My repo"  # With description
-sdo.net repo create myrepo --private                # Make private
-sdo.net repo create myrepo --private --verbose      # With mapping
+sdo repo create myrepo                          # Create repo
+sdo repo create myrepo --description "My repo"  # With description
+sdo repo create myrepo --private                # Make private
+sdo repo create myrepo --private --verbose      # With mapping
 ```
 
 **Options:**
@@ -539,9 +539,9 @@ Delete a repository.
 
 **Usage:**
 ```bash
-sdo.net repo delete                     # Delete (with prompt)
-sdo.net repo delete --force             # Delete (no prompt)
-sdo.net repo delete --force --verbose   # Show mapping
+sdo repo delete                     # Delete (with prompt)
+sdo repo delete --force             # Delete (no prompt)
+sdo repo delete --force --verbose   # Show mapping
 ```
 
 **Options:**
@@ -567,13 +567,13 @@ Manage GitHub Actions workflows and Azure Pipelines. **Read-only operations** ar
 
 **Help:**
 ```
-$ sdo.net pipeline --help
+$ sdo pipeline --help
 
 Description:
   Pipeline/workflow management commands (create, show, list, run, status, logs, delete, lastbuild, update)
 
 Usage:
-  sdo.net pipeline [command] [options]
+  sdo pipeline [command] [options]
 
 Commands:
   create <file-path>          Create a new pipeline/workflow from YAML definition file
@@ -593,10 +593,10 @@ List pipelines/workflows in repository.
 
 **Usage:**
 ```bash
-sdo.net pipeline list                   # List pipelines
-sdo.net pipeline list --repo myrepo     # Filter by repository
-sdo.net pipeline list --all             # Show all pipelines in project
-sdo.net pipeline list --verbose         # Show API commands
+sdo pipeline list                   # List pipelines
+sdo pipeline list --repo myrepo     # Filter by repository
+sdo pipeline list --all             # Show all pipelines in project
+sdo pipeline list --verbose         # Show API commands
 ```
 
 **Options:**
@@ -610,9 +610,9 @@ Display pipeline/workflow details.
 
 **Usage:**
 ```bash
-sdo.net pipeline show 1234              # Show pipeline by ID
-sdo.net pipeline show myworkflow        # Show pipeline by name
-sdo.net pipeline show --verbose         # Show API command
+sdo pipeline show 1234              # Show pipeline by ID
+sdo pipeline show myworkflow        # Show pipeline by name
+sdo pipeline show --verbose         # Show API command
 ```
 
 **Options:**
@@ -625,8 +625,8 @@ Create a new pipeline/workflow from YAML file.
 
 **Usage:**
 ```bash
-sdo.net pipeline create .github/workflows/ci.yml
-sdo.net pipeline create .github/workflows/ci.yml --verbose
+sdo pipeline create .github/workflows/ci.yml
+sdo pipeline create .github/workflows/ci.yml --verbose
 ```
 
 **Options:**
@@ -639,9 +639,9 @@ Execute/trigger a pipeline.
 
 **Usage:**
 ```bash
-sdo.net pipeline run myworkflow         # Trigger run
-sdo.net pipeline run myworkflow -b main # Run on specific branch
-sdo.net pipeline run myworkflow --branch develop --verbose
+sdo pipeline run myworkflow         # Trigger run
+sdo pipeline run myworkflow -b main # Run on specific branch
+sdo pipeline run myworkflow --branch develop --verbose
 ```
 
 **Options:**
@@ -655,9 +655,9 @@ Query pipeline build/run status.
 
 **Usage:**
 ```bash
-sdo.net pipeline status                 # Show latest build status
-sdo.net pipeline status 1234            # Check specific build
-sdo.net pipeline status 1234 --verbose  # Show details
+sdo pipeline status                 # Show latest build status
+sdo pipeline status 1234            # Check specific build
+sdo pipeline status 1234 --verbose  # Show details
 ```
 
 **Options:**
@@ -670,10 +670,10 @@ Retrieve pipeline execution logs.
 
 **Usage:**
 ```bash
-sdo.net pipeline logs                     # Show latest logs
-sdo.net pipeline logs 1234                # Show logs for specific build
-sdo.net pipeline logs --build-id 1234     # Explicit build ID
-sdo.net pipeline logs 1234 --verbose      # Show with details
+sdo pipeline logs                     # Show latest logs
+sdo pipeline logs 1234                # Show logs for specific build
+sdo pipeline logs --build-id 1234     # Explicit build ID
+sdo pipeline logs 1234 --verbose      # Show with details
 ```
 
 **Options:**
@@ -687,9 +687,9 @@ Show last build/run for pipeline.
 
 **Usage:**
 ```bash
-sdo.net pipeline lastbuild              # Last build for current repo
-sdo.net pipeline lastbuild myworkflow   # Last build for specific pipeline
-sdo.net pipeline lastbuild myworkflow --verbose  # Show details
+sdo pipeline lastbuild              # Last build for current repo
+sdo pipeline lastbuild myworkflow   # Last build for specific pipeline
+sdo pipeline lastbuild myworkflow --verbose  # Show details
 ```
 
 **Options:**
@@ -702,9 +702,9 @@ Update pipeline configuration.
 
 **Usage:**
 ```bash
-sdo.net pipeline update --file updated.yml
-sdo.net pipeline update --file updated.yml --pipeline myworkflow
-sdo.net pipeline update --file updated.yml --message "Update CI config" --branch main
+sdo pipeline update --file updated.yml
+sdo pipeline update --file updated.yml --pipeline myworkflow
+sdo pipeline update --file updated.yml --message "Update CI config" --branch main
 ```
 
 **Options:**
@@ -720,9 +720,9 @@ Delete a pipeline/workflow.
 
 **Usage:**
 ```bash
-sdo.net pipeline delete 1234            # Delete (with prompt)
-sdo.net pipeline delete 1234 --force    # Delete (no prompt)
-sdo.net pipeline delete 1234 --force --verbose
+sdo pipeline delete 1234            # Delete (with prompt)
+sdo pipeline delete 1234 --force    # Delete (no prompt)
+sdo pipeline delete 1234 --force --verbose
 ```
 
 **Options:**
@@ -744,13 +744,13 @@ List users, search, and check permissions.
 
 **Help:**
 ```
-$ sdo.net user --help
+$ sdo user --help
 
 Description:
   User management commands
 
 Usage:
-  sdo.net user [command] [options]
+  sdo user [command] [options]
 
 Commands:
   list         List users
@@ -765,9 +765,9 @@ List users in organization.
 
 **Usage:**
 ```bash
-sdo.net user list                      # List users
-sdo.net user list --top 50             # Limit to 50
-sdo.net user list --verbose            # Show API commands
+sdo user list                      # List users
+sdo user list --top 50             # Limit to 50
+sdo user list --verbose            # Show API commands
 ```
 
 **Options:**
@@ -780,8 +780,8 @@ Display user details.
 
 **Usage:**
 ```bash
-sdo.net user show --login naz-hage         # Show GitHub user
-sdo.net user show --login naz-hage --verbose  # Show API command
+sdo user show --login naz-hage         # Show GitHub user
+sdo user show --login naz-hage --verbose  # Show API command
 ```
 
 **Options:**
@@ -794,9 +794,9 @@ Search for users.
 
 **Usage:**
 ```bash
-sdo.net user search --query "naz"              # Search for users
-sdo.net user search --query "naz" --top 20     # Limit to 20
-sdo.net user search --query "naz" --verbose    # Show API command
+sdo user search --query "naz"              # Search for users
+sdo user search --query "naz" --top 20     # Limit to 20
+sdo user search --query "naz" --verbose    # Show API command
 ```
 
 **Options:**
@@ -810,8 +810,8 @@ Show user permissions.
 
 **Usage:**
 ```bash
-sdo.net user permissions --user naz-hage          # Show permissions
-sdo.net user permissions --user naz-hage --verbose  # Show detailed
+sdo user permissions --user naz-hage          # Show permissions
+sdo user permissions --user naz-hage --verbose  # Show detailed
 ```
 
 **Options:**
@@ -880,9 +880,9 @@ git remote add origin https://dev.azure.com/org/project/_git/repo
 **Solution:**
 ```bash
 # Use valid state with exact casing (or lowercase)
-sdo.net wi update --id 170 --state Done          # Correct
-sdo.net wi update --id 170 --state "In Progress"  # Correct
-sdo.net wi update --id 170 --state done           # Also works (case-insensitive)
+sdo wi update --id 170 --state Done          # Correct
+sdo wi update --id 170 --state "In Progress"  # Correct
+sdo wi update --id 170 --state done           # Also works (case-insensitive)
 ```
 
 Valid states:
@@ -917,28 +917,28 @@ For write operations:
 **Using invalid option names:**
 ```bash
 # ❌ Wrong
-sdo.net wi list --assigned-to-me-filter
+sdo wi list --assigned-to-me-filter
 
 # ✓ Correct
-sdo.net wi list --assigned-to-me
+sdo wi list --assigned-to-me
 ```
 
 **Forgetting required flags:**
 ```bash
 # ❌ Missing --id for show
-sdo.net wi show
+sdo wi show
 
 # ✓ Correct
-sdo.net wi show --id 243
+sdo wi show --id 243
 ```
 
 **Mixing GitHub and Azure DevOps states:**
 ```bash
 # ❌ GitHub state on Azure DevOps repo
 git remote set-url origin https://dev.azure.com/org/project/_git/repo
-sdo.net wi update --id 243 --state closed  # Won't work
+sdo wi update --id 243 --state closed  # Won't work
 
 # ✓ Correct
-sdo.net wi update --id 243 --state Done
+sdo wi update --id 243 --state Done
 ```
 
