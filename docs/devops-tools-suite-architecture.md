@@ -9,8 +9,8 @@ The DevOps Tools Suite consists of two main components:
 ### 1. ntools Suite (.NET-based)
 A collection of build automation and utility tools written in .NET 10.0, providing core development and DevOps capabilities.
 
-### 2. sdo (Simple DevOps Operations Tool) (.NET/C#-based)
-A comprehensive CLI tool for work item creation and repository management across Azure DevOps and GitHub platforms. This is the modern C# implementation with full feature parity and 2x+ performance improvement over the deprecated Python version.
+### 2. sdo (Simple DevOps Operations Tool) - .NET/C#
+A comprehensive CLI tool for work item creation and repository management across Azure DevOps and GitHub platforms, written entirely in C# for maximum performance and .NET ecosystem integration.
 
 ## ntools Suite Architecture
 
@@ -126,8 +126,7 @@ ntools/
 ├── ntools.sln                    # Main solution file
 ├── prebuild.bat                  # Pre-build setup script
 ├── mkdocs.yml                    # Documentation configuration
-├── pyproject.toml                # Python project configuration (for docs)
-├── docs-requirements.txt         # Documentation dependencies
+
 ├── CHANGELOG.md                  # Change log
 ├── README.md                     # Project documentation
 ├── targets.md                    # Build targets documentation
@@ -195,7 +194,34 @@ ntools/
 ├── Debug/                        # Debug build outputs
 ├── ArtifactsFolder/              # Build artifacts
 ├── logs/                         # Build and test logs
-└── atools/                       # Additional tools
+├── atools/                       # Automated tools and installers
+│   ├── install-ntools.py         # NTools installation script
+│   ├── install-sdo.py            # SDO installation script
+│   ├── requirements.txt           # Python dependencies for installers
+│   ├── requirements-dev.txt       # Development dependencies
+│   └── sdo.cmd                   # SDO command wrapper
+│
+└── Sdo/                          # sdo (C# executable)
+    ├── Sdo.csproj                # C# project file
+    ├── Program.cs                # Main entry point and CLI setup
+    ├── Commands/                 # Command implementations
+    │   ├── WorkItemCommand.cs
+    │   ├── RepositoryCommand.cs
+    │   ├── PullRequestCommand.cs
+    │   └── PipelineCommand.cs
+    ├── Services/                 # Business logic
+    │   ├── WorkItemService.cs
+    │   ├── RepositoryService.cs
+    │   ├── PullRequestService.cs
+    │   └── PipelineService.cs
+    ├── Platforms/                # Platform implementations
+    │   ├── IPlatform.cs
+    │   ├── AzureDevOpsPlatform.cs
+    │   └── GitHubPlatform.cs
+    ├── Models/                   # Data models
+    ├── Credentials/              # Authentication handling
+    ├── Helpers/                  # Utility helpers
+    └── bin/Debug/sdo.exe         # Compiled executable
 ```
 
 ### Build System
@@ -210,32 +236,11 @@ Go executables are built using the Go toolchain and custom build scripts.
 
 ---
 
-## sdo (C#) Architecture
+## sdo (Simple DevOps Operations Tool) - Architecture & Design
 
 ### Overview
 
-sdo (Simple DevOps Operations Tool) is a modern .NET/C# command-line tool for work item creation and repository management across Azure DevOps and GitHub platforms. It provides full feature parity with the deprecated Python version while delivering 2x+ performance improvement.
-
-### File Structure
-
-```
-Sdo/
-├── Sdo.csproj                      # C# project file
-├── Program.cs                      # Main entry point
-├── Cli/                            # CLI command implementations
-├── Services/                       # Business logic services
-│   ├── WorkItemService.cs
-│   ├── RepositoryService.cs
-│   ├── PullRequestService.cs
-│   └── PipelineService.cs
-├── Platforms/                      # Platform-specific implementations
-│   ├── IPlatform.cs               # Platform interface
-│   ├── AzureDevOpsPlatform.cs     # Azure DevOps operations
-│   └── GitHubPlatform.cs          # GitHub operations
-├── Models/                         # Data models
-├── Tests/                          # Unit and integration tests
-└── mapping.md                      # Command mappings reference
-```
+sdo is a .NET/C# command-line tool for work item creation and repository management across Azure DevOps and GitHub platforms. It provides comprehensive DevOps capabilities with high performance and native .NET ecosystem integration.
 
 ### Architecture Principles
 
@@ -275,24 +280,37 @@ Both sdo and ntools Suite follow consistent design principles:
 - **Build System**: MSBuild with custom targets
 
 #### sdo (C# Simple DevOps Operations Tool)
-- **Runtime**: .NET 10.0
-- **CLI Framework**: System.CommandLine
+- **Runtime**: .NET 10.0 (only supported implementation)
+- **CLI Framework**: System.CommandLine 2.0.1
 - **API Clients**: Octokit.NET (GitHub API), Microsoft.TeamFoundationServer.Client (Azure DevOps API)
 - **HTTP**: System.Net.Http for REST calls
 - **JSON**: System.Text.Json for JSON processing
-- **Development**: xunit, Moq, Microsoft.NET.Test.Sdk
+- **Development & Testing**: xunit, Moq, Microsoft.NET.Test.Sdk
+- **Installation Scripts**: Python (for cross-platform installer compatibility only)
 
 ## Integration Points
 
 ### Cross-Tool Workflows
-1. **Build → Work Item Creation**: ntools builds can trigger SDO work item creation
-2. **Repository Management**: SDO can create repos that ntools can then build in
-3. **Pipeline Integration**: SDO pipeline operations complement ntools build automation
+1. **Build → Work Item Creation**: ntools builds can trigger sdo C# work item creation
+2. **Repository Management**: sdo can create repos that ntools can then build in
+3. **Pipeline Integration**: sdo pipeline operations complement ntools build automation
+4. **Work Item Tracking**: sdo provides work item management alongside ntools build tracking
 
 ### Shared Concepts
-- Dual platform support (Azure DevOps and GitHub)
-- Common authentication patterns
-- Consistent CLI design principles
-- Cross-platform compatibility
+- **Dual Platform Support**: Both tools work seamlessly with Azure DevOps and GitHub
+- **Common Authentication Patterns**: Shared credential management across ntools and sdo
+- **Consistent CLI Design**: System.CommandLine framework for both tool suites
+- **Cross-Platform Compatibility**: All executables run on Windows, Linux, and macOS
+- **Performance First**: C# implementation ensures fast, reliable DevOps operations
 
-This combined architecture document provides a comprehensive view of both tool suites, enabling better understanding of the complete DevOps toolchain and potential integration opportunities.
+## Implementation Notes
+
+### Removal of Python SDO
+The Python implementation of sdo has been deprecated and removed. All DevOps operations now use the high-performance C# implementation (`sdo.exe`).
+
+**Migration Path**: Users previously using Python `sdo` commands should update to use `sdo.exe` with identical command syntax:
+- Old: `sdo wi list` (Python) → New: `sdo.exe wi list` (C#)
+- Old: `sdo pr ls` (Python) → New: `sdo.exe pr list` (C#)
+
+### Command Mapping
+For complete command mapping and usage examples, see [Command Mappings Reference](mapping.md).
