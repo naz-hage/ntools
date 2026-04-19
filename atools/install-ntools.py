@@ -285,8 +285,6 @@ def main():
     else:
         print("\n[SUCCESS] NTools installation completed successfully!")
         print(f"NTools is installed in: {deploy_path}")
-        print("You can now use 'ntools' commands from any location.")
-        print("\nNote: For DevOps operations, please use the C# version 'sdo.net' instead of the deprecated Python SDO.")
 
     return 0
 

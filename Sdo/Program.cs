@@ -54,7 +54,7 @@ namespace Sdo
             rootCommand.SetAction((parseResult) =>
             {
                 Console.WriteLine("Error: Please specify a command (map, auth, pipeline, pr, repo, wi, user)");
-                Console.WriteLine("Run 'sdo.net --help' for usage information.");
+                Console.WriteLine("Run 'sdo --help' for usage information.");
                 return 1;
             });
 

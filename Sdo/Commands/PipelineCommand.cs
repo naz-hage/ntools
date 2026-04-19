@@ -528,16 +528,12 @@ namespace Sdo.Commands
                     return 1;
                 }
 
-                // Get Azure DevOps credentials
-                var pat = AzureDevOpsCredentials.GetTokenOrDefault();
-                if (string.IsNullOrEmpty(pat))
+                if (!ValidateAzureDevOpsCredentials(out var pat))
                 {
-                    ConsoleHelper.WriteError("X Azure DevOps authentication required.");
-                    Console.WriteLine("Please set AZURE_DEVOPS_PAT environment variable or run: sdo.net auth azdo");
                     return 1;
                 }
 
-                using (var client = new Sdo.Services.AzureDevOpsClient(pat, organization, project))
+                using (var client = new Sdo.Services.AzureDevOpsClient(pat!, organization, project))
                 {
                     var pipelines = await client.ListPipelineDefinitionsAsync(project);
 
@@ -729,15 +725,12 @@ namespace Sdo.Commands
                         return 1;
                     }
 
-                    var pat = AzureDevOpsCredentials.GetTokenOrDefault();
-                    if (string.IsNullOrEmpty(pat))
+                    if (!ValidateAzureDevOpsCredentials(out var pat))
                     {
-                        ConsoleHelper.WriteError("X Azure DevOps authentication required.");
-                        Console.WriteLine("Please set AZURE_DEVOPS_PAT environment variable or run: sdo.net auth azdo");
                         return 1;
                     }
 
-                    using var client = new Sdo.Services.AzureDevOpsClient(pat, repoInfo.Organization, repoInfo.Project);
+                    using var client = new Sdo.Services.AzureDevOpsClient(pat!, repoInfo.Organization, repoInfo.Project);
 
                     int? definitionId = null;
                     if (!string.IsNullOrWhiteSpace(pipelineName) && int.TryParse(pipelineName, out var parsed))
@@ -934,16 +927,12 @@ namespace Sdo.Commands
                     return 1;
                 }
 
-                // Fetch pipelines from Azure DevOps API
-                var pat = AzureDevOpsCredentials.GetTokenOrDefault();
-                if (string.IsNullOrEmpty(pat))
+                if (!ValidateAzureDevOpsCredentials(out var pat))
                 {
-                    ConsoleHelper.WriteError("X Azure DevOps authentication required.");
-                    Console.WriteLine("Please set AZURE_DEVOPS_PAT environment variable or run: sdo.net auth azdo");
                     return 1;
                 }
 
-                using (var client = new Sdo.Services.AzureDevOpsClient(pat, organization, project))
+                using (var client = new Sdo.Services.AzureDevOpsClient(pat!, organization, project))
                 {
                     if (!string.IsNullOrWhiteSpace(pipelineIdOrName))
                     {
@@ -1087,12 +1076,8 @@ namespace Sdo.Commands
                     return 1;
                 }
 
-                // Get Azure DevOps credentials
-                var pat = AzureDevOpsCredentials.GetTokenOrDefault();
-                if (string.IsNullOrEmpty(pat))
+                if (!ValidateAzureDevOpsCredentials(out var pat))
                 {
-                    ConsoleHelper.WriteError("X Azure DevOps authentication required.");
-                    Console.WriteLine("Please set AZURE_DEVOPS_PAT environment variable or run: sdo.net auth azdo");
                     return 1;
                 }
 
@@ -1108,7 +1093,7 @@ namespace Sdo.Commands
                     }
                 }
 
-                using (var client = new Sdo.Services.AzureDevOpsClient(pat, organization, project))
+                using (var client = new Sdo.Services.AzureDevOpsClient(pat!, organization, project))
                 {
                     var success = await client.DeletePipelineAsync(project, pipelineId);
                     if (!success)
@@ -1198,16 +1183,12 @@ namespace Sdo.Commands
                     return 1;
                 }
 
-                // Get Azure DevOps credentials
-                var pat = AzureDevOpsCredentials.GetTokenOrDefault();
-                if (string.IsNullOrEmpty(pat))
+                if (!ValidateAzureDevOpsCredentials(out string? pat))
                 {
-                    ConsoleHelper.WriteError("X Azure DevOps authentication required.");
-                    Console.WriteLine("Please set AZURE_DEVOPS_PAT environment variable or run: sdo.net auth azdo");
                     return 1;
                 }
 
-                using (var client = new Sdo.Services.AzureDevOpsClient(pat, organization, project))
+                using (var client = new Sdo.Services.AzureDevOpsClient(pat!, organization, project))
                 {
                     // Use neutral pipeline definitions API
                     var pipelines = await client.ListPipelineDefinitionsAsync(project);
@@ -1353,16 +1334,12 @@ namespace Sdo.Commands
                     return 1;
                 }
 
-                // Get Azure DevOps credentials
-                var pat = AzureDevOpsCredentials.GetTokenOrDefault();
-                if (string.IsNullOrEmpty(pat))
+                if (!ValidateAzureDevOpsCredentials(out var pat))
                 {
-                    ConsoleHelper.WriteError("X Azure DevOps authentication required.");
-                    Console.WriteLine("Please set AZURE_DEVOPS_PAT environment variable or run: sdo.net auth azdo");
                     return 1;
                 }
 
-                using (var client = new Sdo.Services.AzureDevOpsClient(pat, organization, project))
+                using (var client = new Sdo.Services.AzureDevOpsClient(pat!, organization, project))
                 {
                     if (verbose)
                     {
@@ -1414,6 +1391,18 @@ namespace Sdo.Commands
             ConsoleHelper.WriteLine($"   az pipelines list --project <project>", ConsoleColor.Yellow);
             ConsoleHelper.WriteLine($"   az pipelines show --id <pipeline-id> --project <project>", ConsoleColor.Yellow);
             Console.WriteLine();
+        }
+
+        private bool ValidateAzureDevOpsCredentials(out string? pat)
+        {
+            pat = AzureDevOpsCredentials.GetTokenOrDefault();
+            if (string.IsNullOrEmpty(pat))
+            {
+                ConsoleHelper.WriteError("X Azure DevOps authentication required.");
+                Console.WriteLine("Please set AZURE_DEVOPS_PAT environment variable or run: sdo auth azdo");
+                return false;
+            }
+            return true;
         }
 
         private Task<string?> GetAuthenticationTokenAsync(Platform platform)
@@ -1540,15 +1529,12 @@ namespace Sdo.Commands
                     return 1;
                 }
 
-                var pat = AzureDevOpsCredentials.GetTokenOrDefault();
-                if (string.IsNullOrEmpty(pat))
+                if (!ValidateAzureDevOpsCredentials(out var pat))
                 {
-                    ConsoleHelper.WriteError("X Azure DevOps authentication required.");
-                    Console.WriteLine("Please set AZURE_DEVOPS_PAT environment variable or run: sdo.net auth azdo");
                     return 1;
                 }
 
-                using var client = new Sdo.Services.AzureDevOpsClient(pat, organization, project);
+                using var client = new Sdo.Services.AzureDevOpsClient(pat!, organization, project);
                 PipelineRun? run;
 
                 if (buildId.HasValue)
@@ -1677,15 +1663,12 @@ namespace Sdo.Commands
                     return 1;
                 }
 
-                var pat = AzureDevOpsCredentials.GetTokenOrDefault();
-                if (string.IsNullOrEmpty(pat))
+                if (!ValidateAzureDevOpsCredentials(out var pat))
                 {
-                    ConsoleHelper.WriteError("X Azure DevOps authentication required.");
-                    Console.WriteLine("Please set AZURE_DEVOPS_PAT environment variable or run: sdo.net auth azdo");
                     return 1;
                 }
 
-                using var client = new Sdo.Services.AzureDevOpsClient(pat, organization, project);
+                using var client = new Sdo.Services.AzureDevOpsClient(pat!, organization, project);
                 PipelineRun? run;
 
                 if (buildId.HasValue)
