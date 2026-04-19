@@ -46,29 +46,29 @@ nav:
     - Build Types: buildtypes.md
     - Versioning: versioning.md
   - List of Tools:
-      - Nbuild (nb.exe): ntools/nbuild.md
-      - lf (lf.exe): ntools/lf.md
-      - Nbackup (nbackup.exe): ntools/nbackup.md
-      - Github Release : ntools/github-release.md
+      - Nbuild (nb.exe): nbuild.md
+      - lf (lf.exe): lf.md
+      - Nbackup (nbackup.exe): nbackup.md
+      - Github Release : github-release.md
       - Sdo (sdo.exe):
-        - Documentation: atools/sdo-net.md
+        - Documentation: sdo-net.md
         - Usage Examples:
-          - AzDO Bug Example: atools/issue-azdo-bug-example.md
-          - AzDO Epic Example: atools/issue-azdo-epic-example.md
-          - AzDO PBI Example: atools/issue-azdo-pbi-example.md
-          - AzDO Task Example: atools/issue-azdo-task-example.md
-          - GitHub Issue Example: atools/issue-gh-example.md
+          - AzDO Bug Example: issue-azdo-bug-example.md
+          - AzDO Epic Example: issue-azdo-epic-example.md
+          - AzDO PBI Example: issue-azdo-pbi-example.md
+          - AzDO Task Example: issue-azdo-task-example.md
+          - GitHub Issue Example: issue-gh-example.md
   - Custom Build Tasks:
-      - Nbuild Tasks: ntools/nbuildtasks.md
+      - Nbuild Tasks: nbuildtasks.md
   - Developer setup:
     - Version Automation Guide: version-automation-guide.md
-    - Development Tools: ntools/ntools.md
+    - Development Tools: ntools.md
     - ntools-scripts module:
-      - Module: ntools/ntools-scripts-module.md
-      - API: ntools/ntools-scripts-module-api.md
+      - Module: ntools-scripts-module.md
+      - API: ntools-scripts-module-api.md
   - Build System Features:
-    - Code Coverage: ntools/code-coverage.md
-    - MSBuild Targets: ntools/nbuild-targets.md
+    - Code Coverage: code-coverage.md
+    - MSBuild Targets: nbuild-targets.md
   - Reference:
-    - AzDO Payloads: atools/azdo_payloads.md
+    - AzDO Payloads: azdo_payloads.md
   - TODO: todo.md

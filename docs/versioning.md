@@ -13,7 +13,7 @@ Throughout this document, the terms "version" and "tag" are used interchangeably
     - `Z` is the build number:
         - Incremented when [staging](buildtypes.md#stage) Build Type is deployed.
 
-Tags in the [GitHubRelease](./ntools/github-release.md) are used to:
+Tags in the [GitHubRelease](./github-release.md) are used to:
 
 - Identify specific versions of the repository.
 - Associate release assets with a particular version.

@@ -21,6 +21,7 @@ The ntools suite consists of multiple executables that provide various developme
 - **nb.exe** - Main build automation and DevOps utility tool
 - **Nbackup.exe** - Backup automation tool
 - **lf.exe** - File listing and management utility
+- **sdo.exe** - Simple DevOps Operations tool for work item and repository management
 - **Go executables** - Various Go-based utilities in the `go/` directory
 
 ### Architecture Diagram
@@ -32,6 +33,7 @@ graph TB
             NB[nb.exe<br/>Nbuild]
             NBKP[Nbackup.exe<br/>nBackup]
             LF[lf.exe<br/>lf]
+            SDO[sdo.exe<br/>Simple DevOps Operations Tool]
         end
 
         subgraph "Go Executables"
@@ -47,7 +49,7 @@ graph TB
 
     subgraph "External Dependencies"
         SCL[System.CommandLine<br/>CLI framework]
-        DOTNET[.NET 9.0<br/>Runtime]
+        DOTNET[.NET 10.0<br/>Runtime]
         GO_RUNTIME[Go Runtime<br/>For Go tools]
     end
 
@@ -72,13 +74,14 @@ graph TB
     NBL --> DOTNET
     GHR --> DOTNET
     API --> DOTNET
-
+    SDO --> NBL
+    SDO --> GHR
     style NB fill:#e1f5fe
     style NBKP fill:#f3e5f5
     style LF fill:#e8f5e8
     style NBL fill:#fff3e0
     style GHR fill:#fce4ec
-    style API fill:#f1f8e9
+    style API fill:#f1f8e9  
 ```
 
 ### Executable Details
@@ -102,7 +105,14 @@ graph TB
 - **Purpose**: File listing and management utility
 - **Features**: Advanced file listing, file operations
 - **Dependencies**: NbuildTasks, System.CommandLine
-
+#### sdo.exe (Simple DevOps Operations Tool)
+- **Purpose**: Comprehensive CLI for work item creation and repository management across Azure DevOps and GitHub
+- **Features**:
+  - Work item management (create, list, show, update, comment)
+  - Repository operations (create, list, delete)
+  - Pull request management (create, list, show, update)
+  - Pipeline management (create, run, monitor)
+  - Dry-run mode for previewing operations
 #### Go Executables
 - **Purpose**: Various utilities written in Go
 - **Location**: `go/` directory
@@ -227,7 +237,7 @@ ntools/
 ### Build System
 
 All .NET executables are built using:
-- .NET 9.0 SDK
+- .NET 10.0 SDK
 - MSBuild
 - Custom build targets (nbuild.targets)
 - Shared build tasks (NbuildTasks)
@@ -276,12 +286,12 @@ Both sdo and ntools Suite follow consistent design principles:
 
 #### ntools Suite (.NET)
 - **Runtime**: .NET 10.0 SDK
-- **CLI Framework**: System.CommandLine 2.0.1
+- **CLI Framework**: System.CommandLine 2.0.2
 - **Build System**: MSBuild with custom targets
 
 #### sdo (C# Simple DevOps Operations Tool)
 - **Runtime**: .NET 10.0 (only supported implementation)
-- **CLI Framework**: System.CommandLine 2.0.1
+- **CLI Framework**: System.CommandLine 2.0.2
 - **API Clients**: Octokit.NET (GitHub API), Microsoft.TeamFoundationServer.Client (Azure DevOps API)
 - **HTTP**: System.Net.Http for REST calls
 - **JSON**: System.Text.Json for JSON processing
@@ -302,15 +312,3 @@ Both sdo and ntools Suite follow consistent design principles:
 - **Consistent CLI Design**: System.CommandLine framework for both tool suites
 - **Cross-Platform Compatibility**: All executables run on Windows, Linux, and macOS
 - **Performance First**: C# implementation ensures fast, reliable DevOps operations
-
-## Implementation Notes
-
-### Removal of Python SDO
-The Python implementation of sdo has been deprecated and removed. All DevOps operations now use the high-performance C# implementation (`sdo.exe`).
-
-**Migration Path**: Users previously using Python `sdo` commands should update to use `sdo.exe` with identical command syntax:
-- Old: `sdo wi list` (Python) → New: `sdo.exe wi list` (C#)
-- Old: `sdo pr ls` (Python) → New: `sdo.exe pr list` (C#)
-
-### Command Mapping
-For complete command mapping and usage examples, see [Command Mappings Reference](mapping.md).

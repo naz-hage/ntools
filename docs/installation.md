@@ -120,7 +120,7 @@ You can now use 'ntools' commands from any location.
 
 ## Post-Installation
 
-After the installation is complete, check out the [nbuild.targets](./ntools/nbuild-targets.md) for all available targets, and navigate to [Usage](usage.md) to learn how to execute a build target.
+After the installation is complete, check out the [nbuild.targets](./nbuild-targets.md) for all available targets, and navigate to [Usage](usage.md) to learn how to execute a build target.
 
 **Note:** For DevOps operations across Azure DevOps and GitHub, use the sdo (sdo.exe) tool which is included with ntools. See the [List of Tools](index.md) documentation for sdo usage and examples.
 

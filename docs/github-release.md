@@ -1,4 +1,4 @@
-nb.exe is also designed to help you create and manage GitHub releases. It also enables you to download release assets, such as files named in the format x.y.z.zip. The tool expects downloaded assets to be in a zip file named ${tag}.zip, where tag must be a valid tag in the repository created by the tool (e.g., ``x.y.z``).  checkout the [versioning](../versioning.md) section for more details.
+nb.exe is also designed to help you create and manage GitHub releases. It also enables you to download release assets, such as files named in the format x.y.z.zip. The tool expects downloaded assets to be in a zip file named ${tag}.zip, where tag must be a valid tag in the repository created by the tool (e.g., ``x.y.z``).  checkout the [versioning](./versioning.md) section for more details.
 
 ## Requirements
 
@@ -122,7 +122,7 @@ The access token must have the following permissions:
 ## GitHubRelease Command Line Options
 
 ### Usage
-See [nb.exe](../ntools/nbuild.md) for the command line options.
+See [nb.exe](./nbuild.md) for the command line options.
 
 ## Manifests and private GitHub release assets
 

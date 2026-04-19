@@ -1,6 +1,6 @@
 
 
-Once Ntools is installed, Open a Developer Command prompt for Visual Studio 2022 and navigate to your solution folder (i.e. `./ntools`). The [.NET SDK](https://dotnet.microsoft.com/download) must be installed and available in your PATH for build operations. The [`nb.exe`](./ntools/nbuild.md) is the main executable for the Ntools.  The following are some examples of how to use the Ntools:
+Once Ntools is installed, Open a Developer Command prompt for Visual Studio 2022 and navigate to your solution folder (i.e. `./ntools`). The [.NET SDK](https://dotnet.microsoft.com/download) must be installed and available in your PATH for build operations. The [`nb.exe`](./nbuild.md) is the main executable for the Ntools.  The following are some examples of how to use the Ntools:
 
 ## Global Options
 
@@ -58,6 +58,6 @@ nb.exe smoke_test
 nb.exe targets
 ```
 
-- See the complete list of available targets at [Nbuild Targets](./ntools/nbuild-targets.md)
-- Learn more about code coverage at [Code Coverage](./ntools/code-coverage.md)
+- See the complete list of available targets at [Nbuild Targets](./nbuild-targets.md)
+- Learn more about code coverage at [Code Coverage](./code-coverage.md)
 
