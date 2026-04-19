@@ -13,10 +13,10 @@
       
       
       
-        <link rel="prev" href="../usage/">
+        <link rel="prev" href="../code-coverage/">
       
       
-        <link rel="next" href="../buildtypes/">
+        <link rel="next" href="../azdo_payloads/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Setup your project - Ntools - Work in Progress</title>
+        <title>MSBuild Targets - Ntools - Work in Progress</title>
       
     
     
@@ -77,11 +77,6 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
-        
-        <a href="#setting-up-your-project-with-dev-setup" class="md-skip">
-          Skip to content
-        </a>
-      
     </div>
     <div data-md-component="announce">
       
@@ -112,7 +107,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Setup your project
+              MSBuild Targets
             
           </span>
         </div>
@@ -209,12 +204,10 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
+      <li class="md-tabs__item">
         <a href=".." class="md-tabs__link">
           
   
@@ -291,10 +284,12 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
+      <li class="md-tabs__item md-tabs__item--active">
         <a href="../code-coverage/" class="md-tabs__link">
           
   
@@ -397,31 +392,26 @@
       
   
   
-    
   
   
-  
     
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
         
           
-          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="">
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
             
   
   
@@ -439,7 +429,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_1">
             <span class="md-nav__icon md-icon"></span>
             
@@ -566,37 +556,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Setup your project
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../setup/" class="md-nav__link">
         
   
   
@@ -612,137 +575,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#powershell-module-integration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        PowerShell Module Integration
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="PowerShell Module Integration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#using-ntools-scripts-module" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Using ntools-scripts Module
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#overview-of-dev-setup-folder" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Overview of dev-setup Folder
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#file-details" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        File Details
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="File Details">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-ntoolsjson" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. ntools.json
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-appsjson" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. apps.json
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-dev-setupps1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. dev-setup.ps1
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#folder-structure" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Folder Structure
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#adding-a-new-development-tool" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Adding a New Development Tool
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1592,26 +1424,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
         
           
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
             
   
   
@@ -1629,7 +1466,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1672,10 +1509,17 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../nbuild-targets/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1691,6 +1535,7 @@
   
 
       </a>
+      
     </li>
   
 
@@ -1837,211 +1682,521 @@
   
 
 
-<h1 id="setting-up-your-project-with-dev-setup">Setting Up Your Project with dev-setup<a class="headerlink" href="#setting-up-your-project-with-dev-setup" title="Anchor link to this section for reference">&para;</a></h1>
-<p>The dev-setup folder is a critical part of your project setup. It contains scripts and configuration files to automate the installation of development tools and the setup of your development environment.</p>
-<h2 id="powershell-module-integration">PowerShell Module Integration<a class="headerlink" href="#powershell-module-integration" title="Anchor link to this section for reference">&para;</a></h2>
-<p><strong>New in v2.3.0</strong>: NTools now includes a consolidated PowerShell module (<code>ntools-scripts</code>) that replaces individual scripts with a unified, function-based approach. This module is automatically integrated with the setup process.</p>
-<h3 id="using-ntools-scripts-module">Using ntools-scripts Module<a class="headerlink" href="#using-ntools-scripts-module" title="Anchor link to this section for reference">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="c"># Import the module</span>
-<span class="nb">Import-Module</span> <span class="s2">&quot;./scripts/module-package/ntools-scripts.psm1&quot;</span> <span class="n">-Force</span>
+  <h1>MSBuild Targets</h1>
 
-<span class="c"># Install NTools using the module (recommended approach)</span>
-<span class="nb">Install-NTools</span> <span class="n">-NtoolsJsonPath</span> <span class="s2">&quot;./dev-setup/ntools.json&quot;</span>
-
-<span class="c"># Set up development environment</span>
-<span class="nb">Set-DevelopmentEnvironment</span>
-<span class="nb">Install-DevelopmentApps</span>
-</code></pre></div>
-<p>For complete module documentation, see <a href="../ntools-scripts-module/">ntools-scripts Module</a>.</p>
-<h2 id="overview-of-dev-setup-folder">Overview of dev-setup Folder<a class="headerlink" href="#overview-of-dev-setup-folder" title="Anchor link to this section for reference">&para;</a></h2>
-<p>The dev-setup folder typically includes the following files:</p>
+<p>The table below lists all available targets for the Nbuild tool. </p>
 <ul>
-<li><strong><code>ntools.json</code></strong>  <ul>
-<li>Contains installation information for ntools. This file is required to install ntools before other development tools.</li>
+<li><strong>./ntools\nbuild.targets Targets</strong></li>
 </ul>
-</li>
-<li><strong><code>apps.json</code></strong>  <ul>
-<li>Lists the development tools required for your project, including their installation and uninstallation details.</li>
-</ul>
-</li>
-<li><strong>Legacy scripts</strong> (deprecated in favor of ntools-scripts module)</li>
-<li>Individual PowerShell scripts for specific tasks</li>
-</ul>
-<hr />
-<h2 id="file-details">File Details<a class="headerlink" href="#file-details" title="Anchor link to this section for reference">&para;</a></h2>
-<h3 id="1-ntoolsjson">1. ntools.json<a class="headerlink" href="#1-ntoolsjson" title="Anchor link to this section for reference">&para;</a></h3>
-<p>This file provides the installation details for ntools, which is required to manage other tools in the project.</p>
-<p><strong>Example:</strong>
-<div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;Version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1.2.0&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;NbuildAppList&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">    </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;Name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Ntools&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;Version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1.7.0&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;AppFileName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;$(InstallPath)\\nb.exe&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;WebDownloadFile&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;DownloadedFile&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;$(Version).zip&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;InstallCommand&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;powershell.exe&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;InstallArgs&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;-Command Expand-Archive -Path $(Version).zip -DestinationPath &#39;$(InstallPath)&#39; -Force&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;InstallPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;$(ProgramFiles)\\Nbuild&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;UninstallCommand&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;powershell.exe&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;UninstallArgs&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;-Command Remove-Item -Path &#39;$(InstallPath)&#39; -Recurse -Force&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;StoredHash&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;XXX&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;AddToPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="w">  </span><span class="p">]</span>
-<span class="p">}</span>
-</code></pre></div></p>
-<hr />
-<h3 id="2-appsjson">2. apps.json<a class="headerlink" href="#2-appsjson" title="Anchor link to this section for reference">&para;</a></h3>
-<p>This file lists all the development tools required for the project. Each tool is defined with its name, version, installation details, and uninstallation details.</p>
-<p><strong>Example:</strong>
-<div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;Version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1.2.0&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;NbuildAppList&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">    </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;Name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;7-zip&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;Version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;23.01&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;AppFileName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;$(InstallPath)\\7z.exe&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;WebDownloadFile&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://www.7-zip.org/a/7z2301-x64.exe&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;DownloadedFile&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;7zip.exe&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;InstallCommand&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;$(DownloadedFile)&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;InstallArgs&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/S /D=\&quot;$(ProgramFiles)\\7-Zip\&quot;&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;InstallPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;$(ProgramFiles)\\7-Zip&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;UninstallCommand&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;$(InstallPath)\\Uninstall.exe&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;UninstallArgs&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/S&quot;</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="w">  </span><span class="p">]</span>
-<span class="p">}</span>
-</code></pre></div></p>
-<p><strong>Key Elements in apps.json:</strong></p>
 <table>
 <thead>
 <tr>
-<th>Element Name</th>
-<th>Description</th>
+<th><strong>Target Name</strong></th>
+<th><strong>Description</strong></th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>Name</code></td>
-<td>The name of the tool.</td>
+<td>ARTIFACTS</td>
+<td>Setup the ARTIFACTS folders for binaries and test results - override</td>
 </tr>
 <tr>
-<td><code>Version</code></td>
-<td>The version of the tool.</td>
+<td>FILE_VERSIONS</td>
+<td>Test for FileVersion task and powershell file-version.ps1</td>
 </tr>
 <tr>
-<td><code>AppFileName</code></td>
-<td>The file name of the tool, used to check if it is already installed.</td>
+<td>NBUILD_DOWNLOAD</td>
+<td>Download Nbuild specified in the NbuildTargetVersion</td>
 </tr>
 <tr>
-<td><code>WebDownloadFile</code></td>
-<td>The URL to download the tool.</td>
+<td>MKDOCS</td>
+<td>Build docs locally for testing</td>
 </tr>
 <tr>
-<td><code>DownloadedFile</code></td>
-<td>The name of the downloaded file, used for installation.</td>
+<td>MKDOCS_DEPLOY</td>
+<td>mkdocs deploy locally</td>
 </tr>
 <tr>
-<td><code>InstallCommand</code></td>
-<td>The command to install the tool.</td>
+<td>GET_PRODUCT_CODES</td>
+<td>Example to get the installation Product code used for uninstallation of product</td>
 </tr>
 <tr>
-<td><code>InstallArgs</code></td>
-<td>The arguments for the installation command.</td>
+<td>CORE</td>
+<td>Display core properties</td>
 </tr>
 <tr>
-<td><code>InstallPath</code></td>
-<td>The location where the tool will be installed.</td>
+<td>UPDATE_NTOOLS</td>
+<td>Update ntools locally for testing</td>
 </tr>
 <tr>
-<td><code>UninstallCommand</code></td>
-<td>The command to uninstall the tool.</td>
+<td>NUGET_UPDATE</td>
+<td>Update the ntools-launcher nuget package in the local feed for testing - not needed for normal builds</td>
 </tr>
 <tr>
-<td><code>UninstallArgs</code></td>
-<td>The arguments for the uninstallation command.</td>
+<td>YELLOW_MESSAGE</td>
+<td>Example of a target that displays a yellow color message</td>
 </tr>
 <tr>
-<td><code>StoredHash</code></td>
-<td>(Optional) SHA256 hash of the file for verification.</td>
+<td>RED_MESSAGE</td>
+<td>Example of a target that displays a red color message</td>
 </tr>
 <tr>
-<td><code>AddToPath</code></td>
-<td>(Optional) Whether to add the tool's path to the system PATH environment variable.</td>
+<td>GITHUB_RELEASE</td>
+<td>Creates a stage or prod release</td>
+</tr>
+<tr>
+<td>GITHUB_PRE_RELEASE</td>
+<td>Creates a stage or prod pre-release</td>
+</tr>
+<tr>
+<td>INSTALL_DOTNET_OUTDATED_TOOL</td>
+<td>Install dotnet-outdated-tool globally</td>
+</tr>
+<tr>
+<td>UPDATE_NUGET_PACKAGES</td>
+<td>Update all NuGet packages to the latest version</td>
+</tr>
+<tr>
+<td>LIST_NUGET_SOURCES</td>
+<td>List all NuGet sources</td>
+</tr>
+<tr>
+<td>UPDATE_DOC_VERSIONS</td>
+<td>Update documentation versions from JSON configuration files</td>
+</tr>
+<tr>
+<td>GENERATE_COMMIT_MESSAGE</td>
+<td>Intelligent commit message generation</td>
+</tr>
+<tr>
+<td>GIT_COMMIT_INFRASTRUCTURE</td>
+<td>Automated Git commit with intelligent message generation</td>
+</tr>
+<tr>
+<td>UPDATE_AND_COMMIT</td>
+<td>Combined target: Update versions and commit with smart message</td>
+</tr>
+<tr>
+<td>INFRASTRUCTURE_COMMIT</td>
+<td>Full infrastructure update and commit with intelligent analysis</td>
+</tr>
+<tr>
+<td>PREVIEW_COMMIT_MESSAGE</td>
+<td>Preview commit message without committing</td>
 </tr>
 </tbody>
 </table>
-<hr />
-<h3 id="3-dev-setupps1">3. <code>dev-setup.ps1</code><a class="headerlink" href="#3-dev-setupps1" title="Anchor link to this section for reference">&para;</a></h3>
-<p>This PowerShell script automates the installation of tools and sets up the development environment.</p>
-<p><strong>Key Responsibilities:</strong></p>
 <ul>
-<li>Installs ntools using ntools.json.</li>
-<li>Installs other tools listed in apps.json.</li>
-<li>Verifies administrative privileges before proceeding.</li>
+<li><strong>C:\Program Files\Nbuild\common.targets Targets</strong></li>
 </ul>
-<p><strong>Example:</strong>
-<div class="highlight"><pre><span></span><code><span class="c"># Import the install module</span>
-<span class="nv">$url</span> <span class="p">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/naz-hage/ntools/main/dev-setup/install.psm1&quot;</span>
-<span class="nv">$output</span> <span class="p">=</span> <span class="s2">&quot;./install.psm1&quot;</span>
-<span class="nb">Invoke-WebRequest</span> <span class="n">-Uri</span> <span class="nv">$url</span> <span class="n">-OutFile</span> <span class="nv">$output</span>
-<span class="nb">Import-Module</span> <span class="p">./</span><span class="n">install</span><span class="p">.</span><span class="n">psm1</span> <span class="n">-Force</span>
-
-<span class="c"># Install Ntools</span>
-<span class="n">MainInstallApp</span> <span class="n">-command</span> <span class="n">install</span> <span class="n">-json</span> <span class="p">.\</span><span class="n">ntools</span><span class="p">.</span><span class="n">json</span>
-<span class="k">if</span> <span class="p">(</span><span class="nv">$LASTEXITCODE</span> <span class="o">-ne</span> <span class="n">0</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nb">Write-OutputMessage</span> <span class="s2">&quot;Error: Installation of ntools failed. Exiting script.&quot;</span>
-    <span class="n">exit</span> <span class="n">1</span>
-<span class="p">}</span>
-
-<span class="c"># Install other tools</span>
-<span class="p">&amp;</span> <span class="nv">$global:NbExePath</span> <span class="n">install</span> <span class="n">-json</span> <span class="p">.\</span><span class="n">apps</span><span class="p">.</span><span class="n">json</span>
-<span class="k">if</span> <span class="p">(</span><span class="nv">$LASTEXITCODE</span> <span class="o">-ne</span> <span class="n">0</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nb">Write-OutputMessage</span> <span class="s2">&quot;Error: Installation of other tools failed. Exiting script.&quot;</span>
-    <span class="n">exit</span> <span class="n">1</span>
-<span class="p">}</span>
-
-<span class="nb">Write-OutputMessage</span> <span class="s2">&quot;Completed installation script.&quot;</span>
-</code></pre></div></p>
-<hr />
-<h2 id="folder-structure">Folder Structure<a class="headerlink" href="#folder-structure" title="Anchor link to this section for reference">&para;</a></h2>
-<p>Your project folder should look like this:
-<div class="highlight"><pre><span></span><code>%MainDirectory%\
-├── MyProject\
-│   ├── dev-setup\
-│   │   ├── ntools.json
-│   │   ├── apps.json
-│   │   ├── dev-setup.ps1
-│   ├── ... other project and test files
-│   └── nbuild.targets  (this file is required in the solution folder)
-</code></pre></div></p>
-<hr />
-<h2 id="adding-a-new-development-tool">Adding a New Development Tool<a class="headerlink" href="#adding-a-new-development-tool" title="Anchor link to this section for reference">&para;</a></h2>
-<p>To add a new tool to your project:
-1. Identify the tool's:
-   - Download URL and file name.
-   - Installation and uninstallation commands and arguments.
-   - Installation path.
-   - File name for version checks.
-   - Version and name.
-2. Add the tool's details to apps.json.</p>
-<p><strong>Example for a new tool:</strong>
-<div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;Name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Docker&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;Version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;4.38.0.0&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;AppFileName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;$(InstallPath)\\Docker Desktop.exe&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;WebDownloadFile&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;DownloadedFile&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Docker Desktop Installer.exe&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;InstallCommand&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;$(DownloadedFile)&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;InstallArgs&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;install --quiet&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;InstallPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;$(ProgramFiles)\\Docker\\Docker&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;UninstallCommand&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;powershell.exe&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;UninstallArgs&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;-Command \&quot;Remove-Item -Path &#39;$(InstallPath)&#39; -Recurse -Force\&quot;&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;AddToPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
-<span class="p">}</span>
-</code></pre></div></p>
+<table>
+<thead>
+<tr>
+<th><strong>Target Name</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PROPERTIES</td>
+<td>Common properties that will be used by all targets</td>
+</tr>
+<tr>
+<td>CLEAN</td>
+<td>Clean up the project and artifacts folder</td>
+</tr>
+<tr>
+<td>INSTALL_DEP</td>
+<td>Install dependencies</td>
+</tr>
+<tr>
+<td>TELEMETRY_OPT_OUT</td>
+<td>Opt out of the DOTNET_CLI_TELEMETRY_OPTOUT - move to common</td>
+</tr>
+<tr>
+<td>DEV</td>
+<td>Create a development package for testing without incrementing the version</td>
+</tr>
+<tr>
+<td>STAGE</td>
+<td>Create a stage package for testing</td>
+</tr>
+<tr>
+<td>PROD</td>
+<td>Create a PROD package for release</td>
+</tr>
+<tr>
+<td>GITHUB_RELEASE</td>
+<td>Creates a stage or prod release</td>
+</tr>
+<tr>
+<td>GITHUB_PRE_RELEASE</td>
+<td>Creates a stage or prod pre-release</td>
+</tr>
+<tr>
+<td>STAGE_DEPLOY</td>
+<td>Create a STAGE package and deploy for testing</td>
+</tr>
+<tr>
+<td>PROD_DEPLOY</td>
+<td>Create a PROD package and deploy for release</td>
+</tr>
+<tr>
+<td>SOLUTION</td>
+<td>Build the solution Release configuration  using dotnet build</td>
+</tr>
+<tr>
+<td>SOLUTION_MSBUILD</td>
+<td>Build the solution Release configuration  using MSBuild</td>
+</tr>
+<tr>
+<td>PACKAGE</td>
+<td>Create a package for the solution default is a zip file of all artifacts</td>
+</tr>
+<tr>
+<td>COPY_ARTIFACTS</td>
+<td>Save the artifacts to the artifacts folder with organized structure</td>
+</tr>
+<tr>
+<td>DEPLOY</td>
+<td>Deploy the package. default is to extract artifacts into DeploymentProperty folder</td>
+</tr>
+<tr>
+<td>TEST</td>
+<td>Run all tests using dotnet test in Release mode with conditional code coverage</td>
+</tr>
+<tr>
+<td>TEST_DEBUG</td>
+<td>Run all tests using dotnet test in Debug mode</td>
+</tr>
+<tr>
+<td>COVERAGE</td>
+<td>Generate comprehensive code coverage reports using ReportGenerator</td>
+</tr>
+<tr>
+<td>COVERAGE_SUMMARY</td>
+<td>Display high-level code coverage summary</td>
+</tr>
+<tr>
+<td>SMOKE_TEST</td>
+<td><strong>Comprehensive smoke test</strong>: Validates published artifacts (4+ executables) AND build system integrity (target delegation). Consolidated from TEST_TARGET_DELEGATION</td>
+</tr>
+<tr>
+<td>SMOKE_TEST_PWSH</td>
+<td>REMOVED: functionality consolidated into <code>SMOKE_TEST</code></td>
+</tr>
+<tr>
+<td>UNIT_TEST_CLI_VALIDATION</td>
+<td>Run CLI validation unit tests</td>
+</tr>
+<tr>
+<td>UNIT_TEST_BUILD_STARTER</td>
+<td>Run BuildStarter unit tests</td>
+</tr>
+<tr>
+<td>UNIT_TEST_CLI</td>
+<td>Run CLI unit tests</td>
+</tr>
+<tr>
+<td>UNIT_TEST_COMMAND</td>
+<td>Run Command unit tests</td>
+</tr>
+<tr>
+<td>UNIT_TEST_NB_COMMAND</td>
+<td>Run NbCommand unit tests</td>
+</tr>
+<tr>
+<td>UNIT_TEST_GIT_CLONE_COMMAND</td>
+<td>Run GitCloneCommand unit tests</td>
+</tr>
+<tr>
+<td>UNIT_TEST_NTOOLS_JSON</td>
+<td>Run NtoolsJson unit tests</td>
+</tr>
+<tr>
+<td>UNIT_TEST_PATH_MANAGER</td>
+<td>Run PathManager unit tests (excluded from UNIT_TEST_ALL due to long execution time)</td>
+</tr>
+<tr>
+<td>UNIT_TEST_RELEASE_SERVICE_FACTORY</td>
+<td>Run ReleaseServiceFactory unit tests</td>
+</tr>
+<tr>
+<td>UNIT_TEST_RESOURCE_HELPER</td>
+<td>Run ResourceHelper unit tests</td>
+</tr>
+<tr>
+<td>UNIT_TEST_ALL</td>
+<td>Run all unit tests except UNIT_TEST_PATH_MANAGER</td>
+</tr>
+<tr>
+<td>IS_ADMIN</td>
+<td>Check if current process is running in admin mode AdminCheckExitCode property is set</td>
+</tr>
+<tr>
+<td>SingleProject</td>
+<td>Example how to build a single project</td>
+</tr>
+<tr>
+<td>HandleError</td>
+<td>Error handling placeholder</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>C:\Program Files\nbuild\apps-versions.targets Targets</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th><strong>Target Name</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>APP_COMMON</td>
+<td>Defines the download location for the apps</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>C:\Program Files\nbuild\git.targets Targets</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th><strong>Target Name</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GIT_DOWNLOAD</td>
+<td>Download Git For Windows version specified in GitTargetVersion - Requires admin mode</td>
+</tr>
+<tr>
+<td>GIT_INSTALL</td>
+<td>Download Git For Windows version specified in GitTargetVersion property and install</td>
+</tr>
+<tr>
+<td>GIT_UPDATE</td>
+<td>Update the current Git for Windows</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>C:\Program Files\nbuild\dotnet.targets Targets</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th><strong>Target Name</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DOTNET_SDK_DOWNLOAD</td>
+<td>Download dotnet Core sdk</td>
+</tr>
+<tr>
+<td>DOTNET_SDK_INSTALL</td>
+<td>Download and install dotnet Core sdk</td>
+</tr>
+<tr>
+<td>DOTNET_DOWNLOAD</td>
+<td>Download DotNet Core</td>
+</tr>
+<tr>
+<td>DOTNET_INSTALL</td>
+<td>Download and install DotNet Core</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>C:\Program Files\nbuild\code.targets Targets</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th><strong>Target Name</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CODE_DOWNLOAD</td>
+<td>Download node version specified in CodeTargetVersion - Requires admin mode</td>
+</tr>
+<tr>
+<td>CODE_INSTALL</td>
+<td>Download node version specified in CodeTargetVersion property and install</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>C:\Program Files\nbuild\node.targets Targets</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th><strong>Target Name</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NODE_DOWNLOAD</td>
+<td>Download node version specified in NodeTargetVersion - Requires admin mode</td>
+</tr>
+<tr>
+<td>NODE_INSTALL</td>
+<td>Download node version specified in NodeTargetVersion property and install</td>
+</tr>
+<tr>
+<td>NODE_VERSION</td>
+<td>Display the installed note version</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>C:\Program Files\nbuild\mongodb.targets Targets</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th><strong>Target Name</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MONGODB_INSTALL</td>
+<td>Display mongodb version specified in TargetNodeVersion property and install</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>C:\Program Files\nbuild\nuget.targets Targets</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th><strong>Target Name</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NUGET_VERSION</td>
+<td>Display the installed nuget version</td>
+</tr>
+<tr>
+<td>NUGET_INSTALL</td>
+<td>Download latest nuget.exe and install</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>C:\Program Files\nbuild\ngit.targets Targets</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th><strong>Target Name</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GIT_STATUS</td>
+<td>Display the current git status</td>
+</tr>
+<tr>
+<td>AUTOTAG_STAGE</td>
+<td>Increment version for a stage build</td>
+</tr>
+<tr>
+<td>SET_TAG</td>
+<td>Set version for a stage build</td>
+</tr>
+<tr>
+<td>GIT_PULL</td>
+<td>Get the latest tag from git</td>
+</tr>
+<tr>
+<td>AUTOTAG_PROD</td>
+<td>Increment version for a production build</td>
+</tr>
+<tr>
+<td>TAG</td>
+<td>Get the tag from git</td>
+</tr>
+<tr>
+<td>PUSH_TAG</td>
+<td>Push the tag to the remote repo</td>
+</tr>
+<tr>
+<td>GIT_BRANCH</td>
+<td>Get the current git branch</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>C:\Program Files\nbuild\docker.targets Targets</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th><strong>Target Name</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DOCKER_DOWNLOAD</td>
+<td>Download Docker version specified in DockerTargetVersion - Requires admin mode</td>
+</tr>
+<tr>
+<td>DOCKER_INSTALL</td>
+<td>Download Docker version specified in DockerTargetVersion property and install</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>C:\Program Files\nbuild\terraform.targets Targets</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th><strong>Target Name</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TF_WORKSPACE</td>
+<td>Create a new terraform workspace <code>dev</code> and select it</td>
+</tr>
+<tr>
+<td>TF_INIT</td>
+<td>Init terraform</td>
+</tr>
+<tr>
+<td>TF_PLAN</td>
+<td>terraform plan</td>
+</tr>
+<tr>
+<td>TF_APPLY</td>
+<td>terraform apply</td>
+</tr>
+<tr>
+<td>TF_DESTROY</td>
+<td>terraform destroy</td>
+</tr>
+</tbody>
+</table>
 
 
 
