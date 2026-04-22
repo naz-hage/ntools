@@ -2310,11 +2310,11 @@
 ├── ArtifactsFolder/              # Build artifacts
 ├── logs/                         # Build and test logs
 ├── atools/                       # Automated tools and installers
+│   ├── tests/                    # Tests for installation scripts
+│   │   └── test_install_ntools.py # Tests for the NTools installer
 │   ├── install-ntools.py         # NTools installation script
-│   ├── install-sdo.py            # SDO installation script
 │   ├── requirements.txt           # Python dependencies for installers
-│   ├── requirements-dev.txt       # Development dependencies
-│   └── sdo.cmd                   # SDO command wrapper
+│   └── requirements-dev.txt       # Development dependencies
 │
 └── Sdo/                          # sdo (C# executable)
     ├── Sdo.csproj                # C# project file
