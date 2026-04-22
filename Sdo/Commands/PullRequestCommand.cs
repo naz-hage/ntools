@@ -271,6 +271,17 @@ namespace Sdo.Commands
 
                     using var client = new GitHubClient(pat);
                     var currentBranch = GetCurrentBranch();
+                    
+                    // Check if the current branch exists on the remote before attempting to create PR
+                    if (!BranchExistsOnRemote(currentBranch))
+                    {
+                        ConsoleHelper.WriteError($"X Error: Branch '{currentBranch}' does not exist on remote 'origin'");
+                        Console.WriteLine("\nTo fix this, push your branch first:");
+                        Console.WriteLine($"  git push -u origin {currentBranch}");
+                        Console.WriteLine("\nThen retry the PR creation command.");
+                        return 1;
+                    }
+                    
                     try
                     {
                         var pr = await client.CreatePullRequestAsync(repoInfo.Owner, repoInfo.Repo, title,
@@ -356,6 +367,17 @@ namespace Sdo.Commands
 
                     using var client = new AzureDevOpsClient(pat, organization, project);
                     var currentBranch = GetCurrentBranch();
+                    
+                    // Check if the current branch exists on the remote before attempting to create PR
+                    if (!BranchExistsOnRemote(currentBranch))
+                    {
+                        ConsoleHelper.WriteError($"X Error: Branch '{currentBranch}' does not exist on remote 'origin'");
+                        Console.WriteLine("\nTo fix this, push your branch first:");
+                        Console.WriteLine($"  git push -u origin {currentBranch}");
+                        Console.WriteLine("\nThen retry the PR creation command.");
+                        return 1;
+                    }
+                    
                     var pr = await client.CreatePullRequestAsync(project, repoInfo.Repo, title,
                         $"refs/heads/{currentBranch}", "refs/heads/main", body);
 
@@ -825,6 +847,38 @@ namespace Sdo.Commands
             }
 
             return "main"; // Default fallback
+        }
+
+        private bool BranchExistsOnRemote(string branchName)
+        {
+            try
+            {
+                var processInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "git",
+                    Arguments = $"ls-remote --heads origin {branchName}",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    CreateNoWindow = true
+                };
+
+                using (var process = System.Diagnostics.Process.Start(processInfo))
+                {
+                    if (process != null)
+                    {
+                        var output = process.StandardOutput.ReadToEnd().Trim();
+                        process.WaitForExit();
+                        return !string.IsNullOrEmpty(output);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // If git command fails, assume branch exists to avoid false negatives
+                return true;
+            }
+
+            return false;
         }
     }
 }
