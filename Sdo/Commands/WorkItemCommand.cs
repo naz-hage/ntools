@@ -16,6 +16,7 @@ using Sdo.Interfaces;
 using Sdo.Services;
 using Sdo.Models;
 using Sdo.Mapping;
+using Sdo.Utilities;
 
 namespace Sdo.Commands
 {
@@ -27,6 +28,7 @@ namespace Sdo.Commands
         private readonly PlatformService _platformDetector;
         private readonly Sdo.Mapping.IMappingGenerator _mappingGenerator;
         private readonly Sdo.Mapping.IMappingPresenter _mappingPresenter;
+        private readonly ConfigurationManager _configManager;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WorkItemCommand"/> class.
@@ -37,6 +39,7 @@ namespace Sdo.Commands
             _platformDetector = new PlatformService();
             _mappingGenerator = mappingGenerator ?? new Sdo.Mapping.MappingGenerator();
             _mappingPresenter = mappingPresenter ?? new Sdo.Mapping.ConsoleMappingPresenter();
+            _configManager = new ConfigurationManager();
 
             // Add subcommands (in alphabetical order for help display)
             AddCommentCommand(verboseOption);
@@ -88,6 +91,7 @@ namespace Sdo.Commands
             var areaOption = new Option<string?>("--area") { Description = "Filter by area path (Azure DevOps only). Example: 'Project\\Area\\SubArea'" };
             var iterationOption = new Option<string?>("--iteration") { Description = "Filter by iteration (Azure DevOps only). Example: 'Project\\Sprint 1'" };
             var topOption = new Option<int>("--top") { Description = "Maximum number of items to return (default: 50)" };
+            var configOption = new Option<string?>("--config") { Description = "Path to sdo-config.yaml file (optional)" };
 
             listCommand.Add(typeOption);
             listCommand.Add(stateOption);
@@ -96,6 +100,7 @@ namespace Sdo.Commands
             listCommand.Add(areaOption);
             listCommand.Add(iterationOption);
             listCommand.Add(topOption);
+            listCommand.Add(configOption);
             listCommand.Add(verboseOption);
 
             listCommand.SetAction(async (parseResult) =>
@@ -107,9 +112,10 @@ namespace Sdo.Commands
                 var area = parseResult.GetValue(areaOption);
                 var iteration = parseResult.GetValue(iterationOption);
                 var top = parseResult.GetValue(topOption);
+                var config = parseResult.GetValue(configOption);
                 var verbose = parseResult.GetValue(verboseOption);
 
-                return await ListWorkItems(type, state, assignedTo, assignedToMe, area, iteration, top, verbose);
+                return await ListWorkItems(type, state, assignedTo, assignedToMe, area, iteration, top, config, verbose);
             });
 
             Subcommands.Add(listCommand);
@@ -380,9 +386,43 @@ namespace Sdo.Commands
         /// Handles listing work items with filtering.
         /// </summary>
         private async Task<int> ListWorkItems(string? type, string? state, string? assignedTo, 
-            bool assignedToMe, string? areaPath, string? iteration, int top, bool verbose)
+            bool assignedToMe, string? areaPath, string? iteration, int top, string? configPath, bool verbose)
         {
-            // Do not assign a blanket default here; choose per-platform after detection
+            // Load configuration defaults from sdo-config.yaml (if not provided via CLI)
+            _configManager.Load(configPath);
+            
+            // Display config file location
+            if (_configManager.LoadedConfigPath != null)
+            {
+                Console.WriteLine($"Config: {_configManager.LoadedConfigPath}");
+            }
+            
+            // Apply configuration defaults only if CLI values were not provided
+            if (string.IsNullOrEmpty(type))
+            {
+                type = _configManager.GetValue("commands:wi:list:type");
+            }
+            if (string.IsNullOrEmpty(state))
+            {
+                state = _configManager.GetValue("commands:wi:list:state");
+            }
+            if (string.IsNullOrEmpty(assignedTo))
+            {
+                assignedTo = _configManager.GetValue("commands:wi:list:assigned_to");
+            }
+            if (string.IsNullOrEmpty(areaPath))
+            {
+                areaPath = _configManager.GetValue("commands:wi:list:area_path");
+            }
+            if (string.IsNullOrEmpty(iteration))
+            {
+                iteration = _configManager.GetValue("commands:wi:list:iteration");
+            }
+            if (top <= 0)
+            {
+                var topConfig = _configManager.GetInt("commands:wi:list:top", 0);
+                if (topConfig > 0) top = topConfig;
+            }
 
             try
             {
@@ -553,8 +593,9 @@ namespace Sdo.Commands
                     }
                     else
                     {
-                        // Fallback to literal comparison if parsing failed
-                        issues = issues.Where(i => (i.State ?? "").ToLower() == state.ToLower()).ToList();
+                        // Fallback to literal comparison: support comma-separated states
+                        var requestedStates = state.Split(',').Select(s => s.Trim().ToLower()).ToList();
+                        issues = issues.Where(i => requestedStates.Contains((i.State ?? "").ToLower())).ToList();
                     }
                 }
                 else
@@ -708,8 +749,9 @@ namespace Sdo.Commands
                 // Filter by state
                 if (!string.IsNullOrEmpty(state))
                 {
-                    // Filter to specific state when requested
-                    workItems = workItems.Where(w => w.State?.ToLower() == state.ToLower()).ToList();
+                    // Support comma-separated states: "To Do,In Progress" → match any of them
+                    var requestedStates = state.Split(',').Select(s => s.Trim().ToLower()).ToList();
+                    workItems = workItems.Where(w => requestedStates.Contains(w.State?.ToLower() ?? "")).ToList();
                 }
                 else
                 {
@@ -1586,124 +1628,41 @@ namespace Sdo.Commands
             {
                 if (!File.Exists(filePath)) return null;
 
-                var lines = File.ReadAllLines(filePath);
-                var result = new WorkItemParseResult();
-
-                // Simple YAML frontmatter parse
-                int idx = 0;
-                if (lines.Length > 0 && lines[0].Trim() == "---")
+                // Use the robust MarkdownParser utility class
+                var parseResult = Utilities.MarkdownParser.ParseFile(filePath, verbose: false);
+                
+                if (!parseResult.Success)
                 {
-                    idx = 1;
-                    for (; idx < lines.Length; idx++)
+                    if (parseResult.Errors.Any())
                     {
-                        var l = lines[idx];
-                        if (l.Trim() == "---") { idx++; break; }
-                        var sep = l.IndexOf(":");
-                        if (sep > 0)
+                        foreach (var error in parseResult.Errors)
                         {
-                            var k = l.Substring(0, sep).Trim();
-                            var v = l.Substring(sep + 1).Trim().Trim('"');
-                            result.Metadata[k] = v;
+                            ConsoleHelper.WriteLine($"X Markdown parse error (line {error.LineNumber}): {error.Message}", ConsoleColor.Red);
                         }
                     }
+                    return null;
                 }
 
-                // Title: first H1 or first non-empty line
-                for (int i = idx; i < lines.Length; i++)
+                // Map MarkdownParser result to WorkItemParseResult
+                var result = new WorkItemParseResult
                 {
-                    var l = lines[i].Trim();
-                    if (string.IsNullOrEmpty(result.Title) && l.StartsWith("# "))
-                    {
-                        result.Title = l.Substring(2).Trim();
-                        idx = i + 1;
-                        break;
-                    }
-                    if (string.IsNullOrEmpty(result.Title) && !string.IsNullOrEmpty(l) && !l.StartsWith("#"))
-                    {
-                        // treat first paragraph as title if no explicit H1
-                        result.Title = l;
-                        idx = i + 1;
-                        break;
-                    }
-                }
+                    Title = parseResult.Title,
+                    Description = parseResult.Description,
+                    AcceptanceCriteria = parseResult.AcceptanceCriteria
+                };
 
-                // After title, accept metadata lines in the form '## Key: Value'
-                int metaIndex = idx;
-                for (; metaIndex < lines.Length; metaIndex++)
+                // Normalize and copy metadata from MarkdownParser
+                foreach (var kvp in parseResult.Metadata)
                 {
-                    var line = lines[metaIndex].Trim();
-                    if (string.IsNullOrEmpty(line)) continue;
-                    if (line.StartsWith("##") && line.Contains(":"))
-                    {
-                        // Parse key/value and normalize key
-                        var kv = line.Substring(2).Trim();
-                        var sep = kv.IndexOf(":");
-                        if (sep > 0)
-                        {
-                            var key = kv.Substring(0, sep).Trim();
-                            var val = kv.Substring(sep + 1).Trim().Trim('"');
-                            var normKey = key.ToLowerInvariant().Replace(" ", "_");
-                            result.Metadata[normKey] = val;
-                            continue;
-                        }
-                    }
-                    // stop metadata block when encountering a non-meta line
-                    break;
+                    var normalizedKey = kvp.Key.ToLowerInvariant().Replace(" ", "_");
+                    result.Metadata[normalizedKey] = kvp.Value;
                 }
-
-                // Collect description until 'Acceptance Criteria' header or end
-                var descLines = new List<string>();
-                for (int i = metaIndex; i < lines.Length; i++)
-                {
-                    var l = lines[i];
-                    if (l.Trim().StartsWith("##") && l.ToLower().Contains("acceptance"))
-                    {
-                        // parse acceptance criteria from following lines
-                        i++;
-                        for (; i < lines.Length; i++)
-                        {
-                            var ac = lines[i].Trim();
-                            if (string.IsNullOrEmpty(ac)) continue;
-                            if (ac.StartsWith("- [") || ac.StartsWith("- ") || ac.StartsWith("* [") || ac.StartsWith("*"))
-                            {
-                                // normalize checkbox formatting
-                                var cleaned = ac;
-                                // remove list marker
-                                if (cleaned.StartsWith("- ")) cleaned = cleaned.Substring(2).Trim();
-                                else if (cleaned.StartsWith("* ")) cleaned = cleaned.Substring(2).Trim();
-                                // remove checkbox
-                                if (cleaned.StartsWith("[ ]") || cleaned.StartsWith("[x]") || cleaned.StartsWith("[X]"))
-                                {
-                                    cleaned = cleaned.Substring(3).Trim();
-                                }
-                                // remove leading checkbox like [ ]
-                                if (cleaned.StartsWith("["))
-                                {
-                                    var r = cleaned.IndexOf(']');
-                                    if (r > 0) cleaned = cleaned.Substring(r + 1).Trim();
-                                }
-                                if (!string.IsNullOrEmpty(cleaned)) result.AcceptanceCriteria.Add(cleaned);
-                            }
-                            else if (lines[i].Trim().StartsWith("## "))
-                            {
-                                // next section
-                                break;
-                            }
-                        }
-                        break;
-                    }
-                    else
-                    {
-                        descLines.Add(l);
-                    }
-                }
-
-                result.Description = string.Join(Environment.NewLine, descLines).Trim();
 
                 return result;
             }
-            catch
+            catch (Exception ex)
             {
+                ConsoleHelper.WriteLine($"X Failed to parse markdown file: {ex.Message}", ConsoleColor.Red);
                 return null;
             }
         }

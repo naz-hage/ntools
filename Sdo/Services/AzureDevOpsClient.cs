@@ -236,7 +236,7 @@ namespace Sdo.Services
         /// Verifies the authentication token by making a request to the Azure DevOps API.
         /// </summary>
         /// <returns>True if authentication is successful, false otherwise.</returns>
-        public async Task<bool> VerifyAuthenticationAsync()
+        public async Task<bool> VerifyAuthenticationAsync(bool verbose = false)
         {
             try
             {
@@ -249,36 +249,41 @@ namespace Sdo.Services
                     response.StatusCode == System.Net.HttpStatusCode.Forbidden ||
                     response.StatusCode == System.Net.HttpStatusCode.NonAuthoritativeInformation)
                 {
-                    Console.WriteLine($"Debug: API returned {response.StatusCode} - authentication/authorization failed");
-                    var errorContent = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"Debug: Error response content: {errorContent}");
+                    if (verbose)
+                    {
+                        Console.WriteLine($"Debug: API returned {response.StatusCode} - authentication/authorization failed");
+                        var errorContent = await response.Content.ReadAsStringAsync();
+                        Console.WriteLine($"Debug: Error response content: {errorContent}");
+                    }
                     return false;
                 }
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    Console.WriteLine($"Debug: API returned {response.StatusCode} - not successful");
-                    var errorContent = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"Debug: Error response: {errorContent}");
-
-                    // If we get a 500 error, it might be a service issue, not auth issue
-                    // Let's try a different approach - check if the PAT format is correct by examining it
-                    Console.WriteLine($"Debug: PAT length is {_pat?.Length ?? 0} characters");
-                    if (_pat != null && _pat.Length < 50)
+                    if (verbose)
                     {
-                        Console.WriteLine("Debug: Warning - PAT appears to be unusually short. Azure DevOps PATs are typically 52 characters.");
+                        Console.WriteLine($"Debug: API returned {response.StatusCode} - not successful");
+                        var errorContent = await response.Content.ReadAsStringAsync();
+                        Console.WriteLine($"Debug: Error response: {errorContent}");
+
+                        // If we get a 500 error, it might be a service issue, not auth issue
+                        // Let's try a different approach - check if the PAT format is correct by examining it
+                        Console.WriteLine($"Debug: PAT length is {_pat?.Length ?? 0} characters");
+                        if (_pat != null && _pat.Length < 50)
+                        {
+                            Console.WriteLine("Debug: Warning - PAT appears to be unusually short. Azure DevOps PATs are typically 52 characters.");
+                        }
                     }
 
                     return false;
                 }
 
                 // If we get a successful response, authentication worked
-                Console.WriteLine($"Debug: API returned {response.StatusCode} - authentication successful");
                 return true;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Debug: Exception during API call: {ex.Message}");
+                Console.WriteLine($"Exception during API call: {ex.Message}");
                 return false;
             }
         }
@@ -943,17 +948,25 @@ namespace Sdo.Services
                 var response = await _httpClient.GetAsync(orgUrl);
                 result["Organization Access"] = response.IsSuccessStatusCode ? "✓ Allowed" : "X Denied";
 
-                // Test project access if specified
+                // Test project access if specified - use simple project info endpoint
                 if (!string.IsNullOrEmpty(_project))
                 {
-                    var projectUrl = $"https://dev.azure.com/{_organization}/{_project}/_apis/teams?api-version=7.0";
+                    var projectUrl = $"https://dev.azure.com/{_organization}/_apis/projects/{_project}?api-version=7.0";
                     var projectResponse = await _httpClient.GetAsync(projectUrl);
                     result["Project Access"] = projectResponse.IsSuccessStatusCode ? "✓ Allowed" : "X Denied";
                 }
 
-                // Test Work Item Query access - this is what fails in workitem list
-                var wiqlUrl = $"https://dev.azure.com/{_organization}/_apis/wit/wiql?api-version=7.0";
-                var wiqlRequest = new StringContent("{\"query\":\"SELECT [System.Id] FROM WorkItems LIMIT 0\"}", System.Text.Encoding.UTF8, "application/json");
+                // Test Work Item Query access - use project scope if available (matching actual ListWorkItemsAsync behavior)
+                string wiqlUrl;
+                if (!string.IsNullOrEmpty(_project))
+                {
+                    wiqlUrl = $"https://dev.azure.com/{_organization}/{_project}/_apis/wit/wiql?api-version=7.0";
+                }
+                else
+                {
+                    wiqlUrl = $"https://dev.azure.com/{_organization}/_apis/wit/wiql?api-version=7.0";
+                }
+                var wiqlRequest = new StringContent("{\"query\":\"SELECT [System.Id] FROM WorkItems\"}", System.Text.Encoding.UTF8, "application/json");
                 var wiqlResponse = await _httpClient.PostAsync(wiqlUrl, wiqlRequest);
                 result["Work Item Query Access"] = wiqlResponse.IsSuccessStatusCode ? "✓ Allowed" : "X Denied";
 
@@ -1313,6 +1326,7 @@ namespace Sdo.Services
                 var operations = new List<object>
                 {
                     new { op = "add", path = "/fields/System.Title", value = title },
+                    new { op = "add", path = "/fields/System.Description", value = repoStepsHtml },
                     new { op = "add", path = "/fields/Microsoft.VSTS.TCM.ReproSteps", value = repoStepsHtml }
                 };
 
