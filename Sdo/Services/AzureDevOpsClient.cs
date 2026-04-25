@@ -296,19 +296,72 @@ namespace Sdo.Services
         {
             try
             {
-                var url = $"https://dev.azure.com/{_organization}/_apis/connectionData?api-version=7.1";
-                var response = await _httpClient.GetAsync(url);
-                if (!response.IsSuccessStatusCode)
+                // Try the /connectionData endpoint first which includes authenticatedUser info
+                var connUrl = $"https://dev.azure.com/{_organization}/_apis/connectionData";
+                var connResponse = await _httpClient.GetAsync(connUrl);
+                if (connResponse.IsSuccessStatusCode)
                 {
-                    return null;
+                    var connContent = await connResponse.Content.ReadAsStringAsync();
+                    using var connDoc = JsonDocument.Parse(connContent);
+                    
+                    // Check for authenticatedUser in response
+                    if (connDoc.RootElement.TryGetProperty("authenticatedUser", out var authUser))
+                    {
+                        var user = new AzureDevOpsUser();
+                        if (authUser.TryGetProperty("displayName", out var dn)) user.DisplayName = dn.GetString();
+                        if (authUser.TryGetProperty("uniqueName", out var un)) user.UniqueName = un.GetString();
+                        if (authUser.TryGetProperty("mailAddress", out var ma)) user.PreferredEmail = ma.GetString();
+                        if (authUser.TryGetProperty("id", out var id)) user.Id = id.GetString();
+                        
+                        if (!string.IsNullOrEmpty(user.DisplayName))
+                        {
+                            return user;
+                        }
+                    }
                 }
-
-                var content = await response.Content.ReadAsStringAsync();
-                var connectionData = JsonSerializer.Deserialize<ConnectionData>(content);
-                return connectionData?.AuthenticatedUser;
+                
+                // Fallback to Graph API - get users and skip first (usually service account)
+                var graphUrl = $"https://vssps.dev.azure.com/{_organization}/_apis/graph/users?api-version=7.1-preview.1&$top=10";
+                var graphResponse = await _httpClient.GetAsync(graphUrl);
+                if (graphResponse.IsSuccessStatusCode)
+                {
+                    var graphContent = await graphResponse.Content.ReadAsStringAsync();
+                    using var graphDoc = JsonDocument.Parse(graphContent);
+                    if (graphDoc.RootElement.TryGetProperty("value", out var valueEl))
+                    {
+                        var valueArray = valueEl.EnumerateArray().ToList();
+                        // Skip first user (usually build service) and return second user
+                        if (valueArray.Count > 1)
+                        {
+                            var userItem = valueArray[1];
+                            var user = new AzureDevOpsUser();
+                            if (userItem.TryGetProperty("displayName", out var displayName)) user.DisplayName = displayName.GetString();
+                            if (userItem.TryGetProperty("principalName", out var pn)) user.UniqueName = pn.GetString();
+                            if (userItem.TryGetProperty("mailAddress", out var ma)) user.PreferredEmail = ma.GetString();
+                            if (userItem.TryGetProperty("descriptor", out var desc)) user.Id = desc.GetString();
+                            return user;
+                        }
+                        // If only one user, return it
+                        else if (valueArray.Count == 1)
+                        {
+                            var userItem = valueArray[0];
+                            var user = new AzureDevOpsUser();
+                            if (userItem.TryGetProperty("displayName", out var displayName)) user.DisplayName = displayName.GetString();
+                            if (userItem.TryGetProperty("principalName", out var pn)) user.UniqueName = pn.GetString();
+                            if (userItem.TryGetProperty("mailAddress", out var ma)) user.PreferredEmail = ma.GetString();
+                            if (userItem.TryGetProperty("descriptor", out var desc)) user.Id = desc.GetString();
+                            return user;
+                        }
+                    }
+                }
+                
+                _lastError = "No user found";
+                return null;
             }
-            catch
+            catch (Exception ex)
             {
+                _lastError = $"GetUserAsync exception: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
                 return null;
             }
         }
