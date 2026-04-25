@@ -24,6 +24,12 @@ namespace Sdo.Services
         private readonly HttpClient _httpClient;
         private readonly string? _overrideToken;
         private readonly bool _disposeHttpClient;
+        private string? _lastError;
+
+        /// <summary>
+        /// Gets the last error message, if any.
+        /// </summary>
+        public string? LastError => _lastError;
 
         /// <summary>
         /// Initializes a new instance of the GitHubClient class.
@@ -93,14 +99,17 @@ namespace Sdo.Services
                 var response = await _httpClient.GetAsync("https://api.github.com/user");
                 if (!response.IsSuccessStatusCode)
                 {
+                    _lastError = $"GitHub API returned {response.StatusCode}: {response.ReasonPhrase}";
                     return null;
                 }
 
                 var content = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<GitHubUser>(content);
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                return JsonSerializer.Deserialize<GitHubUser>(content, options);
             }
-            catch
+            catch (Exception ex)
             {
+                _lastError = ex.Message;
                 return null;
             }
         }

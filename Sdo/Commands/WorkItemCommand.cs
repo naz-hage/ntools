@@ -626,11 +626,17 @@ namespace Sdo.Commands
                 if (assignedToMe)
                 {
                     var currentUser = await client.GetUserAsync();
-                    if (!string.IsNullOrEmpty(currentUser?.Login))
+                    if (string.IsNullOrEmpty(currentUser?.Login))
                     {
-                        issues = issues.Where(i => !string.IsNullOrEmpty(i.Assignee?.Login) &&
-                            i.Assignee.Login.Equals(currentUser.Login, StringComparison.OrdinalIgnoreCase)).ToList();
+                        ConsoleHelper.WriteLine("X Error: Could not determine current GitHub user. Make sure your authentication token is valid.", ConsoleColor.Red);
+                        if (!string.IsNullOrEmpty(client.LastError))
+                        {
+                            ConsoleHelper.WriteLine($"  Details: {client.LastError}", ConsoleColor.Red);
+                        }
+                        return 1;
                     }
+                    issues = issues.Where(i => !string.IsNullOrEmpty(i.Assignee?.Login) &&
+                        i.Assignee.Login.Equals(currentUser.Login, StringComparison.OrdinalIgnoreCase)).ToList();
                 }
 
                 // Limit to requested number
@@ -776,8 +782,14 @@ namespace Sdo.Commands
                 // Filter by assigned-to-me if specified
                 if (assignedToMe)
                 {
-                    workItems = workItems.Where(w => !string.IsNullOrEmpty(w.AssignedTo)).ToList();
-                    // Note: Actual filtering based on current user identity would require additional context
+                    var currentUser = await GetCurrentAzureDevOpsUserAsync(pat, organization);
+                    if (string.IsNullOrEmpty(currentUser))
+                    {
+                        ConsoleHelper.WriteLine("X Error: Could not determine current Azure DevOps user. Make sure your authentication token is valid.", ConsoleColor.Red);
+                        return 1;
+                    }
+                    workItems = workItems.Where(w => !string.IsNullOrEmpty(w.AssignedTo) && 
+                        w.AssignedTo.Equals(currentUser, StringComparison.OrdinalIgnoreCase)).ToList();
                 }
 
                 // Limit to requested number
@@ -1701,6 +1713,20 @@ namespace Sdo.Commands
                 return await auth.GetAzureDevOpsTokenAsync();
             }
             return null;
+        }
+
+        private async Task<string?> GetCurrentAzureDevOpsUserAsync(string pat, string organization)
+        {
+            try
+            {
+                var client = new AzureDevOpsClient(pat, organization);
+                var user = await client.GetUserAsync();
+                return user?.DisplayName;
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }
