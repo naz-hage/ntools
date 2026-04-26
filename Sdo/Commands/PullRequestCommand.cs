@@ -543,6 +543,16 @@ namespace Sdo.Commands
         {
             try
             {
+                // Validate that PR ID was provided
+                if (prId <= 0)
+                {
+                    ConsoleHelper.WriteError("X Error: PR ID is required. Use the positional argument or --pr-id option");
+                    Console.WriteLine("\nExample:");
+                    Console.WriteLine("  sdo pr show 123");
+                    Console.WriteLine("  sdo pr show --pr-id 123");
+                    return 1;
+                }
+
                 if (verbose) Console.WriteLine($"Retrieving pull request #{prId}...");
 
                 var platform = _platformDetector.DetectPlatform();
@@ -672,6 +682,16 @@ namespace Sdo.Commands
         {
             try
             {
+                // Validate that PR ID was provided
+                if (prId <= 0)
+                {
+                    ConsoleHelper.WriteError("X Error: PR ID is required. Use --pr-id <number>");
+                    Console.WriteLine("\nExample:");
+                    Console.WriteLine("  sdo pr update --pr-id 123 -f ./pr-message.md");
+                    Console.WriteLine("  sdo pr update --pr-id 123 --title \"New Title\"");
+                    return 1;
+                }
+
                 if (verbose) Console.WriteLine($"Updating pull request #{prId}...");
 
                 string? body = null;
@@ -749,7 +769,7 @@ namespace Sdo.Commands
                     var pr = await client.UpdatePullRequestAsync(repoInfo.Owner, repoInfo.Repo, prId, title, body, status);
                     if (pr == null)
                     {
-                        ConsoleHelper.WriteError($"X Error: Failed to update pull request #{prId}");
+                        ConsoleHelper.WriteError($"X Error: {client.LastError ?? "Failed to update pull request"}");
                         return 1;
                     }
 

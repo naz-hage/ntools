@@ -949,7 +949,11 @@ namespace Sdo.Services
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    System.Diagnostics.Debug.WriteLine($"GitHub API error: {response.StatusCode} {response.ReasonPhrase}");
+                    // Try to parse error details from GitHub API response
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    var gitHubError = ExtractGitHubErrorMessage(errorContent, response.StatusCode);
+                    _lastError = gitHubError;
+                    System.Diagnostics.Debug.WriteLine(_lastError);
                     return null;
                 }
 
@@ -959,6 +963,7 @@ namespace Sdo.Services
 
                 if (prData == null)
                 {
+                    _lastError = "Failed to parse GitHub API response";
                     return null;
                 }
 
@@ -982,7 +987,8 @@ namespace Sdo.Services
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error updating GitHub pull request: {ex.Message}");
+                _lastError = $"Exception updating pull request: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
                 return null;
             }
         }
@@ -1262,6 +1268,50 @@ namespace Sdo.Services
             }
         }
         // For brevity the file keeps the original client methods.
+
+        /// <summary>
+        /// Extracts a meaningful error message from GitHub API error response.
+        /// GitHub API returns JSON with a "message" field that provides more context.
+        /// </summary>
+        private string ExtractGitHubErrorMessage(string errorContent, System.Net.HttpStatusCode statusCode)
+        {
+            try
+            {
+                // Try to parse GitHub API error response
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                using var document = JsonDocument.Parse(errorContent);
+                
+                if (document.RootElement.TryGetProperty("message", out var messageElement))
+                {
+                    var message = messageElement.GetString();
+                    
+                    // Provide context-specific guidance for common errors
+                    if (statusCode == System.Net.HttpStatusCode.NotFound)
+                    {
+                        // 404 could be repo not found or PR not found
+                        return $"Pull request not found. The repository or PR ID may be incorrect. Details: {message}";
+                    }
+                    else if (statusCode == System.Net.HttpStatusCode.Unauthorized)
+                    {
+                        return $"Authentication failed. Your GitHub token may be invalid or expired. Details: {message}";
+                    }
+                    else if (statusCode == System.Net.HttpStatusCode.Forbidden)
+                    {
+                        return $"Permission denied. You may not have access to update this PR. Details: {message}";
+                    }
+                    else
+                    {
+                        return $"GitHub API error ({statusCode}): {message}";
+                    }
+                }
+            }
+            catch
+            {
+                // If JSON parsing fails, fall back to HTTP status
+            }
+
+            return $"GitHub API error: {statusCode} (Unable to parse detailed error message)";
+        }
 
         /// <summary>
         /// Disposes the HTTP client if this instance owns it.
