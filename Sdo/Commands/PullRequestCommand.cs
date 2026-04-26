@@ -876,19 +876,42 @@ namespace Sdo.Commands
                 var processInfo = new System.Diagnostics.ProcessStartInfo
                 {
                     FileName = "git",
-                    Arguments = $"ls-remote --heads origin {branchName}",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
+                    RedirectStandardError = true,
                     CreateNoWindow = true
                 };
+
+                // Use ArgumentList to safely pass arguments (prevents command injection)
+                processInfo.ArgumentList.Add("ls-remote");
+                processInfo.ArgumentList.Add("--exit-code");
+                processInfo.ArgumentList.Add("--heads");
+                processInfo.ArgumentList.Add("origin");
+                processInfo.ArgumentList.Add(branchName);
+
+                // Disable credential prompts to prevent hanging on authentication
+                processInfo.Environment["GIT_TERMINAL_PROMPT"] = "0";
 
                 using (var process = System.Diagnostics.Process.Start(processInfo))
                 {
                     if (process != null)
                     {
-                        var output = process.StandardOutput.ReadToEnd().Trim();
-                        process.WaitForExit();
-                        return !string.IsNullOrEmpty(output);
+                        const int gitTimeoutMilliseconds = 10000; // 10-second timeout
+                        if (!process.WaitForExit(gitTimeoutMilliseconds))
+                        {
+                            try
+                            {
+                                process.Kill(entireProcessTree: true);
+                            }
+                            catch
+                            {
+                                // Process may have already exited
+                            }
+
+                            return true; // Timeout - assume branch exists to avoid false negatives
+                        }
+
+                        return process.ExitCode == 0;
                     }
                 }
             }

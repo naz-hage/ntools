@@ -250,7 +250,6 @@ namespace Sdo.Utilities
             var descLines = new List<string>();
             int idx = startIdx;
             bool inCodeBlock = false;
-            string codeBlockLanguage = string.Empty;
             var currentCodeBlock = new List<string>();
 
             while (idx < lines.Length)
@@ -264,7 +263,7 @@ namespace Sdo.Utilities
                     if (!inCodeBlock)
                     {
                         inCodeBlock = true;
-                        codeBlockLanguage = trimmed.Substring(3).Trim().ToLower();
+                        // codeBlockLanguage = trimmed.Substring(3).Trim().ToLower();  // Language info available if needed
                         currentCodeBlock.Clear();
                     }
                     else

@@ -1719,7 +1719,7 @@ namespace Sdo.Commands
         {
             try
             {
-                var client = new AzureDevOpsClient(pat, organization);
+                using var client = new AzureDevOpsClient(pat, organization);
                 var user = await client.GetUserAsync();
                 return user?.DisplayName;
             }
