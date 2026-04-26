@@ -1361,15 +1361,18 @@ namespace Sdo.Commands
                     {
                         ConsoleHelper.WriteLine($"Creating Azure DevOps work item in {organization}/{project ?? "default"}...", ConsoleColor.Gray);
                         ConsoleHelper.WriteLine($"  Title: {title}", ConsoleColor.Gray);
-                        ConsoleHelper.WriteLine($"  Type: {type}", ConsoleColor.Gray);
+                        ConsoleHelper.WriteLine($"  Type: {type} (normalized: {NormalizeWorkItemType(type ?? "PBI")})", ConsoleColor.Gray);
                         ConsoleHelper.WriteLine($"  Description: {description ?? "(none)"}", ConsoleColor.Gray);
                         if (!string.IsNullOrEmpty(assignee)) ConsoleHelper.WriteLine($"  Assignee: {assignee}", ConsoleColor.Gray);
                     }
 
+                    // Normalize work item type: convert abbreviations to full names
+                    var normalizedType = NormalizeWorkItemType(type ?? "PBI");
+
                     // Show external mapping command when verbose
                     if (verbose)
                     {
-                        var mappingCmd = $"az boards work-item create --title \"{title}\" --type \"{type}\" --org \"{organization}\"";
+                        var mappingCmd = $"az boards work-item create --title \"{title}\" --type \"{normalizedType}\" --org \"{organization}\"";
                         if (!string.IsNullOrEmpty(project)) mappingCmd += $" --project \"{project}\"";
                         if (!string.IsNullOrEmpty(assignee)) mappingCmd += $" --assigned-to \"{assignee}\"";
                         ConsoleHelper.WriteLine(mappingCmd, ConsoleColor.Yellow);
@@ -1385,7 +1388,7 @@ namespace Sdo.Commands
                     string? area = parsed?.Metadata?.GetValueOrDefault("area") ?? parsed?.Metadata?.GetValueOrDefault("area_path");
                     string? iteration = parsed?.Metadata?.GetValueOrDefault("iteration") ?? parsed?.Metadata?.GetValueOrDefault("iteration_path");
 
-                    var result = await client.CreateWorkItemAsync(project ?? string.Empty, type ?? "PBI", title, description ?? string.Empty, acceptanceCriteria, assignee, area, iteration, dryRun, verbose);
+                    var result = await client.CreateWorkItemAsync(project ?? string.Empty, normalizedType, title, description ?? string.Empty, acceptanceCriteria, assignee, area, iteration, dryRun, verbose);
 
                     if (result != null)
                     {
@@ -1695,18 +1698,22 @@ namespace Sdo.Commands
         private string NormalizeWorkItemType(string type)
         {
             if (string.IsNullOrEmpty(type))
-                return string.Empty;
+                return "Product Backlog Item"; // Default
 
-            return type.ToLower() switch
+            // Convert to lowercase for comparison, but return proper case
+            var lowerType = type.ToLower().Trim();
+            return lowerType switch
             {
-                "pbi" => "product backlog item",
-                "task" => "task",
-                "bug" => "bug",
-                "epic" => "epic",
-                "spike" => "spike",
-                "feature" => "feature",
-                // Default: return lowercase for case-insensitive comparison
-                _ => type.ToLower()
+                "pbi" => "Product Backlog Item",
+                "product backlog item" => "Product Backlog Item",
+                "task" => "Task",
+                "bug" => "Bug",
+                "epic" => "Epic",
+                "spike" => "Spike",
+                "feature" => "Feature",
+                "user story" => "User Story",
+                // Default: return as-is
+                _ => type
             };
         }
 
