@@ -283,7 +283,10 @@ namespace Sdo.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Exception during API call: {ex.Message}");
+                if (verbose)
+                {
+                    Console.WriteLine($"Exception during API call: {ex.Message}");
+                }
                 return false;
             }
         }
