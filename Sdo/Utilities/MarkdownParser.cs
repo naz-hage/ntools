@@ -10,8 +10,8 @@ using Sdo.Models;
 namespace Sdo.Utilities
 {
     /// <summary>
-    /// Parses markdown files for rich content creation (work items, PRs).
-    /// Supports YAML frontmatter, tables, code blocks, and flexible metadata extraction.
+    /// Parses markdown files for content creation (work items, PRs).
+    /// Supports YAML frontmatter, metadata extraction, headings, paragraphs, code blocks, and acceptance criteria.
     /// </summary>
     public class MarkdownParser
     {

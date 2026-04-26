@@ -13,8 +13,9 @@ using YamlDotNet.Serialization.NamingConventions;
 namespace Sdo.Utilities
 {
     /// <summary>
-    /// Manages SDO configuration from .sdo.yaml files.
-    /// Supports environment variable interpolation, defaults, and CLI overrides.
+    /// Manages SDO configuration from sdo-config.yaml files.
+    /// Supports YAML parsing, nested key flattening, environment variable interpolation,
+    /// configuration defaults, and CLI overrides via GetValue/GetInt/GetBool methods.
     /// </summary>
     public class ConfigurationManager
     {
@@ -36,6 +37,8 @@ namespace Sdo.Utilities
         /// <returns>True if configuration loaded successfully.</returns>
         public bool Load(string? configPath = null)
         {
+            _isLoaded = false;
+            _loadedConfigPath = null;
             _config.Clear();
             _errors.Clear();
 

@@ -389,7 +389,16 @@ namespace Sdo.Commands
             bool assignedToMe, string? areaPath, string? iteration, int top, string? configPath, bool verbose)
         {
             // Load configuration defaults from sdo-config.yaml (if not provided via CLI)
-            _configManager.Load(configPath);
+            var configLoaded = _configManager.Load(configPath);
+            if (!configLoaded)
+            {
+                // Display config errors to user
+                foreach (var error in _configManager.GetErrors())
+                {
+                    ConsoleHelper.WriteError($"Config error: {error}");
+                }
+                return 1;
+            }
             
             // Display config file location
             if (_configManager.LoadedConfigPath != null)
