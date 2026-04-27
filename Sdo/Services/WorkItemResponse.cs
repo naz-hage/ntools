@@ -69,6 +69,20 @@ namespace Sdo.Services
                     }
                 }
 
+                // Extract area path - get the last component after backslash
+                if (Fields.ContainsKey("System.AreaPath"))
+                {
+                    var areaPath = Fields["System.AreaPath"]?.ToString();
+                    if (!string.IsNullOrEmpty(areaPath) && areaPath.Contains("\\"))
+                    {
+                        item.Area = areaPath.Split("\\").LastOrDefault();
+                    }
+                    else if (!string.IsNullOrEmpty(areaPath))
+                    {
+                        item.Area = areaPath;
+                    }
+                }
+
                 // Extract assigned to user name
                 if (Fields.ContainsKey("System.AssignedTo"))
                 {

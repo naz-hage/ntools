@@ -58,6 +58,11 @@ namespace Sdo.Services
         public string? Sprint { get; set; }
 
         /// <summary>
+        /// Gets or sets the area path.
+        /// </summary>
+        public string? Area { get; set; }
+
+        /// <summary>
         /// Gets or sets the assigned to user name.
         /// </summary>
         public string? AssignedTo { get; set; }

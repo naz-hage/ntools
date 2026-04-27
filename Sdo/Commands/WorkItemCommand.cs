@@ -1451,6 +1451,9 @@ namespace Sdo.Commands
             Console.WriteLine($"State:       {issue.State}");
             Console.WriteLine($"Created:     {issue.CreatedAt:O}");
             Console.WriteLine($"Updated:     {issue.UpdatedAt:O}");
+            
+            // Display Assigned To field
+            Console.WriteLine($"Assigned To: {issue.Assignee?.Login ?? "Not assigned"}");
 
             if (!string.IsNullOrEmpty(issue.Body))
             {
@@ -1482,6 +1485,11 @@ namespace Sdo.Commands
             Console.WriteLine($"State:       {workItem.State}");
             Console.WriteLine($"Created:     {workItem.CreatedDate:O}");
             Console.WriteLine($"Updated:     {workItem.ChangedDate:O}");
+            
+            // Display Area, Iteration, and Assigned To fields
+            Console.WriteLine($"Area:        {workItem.Area ?? "Not assigned"}");
+            Console.WriteLine($"Iteration:   {workItem.Sprint ?? "Not assigned"}");
+            Console.WriteLine($"Assigned To: {workItem.AssignedTo ?? "Not assigned"}");
 
             if (!string.IsNullOrEmpty(workItem.Description))
             {
