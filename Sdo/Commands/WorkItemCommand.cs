@@ -1497,7 +1497,15 @@ namespace Sdo.Commands
             }
 
             Console.WriteLine();
-            Console.WriteLine($"URL: {workItem.Url}");
+            // Convert API URL to browsable format
+            // From: https://dev.azure.com/org/proj/project/_apis/wit/workItems/123
+            // To:   https://dev.azure.com/org/proj/project/_workitems/edit/123
+            string displayUrl = workItem.Url ?? string.Empty;
+            if (!string.IsNullOrEmpty(displayUrl) && displayUrl.Contains("_apis/wit/workItems/"))
+            {
+                displayUrl = displayUrl.Replace("/_apis/wit/workItems/", "/_workitems/edit/");
+            }
+            Console.WriteLine($"URL: {displayUrl}");
         }
 
         /// <summary>
