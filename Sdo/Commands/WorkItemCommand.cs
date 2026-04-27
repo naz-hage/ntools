@@ -1500,6 +1500,26 @@ namespace Sdo.Commands
                 Console.WriteLine(cleanedDescription);
             }
 
+            // Display acceptance criteria if present
+            if (!string.IsNullOrEmpty(workItem.AcceptanceCriteria))
+            {
+                Console.WriteLine();
+                Console.WriteLine("Acceptance Criteria:");
+                var cleanedCriteria = StripHtmlTags(workItem.AcceptanceCriteria);
+                Console.WriteLine(cleanedCriteria);
+            }
+
+            // Validate acceptance criteria for PBI and Epic types
+            var isPBIOrEpic = workItem.Type != null && 
+                (workItem.Type.Equals("PBI", StringComparison.OrdinalIgnoreCase) || 
+                 workItem.Type.Equals("Epic", StringComparison.OrdinalIgnoreCase));
+            
+            if (isPBIOrEpic && string.IsNullOrEmpty(workItem.AcceptanceCriteria))
+            {
+                Console.WriteLine();
+                ConsoleHelper.WriteLine("⚠ WARNING: PBI/Epic work items should have acceptance criteria defined", ConsoleColor.Yellow);
+            }
+
             if (includeComments && workItem.CommentCount > 0)
             {
                 Console.WriteLine();

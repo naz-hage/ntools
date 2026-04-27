@@ -66,5 +66,10 @@ namespace Sdo.Services
         /// Gets or sets the assigned to user name.
         /// </summary>
         public string? AssignedTo { get; set; }
+
+        /// <summary>
+        /// Gets or sets the acceptance criteria.
+        /// </summary>
+        public string? AcceptanceCriteria { get; set; }
     }
 }

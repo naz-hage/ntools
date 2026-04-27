@@ -111,6 +111,16 @@ namespace Sdo.Services
 
                 // Comments count is typically in comments section, defaulting to 0
                 item.CommentCount = 0;
+
+                // Extract acceptance criteria
+                if (Fields.ContainsKey("Microsoft.VSTS.Common.AcceptanceCriteria"))
+                {
+                    var acceptanceCriteria = Fields["Microsoft.VSTS.Common.AcceptanceCriteria"]?.ToString();
+                    if (!string.IsNullOrEmpty(acceptanceCriteria))
+                    {
+                        item.AcceptanceCriteria = acceptanceCriteria;
+                    }
+                }
             }
 
             return item;
