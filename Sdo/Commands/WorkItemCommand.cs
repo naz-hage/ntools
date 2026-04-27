@@ -1678,7 +1678,7 @@ namespace Sdo.Commands
                 // Map MarkdownParser result to WorkItemParseResult
                 var result = new WorkItemParseResult
                 {
-                    Title = parseResult.Title,
+                    Title = StripTypePrefix(parseResult.Title),
                     Description = parseResult.Description,
                     AcceptanceCriteria = parseResult.AcceptanceCriteria
                 };
@@ -1697,6 +1697,25 @@ namespace Sdo.Commands
                 ConsoleHelper.WriteLine($"X Failed to parse markdown file: {ex.Message}", ConsoleColor.Red);
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Strips type prefixes from work item titles.
+        /// Converts "Bug-001: Title" to "Title"
+        /// </summary>
+        private string StripTypePrefix(string title)
+        {
+            if (string.IsNullOrEmpty(title)) return title;
+            
+            // Pattern: Type-Number: Title
+            // Examples: Bug-001: ..., Epic-001: ..., Task-001: ..., PBI-001: ..., etc.
+            var match = System.Text.RegularExpressions.Regex.Match(title, @"^(Bug|Epic|Task|PBI|Feature|Story)-\d+:\s*(.+)$", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            if (match.Success)
+            {
+                return match.Groups[2].Value; // Return everything after the colon and space
+            }
+            
+            return title; // Return unchanged if no prefix found
         }
 
         /// <summary>
