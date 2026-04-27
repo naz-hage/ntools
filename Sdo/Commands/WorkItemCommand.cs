@@ -1495,7 +1495,9 @@ namespace Sdo.Commands
             {
                 Console.WriteLine();
                 Console.WriteLine("Description:");
-                Console.WriteLine(workItem.Description);
+                // Strip HTML tags and format for display
+                var cleanedDescription = StripHtmlTags(workItem.Description);
+                Console.WriteLine(cleanedDescription);
             }
 
             if (includeComments && workItem.CommentCount > 0)
@@ -1514,6 +1516,36 @@ namespace Sdo.Commands
                 displayUrl = displayUrl.Replace("/_apis/wit/workItems/", "/_workitems/edit/");
             }
             Console.WriteLine($"URL: {displayUrl}");
+        }
+
+        /// <summary>
+        /// Strips HTML tags from text and formats it for display.
+        /// </summary>
+        private string StripHtmlTags(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return text;
+
+            // Replace common HTML tags with text equivalents
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"<h[1-6]>(.*?)</h[1-6]>", "$1");
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"<h[1-6]>", "");
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"</h[1-6]>", "");
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"</?ul>", "");
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"</?ol>", "");
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"<li>(.*?)</li>", "• $1");
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"</?li>", "");
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"<br\s*/?>\s*", "\n");
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"</?p>", "");
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"</?strong>", "");
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"</?em>", "");
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"</?[^>]+>", ""); // Remove any remaining tags
+
+            // Clean up whitespace
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"\s+\n", "\n");
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"\n\s+", "\n");
+            text = text.Trim();
+
+            return text;
         }
 
         /// <summary>
