@@ -717,7 +717,22 @@ commands:
             finally
             {
                 Directory.SetCurrentDirectory(originalCwd);
-                Directory.Delete(tempDir, recursive: true);
+                // Force garbage collection to release file handles
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                // Retry logic for file system operations on Windows
+                for (int attempt = 0; attempt < 3; attempt++)
+                {
+                    try
+                    {
+                        Directory.Delete(tempDir, recursive: true);
+                        break;
+                    }
+                    catch (IOException) when (attempt < 2)
+                    {
+                        System.Threading.Thread.Sleep(100);
+                    }
+                }
             }
         }
 
