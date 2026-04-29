@@ -115,7 +115,6 @@ graph TB
   - Dry-run mode for previewing operations
   - **Advanced Automation Features** (new):
     - YAML configuration system with auto-discovery
-    - Bulk operations processor with retry logic
     - Markdown parser for rich content creation
     - E2E testing infrastructure with cross-platform support
 #### Go Executables
@@ -279,7 +278,7 @@ Both sdo and ntools Suite follow consistent design principles:
 
 ### Advanced Automation Features
 
-**Advanced Automation Features** introduces comprehensive enterprise capabilities to the SDO CLI tool, enabling teams to standardize operations, automate bulk workflows, and ensure reliable cross-platform testing.
+**Advanced Automation Features** introduces comprehensive enterprise capabilities to the SDO CLI tool, enabling teams to standardize operations and ensure reliable cross-platform testing.
 
 #### 1. **YAML Configuration System**
 - **ConfigurationManager**: New utility class with YamlDotNet integration
@@ -292,15 +291,7 @@ Both sdo and ntools Suite follow consistent design principles:
 - **Example**: `sdo wi list --config .\.temp\sdo-config.yaml` applies default filters for area, state, type, iteration, and top
 - **Benefits**: Team standardization, reduced repetitive CLI arguments, config file sharing via version control
 
-#### 2. **Bulk Operations Processor**
-- **BulkOperationProcessor**: New utility class for batch create/update operations
-- **Robust Error Handling**: Built-in retry logic with configurable attempts and exponential backoff
-- **Configurable Batch Sizes**: Default 10 operations per batch, customizable via constructor
-- **Partial Success Reporting**: Handles failures gracefully with detailed error summaries
-- **Thread-Safe Implementation**: Supports concurrent operations safely
-- **Benefits**: Automate large-scale operations, eliminate external scripting, improved reliability for bulk tasks
-
-#### 3. **Markdown Parser**
+#### 2. **Markdown Parser**
 - **MarkdownParser**: New utility class for parsing markdown content
 - **Rich Content Support**: 
   - YAML frontmatter parsing
@@ -360,7 +351,6 @@ Both sdo and ntools Suite follow consistent design principles:
 - **Dry-Run Mode**: Preview operations before execution
 - **Automatic Platform Detection**: Detects platform from Git remote configuration
 - **Configuration Management**: YAML-based defaults for standardized operations (Advanced Automation Features)
-- **Bulk Operations**: Batch create/update with retry logic and error handling (Advanced Automation Features)
 - **Rich Content**: Markdown templates for professional work items and PRs (Advanced Automation Features)
 - **Automated Testing**: E2E testing infrastructure with cross-platform validation (Advanced Automation Features)
 

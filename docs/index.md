@@ -20,7 +20,6 @@ This repository contains a collection of software tools specifically designed to
 - [Sdo (sdo.exe) - Simple DevOps Operations](sdo-net.md) - Unified CLI for GitHub and Azure DevOps
   - [Advanced Automation Features](sdo-net.md#advanced-automation-features)
     - [Configuration System](sdo-net.md#configuration-system-yaml-based)
-    - [Bulk Operations](sdo-net.md#bulk-operations-processor)
     - [Markdown Parser](sdo-net.md#markdown-parser-for-content-creation)
     - [E2E Testing Infrastructure](sdo-net.md#e2e-testing-infrastructure)
 

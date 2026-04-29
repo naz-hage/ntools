@@ -854,7 +854,7 @@ $env:AZURE_DEVOPS_PAT = "your_azure_pat"
 
 ## Advanced Automation Features
 
-Advanced Automation Features introduces comprehensive enterprise capabilities to standardize operations, automate bulk workflows, and ensure reliable testing across GitHub and Azure DevOps platforms.
+Advanced Automation Features introduces comprehensive enterprise capabilities to standardize operations and ensure reliable testing across GitHub and Azure DevOps platforms.
 
 ### Configuration System (YAML-based)
 
@@ -998,43 +998,6 @@ Verify release readiness:
 sdo wi list --config .temp/sdo-release.yaml
 # Shows all completed release items
 ```
-
----
-
-### Bulk Operations Processor
-
-Process large batches of work items or pull requests efficiently with built-in error handling and retry logic.
-
-#### Overview
-
-- **Batch Size**: Default 10 operations per batch (configurable)
-- **Retry Logic**: 3 retry attempts with exponential backoff (configurable)
-- **Error Handling**: Continues processing on failures, provides summary report
-- **Thread-Safe**: Supports concurrent operations safely
-
-#### Features
-
-- Graceful failure handling with partial success reporting
-- Detailed error summaries showing what succeeded and what failed
-- Configurable batch sizes and retry attempts
-- Supports both create and update operations
-
-#### Example Usage
-
-When processing large numbers of work items:
-
-```bash
-# Process 100 work items in batches of 10
-# Automatically retries failed operations up to 3 times
-sdo wi bulk-create items.txt --batch-size 10 --max-retries 3
-```
-
-#### Use Cases
-
-1. **Migration**: Move items from one platform to another
-2. **Bulk Updates**: Update multiple work items simultaneously
-3. **Data Import**: Import large CSV files of work items
-4. **Batch Operations**: Create multiple related items in one command
 
 ---
 

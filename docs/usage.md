@@ -120,5 +120,4 @@ commands:
 For more details, see:
 - [Configuration System Documentation](./sdo-net.md#configuration-system-yaml-based)
 - [Markdown Parser for Content Creation](./sdo-net.md#markdown-parser-for-content-creation)
-- [Bulk Operations Processor](./sdo-net.md#bulk-operations-processor)
 
