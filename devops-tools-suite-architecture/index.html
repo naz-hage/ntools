@@ -840,6 +840,67 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#advanced-automation-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advanced Automation Features
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Advanced Automation Features">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-yaml-configuration-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. YAML Configuration System
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-markdown-parser" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Markdown Parser
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-e2e-testing-infrastructure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. E2E Testing Infrastructure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-service-enhancements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Service Enhancements
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#key-features" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1392,7 +1453,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../issue-azdo-bug-example/" class="md-nav__link">
+      <a href="../issue-azdo-bug-example.md" class="md-nav__link">
         
   
   
@@ -1420,7 +1481,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../issue-azdo-epic-example/" class="md-nav__link">
+      <a href="../issue-azdo-epic-example.md" class="md-nav__link">
         
   
   
@@ -1448,7 +1509,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../issue-azdo-pbi-example/" class="md-nav__link">
+      <a href="../issue-azdo-pbi-example.md" class="md-nav__link">
         
   
   
@@ -1476,7 +1537,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../issue-azdo-task-example/" class="md-nav__link">
+      <a href="../issue-azdo-task-example.md" class="md-nav__link">
         
   
   
@@ -1504,7 +1565,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../issue-gh-example/" class="md-nav__link">
+      <a href="../issue-gh-example.md" class="md-nav__link">
         
   
   
@@ -2222,6 +2283,12 @@
 <li>Pull request management (create, list, show, update)</li>
 <li>Pipeline management (create, run, monitor)</li>
 <li>Dry-run mode for previewing operations</li>
+<li><strong>Advanced Automation Features</strong> (new):<ul>
+<li>YAML configuration system with auto-discovery</li>
+<li>Markdown parser for rich content creation</li>
+<li>E2E testing infrastructure with cross-platform support</li>
+</ul>
+</li>
 </ul>
 <h4 id="go-executables">Go Executables<a class="headerlink" href="#go-executables" title="Anchor link to this section for reference">&para;</a></h4>
 <ul>
@@ -2370,6 +2437,73 @@
 <li>Modular service systems for different business domains</li>
 <li>Configurable authentication and API integration</li>
 </ul>
+<h3 id="advanced-automation-features">Advanced Automation Features<a class="headerlink" href="#advanced-automation-features" title="Anchor link to this section for reference">&para;</a></h3>
+<p><strong>Advanced Automation Features</strong> introduces comprehensive enterprise capabilities to the SDO CLI tool, enabling teams to standardize operations and ensure reliable cross-platform testing.</p>
+<h4 id="1-yaml-configuration-system">1. <strong>YAML Configuration System</strong><a class="headerlink" href="#1-yaml-configuration-system" title="Anchor link to this section for reference">&para;</a></h4>
+<ul>
+<li><strong>ConfigurationManager</strong>: New utility class with YamlDotNet integration</li>
+<li><strong>Auto-Discovery</strong>: Searches current directory → .temp subfolder → parent directory's .temp folder</li>
+<li><strong>Nested Structure</strong>: Supports complex nested YAML configurations flattened to dot-notation</li>
+<li><strong>Configuration Priority</strong> (highest to lowest):</li>
+<li>CLI parameters (e.g., <code>sdo wi list --state "Done"</code>)</li>
+<li>Config file defaults (from sdo-config.yaml)</li>
+<li>Hard-coded defaults in code</li>
+<li><strong>Example</strong>: <code>sdo wi list --config .\.temp\sdo-config.yaml</code> applies default filters for area, state, type, iteration, and top</li>
+<li><strong>Benefits</strong>: Team standardization, reduced repetitive CLI arguments, config file sharing via version control</li>
+</ul>
+<h4 id="2-markdown-parser">2. <strong>Markdown Parser</strong><a class="headerlink" href="#2-markdown-parser" title="Anchor link to this section for reference">&para;</a></h4>
+<ul>
+<li><strong>MarkdownParser</strong>: New utility class for parsing markdown content</li>
+<li><strong>Rich Content Support</strong>: </li>
+<li>YAML frontmatter parsing</li>
+<li>Title and description extraction</li>
+<li>Metadata extraction (Key: Value format in headers)</li>
+<li>Acceptance criteria parsing (checkbox-based lists)</li>
+<li>Code block extraction and preservation</li>
+<li><strong>Features</strong>:</li>
+<li>GitHub-flavored markdown (GFM) syntax support</li>
+<li>HTML sanitization for security</li>
+<li>Comprehensive error reporting with line numbers</li>
+<li>Verbose mode for detailed diagnostics</li>
+<li><strong>Integration</strong>: Automatically applied when creating work items or PRs from markdown files</li>
+<li><strong>Benefits</strong>: Professional-formatted work items, template reuse, standardized content structure</li>
+</ul>
+<h4 id="4-e2e-testing-infrastructure">4. <strong>E2E Testing Infrastructure</strong><a class="headerlink" href="#4-e2e-testing-infrastructure" title="Anchor link to this section for reference">&para;</a></h4>
+<ul>
+<li><strong>e2e-tests.targets</strong>: New MSBuild build targets for E2E test orchestration</li>
+<li><strong>Test Discovery</strong>: Reflection-based attribute matching for automatic test discovery</li>
+<li><strong>Color-Coded Output</strong>: </li>
+<li>[SUCCESS] messages in green for quick feedback</li>
+<li>[ERROR] messages in red for failure identification</li>
+<li>Plain text log file output (sdo-e2e-test.log)</li>
+<li><strong>Cross-Platform Validation</strong>: Integrated tests for both Azure DevOps and GitHub platforms</li>
+<li><strong>Test Execution</strong>: Supports specific test case execution via <code>--test-case</code> parameter</li>
+<li><strong>Available Targets</strong>:</li>
+<li><code>RUN_AZDO_WI_ASSIGNED_TO_ME_TEST</code> - Azure DevOps work item filtering</li>
+<li><code>RUN_GITHUB_WI_ASSIGNED_TO_ME_TEST</code> - GitHub issue filtering</li>
+<li><code>RUN_AZDO_PIPELINE_TEST</code> - Azure DevOps pipeline operations</li>
+<li><code>RUN_GITHUB_PIPELINE_TEST</code> - GitHub Actions operations</li>
+<li><strong>Benefits</strong>: Automated quality validation, cross-platform parity assurance, comprehensive release testing</li>
+</ul>
+<h4 id="5-service-enhancements">5. <strong>Service Enhancements</strong><a class="headerlink" href="#5-service-enhancements" title="Anchor link to this section for reference">&para;</a></h4>
+<ul>
+<li><strong>AzureDevOpsClient</strong>: </li>
+<li>Endpoint prioritization: /connectionData first (most reliable), falls back to Graph API</li>
+<li>Enhanced error handling and logging</li>
+<li>Improved user detection reliability</li>
+<li><strong>GitHubClient</strong>: </li>
+<li>Enhanced error handling for API operations</li>
+<li>Improved API timeout management (default 30s, configurable)</li>
+<li>Better exception messaging for troubleshooting</li>
+<li><strong>WorkItemCommand</strong>: </li>
+<li>Comprehensive error handling for list, show, create operations</li>
+<li>Config file loading with error validation</li>
+<li>Better user feedback and validation</li>
+<li><strong>PullRequestCommand</strong>: </li>
+<li>Branch existence validation before creation</li>
+<li>Improved error messages and diagnostic information</li>
+<li><strong>Benefits</strong>: Better error handling, improved reliability, enhanced developer experience</li>
+</ul>
 <h3 id="key-features">Key Features<a class="headerlink" href="#key-features" title="Anchor link to this section for reference">&para;</a></h3>
 <ul>
 <li><strong>Multi-Platform Support</strong>: Works seamlessly with Azure DevOps and GitHub</li>
@@ -2379,6 +2513,9 @@
 <li><strong>Pipeline Management</strong>: Create, run, monitor, and manage CI/CD pipelines</li>
 <li><strong>Dry-Run Mode</strong>: Preview operations before execution</li>
 <li><strong>Automatic Platform Detection</strong>: Detects platform from Git remote configuration</li>
+<li><strong>Configuration Management</strong>: YAML-based defaults for standardized operations (Advanced Automation Features)</li>
+<li><strong>Rich Content</strong>: Markdown templates for professional work items and PRs (Advanced Automation Features)</li>
+<li><strong>Automated Testing</strong>: E2E testing infrastructure with cross-platform validation (Advanced Automation Features)</li>
 </ul>
 <h3 id="dependencies">Dependencies<a class="headerlink" href="#dependencies" title="Anchor link to this section for reference">&para;</a></h3>
 <h4 id="ntools-suite-net">ntools Suite (.NET)<a class="headerlink" href="#ntools-suite-net" title="Anchor link to this section for reference">&para;</a></h4>
@@ -2391,6 +2528,7 @@
 <ul>
 <li><strong>Runtime</strong>: .NET 10.0 (only supported implementation)</li>
 <li><strong>CLI Framework</strong>: System.CommandLine 2.0.2</li>
+<li><strong>Configuration</strong>: YamlDotNet 15.1.1 for YAML parsing (Advanced Automation Features)</li>
 <li><strong>API Clients</strong>: Octokit.NET (GitHub API), Microsoft.TeamFoundationServer.Client (Azure DevOps API)</li>
 <li><strong>HTTP</strong>: System.Net.Http for REST calls</li>
 <li><strong>JSON</strong>: System.Text.Json for JSON processing</li>

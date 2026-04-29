@@ -618,6 +618,28 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#e2e-testing-commands-advanced-automation-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E2E Testing Commands (Advanced Automation Features)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sdo-configuration-management-advanced-automation-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SDO Configuration Management (Advanced Automation Features)
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1021,7 +1043,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../issue-azdo-bug-example/" class="md-nav__link">
+      <a href="../issue-azdo-bug-example.md" class="md-nav__link">
         
   
   
@@ -1049,7 +1071,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../issue-azdo-epic-example/" class="md-nav__link">
+      <a href="../issue-azdo-epic-example.md" class="md-nav__link">
         
   
   
@@ -1077,7 +1099,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../issue-azdo-pbi-example/" class="md-nav__link">
+      <a href="../issue-azdo-pbi-example.md" class="md-nav__link">
         
   
   
@@ -1105,7 +1127,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../issue-azdo-task-example/" class="md-nav__link">
+      <a href="../issue-azdo-task-example.md" class="md-nav__link">
         
   
   
@@ -1133,7 +1155,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../issue-gh-example/" class="md-nav__link">
+      <a href="../issue-gh-example.md" class="md-nav__link">
         
   
   
@@ -1800,6 +1822,55 @@ nb UNIT_TEST_ALL              # All unit tests (except long-running ones)
 <li>See the complete list of available targets at <a href="../nbuild-targets/">Nbuild Targets</a></li>
 <li>Learn more about code coverage at <a href="../code-coverage/">Code Coverage</a></li>
 </ul>
+<h2 id="e2e-testing-commands-advanced-automation-features">E2E Testing Commands (Advanced Automation Features)<a class="headerlink" href="#e2e-testing-commands-advanced-automation-features" title="Anchor link to this section for reference">&para;</a></h2>
+<p>Run end-to-end tests for validating cross-platform SDO operations:</p>
+<ul>
+<li>Run Azure DevOps work item filtering tests:</li>
+</ul>
+<div class="highlight"><pre><span></span><code>nb RUN_AZDO_WI_ASSIGNED_TO_ME_TEST
+</code></pre></div>
+<ul>
+<li>Run GitHub issue filtering tests:</li>
+</ul>
+<div class="highlight"><pre><span></span><code>nb RUN_GITHUB_WI_ASSIGNED_TO_ME_TEST
+</code></pre></div>
+<ul>
+<li>Run Azure DevOps pipeline operation tests:</li>
+</ul>
+<div class="highlight"><pre><span></span><code>nb RUN_AZDO_PIPELINE_TEST
+</code></pre></div>
+<ul>
+<li>Run GitHub Actions operation tests:</li>
+</ul>
+<div class="highlight"><pre><span></span><code>nb RUN_GITHUB_PIPELINE_TEST
+</code></pre></div>
+<p><strong>Output</strong>: Color-coded console (green for [SUCCESS], red for [ERROR]) with detailed logging to <code>sdo-e2e-test.log</code></p>
+<ul>
+<li>See the complete list of E2E targets at <a href="../nbuild-targets/#e2e-testing-targets">Nbuild Targets - E2E Testing</a></li>
+</ul>
+<h2 id="sdo-configuration-management-advanced-automation-features">SDO Configuration Management (Advanced Automation Features)<a class="headerlink" href="#sdo-configuration-management-advanced-automation-features" title="Anchor link to this section for reference">&para;</a></h2>
+<p>Work item queries can be standardized using YAML configuration files. See <a href="../sdo-net/#configuration-system-yaml-based">SDO Configuration System</a> for detailed documentation.</p>
+<p><strong>Quick Start</strong>:</p>
+<ol>
+<li>Create <code>sdo-config.yaml</code> in your project's <code>.temp</code> folder:</li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="nt">commands</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">wi</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">list</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">area_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;MyProject\\Backend&quot;</span>
+<span class="w">      </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;In</span><span class="nv"> </span><span class="s">Progress&quot;</span>
+<span class="w">      </span><span class="nt">top</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20</span>
+</code></pre></div>
+<ol>
+<li>Run <code>sdo wi list</code> from the project directory to use configuration defaults automatically</li>
+</ol>
+<p><strong>Configuration Priority</strong> (highest to lowest):
+1. CLI parameters: <code>sdo wi list --state "Done"</code>
+2. Config file defaults: <code>sdo-config.yaml</code>
+3. Hard-coded defaults in code</p>
+<p>For more details, see:
+- <a href="../sdo-net/#configuration-system-yaml-based">Configuration System Documentation</a>
+- <a href="../sdo-net/#markdown-parser-for-content-creation">Markdown Parser for Content Creation</a></p>
 
 
 

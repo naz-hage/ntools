@@ -16,7 +16,7 @@
         <link rel="prev" href="../github-release/">
       
       
-        <link rel="next" href="../issue-azdo-bug-example/">
+        <link rel="next" href="../nbuildtasks/">
       
       
         
@@ -1467,6 +1467,327 @@
   
 </li>
         
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#advanced-automation-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advanced Automation Features
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Advanced Automation Features">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration-system-yaml-based" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration System (YAML-based)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration System (YAML-based)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#overview_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration-file-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration File Format
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#usage-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration-discovery" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Discovery
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explicit-configuration-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explicit Configuration Path
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#supported-configuration-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Supported Configuration Keys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-scenarios" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example Scenarios
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#markdown-parser-for-content-creation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Markdown Parser for Content Creation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Markdown Parser for Content Creation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#overview_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#markdown-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Markdown Format
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#creating-work-items-from-markdown" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Creating Work Items from Markdown
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#supported-metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Supported Metadata
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metadata-via-headers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metadata via Headers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parsing-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parsing Details
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error Handling
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-scenarios_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example Scenarios
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example Output
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running-specific-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running Specific Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-coverage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Coverage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#log-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Log Files
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#integration-with-cicd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Integration with CI/CD
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#service-enhancements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Service Enhancements
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Service Enhancements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#azuredevopsclient-enhancements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AzureDevOpsClient Enhancements
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#githubclient-enhancements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GitHubClient Enhancements
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#command-improvements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Command Improvements
+      
+    </span>
+  </a>
+  
+</li>
+        
           <li class="md-nav__item">
   <a href="#platform-detection-errors" class="md-nav__link">
     <span class="md-ellipsis">
@@ -1584,7 +1905,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../issue-azdo-bug-example/" class="md-nav__link">
+      <a href="../issue-azdo-bug-example.md" class="md-nav__link">
         
   
   
@@ -1612,7 +1933,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../issue-azdo-epic-example/" class="md-nav__link">
+      <a href="../issue-azdo-epic-example.md" class="md-nav__link">
         
   
   
@@ -1640,7 +1961,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../issue-azdo-pbi-example/" class="md-nav__link">
+      <a href="../issue-azdo-pbi-example.md" class="md-nav__link">
         
   
   
@@ -1668,7 +1989,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../issue-azdo-task-example/" class="md-nav__link">
+      <a href="../issue-azdo-task-example.md" class="md-nav__link">
         
   
   
@@ -1696,7 +2017,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../issue-gh-example/" class="md-nav__link">
+      <a href="../issue-gh-example.md" class="md-nav__link">
         
   
   
@@ -2943,6 +3264,477 @@ gh<span class="w"> </span>auth<span class="w"> </span>login
 <div class="highlight"><pre><span></span><code><span class="c1"># Set personal access token</span>
 <span class="nv">$env</span>:AZURE_DEVOPS_PAT<span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;your_azure_pat&quot;</span>
 </code></pre></div></p>
+<hr />
+<h2 id="advanced-automation-features">Advanced Automation Features<a class="headerlink" href="#advanced-automation-features" title="Anchor link to this section for reference">&para;</a></h2>
+<p>Advanced Automation Features introduces comprehensive enterprise capabilities to standardize operations and ensure reliable testing across GitHub and Azure DevOps platforms.</p>
+<h3 id="configuration-system-yaml-based">Configuration System (YAML-based)<a class="headerlink" href="#configuration-system-yaml-based" title="Anchor link to this section for reference">&para;</a></h3>
+<p>The configuration system allows you to standardize work item queries by storing default filters in a YAML configuration file.</p>
+<h4 id="overview_1">Overview<a class="headerlink" href="#overview_1" title="Anchor link to this section for reference">&para;</a></h4>
+<ul>
+<li><strong>Automatic Discovery</strong>: Searches for <code>sdo-config.yaml</code> in:</li>
+<li>Current working directory</li>
+<li><code>.temp</code> subfolder in current directory  </li>
+<li><code>.temp</code> subfolder in parent directory</li>
+<li><strong>Configuration Priority</strong> (highest to lowest):</li>
+<li>CLI parameters (e.g., <code>sdo wi list --state "Done"</code>)</li>
+<li>Config file defaults (from sdo-config.yaml)</li>
+<li>Hard-coded defaults in code</li>
+<li><strong>Optional</strong>: Configuration files are completely optional; all commands work without them</li>
+</ul>
+<h4 id="configuration-file-format">Configuration File Format<a class="headerlink" href="#configuration-file-format" title="Anchor link to this section for reference">&para;</a></h4>
+<p>Create <code>sdo-config.yaml</code> in your project:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">commands</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">wi</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">list</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">area_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Project\\Warriors&quot;</span>
+<span class="w">      </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;To</span><span class="nv"> </span><span class="s">Do,In</span><span class="nv"> </span><span class="s">Progress&quot;</span>
+<span class="w">      </span><span class="nt">top</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">9</span>
+</code></pre></div>
+<h4 id="usage-examples">Usage Examples<a class="headerlink" href="#usage-examples" title="Anchor link to this section for reference">&para;</a></h4>
+<p><strong>Without Configuration</strong>:
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--area<span class="w"> </span><span class="s2">&quot;Project\Warriors&quot;</span><span class="w"> </span>--state<span class="w"> </span><span class="s2">&quot;To Do,In Progress&quot;</span><span class="w"> </span>--top<span class="w"> </span><span class="m">9</span>
+<span class="c1"># Returns: 9 work items from Warriors area in To Do or In Progress states</span>
+</code></pre></div></p>
+<p><strong>With Configuration File</strong>:
+<div class="highlight"><pre><span></span><code><span class="c1"># Place sdo-config.yaml in .temp\ folder</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>list
+<span class="c1"># Returns: Same 9 items using defaults from config</span>
+<span class="c1"># Displays: Config: C:\project\.temp\sdo-config.yaml</span>
+</code></pre></div></p>
+<p><strong>Override Configuration Defaults</strong>:
+<div class="highlight"><pre><span></span><code><span class="c1"># CLI parameters override config defaults</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--state<span class="w"> </span><span class="s2">&quot;Done&quot;</span>
+<span class="c1"># Returns: All work items in Done state (ignores config state filter)</span>
+</code></pre></div></p>
+<h4 id="configuration-discovery">Configuration Discovery<a class="headerlink" href="#configuration-discovery" title="Anchor link to this section for reference">&para;</a></h4>
+<p>The tool automatically searches for configuration files:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># From C:\project\myrepo</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>list
+<span class="c1"># Searches for config in this order:</span>
+<span class="c1"># 1. C:\project\myrepo\sdo-config.yaml</span>
+<span class="c1"># 2. C:\project\myrepo\.temp\sdo-config.yaml  </span>
+<span class="c1"># 3. C:\project\.temp\sdo-config.yaml</span>
+</code></pre></div>
+<h4 id="explicit-configuration-path">Explicit Configuration Path<a class="headerlink" href="#explicit-configuration-path" title="Anchor link to this section for reference">&para;</a></h4>
+<p>Specify a custom configuration path:</p>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--config<span class="w"> </span><span class="s2">&quot;C:\my-configs\standard.yaml&quot;</span>
+</code></pre></div>
+<h4 id="supported-configuration-keys">Supported Configuration Keys<a class="headerlink" href="#supported-configuration-keys" title="Anchor link to this section for reference">&para;</a></h4>
+<p>Under <code>commands.wi.list</code> in the YAML file:</p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Azure DevOps</th>
+<th>GitHub</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>area_path</code></td>
+<td>✓</td>
+<td>-</td>
+<td>Area path filter (e.g., "Project\Area\SubArea")</td>
+</tr>
+<tr>
+<td><code>state</code></td>
+<td>✓</td>
+<td>✓</td>
+<td>State filter: New, Approved, Committed, Done, To Do, In Progress</td>
+</tr>
+<tr>
+<td><code>type</code></td>
+<td>✓</td>
+<td>-</td>
+<td>Work item type: PBI, Bug, Task, Spike, Epic</td>
+</tr>
+<tr>
+<td><code>iteration</code></td>
+<td>✓</td>
+<td>-</td>
+<td>Iteration filter (e.g., "Project\Sprint 1")</td>
+</tr>
+<tr>
+<td><code>top</code></td>
+<td>✓</td>
+<td>✓</td>
+<td>Maximum items to return (default: 50)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="example-scenarios">Example Scenarios<a class="headerlink" href="#example-scenarios" title="Anchor link to this section for reference">&para;</a></h4>
+<p><strong>Scenario 1: Team Standardization</strong></p>
+<p>Team commits configuration to project repository:
+<div class="highlight"><pre><span></span><code><span class="c1"># .github/.temp/sdo-config.yaml</span>
+<span class="nt">commands</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">wi</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">list</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">area_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;MyProject\\Backend&quot;</span>
+<span class="w">      </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;In</span><span class="nv"> </span><span class="s">Progress&quot;</span>
+<span class="w">      </span><span class="nt">top</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20</span>
+</code></pre></div></p>
+<p>All team members get consistent results without remembering filters:
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/myorg/myproject
+<span class="nb">cd</span><span class="w"> </span>myproject
+sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w">  </span><span class="c1"># Gets team&#39;s standard view automatically</span>
+</code></pre></div></p>
+<p><strong>Scenario 2: Sprint Planning</strong></p>
+<p>Create sprint-specific configuration:
+<div class="highlight"><pre><span></span><code><span class="c1"># .temp/sdo-sprint-5.yaml</span>
+<span class="nt">commands</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">wi</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">list</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">iteration</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;MyProject\\Sprint</span><span class="nv"> </span><span class="s">5&quot;</span>
+<span class="w">      </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;New,Approved,Committed&quot;</span>
+</code></pre></div></p>
+<p>Use it explicitly:
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--config<span class="w"> </span>.temp/sdo-sprint-5.yaml
+</code></pre></div></p>
+<p><strong>Scenario 3: Release Validation</strong></p>
+<p>Store release criteria configuration:
+<div class="highlight"><pre><span></span><code><span class="c1"># .temp/sdo-release.yaml</span>
+<span class="nt">commands</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">wi</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">list</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Done&quot;</span>
+<span class="w">      </span><span class="nt">area_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;MyProject\\Release&quot;</span>
+<span class="w">      </span><span class="nt">top</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100</span>
+</code></pre></div></p>
+<p>Verify release readiness:
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--config<span class="w"> </span>.temp/sdo-release.yaml
+<span class="c1"># Shows all completed release items</span>
+</code></pre></div></p>
+<hr />
+<h3 id="markdown-parser-for-content-creation">Markdown Parser for Content Creation<a class="headerlink" href="#markdown-parser-for-content-creation" title="Anchor link to this section for reference">&para;</a></h3>
+<p>Create professional work items and pull requests using markdown files with rich formatting support.</p>
+<h4 id="overview_2">Overview<a class="headerlink" href="#overview_2" title="Anchor link to this section for reference">&para;</a></h4>
+<ul>
+<li><strong>Markdown Support</strong>: GitHub-flavored markdown (GFM) syntax</li>
+<li><strong>Metadata</strong>: YAML frontmatter for work item properties</li>
+<li><strong>Rich Content</strong>: Support for code blocks, acceptance criteria, tables</li>
+<li><strong>Error Handling</strong>: Detailed error reporting with line numbers</li>
+<li><strong>Security</strong>: HTML sanitization for safe content</li>
+</ul>
+<h4 id="markdown-format">Markdown Format<a class="headerlink" href="#markdown-format" title="Anchor link to this section for reference">&para;</a></h4>
+<p><strong>Basic Format</strong> (required):
+<div class="highlight"><pre><span></span><code><span class="gh"># Work Item Title</span>
+
+This is the description text. 
+Supports multiple paragraphs.
+
+<span class="gu">## Acceptance Criteria</span>
+<span class="k">- [ ]</span> Criterion 1
+<span class="k">- [ ]</span> Criterion 2  
+<span class="k">- [x]</span> Criterion 3 (completed)
+
+<span class="gu">## Code Examples</span>
+```csharp
+public void DoSomething()
+{
+    // Code here
+}
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>**With YAML Frontmatter** (optional):
+```markdown
+---
+work_item_type: PBI
+priority: High
+assignee: user@example.com
+labels: &quot;feature, backend, auth&quot;
+target: &quot;azdo&quot;  # azdo or github
+---
+
+# Authentication Service Design
+
+Implement OAuth2 integration for secure user authentication...
+
+## Acceptance Criteria
+- [ ] OAuth2 provider integrated
+- [ ] Token refresh mechanism implemented
+- [ ] Session management in place
+</code></pre></div></p>
+<h4 id="creating-work-items-from-markdown">Creating Work Items from Markdown<a class="headerlink" href="#creating-work-items-from-markdown" title="Anchor link to this section for reference">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Create from markdown file</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>create<span class="w"> </span>--file-path<span class="w"> </span>work-item.md
+
+<span class="c1"># Preview before creating (dry-run)</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>create<span class="w"> </span>--file-path<span class="w"> </span>work-item.md<span class="w"> </span>--dry-run
+
+<span class="c1"># Show mapping to native commands</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>create<span class="w"> </span>--file-path<span class="w"> </span>work-item.md<span class="w"> </span>--verbose
+</code></pre></div>
+<h4 id="supported-metadata">Supported Metadata<a class="headerlink" href="#supported-metadata" title="Anchor link to this section for reference">&para;</a></h4>
+<p>In YAML frontmatter under <code>---</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example</th>
+<th>Platforms</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>work_item_type</code></td>
+<td>string</td>
+<td>PBI, Bug, Task, Feature, Epic</td>
+<td>Azure DevOps</td>
+</tr>
+<tr>
+<td><code>priority</code></td>
+<td>string</td>
+<td>High, Medium, Low</td>
+<td>Both</td>
+</tr>
+<tr>
+<td><code>assignee</code></td>
+<td>email</td>
+<td>user@example.com</td>
+<td>Both</td>
+</tr>
+<tr>
+<td><code>labels</code></td>
+<td>csv</td>
+<td>"backend, auth, security"</td>
+<td>GitHub</td>
+</tr>
+<tr>
+<td><code>area_path</code></td>
+<td>string</td>
+<td>Project\Team\Component</td>
+<td>Azure DevOps</td>
+</tr>
+<tr>
+<td><code>target</code></td>
+<td>string</td>
+<td>azdo, github</td>
+<td>Both</td>
+</tr>
+</tbody>
+</table>
+<h4 id="metadata-via-headers">Metadata via Headers<a class="headerlink" href="#metadata-via-headers" title="Anchor link to this section for reference">&para;</a></h4>
+<p>Alternative to YAML frontmatter using level-2 headers:</p>
+<div class="highlight"><pre><span></span><code><span class="gh"># Feature Title</span>
+
+<span class="gu">## Type: PBI</span>
+<span class="gu">## Priority: High</span>
+<span class="gu">## Assignee: user@example.com</span>
+
+Description here...
+</code></pre></div>
+<h4 id="parsing-details">Parsing Details<a class="headerlink" href="#parsing-details" title="Anchor link to this section for reference">&para;</a></h4>
+<p>The parser extracts:</p>
+<ol>
+<li><strong>Title</strong>: First H1 header (required)</li>
+<li><strong>Frontmatter</strong>: YAML between <code>---</code> markers (optional)</li>
+<li><strong>Metadata</strong>: Level-2 headers in "Key: Value" format (optional)</li>
+<li><strong>Description</strong>: All paragraphs before acceptance criteria</li>
+<li><strong>Code Blocks</strong>: All fenced code blocks with language detection</li>
+<li><strong>Acceptance Criteria</strong>: Unordered list after "## Acceptance Criteria" header</li>
+</ol>
+<h4 id="error-handling">Error Handling<a class="headerlink" href="#error-handling" title="Anchor link to this section for reference">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Verbose mode shows detailed parsing errors</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>create<span class="w"> </span>--file-path<span class="w"> </span>work-item.md<span class="w"> </span>--verbose
+
+<span class="c1"># Errors include:</span>
+<span class="c1"># - Line number and content</span>
+<span class="c1"># - Specific issue (e.g., &quot;Title is required&quot;, &quot;Malformed header&quot;)</span>
+<span class="c1"># - Warnings for minor issues (unclosed code blocks, etc.)</span>
+</code></pre></div>
+<h4 id="example-scenarios_1">Example Scenarios<a class="headerlink" href="#example-scenarios_1" title="Anchor link to this section for reference">&para;</a></h4>
+<p><strong>Scenario 1: Feature Request</strong></p>
+<p>Create <code>features/auth-redesign.md</code>:
+<div class="highlight"><pre><span></span><code>---
+work_item_type: PBI
+priority: High
+assignee: alice@company.com
+<span class="gu">labels: &quot;backend, security, authentication&quot;</span>
+<span class="gu">---</span>
+
+<span class="gh"># Redesign Authentication System</span>
+
+Complete overhaul of the authentication layer to support modern OAuth2 and OpenID Connect standards.
+
+<span class="gu">## Acceptance Criteria</span>
+<span class="k">- [ ]</span> OAuth2 provider integration
+<span class="k">- [ ]</span> OpenID Connect support
+<span class="k">- [ ]</span> Token refresh mechanism
+<span class="k">- [ ]</span> Backward compatibility maintained
+<span class="k">- [ ]</span> Documentation updated
+
+<span class="gu">## Technical Details</span>
+```csharp
+public interface IAuthenticationProvider
+{
+    Task&lt;AuthToken&gt; AuthenticateAsync(credentials);
+    Task&lt;bool&gt; RefreshTokenAsync(token);
+}
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>Then create:
+```bash
+sdo wi create --file-path features/auth-redesign.md
+</code></pre></div></p>
+<p><strong>Scenario 2: Bug Report</strong></p>
+<p>Create <code>bugs/parser-crash.md</code>:
+<div class="highlight"><pre><span></span><code>---
+work_item_type: Bug
+priority: Critical
+<span class="gu">target: &quot;github&quot;</span>
+<span class="gu">---</span>
+
+<span class="gh"># Parser Crashes on Malformed Markdown</span>
+
+The markdown parser crashes when encountering headers without proper spacing.
+
+<span class="gu">## Acceptance Criteria</span>
+<span class="k">- [ ]</span> Malformed header detected and handled gracefully
+<span class="k">- [ ]</span> Error message is user-friendly
+<span class="k">- [ ]</span> Unit tests added for edge cases
+
+<span class="gu">## Reproduction Steps</span>
+```markdown
+<span class="gh">#NoSpace Header</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>**Scenario 3: Pull Request**
+
+Create `prs/feature-merge.md`:
+```markdown
+---
+work_item_type: Pull Request
+target: &quot;github&quot;
+---
+
+# Add User Authentication to Dashboard
+
+This PR implements OAuth2 authentication for dashboard access.
+
+## Changes
+- Added authentication middleware
+- Integrated identity provider
+- Updated login form
+
+## Testing
+```bash
+npm test
+npm run lint
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>---
+
+### E2E Testing Infrastructure
+
+Automated testing framework for validating SDO functionality across Azure DevOps and GitHub platforms with color-coded output.
+
+#### Overview
+
+- **Cross-Platform Testing**: Validates both Azure DevOps and GitHub operations
+- **Color-Coded Output**: Green for success, red for errors, visible in console
+- **Test Discovery**: Reflection-based automatic test discovery
+- **Specific Test Execution**: Run individual tests via `--test-case` parameter
+- **Logging**: Plain text output to `sdo-e2e-test.log`
+
+#### Test Targets
+
+Available MSBuild targets for E2E testing:
+
+```bash
+# Run all Azure DevOps tests
+nb RUN_AZDO_WI_ASSIGNED_TO_ME_TEST
+
+# Run all GitHub tests  
+nb RUN_GITHUB_WI_ASSIGNED_TO_ME_TEST
+
+# Run Azure DevOps pipeline tests
+nb RUN_AZDO_PIPELINE_TEST
+
+# Run GitHub Actions tests
+nb RUN_GITHUB_PIPELINE_TEST
+</code></pre></div></p>
+<h4 id="example-output">Example Output<a class="headerlink" href="#example-output" title="Anchor link to this section for reference">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>----------------------------------------------------------
+STEP 1: Get unfiltered work item count
+----------------------------------------------------------
+[INFO] Executing: sdo.exe wi list
+[INFO] Unfiltered work items count: 34
+
+----------------------------------------------------------
+STEP 2: Execute --assigned-to-me filter
+----------------------------------------------------------
+[INFO] Executing: sdo.exe wi list --assigned-to-me
+[SUCCESS] √ Exit code is 0
+[SUCCESS] √ Work items returned: 1
+[SUCCESS] √ Filter validation passed: 1 &lt;= 34
+
+----------------------------------------------------------
+[SUCCESS] √ Azure DevOps List Assigned To Me Test PASSED
+[SUCCESS] √ PASSED: Validate_AzureDevOps_ListAssignedToMe
+----------------------------------------------------------
+</code></pre></div>
+<h4 id="running-specific-tests">Running Specific Tests<a class="headerlink" href="#running-specific-tests" title="Anchor link to this section for reference">&para;</a></h4>
+<p>Run individual test cases:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Run a specific test</span>
+sdo-e2e-tests.exe<span class="w"> </span>--test-case<span class="w"> </span>Validate_AzureDevOps_ListAssignedToMe
+
+<span class="c1"># Run with verbose output</span>
+sdo-e2e-tests.exe<span class="w"> </span>--test-case<span class="w"> </span>Validate_GitHub_ListAssignedToMe<span class="w"> </span>--verbose
+</code></pre></div>
+<h4 id="test-coverage">Test Coverage<a class="headerlink" href="#test-coverage" title="Anchor link to this section for reference">&para;</a></h4>
+<p><strong>Platform Parity Tests</strong>:
+- Work item list filtering
+- Assigned-to-me logic
+- User detection across platforms
+- Pipeline creation and execution
+- Repository operations</p>
+<p><strong>Reliability Tests</strong>:
+- Connection timeout handling
+- Authentication failure recovery
+- API rate limiting
+- Network error resilience</p>
+<h4 id="log-files">Log Files<a class="headerlink" href="#log-files" title="Anchor link to this section for reference">&para;</a></h4>
+<p>Test logs are saved to:
+- Location: <code>sdo-e2e-test/bin/Debug/net10.0/sdo-e2e-test.log</code>
+- Format: Plain text with timestamps
+- Content: Detailed step-by-step execution trace</p>
+<h4 id="integration-with-cicd">Integration with CI/CD<a class="headerlink" href="#integration-with-cicd" title="Anchor link to this section for reference">&para;</a></h4>
+<p>These tests can be integrated into your build pipeline:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># In your GitHub Actions workflow</span>
+-<span class="w"> </span>name:<span class="w"> </span>Run<span class="w"> </span>E2E<span class="w"> </span>Tests
+<span class="w">  </span>run:<span class="w"> </span>nb<span class="w"> </span>RUN_AZDO_WI_ASSIGNED_TO_ME_TEST
+
+<span class="c1"># Or in Azure Pipelines</span>
+-<span class="w"> </span>task:<span class="w"> </span>PowerShell@2
+<span class="w">  </span>inputs:
+<span class="w">    </span>scriptType:<span class="w"> </span><span class="s1">&#39;inline&#39;</span>
+<span class="w">    </span>script:<span class="w"> </span><span class="s1">&#39;nb RUN_GITHUB_WI_ASSIGNED_TO_ME_TEST&#39;</span>
+</code></pre></div>
+<hr />
+<h2 id="service-enhancements">Service Enhancements<a class="headerlink" href="#service-enhancements" title="Anchor link to this section for reference">&para;</a></h2>
+<p>Advanced Automation Features includes reliability and performance improvements to core services.</p>
+<h3 id="azuredevopsclient-enhancements">AzureDevOpsClient Enhancements<a class="headerlink" href="#azuredevopsclient-enhancements" title="Anchor link to this section for reference">&para;</a></h3>
+<ul>
+<li><strong>Endpoint Prioritization</strong>: Queries <code>/connectionData</code> first (most reliable), falls back to Graph API</li>
+<li><strong>Improved User Detection</strong>: Better identification of current user</li>
+<li><strong>Enhanced Error Handling</strong>: Detailed error messages for API failures</li>
+<li><strong>Structured Logging</strong>: Better diagnostics for troubleshooting</li>
+</ul>
+<h3 id="githubclient-enhancements">GitHubClient Enhancements<a class="headerlink" href="#githubclient-enhancements" title="Anchor link to this section for reference">&para;</a></h3>
+<ul>
+<li><strong>Better Timeout Handling</strong>: Default 30 seconds, configurable per request</li>
+<li><strong>Improved Error Messages</strong>: Clearer feedback on API errors</li>
+<li><strong>Enhanced Logging</strong>: Structured logging for debugging</li>
+<li><strong>Rate Limiting Awareness</strong>: Better handling of GitHub API rate limits</li>
+</ul>
+<h3 id="command-improvements">Command Improvements<a class="headerlink" href="#command-improvements" title="Anchor link to this section for reference">&para;</a></h3>
+<p><strong>WorkItemCommand</strong>:
+- Configuration file loading with error validation
+- Comprehensive error handling for list/show/create operations
+- Better user feedback and validation messages</p>
+<p><strong>PullRequestCommand</strong>:
+- Branch existence validation before creation
+- Improved error messages
+- Better diagnostic information</p>
+<hr />
 <h3 id="platform-detection-errors">Platform Detection Errors<a class="headerlink" href="#platform-detection-errors" title="Anchor link to this section for reference">&para;</a></h3>
 <p><strong>Error:</strong> <code>Could not determine GitHub repository from Git remote</code></p>
 <p><strong>Causes:</strong>

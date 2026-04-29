@@ -946,7 +946,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../issue-azdo-bug-example/" class="md-nav__link">
+      <a href="../issue-azdo-bug-example.md" class="md-nav__link">
         
   
   
@@ -974,7 +974,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../issue-azdo-epic-example/" class="md-nav__link">
+      <a href="../issue-azdo-epic-example.md" class="md-nav__link">
         
   
   
@@ -1002,7 +1002,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../issue-azdo-pbi-example/" class="md-nav__link">
+      <a href="../issue-azdo-pbi-example.md" class="md-nav__link">
         
   
   
@@ -1030,7 +1030,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../issue-azdo-task-example/" class="md-nav__link">
+      <a href="../issue-azdo-task-example.md" class="md-nav__link">
         
   
   
@@ -1058,7 +1058,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../issue-gh-example/" class="md-nav__link">
+      <a href="../issue-gh-example.md" class="md-nav__link">
         
   
   
@@ -1787,8 +1787,57 @@
 </tbody>
 </table>
 <ul>
-<li><strong>C:\Program Files\Nbuild\common.targets Targets</strong></li>
+<li><strong>./ntools\e2e-tests.targets Targets (Advanced Automation Features)</strong></li>
 </ul>
+<table>
+<thead>
+<tr>
+<th><strong>Target Name</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BUILD_E2E_FRAMEWORK</td>
+<td>Build the E2E test framework library</td>
+</tr>
+<tr>
+<td>BUILD_SDO_E2E</td>
+<td>Build the SDO service for E2E testing</td>
+</tr>
+<tr>
+<td>BUILD_SDO_E2E_TESTS</td>
+<td>Build the E2E test projects</td>
+</tr>
+<tr>
+<td>COPY_SDO_EXECUTABLE</td>
+<td>Copy SDO executable to test directory</td>
+</tr>
+<tr>
+<td>RUN_AZDO_WI_ASSIGNED_TO_ME_TEST</td>
+<td>Run Azure DevOps work item filtering test</td>
+</tr>
+<tr>
+<td>RUN_GITHUB_WI_ASSIGNED_TO_ME_TEST</td>
+<td>Run GitHub issue filtering test</td>
+</tr>
+<tr>
+<td>RUN_AZDO_PIPELINE_TEST</td>
+<td>Run Azure DevOps pipeline operations test</td>
+</tr>
+<tr>
+<td>RUN_GITHUB_PIPELINE_TEST</td>
+<td>Run GitHub Actions operations test</td>
+</tr>
+</tbody>
+</table>
+<p><strong>E2E Testing Features (Advanced Automation Features)</strong>:
+- Color-coded console output (green for [SUCCESS], red for [ERROR])
+- Cross-platform validation for Azure DevOps and GitHub
+- Plain text log output to sdo-e2e-test.log
+- Test discovery via reflection-based attributes
+- Specific test case execution support via <code>--test-case</code> parameter
+- Integration with MSBuild build system</p>
 <table>
 <thead>
 <tr>
