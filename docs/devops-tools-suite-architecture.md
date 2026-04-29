@@ -113,6 +113,11 @@ graph TB
   - Pull request management (create, list, show, update)
   - Pipeline management (create, run, monitor)
   - Dry-run mode for previewing operations
+  - **Advanced Automation Features** (new):
+    - YAML configuration system with auto-discovery
+    - Bulk operations processor with retry logic
+    - Markdown parser for rich content creation
+    - E2E testing infrastructure with cross-platform support
 #### Go Executables
 - **Purpose**: Various utilities written in Go
 - **Location**: `go/` directory
@@ -272,6 +277,79 @@ Both sdo and ntools Suite follow consistent design principles:
 - Modular service systems for different business domains
 - Configurable authentication and API integration
 
+### Advanced Automation Features
+
+**Advanced Automation Features** introduces comprehensive enterprise capabilities to the SDO CLI tool, enabling teams to standardize operations, automate bulk workflows, and ensure reliable cross-platform testing.
+
+#### 1. **YAML Configuration System**
+- **ConfigurationManager**: New utility class with YamlDotNet integration
+- **Auto-Discovery**: Searches current directory → .temp subfolder → parent directory's .temp folder
+- **Nested Structure**: Supports complex nested YAML configurations flattened to dot-notation
+- **Configuration Priority** (highest to lowest):
+  1. CLI parameters (e.g., `sdo wi list --state "Done"`)
+  2. Config file defaults (from sdo-config.yaml)
+  3. Hard-coded defaults in code
+- **Example**: `sdo wi list --config .\.temp\sdo-config.yaml` applies default filters for area, state, type, iteration, and top
+- **Benefits**: Team standardization, reduced repetitive CLI arguments, config file sharing via version control
+
+#### 2. **Bulk Operations Processor**
+- **BulkOperationProcessor**: New utility class for batch create/update operations
+- **Robust Error Handling**: Built-in retry logic with configurable attempts and exponential backoff
+- **Configurable Batch Sizes**: Default 10 operations per batch, customizable via constructor
+- **Partial Success Reporting**: Handles failures gracefully with detailed error summaries
+- **Thread-Safe Implementation**: Supports concurrent operations safely
+- **Benefits**: Automate large-scale operations, eliminate external scripting, improved reliability for bulk tasks
+
+#### 3. **Markdown Parser**
+- **MarkdownParser**: New utility class for parsing markdown content
+- **Rich Content Support**: 
+  - YAML frontmatter parsing
+  - Title and description extraction
+  - Metadata extraction (Key: Value format in headers)
+  - Acceptance criteria parsing (checkbox-based lists)
+  - Code block extraction and preservation
+- **Features**:
+  - GitHub-flavored markdown (GFM) syntax support
+  - HTML sanitization for security
+  - Comprehensive error reporting with line numbers
+  - Verbose mode for detailed diagnostics
+- **Integration**: Automatically applied when creating work items or PRs from markdown files
+- **Benefits**: Professional-formatted work items, template reuse, standardized content structure
+
+#### 4. **E2E Testing Infrastructure**
+- **e2e-tests.targets**: New MSBuild build targets for E2E test orchestration
+- **Test Discovery**: Reflection-based attribute matching for automatic test discovery
+- **Color-Coded Output**: 
+  - [SUCCESS] messages in green for quick feedback
+  - [ERROR] messages in red for failure identification
+  - Plain text log file output (sdo-e2e-test.log)
+- **Cross-Platform Validation**: Integrated tests for both Azure DevOps and GitHub platforms
+- **Test Execution**: Supports specific test case execution via `--test-case` parameter
+- **Available Targets**:
+  - `RUN_AZDO_WI_ASSIGNED_TO_ME_TEST` - Azure DevOps work item filtering
+  - `RUN_GITHUB_WI_ASSIGNED_TO_ME_TEST` - GitHub issue filtering
+  - `RUN_AZDO_PIPELINE_TEST` - Azure DevOps pipeline operations
+  - `RUN_GITHUB_PIPELINE_TEST` - GitHub Actions operations
+- **Benefits**: Automated quality validation, cross-platform parity assurance, comprehensive release testing
+
+#### 5. **Service Enhancements**
+- **AzureDevOpsClient**: 
+  - Endpoint prioritization: /connectionData first (most reliable), falls back to Graph API
+  - Enhanced error handling and logging
+  - Improved user detection reliability
+- **GitHubClient**: 
+  - Enhanced error handling for API operations
+  - Improved API timeout management (default 30s, configurable)
+  - Better exception messaging for troubleshooting
+- **WorkItemCommand**: 
+  - Comprehensive error handling for list, show, create operations
+  - Config file loading with error validation
+  - Better user feedback and validation
+- **PullRequestCommand**: 
+  - Branch existence validation before creation
+  - Improved error messages and diagnostic information
+- **Benefits**: Better error handling, improved reliability, enhanced developer experience
+
 ### Key Features
 
 - **Multi-Platform Support**: Works seamlessly with Azure DevOps and GitHub
@@ -281,6 +359,10 @@ Both sdo and ntools Suite follow consistent design principles:
 - **Pipeline Management**: Create, run, monitor, and manage CI/CD pipelines
 - **Dry-Run Mode**: Preview operations before execution
 - **Automatic Platform Detection**: Detects platform from Git remote configuration
+- **Configuration Management**: YAML-based defaults for standardized operations (Advanced Automation Features)
+- **Bulk Operations**: Batch create/update with retry logic and error handling (Advanced Automation Features)
+- **Rich Content**: Markdown templates for professional work items and PRs (Advanced Automation Features)
+- **Automated Testing**: E2E testing infrastructure with cross-platform validation (Advanced Automation Features)
 
 ### Dependencies
 
@@ -292,6 +374,7 @@ Both sdo and ntools Suite follow consistent design principles:
 #### sdo (C# Simple DevOps Operations Tool)
 - **Runtime**: .NET 10.0 (only supported implementation)
 - **CLI Framework**: System.CommandLine 2.0.2
+- **Configuration**: YamlDotNet 15.1.1 for YAML parsing (Advanced Automation Features)
 - **API Clients**: Octokit.NET (GitHub API), Microsoft.TeamFoundationServer.Client (Azure DevOps API)
 - **HTTP**: System.Net.Http for REST calls
 - **JSON**: System.Text.Json for JSON processing
