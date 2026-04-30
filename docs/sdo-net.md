@@ -850,6 +850,503 @@ Azure DevOps:
 $env:AZURE_DEVOPS_PAT = "your_azure_pat"
 ```
 
+---
+
+## Advanced Automation Features
+
+Advanced Automation Features introduces comprehensive enterprise capabilities to standardize operations and ensure reliable testing across GitHub and Azure DevOps platforms.
+
+### Configuration System (YAML-based)
+
+The configuration system allows you to standardize work item queries by storing default filters in a YAML configuration file.
+
+#### Overview
+
+- **Automatic Discovery**: Searches for `sdo-config.yaml` in:
+  1. Current working directory
+  2. `.temp` subfolder in current directory  
+  3. `.temp` subfolder in parent directory
+- **Configuration Priority** (highest to lowest):
+  1. CLI parameters (e.g., `sdo wi list --state "Done"`)
+  2. Config file defaults (from sdo-config.yaml)
+  3. Hard-coded defaults in code
+- **Optional**: Configuration files are completely optional; all commands work without them
+
+#### Configuration File Format
+
+Create `sdo-config.yaml` in your project:
+
+```yaml
+commands:
+  wi:
+    list:
+      area_path: "Project\\Warriors"
+      state: "To Do,In Progress"
+      top: 9
+```
+
+#### Usage Examples
+
+**Without Configuration**:
+```bash
+sdo wi list --area "Project\Warriors" --state "To Do,In Progress" --top 9
+# Returns: 9 work items from Warriors area in To Do or In Progress states
+```
+
+**With Configuration File**:
+```bash
+# Place sdo-config.yaml in .temp\ folder
+sdo wi list
+# Returns: Same 9 items using defaults from config
+# Displays: Config: C:\project\.temp\sdo-config.yaml
+```
+
+**Override Configuration Defaults**:
+```bash
+# CLI parameters override config defaults
+sdo wi list --state "Done"
+# Returns: All work items in Done state (ignores config state filter)
+```
+
+#### Configuration Discovery
+
+The tool automatically searches for configuration files:
+
+```bash
+# From C:\project\myrepo
+sdo wi list
+# Searches for config in this order:
+# 1. C:\project\myrepo\sdo-config.yaml
+# 2. C:\project\myrepo\.temp\sdo-config.yaml  
+# 3. C:\project\.temp\sdo-config.yaml
+```
+
+#### Explicit Configuration Path
+
+Specify a custom configuration path:
+
+```bash
+sdo wi list --config "C:\my-configs\standard.yaml"
+```
+
+#### Supported Configuration Keys
+
+Under `commands.wi.list` in the YAML file:
+
+| Key | Azure DevOps | GitHub | Description |
+|-----|--------------|--------|-------------|
+| `area_path` | ✓ | - | Area path filter (e.g., "Project\\Area\\SubArea") |
+| `state` | ✓ | ✓ | State filter: New, Approved, Committed, Done, To Do, In Progress |
+| `type` | ✓ | - | Work item type: PBI, Bug, Task, Spike, Epic |
+| `iteration` | ✓ | - | Iteration filter (e.g., "Project\\Sprint 1") |
+| `top` | ✓ | ✓ | Maximum items to return (default: 50) |
+
+#### Example Scenarios
+
+**Scenario 1: Team Standardization**
+
+Team commits configuration to project repository:
+```yaml
+# .github/.temp/sdo-config.yaml
+commands:
+  wi:
+    list:
+      area_path: "MyProject\\Backend"
+      state: "In Progress"
+      top: 20
+```
+
+All team members get consistent results without remembering filters:
+```bash
+git clone https://github.com/myorg/myproject
+cd myproject
+sdo wi list  # Gets team's standard view automatically
+```
+
+**Scenario 2: Sprint Planning**
+
+Create sprint-specific configuration:
+```yaml
+# .temp/sdo-sprint-5.yaml
+commands:
+  wi:
+    list:
+      iteration: "MyProject\\Sprint 5"
+      state: "New,Approved,Committed"
+```
+
+Use it explicitly:
+```bash
+sdo wi list --config .temp/sdo-sprint-5.yaml
+```
+
+**Scenario 3: Release Validation**
+
+Store release criteria configuration:
+```yaml
+# .temp/sdo-release.yaml
+commands:
+  wi:
+    list:
+      state: "Done"
+      area_path: "MyProject\\Release"
+      top: 100
+```
+
+Verify release readiness:
+```bash
+sdo wi list --config .temp/sdo-release.yaml
+# Shows all completed release items
+```
+
+---
+
+### Markdown Parser for Content Creation
+
+Create professional work items and pull requests using markdown files with rich formatting support.
+
+#### Overview
+
+- **Markdown Support**: GitHub-flavored markdown (GFM) syntax
+- **Metadata**: YAML frontmatter for work item properties
+- **Rich Content**: Support for code blocks, acceptance criteria, tables
+- **Error Handling**: Detailed error reporting with line numbers
+- **Security**: HTML sanitization for safe content
+
+#### Markdown Format
+
+**Basic Format** (required):
+```markdown
+# Work Item Title
+
+This is the description text. 
+Supports multiple paragraphs.
+
+## Acceptance Criteria
+- [ ] Criterion 1
+- [ ] Criterion 2  
+- [x] Criterion 3 (completed)
+
+## Code Examples
+```csharp
+public void DoSomething()
+{
+    // Code here
+}
+```
+```
+
+**With YAML Frontmatter** (optional):
+```markdown
+---
+work_item_type: PBI
+priority: High
+assignee: user@example.com
+labels: "feature, backend, auth"
+target: "azdo"  # azdo or github
+---
+
+# Authentication Service Design
+
+Implement OAuth2 integration for secure user authentication...
+
+## Acceptance Criteria
+- [ ] OAuth2 provider integrated
+- [ ] Token refresh mechanism implemented
+- [ ] Session management in place
+```
+
+#### Creating Work Items from Markdown
+
+```bash
+# Create from markdown file
+sdo wi create --file-path work-item.md
+
+# Preview before creating (dry-run)
+sdo wi create --file-path work-item.md --dry-run
+
+# Show mapping to native commands
+sdo wi create --file-path work-item.md --verbose
+```
+
+#### Supported Metadata
+
+In YAML frontmatter under `---`:
+
+| Field | Type | Example | Platforms |
+|-------|------|---------|-----------|
+| `work_item_type` | string | PBI, Bug, Task, Feature, Epic | Azure DevOps |
+| `priority` | string | High, Medium, Low | Both |
+| `assignee` | email | user@example.com | Both |
+| `labels` | csv | "backend, auth, security" | GitHub |
+| `area_path` | string | Project\\Team\\Component | Azure DevOps |
+| `target` | string | azdo, github | Both |
+
+#### Metadata via Headers
+
+Alternative to YAML frontmatter using level-2 headers:
+
+```markdown
+# Feature Title
+
+## Type: PBI
+## Priority: High
+## Assignee: user@example.com
+
+Description here...
+```
+
+#### Parsing Details
+
+The parser extracts:
+
+1. **Title**: First H1 header (required)
+2. **Frontmatter**: YAML between `---` markers (optional)
+3. **Metadata**: Level-2 headers in "Key: Value" format (optional)
+4. **Description**: All paragraphs before acceptance criteria
+5. **Code Blocks**: All fenced code blocks with language detection
+6. **Acceptance Criteria**: Unordered list after "## Acceptance Criteria" header
+
+#### Error Handling
+
+```bash
+# Verbose mode shows detailed parsing errors
+sdo wi create --file-path work-item.md --verbose
+
+# Errors include:
+# - Line number and content
+# - Specific issue (e.g., "Title is required", "Malformed header")
+# - Warnings for minor issues (unclosed code blocks, etc.)
+```
+
+#### Example Scenarios
+
+**Scenario 1: Feature Request**
+
+Create `features/auth-redesign.md`:
+```markdown
+---
+work_item_type: PBI
+priority: High
+assignee: alice@company.com
+labels: "backend, security, authentication"
+---
+
+# Redesign Authentication System
+
+Complete overhaul of the authentication layer to support modern OAuth2 and OpenID Connect standards.
+
+## Acceptance Criteria
+- [ ] OAuth2 provider integration
+- [ ] OpenID Connect support
+- [ ] Token refresh mechanism
+- [ ] Backward compatibility maintained
+- [ ] Documentation updated
+
+## Technical Details
+```csharp
+public interface IAuthenticationProvider
+{
+    Task<AuthToken> AuthenticateAsync(credentials);
+    Task<bool> RefreshTokenAsync(token);
+}
+```
+```
+
+Then create:
+```bash
+sdo wi create --file-path features/auth-redesign.md
+```
+
+**Scenario 2: Bug Report**
+
+Create `bugs/parser-crash.md`:
+```markdown
+---
+work_item_type: Bug
+priority: Critical
+target: "github"
+---
+
+# Parser Crashes on Malformed Markdown
+
+The markdown parser crashes when encountering headers without proper spacing.
+
+## Acceptance Criteria
+- [ ] Malformed header detected and handled gracefully
+- [ ] Error message is user-friendly
+- [ ] Unit tests added for edge cases
+
+## Reproduction Steps
+```markdown
+#NoSpace Header
+```
+```
+
+**Scenario 3: Pull Request**
+
+Create `prs/feature-merge.md`:
+```markdown
+---
+work_item_type: Pull Request
+target: "github"
+---
+
+# Add User Authentication to Dashboard
+
+This PR implements OAuth2 authentication for dashboard access.
+
+## Changes
+- Added authentication middleware
+- Integrated identity provider
+- Updated login form
+
+## Testing
+```bash
+npm test
+npm run lint
+```
+```
+
+---
+
+### E2E Testing Infrastructure
+
+Automated testing framework for validating SDO functionality across Azure DevOps and GitHub platforms with color-coded output.
+
+#### Overview
+
+- **Cross-Platform Testing**: Validates both Azure DevOps and GitHub operations
+- **Color-Coded Output**: Green for success, red for errors, visible in console
+- **Test Discovery**: Reflection-based automatic test discovery
+- **Specific Test Execution**: Run individual tests via `--test-case` parameter
+- **Logging**: Plain text output to `sdo-e2e-test.log`
+
+#### Test Targets
+
+Available MSBuild targets for E2E testing:
+
+```bash
+# Run all Azure DevOps tests
+nb RUN_AZDO_WI_ASSIGNED_TO_ME_TEST
+
+# Run all GitHub tests  
+nb RUN_GITHUB_WI_ASSIGNED_TO_ME_TEST
+
+# Run Azure DevOps pipeline tests
+nb RUN_AZDO_PIPELINE_TEST
+
+# Run GitHub Actions tests
+nb RUN_GITHUB_PIPELINE_TEST
+```
+
+#### Example Output
+
+```
+----------------------------------------------------------
+STEP 1: Get unfiltered work item count
+----------------------------------------------------------
+[INFO] Executing: sdo.exe wi list
+[INFO] Unfiltered work items count: 34
+
+----------------------------------------------------------
+STEP 2: Execute --assigned-to-me filter
+----------------------------------------------------------
+[INFO] Executing: sdo.exe wi list --assigned-to-me
+[SUCCESS] √ Exit code is 0
+[SUCCESS] √ Work items returned: 1
+[SUCCESS] √ Filter validation passed: 1 <= 34
+
+----------------------------------------------------------
+[SUCCESS] √ Azure DevOps List Assigned To Me Test PASSED
+[SUCCESS] √ PASSED: Validate_AzureDevOps_ListAssignedToMe
+----------------------------------------------------------
+```
+
+#### Running Specific Tests
+
+Run individual test cases:
+
+```bash
+# Run a specific test
+sdo-e2e-tests.exe --test-case Validate_AzureDevOps_ListAssignedToMe
+
+# Run with verbose output
+sdo-e2e-tests.exe --test-case Validate_GitHub_ListAssignedToMe --verbose
+```
+
+#### Test Coverage
+
+**Platform Parity Tests**:
+- Work item list filtering
+- Assigned-to-me logic
+- User detection across platforms
+- Pipeline creation and execution
+- Repository operations
+
+**Reliability Tests**:
+- Connection timeout handling
+- Authentication failure recovery
+- API rate limiting
+- Network error resilience
+
+#### Log Files
+
+Test logs are saved to:
+- Location: `sdo-e2e-test/bin/Debug/net10.0/sdo-e2e-test.log`
+- Format: Plain text with timestamps
+- Content: Detailed step-by-step execution trace
+
+#### Integration with CI/CD
+
+These tests can be integrated into your build pipeline:
+
+```bash
+# In your GitHub Actions workflow
+- name: Run E2E Tests
+  run: nb RUN_AZDO_WI_ASSIGNED_TO_ME_TEST
+
+# Or in Azure Pipelines
+- task: PowerShell@2
+  inputs:
+    scriptType: 'inline'
+    script: 'nb RUN_GITHUB_WI_ASSIGNED_TO_ME_TEST'
+```
+
+---
+
+## Service Enhancements
+
+Advanced Automation Features includes reliability and performance improvements to core services.
+
+### AzureDevOpsClient Enhancements
+
+- **Endpoint Prioritization**: Queries `/connectionData` first (most reliable), falls back to Graph API
+- **Improved User Detection**: Better identification of current user
+- **Enhanced Error Handling**: Detailed error messages for API failures
+- **Structured Logging**: Better diagnostics for troubleshooting
+
+### GitHubClient Enhancements
+
+- **Better Timeout Handling**: Default 30 seconds, configurable per request
+- **Improved Error Messages**: Clearer feedback on API errors
+- **Enhanced Logging**: Structured logging for debugging
+- **Rate Limiting Awareness**: Better handling of GitHub API rate limits
+
+### Command Improvements
+
+**WorkItemCommand**:
+- Configuration file loading with error validation
+- Comprehensive error handling for list/show/create operations
+- Better user feedback and validation messages
+
+**PullRequestCommand**:
+- Branch existence validation before creation
+- Improved error messages
+- Better diagnostic information
+
+---
+
 ### Platform Detection Errors
 
 **Error:** `Could not determine GitHub repository from Git remote`

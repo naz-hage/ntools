@@ -271,6 +271,17 @@ namespace Sdo.Commands
 
                     using var client = new GitHubClient(pat);
                     var currentBranch = GetCurrentBranch();
+                    
+                    // Check if the current branch exists on the remote before attempting to create PR
+                    if (!BranchExistsOnRemote(currentBranch))
+                    {
+                        ConsoleHelper.WriteError($"X Error: Branch '{currentBranch}' does not exist on remote 'origin'");
+                        Console.WriteLine("\nTo fix this, push your branch first:");
+                        Console.WriteLine($"  git push -u origin {currentBranch}");
+                        Console.WriteLine("\nThen retry the PR creation command.");
+                        return 1;
+                    }
+                    
                     try
                     {
                         var pr = await client.CreatePullRequestAsync(repoInfo.Owner, repoInfo.Repo, title,
@@ -356,6 +367,17 @@ namespace Sdo.Commands
 
                     using var client = new AzureDevOpsClient(pat, organization, project);
                     var currentBranch = GetCurrentBranch();
+                    
+                    // Check if the current branch exists on the remote before attempting to create PR
+                    if (!BranchExistsOnRemote(currentBranch))
+                    {
+                        ConsoleHelper.WriteError($"X Error: Branch '{currentBranch}' does not exist on remote 'origin'");
+                        Console.WriteLine("\nTo fix this, push your branch first:");
+                        Console.WriteLine($"  git push -u origin {currentBranch}");
+                        Console.WriteLine("\nThen retry the PR creation command.");
+                        return 1;
+                    }
+                    
                     var pr = await client.CreatePullRequestAsync(project, repoInfo.Repo, title,
                         $"refs/heads/{currentBranch}", "refs/heads/main", body);
 
@@ -521,6 +543,16 @@ namespace Sdo.Commands
         {
             try
             {
+                // Validate that PR ID was provided
+                if (prId <= 0)
+                {
+                    ConsoleHelper.WriteError("X Error: PR ID is required. Use the positional argument or --pr-id option");
+                    Console.WriteLine("\nExample:");
+                    Console.WriteLine("  sdo pr show 123");
+                    Console.WriteLine("  sdo pr show --pr-id 123");
+                    return 1;
+                }
+
                 if (verbose) Console.WriteLine($"Retrieving pull request #{prId}...");
 
                 var platform = _platformDetector.DetectPlatform();
@@ -650,6 +682,16 @@ namespace Sdo.Commands
         {
             try
             {
+                // Validate that PR ID was provided
+                if (prId <= 0)
+                {
+                    ConsoleHelper.WriteError("X Error: PR ID is required. Use --pr-id <number>");
+                    Console.WriteLine("\nExample:");
+                    Console.WriteLine("  sdo pr update --pr-id 123 -f ./pr-message.md");
+                    Console.WriteLine("  sdo pr update --pr-id 123 --title \"New Title\"");
+                    return 1;
+                }
+
                 if (verbose) Console.WriteLine($"Updating pull request #{prId}...");
 
                 string? body = null;
@@ -727,7 +769,7 @@ namespace Sdo.Commands
                     var pr = await client.UpdatePullRequestAsync(repoInfo.Owner, repoInfo.Repo, prId, title, body, status);
                     if (pr == null)
                     {
-                        ConsoleHelper.WriteError($"X Error: Failed to update pull request #{prId}");
+                        ConsoleHelper.WriteError($"X Error: {client.LastError ?? "Failed to update pull request"}");
                         return 1;
                     }
 
@@ -825,6 +867,61 @@ namespace Sdo.Commands
             }
 
             return "main"; // Default fallback
+        }
+
+        private bool BranchExistsOnRemote(string branchName)
+        {
+            try
+            {
+                var processInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "git",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
+                };
+
+                // Use ArgumentList to safely pass arguments (prevents command injection)
+                processInfo.ArgumentList.Add("ls-remote");
+                processInfo.ArgumentList.Add("--exit-code");
+                processInfo.ArgumentList.Add("--heads");
+                processInfo.ArgumentList.Add("origin");
+                processInfo.ArgumentList.Add(branchName);
+
+                // Disable credential prompts to prevent hanging on authentication
+                processInfo.Environment["GIT_TERMINAL_PROMPT"] = "0";
+
+                using (var process = System.Diagnostics.Process.Start(processInfo))
+                {
+                    if (process != null)
+                    {
+                        const int gitTimeoutMilliseconds = 10000; // 10-second timeout
+                        if (!process.WaitForExit(gitTimeoutMilliseconds))
+                        {
+                            try
+                            {
+                                process.Kill(entireProcessTree: true);
+                            }
+                            catch
+                            {
+                                // Process may have already exited
+                            }
+
+                            return true; // Timeout - assume branch exists to avoid false negatives
+                        }
+
+                        return process.ExitCode == 0;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // If git command fails, assume branch exists to avoid false negatives
+                return true;
+            }
+
+            return false;
         }
     }
 }

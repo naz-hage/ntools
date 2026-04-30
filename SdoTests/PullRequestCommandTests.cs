@@ -1,4 +1,8 @@
+using System;
 using System.CommandLine;
+using System.IO;
+using System.Reflection;
+using System.Threading.Tasks;
 using Xunit;
 using Sdo.Commands;
 
@@ -11,6 +15,30 @@ public class PullRequestCommandTests
     public PullRequestCommandTests()
     {
         _verboseOption = new Option<bool>("--verbose");
+    }
+
+    /// <summary>
+    /// Captures console output for testing error messages
+    /// </summary>
+    private class ConsoleOutputCapture : IDisposable
+    {
+        private readonly StringWriter _stringWriter;
+        private readonly TextWriter _originalOut;
+
+        public ConsoleOutputCapture()
+        {
+            _stringWriter = new StringWriter();
+            _originalOut = Console.Out;
+            Console.SetOut(_stringWriter);
+        }
+
+        public string GetOutput() => _stringWriter.ToString();
+
+        public void Dispose()
+        {
+            Console.SetOut(_originalOut);
+            _stringWriter?.Dispose();
+        }
     }
 
     [Fact]
@@ -174,6 +202,161 @@ public class PullRequestCommandTests
         var updateCmd = command.Subcommands.First(s => s.Name == "update");
         var statusOption = updateCmd.Options.FirstOrDefault(o => o.Name.Contains("status"));
         Assert.NotNull(statusOption);
+    }
+
+    // Error Handling Tests for PR ID Validation
+
+    [Fact]
+    public async Task UpdatePullRequest_WithZeroPrId_ReturnsErrorCode()
+    {
+        using (new ConsoleOutputCapture())
+        {
+            var command = new PullRequestCommand(_verboseOption);
+            var method = typeof(PullRequestCommand).GetMethod("UpdatePullRequest", BindingFlags.NonPublic | BindingFlags.Instance);
+            Assert.NotNull(method);
+
+            var task = (Task<int>)method.Invoke(command, new object[] { 0, null, null, null, false })!;
+            var result = await task;
+
+            // Should return error code 1
+            Assert.Equal(1, result);
+        }
+    }
+
+    [Fact]
+    public async Task UpdatePullRequest_WithNegativePrId_ReturnsErrorCode()
+    {
+        using (new ConsoleOutputCapture())
+        {
+            var command = new PullRequestCommand(_verboseOption);
+            var method = typeof(PullRequestCommand).GetMethod("UpdatePullRequest", BindingFlags.NonPublic | BindingFlags.Instance);
+            Assert.NotNull(method);
+
+            var task = (Task<int>)method.Invoke(command, new object[] { -1, null, null, null, false })!;
+            var result = await task;
+
+            // Should return error code 1
+            Assert.Equal(1, result);
+        }
+    }
+
+    [Fact]
+    public async Task UpdatePullRequest_WithZeroPrId_DisplaysHelpfulErrorMessage()
+    {
+        using (var capture = new ConsoleOutputCapture())
+        {
+            var command = new PullRequestCommand(_verboseOption);
+            var method = typeof(PullRequestCommand).GetMethod("UpdatePullRequest", BindingFlags.NonPublic | BindingFlags.Instance);
+            Assert.NotNull(method);
+
+            var task = (Task<int>)method.Invoke(command, new object[] { 0, null, null, null, false })!;
+            await task;
+
+            var output = capture.GetOutput();
+            
+            // Verify error message contains key information
+            Assert.Contains("PR ID is required", output);
+            Assert.Contains("--pr-id", output);
+            Assert.Contains("Example:", output);
+            Assert.Contains("sdo pr update --pr-id 123", output);
+        }
+    }
+
+    [Fact]
+    public async Task ShowPullRequest_WithZeroPrId_ReturnsErrorCode()
+    {
+        using (new ConsoleOutputCapture())
+        {
+            var command = new PullRequestCommand(_verboseOption);
+            var method = typeof(PullRequestCommand).GetMethod("ShowPullRequest", BindingFlags.NonPublic | BindingFlags.Instance);
+            Assert.NotNull(method);
+
+            var task = (Task<int>)method.Invoke(command, new object[] { 0, false })!;
+            var result = await task;
+
+            // Should return error code 1
+            Assert.Equal(1, result);
+        }
+    }
+
+    [Fact]
+    public async Task ShowPullRequest_WithNegativePrId_ReturnsErrorCode()
+    {
+        using (new ConsoleOutputCapture())
+        {
+            var command = new PullRequestCommand(_verboseOption);
+            var method = typeof(PullRequestCommand).GetMethod("ShowPullRequest", BindingFlags.NonPublic | BindingFlags.Instance);
+            Assert.NotNull(method);
+
+            var task = (Task<int>)method.Invoke(command, new object[] { -1, false })!;
+            var result = await task;
+
+            // Should return error code 1
+            Assert.Equal(1, result);
+        }
+    }
+
+    [Fact]
+    public async Task ShowPullRequest_WithZeroPrId_DisplaysHelpfulErrorMessage()
+    {
+        using (var capture = new ConsoleOutputCapture())
+        {
+            var command = new PullRequestCommand(_verboseOption);
+            var method = typeof(PullRequestCommand).GetMethod("ShowPullRequest", BindingFlags.NonPublic | BindingFlags.Instance);
+            Assert.NotNull(method);
+
+            var task = (Task<int>)method.Invoke(command, new object[] { 0, false })!;
+            await task;
+
+            var output = capture.GetOutput();
+            
+            // Verify error message contains key information
+            Assert.Contains("PR ID is required", output);
+            Assert.Contains("positional argument", output);
+            Assert.Contains("--pr-id", output);
+            Assert.Contains("Example:", output);
+            Assert.Contains("sdo pr show 123", output);
+        }
+    }
+
+    [Fact]
+    public async Task UpdatePullRequest_WithZeroPrId_ShowsExamples()
+    {
+        using (var capture = new ConsoleOutputCapture())
+        {
+            var command = new PullRequestCommand(_verboseOption);
+            var method = typeof(PullRequestCommand).GetMethod("UpdatePullRequest", BindingFlags.NonPublic | BindingFlags.Instance);
+            Assert.NotNull(method);
+
+            var task = (Task<int>)method.Invoke(command, new object[] { 0, null, null, null, false })!;
+            await task;
+
+            var output = capture.GetOutput();
+            
+            // Verify both examples are shown
+            Assert.Contains("sdo pr update --pr-id 123 -f ./pr-message.md", output);
+            Assert.Contains("sdo pr update --pr-id 123 --title", output);
+        }
+    }
+
+    [Fact]
+    public async Task ShowPullRequest_WithZeroPrId_ShowsExamples()
+    {
+        using (var capture = new ConsoleOutputCapture())
+        {
+            var command = new PullRequestCommand(_verboseOption);
+            var method = typeof(PullRequestCommand).GetMethod("ShowPullRequest", BindingFlags.NonPublic | BindingFlags.Instance);
+            Assert.NotNull(method);
+
+            var task = (Task<int>)method.Invoke(command, new object[] { 0, false })!;
+            await task;
+
+            var output = capture.GetOutput();
+            
+            // Verify both examples are shown
+            Assert.Contains("sdo pr show 123", output);
+            Assert.Contains("sdo pr show --pr-id 123", output);
+        }
     }
 }
 

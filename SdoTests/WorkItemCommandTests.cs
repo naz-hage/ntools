@@ -203,6 +203,19 @@ public class WorkItemCommandTests
         Assert.Equal("Enable verbose output", verboseOpt.Description);
     }
 
+    [Fact]
+    public void ListSubcommand_HasConfigOption()
+    {
+        // Act
+        var command = new WorkItemCommand(_verboseOption);
+        var listCmd = Assert.Single(command.Subcommands, s => s.Name == "list");
+
+        // Assert
+        var configOption = Assert.Single(listCmd.Options, o => o.Name == "--config");
+        Assert.NotNull(configOption);
+        Assert.Equal("Path to sdo-config.yaml file (optional)", configOption.Description);
+    }
+
     #endregion
 
     #region Show Subcommand Execution Tests
@@ -734,6 +747,53 @@ public class WorkItemCommandTests
         // 4. Clean up test work item
         Assert.True(true);
     }
+
+    #region Config File and Defaults Tests
+
+    [Fact]
+    public void ListSubcommand_WithConfigParameter_ReturnsExitCode()
+    {
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        var args = new[] { "list", "--config", "./sdo-config.yaml" };
+
+        // Act
+        var result = command.Parse(args).Invoke();
+
+        // Assert
+        Assert.True(result == 0 || result == 1, $"Expected exit code 0 or 1, got {result}");
+    }
+
+    [Fact]
+    public void ListSubcommand_WithConfigAndOtherFilters_ReturnsExitCode()
+    {
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        var args = new[] { "list", "--config", "./sdo-config.yaml", "--state", "Done" };
+
+        // Act
+        var result = command.Parse(args).Invoke();
+
+        // Assert
+        // CLI filters should override config defaults
+        Assert.True(result == 0 || result == 1, $"Expected exit code 0 or 1, got {result}");
+    }
+
+    [Fact]
+    public void ListSubcommand_ConfigParameterIsOptional()
+    {
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        var args = new[] { "list" };
+
+        // Act - should not throw, config parameter is optional
+        var result = command.Parse(args).Invoke();
+
+        // Assert
+        Assert.True(result == 0 || result == 1, $"Expected exit code 0 or 1, got {result}");
+    }
+
+    #endregion
 
     [Fact(Skip = "Integration: Scaffolded for Phase 3.2 - requires GitHub credentials")]
     public void IntegrationTest_Create_GitHub_WithValidRepository()

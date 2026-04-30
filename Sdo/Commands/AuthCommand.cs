@@ -199,7 +199,8 @@ namespace Sdo.Commands
                 ConsoleHelper.WriteLine($"✓ Using organization: {organization}", ConsoleColor.Green);
             }
 
-            using var client = new AzureDevOpsClient(token, organization);
+            var project = _platformDetector.GetProject();
+            using var client = new AzureDevOpsClient(token, organization, project);
             
             if (verbose)
             {
@@ -215,7 +216,7 @@ namespace Sdo.Commands
                 }
             }
             
-            var isAuthenticated = await client.VerifyAuthenticationAsync();
+            var isAuthenticated = await client.VerifyAuthenticationAsync(verbose);
             if (!isAuthenticated)
             {
                 ConsoleHelper.WriteLine("X Azure DevOps authentication failed - invalid token or organization", ConsoleColor.Red);

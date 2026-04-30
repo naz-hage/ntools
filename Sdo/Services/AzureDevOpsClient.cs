@@ -236,7 +236,7 @@ namespace Sdo.Services
         /// Verifies the authentication token by making a request to the Azure DevOps API.
         /// </summary>
         /// <returns>True if authentication is successful, false otherwise.</returns>
-        public async Task<bool> VerifyAuthenticationAsync()
+        public async Task<bool> VerifyAuthenticationAsync(bool verbose = false)
         {
             try
             {
@@ -249,36 +249,44 @@ namespace Sdo.Services
                     response.StatusCode == System.Net.HttpStatusCode.Forbidden ||
                     response.StatusCode == System.Net.HttpStatusCode.NonAuthoritativeInformation)
                 {
-                    Console.WriteLine($"Debug: API returned {response.StatusCode} - authentication/authorization failed");
-                    var errorContent = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"Debug: Error response content: {errorContent}");
+                    if (verbose)
+                    {
+                        Console.WriteLine($"Debug: API returned {response.StatusCode} - authentication/authorization failed");
+                        var errorContent = await response.Content.ReadAsStringAsync();
+                        Console.WriteLine($"Debug: Error response content: {errorContent}");
+                    }
                     return false;
                 }
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    Console.WriteLine($"Debug: API returned {response.StatusCode} - not successful");
-                    var errorContent = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"Debug: Error response: {errorContent}");
-
-                    // If we get a 500 error, it might be a service issue, not auth issue
-                    // Let's try a different approach - check if the PAT format is correct by examining it
-                    Console.WriteLine($"Debug: PAT length is {_pat?.Length ?? 0} characters");
-                    if (_pat != null && _pat.Length < 50)
+                    if (verbose)
                     {
-                        Console.WriteLine("Debug: Warning - PAT appears to be unusually short. Azure DevOps PATs are typically 52 characters.");
+                        Console.WriteLine($"Debug: API returned {response.StatusCode} - not successful");
+                        var errorContent = await response.Content.ReadAsStringAsync();
+                        Console.WriteLine($"Debug: Error response: {errorContent}");
+
+                        // If we get a 500 error, it might be a service issue, not auth issue
+                        // Let's try a different approach - check if the PAT format is correct by examining it
+                        Console.WriteLine($"Debug: PAT length is {_pat?.Length ?? 0} characters");
+                        if (_pat != null && _pat.Length < 50)
+                        {
+                            Console.WriteLine("Debug: Warning - PAT appears to be unusually short. Azure DevOps PATs are typically 52 characters.");
+                        }
                     }
 
                     return false;
                 }
 
                 // If we get a successful response, authentication worked
-                Console.WriteLine($"Debug: API returned {response.StatusCode} - authentication successful");
                 return true;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Debug: Exception during API call: {ex.Message}");
+                if (verbose)
+                {
+                    Console.WriteLine($"Exception during API call: {ex.Message}");
+                }
                 return false;
             }
         }
@@ -291,19 +299,72 @@ namespace Sdo.Services
         {
             try
             {
-                var url = $"https://dev.azure.com/{_organization}/_apis/connectionData?api-version=7.1";
-                var response = await _httpClient.GetAsync(url);
-                if (!response.IsSuccessStatusCode)
+                // Try the /connectionData endpoint first which includes authenticatedUser info
+                var connUrl = $"https://dev.azure.com/{_organization}/_apis/connectionData";
+                var connResponse = await _httpClient.GetAsync(connUrl);
+                if (connResponse.IsSuccessStatusCode)
                 {
-                    return null;
+                    var connContent = await connResponse.Content.ReadAsStringAsync();
+                    using var connDoc = JsonDocument.Parse(connContent);
+                    
+                    // Check for authenticatedUser in response
+                    if (connDoc.RootElement.TryGetProperty("authenticatedUser", out var authUser))
+                    {
+                        var user = new AzureDevOpsUser();
+                        if (authUser.TryGetProperty("displayName", out var dn)) user.DisplayName = dn.GetString();
+                        if (authUser.TryGetProperty("uniqueName", out var un)) user.UniqueName = un.GetString();
+                        if (authUser.TryGetProperty("mailAddress", out var ma)) user.PreferredEmail = ma.GetString();
+                        if (authUser.TryGetProperty("id", out var id)) user.Id = id.GetString();
+                        
+                        if (!string.IsNullOrEmpty(user.DisplayName))
+                        {
+                            return user;
+                        }
+                    }
                 }
-
-                var content = await response.Content.ReadAsStringAsync();
-                var connectionData = JsonSerializer.Deserialize<ConnectionData>(content);
-                return connectionData?.AuthenticatedUser;
+                
+                // Fallback to Graph API - get users and skip first (usually service account)
+                var graphUrl = $"https://vssps.dev.azure.com/{_organization}/_apis/graph/users?api-version=7.1-preview.1&$top=10";
+                var graphResponse = await _httpClient.GetAsync(graphUrl);
+                if (graphResponse.IsSuccessStatusCode)
+                {
+                    var graphContent = await graphResponse.Content.ReadAsStringAsync();
+                    using var graphDoc = JsonDocument.Parse(graphContent);
+                    if (graphDoc.RootElement.TryGetProperty("value", out var valueEl))
+                    {
+                        var valueArray = valueEl.EnumerateArray().ToList();
+                        // Skip first user (usually build service) and return second user
+                        if (valueArray.Count > 1)
+                        {
+                            var userItem = valueArray[1];
+                            var user = new AzureDevOpsUser();
+                            if (userItem.TryGetProperty("displayName", out var displayName)) user.DisplayName = displayName.GetString();
+                            if (userItem.TryGetProperty("principalName", out var pn)) user.UniqueName = pn.GetString();
+                            if (userItem.TryGetProperty("mailAddress", out var ma)) user.PreferredEmail = ma.GetString();
+                            if (userItem.TryGetProperty("descriptor", out var desc)) user.Id = desc.GetString();
+                            return user;
+                        }
+                        // If only one user, return it
+                        else if (valueArray.Count == 1)
+                        {
+                            var userItem = valueArray[0];
+                            var user = new AzureDevOpsUser();
+                            if (userItem.TryGetProperty("displayName", out var displayName)) user.DisplayName = displayName.GetString();
+                            if (userItem.TryGetProperty("principalName", out var pn)) user.UniqueName = pn.GetString();
+                            if (userItem.TryGetProperty("mailAddress", out var ma)) user.PreferredEmail = ma.GetString();
+                            if (userItem.TryGetProperty("descriptor", out var desc)) user.Id = desc.GetString();
+                            return user;
+                        }
+                    }
+                }
+                
+                _lastError = "No user found";
+                return null;
             }
-            catch
+            catch (Exception ex)
             {
+                _lastError = $"GetUserAsync exception: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
                 return null;
             }
         }
@@ -448,7 +509,11 @@ namespace Sdo.Services
                             }
                         }
                     }
-                    catch { }
+                    catch (Exception ex)
+                    {
+                        // Fallback: continue without project ID, will use default
+                        if (verbose) Console.WriteLine($"Warning: Failed to parse project ID from response: {ex.Message}");
+                    }
                 }
 
                 if (string.IsNullOrEmpty(projectId))
@@ -943,17 +1008,25 @@ namespace Sdo.Services
                 var response = await _httpClient.GetAsync(orgUrl);
                 result["Organization Access"] = response.IsSuccessStatusCode ? "✓ Allowed" : "X Denied";
 
-                // Test project access if specified
+                // Test project access if specified - use simple project info endpoint
                 if (!string.IsNullOrEmpty(_project))
                 {
-                    var projectUrl = $"https://dev.azure.com/{_organization}/{_project}/_apis/teams?api-version=7.0";
+                    var projectUrl = $"https://dev.azure.com/{_organization}/_apis/projects/{_project}?api-version=7.0";
                     var projectResponse = await _httpClient.GetAsync(projectUrl);
                     result["Project Access"] = projectResponse.IsSuccessStatusCode ? "✓ Allowed" : "X Denied";
                 }
 
-                // Test Work Item Query access - this is what fails in workitem list
-                var wiqlUrl = $"https://dev.azure.com/{_organization}/_apis/wit/wiql?api-version=7.0";
-                var wiqlRequest = new StringContent("{\"query\":\"SELECT [System.Id] FROM WorkItems LIMIT 0\"}", System.Text.Encoding.UTF8, "application/json");
+                // Test Work Item Query access - use project scope if available (matching actual ListWorkItemsAsync behavior)
+                string wiqlUrl;
+                if (!string.IsNullOrEmpty(_project))
+                {
+                    wiqlUrl = $"https://dev.azure.com/{_organization}/{_project}/_apis/wit/wiql?api-version=7.0";
+                }
+                else
+                {
+                    wiqlUrl = $"https://dev.azure.com/{_organization}/_apis/wit/wiql?api-version=7.0";
+                }
+                var wiqlRequest = new StringContent("{\"query\":\"SELECT [System.Id] FROM WorkItems\"}", System.Text.Encoding.UTF8, "application/json");
                 var wiqlResponse = await _httpClient.PostAsync(wiqlUrl, wiqlRequest);
                 result["Work Item Query Access"] = wiqlResponse.IsSuccessStatusCode ? "✓ Allowed" : "X Denied";
 
@@ -1257,6 +1330,7 @@ namespace Sdo.Services
             string? assignee = null,
             string? areaPath = null,
             string? iterationPath = null,
+            string? parentId = null,
             bool dryRun = false,
             bool verbose = false)
         {
@@ -1313,6 +1387,7 @@ namespace Sdo.Services
                 var operations = new List<object>
                 {
                     new { op = "add", path = "/fields/System.Title", value = title },
+                    new { op = "add", path = "/fields/System.Description", value = repoStepsHtml },
                     new { op = "add", path = "/fields/Microsoft.VSTS.TCM.ReproSteps", value = repoStepsHtml }
                 };
 
@@ -1338,7 +1413,7 @@ namespace Sdo.Services
                     operations.Add(new { op = "add", path = "/fields/System.AssignedTo", value = assignee });
                 }
 
-                var url = $"https://dev.azure.com/{_organization}/{project}/_apis/wit/workitems/${encodedType}?api-version=7.1";
+                var url = "https://dev.azure.com/" + _organization + "/" + project + "/_apis/wit/workitems/$" + encodedType + "?api-version=7.1";
 
                 if (verbose)
                 {
@@ -1393,17 +1468,40 @@ namespace Sdo.Services
                     if (doc.TryGetProperty("id", out var idProp) && idProp.ValueKind == JsonValueKind.Number) id = idProp.GetInt32();
                     if (doc.TryGetProperty("_links", out var links) && links.ValueKind == JsonValueKind.Object && links.TryGetProperty("html", out var html) && html.TryGetProperty("href", out var href)) link = href.GetString();
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    // Fallback: continue without ID or link
+                    if (verbose) Console.WriteLine($"Warning: Failed to parse work item response: {ex.Message}");
+                }
 
                 if (id.HasValue)
                 {
                     Console.WriteLine($"✅ Created {workItemType} #{id}: {title}");
                     if (!string.IsNullOrEmpty(link)) Console.WriteLine($"   URL: {link}");
+                    
+                    // Link to parent if specified
+                    if (!string.IsNullOrEmpty(parentId))
+                    {
+                        if (int.TryParse(parentId, out int parentWorkItemIdValue) && parentWorkItemIdValue > 0)
+                        {
+                            bool parentLinked = await LinkToParentAsync(project, id.Value, parentWorkItemIdValue, verbose);
+                            if (parentLinked)
+                            {
+                                if (verbose) Console.WriteLine($"[VERBOSE] Work item #{id} linked to parent #{parentWorkItemIdValue}");
+                            }
+                            else if (verbose)
+                            {
+                                Console.WriteLine($"[VERBOSE] Warning: Could not link to parent #{parentWorkItemIdValue}");
+                            }
+                        }
+                    }
+                    
                     var result = new Dictionary<string, object>();
                     result["id"] = id.Value;
                     if (!string.IsNullOrEmpty(link)) result["url"] = link;
                     result["type"] = workItemType;
                     result["title"] = title;
+                    if (!string.IsNullOrEmpty(parentId)) result["parent"] = parentId;
                     return result;
                 }
 
@@ -1415,6 +1513,75 @@ namespace Sdo.Services
                 _lastError = $"Exception creating work item: {ex.Message}";
                 System.Diagnostics.Debug.WriteLine(_lastError);
                 return null;
+            }
+        }
+
+        /// <summary>
+        /// Links a work item to a parent work item by creating a "Parent" relationship.
+        /// </summary>
+        /// <param name="project">Project ID or name.</param>
+        /// <param name="childId">The child work item ID.</param>
+        /// <param name="parentId">The parent work item ID.</param>
+        /// <param name="verbose">Enable verbose logging.</param>
+        /// <returns>True if the parent link was created successfully, false otherwise.</returns>
+        private async Task<bool> LinkToParentAsync(string project, int childId, int parentId, bool verbose = false)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(project))
+                {
+                    _lastError = "Project must be specified for parent linking";
+                    return false;
+                }
+
+                // Use the relations API to create a parent-child relationship
+                // POST to /workitems/{id}/relations with relation type "System.LinkTypes.Hierarchy-Reverse"
+                var relationPayload = new
+                {
+                    op = "add",
+                    path = "/relations/-",
+                    value = new
+                    {
+                        rel = "System.LinkTypes.Hierarchy-Reverse",
+                        url = $"https://dev.azure.com/{_organization}/_apis/wit/workitems/{parentId}",
+                        attributes = new { name = "Parent" }
+                    }
+                };
+
+                var url = $"https://dev.azure.com/{_organization}/{project}/_apis/wit/workitems/{childId}?api-version=7.0";
+
+                var content = JsonSerializer.Serialize(new[] { relationPayload });
+                if (verbose)
+                {
+                    Console.WriteLine($"[VERBOSE] Linking work item #{childId} to parent #{parentId}");
+                    Console.WriteLine($"[VERBOSE] PATCH URL: {url}");
+                    Console.WriteLine($"[VERBOSE] Payload: {content}");
+                }
+
+                var request = new StringContent(content, System.Text.Encoding.UTF8, "application/json-patch+json");
+                var response = await _httpClient.PatchAsync(url, request);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    var errorMessage = ExtractErrorMessage(errorContent);
+                    _lastError = $"Link to parent failed: {response.StatusCode} {response.ReasonPhrase}\n{errorMessage}";
+                    if (verbose)
+                        Console.WriteLine($"[VERBOSE] {_lastError}");
+                    return false;
+                }
+
+                if (verbose)
+                    Console.WriteLine($"[VERBOSE] Parent link created successfully");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Exception linking to parent: {ex.Message}";
+                if (verbose)
+                    Console.WriteLine($"[VERBOSE] {_lastError}");
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return false;
             }
         }
 

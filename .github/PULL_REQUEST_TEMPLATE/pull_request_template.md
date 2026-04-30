@@ -1,4 +1,4 @@
-<!-- Title: [TASK/PBI-XXX] Brief description -->
+ ## Title: [TASK/PBI-XXX] Brief description
 
 ## Description
 <!-- What changed and why -->

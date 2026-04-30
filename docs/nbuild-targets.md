@@ -27,8 +27,28 @@ The table below lists all available targets for the Nbuild tool.
 | INFRASTRUCTURE_COMMIT | Full infrastructure update and commit with intelligent analysis |
 | PREVIEW_COMMIT_MESSAGE | Preview commit message without committing |
 
+- **./ntools\e2e-tests.targets Targets (Advanced Automation Features)**
 
-- **C:\Program Files\Nbuild\common.targets Targets**
+| **Target Name** | **Description** |
+| --- | --- |
+| BUILD_E2E_FRAMEWORK | Build the E2E test framework library |
+| BUILD_SDO_E2E | Build the SDO service for E2E testing |
+| BUILD_SDO_E2E_TESTS | Build the E2E test projects |
+| COPY_SDO_EXECUTABLE | Copy SDO executable to test directory |
+| RUN_AZDO_WI_ASSIGNED_TO_ME_TEST | Run Azure DevOps work item filtering test |
+| RUN_GITHUB_WI_ASSIGNED_TO_ME_TEST | Run GitHub issue filtering test |
+| RUN_AZDO_PIPELINE_TEST | Run Azure DevOps pipeline operations test |
+| RUN_GITHUB_PIPELINE_TEST | Run GitHub Actions operations test |
+
+**E2E Testing Features (Advanced Automation Features)**:
+- Color-coded console output (green for [SUCCESS], red for [ERROR])
+- Cross-platform validation for Azure DevOps and GitHub
+- Plain text log output to sdo-e2e-test.log
+- Test discovery via reflection-based attributes
+- Specific test case execution support via `--test-case` parameter
+- Integration with MSBuild build system
+
+
 
 | **Target Name** | **Description** |
 | --- | --- |

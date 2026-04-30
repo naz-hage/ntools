@@ -16,10 +16,24 @@ namespace SdoTests;
 /// </summary>
 public class PlatformServiceTests
 {
+    private void SetupWorkingDirectory()
+    {
+        // Set working directory to the solution root (ntools) to ensure Git repository is accessible
+        var currentDir = Directory.GetCurrentDirectory();
+        var solutionDir = Path.Combine(currentDir, "..", "..", "..");
+        var normalizedPath = Path.GetFullPath(solutionDir);
+        
+        if (Directory.Exists(normalizedPath) && Directory.Exists(Path.Combine(normalizedPath, ".git")))
+        {
+            Environment.CurrentDirectory = normalizedPath;
+        }
+    }
+
     [Fact]
     public void DetectPlatform_InGitHubRepo_ReturnsGitHub()
     {
         // Arrange
+        SetupWorkingDirectory();
         var detector = new PlatformService();
 
         // Act
@@ -33,6 +47,7 @@ public class PlatformServiceTests
     public void GetOrganization_InGitHubRepo_ReturnsOrganization()
     {
         // Arrange
+        SetupWorkingDirectory();
         var detector = new PlatformService();
 
         // Act
@@ -46,6 +61,7 @@ public class PlatformServiceTests
     public void GetProject_InGitHubRepo_ReturnsProject()
     {
         // Arrange
+        SetupWorkingDirectory();
         var detector = new PlatformService();
 
         // Act
