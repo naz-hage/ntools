@@ -1347,6 +1347,17 @@ namespace Sdo.Commands
                     }
 
                     var organization = _platformDetector.GetOrganization();
+                    
+                    // Allow markdown metadata to override the detected organization
+                    if (parsed?.Metadata != null && parsed.Metadata.TryGetValue("organization", out var metadataOrg) && !string.IsNullOrEmpty(metadataOrg))
+                    {
+                        organization = metadataOrg;
+                        if (verbose)
+                        {
+                            ConsoleHelper.WriteLine($"[VERBOSE] Organization overridden from metadata: {organization}", ConsoleColor.Gray);
+                        }
+                    }
+                    
                     if (string.IsNullOrEmpty(organization))
                     {
                         ConsoleHelper.WriteLine("X Could not determine Azure DevOps organization", ConsoleColor.Red);
@@ -1354,6 +1365,16 @@ namespace Sdo.Commands
                     }
 
                     var project = _platformDetector.GetProject();
+                    
+                    // Allow markdown metadata to override the detected project
+                    if (parsed?.Metadata != null && parsed.Metadata.TryGetValue("project", out var metadataProject) && !string.IsNullOrEmpty(metadataProject))
+                    {
+                        project = metadataProject;
+                        if (verbose)
+                        {
+                            ConsoleHelper.WriteLine($"[VERBOSE] Project overridden from metadata: {project}", ConsoleColor.Gray);
+                        }
+                    }
 
                     using var client = new AzureDevOpsClient(pat, organization, project);
 
@@ -1384,11 +1405,26 @@ namespace Sdo.Commands
                         ConsoleHelper.WriteLine($"Creating Azure DevOps work item in {organization}/{project ?? "default"}...", ConsoleColor.Gray);
                     }
 
-                    // Provide area/iteration if available in parsed metadata
+                    // Provide area/iteration/parent if available in parsed metadata
                     string? area = parsed?.Metadata?.GetValueOrDefault("area") ?? parsed?.Metadata?.GetValueOrDefault("area_path");
                     string? iteration = parsed?.Metadata?.GetValueOrDefault("iteration") ?? parsed?.Metadata?.GetValueOrDefault("iteration_path");
+                    string? parent = parsed?.Metadata?.GetValueOrDefault("parent");
 
-                    var result = await client.CreateWorkItemAsync(project ?? string.Empty, normalizedType, title, description ?? string.Empty, acceptanceCriteria, assignee, area, iteration, dryRun, verbose);
+                    if (verbose && parsed?.Metadata != null)
+                    {
+                        ConsoleHelper.WriteLine("[VERBOSE] Parsed metadata:", ConsoleColor.Gray);
+                        foreach (var kvp in parsed.Metadata)
+                        {
+                            ConsoleHelper.WriteLine($"  {kvp.Key} = {kvp.Value}", ConsoleColor.Gray);
+                        }
+                    }
+
+                    if (verbose)
+                    {
+                        ConsoleHelper.WriteLine($"[VERBOSE] parent ID value: {parent ?? "(null)"}", ConsoleColor.Gray);
+                    }
+
+                    var result = await client.CreateWorkItemAsync(project ?? string.Empty, normalizedType, title, description ?? string.Empty, acceptanceCriteria, assignee, area, iteration, parent, dryRun, verbose);
 
                     if (result != null)
                     {
@@ -1482,6 +1518,8 @@ namespace Sdo.Commands
             Console.WriteLine("=".PadRight(70, '='));
             Console.WriteLine($"Title:       {workItem.Title}");
             Console.WriteLine($"Type:        {workItem.Type}");
+            if (workItem.ParentId.HasValue)
+                Console.WriteLine($"Parent ID:   {workItem.ParentId}");
             Console.WriteLine($"State:       {workItem.State}");
             Console.WriteLine($"Created:     {workItem.CreatedDate:O}");
             Console.WriteLine($"Updated:     {workItem.ChangedDate:O}");

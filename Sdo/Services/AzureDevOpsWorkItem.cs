@@ -71,5 +71,10 @@ namespace Sdo.Services
         /// Gets or sets the acceptance criteria.
         /// </summary>
         public string? AcceptanceCriteria { get; set; }
+
+        /// <summary>
+        /// Gets or sets the parent work item ID.
+        /// </summary>
+        public int? ParentId { get; set; }
     }
 }

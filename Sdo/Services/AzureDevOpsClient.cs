@@ -509,7 +509,11 @@ namespace Sdo.Services
                             }
                         }
                     }
-                    catch { }
+                    catch (Exception ex)
+                    {
+                        // Fallback: continue without project ID, will use default
+                        if (verbose) Console.WriteLine($"Warning: Failed to parse project ID from response: {ex.Message}");
+                    }
                 }
 
                 if (string.IsNullOrEmpty(projectId))
@@ -1326,6 +1330,7 @@ namespace Sdo.Services
             string? assignee = null,
             string? areaPath = null,
             string? iterationPath = null,
+            string? parentId = null,
             bool dryRun = false,
             bool verbose = false)
         {
@@ -1408,7 +1413,7 @@ namespace Sdo.Services
                     operations.Add(new { op = "add", path = "/fields/System.AssignedTo", value = assignee });
                 }
 
-                var url = $"https://dev.azure.com/{_organization}/{project}/_apis/wit/workitems/${encodedType}?api-version=7.1";
+                var url = "https://dev.azure.com/" + _organization + "/" + project + "/_apis/wit/workitems/$" + encodedType + "?api-version=7.1";
 
                 if (verbose)
                 {
@@ -1463,17 +1468,40 @@ namespace Sdo.Services
                     if (doc.TryGetProperty("id", out var idProp) && idProp.ValueKind == JsonValueKind.Number) id = idProp.GetInt32();
                     if (doc.TryGetProperty("_links", out var links) && links.ValueKind == JsonValueKind.Object && links.TryGetProperty("html", out var html) && html.TryGetProperty("href", out var href)) link = href.GetString();
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    // Fallback: continue without ID or link
+                    if (verbose) Console.WriteLine($"Warning: Failed to parse work item response: {ex.Message}");
+                }
 
                 if (id.HasValue)
                 {
                     Console.WriteLine($"✅ Created {workItemType} #{id}: {title}");
                     if (!string.IsNullOrEmpty(link)) Console.WriteLine($"   URL: {link}");
+                    
+                    // Link to parent if specified
+                    if (!string.IsNullOrEmpty(parentId))
+                    {
+                        if (int.TryParse(parentId, out int parentWorkItemIdValue) && parentWorkItemIdValue > 0)
+                        {
+                            bool parentLinked = await LinkToParentAsync(project, id.Value, parentWorkItemIdValue, verbose);
+                            if (parentLinked)
+                            {
+                                if (verbose) Console.WriteLine($"[VERBOSE] Work item #{id} linked to parent #{parentWorkItemIdValue}");
+                            }
+                            else if (verbose)
+                            {
+                                Console.WriteLine($"[VERBOSE] Warning: Could not link to parent #{parentWorkItemIdValue}");
+                            }
+                        }
+                    }
+                    
                     var result = new Dictionary<string, object>();
                     result["id"] = id.Value;
                     if (!string.IsNullOrEmpty(link)) result["url"] = link;
                     result["type"] = workItemType;
                     result["title"] = title;
+                    if (!string.IsNullOrEmpty(parentId)) result["parent"] = parentId;
                     return result;
                 }
 
@@ -1485,6 +1513,75 @@ namespace Sdo.Services
                 _lastError = $"Exception creating work item: {ex.Message}";
                 System.Diagnostics.Debug.WriteLine(_lastError);
                 return null;
+            }
+        }
+
+        /// <summary>
+        /// Links a work item to a parent work item by creating a "Parent" relationship.
+        /// </summary>
+        /// <param name="project">Project ID or name.</param>
+        /// <param name="childId">The child work item ID.</param>
+        /// <param name="parentId">The parent work item ID.</param>
+        /// <param name="verbose">Enable verbose logging.</param>
+        /// <returns>True if the parent link was created successfully, false otherwise.</returns>
+        private async Task<bool> LinkToParentAsync(string project, int childId, int parentId, bool verbose = false)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(project))
+                {
+                    _lastError = "Project must be specified for parent linking";
+                    return false;
+                }
+
+                // Use the relations API to create a parent-child relationship
+                // POST to /workitems/{id}/relations with relation type "System.LinkTypes.Hierarchy-Reverse"
+                var relationPayload = new
+                {
+                    op = "add",
+                    path = "/relations/-",
+                    value = new
+                    {
+                        rel = "System.LinkTypes.Hierarchy-Reverse",
+                        url = $"https://dev.azure.com/{_organization}/_apis/wit/workitems/{parentId}",
+                        attributes = new { name = "Parent" }
+                    }
+                };
+
+                var url = $"https://dev.azure.com/{_organization}/{project}/_apis/wit/workitems/{childId}?api-version=7.0";
+
+                var content = JsonSerializer.Serialize(new[] { relationPayload });
+                if (verbose)
+                {
+                    Console.WriteLine($"[VERBOSE] Linking work item #{childId} to parent #{parentId}");
+                    Console.WriteLine($"[VERBOSE] PATCH URL: {url}");
+                    Console.WriteLine($"[VERBOSE] Payload: {content}");
+                }
+
+                var request = new StringContent(content, System.Text.Encoding.UTF8, "application/json-patch+json");
+                var response = await _httpClient.PatchAsync(url, request);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    var errorMessage = ExtractErrorMessage(errorContent);
+                    _lastError = $"Link to parent failed: {response.StatusCode} {response.ReasonPhrase}\n{errorMessage}";
+                    if (verbose)
+                        Console.WriteLine($"[VERBOSE] {_lastError}");
+                    return false;
+                }
+
+                if (verbose)
+                    Console.WriteLine($"[VERBOSE] Parent link created successfully");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Exception linking to parent: {ex.Message}";
+                if (verbose)
+                    Console.WriteLine($"[VERBOSE] {_lastError}");
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return false;
             }
         }
 
