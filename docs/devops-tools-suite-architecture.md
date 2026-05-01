@@ -337,19 +337,24 @@ Both sdo and ntools Suite follow consistent design principles:
   - Config file loading with error validation
   - Better user feedback and validation
 - **PullRequestCommand**: 
+  - Branch-based auto-detection: extracts work item ID from branch name pattern `<number>-<description>`
+  - Auto-constructs file path as `.temp/<work-item-id>-pr-message.md` when not provided
+  - Supports explicit overrides for file path and work item ID
+  - Enhanced error messages with format examples and current branch context
   - Branch existence validation before creation
   - Improved error messages and diagnostic information
-- **Benefits**: Better error handling, improved reliability, enhanced developer experience
+- **Benefits**: Simplified PR creation workflow, better error handling, improved reliability, enhanced developer experience
 
 ### Key Features
 
 - **Multi-Platform Support**: Works seamlessly with Azure DevOps and GitHub
 - **Work Item Management**: Create, list, show, update, and comment on work items
 - **Repository Operations**: Create, list, delete, and manage repositories
-- **Pull Request Management**: Create, list, show, and update pull requests
+- **Pull Request Management**: Create (with branch-based auto-detection), list, show, and update pull requests
 - **Pipeline Management**: Create, run, monitor, and manage CI/CD pipelines
 - **Dry-Run Mode**: Preview operations before execution
 - **Automatic Platform Detection**: Detects platform from Git remote configuration
+- **Branch-Based PR Creation**: Auto-detects work item ID and file path from branch name pattern
 - **Configuration Management**: YAML-based defaults for standardized operations (Advanced Automation Features)
 - **Rich Content**: Markdown templates for professional work items and PRs (Advanced Automation Features)
 - **Automated Testing**: E2E testing infrastructure with cross-platform validation (Advanced Automation Features)

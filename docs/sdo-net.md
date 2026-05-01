@@ -345,7 +345,7 @@ sdo wi comment --id 243 --message "Looks good!" --verbose
 
 ### pr — Pull Request Operations
 
-List, show, create, and manage pull requests on GitHub and Azure DevOps. `pr create` uses markdown files similar to `wi create`.
+List, show, create, and manage pull requests on GitHub and Azure DevOps. `pr create` intelligently auto-detects work item ID and file path from your current branch name, making PR creation simpler and faster.
 
 **Subcommands:**
 - `list` — List pull requests
@@ -374,24 +374,52 @@ Commands:
 
 #### pr create
 
-Create a new pull request from markdown file.
+Create a new pull request from markdown file. Values are intelligently auto-detected from your current branch name when not provided.
+
+**Auto-Detection:**
+- **Work item ID**: Extracted from branch name if it follows pattern `<number>-<description>` (e.g., `244-issue` → ID 244)
+- **File path**: Auto-constructed as `.temp/<work-item-id>-pr-message.md` if not provided
 
 **Usage:**
 ```bash
-sdo pr create --file pr.md                        # Create from file
-sdo pr create -f pr.md                            # Short option
-sdo pr create --file pr.md --work-item 243        # Link to work item
-sdo pr create --file pr.md --draft                # Create as draft
-sdo pr create --file pr.md --dry-run              # Preview
-sdo pr create --file pr.md --verbose              # Show mapping
+# Simplest - auto-detect everything from branch name
+sdo pr create
+
+# Override file only
+sdo pr create -f custom-message.md
+
+# Override work item only
+sdo pr create --work-item 250
+
+# Explicit (backward compatible)
+sdo pr create --file pr.md --work-item 243
+
+# With additional options
+sdo pr create --draft                             # Create as draft
+sdo pr create --dry-run                           # Preview without creating
+sdo pr create --verbose                           # Show auto-detected values
 ```
 
 **Options:**
-- `-f, --file <file>` — Path to markdown file (required)
-- `--work-item <work-item>` — Work item ID to link to PR
+- `-f, --file <file>` — Path to markdown file (optional; auto-detected as `.temp/<work-item-id>-pr-message.md`)
+- `--work-item <work-item>` — Work item ID to link to PR (optional; auto-detected from branch name)
 - `--draft` — Create as draft pull request
 - `--dry-run` — Preview without creating
-- `--verbose` — Show mapping
+- `--verbose` — Show auto-detected values and mapping
+
+**Branch Name Format:**
+- Expected format: `<number>-<description>`
+- Examples:
+  - ✓ `244-issue` → Work item ID 244
+  - ✓ `123-feature-name` → Work item ID 123
+  - ✗ `issue-244` → Error (number must be at start)
+  - ✗ `feature` → Error (no number found)
+
+**Error Handling:**
+If auto-detection fails, the command provides helpful guidance:
+- Shows current branch name
+- Displays expected format with valid/invalid examples
+- Suggests explicit options as alternatives
 
 #### pr list
 
