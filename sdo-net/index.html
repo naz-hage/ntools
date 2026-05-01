@@ -2901,7 +2901,7 @@ sdo<span class="w"> </span>wi<span class="w"> </span>comment<span class="w"> </s
 - <code>--verbose</code> — Show mapping</p>
 <hr />
 <h3 id="pr-pull-request-operations">pr — Pull Request Operations<a class="headerlink" href="#pr-pull-request-operations" title="Anchor link to this section for reference">&para;</a></h3>
-<p>List, show, create, and manage pull requests on GitHub and Azure DevOps. <code>pr create</code> uses markdown files similar to <code>wi create</code>.</p>
+<p>List, show, create, and manage pull requests on GitHub and Azure DevOps. <code>pr create</code> intelligently auto-detects work item ID and file path from your current branch name, making PR creation simpler and faster.</p>
 <p><strong>Subcommands:</strong>
 - <code>list</code> — List pull requests
 - <code>show</code> — Display PR details
@@ -2925,21 +2925,46 @@ Commands:
   update          Update an existing pull request
 </code></pre></div></p>
 <h4 id="pr-create">pr create<a class="headerlink" href="#pr-create" title="Anchor link to this section for reference">&para;</a></h4>
-<p>Create a new pull request from markdown file.</p>
+<p>Create a new pull request from markdown file. Values are intelligently auto-detected from your current branch name when not provided.</p>
+<p><strong>Auto-Detection:</strong>
+- <strong>Work item ID</strong>: Extracted from branch name if it follows pattern <code>&lt;number&gt;-&lt;description&gt;</code> (e.g., <code>244-issue</code> → ID 244)
+- <strong>File path</strong>: Auto-constructed as <code>.temp/&lt;work-item-id&gt;-pr-message.md</code> if not provided</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span>--file<span class="w"> </span>pr.md<span class="w">                        </span><span class="c1"># Create from file</span>
-sdo<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>pr.md<span class="w">                            </span><span class="c1"># Short option</span>
-sdo<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span>--file<span class="w"> </span>pr.md<span class="w"> </span>--work-item<span class="w"> </span><span class="m">243</span><span class="w">        </span><span class="c1"># Link to work item</span>
-sdo<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span>--file<span class="w"> </span>pr.md<span class="w"> </span>--draft<span class="w">                </span><span class="c1"># Create as draft</span>
-sdo<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span>--file<span class="w"> </span>pr.md<span class="w"> </span>--dry-run<span class="w">              </span><span class="c1"># Preview</span>
-sdo<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span>--file<span class="w"> </span>pr.md<span class="w"> </span>--verbose<span class="w">              </span><span class="c1"># Show mapping</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># Simplest - auto-detect everything from branch name</span>
+sdo<span class="w"> </span>pr<span class="w"> </span>create
+
+<span class="c1"># Override file only</span>
+sdo<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>custom-message.md
+
+<span class="c1"># Override work item only</span>
+sdo<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span>--work-item<span class="w"> </span><span class="m">250</span>
+
+<span class="c1"># Explicit (backward compatible)</span>
+sdo<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span>--file<span class="w"> </span>pr.md<span class="w"> </span>--work-item<span class="w"> </span><span class="m">243</span>
+
+<span class="c1"># With additional options</span>
+sdo<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span>--draft<span class="w">                             </span><span class="c1"># Create as draft</span>
+sdo<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span>--dry-run<span class="w">                           </span><span class="c1"># Preview without creating</span>
+sdo<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span>--verbose<span class="w">                           </span><span class="c1"># Show auto-detected values</span>
 </code></pre></div></p>
 <p><strong>Options:</strong>
-- <code>-f, --file &lt;file&gt;</code> — Path to markdown file (required)
-- <code>--work-item &lt;work-item&gt;</code> — Work item ID to link to PR
+- <code>-f, --file &lt;file&gt;</code> — Path to markdown file (optional; auto-detected as <code>.temp/&lt;work-item-id&gt;-pr-message.md</code>)
+- <code>--work-item &lt;work-item&gt;</code> — Work item ID to link to PR (optional; auto-detected from branch name)
 - <code>--draft</code> — Create as draft pull request
 - <code>--dry-run</code> — Preview without creating
-- <code>--verbose</code> — Show mapping</p>
+- <code>--verbose</code> — Show auto-detected values and mapping</p>
+<p><strong>Branch Name Format:</strong>
+- Expected format: <code>&lt;number&gt;-&lt;description&gt;</code>
+- Examples:
+  - ✓ <code>244-issue</code> → Work item ID 244
+  - ✓ <code>123-feature-name</code> → Work item ID 123
+  - ✗ <code>issue-244</code> → Error (number must be at start)
+  - ✗ <code>feature</code> → Error (no number found)</p>
+<p><strong>Error Handling:</strong>
+If auto-detection fails, the command provides helpful guidance:
+- Shows current branch name
+- Displays expected format with valid/invalid examples
+- Suggests explicit options as alternatives</p>
 <h4 id="pr-list">pr list<a class="headerlink" href="#pr-list" title="Anchor link to this section for reference">&para;</a></h4>
 <p>List pull requests with optional filtering.</p>
 <p><strong>Usage:</strong>

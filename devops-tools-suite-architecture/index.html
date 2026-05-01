@@ -2500,19 +2500,24 @@
 <li>Config file loading with error validation</li>
 <li>Better user feedback and validation</li>
 <li><strong>PullRequestCommand</strong>: </li>
+<li>Branch-based auto-detection: extracts work item ID from branch name pattern <code>&lt;number&gt;-&lt;description&gt;</code></li>
+<li>Auto-constructs file path as <code>.temp/&lt;work-item-id&gt;-pr-message.md</code> when not provided</li>
+<li>Supports explicit overrides for file path and work item ID</li>
+<li>Enhanced error messages with format examples and current branch context</li>
 <li>Branch existence validation before creation</li>
 <li>Improved error messages and diagnostic information</li>
-<li><strong>Benefits</strong>: Better error handling, improved reliability, enhanced developer experience</li>
+<li><strong>Benefits</strong>: Simplified PR creation workflow, better error handling, improved reliability, enhanced developer experience</li>
 </ul>
 <h3 id="key-features">Key Features<a class="headerlink" href="#key-features" title="Anchor link to this section for reference">&para;</a></h3>
 <ul>
 <li><strong>Multi-Platform Support</strong>: Works seamlessly with Azure DevOps and GitHub</li>
 <li><strong>Work Item Management</strong>: Create, list, show, update, and comment on work items</li>
 <li><strong>Repository Operations</strong>: Create, list, delete, and manage repositories</li>
-<li><strong>Pull Request Management</strong>: Create, list, show, and update pull requests</li>
+<li><strong>Pull Request Management</strong>: Create (with branch-based auto-detection), list, show, and update pull requests</li>
 <li><strong>Pipeline Management</strong>: Create, run, monitor, and manage CI/CD pipelines</li>
 <li><strong>Dry-Run Mode</strong>: Preview operations before execution</li>
 <li><strong>Automatic Platform Detection</strong>: Detects platform from Git remote configuration</li>
+<li><strong>Branch-Based PR Creation</strong>: Auto-detects work item ID and file path from branch name pattern</li>
 <li><strong>Configuration Management</strong>: YAML-based defaults for standardized operations (Advanced Automation Features)</li>
 <li><strong>Rich Content</strong>: Markdown templates for professional work items and PRs (Advanced Automation Features)</li>
 <li><strong>Automated Testing</strong>: E2E testing infrastructure with cross-platform validation (Advanced Automation Features)</li>
