@@ -283,6 +283,7 @@ namespace Sdo.Commands
                     }
                     Console.WriteLine("Repository Information:");
                     Console.WriteLine($"  Name: {repo.Name}");
+                    Console.WriteLine($"  ID: {repo.PlatformId}");
                     Console.WriteLine($"  URL: {repo.Url}");
                     if (!string.IsNullOrEmpty(repo.DefaultBranch))
                         Console.WriteLine($"  Default Branch: {repo.DefaultBranch}");
@@ -314,6 +315,7 @@ namespace Sdo.Commands
                     }
                     Console.WriteLine("Repository Information:");
                     Console.WriteLine($"  Name: {repo.Name}");
+                    Console.WriteLine($"  ID: {repo.PlatformId}");
                     Console.WriteLine($"  URL: {repo.Url}");
                     if (!string.IsNullOrEmpty(repo.DefaultBranch))
                         Console.WriteLine($"  Default Branch: {repo.DefaultBranch}");

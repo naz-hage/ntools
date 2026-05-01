@@ -58,8 +58,23 @@ namespace Sdo.Services
         public string? Sprint { get; set; }
 
         /// <summary>
+        /// Gets or sets the area path.
+        /// </summary>
+        public string? Area { get; set; }
+
+        /// <summary>
         /// Gets or sets the assigned to user name.
         /// </summary>
         public string? AssignedTo { get; set; }
+
+        /// <summary>
+        /// Gets or sets the acceptance criteria.
+        /// </summary>
+        public string? AcceptanceCriteria { get; set; }
+
+        /// <summary>
+        /// Gets or sets the parent work item ID.
+        /// </summary>
+        public int? ParentId { get; set; }
     }
 }

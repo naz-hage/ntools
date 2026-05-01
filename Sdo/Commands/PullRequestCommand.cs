@@ -47,8 +47,14 @@ namespace Sdo.Commands
         private void AddCreateCommand(Option<bool> verboseOption)
         {
             var createCommand = new System.CommandLine.Command("create", "Create a pull request from markdown file");
-            var fileOption = new Option<string>("--file", new[] { "-f" }) { Description = "Path to markdown file containing PR details" };
-            var workItemOption = new Option<int>("--work-item") { Description = "Work item ID to link to the pull request" };
+            var fileOption = new Option<string?>("--file", new[] { "-f" }) 
+            { 
+                Description = "Path to markdown file containing PR details (auto-detected as .temp/<work-item-id>-pr-message.md if not provided)" 
+            };
+            var workItemOption = new Option<int?>("--work-item") 
+            { 
+                Description = "Work item ID to link to the pull request (auto-detected from branch name if not provided)" 
+            };
             var draftOption = new Option<bool>("--draft") { Description = "Create as draft pull request" };
             var dryRunOption = new Option<bool>("--dry-run") { Description = "Parse and preview PR creation without creating it" };
 
@@ -65,7 +71,7 @@ namespace Sdo.Commands
                 var draft = parseResult.GetValue(draftOption);
                 var dryRun = parseResult.GetValue(dryRunOption);
                 var verbose = parseResult.GetValue(verboseOption);
-                return await CreatePullRequest(file!, workItem, draft, dryRun, verbose);
+                return await CreatePullRequest(file, workItem, draft, dryRun, verbose);
             });
 
             Subcommands.Add(createCommand);
@@ -157,15 +163,66 @@ namespace Sdo.Commands
             Subcommands.Add(updateCommand);
         }
 
-        private async Task<int> CreatePullRequest(string file, int workItem, bool draft, bool dryRun, bool verbose)
+        private async Task<int> CreatePullRequest(string? file, int? workItem, bool draft, bool dryRun, bool verbose)
         {
             try
             {
                 if (verbose) Console.WriteLine("Creating pull request...");
 
+                // Auto-detect work item ID from branch name if not provided
+                if (!workItem.HasValue || workItem <= 0)
+                {
+                    var currentBranch = GetCurrentBranch();
+                    workItem = ExtractWorkItemIdFromBranch(currentBranch);
+                    
+                    if (!workItem.HasValue || workItem <= 0)
+                    {
+                        ConsoleHelper.WriteError("X Error: Could not determine work item ID");
+                        Console.WriteLine($"\nCurrent branch: '{currentBranch}'");
+                        Console.WriteLine("\nExpected branch name format: <number>-<description>");
+                        Console.WriteLine("  - Must start with digits (e.g., 244)");
+                        Console.WriteLine("  - Followed by a hyphen (-)");
+                        Console.WriteLine("  - Then any description (e.g., issue, feature-name)");
+                        Console.WriteLine("\nValid examples:");
+                        Console.WriteLine("  ✓ 244-issue");
+                        Console.WriteLine("  ✓ 123-feature-name");
+                        Console.WriteLine("  ✓ 999-my-feature");
+                        Console.WriteLine("\nInvalid examples:");
+                        Console.WriteLine("  ✗ issue-244 (number not at start)");
+                        Console.WriteLine("  ✗ feature (no hyphen or number)");
+                        Console.WriteLine("\nAlternatively, provide work item ID explicitly:");
+                        Console.WriteLine("  sdo pr create --work-item <id>");
+                        return 1;
+                    }
+                    
+                    if (verbose)
+                    {
+                        Console.WriteLine($"[VERBOSE] Auto-detected work item ID '{workItem}' from branch '{currentBranch}'");
+                    }
+                }
+
+                // Auto-detect file path if not provided
+                if (string.IsNullOrEmpty(file))
+                {
+                    file = ConstructDefaultFilePath(workItem.Value);
+                    
+                    if (verbose)
+                    {
+                        Console.WriteLine($"[VERBOSE] Auto-detected file path: {file}");
+                    }
+                }
+
+                // Validate file exists
                 if (!System.IO.File.Exists(file))
                 {
                     ConsoleHelper.WriteError($"X Error: File not found: {file}");
+                    Console.WriteLine("\nExpected file path format: .temp/<work-item-id>-pr-message.md");
+                    Console.WriteLine($"Example for work item {workItem}: .temp/{workItem}-pr-message.md");
+                    Console.WriteLine("\nIf you want to auto-detect the file path:");
+                    Console.WriteLine("  - Create the file at the expected location above, OR");
+                    Console.WriteLine("  - Provide file path explicitly with -f or --file option");
+                    Console.WriteLine($"\nExample:");
+                    Console.WriteLine($"  sdo pr create -f .temp/{workItem}-pr-message.md");
                     return 1;
                 }
                 // Read the markdown file
@@ -206,7 +263,7 @@ namespace Sdo.Commands
                 }
 
                 // Add work item ID to title (remove existing brackets and add work item number)
-                if (workItem > 0)
+                if (workItem.HasValue && workItem.Value > 0)
                 {
                     // Remove existing [PBI-XXX] or similar bracketed prefixes
                     var titleWithoutBrackets = System.Text.RegularExpressions.Regex.Replace(title, @"^\s*\[[^\]]*\]\s*", "");
@@ -224,7 +281,7 @@ namespace Sdo.Commands
                 {
                     Console.WriteLine($"PR would be created with:");
                     Console.WriteLine($"  Title: {title}");
-                    Console.WriteLine($"  Work Item: {workItem}");
+                    Console.WriteLine($"  Work Item: {(workItem.HasValue ? workItem.ToString() : "Not specified")}");
                     Console.WriteLine($"  Draft: {draft}");
                     if (!string.IsNullOrEmpty(body))
                         Console.WriteLine($"  Description: {body.Substring(0, Math.Min(100, body.Length))}...");
@@ -271,6 +328,17 @@ namespace Sdo.Commands
 
                     using var client = new GitHubClient(pat);
                     var currentBranch = GetCurrentBranch();
+                    
+                    // Check if the current branch exists on the remote before attempting to create PR
+                    if (!BranchExistsOnRemote(currentBranch))
+                    {
+                        ConsoleHelper.WriteError($"X Error: Branch '{currentBranch}' does not exist on remote 'origin'");
+                        Console.WriteLine("\nTo fix this, push your branch first:");
+                        Console.WriteLine($"  git push -u origin {currentBranch}");
+                        Console.WriteLine("\nThen retry the PR creation command.");
+                        return 1;
+                    }
+                    
                     try
                     {
                         var pr = await client.CreatePullRequestAsync(repoInfo.Owner, repoInfo.Repo, title,
@@ -356,6 +424,17 @@ namespace Sdo.Commands
 
                     using var client = new AzureDevOpsClient(pat, organization, project);
                     var currentBranch = GetCurrentBranch();
+                    
+                    // Check if the current branch exists on the remote before attempting to create PR
+                    if (!BranchExistsOnRemote(currentBranch))
+                    {
+                        ConsoleHelper.WriteError($"X Error: Branch '{currentBranch}' does not exist on remote 'origin'");
+                        Console.WriteLine("\nTo fix this, push your branch first:");
+                        Console.WriteLine($"  git push -u origin {currentBranch}");
+                        Console.WriteLine("\nThen retry the PR creation command.");
+                        return 1;
+                    }
+                    
                     var pr = await client.CreatePullRequestAsync(project, repoInfo.Repo, title,
                         $"refs/heads/{currentBranch}", "refs/heads/main", body);
 
@@ -368,9 +447,9 @@ namespace Sdo.Commands
                     Console.WriteLine("✓ Pull request created successfully!");
                     Console.WriteLine($"URL: {pr.Url}");
                     // If a work item ID was provided, attempt to link it to the created PR
-                    if (workItem > 0)
+                    if (workItem.HasValue && workItem.Value > 0)
                     {
-                        var linked = await client.LinkWorkItemAsync(workItem, pr.Number, repoInfo.Repo);
+                        var linked = await client.LinkWorkItemAsync(workItem.Value, pr.Number, repoInfo.Repo);
                         if (!linked)
                         {
                             ConsoleHelper.WriteError($"Warning: Failed to link work item #{workItem} to PR {pr.Number}: {client.LastError}");
@@ -521,6 +600,16 @@ namespace Sdo.Commands
         {
             try
             {
+                // Validate that PR ID was provided
+                if (prId <= 0)
+                {
+                    ConsoleHelper.WriteError("X Error: PR ID is required. Use the positional argument or --pr-id option");
+                    Console.WriteLine("\nExample:");
+                    Console.WriteLine("  sdo pr show 123");
+                    Console.WriteLine("  sdo pr show --pr-id 123");
+                    return 1;
+                }
+
                 if (verbose) Console.WriteLine($"Retrieving pull request #{prId}...");
 
                 var platform = _platformDetector.DetectPlatform();
@@ -650,6 +739,16 @@ namespace Sdo.Commands
         {
             try
             {
+                // Validate that PR ID was provided
+                if (prId <= 0)
+                {
+                    ConsoleHelper.WriteError("X Error: PR ID is required. Use --pr-id <number>");
+                    Console.WriteLine("\nExample:");
+                    Console.WriteLine("  sdo pr update --pr-id 123 -f ./pr-message.md");
+                    Console.WriteLine("  sdo pr update --pr-id 123 --title \"New Title\"");
+                    return 1;
+                }
+
                 if (verbose) Console.WriteLine($"Updating pull request #{prId}...");
 
                 string? body = null;
@@ -727,7 +826,7 @@ namespace Sdo.Commands
                     var pr = await client.UpdatePullRequestAsync(repoInfo.Owner, repoInfo.Repo, prId, title, body, status);
                     if (pr == null)
                     {
-                        ConsoleHelper.WriteError($"X Error: Failed to update pull request #{prId}");
+                        ConsoleHelper.WriteError($"X Error: {client.LastError ?? "Failed to update pull request"}");
                         return 1;
                     }
 
@@ -826,5 +925,92 @@ namespace Sdo.Commands
 
             return "main"; // Default fallback
         }
+
+        private bool BranchExistsOnRemote(string branchName)
+        {
+            try
+            {
+                var processInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "git",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
+                };
+
+                // Use ArgumentList to safely pass arguments (prevents command injection)
+                processInfo.ArgumentList.Add("ls-remote");
+                processInfo.ArgumentList.Add("--exit-code");
+                processInfo.ArgumentList.Add("--heads");
+                processInfo.ArgumentList.Add("origin");
+                processInfo.ArgumentList.Add(branchName);
+
+                // Disable credential prompts to prevent hanging on authentication
+                processInfo.Environment["GIT_TERMINAL_PROMPT"] = "0";
+
+                using (var process = System.Diagnostics.Process.Start(processInfo))
+                {
+                    if (process != null)
+                    {
+                        const int gitTimeoutMilliseconds = 10000; // 10-second timeout
+                        if (!process.WaitForExit(gitTimeoutMilliseconds))
+                        {
+                            try
+                            {
+                                process.Kill(entireProcessTree: true);
+                            }
+                            catch
+                            {
+                                // Process may have already exited
+                            }
+
+                            return true; // Timeout - assume branch exists to avoid false negatives
+                        }
+
+                        return process.ExitCode == 0;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // If git command fails, assume branch exists to avoid false negatives
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Extracts the work item ID from the branch name.
+        /// Expected format: <number>-<description> (e.g., 244-issue)
+        /// </summary>
+        /// <param name="branchName">The git branch name.</param>
+        /// <returns>The work item ID, or null if not found.</returns>
+        private int? ExtractWorkItemIdFromBranch(string branchName)
+        {
+            if (string.IsNullOrEmpty(branchName))
+                return null;
+
+            var match = System.Text.RegularExpressions.Regex.Match(branchName, @"^(\d+)-");
+            if (match.Success && int.TryParse(match.Groups[1].Value, out int id))
+            {
+                return id;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Constructs the default file path for a PR markdown file based on the work item ID.
+        /// Default format: .temp/<work-item-id>-pr-message.md
+        /// </summary>
+        /// <param name="workItemId">The work item ID.</param>
+        /// <returns>The default file path.</returns>
+        private string ConstructDefaultFilePath(int workItemId)
+        {
+            return System.IO.Path.Combine(".temp", $"{workItemId}-pr-message.md");
+        }
     }
 }
+

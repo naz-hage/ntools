@@ -16,6 +16,7 @@ using Sdo.Interfaces;
 using Sdo.Services;
 using Sdo.Models;
 using Sdo.Mapping;
+using Sdo.Utilities;
 
 namespace Sdo.Commands
 {
@@ -27,6 +28,7 @@ namespace Sdo.Commands
         private readonly PlatformService _platformDetector;
         private readonly Sdo.Mapping.IMappingGenerator _mappingGenerator;
         private readonly Sdo.Mapping.IMappingPresenter _mappingPresenter;
+        private readonly ConfigurationManager _configManager;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WorkItemCommand"/> class.
@@ -37,6 +39,7 @@ namespace Sdo.Commands
             _platformDetector = new PlatformService();
             _mappingGenerator = mappingGenerator ?? new Sdo.Mapping.MappingGenerator();
             _mappingPresenter = mappingPresenter ?? new Sdo.Mapping.ConsoleMappingPresenter();
+            _configManager = new ConfigurationManager();
 
             // Add subcommands (in alphabetical order for help display)
             AddCommentCommand(verboseOption);
@@ -88,6 +91,7 @@ namespace Sdo.Commands
             var areaOption = new Option<string?>("--area") { Description = "Filter by area path (Azure DevOps only). Example: 'Project\\Area\\SubArea'" };
             var iterationOption = new Option<string?>("--iteration") { Description = "Filter by iteration (Azure DevOps only). Example: 'Project\\Sprint 1'" };
             var topOption = new Option<int>("--top") { Description = "Maximum number of items to return (default: 50)" };
+            var configOption = new Option<string?>("--config") { Description = "Path to sdo-config.yaml file (optional)" };
 
             listCommand.Add(typeOption);
             listCommand.Add(stateOption);
@@ -96,6 +100,7 @@ namespace Sdo.Commands
             listCommand.Add(areaOption);
             listCommand.Add(iterationOption);
             listCommand.Add(topOption);
+            listCommand.Add(configOption);
             listCommand.Add(verboseOption);
 
             listCommand.SetAction(async (parseResult) =>
@@ -107,9 +112,10 @@ namespace Sdo.Commands
                 var area = parseResult.GetValue(areaOption);
                 var iteration = parseResult.GetValue(iterationOption);
                 var top = parseResult.GetValue(topOption);
+                var config = parseResult.GetValue(configOption);
                 var verbose = parseResult.GetValue(verboseOption);
 
-                return await ListWorkItems(type, state, assignedTo, assignedToMe, area, iteration, top, verbose);
+                return await ListWorkItems(type, state, assignedTo, assignedToMe, area, iteration, top, config, verbose);
             });
 
             Subcommands.Add(listCommand);
@@ -380,9 +386,52 @@ namespace Sdo.Commands
         /// Handles listing work items with filtering.
         /// </summary>
         private async Task<int> ListWorkItems(string? type, string? state, string? assignedTo, 
-            bool assignedToMe, string? areaPath, string? iteration, int top, bool verbose)
+            bool assignedToMe, string? areaPath, string? iteration, int top, string? configPath, bool verbose)
         {
-            // Do not assign a blanket default here; choose per-platform after detection
+            // Load configuration defaults from sdo-config.yaml (if not provided via CLI)
+            var configLoaded = _configManager.Load(configPath);
+            if (!configLoaded)
+            {
+                // Display config errors to user
+                foreach (var error in _configManager.GetErrors())
+                {
+                    ConsoleHelper.WriteError($"Config error: {error}");
+                }
+                return 1;
+            }
+            
+            // Display config file location
+            if (_configManager.LoadedConfigPath != null)
+            {
+                Console.WriteLine($"Config: {_configManager.LoadedConfigPath}");
+            }
+            
+            // Apply configuration defaults only if CLI values were not provided
+            if (string.IsNullOrEmpty(type))
+            {
+                type = _configManager.GetValue("commands:wi:list:type");
+            }
+            if (string.IsNullOrEmpty(state))
+            {
+                state = _configManager.GetValue("commands:wi:list:state");
+            }
+            if (string.IsNullOrEmpty(assignedTo))
+            {
+                assignedTo = _configManager.GetValue("commands:wi:list:assigned_to");
+            }
+            if (string.IsNullOrEmpty(areaPath))
+            {
+                areaPath = _configManager.GetValue("commands:wi:list:area_path");
+            }
+            if (string.IsNullOrEmpty(iteration))
+            {
+                iteration = _configManager.GetValue("commands:wi:list:iteration");
+            }
+            if (top <= 0)
+            {
+                var topConfig = _configManager.GetInt("commands:wi:list:top", 0);
+                if (topConfig > 0) top = topConfig;
+            }
 
             try
             {
@@ -553,8 +602,9 @@ namespace Sdo.Commands
                     }
                     else
                     {
-                        // Fallback to literal comparison if parsing failed
-                        issues = issues.Where(i => (i.State ?? "").ToLower() == state.ToLower()).ToList();
+                        // Fallback to literal comparison: support comma-separated states
+                        var requestedStates = state.Split(',').Select(s => s.Trim().ToLower()).ToList();
+                        issues = issues.Where(i => requestedStates.Contains((i.State ?? "").ToLower())).ToList();
                     }
                 }
                 else
@@ -585,11 +635,17 @@ namespace Sdo.Commands
                 if (assignedToMe)
                 {
                     var currentUser = await client.GetUserAsync();
-                    if (!string.IsNullOrEmpty(currentUser?.Login))
+                    if (string.IsNullOrEmpty(currentUser?.Login))
                     {
-                        issues = issues.Where(i => !string.IsNullOrEmpty(i.Assignee?.Login) &&
-                            i.Assignee.Login.Equals(currentUser.Login, StringComparison.OrdinalIgnoreCase)).ToList();
+                        ConsoleHelper.WriteLine("X Error: Could not determine current GitHub user. Make sure your authentication token is valid.", ConsoleColor.Red);
+                        if (!string.IsNullOrEmpty(client.LastError))
+                        {
+                            ConsoleHelper.WriteLine($"  Details: {client.LastError}", ConsoleColor.Red);
+                        }
+                        return 1;
                     }
+                    issues = issues.Where(i => !string.IsNullOrEmpty(i.Assignee?.Login) &&
+                        i.Assignee.Login.Equals(currentUser.Login, StringComparison.OrdinalIgnoreCase)).ToList();
                 }
 
                 // Limit to requested number
@@ -708,8 +764,9 @@ namespace Sdo.Commands
                 // Filter by state
                 if (!string.IsNullOrEmpty(state))
                 {
-                    // Filter to specific state when requested
-                    workItems = workItems.Where(w => w.State?.ToLower() == state.ToLower()).ToList();
+                    // Support comma-separated states: "To Do,In Progress" → match any of them
+                    var requestedStates = state.Split(',').Select(s => s.Trim().ToLower()).ToList();
+                    workItems = workItems.Where(w => requestedStates.Contains(w.State?.ToLower() ?? "")).ToList();
                 }
                 else
                 {
@@ -734,8 +791,14 @@ namespace Sdo.Commands
                 // Filter by assigned-to-me if specified
                 if (assignedToMe)
                 {
-                    workItems = workItems.Where(w => !string.IsNullOrEmpty(w.AssignedTo)).ToList();
-                    // Note: Actual filtering based on current user identity would require additional context
+                    var currentUser = await GetCurrentAzureDevOpsUserAsync(pat, organization);
+                    if (string.IsNullOrEmpty(currentUser))
+                    {
+                        ConsoleHelper.WriteLine("X Error: Could not determine current Azure DevOps user. Make sure your authentication token is valid.", ConsoleColor.Red);
+                        return 1;
+                    }
+                    workItems = workItems.Where(w => !string.IsNullOrEmpty(w.AssignedTo) && 
+                        w.AssignedTo.Equals(currentUser, StringComparison.OrdinalIgnoreCase)).ToList();
                 }
 
                 // Limit to requested number
@@ -1284,6 +1347,17 @@ namespace Sdo.Commands
                     }
 
                     var organization = _platformDetector.GetOrganization();
+                    
+                    // Allow markdown metadata to override the detected organization
+                    if (parsed?.Metadata != null && parsed.Metadata.TryGetValue("organization", out var metadataOrg) && !string.IsNullOrEmpty(metadataOrg))
+                    {
+                        organization = metadataOrg;
+                        if (verbose)
+                        {
+                            ConsoleHelper.WriteLine($"[VERBOSE] Organization overridden from metadata: {organization}", ConsoleColor.Gray);
+                        }
+                    }
+                    
                     if (string.IsNullOrEmpty(organization))
                     {
                         ConsoleHelper.WriteLine("X Could not determine Azure DevOps organization", ConsoleColor.Red);
@@ -1291,6 +1365,16 @@ namespace Sdo.Commands
                     }
 
                     var project = _platformDetector.GetProject();
+                    
+                    // Allow markdown metadata to override the detected project
+                    if (parsed?.Metadata != null && parsed.Metadata.TryGetValue("project", out var metadataProject) && !string.IsNullOrEmpty(metadataProject))
+                    {
+                        project = metadataProject;
+                        if (verbose)
+                        {
+                            ConsoleHelper.WriteLine($"[VERBOSE] Project overridden from metadata: {project}", ConsoleColor.Gray);
+                        }
+                    }
 
                     using var client = new AzureDevOpsClient(pat, organization, project);
 
@@ -1298,15 +1382,18 @@ namespace Sdo.Commands
                     {
                         ConsoleHelper.WriteLine($"Creating Azure DevOps work item in {organization}/{project ?? "default"}...", ConsoleColor.Gray);
                         ConsoleHelper.WriteLine($"  Title: {title}", ConsoleColor.Gray);
-                        ConsoleHelper.WriteLine($"  Type: {type}", ConsoleColor.Gray);
+                        ConsoleHelper.WriteLine($"  Type: {type} (normalized: {NormalizeWorkItemType(type ?? "PBI")})", ConsoleColor.Gray);
                         ConsoleHelper.WriteLine($"  Description: {description ?? "(none)"}", ConsoleColor.Gray);
                         if (!string.IsNullOrEmpty(assignee)) ConsoleHelper.WriteLine($"  Assignee: {assignee}", ConsoleColor.Gray);
                     }
 
+                    // Normalize work item type: convert abbreviations to full names
+                    var normalizedType = NormalizeWorkItemType(type ?? "PBI");
+
                     // Show external mapping command when verbose
                     if (verbose)
                     {
-                        var mappingCmd = $"az boards work-item create --title \"{title}\" --type \"{type}\" --org \"{organization}\"";
+                        var mappingCmd = $"az boards work-item create --title \"{title}\" --type \"{normalizedType}\" --org \"{organization}\"";
                         if (!string.IsNullOrEmpty(project)) mappingCmd += $" --project \"{project}\"";
                         if (!string.IsNullOrEmpty(assignee)) mappingCmd += $" --assigned-to \"{assignee}\"";
                         ConsoleHelper.WriteLine(mappingCmd, ConsoleColor.Yellow);
@@ -1318,11 +1405,26 @@ namespace Sdo.Commands
                         ConsoleHelper.WriteLine($"Creating Azure DevOps work item in {organization}/{project ?? "default"}...", ConsoleColor.Gray);
                     }
 
-                    // Provide area/iteration if available in parsed metadata
+                    // Provide area/iteration/parent if available in parsed metadata
                     string? area = parsed?.Metadata?.GetValueOrDefault("area") ?? parsed?.Metadata?.GetValueOrDefault("area_path");
                     string? iteration = parsed?.Metadata?.GetValueOrDefault("iteration") ?? parsed?.Metadata?.GetValueOrDefault("iteration_path");
+                    string? parent = parsed?.Metadata?.GetValueOrDefault("parent");
 
-                    var result = await client.CreateWorkItemAsync(project ?? string.Empty, type ?? "PBI", title, description ?? string.Empty, acceptanceCriteria, assignee, area, iteration, dryRun, verbose);
+                    if (verbose && parsed?.Metadata != null)
+                    {
+                        ConsoleHelper.WriteLine("[VERBOSE] Parsed metadata:", ConsoleColor.Gray);
+                        foreach (var kvp in parsed.Metadata)
+                        {
+                            ConsoleHelper.WriteLine($"  {kvp.Key} = {kvp.Value}", ConsoleColor.Gray);
+                        }
+                    }
+
+                    if (verbose)
+                    {
+                        ConsoleHelper.WriteLine($"[VERBOSE] parent ID value: {parent ?? "(null)"}", ConsoleColor.Gray);
+                    }
+
+                    var result = await client.CreateWorkItemAsync(project ?? string.Empty, normalizedType, title, description ?? string.Empty, acceptanceCriteria, assignee, area, iteration, parent, dryRun, verbose);
 
                     if (result != null)
                     {
@@ -1385,6 +1487,9 @@ namespace Sdo.Commands
             Console.WriteLine($"State:       {issue.State}");
             Console.WriteLine($"Created:     {issue.CreatedAt:O}");
             Console.WriteLine($"Updated:     {issue.UpdatedAt:O}");
+            
+            // Display Assigned To field
+            Console.WriteLine($"Assigned To: {issue.Assignee?.Login ?? "Not assigned"}");
 
             if (!string.IsNullOrEmpty(issue.Body))
             {
@@ -1413,15 +1518,44 @@ namespace Sdo.Commands
             Console.WriteLine("=".PadRight(70, '='));
             Console.WriteLine($"Title:       {workItem.Title}");
             Console.WriteLine($"Type:        {workItem.Type}");
+            if (workItem.ParentId.HasValue)
+                Console.WriteLine($"Parent ID:   {workItem.ParentId}");
             Console.WriteLine($"State:       {workItem.State}");
             Console.WriteLine($"Created:     {workItem.CreatedDate:O}");
             Console.WriteLine($"Updated:     {workItem.ChangedDate:O}");
+            
+            // Display Area, Iteration, and Assigned To fields
+            Console.WriteLine($"Area:        {workItem.Area ?? "Not assigned"}");
+            Console.WriteLine($"Iteration:   {workItem.Sprint ?? "Not assigned"}");
+            Console.WriteLine($"Assigned To: {workItem.AssignedTo ?? "Not assigned"}");
 
             if (!string.IsNullOrEmpty(workItem.Description))
             {
                 Console.WriteLine();
                 Console.WriteLine("Description:");
-                Console.WriteLine(workItem.Description);
+                // Strip HTML tags and format for display
+                var cleanedDescription = StripHtmlTags(workItem.Description);
+                Console.WriteLine(cleanedDescription);
+            }
+
+            // Display acceptance criteria if present
+            if (!string.IsNullOrEmpty(workItem.AcceptanceCriteria))
+            {
+                Console.WriteLine();
+                Console.WriteLine("Acceptance Criteria:");
+                var cleanedCriteria = StripHtmlTags(workItem.AcceptanceCriteria);
+                Console.WriteLine(cleanedCriteria);
+            }
+
+            // Validate acceptance criteria for PBI and Epic types
+            var isPBIOrEpic = workItem.Type != null && 
+                (workItem.Type.Equals("PBI", StringComparison.OrdinalIgnoreCase) || 
+                 workItem.Type.Equals("Epic", StringComparison.OrdinalIgnoreCase));
+            
+            if (isPBIOrEpic && string.IsNullOrEmpty(workItem.AcceptanceCriteria))
+            {
+                Console.WriteLine();
+                ConsoleHelper.WriteLine("⚠ WARNING: PBI/Epic work items should have acceptance criteria defined", ConsoleColor.Yellow);
             }
 
             if (includeComments && workItem.CommentCount > 0)
@@ -1431,7 +1565,45 @@ namespace Sdo.Commands
             }
 
             Console.WriteLine();
-            Console.WriteLine($"URL: {workItem.Url}");
+            // Convert API URL to browsable format
+            // From: https://dev.azure.com/org/proj/project/_apis/wit/workItems/123
+            // To:   https://dev.azure.com/org/proj/project/_workitems/edit/123
+            string displayUrl = workItem.Url ?? string.Empty;
+            if (!string.IsNullOrEmpty(displayUrl) && displayUrl.Contains("_apis/wit/workItems/"))
+            {
+                displayUrl = displayUrl.Replace("/_apis/wit/workItems/", "/_workitems/edit/");
+            }
+            Console.WriteLine($"URL: {displayUrl}");
+        }
+
+        /// <summary>
+        /// Strips HTML tags from text and formats it for display.
+        /// </summary>
+        private string StripHtmlTags(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return text;
+
+            // Replace common HTML tags with text equivalents
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"<h[1-6]>(.*?)</h[1-6]>", "$1");
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"<h[1-6]>", "");
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"</h[1-6]>", "");
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"</?ul>", "");
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"</?ol>", "");
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"<li>(.*?)</li>", "• $1");
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"</?li>", "");
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"<br\s*/?>\s*", "\n");
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"</?p>", "");
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"</?strong>", "");
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"</?em>", "");
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"</?[^>]+>", ""); // Remove any remaining tags
+
+            // Clean up whitespace
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"\s+\n", "\n");
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"\n\s+", "\n");
+            text = text.Trim();
+
+            return text;
         }
 
         /// <summary>
@@ -1586,126 +1758,62 @@ namespace Sdo.Commands
             {
                 if (!File.Exists(filePath)) return null;
 
-                var lines = File.ReadAllLines(filePath);
-                var result = new WorkItemParseResult();
-
-                // Simple YAML frontmatter parse
-                int idx = 0;
-                if (lines.Length > 0 && lines[0].Trim() == "---")
+                // Use the robust MarkdownParser utility class
+                var parseResult = Utilities.MarkdownParser.ParseFile(filePath, verbose: false);
+                
+                if (!parseResult.Success)
                 {
-                    idx = 1;
-                    for (; idx < lines.Length; idx++)
+                    if (parseResult.Errors.Any())
                     {
-                        var l = lines[idx];
-                        if (l.Trim() == "---") { idx++; break; }
-                        var sep = l.IndexOf(":");
-                        if (sep > 0)
+                        foreach (var error in parseResult.Errors)
                         {
-                            var k = l.Substring(0, sep).Trim();
-                            var v = l.Substring(sep + 1).Trim().Trim('"');
-                            result.Metadata[k] = v;
+                            ConsoleHelper.WriteLine($"X Markdown parse error (line {error.LineNumber}): {error.Message}", ConsoleColor.Red);
                         }
                     }
+                    return null;
                 }
 
-                // Title: first H1 or first non-empty line
-                for (int i = idx; i < lines.Length; i++)
+                // Map MarkdownParser result to WorkItemParseResult
+                var result = new WorkItemParseResult
                 {
-                    var l = lines[i].Trim();
-                    if (string.IsNullOrEmpty(result.Title) && l.StartsWith("# "))
-                    {
-                        result.Title = l.Substring(2).Trim();
-                        idx = i + 1;
-                        break;
-                    }
-                    if (string.IsNullOrEmpty(result.Title) && !string.IsNullOrEmpty(l) && !l.StartsWith("#"))
-                    {
-                        // treat first paragraph as title if no explicit H1
-                        result.Title = l;
-                        idx = i + 1;
-                        break;
-                    }
-                }
+                    Title = StripTypePrefix(parseResult.Title),
+                    Description = parseResult.Description,
+                    AcceptanceCriteria = parseResult.AcceptanceCriteria
+                };
 
-                // After title, accept metadata lines in the form '## Key: Value'
-                int metaIndex = idx;
-                for (; metaIndex < lines.Length; metaIndex++)
+                // Normalize and copy metadata from MarkdownParser
+                foreach (var kvp in parseResult.Metadata)
                 {
-                    var line = lines[metaIndex].Trim();
-                    if (string.IsNullOrEmpty(line)) continue;
-                    if (line.StartsWith("##") && line.Contains(":"))
-                    {
-                        // Parse key/value and normalize key
-                        var kv = line.Substring(2).Trim();
-                        var sep = kv.IndexOf(":");
-                        if (sep > 0)
-                        {
-                            var key = kv.Substring(0, sep).Trim();
-                            var val = kv.Substring(sep + 1).Trim().Trim('"');
-                            var normKey = key.ToLowerInvariant().Replace(" ", "_");
-                            result.Metadata[normKey] = val;
-                            continue;
-                        }
-                    }
-                    // stop metadata block when encountering a non-meta line
-                    break;
+                    var normalizedKey = kvp.Key.ToLowerInvariant().Replace(" ", "_");
+                    result.Metadata[normalizedKey] = kvp.Value;
                 }
-
-                // Collect description until 'Acceptance Criteria' header or end
-                var descLines = new List<string>();
-                for (int i = metaIndex; i < lines.Length; i++)
-                {
-                    var l = lines[i];
-                    if (l.Trim().StartsWith("##") && l.ToLower().Contains("acceptance"))
-                    {
-                        // parse acceptance criteria from following lines
-                        i++;
-                        for (; i < lines.Length; i++)
-                        {
-                            var ac = lines[i].Trim();
-                            if (string.IsNullOrEmpty(ac)) continue;
-                            if (ac.StartsWith("- [") || ac.StartsWith("- ") || ac.StartsWith("* [") || ac.StartsWith("*"))
-                            {
-                                // normalize checkbox formatting
-                                var cleaned = ac;
-                                // remove list marker
-                                if (cleaned.StartsWith("- ")) cleaned = cleaned.Substring(2).Trim();
-                                else if (cleaned.StartsWith("* ")) cleaned = cleaned.Substring(2).Trim();
-                                // remove checkbox
-                                if (cleaned.StartsWith("[ ]") || cleaned.StartsWith("[x]") || cleaned.StartsWith("[X]"))
-                                {
-                                    cleaned = cleaned.Substring(3).Trim();
-                                }
-                                // remove leading checkbox like [ ]
-                                if (cleaned.StartsWith("["))
-                                {
-                                    var r = cleaned.IndexOf(']');
-                                    if (r > 0) cleaned = cleaned.Substring(r + 1).Trim();
-                                }
-                                if (!string.IsNullOrEmpty(cleaned)) result.AcceptanceCriteria.Add(cleaned);
-                            }
-                            else if (lines[i].Trim().StartsWith("## "))
-                            {
-                                // next section
-                                break;
-                            }
-                        }
-                        break;
-                    }
-                    else
-                    {
-                        descLines.Add(l);
-                    }
-                }
-
-                result.Description = string.Join(Environment.NewLine, descLines).Trim();
 
                 return result;
             }
-            catch
+            catch (Exception ex)
             {
+                ConsoleHelper.WriteLine($"X Failed to parse markdown file: {ex.Message}", ConsoleColor.Red);
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Strips type prefixes from work item titles.
+        /// Converts "Bug-001: Title" to "Title"
+        /// </summary>
+        private string StripTypePrefix(string title)
+        {
+            if (string.IsNullOrEmpty(title)) return title;
+            
+            // Pattern: Type-Number: Title
+            // Examples: Bug-001: ..., Epic-001: ..., Task-001: ..., PBI-001: ..., etc.
+            var match = System.Text.RegularExpressions.Regex.Match(title, @"^(Bug|Epic|Task|PBI|Feature|Story)-\d+:\s*(.+)$", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            if (match.Success)
+            {
+                return match.Groups[2].Value; // Return everything after the colon and space
+            }
+            
+            return title; // Return unchanged if no prefix found
         }
 
         /// <summary>
@@ -1715,18 +1823,22 @@ namespace Sdo.Commands
         private string NormalizeWorkItemType(string type)
         {
             if (string.IsNullOrEmpty(type))
-                return string.Empty;
+                return "Product Backlog Item"; // Default
 
-            return type.ToLower() switch
+            // Convert to lowercase for comparison, but return proper case
+            var lowerType = type.ToLower().Trim();
+            return lowerType switch
             {
-                "pbi" => "product backlog item",
-                "task" => "task",
-                "bug" => "bug",
-                "epic" => "epic",
-                "spike" => "spike",
-                "feature" => "feature",
-                // Default: return lowercase for case-insensitive comparison
-                _ => type.ToLower()
+                "pbi" => "Product Backlog Item",
+                "product backlog item" => "Product Backlog Item",
+                "task" => "Task",
+                "bug" => "Bug",
+                "epic" => "Epic",
+                "spike" => "Spike",
+                "feature" => "Feature",
+                "user story" => "User Story",
+                // Default: return as-is
+                _ => type
             };
         }
 
@@ -1742,6 +1854,20 @@ namespace Sdo.Commands
                 return await auth.GetAzureDevOpsTokenAsync();
             }
             return null;
+        }
+
+        private async Task<string?> GetCurrentAzureDevOpsUserAsync(string pat, string organization)
+        {
+            try
+            {
+                using var client = new AzureDevOpsClient(pat, organization);
+                var user = await client.GetUserAsync();
+                return user?.DisplayName;
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }

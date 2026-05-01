@@ -69,6 +69,20 @@ namespace Sdo.Services
                     }
                 }
 
+                // Extract area path - get the last component after backslash
+                if (Fields.ContainsKey("System.AreaPath"))
+                {
+                    var areaPath = Fields["System.AreaPath"]?.ToString();
+                    if (!string.IsNullOrEmpty(areaPath) && areaPath.Contains("\\"))
+                    {
+                        item.Area = areaPath.Split("\\").LastOrDefault();
+                    }
+                    else if (!string.IsNullOrEmpty(areaPath))
+                    {
+                        item.Area = areaPath;
+                    }
+                }
+
                 // Extract assigned to user name
                 if (Fields.ContainsKey("System.AssignedTo"))
                 {
@@ -97,6 +111,41 @@ namespace Sdo.Services
 
                 // Comments count is typically in comments section, defaulting to 0
                 item.CommentCount = 0;
+
+                // Extract acceptance criteria
+                if (Fields.ContainsKey("Microsoft.VSTS.Common.AcceptanceCriteria"))
+                {
+                    var acceptanceCriteria = Fields["Microsoft.VSTS.Common.AcceptanceCriteria"]?.ToString();
+                    if (!string.IsNullOrEmpty(acceptanceCriteria))
+                    {
+                        item.AcceptanceCriteria = acceptanceCriteria;
+                    }
+                }
+
+                // Extract parent work item ID
+                if (Fields.ContainsKey("System.Parent"))
+                {
+                    var parentField = Fields["System.Parent"];
+                    if (parentField != null)
+                    {
+                        // Try to parse as integer or from JsonElement
+                        if (parentField is JsonElement jElement)
+                        {
+                            if (jElement.ValueKind == JsonValueKind.Number)
+                            {
+                                item.ParentId = jElement.GetInt32();
+                            }
+                            else if (jElement.ValueKind == JsonValueKind.String && int.TryParse(jElement.GetString(), out var parentId))
+                            {
+                                item.ParentId = parentId;
+                            }
+                        }
+                        else if (int.TryParse(parentField.ToString(), out var parentId))
+                        {
+                            item.ParentId = parentId;
+                        }
+                    }
+                }
             }
 
             return item;
