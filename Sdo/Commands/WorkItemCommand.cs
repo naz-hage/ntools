@@ -17,6 +17,7 @@ using Sdo.Services;
 using Sdo.Models;
 using Sdo.Mapping;
 using Sdo.Utilities;
+using NbuildTasks;
 
 namespace Sdo.Commands
 {
@@ -46,6 +47,7 @@ namespace Sdo.Commands
             AddCreateCommand(verboseOption);
             AddListCommand(verboseOption);
             AddShowCommand(verboseOption);
+            AddStartCommand(verboseOption);
             AddUpdateCommand(verboseOption);
         }
 
@@ -155,6 +157,30 @@ namespace Sdo.Commands
             });
 
             Subcommands.Add(updateCommand);
+        }
+
+        /// <summary>
+        /// Adds the 'start' subcommand to initialize a work item branch.
+        /// </summary>
+        /// <param name="verboseOption">The global verbose option.</param>
+        private void AddStartCommand(Option<bool> verboseOption)
+        {
+            var startCommand = new Command("start", "Start work on a work item by creating a feature branch and PR template");
+
+            var idArgument = new Argument<int>("id") { Description = "Work item ID (required)" };
+
+            startCommand.Add(idArgument);
+            startCommand.Add(verboseOption);
+
+            startCommand.SetAction(async (parseResult) =>
+            {
+                var id = parseResult.GetValue(idArgument);
+                var verbose = parseResult.GetValue(verboseOption);
+
+                return await StartWorkItem(id, verbose);
+            });
+
+            Subcommands.Add(startCommand);
         }
 
         /// <summary>
@@ -1868,6 +1894,279 @@ namespace Sdo.Commands
             {
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Handles starting work on a work item by creating a feature branch and PR template.
+        /// Validates all conditions first before making any changes to the repository.
+        /// </summary>
+        /// <param name="id">The work item ID.</param>
+        /// <param name="verbose">Whether to enable verbose output.</param>
+        /// <returns>Exit code.</returns>
+        private async Task<int> StartWorkItem(int id, bool verbose)
+        {
+            try
+            {
+                if (verbose)
+                {
+                    ConsoleHelper.WriteLine($"Starting work on work item {id}...", ConsoleColor.Green);
+                }
+
+                // ===== VALIDATION PHASE (no repository changes) =====
+                if (verbose)
+                {
+                    ConsoleHelper.WriteLine("\n=== VALIDATION PHASE ===", ConsoleColor.Cyan);
+                }
+
+                // Validate: ID must be positive
+                if (id <= 0)
+                {
+                    ConsoleHelper.WriteLine("X Work item ID must be positive", ConsoleColor.Red);
+                    return 1;
+                }
+                if (verbose) ConsoleHelper.WriteLine("✓ Work item ID is valid", ConsoleColor.Yellow);
+
+                // Validate: Detect platform
+                if (verbose) ConsoleHelper.WriteLine("\nValidating: Platform Detection", ConsoleColor.Cyan);
+                var platform = _platformDetector.DetectPlatform();
+                if (verbose)
+                {
+                    ConsoleHelper.WriteLine($"✓ Detected platform: {platform}", ConsoleColor.Yellow);
+                }
+
+                // Validate: Platform-specific prerequisites
+                string? workItemTitle = null;
+                if (platform == Platform.GitHub)
+                {
+                    if (verbose) ConsoleHelper.WriteLine("\nValidating: GitHub Prerequisites", ConsoleColor.Cyan);
+                    
+                    var repoInfo = _platformDetector.GetRepositoryInfo();
+                    if (repoInfo == null || repoInfo.Owner == null || repoInfo.Repo == null)
+                    {
+                        ConsoleHelper.WriteLine("X Could not determine GitHub repository from Git remote", ConsoleColor.Red);
+                        return 1;
+                    }
+                    if (verbose) ConsoleHelper.WriteLine($"✓ Repository: {repoInfo.Owner}/{repoInfo.Repo}", ConsoleColor.Yellow);
+
+                    var token = await GetAuthenticationTokenAsync(Platform.GitHub);
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
+                        return 1;
+                    }
+                    if (verbose) ConsoleHelper.WriteLine("✓ GitHub authentication token found", ConsoleColor.Yellow);
+
+                    using var client = new GitHubClient(token);
+                    var issue = await client.GetIssueAsync(repoInfo.Owner!, repoInfo.Repo!, id);
+                    if (issue == null)
+                    {
+                        ConsoleHelper.WriteLine($"X GitHub issue #{id} not found", ConsoleColor.Red);
+                        return 1;
+                    }
+                    workItemTitle = issue.Title;
+                    if (verbose) ConsoleHelper.WriteLine($"✓ Issue found: {workItemTitle}", ConsoleColor.Yellow);
+                }
+                else if (platform == Platform.AzureDevOps)
+                {
+                    if (verbose) ConsoleHelper.WriteLine("\nValidating: Azure DevOps Prerequisites", ConsoleColor.Cyan);
+                    
+                    var pat = await GetAuthenticationTokenAsync(Platform.AzureDevOps);
+                    if (string.IsNullOrEmpty(pat))
+                    {
+                        ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
+                        return 1;
+                    }
+                    if (verbose) ConsoleHelper.WriteLine("✓ Azure DevOps authentication token found", ConsoleColor.Yellow);
+
+                    var organization = _platformDetector.GetOrganization();
+                    if (string.IsNullOrEmpty(organization))
+                    {
+                        ConsoleHelper.WriteLine("X Could not determine Azure DevOps organization", ConsoleColor.Red);
+                        return 1;
+                    }
+                    if (verbose) ConsoleHelper.WriteLine($"✓ Organization: {organization}", ConsoleColor.Yellow);
+
+                    var project = _platformDetector.GetProject();
+                    using var client = new AzureDevOpsClient(pat, organization, project);
+                    var workItem = await client.GetWorkItemAsync(id);
+                    if (workItem == null)
+                    {
+                        ConsoleHelper.WriteLine($"X Work item {id} not found", ConsoleColor.Red);
+                        return 1;
+                    }
+                    workItemTitle = workItem.Title;
+                    if (verbose) ConsoleHelper.WriteLine($"✓ Work item found: {workItemTitle}", ConsoleColor.Yellow);
+                }
+                else
+                {
+                    ConsoleHelper.WriteLine("X Unsupported platform detected", ConsoleColor.Red);
+                    return 1;
+                }
+
+                // Validate: Work item has title
+                if (string.IsNullOrEmpty(workItemTitle))
+                {
+                    ConsoleHelper.WriteLine($"X Work item {id} has no title", ConsoleColor.Red);
+                    return 1;
+                }
+
+                // Validate: Create branch name
+                if (verbose) ConsoleHelper.WriteLine("\nValidating: Branch Name", ConsoleColor.Cyan);
+                var branchName = CreateBranchName(id, workItemTitle);
+                if (verbose) ConsoleHelper.WriteLine($"✓ Branch name valid: {branchName}", ConsoleColor.Yellow);
+
+                // Validate: PR template exists
+                if (verbose) ConsoleHelper.WriteLine("\nValidating: PR Template", ConsoleColor.Cyan);
+                string prTemplatePath = GetPullRequestTemplatePath(platform);
+                if (string.IsNullOrEmpty(prTemplatePath))
+                {
+                    ConsoleHelper.WriteLine($"X Unable to determine PR template path for platform {platform}", ConsoleColor.Red);
+                    return 1;
+                }
+                if (!File.Exists(prTemplatePath))
+                {
+                    ConsoleHelper.WriteLine($"X Pull request template not found at: {prTemplatePath}", ConsoleColor.Red);
+                    ConsoleHelper.WriteLine($"", ConsoleColor.Red);
+                    ConsoleHelper.WriteLine($"Expected one of:", ConsoleColor.Red);
+                    ConsoleHelper.WriteLine($"  - .github/PULL_REQUEST_TEMPLATE/pull_request_template.md (GitHub)", ConsoleColor.Red);
+                    ConsoleHelper.WriteLine($"  - .azuredevops/PULL_REQUEST_TEMPLATE.md (Azure DevOps)", ConsoleColor.Red);
+                    return 1;
+                }
+                if (verbose) ConsoleHelper.WriteLine($"✓ PR template found: {prTemplatePath}", ConsoleColor.Yellow);
+
+                // Validate: .temp directory can be created/accessed
+                if (verbose) ConsoleHelper.WriteLine("\nValidating: .temp Directory", ConsoleColor.Cyan);
+                var tempDir = ".temp";
+                try
+                {
+                    if (!Directory.Exists(tempDir))
+                    {
+                        Directory.CreateDirectory(tempDir);
+                    }
+                    if (verbose) ConsoleHelper.WriteLine($"✓ .temp directory accessible", ConsoleColor.Yellow);
+                }
+                catch (Exception ex)
+                {
+                    ConsoleHelper.WriteLine($"X Cannot access .temp directory: {ex.Message}", ConsoleColor.Red);
+                    return 1;
+                }
+
+                // Validate: Git is available and main branch exists
+                if (verbose) ConsoleHelper.WriteLine("\nValidating: Git Environment", ConsoleColor.Cyan);
+                var gitWrapper = new GitWrapper(verbose: verbose);
+                
+                if (!gitWrapper.BranchExists("main"))
+                {
+                    ConsoleHelper.WriteLine("X Main branch not found in repository", ConsoleColor.Red);
+                    return 1;
+                }
+                if (verbose) ConsoleHelper.WriteLine("✓ Main branch exists", ConsoleColor.Yellow);
+
+                // ===== EXECUTION PHASE (all validations passed) =====
+                if (verbose)
+                {
+                    ConsoleHelper.WriteLine("\n=== EXECUTION PHASE ===", ConsoleColor.Cyan);
+                }
+
+                // Switch to main branch
+                if (verbose) ConsoleHelper.WriteLine("\nStep 1: Switching to main branch", ConsoleColor.Cyan);
+                if (!gitWrapper.CheckoutBranch("main"))
+                {
+                    ConsoleHelper.WriteLine("X Failed to switch to main branch", ConsoleColor.Red);
+                    return 1;
+                }
+                if (verbose) ConsoleHelper.WriteLine("✓ Switched to main branch", ConsoleColor.Yellow);
+
+                // Git sync (pull latest)
+                if (verbose) ConsoleHelper.WriteLine("\nStep 2: Syncing with remote", ConsoleColor.Cyan);
+                if (!gitWrapper.PullWithRebase())
+                {
+                    ConsoleHelper.WriteLine("⚠ Git pull encountered an issue, but continuing...", ConsoleColor.Yellow);
+                }
+                if (verbose) ConsoleHelper.WriteLine("✓ Repository synchronized", ConsoleColor.Yellow);
+
+                // Create feature branch
+                if (verbose) ConsoleHelper.WriteLine("\nStep 3: Creating feature branch", ConsoleColor.Cyan);
+                if (!gitWrapper.CheckoutBranch(branchName, create: true))
+                {
+                    ConsoleHelper.WriteLine($"X Failed to create branch {branchName}", ConsoleColor.Red);
+                    return 1;
+                }
+                if (verbose) ConsoleHelper.WriteLine($"✓ Created feature branch: {branchName}", ConsoleColor.Yellow);
+
+                // Copy PR template
+                if (verbose) ConsoleHelper.WriteLine("\nStep 4: Copying PR template", ConsoleColor.Cyan);
+                string prMessageFile = Path.Combine(tempDir, $"{id}-pr-message.md");
+                try
+                {
+                    File.Copy(prTemplatePath, prMessageFile, overwrite: true);
+                    if (verbose) ConsoleHelper.WriteLine($"✓ Copied PR template to {prMessageFile}", ConsoleColor.Yellow);
+                }
+                catch (Exception ex)
+                {
+                    ConsoleHelper.WriteLine($"X Failed to copy PR template: {ex.Message}", ConsoleColor.Red);
+                    return 1;
+                }
+
+                // Success!
+                Console.WriteLine();
+                ConsoleHelper.WriteLine($"✓ Work item {id} ready for development", ConsoleColor.Green);
+                ConsoleHelper.WriteLine($"  Branch: {branchName}", ConsoleColor.Green);
+                ConsoleHelper.WriteLine($"  PR Message: {prMessageFile}", ConsoleColor.Green);
+                Console.WriteLine();
+                ConsoleHelper.WriteLine("Next steps:", ConsoleColor.Cyan);
+                ConsoleHelper.WriteLine($"  1. Implement changes for work item {id}", ConsoleColor.Cyan);
+                ConsoleHelper.WriteLine($"  2. Commit your changes to the {branchName} branch", ConsoleColor.Cyan);
+                ConsoleHelper.WriteLine($"  3. Edit {prMessageFile} with PR details (optional)", ConsoleColor.Cyan);
+                ConsoleHelper.WriteLine($"  4. Run: sdo pr create", ConsoleColor.Cyan);
+
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                ConsoleHelper.WriteLine($"X Error: {ex.Message}", ConsoleColor.Red);
+                if (verbose)
+                {
+                    ConsoleHelper.WriteLine($"Stack trace: {ex.StackTrace}", ConsoleColor.Red);
+                }
+                return 1;
+            }
+        }
+
+        /// <summary>
+        /// Creates a branch name from work item ID and title.
+        /// Format: <id>-<slugified-title>
+        /// </summary>
+        private string CreateBranchName(int id, string title)
+        {
+            // Slugify the title: lowercase, replace spaces and special chars with hyphens
+            var slug = System.Text.RegularExpressions.Regex.Replace(title, @"[^a-z0-9\s-]", "", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            slug = System.Text.RegularExpressions.Regex.Replace(slug, @"\s+", "-").ToLowerInvariant();
+            slug = System.Text.RegularExpressions.Regex.Replace(slug, @"-+", "-").Trim('-');
+            
+            // Limit slug length to avoid excessively long branch names
+            if (slug.Length > 50)
+            {
+                slug = slug.Substring(0, 50).TrimEnd('-');
+            }
+
+            return $"{id}-{slug}";
+        }
+
+        /// <summary>
+        /// Gets the path to the pull request template for the current platform.
+        /// </summary>
+        private string GetPullRequestTemplatePath(Platform platform)
+        {
+            if (platform == Platform.GitHub)
+            {
+                return Path.Combine(".github", "PULL_REQUEST_TEMPLATE", "pull_request_template.md");
+            }
+            else if (platform == Platform.AzureDevOps)
+            {
+                return Path.Combine(".azuredevops", "PULL_REQUEST_TEMPLATE.md");
+            }
+            return string.Empty;
         }
     }
 }

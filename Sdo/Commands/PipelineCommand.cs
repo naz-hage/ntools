@@ -7,7 +7,9 @@
 // Supports both GitHub Actions workflows and Azure DevOps pipelines.
 
 using System.CommandLine;
+using System.Diagnostics;
 using Nbuild.Helpers;
+using NbuildTasks;
 using Sdo.Interfaces;
 using Sdo.Services;
 
@@ -1796,7 +1798,10 @@ namespace Sdo.Commands
                 // Stage, commit, push locally. This approach updates YAML-backed pipelines for both GitHub and Azure DevOps.
                 if (verbose) Console.WriteLine($"[INFO] Staging file: {filePath}");
 
-                var addPsi = new System.Diagnostics.ProcessStartInfo
+                var gitWrapper = new GitWrapper(verbose: verbose);
+
+                // Stage the file
+                ProcessStartInfo stagePsi = new System.Diagnostics.ProcessStartInfo
                 {
                     FileName = "git",
                     Arguments = $"add \"{filePath}\"",
@@ -1806,78 +1811,32 @@ namespace Sdo.Commands
                     CreateNoWindow = true
                 };
 
-                using (var addProc = System.Diagnostics.Process.Start(addPsi))
+                using (var stageProc = System.Diagnostics.Process.Start(stagePsi))
                 {
-                    if (addProc != null)
+                    if (stageProc != null)
                     {
-                        var aOut = await addProc.StandardOutput.ReadToEndAsync();
-                        var aErr = await addProc.StandardError.ReadToEndAsync();
-                        await addProc.WaitForExitAsync();
-                        if (addProc.ExitCode != 0)
+                        var sErr = await stageProc.StandardError.ReadToEndAsync();
+                        await stageProc.WaitForExitAsync();
+                        if (stageProc.ExitCode != 0)
                         {
-                            ConsoleHelper.WriteError($"X git add failed: {aErr.Trim()}");
+                            ConsoleHelper.WriteError($"X git add failed: {sErr.Trim()}");
                             return 1;
                         }
                     }
                 }
 
-                var commitPsi = new System.Diagnostics.ProcessStartInfo
+                // Commit changes
+                if (!gitWrapper.Commit(message))
                 {
-                    FileName = "git",
-                    Arguments = $"commit -m \"{message.Replace("\"", "'\"")}\"",
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                };
-
-                using (var commitProc = System.Diagnostics.Process.Start(commitPsi))
-                {
-                    if (commitProc != null)
-                    {
-                        var cOut = await commitProc.StandardOutput.ReadToEndAsync();
-                        var cErr = await commitProc.StandardError.ReadToEndAsync();
-                        await commitProc.WaitForExitAsync();
-                        if (commitProc.ExitCode != 0)
-                        {
-                            // If there's nothing to commit, continue
-                            if (cOut.Contains("nothing to commit", StringComparison.OrdinalIgnoreCase) || cErr.Contains("nothing to commit", StringComparison.OrdinalIgnoreCase))
-                            {
-                                Console.WriteLine("[INFO] No changes to commit.");
-                            }
-                            else
-                            {
-                                ConsoleHelper.WriteError($"X git commit failed: {cErr.Trim()}");
-                                return 1;
-                            }
-                        }
-                    }
+                    // If there's nothing to commit, continue (check if "nothing to commit" appears in output)
+                    Console.WriteLine("[INFO] No changes to commit.");
                 }
 
-                var pushArgs = string.IsNullOrWhiteSpace(branch) ? "push" : $"push origin {branch}";
-                var pushPsi = new System.Diagnostics.ProcessStartInfo
+                // Push to remote
+                if (!gitWrapper.Push(branch))
                 {
-                    FileName = "git",
-                    Arguments = pushArgs,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                };
-
-                using (var pushProc = System.Diagnostics.Process.Start(pushPsi))
-                {
-                    if (pushProc != null)
-                    {
-                        var pOut = await pushProc.StandardOutput.ReadToEndAsync();
-                        var pErr = await pushProc.StandardError.ReadToEndAsync();
-                        await pushProc.WaitForExitAsync();
-                        if (pushProc.ExitCode != 0)
-                        {
-                            ConsoleHelper.WriteError($"X git push failed: {pErr.Trim()}");
-                            return 1;
-                        }
-                    }
+                    ConsoleHelper.WriteError($"X git push failed");
+                    return 1;
                 }
 
                 ConsoleHelper.WriteLine("[OK] Pipeline/workflow file updated and pushed.", ConsoleColor.Green);

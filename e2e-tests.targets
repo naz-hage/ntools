@@ -18,6 +18,21 @@
 		<Message Text="No log file found to delete" Importance="High" Condition="'@(DeletedFiles)' == ''" />
 	</Target>
 
+	<!-- Clean up local branches in test repositories using PowerShell -->
+	<Target Name="CLEANUP_TEST_BRANCHES">
+		<Message Text="Cleaning up local branches in test repositories..." Importance="high" />
+		
+		<!-- GitHub test repo (c:\prog\naz) -->
+		<Message Text="Checking GitHub test repo (c:\prog\naz)..." Importance="high" />
+		<Exec Command="powershell -Command &quot;if (Test-Path 'c:\prog\naz\.git') { cd 'c:\prog\naz'; Write-Host 'GitHub repo found'; git checkout main 2>$null; git for-each-ref --format='%(refname:short)' refs/heads | Where-Object {$_ -ne 'main'} | ForEach-Object { git branch -D $_ 2>$null } | Out-Null; Write-Host 'Cleaned GitHub repo' } else { Write-Host 'GitHub repo not found at c:\prog\naz' }&quot;" ContinueOnError="true" />
+		
+		<!-- Azure DevOps test repo (c:\source\ConsoleApp1) -->
+		<Message Text="Checking Azure DevOps test repo (c:\source\ConsoleApp1)..." Importance="high" />
+		<Exec Command="powershell -Command &quot;if (Test-Path 'c:\source\ConsoleApp1\.git') { cd 'c:\source\ConsoleApp1'; Write-Host 'Azure DevOps repo found'; git checkout main 2>$null; git for-each-ref --format='%(refname:short)' refs/heads | Where-Object {$_ -ne 'main'} | ForEach-Object { git branch -D $_ 2>$null } | Out-Null; Write-Host 'Cleaned Azure DevOps repo' } else { Write-Host 'Azure DevOps repo not found at c:\source\ConsoleApp1' }&quot;" ContinueOnError="true" />
+		
+		<Message Text="✓ Test repositories cleaned and ready" Importance="high" />
+	</Target>
+
 	<!-- Build test-framework library -->
 	<Target Name="BUILD_E2E_FRAMEWORK" DependsOnTargets="PROPERTIES">
 		<Message Text="Building test-framework library..." Importance="high" />
@@ -208,6 +223,56 @@
 		<Message Text="Test output log: $(E2ELogFile)" Importance="normal" />
 	</Target>
 
+	<!-- Run GitHub Work Item Start test -->
+	<Target Name="RUN_GITHUB_WI_START_TEST" DependsOnTargets="COPY_SDO_EXECUTABLE">
+		<Message Text="Running GitHub Work Item Start test..." Importance="high" />
+		<PropertyGroup>
+			<SdoE2eTestExe>$(SolutionDir)\sdo-e2e-test\bin\Debug\net10.0\sdo-e2e-test.exe</SdoE2eTestExe>
+		</PropertyGroup>
+		<Exec Command="$(SdoE2eTestExe) test --verbose --test-case Validate_GitHub_StartWorkOnIssue"
+		      WorkingDirectory="$(SolutionDir)"
+		      IgnoreExitCode="false"
+		      ContinueOnError="false"
+		      EnvironmentVariables="SOLUTION_DIR=$(SolutionDir)" />
+		<Message Text="✓ GitHub Work Item Start test completed" Importance="high" />
+	</Target>
+
+	<!-- Run GitHub Work Item Start with Verbose Mode test -->
+	<Target Name="RUN_GITHUB_WI_START_VERBOSE_TEST" DependsOnTargets="COPY_SDO_EXECUTABLE">
+		<Message Text="Running GitHub Work Item Start with Verbose Mode test..." Importance="high" />
+		<PropertyGroup>
+			<SdoE2eTestExe>$(SolutionDir)\sdo-e2e-test\bin\Debug\net10.0\sdo-e2e-test.exe</SdoE2eTestExe>
+		</PropertyGroup>
+		<Exec Command="$(SdoE2eTestExe) test --verbose --test-case Validate_GitHub_StartWithVerboseMode"
+		      WorkingDirectory="$(SolutionDir)"
+		      IgnoreExitCode="false"
+		      ContinueOnError="false"
+		      EnvironmentVariables="SOLUTION_DIR=$(SolutionDir)" />
+		<Message Text="✓ GitHub Work Item Start with Verbose Mode test completed" Importance="high" />
+	</Target>
+
+	<!-- Run GitHub Work Item Start with Invalid Issue ID test -->
+	<Target Name="RUN_GITHUB_WI_START_INVALID_ID_TEST" DependsOnTargets="COPY_SDO_EXECUTABLE">
+		<Message Text="Running GitHub Work Item Start with Invalid Issue ID test..." Importance="high" />
+		<PropertyGroup>
+			<SdoE2eTestExe>$(SolutionDir)\sdo-e2e-test\bin\Debug\net10.0\sdo-e2e-test.exe</SdoE2eTestExe>
+		</PropertyGroup>
+		<Exec Command="$(SdoE2eTestExe) test --verbose --test-case Validate_GitHub_StartWithInvalidIssueId"
+		      WorkingDirectory="$(SolutionDir)"
+		      IgnoreExitCode="false"
+		      ContinueOnError="false"
+		      EnvironmentVariables="SOLUTION_DIR=$(SolutionDir)" />
+		<Message Text="✓ GitHub Work Item Start with Invalid Issue ID test completed" Importance="high" />
+	</Target>
+
+	<!-- Main E2E GitHub Work Item Start Pipeline target - runs all GitHub work item start tests -->
+	<Target Name="E2E_GITHUB_WI_START" DependsOnTargets="ARTIFACTS;DELETE_E2E_LOG;RUN_GITHUB_WI_START_TEST;RUN_GITHUB_WI_START_VERBOSE_TEST;RUN_GITHUB_WI_START_INVALID_ID_TEST">
+		<Message Text="======================================" Importance="high" />
+		<Message Text="✓ All GitHub Work Item Start tests completed successfully" Importance="high" />
+		<Message Text="======================================" Importance="high" />
+		<Message Text="Test output log: $(E2ELogFile)" Importance="normal" />
+	</Target>
+
 	<!-- Run Azure DevOps Work Item Create Bug test -->
 	<Target Name="RUN_AZDO_WI_CREATE_BUG_TEST" DependsOnTargets="COPY_SDO_EXECUTABLE">
 		<Message Text="Running Azure DevOps Work Item Create Bug test..." Importance="high" />
@@ -278,10 +343,60 @@
 		<Message Text="✓ Azure DevOps Work Item Create Type Verification test completed" Importance="high" />
 	</Target>
 
+	<!-- Run Azure DevOps Work Item Create Parent ID Verification test -->
+	<Target Name="RUN_AZDO_WI_CREATE_PARENT_ID_TEST" DependsOnTargets="COPY_SDO_EXECUTABLE">
+		<Message Text="Running Azure DevOps Work Item Create Parent ID Verification test..." Importance="high" />
+		<PropertyGroup>
+			<SdoE2eTestExe>$(SolutionDir)\sdo-e2e-test\bin\Debug\net10.0\sdo-e2e-test.exe</SdoE2eTestExe>
+		</PropertyGroup>
+		<Exec Command="$(SdoE2eTestExe) test --verbose --test-case Validate_AzureDevOps_CreatedWorkItemHasCorrectParentId"
+		      WorkingDirectory="$(SolutionDir)"
+		      IgnoreExitCode="false"
+		      ContinueOnError="false"
+		      EnvironmentVariables="SOLUTION_DIR=$(SolutionDir)" />
+		<Message Text="✓ Azure DevOps Work Item Create Parent ID Verification test completed" Importance="high" />
+	</Target>
+
 	<!-- Main E2E Azure DevOps Work Item Creation Pipeline target - runs all Azure DevOps work item creation tests -->
-	<Target Name="E2E_AZDO_WI_CREATE" DependsOnTargets="ARTIFACTS;DELETE_E2E_LOG;RUN_AZDO_WI_CREATE_BUG_TEST;RUN_AZDO_WI_CREATE_EPIC_TEST;RUN_AZDO_WI_CREATE_PBI_TEST;RUN_AZDO_WI_CREATE_TASK_TEST;RUN_AZDO_WI_CREATE_TYPE_TEST">
+	<Target Name="E2E_AZDO_WI_CREATE" DependsOnTargets="ARTIFACTS;DELETE_E2E_LOG;RUN_AZDO_WI_CREATE_BUG_TEST;RUN_AZDO_WI_CREATE_EPIC_TEST;RUN_AZDO_WI_CREATE_PBI_TEST;RUN_AZDO_WI_CREATE_TASK_TEST;RUN_AZDO_WI_CREATE_TYPE_TEST;RUN_AZDO_WI_CREATE_PARENT_ID_TEST">
 		<Message Text="======================================" Importance="high" />
 		<Message Text="✓ All Azure DevOps Work Item Creation tests completed successfully" Importance="high" />
+		<Message Text="======================================" Importance="high" />
+		<Message Text="Test output log: $(E2ELogFile)" Importance="normal" />
+	</Target>
+
+	<!-- Run Azure DevOps Work Item Start test -->
+	<Target Name="RUN_AZDO_WI_START_TEST" DependsOnTargets="COPY_SDO_EXECUTABLE">
+		<Message Text="Running Azure DevOps Work Item Start test..." Importance="high" />
+		<PropertyGroup>
+			<SdoE2eTestExe>$(SolutionDir)\sdo-e2e-test\bin\Debug\net10.0\sdo-e2e-test.exe</SdoE2eTestExe>
+		</PropertyGroup>
+		<Exec Command="$(SdoE2eTestExe) test --verbose --test-case Validate_AzureDevOps_StartWorkOnItem"
+		      WorkingDirectory="$(SolutionDir)"
+		      IgnoreExitCode="false"
+		      ContinueOnError="false"
+		      EnvironmentVariables="SOLUTION_DIR=$(SolutionDir)" />
+		<Message Text="✓ Azure DevOps Work Item Start test completed" Importance="high" />
+	</Target>
+
+	<!-- Run Azure DevOps Work Item Start Branch Naming Convention test -->
+	<Target Name="RUN_AZDO_WI_START_BRANCH_NAMING_TEST" DependsOnTargets="COPY_SDO_EXECUTABLE">
+		<Message Text="Running Azure DevOps Work Item Start Branch Naming Convention test..." Importance="high" />
+		<PropertyGroup>
+			<SdoE2eTestExe>$(SolutionDir)\sdo-e2e-test\bin\Debug\net10.0\sdo-e2e-test.exe</SdoE2eTestExe>
+		</PropertyGroup>
+		<Exec Command="$(SdoE2eTestExe) test --verbose --test-case Validate_AzureDevOps_BranchNamingConvention"
+		      WorkingDirectory="$(SolutionDir)"
+		      IgnoreExitCode="false"
+		      ContinueOnError="false"
+		      EnvironmentVariables="SOLUTION_DIR=$(SolutionDir)" />
+		<Message Text="✓ Azure DevOps Work Item Start Branch Naming Convention test completed" Importance="high" />
+	</Target>
+
+	<!-- Main E2E Azure DevOps Work Item Start Pipeline target - runs all Azure DevOps work item start tests -->
+	<Target Name="E2E_AZDO_WI_START" DependsOnTargets="ARTIFACTS;DELETE_E2E_LOG;RUN_AZDO_WI_START_TEST;RUN_AZDO_WI_START_BRANCH_NAMING_TEST">
+		<Message Text="======================================" Importance="high" />
+		<Message Text="✓ All Azure DevOps Work Item Start tests completed successfully" Importance="high" />
 		<Message Text="======================================" Importance="high" />
 		<Message Text="Test output log: $(E2ELogFile)" Importance="normal" />
 	</Target>
@@ -347,25 +462,25 @@
 	</Target>
 
 	<!-- Main E2E GitHub Work Items Pipeline target - runs all GitHub work item tests -->
-	<Target Name="E2E_GITHUB_WI" DependsOnTargets="ARTIFACTS;DELETE_E2E_LOG;RUN_GITHUB_WI_LIST_USERS_TEST;RUN_GITHUB_WI_LIST_ALL_TEST;RUN_GITHUB_WI_ASSIGNED_TO_ME_TEST">
+	<Target Name="E2E_GITHUB_WI" DependsOnTargets="ARTIFACTS;DELETE_E2E_LOG;RUN_GITHUB_WI_LIST_USERS_TEST;RUN_GITHUB_WI_LIST_ALL_TEST;RUN_GITHUB_WI_ASSIGNED_TO_ME_TEST;RUN_GITHUB_WI_START_TEST;RUN_GITHUB_WI_START_VERBOSE_TEST;RUN_GITHUB_WI_START_INVALID_ID_TEST">
 		<Message Text="======================================" Importance="high" />
-		<Message Text="✓ All GitHub Work Item tests completed successfully" Importance="high" />
+		<Message Text="✓ All GitHub Work Item tests (list + start) completed successfully" Importance="high" />
 		<Message Text="======================================" Importance="high" />
 		<Message Text="Test output log: $(E2ELogFile)" Importance="normal" />
 	</Target>
 
 	<!-- Main E2E Azure DevOps Work Items Pipeline target - runs all Azure DevOps work item tests -->
-	<Target Name="E2E_AZDO_WI" DependsOnTargets="ARTIFACTS;DELETE_E2E_LOG;RUN_AZDO_WI_LIST_USERS_TEST;RUN_AZDO_WI_LIST_ALL_TEST;RUN_AZDO_WI_ASSIGNED_TO_ME_TEST">
+	<Target Name="E2E_AZDO_WI" DependsOnTargets="ARTIFACTS;DELETE_E2E_LOG;RUN_AZDO_WI_LIST_USERS_TEST;RUN_AZDO_WI_LIST_ALL_TEST;RUN_AZDO_WI_ASSIGNED_TO_ME_TEST;RUN_AZDO_WI_START_TEST;RUN_AZDO_WI_START_BRANCH_NAMING_TEST">
 		<Message Text="======================================" Importance="high" />
-		<Message Text="✓ All Azure DevOps Work Item tests completed successfully" Importance="high" />
+		<Message Text="✓ All Azure DevOps Work Item tests (list + start) completed successfully" Importance="high" />
 		<Message Text="======================================" Importance="high" />
 		<Message Text="Test output log: $(E2ELogFile)" Importance="normal" />
 	</Target>
 
 	<!-- Main E2E Work Items Pipeline target - runs all work item tests for both platforms -->
-	<Target Name="E2E_WI" DependsOnTargets="E2E_GITHUB_WI;E2E_AZDO_WI">
+	<Target Name="E2E_WI" DependsOnTargets="E2E_GITHUB_WI;E2E_AZDO_WI;E2E_WI_CREATE">
 		<Message Text="======================================" Importance="high" />
-		<Message Text="✓ All Work Item tests (GitHub + Azure DevOps) completed successfully" Importance="high" />
+		<Message Text="✓ All Work Item tests (list + start + create) for GitHub + Azure DevOps completed successfully" Importance="high" />
 		<Message Text="======================================" Importance="high" />
 		<Message Text="Test output log: $(E2ELogFile)" Importance="normal" />
 	</Target>
@@ -378,10 +493,16 @@
 		<Message Text="Test output log: $(E2ELogFile)" Importance="normal" />
 	</Target>
 
-	<!-- Main E2E target - builds and runs all E2E tests -->
-	<Target Name="E2E" DependsOnTargets="ARTIFACTS;DELETE_E2E_LOG;RUN_SDO_E2E_TESTS">
+	<!-- Main E2E target - builds and runs all E2E tests via sdo-e2e-test CLI -->
+	<Target Name="E2E" DependsOnTargets="COPY_SDO_EXECUTABLE;DELETE_E2E_LOG;CLEANUP_TEST_BRANCHES">
 		<Message Text="======================================" Importance="high" />
-		<Message Text="✓ All E2E tests completed successfully" Importance="high" />
+		<Message Text="Running all E2E tests via sdo-e2e-test CLI..." Importance="high" />
+		<Message Text="======================================" Importance="high" />
+		<Exec Command="dotnet run --project sdo-e2e-test\sdo-e2e-test.csproj --configuration Debug -- test --verbose --log-file $(E2ELogFile)"
+		      WorkingDirectory="$(SolutionDir)"
+		      ContinueOnError="false" />
+		<Message Text="======================================" Importance="high" />
+		<Message Text="✓ All E2E tests completed successfully (23 total tests)" Importance="high" />
 		<Message Text="======================================" Importance="high" />
 		<Message Text="Test output log: $(E2ELogFile)" Importance="normal" />
 	</Target>

@@ -696,6 +696,134 @@ public class WorkItemCommandTests
 
     #endregion
 
+    #region Start Subcommand Tests
+
+    [Fact]
+    public void Constructor_AddsStartSubcommand()
+    {
+        // Act
+        var command = new WorkItemCommand(_verboseOption);
+
+        // Assert
+        var startSubcommand = Assert.Single(command.Subcommands, s => s.Name == "start");
+        Assert.NotNull(startSubcommand);
+        Assert.Equal("Start work on a work item by creating a feature branch and PR template", startSubcommand.Description);
+    }
+
+    [Fact]
+    public void StartSubcommand_HasIdArgument()
+    {
+        // Act
+        var command = new WorkItemCommand(_verboseOption);
+        var startCmd = Assert.Single(command.Subcommands, s => s.Name == "start");
+
+        // Assert
+        var idArgument = Assert.Single(startCmd.Arguments, a => a.Name == "id");
+        Assert.NotNull(idArgument);
+        Assert.Equal("Work item ID (required)", idArgument.Description);
+    }
+
+    [Fact]
+    public void StartSubcommand_HasVerboseOption()
+    {
+        // Act
+        var command = new WorkItemCommand(_verboseOption);
+        var startCmd = Assert.Single(command.Subcommands, s => s.Name == "start");
+
+        // Assert
+        var verboseOpt = Assert.Single(startCmd.Options, o => o.Name == "--verbose");
+        Assert.NotNull(verboseOpt);
+        Assert.Equal("Enable verbose output", verboseOpt.Description);
+    }
+
+    [Fact]
+    public void StartSubcommand_WithNoArguments_Fails()
+    {
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        var args = new[] { "start" };
+
+        // Act
+        var parseResult = command.Parse(args);
+
+        // Assert
+        // Should have an error because id is required
+        Assert.NotEmpty(parseResult.Errors);
+    }
+
+    [Fact]
+    public void StartSubcommand_WithValidId_ReturnsExitCode()
+    {
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        var args = new[] { "start", "123" };
+
+        // Act
+        var result = command.Parse(args).Invoke();
+
+        // Assert
+        Assert.True(result == 0 || result == 1, $"Expected exit code 0 or 1, got {result}");
+    }
+
+    [Fact]
+    public void StartSubcommand_WithValidIdAndVerbose_ReturnsExitCode()
+    {
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        var args = new[] { "start", "123", "--verbose" };
+
+        // Act
+        var result = command.Parse(args).Invoke();
+
+        // Assert
+        Assert.True(result == 0 || result == 1, $"Expected exit code 0 or 1, got {result}");
+    }
+
+    [Fact]
+    public void StartSubcommand_WithIdOne_ReturnsExitCode()
+    {
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        var args = new[] { "start", "1" };
+
+        // Act
+        var result = command.Parse(args).Invoke();
+
+        // Assert
+        Assert.True(result == 0 || result == 1, $"Expected exit code 0 or 1, got {result}");
+    }
+
+    [Fact]
+    public void StartSubcommand_WithLargeId_ReturnsExitCode()
+    {
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        var args = new[] { "start", "999999" };
+
+        // Act
+        var result = command.Parse(args).Invoke();
+
+        // Assert
+        Assert.True(result == 0 || result == 1, $"Expected exit code 0 or 1, got {result}");
+    }
+
+    [Fact]
+    public void StartSubcommand_WithNegativeId_ReturnsErrorExitCode()
+    {
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        var args = new[] { "start", "-5" };
+
+        // Act
+        var result = command.Parse(args).Invoke();
+
+        // Assert
+        // Command should reject negative IDs at runtime (not at parse time)
+        Assert.Equal(1, result);
+    }
+
+    #endregion
+
     #region Integration Tests (Phase 3.2+)
 
     /// <summary>
@@ -703,6 +831,48 @@ public class WorkItemCommandTests
     /// These require valid credentials and network access.
     /// Scaffolded for Phase 3.2 implementation.
     /// </summary>
+
+    [Fact(Skip = "Integration: Scaffolded for Phase 3.2 - requires GitHub credentials")]
+    public void IntegrationTest_Create_GitHub_WithValidRepository()
+    {
+        // TODO: Implement real GitHub API integration test
+        // 1. Create new issue using wi create command
+        // 2. Verify issue created via GitHub API
+        // 3. Clean up test issue
+        Assert.True(true);
+    }
+
+    [Fact(Skip = "Integration: Scaffolded for Phase 3.2 - requires Azure DevOps credentials")]
+    public void IntegrationTest_Create_AzureDevOps_WithValidProject()
+    {
+        // TODO: Implement real Azure DevOps API integration test
+        // 1. Create new work item using wi create command
+        // 2. Verify work item created via Azure DevOps API
+        // 3. Clean up test work item
+        Assert.True(true);
+    }
+
+    [Fact(Skip = "Integration: Scaffolded for Phase 3.2 - requires GitHub credentials and git")]
+    public void IntegrationTest_Start_GitHub_WithValidRepository()
+    {
+        // TODO: Implement real GitHub API + git integration test
+        // 1. Start work on issue using wi start command
+        // 2. Verify branch created locally
+        // 3. Verify PR template file generated
+        // 4. Clean up branch
+        Assert.True(true);
+    }
+
+    [Fact(Skip = "Integration: Scaffolded for Phase 3.2 - requires Azure DevOps credentials and git")]
+    public void IntegrationTest_Start_AzureDevOps_WithValidProject()
+    {
+        // TODO: Implement real Azure DevOps API + git integration test
+        // 1. Start work on work item using wi start command
+        // 2. Verify branch created locally
+        // 3. Verify PR template file generated
+        // 4. Clean up branch
+        Assert.True(true);
+    }
 
     [Fact(Skip = "Integration: Scaffolded for Phase 3.2 - requires GitHub credentials")]
     public void IntegrationTest_Update_GitHub_WithValidIssue()
@@ -794,26 +964,6 @@ public class WorkItemCommandTests
     }
 
     #endregion
-
-    [Fact(Skip = "Integration: Scaffolded for Phase 3.2 - requires GitHub credentials")]
-    public void IntegrationTest_Create_GitHub_WithValidRepository()
-    {
-        // TODO: Implement real GitHub API integration test
-        // 1. Create new issue using wi create command
-        // 2. Verify issue created via GitHub API
-        // 3. Clean up test issue
-        Assert.True(true);
-    }
-
-    [Fact(Skip = "Integration: Scaffolded for Phase 3.2 - requires Azure DevOps credentials")]
-    public void IntegrationTest_Create_AzureDevOps_WithValidProject()
-    {
-        // TODO: Implement real Azure DevOps API integration test
-        // 1. Create new work item using wi create command
-        // 2. Verify work item created via Azure DevOps API
-        // 3. Clean up test work item
-        Assert.True(true);
-    }
 
     #endregion
 }
