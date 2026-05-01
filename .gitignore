@@ -424,3 +424,6 @@ docs/todo.md
 /test-workflow.yml
 /test-framework
 /sdo-e2e-test
+
+# Code coverage reports
+/CoverageReport/

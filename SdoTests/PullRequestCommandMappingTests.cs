@@ -43,9 +43,9 @@ namespace SdoTests
             var detField = platInstance.GetType().GetField("_detectedPlatform", BindingFlags.NonPublic | BindingFlags.Instance);
             var orgField = platInstance.GetType().GetField("_organization", BindingFlags.NonPublic | BindingFlags.Instance);
             var projField = platInstance.GetType().GetField("_project", BindingFlags.NonPublic | BindingFlags.Instance);
-            detField.SetValue(platInstance, Sdo.Interfaces.Platform.GitHub);
-            orgField.SetValue(platInstance, "ownerX");
-            projField.SetValue(platInstance, "repoY");
+            detField!.SetValue(platInstance, Sdo.Interfaces.Platform.GitHub);
+            orgField!.SetValue(platInstance, "ownerX");
+            projField!.SetValue(platInstance, "repoY");
 
             // Invoke private CreatePullRequest with dryRun=true and verbose=true
             var method = typeof(PullRequestCommand).GetMethod("CreatePullRequest", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -75,16 +75,16 @@ namespace SdoTests
 
             // Configure platform detector internals
             var platField = typeof(PullRequestCommand).GetField("_platformDetector", BindingFlags.NonPublic | BindingFlags.Instance);
-            var platInstance = platField.GetValue(cmd);
-            var detField = platInstance.GetType().GetField("_detectedPlatform", BindingFlags.NonPublic | BindingFlags.Instance);
+            var platInstance = platField!.GetValue(cmd);
+            var detField = platInstance!.GetType().GetField("_detectedPlatform", BindingFlags.NonPublic | BindingFlags.Instance);
             var orgField = platInstance.GetType().GetField("_organization", BindingFlags.NonPublic | BindingFlags.Instance);
             var projField = platInstance.GetType().GetField("_project", BindingFlags.NonPublic | BindingFlags.Instance);
-            detField.SetValue(platInstance, Sdo.Interfaces.Platform.GitHub);
-            orgField.SetValue(platInstance, "ownerA");
-            projField.SetValue(platInstance, "repoB");
+            detField!.SetValue(platInstance, Sdo.Interfaces.Platform.GitHub);
+            orgField!.SetValue(platInstance, "ownerA");
+            projField!.SetValue(platInstance, "repoB");
 
             var method = typeof(PullRequestCommand).GetMethod("ListPullRequests", BindingFlags.NonPublic | BindingFlags.Instance);
-            var task = (Task<int>)method.Invoke(cmd, new object[] { "open", 5, true })!;
+            var task = (Task<int>)method!.Invoke(cmd, new object[] { "open", 5, true })!;
             var result = await task;
 
             // mapping should have been presented
@@ -101,16 +101,16 @@ namespace SdoTests
             var cmd = new PullRequestCommand(_verboseOption, generator, presenter);
 
             var platField = typeof(PullRequestCommand).GetField("_platformDetector", BindingFlags.NonPublic | BindingFlags.Instance);
-            var platInstance = platField.GetValue(cmd);
-            var detField = platInstance.GetType().GetField("_detectedPlatform", BindingFlags.NonPublic | BindingFlags.Instance);
+            var platInstance = platField!.GetValue(cmd);
+            var detField = platInstance!.GetType().GetField("_detectedPlatform", BindingFlags.NonPublic | BindingFlags.Instance);
             var orgField = platInstance.GetType().GetField("_organization", BindingFlags.NonPublic | BindingFlags.Instance);
             var projField = platInstance.GetType().GetField("_project", BindingFlags.NonPublic | BindingFlags.Instance);
-            detField.SetValue(platInstance, Sdo.Interfaces.Platform.GitHub);
-            orgField.SetValue(platInstance, "ownerA");
-            projField.SetValue(platInstance, "repoB");
+            detField!.SetValue(platInstance, Sdo.Interfaces.Platform.GitHub);
+            orgField!.SetValue(platInstance, "ownerA");
+            projField!.SetValue(platInstance, "repoB");
 
             var method = typeof(PullRequestCommand).GetMethod("ShowPullRequest", BindingFlags.NonPublic | BindingFlags.Instance);
-            var task = (Task<int>)method.Invoke(cmd, new object[] { 123, true })!;
+            var task = (Task<int>)method!.Invoke(cmd, new object[] { 123, true })!;
             var result = await task;
 
             var expected = $"gh pr view -R ownerA/repoB 123";
@@ -126,16 +126,16 @@ namespace SdoTests
             var cmd = new PullRequestCommand(_verboseOption, generator, presenter);
 
             var platField = typeof(PullRequestCommand).GetField("_platformDetector", BindingFlags.NonPublic | BindingFlags.Instance);
-            var platInstance = platField.GetValue(cmd);
-            var detField = platInstance.GetType().GetField("_detectedPlatform", BindingFlags.NonPublic | BindingFlags.Instance);
+            var platInstance = platField!.GetValue(cmd);
+            var detField = platInstance!.GetType().GetField("_detectedPlatform", BindingFlags.NonPublic | BindingFlags.Instance);
             var orgField = platInstance.GetType().GetField("_organization", BindingFlags.NonPublic | BindingFlags.Instance);
             var projField = platInstance.GetType().GetField("_project", BindingFlags.NonPublic | BindingFlags.Instance);
-            detField.SetValue(platInstance, Sdo.Interfaces.Platform.GitHub);
-            orgField.SetValue(platInstance, "ownerA");
-            projField.SetValue(platInstance, "repoB");
+            detField!.SetValue(platInstance, Sdo.Interfaces.Platform.GitHub);
+            orgField!.SetValue(platInstance, "ownerA");
+            projField!.SetValue(platInstance, "repoB");
 
             var method = typeof(PullRequestCommand).GetMethod("UpdatePullRequest", BindingFlags.NonPublic | BindingFlags.Instance);
-            var task = (Task<int>)method.Invoke(cmd, new object[] { 321, null, "New Title", "closed", true })!;
+            var task = (Task<int>)method!.Invoke(cmd, new object[] { 321, null!, "New Title", "closed", true })!;
             var result = await task;
 
             var expectedStart = $"gh pr edit -R ownerA/repoB 321";
