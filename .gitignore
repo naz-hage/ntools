@@ -424,6 +424,8 @@ docs/todo.md
 /test-workflow.yml
 /test-framework
 /sdo-e2e-test
+/test-framework.temp
+/sdo-e2e-test.temp
 
 # Code coverage reports
 /CoverageReport/
