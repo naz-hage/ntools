@@ -124,53 +124,6 @@ namespace SdoTests
 
         #endregion
 
-        #region Issue #3 - Process Hang Vulnerability Tests
-
-        [Fact]
-        public void PullRequestCommand_BranchExistsOnRemote_WithValidBranch()
-        {
-            // Arrange
-            var verboseOption = new Option<bool>("--verbose");
-            var command = new PullRequestCommand(verboseOption);
-
-            // Act - Check if main branch exists (should exist in repo)
-            var mainBranchMethod = typeof(PullRequestCommand).GetMethod(
-                "BranchExistsOnRemote", 
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-
-            if (mainBranchMethod != null)
-            {
-                var result = (bool)mainBranchMethod.Invoke(command, new object[] { "main" })!;
-
-                // Assert
-                Assert.True(result); // Main branch should exist
-            }
-        }
-
-        [Fact]
-        public void PullRequestCommand_BranchExistsOnRemote_WithInvalidBranch()
-        {
-            // Arrange
-            var verboseOption = new Option<bool>("--verbose");
-            var command = new PullRequestCommand(verboseOption);
-            var invalidBranchName = "this-branch-definitely-does-not-exist-" + Guid.NewGuid();
-
-            // Act
-            var mainBranchMethod = typeof(PullRequestCommand).GetMethod(
-                "BranchExistsOnRemote",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-
-            if (mainBranchMethod != null)
-            {
-                var result = (bool)mainBranchMethod.Invoke(command, new object[] { invalidBranchName })!;
-
-                // Assert
-                Assert.False(result); // Invalid branch should not exist
-            }
-        }
-
-        #endregion
-
         #region Issue #6 - Documentation Tests
 
         [Fact]

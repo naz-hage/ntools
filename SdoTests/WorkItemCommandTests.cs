@@ -664,7 +664,7 @@ public class WorkItemCommandTests
         // Assert
         var filePathOption = Assert.Single(createCmd.Options, o => o.Name == "--file-path");
         Assert.NotNull(filePathOption);
-        Assert.Equal("Path to markdown file containing work item details", filePathOption.Description);
+        Assert.Equal("Path to markdown file containing work item details (auto-detected as .temp/wi.md if not provided)", filePathOption.Description);
     }
 
     [Fact]

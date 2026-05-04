@@ -701,4 +701,54 @@
 		<Exec Command="$(SolutionDir)\Sdo\bin\Debug\sdo.exe pipeline logs --verbose" WorkingDirectory="C:\source\ConsoleApp1" ContinueOnError="true" />
 	</Target>
 
+	<!-- Run GitHub Pull Request Create with Valid Branch test -->
+	<Target Name="RUN_GITHUB_PR_CREATE_VALID_BRANCH_TEST" DependsOnTargets="COPY_SDO_EXECUTABLE">
+		<Message Text="Running GitHub Pull Request Create with Valid Branch test..." Importance="high" />
+		<PropertyGroup>
+			<SdoE2eTestExe>$(SolutionDir)\sdo-e2e-test\bin\Debug\net10.0\sdo-e2e-test.exe</SdoE2eTestExe>
+		</PropertyGroup>
+		<Exec Command="$(SdoE2eTestExe) test --verbose --test-case Validate_GitHub_CreatePRWithValidBranch"
+		      WorkingDirectory="$(SolutionDir)"
+		      IgnoreExitCode="false"
+		      ContinueOnError="false"
+		      EnvironmentVariables="SOLUTION_DIR=$(SolutionDir)" />
+		<Message Text="✓ GitHub PR Create with Valid Branch test completed" Importance="high" />
+	</Target>
+
+	<!-- Run GitHub Pull Request Create with Invalid Branch test -->
+	<Target Name="RUN_GITHUB_PR_CREATE_INVALID_BRANCH_TEST" DependsOnTargets="COPY_SDO_EXECUTABLE">
+		<Message Text="Running GitHub Pull Request Create with Invalid Branch test..." Importance="high" />
+		<PropertyGroup>
+			<SdoE2eTestExe>$(SolutionDir)\sdo-e2e-test\bin\Debug\net10.0\sdo-e2e-test.exe</SdoE2eTestExe>
+		</PropertyGroup>
+		<Exec Command="$(SdoE2eTestExe) test --verbose --test-case Validate_GitHub_CreatePRWithInvalidBranch"
+		      WorkingDirectory="$(SolutionDir)"
+		      IgnoreExitCode="false"
+		      ContinueOnError="false"
+		      EnvironmentVariables="SOLUTION_DIR=$(SolutionDir)" />
+		<Message Text="✓ GitHub PR Create with Invalid Branch test completed" Importance="high" />
+	</Target>
+
+	<!-- Run GitHub Pull Request Branch Validation test -->
+	<Target Name="RUN_GITHUB_PR_BRANCH_VALIDATION_TEST" DependsOnTargets="COPY_SDO_EXECUTABLE">
+		<Message Text="Running GitHub Pull Request Branch Validation test..." Importance="high" />
+		<PropertyGroup>
+			<SdoE2eTestExe>$(SolutionDir)\sdo-e2e-test\bin\Debug\net10.0\sdo-e2e-test.exe</SdoE2eTestExe>
+		</PropertyGroup>
+		<Exec Command="$(SdoE2eTestExe) test --verbose --test-case Validate_GitHub_BranchValidationBeforePRCreation"
+		      WorkingDirectory="$(SolutionDir)"
+		      IgnoreExitCode="false"
+		      ContinueOnError="false"
+		      EnvironmentVariables="SOLUTION_DIR=$(SolutionDir)" />
+		<Message Text="✓ GitHub PR Branch Validation test completed" Importance="high" />
+	</Target>
+
+	<!-- Main E2E Pull Request Creation Pipeline target - runs all PR creation tests -->
+	<Target Name="E2E_PR_CREATE" DependsOnTargets="ARTIFACTS;DELETE_E2E_LOG;RUN_GITHUB_PR_CREATE_VALID_BRANCH_TEST;RUN_GITHUB_PR_CREATE_INVALID_BRANCH_TEST;RUN_GITHUB_PR_BRANCH_VALIDATION_TEST">
+		<Message Text="======================================" Importance="high" />
+		<Message Text="✓ All Pull Request Creation tests completed successfully" Importance="high" />
+		<Message Text="======================================" Importance="high" />
+		<Message Text="Test output log: $(E2ELogFile)" Importance="normal" />
+	</Target>
+
 </Project>
