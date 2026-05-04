@@ -218,7 +218,10 @@ namespace Sdo.Commands
         {
             var createCommand = new Command("create", "Create a new work item");
             // Only allow markdown-file-driven creation; all fields must be in the file
-            var filePathOption = new Option<string?>("--file-path", new[] { "-f" }) { Description = "Path to markdown file containing work item details" };
+            var filePathOption = new Option<string?>("--file-path", new[] { "-f" }) 
+            { 
+                Description = "Path to markdown file containing work item details (auto-detected as .temp/wi.md if not provided)" 
+            };
             var dryRunOption = new Option<bool>("--dry-run") { Description = "Parse and preview work item creation without creating it" };
 
             createCommand.Add(filePathOption);
@@ -1212,15 +1215,37 @@ namespace Sdo.Commands
         {
             try
             {
+                // Auto-detect file path if not provided
+                string? sourceFilePath = filePath;
+                if (string.IsNullOrEmpty(sourceFilePath))
+                {
+                    sourceFilePath = Path.Combine(".temp", "wi.md");
+                    
+                    if (verbose)
+                    {
+                        ConsoleHelper.WriteLine($"[VERBOSE] Auto-detected file path: {sourceFilePath}", ConsoleColor.Gray);
+                    }
+                }
+
+                // Validate file exists
+                if (!File.Exists(sourceFilePath))
+                {
+                    ConsoleHelper.WriteLine($"X Error: File not found: {sourceFilePath}", ConsoleColor.Red);
+                    Console.WriteLine("\nExpected file path format: .temp/wi.md");
+                    Console.WriteLine("If you want to use a different file path:");
+                    Console.WriteLine($"  sdo wi create -f <file-path>");
+                    return 1;
+                }
+
                 // If a markdown file was provided, parse it and override values where present
                 List<string>? acceptanceCriteria = null;
                 WorkItemParseResult? parsed = null;
-                if (!string.IsNullOrEmpty(filePath))
+                if (!string.IsNullOrEmpty(sourceFilePath))
                 {
-                    parsed = ParseWorkItemFromMarkdown(filePath);
+                    parsed = ParseWorkItemFromMarkdown(sourceFilePath);
                     if (parsed == null)
                     {
-                        ConsoleHelper.WriteLine($"X Failed to parse markdown file: {filePath}", ConsoleColor.Red);
+                        ConsoleHelper.WriteLine($"X Failed to parse markdown file: {sourceFilePath}", ConsoleColor.Red);
                         return 1;
                     }
 
@@ -1294,8 +1319,8 @@ namespace Sdo.Commands
                     // Show external mapping command when verbose (helpful for users migrating from CLI)
                     if (verbose)
                     {
-                        var mappingCmd = !string.IsNullOrEmpty(filePath)
-                            ? _mappingGenerator.IssueCreateGitHub(repoInfo.Owner, repoInfo.Repo, title, filePath, true)
+                        var mappingCmd = !string.IsNullOrEmpty(sourceFilePath)
+                            ? _mappingGenerator.IssueCreateGitHub(repoInfo.Owner, repoInfo.Repo, title, sourceFilePath, true)
                             : _mappingGenerator.IssueCreateGitHub(repoInfo.Owner, repoInfo.Repo, title, description ?? string.Empty, false);
 
                         if (!string.IsNullOrEmpty(mappingCmd))
@@ -1356,6 +1381,35 @@ namespace Sdo.Commands
                         ConsoleHelper.WriteLine($"✓ Created GitHub issue #{createdIssue.Number}: {title}", ConsoleColor.Green);
                         if (!string.IsNullOrEmpty(createdIssue.HtmlUrl))
                             ConsoleHelper.WriteLine($"   URL: {createdIssue.HtmlUrl}", ConsoleColor.Green);
+                        
+                        // Rename file if it was auto-detected from default path
+                        if (string.IsNullOrEmpty(filePath) && sourceFilePath != null)
+                        {
+                            string newFileName = Path.Combine(".temp", $"{createdIssue.Number}-issue.md");
+                            try
+                            {
+                                if (File.Exists(sourceFilePath))
+                                {
+                                    File.Move(sourceFilePath, newFileName, overwrite: true);
+                                    if (verbose)
+                                        ConsoleHelper.WriteLine($"✓ Renamed file from {sourceFilePath} to {newFileName}", ConsoleColor.Gray);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                ConsoleHelper.WriteLine($"⚠ Warning: Failed to rename file: {ex.Message}", ConsoleColor.Yellow);
+                                // Don't fail the operation if renaming fails
+                            }
+                        }
+                        
+                        // Display next steps
+                        Console.WriteLine();
+                        ConsoleHelper.WriteLine("Next steps:", ConsoleColor.Cyan);
+                        ConsoleHelper.WriteLine($"  1. Run: sdo wi start {createdIssue.Number}", ConsoleColor.Cyan);
+                        ConsoleHelper.WriteLine($"  2. Implement changes for issue {createdIssue.Number}", ConsoleColor.Cyan);
+                        ConsoleHelper.WriteLine($"  3. Edit .temp/{createdIssue.Number}-pr-message.md with PR details (optional)", ConsoleColor.Cyan);
+                        ConsoleHelper.WriteLine($"  4. Run: sdo pr create", ConsoleColor.Cyan);
+                        
                         return 0;
                     }
 
@@ -1468,6 +1522,70 @@ namespace Sdo.Commands
                             {
                                 ConsoleHelper.WriteLine($"  URL: {urlObj}", ConsoleColor.Yellow);
                             }
+                            
+                            // Rename file if it was auto-detected from default path
+                            if (string.IsNullOrEmpty(filePath) && sourceFilePath != null && idObj is int workItemId)
+                            {
+                                // Determine suffix based on work item type
+                                string typeSuffix = normalizedType.ToLowerInvariant() switch
+                                {
+                                    "task" => "task",
+                                    "pbi" => "pbi",
+                                    "product backlog item" => "pbi",
+                                    "bug" => "bug",
+                                    "epic" => "epic",
+                                    "feature" => "feature",
+                                    _ => normalizedType.ToLowerInvariant()
+                                };
+                                
+                                string newFileName = Path.Combine(".temp", $"{workItemId}-{typeSuffix}.md");
+                                try
+                                {
+                                    if (File.Exists(sourceFilePath))
+                                    {
+                                        File.Move(sourceFilePath, newFileName, overwrite: true);
+                                        if (verbose)
+                                            ConsoleHelper.WriteLine($"✓ Renamed file from {sourceFilePath} to {newFileName}", ConsoleColor.Gray);
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    ConsoleHelper.WriteLine($"⚠ Warning: Failed to rename file: {ex.Message}", ConsoleColor.Yellow);
+                                    // Don't fail the operation if renaming fails
+                                }
+                            }
+                            
+                            // Display context-aware next steps
+                            Console.WriteLine();
+                            ConsoleHelper.WriteLine("Next steps:", ConsoleColor.Cyan);
+                            
+                            // Check if this is a Task or Bug type - these are implementation items
+                            bool isImplementationItem = normalizedType.Equals("Task", StringComparison.OrdinalIgnoreCase) || 
+                                                      normalizedType.Equals("Bug", StringComparison.OrdinalIgnoreCase);
+                            
+                            if (isImplementationItem)
+                            {
+                                // Task/Bug workflow - start working immediately
+                                ConsoleHelper.WriteLine($"  1. Run: sdo wi start {idObj}", ConsoleColor.Cyan);
+                                ConsoleHelper.WriteLine($"  2. Implement changes for work item {idObj}", ConsoleColor.Cyan);
+                                ConsoleHelper.WriteLine($"  3. Edit .temp/{idObj}-pr-message.md with PR details (optional)", ConsoleColor.Cyan);
+                                ConsoleHelper.WriteLine($"  4. Run: sdo pr create", ConsoleColor.Cyan);
+                            }
+                            else
+                            {
+                                // PBI/Feature/Epic workflow - create child items first
+                                string nextItemType = normalizedType.Equals("Feature", StringComparison.OrdinalIgnoreCase) || 
+                                                     normalizedType.Equals("Epic", StringComparison.OrdinalIgnoreCase) 
+                                    ? "PBI" : "Task";
+                                string tempFileName = nextItemType.Equals("PBI", StringComparison.OrdinalIgnoreCase) 
+                                    ? ".temp/pbi.md" : ".temp/wi.md";
+                                
+                                ConsoleHelper.WriteLine($"  1. Create a {nextItemType} as a child item", ConsoleColor.Cyan);
+                                ConsoleHelper.WriteLine($"  2. Create {nextItemType} markdown in {tempFileName}", ConsoleColor.Cyan);
+                                ConsoleHelper.WriteLine($"  3. Run: sdo wi create", ConsoleColor.Cyan);
+                                ConsoleHelper.WriteLine($"  4. Then follow the workflow for the {nextItemType}", ConsoleColor.Cyan);
+                            }
+                            
                             return 0;
                         }
                     }

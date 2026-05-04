@@ -172,12 +172,13 @@ sdo auth azdo --verbose     # Show token source details
 
 ### wi — Work Item Management
 
-Create, list, show, update work items and add comments. Supports GitHub issues and Azure DevOps work items with automatic state translation.
+Create, list, show, update work items, add comments, and start work. Supports GitHub issues and Azure DevOps work items with automatic state translation.
 
 **Subcommands:**
 - `list` — List work items with filtering
 - `show` — Display work item details
-- `create` — Create new work item from markdown file
+- `create` — Create new work item from markdown file (auto-detects `.temp\wi.md`)
+- `start` — Start work on a work item by creating a feature branch (auto-detects work item ID)
 - `update` — Update work item properties
 - `comment` — Add comment to work item
 
@@ -196,6 +197,7 @@ Commands:
   create   Create a new work item
   list     List work items with optional filtering
   show     Display detailed work item information
+  start    Start work on a work item by creating a feature branch and PR template
   update   Update work item properties
 ```
 
@@ -262,20 +264,37 @@ sdo wi show --id 243 --verbose      # Show API command
 
 #### wi create
 
-Create new work item from markdown file.
+Create new work item from markdown file. The `-f` option is optional; if omitted, `.temp\wi.md` is auto-detected.
 
 **Usage:**
 ```bash
-sdo wi create --file-path work-item.md              # Create
+sdo wi create                                       # Auto-detect .temp\wi.md
+sdo wi create --file-path work-item.md              # Create from specified file
 sdo wi create -f work-item.md                       # Short option
 sdo wi create --file-path work-item.md --dry-run   # Preview
 sdo wi create --file-path work-item.md --verbose   # Show mapping
 ```
 
+**Auto-Detection & File Renaming:**
+
+When no `--file-path` is provided, the tool automatically looks for `.temp\wi.md`. After successful creation, the file is renamed based on the work item type:
+- **GitHub Issues**: `.temp\<issue-number>-issue.md`
+- **Azure DevOps Tasks**: `.temp\<id>-task.md`
+- **Azure DevOps PBIs**: `.temp\<id>-pbi.md`
+- **Azure DevOps Bugs**: `.temp\<id>-bug.md`
+- **Azure DevOps Features**: `.temp\<id>-feature.md`
+- **Azure DevOps Epics**: `.temp\<id>-epic.md`
+
+**Context-Aware Next Steps:**
+
+The tool provides intelligent workflow guidance after creation:
+- **Implementation Items** (Task, Bug): Shows `sdo wi start` command to begin work
+- **Planning Items** (PBI, Feature, Epic): Shows guidance for creating child work items
+
 **Options:**
-- `-f, --file-path <file-path>` — Path to markdown file containing work item details (required)
+- `-f, --file-path <file-path>` — Path to markdown file containing work item details (optional; defaults to `.temp\wi.md` if not provided)
 - `--dry-run` — Parse and preview work item creation without creating it
-- `--verbose` — Show mapping
+- `--verbose` — Show mapping and diagnostics
 
 **Markdown Format:**
 ```markdown
@@ -300,6 +319,61 @@ target: "github"  # or "azdo"
 
 # Title
 ...
+```
+
+**Workflow Examples:**
+
+Create a work item with auto-detected file:
+```bash
+# Prepare your work item template
+# Save to: .temp\wi.md
+
+# Create the work item (auto-detects .temp\wi.md)
+sdo wi create
+
+# File is automatically renamed to .temp\<id>-issue.md (GitHub) or .temp\<id>-task.md (Azure DevOps)
+```
+
+Next steps guidance:
+```
+✓ GitHub Issue #247 created successfully
+
+📋 Next Steps:
+  - Start work: sdo wi start
+```
+
+#### wi start
+
+Start work on a work item by creating a feature branch and PR template. The `--id` option is optional; if omitted, the work item ID is auto-detected from the current branch name or renamed file (`.temp\<id>-*.md`).
+
+**Usage:**
+```bash
+sdo wi start                         # Auto-detect from branch/file
+sdo wi start --id 247                # Explicit work item ID
+sdo wi start --id 247 --verbose      # Show mapping and details
+```
+
+**Auto-Detection:**
+
+When no `--id` is provided, the tool attempts to extract the work item ID from:
+1. Current Git branch name (e.g., `feat/247-github-issue-title` → detects `247`)
+2. Renamed work item file in `.temp\` (e.g., `.temp\247-issue.md` → detects `247`)
+
+**Options:**
+- `--id <id>` — Work item ID (optional; auto-detected if not provided)
+- `--verbose` — Show mapping and API commands
+
+**What it does:**
+1. Creates a feature branch from the work item ID and title
+2. Generates a PR template with work item metadata
+3. Prepares the workspace for implementation
+
+**Output Example:**
+```
+Starting work on work item 247...
+✓ Feature branch created: feat/247-github-issue-title
+✓ PR template generated at: .github/pull_request_template.md
+Ready to start implementing work item #247
 ```
 
 #### wi update

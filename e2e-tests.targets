@@ -365,6 +365,56 @@
 		<Message Text="Test output log: $(E2ELogFile)" Importance="normal" />
 	</Target>
 
+	<!-- Run GitHub Work Item Create with Auto-Detection test -->
+	<Target Name="RUN_GITHUB_WI_CREATE_AUTO_DETECT_TEST" DependsOnTargets="COPY_SDO_EXECUTABLE">
+		<Message Text="Running GitHub Work Item Create with Auto-Detection test..." Importance="high" />
+		<PropertyGroup>
+			<SdoE2eTestExe>$(SolutionDir)\sdo-e2e-test\bin\Debug\net10.0\sdo-e2e-test.exe</SdoE2eTestExe>
+		</PropertyGroup>
+		<Exec Command="$(SdoE2eTestExe) test --verbose --test-case Validate_GitHub_CreateIssueWithAutoDetection"
+		      WorkingDirectory="$(SolutionDir)"
+		      IgnoreExitCode="false"
+		      ContinueOnError="false"
+		      EnvironmentVariables="SOLUTION_DIR=$(SolutionDir)" />
+		<Message Text="✓ GitHub Work Item Create with Auto-Detection test completed" Importance="high" />
+	</Target>
+
+	<!-- Run Azure DevOps Work Item Create Task with Auto-Detection test -->
+	<Target Name="RUN_AZDO_WI_CREATE_TASK_AUTO_DETECT_TEST" DependsOnTargets="COPY_SDO_EXECUTABLE">
+		<Message Text="Running Azure DevOps Work Item Create Task with Auto-Detection test..." Importance="high" />
+		<PropertyGroup>
+			<SdoE2eTestExe>$(SolutionDir)\sdo-e2e-test\bin\Debug\net10.0\sdo-e2e-test.exe</SdoE2eTestExe>
+		</PropertyGroup>
+		<Exec Command="$(SdoE2eTestExe) test --verbose --test-case Validate_AzureDevOps_CreateTaskWithAutoDetection"
+		      WorkingDirectory="$(SolutionDir)"
+		      IgnoreExitCode="false"
+		      ContinueOnError="false"
+		      EnvironmentVariables="SOLUTION_DIR=$(SolutionDir)" />
+		<Message Text="✓ Azure DevOps Work Item Create Task with Auto-Detection test completed" Importance="high" />
+	</Target>
+
+	<!-- Run Azure DevOps Work Item Create PBI with Auto-Detection test -->
+	<Target Name="RUN_AZDO_WI_CREATE_PBI_AUTO_DETECT_TEST" DependsOnTargets="COPY_SDO_EXECUTABLE">
+		<Message Text="Running Azure DevOps Work Item Create PBI with Auto-Detection test..." Importance="high" />
+		<PropertyGroup>
+			<SdoE2eTestExe>$(SolutionDir)\sdo-e2e-test\bin\Debug\net10.0\sdo-e2e-test.exe</SdoE2eTestExe>
+		</PropertyGroup>
+		<Exec Command="$(SdoE2eTestExe) test --verbose --test-case Validate_AzureDevOps_CreatePBIWithAutoDetection"
+		      WorkingDirectory="$(SolutionDir)"
+		      IgnoreExitCode="false"
+		      ContinueOnError="false"
+		      EnvironmentVariables="SOLUTION_DIR=$(SolutionDir)" />
+		<Message Text="✓ Azure DevOps Work Item Create PBI with Auto-Detection test completed" Importance="high" />
+	</Target>
+
+	<!-- Main E2E Work Item Creation with Auto-Detection Pipeline target - runs all auto-detection tests -->
+	<Target Name="E2E_WI_CREATE_AUTO_DETECT" DependsOnTargets="ARTIFACTS;DELETE_E2E_LOG;RUN_GITHUB_WI_CREATE_AUTO_DETECT_TEST;RUN_AZDO_WI_CREATE_TASK_AUTO_DETECT_TEST;RUN_AZDO_WI_CREATE_PBI_AUTO_DETECT_TEST">
+		<Message Text="======================================" Importance="high" />
+		<Message Text="✓ All Work Item Creation with Auto-Detection tests completed successfully" Importance="high" />
+		<Message Text="======================================" Importance="high" />
+		<Message Text="Test output log: $(E2ELogFile)" Importance="normal" />
+	</Target>
+
 	<!-- Run Azure DevOps Work Item Start test -->
 	<Target Name="RUN_AZDO_WI_START_TEST" DependsOnTargets="COPY_SDO_EXECUTABLE">
 		<Message Text="Running Azure DevOps Work Item Start test..." Importance="high" />
