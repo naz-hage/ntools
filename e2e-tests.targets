@@ -498,11 +498,11 @@
 		<Message Text="======================================" Importance="high" />
 		<Message Text="Running all E2E tests via sdo-e2e-test CLI..." Importance="high" />
 		<Message Text="======================================" Importance="high" />
-		<Exec Command="dotnet run --project sdo-e2e-test\sdo-e2e-test.csproj --configuration Debug -- test --verbose --log-file $(E2ELogFile)"
-		      WorkingDirectory="$(SolutionDir)"
+		<Exec Command=".\sdo-e2e-test.exe test --verbose --log-file $(E2ELogFile)"
+		      WorkingDirectory="$(SolutionDir)\sdo-e2e-test\bin\Debug\net10.0\"
 		      ContinueOnError="false" />
 		<Message Text="======================================" Importance="high" />
-		<Message Text="✓ All E2E tests completed successfully (23 total tests)" Importance="high" />
+		<Message Text="✓ All E2E tests completed successfully" Importance="high" />
 		<Message Text="======================================" Importance="high" />
 		<Message Text="Test output log: $(E2ELogFile)" Importance="normal" />
 	</Target>
