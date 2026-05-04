@@ -1,0 +1,3 @@
+[submodule "sdo-e2e-test"]
+	path = sdo-e2e-test
+	url = https://github.com/naz-hage/sdo-e2e-test
