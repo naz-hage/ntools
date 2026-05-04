@@ -1103,6 +1103,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#wi-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        wi start
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#wi-update" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2767,11 +2778,12 @@ sdo<span class="w"> </span>auth<span class="w"> </span>azdo<span class="w"> </sp
 </code></pre></div></p>
 <hr />
 <h3 id="wi-work-item-management">wi — Work Item Management<a class="headerlink" href="#wi-work-item-management" title="Anchor link to this section for reference">&para;</a></h3>
-<p>Create, list, show, update work items and add comments. Supports GitHub issues and Azure DevOps work items with automatic state translation.</p>
+<p>Create, list, show, update work items, add comments, and start work. Supports GitHub issues and Azure DevOps work items with automatic state translation.</p>
 <p><strong>Subcommands:</strong>
 - <code>list</code> — List work items with filtering
 - <code>show</code> — Display work item details
-- <code>create</code> — Create new work item from markdown file
+- <code>create</code> — Create new work item from markdown file (auto-detects <code>.temp\wi.md</code>)
+- <code>start</code> — Start work on a work item by creating a feature branch (auto-detects work item ID)
 - <code>update</code> — Update work item properties
 - <code>comment</code> — Add comment to work item</p>
 <p><strong>Help:</strong>
@@ -2788,6 +2800,7 @@ Commands:
   create   Create a new work item
   list     List work items with optional filtering
   show     Display detailed work item information
+  start    Start work on a work item by creating a feature branch and PR template
   update   Update work item properties
 </code></pre></div></p>
 <h4 id="wi-list">wi list<a class="headerlink" href="#wi-list" title="Anchor link to this section for reference">&para;</a></h4>
@@ -2839,17 +2852,30 @@ sdo<span class="w"> </span>wi<span class="w"> </span>show<span class="w"> </span
 - <code>-c, --comments</code> — Show comments/discussion
 - <code>--verbose</code> — Show mapping</p>
 <h4 id="wi-create">wi create<a class="headerlink" href="#wi-create" title="Anchor link to this section for reference">&para;</a></h4>
-<p>Create new work item from markdown file.</p>
+<p>Create new work item from markdown file. The <code>-f</code> option is optional; if omitted, <code>.temp\wi.md</code> is auto-detected.</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>wi<span class="w"> </span>create<span class="w"> </span>--file-path<span class="w"> </span>work-item.md<span class="w">              </span><span class="c1"># Create</span>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>wi<span class="w"> </span>create<span class="w">                                       </span><span class="c1"># Auto-detect .temp\wi.md</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>create<span class="w"> </span>--file-path<span class="w"> </span>work-item.md<span class="w">              </span><span class="c1"># Create from specified file</span>
 sdo<span class="w"> </span>wi<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>work-item.md<span class="w">                       </span><span class="c1"># Short option</span>
 sdo<span class="w"> </span>wi<span class="w"> </span>create<span class="w"> </span>--file-path<span class="w"> </span>work-item.md<span class="w"> </span>--dry-run<span class="w">   </span><span class="c1"># Preview</span>
 sdo<span class="w"> </span>wi<span class="w"> </span>create<span class="w"> </span>--file-path<span class="w"> </span>work-item.md<span class="w"> </span>--verbose<span class="w">   </span><span class="c1"># Show mapping</span>
 </code></pre></div></p>
+<p><strong>Auto-Detection &amp; File Renaming:</strong></p>
+<p>When no <code>--file-path</code> is provided, the tool automatically looks for <code>.temp\wi.md</code>. After successful creation, the file is renamed based on the work item type:
+- <strong>GitHub Issues</strong>: <code>.temp\&lt;issue-number&gt;-issue.md</code>
+- <strong>Azure DevOps Tasks</strong>: <code>.temp\&lt;id&gt;-task.md</code>
+- <strong>Azure DevOps PBIs</strong>: <code>.temp\&lt;id&gt;-pbi.md</code>
+- <strong>Azure DevOps Bugs</strong>: <code>.temp\&lt;id&gt;-bug.md</code>
+- <strong>Azure DevOps Features</strong>: <code>.temp\&lt;id&gt;-feature.md</code>
+- <strong>Azure DevOps Epics</strong>: <code>.temp\&lt;id&gt;-epic.md</code></p>
+<p><strong>Context-Aware Next Steps:</strong></p>
+<p>The tool provides intelligent workflow guidance after creation:
+- <strong>Implementation Items</strong> (Task, Bug): Shows <code>sdo wi start</code> command to begin work
+- <strong>Planning Items</strong> (PBI, Feature, Epic): Shows guidance for creating child work items</p>
 <p><strong>Options:</strong>
-- <code>-f, --file-path &lt;file-path&gt;</code> — Path to markdown file containing work item details (required)
+- <code>-f, --file-path &lt;file-path&gt;</code> — Path to markdown file containing work item details (optional; defaults to <code>.temp\wi.md</code> if not provided)
 - <code>--dry-run</code> — Parse and preview work item creation without creating it
-- <code>--verbose</code> — Show mapping</p>
+- <code>--verbose</code> — Show mapping and diagnostics</p>
 <p><strong>Markdown Format:</strong>
 <div class="highlight"><pre><span></span><code><span class="gh"># Work Item Title</span>
 
@@ -2870,6 +2896,46 @@ labels: &quot;feature, backlog&quot;
 
 <span class="gh"># Title</span>
 ...
+</code></pre></div></p>
+<p><strong>Workflow Examples:</strong></p>
+<p>Create a work item with auto-detected file:
+<div class="highlight"><pre><span></span><code><span class="c1"># Prepare your work item template</span>
+<span class="c1"># Save to: .temp\wi.md</span>
+
+<span class="c1"># Create the work item (auto-detects .temp\wi.md)</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>create
+
+<span class="c1"># File is automatically renamed to .temp\&lt;id&gt;-issue.md (GitHub) or .temp\&lt;id&gt;-task.md (Azure DevOps)</span>
+</code></pre></div></p>
+<p>Next steps guidance:
+<div class="highlight"><pre><span></span><code>✓ GitHub Issue #247 created successfully
+
+📋 Next Steps:
+  - Start work: sdo wi start
+</code></pre></div></p>
+<h4 id="wi-start">wi start<a class="headerlink" href="#wi-start" title="Anchor link to this section for reference">&para;</a></h4>
+<p>Start work on a work item by creating a feature branch and PR template. The <code>--id</code> option is optional; if omitted, the work item ID is auto-detected from the current branch name or renamed file (<code>.temp\&lt;id&gt;-*.md</code>).</p>
+<p><strong>Usage:</strong>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>wi<span class="w"> </span>start<span class="w">                         </span><span class="c1"># Auto-detect from branch/file</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>start<span class="w"> </span>--id<span class="w"> </span><span class="m">247</span><span class="w">                </span><span class="c1"># Explicit work item ID</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>start<span class="w"> </span>--id<span class="w"> </span><span class="m">247</span><span class="w"> </span>--verbose<span class="w">      </span><span class="c1"># Show mapping and details</span>
+</code></pre></div></p>
+<p><strong>Auto-Detection:</strong></p>
+<p>When no <code>--id</code> is provided, the tool attempts to extract the work item ID from:
+1. Current Git branch name (e.g., <code>feat/247-github-issue-title</code> → detects <code>247</code>)
+2. Renamed work item file in <code>.temp\</code> (e.g., <code>.temp\247-issue.md</code> → detects <code>247</code>)</p>
+<p><strong>Options:</strong>
+- <code>--id &lt;id&gt;</code> — Work item ID (optional; auto-detected if not provided)
+- <code>--verbose</code> — Show mapping and API commands</p>
+<p><strong>What it does:</strong>
+1. Creates a feature branch from the work item ID and title
+2. Generates a PR template with work item metadata
+3. Prepares the workspace for implementation</p>
+<p><strong>Output Example:</strong>
+<div class="highlight"><pre><span></span><code>Starting work on work item 247...
+✓ Feature branch created: feat/247-github-issue-title
+✓ PR template generated at: .github/pull_request_template.md
+Ready to start implementing work item #247
 </code></pre></div></p>
 <h4 id="wi-update">wi update<a class="headerlink" href="#wi-update" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Update work item properties.</p>
