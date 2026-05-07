@@ -160,7 +160,10 @@ namespace Sdo.Commands
         {
             var updateCommand = new Command("update", "Update work item properties");
 
-            var idOption = new Option<int>("--id") { Description = "Work item ID (required)" };
+            var idOption = new Option<int?>("--id") 
+            { 
+                Description = "Work item ID (optional; auto-detected from branch name if not on main)" 
+            };
             var titleOption = new Option<string?>("--title") { Description = "Update work item title" };
             var stateOption = new Option<string?>("--state") { Description = "Update work item state" };
             var assigneeOption = new Option<string?>("--assignee") { Description = "Update assigned user" };
@@ -905,15 +908,20 @@ namespace Sdo.Commands
         /// <param name="description">New description (optional).</param>
         /// <param name="verbose">Whether to enable verbose output.</param>
         /// <returns>Exit code.</returns>
-        private async Task<int> UpdateWorkItem(int id, string? title, string? state, string? assignee, string? description, bool verbose)
+        private async Task<int> UpdateWorkItem(int? idParam, string? title, string? state, string? assignee, string? description, bool verbose)
         {
             try
             {
-                if (id <= 0)
+                // Auto-detect ID from branch name if not provided
+                int? detectedId = idParam ?? TryAutoDetectWorkItemIdFromBranch(verbose);
+
+                if (!detectedId.HasValue || detectedId <= 0)
                 {
-                    ConsoleHelper.WriteLine("X Work item ID must be positive", ConsoleColor.Red);
+                    ConsoleHelper.WriteLine("X Work item ID must be provided or auto-detected from branch name", ConsoleColor.Red);
                     return 1;
                 }
+
+                var id = detectedId.Value;
 
                 if (string.IsNullOrEmpty(title) && string.IsNullOrEmpty(state) &&
                     string.IsNullOrEmpty(assignee) && string.IsNullOrEmpty(description))

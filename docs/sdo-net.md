@@ -404,19 +404,28 @@ Ready to start implementing work item #247
 
 #### wi update
 
-Update work item properties.
+Update work item properties. The `--id` option is optional; if omitted, the work item ID is auto-detected from the current branch name (if not on main).
 
 **Usage:**
 ```bash
-sdo wi update --id 243 --state Done                    # Update state
-sdo wi update --id 243 --title "New Title"            # Update title
+sdo wi update                                          # Auto-detect ID from branch, requires at least one property
+sdo wi update --state Done                             # Auto-detect ID, update state
+sdo wi update --id 243 --state Done                    # Update state with explicit ID
+sdo wi update --id 243 --title "New Title"             # Update title
 sdo wi update --id 243 --assignee user@example.com    # Change assignee
 sdo wi update --id 243 --state Done --title "Title"   # Multiple fields
-sdo wi update --id 243 --state done                   # Case-insensitive
+sdo wi update --state done                             # Case-insensitive
+sdo wi update --state Done --verbose                  # Show mapping with auto-detection
 ```
 
+**Auto-Detection:**
+
+When no `--id` is provided:
+- If on main branch: Requires `--id` (error if not provided)
+- If on feature branch: Extracts ID from branch name (e.g., `123-feature-name` → ID 123)
+
 **Options:**
-- `--id <id>` — Work item ID (required)
+- `--id <id>` — Work item ID (optional; auto-detected from branch name if not on main)
 - `--title <title>` — Update work item title
 - `--state <state>` — Update work item state
 - `--assignee <assignee>` — Update assigned user
@@ -425,6 +434,58 @@ sdo wi update --id 243 --state done                   # Case-insensitive
 
 **Valid States** (case-insensitive):
 - `New`, `Approved`, `Committed`, `Done`, `To Do`, `In Progress`
+
+#### wi close
+
+Close a work item and delete the feature branch. Auto-detects work item ID from the current branch name. Performs git operations: checkout main, pull latest, and delete feature branch.
+
+**Usage:**
+```bash
+sdo wi close                         # Auto-detect ID from branch name and close
+sdo wi close 243                     # Close with explicit ID
+sdo wi close --verbose               # Show detailed output during close
+sdo wi close 243 --verbose           # Close with explicit ID and verbose output
+```
+
+**Auto-Detection:**
+
+When no ID argument is provided:
+- If on main branch: Requires explicit ID (e.g., `sdo wi close 123`)
+- If on feature branch: Extracts ID from branch name (e.g., `123-feature-name` → ID 123)
+
+**What it does:**
+1. Validates the work item exists on the current platform (GitHub or Azure DevOps)
+2. Checks out the main branch
+3. Pulls the latest changes from main
+4. Deletes the feature branch locally
+
+**Options:**
+- `<id>` — Work item ID (optional; auto-detected from branch name if not on main)
+- `--verbose` — Show detailed output including validation and execution phases
+
+**Example Workflow:**
+```bash
+# 1. Start work on issue 243
+sdo wi start 243
+# Creates branch: 243-issue-description
+
+# 2. Work on the feature...
+# (make changes, commit, create PR, merge)
+
+# 3. Close the work item and clean up
+sdo wi close
+# Auto-detects ID 243 from branch name
+# Checks out main
+# Pulls latest
+# Deletes 243-issue-description branch
+```
+
+**Branch Name Format:**
+- Expected format: `<number>-<description>`
+- Examples:
+  - ✓ `244-issue` → Work item ID 244
+  - ✓ `123-feature-name` → Work item ID 123
+  - ✗ `feature` → Error (no number found)
 
 #### wi comment
 
