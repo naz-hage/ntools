@@ -716,6 +716,39 @@ namespace NbuildTasks
             return deletedBranches;
         }
 
+        /// <summary>
+        /// Deletes a specific local git branch.
+        /// </summary>
+        /// <param name="branch">The branch name to delete.</param>
+        /// <returns>True if the branch was successfully deleted, false otherwise.</returns>
+        public bool DeleteBranch(string branch)
+        {
+            if (string.IsNullOrEmpty(branch) || branch.Equals("main", StringComparison.OrdinalIgnoreCase))
+            {
+                if (Verbose) Console.WriteLine($"Cannot delete branch: {branch}");
+                return false;
+            }
+
+            Process.StartInfo.Arguments = $"branch -D {branch}";
+            var result = Process.LockStart(Verbose);
+            if (result.Code == 0)
+            {
+                return true;
+            }
+            else
+            {
+                if (Verbose)
+                {
+                    Console.WriteLine($"Failed to delete branch: {branch}");
+                    foreach (var line in result.Output)
+                    {
+                        Console.WriteLine(line);
+                    }
+                }
+                return false;
+            }
+        }
+
         private bool CheckForErrorAndDisplayOutput(List<string> lines)
         {
             foreach (var line in lines)

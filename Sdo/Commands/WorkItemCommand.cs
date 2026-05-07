@@ -43,12 +43,41 @@ namespace Sdo.Commands
             _configManager = new ConfigurationManager();
 
             // Add subcommands (in alphabetical order for help display)
+            AddCloseCommand(verboseOption);
             AddCommentCommand(verboseOption);
             AddCreateCommand(verboseOption);
             AddListCommand(verboseOption);
             AddShowCommand(verboseOption);
             AddStartCommand(verboseOption);
             AddUpdateCommand(verboseOption);
+        }
+
+        /// <summary>
+        /// Adds the 'close' subcommand to close work items and clean up branches.
+        /// </summary>
+        /// <param name="verboseOption">The global verbose option.</param>
+        private void AddCloseCommand(Option<bool> verboseOption)
+        {
+            var closeCommand = new Command("close", "Close a work item and clean up feature branch");
+
+            var idArgument = new Argument<int?>("id") 
+            { 
+                Description = "Work item ID (optional; auto-detected from branch name if not on main)",
+                Arity = ArgumentArity.ZeroOrOne
+            };
+
+            closeCommand.Add(idArgument);
+            closeCommand.Add(verboseOption);
+
+            closeCommand.SetAction(async (parseResult) =>
+            {
+                var id = parseResult.GetValue(idArgument);
+                var verbose = parseResult.GetValue(verboseOption);
+
+                return await CloseWorkItem(id, verbose);
+            });
+
+            Subcommands.Add(closeCommand);
         }
 
         /// <summary>
@@ -2264,6 +2293,198 @@ namespace Sdo.Commands
                 ConsoleHelper.WriteLine($"  2. Commit your changes to the {branchName} branch", ConsoleColor.Cyan);
                 ConsoleHelper.WriteLine($"  3. Edit {prMessageFile} with PR details (optional)", ConsoleColor.Cyan);
                 ConsoleHelper.WriteLine($"  4. Run: sdo pr create", ConsoleColor.Cyan);
+
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                ConsoleHelper.WriteLine($"X Error: {ex.Message}", ConsoleColor.Red);
+                if (verbose)
+                {
+                    ConsoleHelper.WriteLine($"Stack trace: {ex.StackTrace}", ConsoleColor.Red);
+                }
+                return 1;
+            }
+        }
+
+        /// <summary>
+        /// Closes a work item and cleans up the feature branch.
+        /// </summary>
+        /// <param name="idParam">The work item ID (optional; auto-detected from branch name).</param>
+        /// <param name="verbose">Whether to enable verbose output.</param>
+        /// <returns>0 on success, 1 on failure.</returns>
+        private async Task<int> CloseWorkItem(int? idParam, bool verbose)
+        {
+            try
+            {
+                // Get current branch before auto-detection (we'll need it for deletion)
+                var gitWrapper = new GitWrapper(verbose: verbose);
+                var currentBranchBeforeClose = gitWrapper.Branch;
+
+                // Auto-detect work item ID from branch name if not provided
+                int? detectedId = idParam;
+                if (!detectedId.HasValue)
+                {
+                    detectedId = TryAutoDetectWorkItemIdFromBranch(verbose);
+                    if (!detectedId.HasValue)
+                    {
+                        return 1;
+                    }
+                }
+
+                int id = (int)detectedId!;
+
+                if (verbose)
+                {
+                    ConsoleHelper.WriteLine($"Closing work item {id}...", ConsoleColor.Green);
+                }
+
+                // ===== VALIDATION PHASE (no repository changes) =====
+                if (verbose)
+                {
+                    ConsoleHelper.WriteLine("\n=== VALIDATION PHASE ===", ConsoleColor.Cyan);
+                }
+
+                // Validate: ID must be positive
+                if (id <= 0)
+                {
+                    ConsoleHelper.WriteLine("X Work item ID must be positive", ConsoleColor.Red);
+                    return 1;
+                }
+                if (verbose) ConsoleHelper.WriteLine("✓ Work item ID is valid", ConsoleColor.Yellow);
+
+                // Validate: Detect platform
+                if (verbose) ConsoleHelper.WriteLine("\nValidating: Platform Detection", ConsoleColor.Cyan);
+                var platform = _platformDetector.DetectPlatform();
+                if (verbose)
+                {
+                    ConsoleHelper.WriteLine($"✓ Detected platform: {platform}", ConsoleColor.Yellow);
+                }
+
+                // Validate: Platform-specific prerequisites and work item existence
+                if (platform == Platform.GitHub)
+                {
+                    if (verbose) ConsoleHelper.WriteLine("\nValidating: GitHub Prerequisites", ConsoleColor.Cyan);
+                    
+                    var repoInfo = _platformDetector.GetRepositoryInfo();
+                    if (repoInfo == null || repoInfo.Owner == null || repoInfo.Repo == null)
+                    {
+                        ConsoleHelper.WriteLine("X Could not determine GitHub repository from Git remote", ConsoleColor.Red);
+                        return 1;
+                    }
+                    if (verbose) ConsoleHelper.WriteLine($"✓ Repository: {repoInfo.Owner}/{repoInfo.Repo}", ConsoleColor.Yellow);
+
+                    var token = await GetAuthenticationTokenAsync(Platform.GitHub);
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
+                        return 1;
+                    }
+                    if (verbose) ConsoleHelper.WriteLine("✓ GitHub authentication token found", ConsoleColor.Yellow);
+
+                    using var client = new GitHubClient(token);
+                    var issue = await client.GetIssueAsync(repoInfo.Owner!, repoInfo.Repo!, id);
+                    if (issue == null)
+                    {
+                        ConsoleHelper.WriteLine($"X GitHub issue #{id} not found", ConsoleColor.Red);
+                        return 1;
+                    }
+                    if (verbose) ConsoleHelper.WriteLine($"✓ Issue found: {issue.Title}", ConsoleColor.Yellow);
+                }
+                else if (platform == Platform.AzureDevOps)
+                {
+                    if (verbose) ConsoleHelper.WriteLine("\nValidating: Azure DevOps Prerequisites", ConsoleColor.Cyan);
+                    
+                    var pat = await GetAuthenticationTokenAsync(Platform.AzureDevOps);
+                    if (string.IsNullOrEmpty(pat))
+                    {
+                        ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
+                        return 1;
+                    }
+                    if (verbose) ConsoleHelper.WriteLine("✓ Azure DevOps authentication token found", ConsoleColor.Yellow);
+
+                    var organization = _platformDetector.GetOrganization();
+                    if (string.IsNullOrEmpty(organization))
+                    {
+                        ConsoleHelper.WriteLine("X Could not determine Azure DevOps organization", ConsoleColor.Red);
+                        return 1;
+                    }
+                    if (verbose) ConsoleHelper.WriteLine($"✓ Organization: {organization}", ConsoleColor.Yellow);
+
+                    var project = _platformDetector.GetProject();
+                    using var client = new AzureDevOpsClient(pat, organization, project);
+                    var workItem = await client.GetWorkItemAsync(id);
+                    if (workItem == null)
+                    {
+                        ConsoleHelper.WriteLine($"X Work item {id} not found", ConsoleColor.Red);
+                        return 1;
+                    }
+                    if (verbose) ConsoleHelper.WriteLine($"✓ Work item found: {workItem.Title}", ConsoleColor.Yellow);
+                }
+                else
+                {
+                    ConsoleHelper.WriteLine("X Unsupported platform detected", ConsoleColor.Red);
+                    return 1;
+                }
+
+                // Validate: Git is available and main branch exists
+                if (verbose) ConsoleHelper.WriteLine("\nValidating: Git Environment", ConsoleColor.Cyan);
+                
+                if (!gitWrapper.BranchExists("main"))
+                {
+                    ConsoleHelper.WriteLine("X Main branch not found in repository", ConsoleColor.Red);
+                    return 1;
+                }
+                if (verbose) ConsoleHelper.WriteLine("✓ Main branch exists", ConsoleColor.Yellow);
+
+                // Validate: Current branch is not main (can't close from main without explicit ID)
+                if (currentBranchBeforeClose == "main" && !idParam.HasValue)
+                {
+                    ConsoleHelper.WriteLine("X Cannot auto-detect work item ID when on main branch", ConsoleColor.Red);
+                    return 1;
+                }
+                if (verbose) ConsoleHelper.WriteLine($"✓ Currently on branch: {currentBranchBeforeClose}", ConsoleColor.Yellow);
+
+                // ===== EXECUTION PHASE (all validations passed) =====
+                if (verbose)
+                {
+                    ConsoleHelper.WriteLine("\n=== EXECUTION PHASE ===", ConsoleColor.Cyan);
+                }
+
+                // Switch to main branch
+                if (verbose) ConsoleHelper.WriteLine("\nStep 1: Switching to main branch", ConsoleColor.Cyan);
+                if (!gitWrapper.CheckoutBranch("main"))
+                {
+                    ConsoleHelper.WriteLine("X Failed to switch to main branch", ConsoleColor.Red);
+                    return 1;
+                }
+                if (verbose) ConsoleHelper.WriteLine("✓ Switched to main branch", ConsoleColor.Yellow);
+
+                // Pull latest from origin
+                if (verbose) ConsoleHelper.WriteLine("\nStep 2: Pulling latest changes from main", ConsoleColor.Cyan);
+                if (!gitWrapper.PullWithRebase())
+                {
+                    ConsoleHelper.WriteLine("⚠ Git pull encountered an issue, but continuing...", ConsoleColor.Yellow);
+                }
+                if (verbose) ConsoleHelper.WriteLine("✓ Main branch synchronized", ConsoleColor.Yellow);
+
+                // Delete feature branch
+                if (verbose) ConsoleHelper.WriteLine($"\nStep 3: Deleting feature branch '{currentBranchBeforeClose}'", ConsoleColor.Cyan);
+                if (!gitWrapper.DeleteBranch(currentBranchBeforeClose))
+                {
+                    ConsoleHelper.WriteLine($"⚠ Failed to delete branch '{currentBranchBeforeClose}', but work item closed", ConsoleColor.Yellow);
+                }
+                else
+                {
+                    if (verbose) ConsoleHelper.WriteLine($"✓ Deleted feature branch: {currentBranchBeforeClose}", ConsoleColor.Yellow);
+                }
+
+                // Success!
+                Console.WriteLine();
+                ConsoleHelper.WriteLine($"✓ Work item {id} closed successfully", ConsoleColor.Green);
+                ConsoleHelper.WriteLine($"  Deleted branch: {currentBranchBeforeClose}", ConsoleColor.Green);
+                ConsoleHelper.WriteLine($"  Current branch: main", ConsoleColor.Green);
+                Console.WriteLine();
 
                 return 0;
             }

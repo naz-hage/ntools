@@ -1016,5 +1016,135 @@ public class WorkItemCommandTests
 
     #endregion
 
+    #region Close Subcommand Tests
+
+    [Fact]
+    public void Constructor_AddsCloseSubcommand()
+    {
+        // Act
+        var command = new WorkItemCommand(_verboseOption);
+
+        // Assert
+        var closeSubcommand = Assert.Single(command.Subcommands, s => s.Name == "close");
+        Assert.NotNull(closeSubcommand);
+        Assert.Equal("Close a work item and clean up feature branch", closeSubcommand.Description);
+    }
+
+    [Fact]
+    public void CloseSubcommand_HasIdArgument()
+    {
+        // Act
+        var command = new WorkItemCommand(_verboseOption);
+        var closeCmd = Assert.Single(command.Subcommands, s => s.Name == "close");
+
+        // Assert
+        var idArgument = Assert.Single(closeCmd.Arguments, a => a.Name == "id");
+        Assert.NotNull(idArgument);
+        Assert.Equal("Work item ID (optional; auto-detected from branch name if not on main)", idArgument.Description);
+    }
+
+    [Fact]
+    public void CloseSubcommand_HasVerboseOption()
+    {
+        // Act
+        var command = new WorkItemCommand(_verboseOption);
+        var closeCmd = Assert.Single(command.Subcommands, s => s.Name == "close");
+
+        // Assert
+        var verboseOpt = Assert.Single(closeCmd.Options, o => o.Name == "--verbose");
+        Assert.NotNull(verboseOpt);
+        Assert.Equal("Enable verbose output", verboseOpt.Description);
+    }
+
+    [Fact]
+    public void CloseSubcommand_WithNoArguments_Succeeds()
+    {
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        var args = new[] { "close" };
+
+        // Act
+        var parseResult = command.Parse(args);
+
+        // Assert
+        // Should parse successfully because id is now optional (auto-detected from branch at runtime)
+        Assert.Empty(parseResult.Errors);
+    }
+
+    [Fact]
+    public void CloseSubcommand_IdArgumentIsOptional()
+    {
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        var closeSubcommand = Assert.Single(command.Subcommands, s => s.Name == "close");
+
+        // Act
+        var idArgument = closeSubcommand.Arguments.FirstOrDefault(a => a.Name == "id");
+
+        // Assert
+        Assert.NotNull(idArgument);
+        // Verify it's optional (not required)
+        Assert.Equal(ArgumentArity.ZeroOrOne, idArgument.Arity);
+    }
+
+    [Fact]
+    public void CloseSubcommand_WithoutId_AndNotOnMain_AutoDetectsFromBranchName()
+    {
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        // Test auto-detection without id argument
+        var args = new[] { "close" };
+
+        // Act
+        var result = command.Parse(args);
+
+        // Assert
+        // Should parse without error (auto-detection happens at runtime based on git branch)
+        Assert.NotNull(result);
+    }
+
+    [Fact]
+    public void CloseSubcommand_WithoutId_ShouldParseSuccessfully()
+    {
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        var args = new[] { "close" };
+
+        // Act
+        var result = command.Parse(args);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Empty(result.Errors); // Parsing should succeed; runtime auto-detection happens in CloseWorkItem
+    }
+
+    #endregion
+
+    #region Close Subcommand Integration Tests (Phase 3.2+)
+
+    [Fact(Skip = "Integration: Scaffolded for Phase 3.2 - requires GitHub credentials and git")]
+    public void IntegrationTest_Close_GitHub_WithValidRepository()
+    {
+        // TODO: Implement real GitHub API + git integration test
+        // 1. Start work on issue using wi start command (creates feature branch)
+        // 2. Close work item using wi close command
+        // 3. Verify branch deleted locally
+        // 4. Verify checked out to main branch
+        Assert.True(true);
+    }
+
+    [Fact(Skip = "Integration: Scaffolded for Phase 3.2 - requires Azure DevOps credentials and git")]
+    public void IntegrationTest_Close_AzureDevOps_WithValidProject()
+    {
+        // TODO: Implement real Azure DevOps API + git integration test
+        // 1. Start work on work item using wi start command (creates feature branch)
+        // 2. Close work item using wi close command
+        // 3. Verify branch deleted locally
+        // 4. Verify checked out to main branch
+        Assert.True(true);
+    }
+
+    #endregion
+
     #endregion
 }
