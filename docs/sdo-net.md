@@ -248,19 +248,34 @@ Summary:
 
 #### wi show
 
-Display full details of a work item.
+Display full details of a work item. The `--id` option is optional; if omitted, the work item ID is auto-detected from the current branch name (if not on main).
 
 **Usage:**
 ```bash
-sdo wi show --id 243                # Show item details
+sdo wi show                         # Auto-detect from branch name
+sdo wi show --id 243                # Show item details with explicit ID
 sdo wi show --id 243 --comments     # Include comments
 sdo wi show --id 243 --verbose      # Show API command
 ```
 
+**Auto-Detection:**
+
+When no `--id` is provided:
+- If on main branch: Requires `--id` (error if not provided)
+- If on feature branch: Extracts ID from branch name (e.g., `123-feature-name` → ID 123)
+
 **Options:**
-- `--id <id>` — Work item ID (required)
+- `--id <id>` — Work item ID (optional; auto-detected from branch name if not on main)
 - `-c, --comments` — Show comments/discussion
 - `--verbose` — Show mapping
+
+**Branch Name Format:**
+- Expected format: `<number>-<description>`
+- Examples:
+  - ✓ `244-issue` → Work item ID 244
+  - ✓ `123-feature-name` → Work item ID 123
+  - ✗ `issue-244` → Error (number must be at start)
+  - ✗ `feature` → Error (no number found)
 
 #### wi create
 
@@ -344,29 +359,40 @@ Next steps guidance:
 
 #### wi start
 
-Start work on a work item by creating a feature branch and PR template. The `--id` option is optional; if omitted, the work item ID is auto-detected from the current branch name or renamed file (`.temp\<id>-*.md`).
+Start work on a work item by creating a feature branch and PR template. The work item ID is optional; if omitted, it is auto-detected from the current branch name (if not on main).
 
 **Usage:**
 ```bash
-sdo wi start                         # Auto-detect from branch/file
-sdo wi start --id 247                # Explicit work item ID
-sdo wi start --id 247 --verbose      # Show mapping and details
+sdo wi start                        # Auto-detect from branch name
+sdo wi start 243                    # Start item 243 with explicit ID
+sdo wi start 243 --verbose          # Verbose output showing detection steps
 ```
 
 **Auto-Detection:**
 
-When no `--id` is provided, the tool attempts to extract the work item ID from:
-1. Current Git branch name (e.g., `feat/247-github-issue-title` → detects `247`)
-2. Renamed work item file in `.temp\` (e.g., `.temp\247-issue.md` → detects `247`)
+When no ID is provided:
+- If on main branch: Requires ID (error if not provided)
+- If on feature branch: Extracts ID from branch name (e.g., `123-feature-name` → ID 123)
+
+**Arguments:**
+- `[id]` — Work item ID (optional; auto-detected from branch name if not on main)
 
 **Options:**
-- `--id <id>` — Work item ID (optional; auto-detected if not provided)
-- `--verbose` — Show mapping and API commands
+- `--verbose` — Enable verbose output
 
-**What it does:**
-1. Creates a feature branch from the work item ID and title
-2. Generates a PR template with work item metadata
-3. Prepares the workspace for implementation
+**Branch Name Format:**
+- Expected format: `<number>-<description>`
+- Examples:
+  - ✓ `244-issue` → Work item ID 244
+  - ✓ `123-feature-name` → Work item ID 123
+  - ✗ `issue-244` → Error (number must be at start)
+  - ✗ `feature` → Error (no number found)
+
+**Workflow:**
+1. Switches to main branch and syncs with remote
+2. Creates feature branch named `<id>-<slugified-title>`
+3. Copies PR template to `.temp/<id>-pr-message.md`
+4. Ready for development and PR creation
 
 **Output Example:**
 ```

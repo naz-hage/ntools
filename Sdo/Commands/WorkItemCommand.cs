@@ -59,7 +59,7 @@ namespace Sdo.Commands
         {
             var showCommand = new Command("show", "Display detailed work item information");
 
-            var idOption = new Option<int>("--id") { Description = "Work item ID (required)" };
+            var idOption = new Option<int?>("--id") { Description = "Work item ID (optional; auto-detected from branch name if not on main)" };
             var commentsOption = new Option<bool>("--comments") { Description = "Show comments/discussion", Aliases = { "-c" } };
 
             showCommand.Add(idOption);
@@ -167,7 +167,11 @@ namespace Sdo.Commands
         {
             var startCommand = new Command("start", "Start work on a work item by creating a feature branch and PR template");
 
-            var idArgument = new Argument<int>("id") { Description = "Work item ID (required)" };
+            var idArgument = new Argument<int?>("id") 
+            { 
+                Description = "Work item ID (optional; auto-detected from branch name if not on main)",
+                Arity = ArgumentArity.ZeroOrOne
+            };
 
             startCommand.Add(idArgument);
             startCommand.Add(verboseOption);
@@ -244,14 +248,24 @@ namespace Sdo.Commands
         /// <summary>
         /// Handles displaying work item details.
         /// </summary>
-        /// <param name="id">The work item ID.</param>
+        /// <param name="id">The work item ID (optional; auto-detected from branch if not provided).</param>
         /// <param name="includeComments">Whether to include comments/discussion.</param>
         /// <param name="verbose">Whether to enable verbose output.</param>
         /// <returns>Exit code.</returns>
-        private async Task<int> ShowWorkItem(int id, bool includeComments, bool verbose)
+        private async Task<int> ShowWorkItem(int? id, bool includeComments, bool verbose)
         {
             try
             {
+                // Auto-detect work item ID from branch name if not provided
+                if (!id.HasValue)
+                {
+                    id = TryAutoDetectWorkItemIdFromBranch(verbose);
+                    if (!id.HasValue)
+                    {
+                        return 1;
+                    }
+                }
+
                 if (verbose)
                 {
                     ConsoleHelper.WriteLine($"Detecting platform and retrieving work item {id}...", ConsoleColor.Green);
@@ -268,7 +282,7 @@ namespace Sdo.Commands
                         var repoInfo = _platformDetector.GetRepositoryInfo();
                         if (repoInfo != null && !string.IsNullOrEmpty(repoInfo.Owner) && !string.IsNullOrEmpty(repoInfo.Repo))
                         {
-                            mappingCmd = _mappingGenerator.IssueShowGitHub(repoInfo.Owner, repoInfo.Repo, id);
+                            mappingCmd = _mappingGenerator.IssueShowGitHub(repoInfo.Owner, repoInfo.Repo, (int)id!);
                         }
                     }
                     else if (platform == Platform.AzureDevOps)
@@ -277,7 +291,7 @@ namespace Sdo.Commands
                         var project = _platformDetector.GetProject();
                         if (!string.IsNullOrEmpty(org) && !string.IsNullOrEmpty(project))
                         {
-                            mappingCmd = _mappingGenerator.WorkItemShowAzure(org, project, id);
+                            mappingCmd = _mappingGenerator.WorkItemShowAzure(org, project, (int)id!);
                         }
                     }
 
@@ -291,11 +305,11 @@ namespace Sdo.Commands
 
                 if (platform == Platform.GitHub)
                 {
-                    return await ShowGitHubIssue(id, includeComments, verbose);
+                    return await ShowGitHubIssue((int)id!, includeComments, verbose);
                 }
                 else if (platform == Platform.AzureDevOps)
                 {
-                    return await ShowAzureDevOpsWorkItem(id, includeComments, verbose);
+                    return await ShowAzureDevOpsWorkItem((int)id!, includeComments, verbose);
                 }
                 else
                 {
@@ -2021,10 +2035,23 @@ namespace Sdo.Commands
         /// <param name="id">The work item ID.</param>
         /// <param name="verbose">Whether to enable verbose output.</param>
         /// <returns>Exit code.</returns>
-        private async Task<int> StartWorkItem(int id, bool verbose)
+        private async Task<int> StartWorkItem(int? idParam, bool verbose)
         {
             try
             {
+                // Auto-detect work item ID from branch name if not provided
+                int? detectedId = idParam;
+                if (!detectedId.HasValue)
+                {
+                    detectedId = TryAutoDetectWorkItemIdFromBranch(verbose);
+                    if (!detectedId.HasValue)
+                    {
+                        return 1;
+                    }
+                }
+
+                int id = (int)detectedId!;
+
                 if (verbose)
                 {
                     ConsoleHelper.WriteLine($"Starting work on work item {id}...", ConsoleColor.Green);
@@ -2285,6 +2312,62 @@ namespace Sdo.Commands
                 return Path.Combine(".azuredevops", "PULL_REQUEST_TEMPLATE.md");
             }
             return string.Empty;
+        }
+
+        /// <summary>
+        /// Attempts to auto-detect work item ID from the current Git branch name.
+        /// Returns null and logs errors if auto-detection fails or if on main branch.
+        /// </summary>
+        /// <param name="verbose">Whether to enable verbose output.</param>
+        /// <returns>The detected work item ID, or null if auto-detection failed.</returns>
+        private int? TryAutoDetectWorkItemIdFromBranch(bool verbose)
+        {
+            var gitWrapper = new GitWrapper(verbose: verbose);
+            var currentBranch = gitWrapper.Branch;
+
+            // Main branch requires explicit --id
+            if (currentBranch == "main")
+            {
+                ConsoleHelper.WriteLine("X Work item ID is required when on main branch. Use --id <number>", ConsoleColor.Red);
+                return null;
+            }
+
+            // Try to extract ID from branch name
+            var workItemId = ExtractWorkItemIdFromBranch(currentBranch);
+            if (!workItemId.HasValue)
+            {
+                ConsoleHelper.WriteLine($"X Could not auto-detect work item ID from branch name '{currentBranch}'", ConsoleColor.Red);
+                ConsoleHelper.WriteLine("  Expected branch format: <number>-<description> (e.g., 123-feature-name)", ConsoleColor.Red);
+                ConsoleHelper.WriteLine("  Or use --id <number> to specify explicitly", ConsoleColor.Red);
+                return null;
+            }
+
+            if (verbose)
+            {
+                ConsoleHelper.WriteLine($"Auto-detected work item ID {workItemId} from branch '{currentBranch}'", ConsoleColor.Green);
+            }
+
+            return workItemId;
+        }
+
+        /// <summary>
+        /// Extracts the work item ID from the branch name.
+        /// Expected format: <number>-<description> (e.g., 244-issue)
+        /// </summary>
+        /// <param name="branchName">The git branch name.</param>
+        /// <returns>The work item ID, or null if not found.</returns>
+        private int? ExtractWorkItemIdFromBranch(string branchName)
+        {
+            if (string.IsNullOrEmpty(branchName))
+                return null;
+
+            var match = System.Text.RegularExpressions.Regex.Match(branchName, @"^(\d+)-");
+            if (match.Success && int.TryParse(match.Groups[1].Value, out int id))
+            {
+                return id;
+            }
+
+            return null;
         }
     }
 }

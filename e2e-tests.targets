@@ -22,13 +22,13 @@
 	<Target Name="CLEANUP_TEST_BRANCHES">
 		<Message Text="Cleaning up local branches in test repositories..." Importance="high" />
 		
-		<!-- GitHub test repo (c:\prog\naz) -->
-		<Message Text="Checking GitHub test repo (c:\prog\naz)..." Importance="high" />
-		<Exec Command="powershell -Command &quot;if (Test-Path 'c:\prog\naz\.git') { cd 'c:\prog\naz'; Write-Host 'GitHub repo found'; git checkout main 2>$null; git for-each-ref --format='%(refname:short)' refs/heads | Where-Object {$_ -ne 'main'} | ForEach-Object { git branch -D $_ 2>$null } | Out-Null; Write-Host 'Cleaned GitHub repo' } else { Write-Host 'GitHub repo not found at c:\prog\naz' }&quot;" ContinueOnError="true" />
+		<!-- GitHub test repo (C:\source\naz) -->
+		<Message Text="Checking GitHub test repo (C:\source\naz)..." Importance="high" />
+		<Exec Command="powershell -Command &quot;if (Test-Path 'C:\source\naz\.git') { cd 'C:\source\naz'; Write-Host 'GitHub repo found'; git checkout main 2>$null; git for-each-ref --format='%(refname:short)' refs/heads | Where-Object {$_ -ne 'main'} | ForEach-Object { git branch -D $_ 2>$null } | Out-Null; Write-Host 'Cleaned GitHub repo' } else { Write-Host 'GitHub repo not found at C:\source\naz' }&quot;" ContinueOnError="true" />
 		
-		<!-- Azure DevOps test repo (c:\source\ConsoleApp1) -->
-		<Message Text="Checking Azure DevOps test repo (c:\source\ConsoleApp1)..." Importance="high" />
-		<Exec Command="powershell -Command &quot;if (Test-Path 'c:\source\ConsoleApp1\.git') { cd 'c:\source\ConsoleApp1'; Write-Host 'Azure DevOps repo found'; git checkout main 2>$null; git for-each-ref --format='%(refname:short)' refs/heads | Where-Object {$_ -ne 'main'} | ForEach-Object { git branch -D $_ 2>$null } | Out-Null; Write-Host 'Cleaned Azure DevOps repo' } else { Write-Host 'Azure DevOps repo not found at c:\source\ConsoleApp1' }&quot;" ContinueOnError="true" />
+		<!-- Azure DevOps test repo (C:\source\ConsoleApp1) -->
+		<Message Text="Checking Azure DevOps test repo (C:\source\ConsoleApp1)..." Importance="high" />
+		<Exec Command="powershell -Command &quot;if (Test-Path 'C:\source\ConsoleApp1\.git') { cd 'C:\source\ConsoleApp1'; Write-Host 'Azure DevOps repo found'; git checkout main 2>$null; git for-each-ref --format='%(refname:short)' refs/heads | Where-Object {$_ -ne 'main'} | ForEach-Object { git branch -D $_ 2>$null } | Out-Null; Write-Host 'Cleaned Azure DevOps repo' } else { Write-Host 'Azure DevOps repo not found at C:\source\ConsoleApp1' }&quot;" ContinueOnError="true" />
 		
 		<Message Text="✓ Test repositories cleaned and ready" Importance="high" />
 	</Target>

@@ -78,7 +78,7 @@ public class WorkItemCommandTests
         // Assert
         var idOption = Assert.Single(showCmd.Options, o => o.Name == "--id");
         Assert.NotNull(idOption);
-        Assert.Equal("Work item ID (required)", idOption.Description);
+        Assert.Equal("Work item ID (optional; auto-detected from branch name if not on main)", idOption.Description);
     }
 
     [Fact]
@@ -720,7 +720,7 @@ public class WorkItemCommandTests
         // Assert
         var idArgument = Assert.Single(startCmd.Arguments, a => a.Name == "id");
         Assert.NotNull(idArgument);
-        Assert.Equal("Work item ID (required)", idArgument.Description);
+        Assert.Equal("Work item ID (optional; auto-detected from branch name if not on main)", idArgument.Description);
     }
 
     [Fact]
@@ -737,7 +737,7 @@ public class WorkItemCommandTests
     }
 
     [Fact]
-    public void StartSubcommand_WithNoArguments_Fails()
+    public void StartSubcommand_WithNoArguments_Succeeds()
     {
         // Arrange
         var command = new WorkItemCommand(_verboseOption);
@@ -747,8 +747,8 @@ public class WorkItemCommandTests
         var parseResult = command.Parse(args);
 
         // Assert
-        // Should have an error because id is required
-        Assert.NotEmpty(parseResult.Errors);
+        // Should parse successfully because id is now optional (auto-detected from branch at runtime)
+        Assert.Empty(parseResult.Errors);
     }
 
     [Fact]
@@ -961,6 +961,57 @@ public class WorkItemCommandTests
 
         // Assert
         Assert.True(result == 0 || result == 1, $"Expected exit code 0 or 1, got {result}");
+    }
+
+    #endregion
+
+    #region Start Subcommand Auto-Detection Tests
+
+    [Fact]
+    public void StartSubcommand_WithoutId_AndNotOnMain_AutoDetectsFromBranchName()
+    {
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        // Test auto-detection without id argument
+        var args = new[] { "start" };
+
+        // Act
+        var result = command.Parse(args);
+
+        // Assert
+        // Should parse without error (auto-detection happens at runtime based on git branch)
+        Assert.NotNull(result);
+    }
+
+    [Fact]
+    public void StartSubcommand_WithoutId_ShouldParseSuccessfully()
+    {
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        var args = new[] { "start" };
+
+        // Act
+        var result = command.Parse(args);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Empty(result.Errors); // Parsing should succeed; runtime auto-detection happens in StartWorkItem
+    }
+
+    [Fact]
+    public void StartSubcommand_IdArgumentIsNowOptional()
+    {
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        var startSubcommand = Assert.Single(command.Subcommands, s => s.Name == "start");
+
+        // Act
+        var idArgument = startSubcommand.Arguments.FirstOrDefault(a => a.Name == "id");
+
+        // Assert
+        Assert.NotNull(idArgument);
+        // Verify it's optional (not required)
+        Assert.Equal(ArgumentArity.ZeroOrOne, idArgument.Arity);
     }
 
     #endregion
