@@ -172,12 +172,13 @@ sdo auth azdo --verbose     # Show token source details
 
 ### wi — Work Item Management
 
-Create, list, show, update work items and add comments. Supports GitHub issues and Azure DevOps work items with automatic state translation.
+Create, list, show, update work items, add comments, and start work. Supports GitHub issues and Azure DevOps work items with automatic state translation.
 
 **Subcommands:**
 - `list` — List work items with filtering
 - `show` — Display work item details
-- `create` — Create new work item from markdown file
+- `create` — Create new work item from markdown file (auto-detects `.temp\wi.md`)
+- `start` — Start work on a work item by creating a feature branch (auto-detects work item ID)
 - `update` — Update work item properties
 - `comment` — Add comment to work item
 
@@ -196,6 +197,7 @@ Commands:
   create   Create a new work item
   list     List work items with optional filtering
   show     Display detailed work item information
+  start    Start work on a work item by creating a feature branch and PR template
   update   Update work item properties
 ```
 
@@ -246,36 +248,68 @@ Summary:
 
 #### wi show
 
-Display full details of a work item.
+Display full details of a work item. The `--id` option is optional; if omitted, the work item ID is auto-detected from the current branch name (if not on main).
 
 **Usage:**
 ```bash
-sdo wi show --id 243                # Show item details
+sdo wi show                         # Auto-detect from branch name
+sdo wi show --id 243                # Show item details with explicit ID
 sdo wi show --id 243 --comments     # Include comments
 sdo wi show --id 243 --verbose      # Show API command
 ```
 
+**Auto-Detection:**
+
+When no `--id` is provided:
+- If on main branch: Requires `--id` (error if not provided)
+- If on feature branch: Extracts ID from branch name (e.g., `123-feature-name` → ID 123)
+
 **Options:**
-- `--id <id>` — Work item ID (required)
+- `--id <id>` — Work item ID (optional; auto-detected from branch name if not on main)
 - `-c, --comments` — Show comments/discussion
 - `--verbose` — Show mapping
 
+**Branch Name Format:**
+- Expected format: `<number>-<description>`
+- Examples:
+  - ✓ `244-issue` → Work item ID 244
+  - ✓ `123-feature-name` → Work item ID 123
+  - ✗ `issue-244` → Error (number must be at start)
+  - ✗ `feature` → Error (no number found)
+
 #### wi create
 
-Create new work item from markdown file.
+Create new work item from markdown file. The `-f` option is optional; if omitted, `.temp\wi.md` is auto-detected.
 
 **Usage:**
 ```bash
-sdo wi create --file-path work-item.md              # Create
+sdo wi create                                       # Auto-detect .temp\wi.md
+sdo wi create --file-path work-item.md              # Create from specified file
 sdo wi create -f work-item.md                       # Short option
 sdo wi create --file-path work-item.md --dry-run   # Preview
 sdo wi create --file-path work-item.md --verbose   # Show mapping
 ```
 
+**Auto-Detection & File Renaming:**
+
+When no `--file-path` is provided, the tool automatically looks for `.temp\wi.md`. After successful creation, the file is renamed based on the work item type:
+- **GitHub Issues**: `.temp\<issue-number>-issue.md`
+- **Azure DevOps Tasks**: `.temp\<id>-task.md`
+- **Azure DevOps PBIs**: `.temp\<id>-pbi.md`
+- **Azure DevOps Bugs**: `.temp\<id>-bug.md`
+- **Azure DevOps Features**: `.temp\<id>-feature.md`
+- **Azure DevOps Epics**: `.temp\<id>-epic.md`
+
+**Context-Aware Next Steps:**
+
+The tool provides intelligent workflow guidance after creation:
+- **Implementation Items** (Task, Bug): Shows `sdo wi start` command to begin work
+- **Planning Items** (PBI, Feature, Epic): Shows guidance for creating child work items
+
 **Options:**
-- `-f, --file-path <file-path>` — Path to markdown file containing work item details (required)
+- `-f, --file-path <file-path>` — Path to markdown file containing work item details (optional; defaults to `.temp\wi.md` if not provided)
 - `--dry-run` — Parse and preview work item creation without creating it
-- `--verbose` — Show mapping
+- `--verbose` — Show mapping and diagnostics
 
 **Markdown Format:**
 ```markdown
@@ -300,6 +334,72 @@ target: "github"  # or "azdo"
 
 # Title
 ...
+```
+
+**Workflow Examples:**
+
+Create a work item with auto-detected file:
+```bash
+# Prepare your work item template
+# Save to: .temp\wi.md
+
+# Create the work item (auto-detects .temp\wi.md)
+sdo wi create
+
+# File is automatically renamed to .temp\<id>-issue.md (GitHub) or .temp\<id>-task.md (Azure DevOps)
+```
+
+Next steps guidance:
+```
+✓ GitHub Issue #247 created successfully
+
+📋 Next Steps:
+  - Start work: sdo wi start
+```
+
+#### wi start
+
+Start work on a work item by creating a feature branch and PR template. The work item ID is optional; if omitted, it is auto-detected from the current branch name (if not on main).
+
+**Usage:**
+```bash
+sdo wi start                        # Auto-detect from branch name
+sdo wi start 243                    # Start item 243 with explicit ID
+sdo wi start 243 --verbose          # Verbose output showing detection steps
+```
+
+**Auto-Detection:**
+
+When no ID is provided:
+- If on main branch: Requires ID (error if not provided)
+- If on feature branch: Extracts ID from branch name (e.g., `123-feature-name` → ID 123)
+
+**Arguments:**
+- `[id]` — Work item ID (optional; auto-detected from branch name if not on main)
+
+**Options:**
+- `--verbose` — Enable verbose output
+
+**Branch Name Format:**
+- Expected format: `<number>-<description>`
+- Examples:
+  - ✓ `244-issue` → Work item ID 244
+  - ✓ `123-feature-name` → Work item ID 123
+  - ✗ `issue-244` → Error (number must be at start)
+  - ✗ `feature` → Error (no number found)
+
+**Workflow:**
+1. Switches to main branch and syncs with remote
+2. Creates feature branch named `<id>-<slugified-title>`
+3. Copies PR template to `.temp/<id>-pr-message.md`
+4. Ready for development and PR creation
+
+**Output Example:**
+```
+Starting work on work item 247...
+✓ Feature branch created: feat/247-github-issue-title
+✓ PR template generated at: .github/pull_request_template.md
+Ready to start implementing work item #247
 ```
 
 #### wi update

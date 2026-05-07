@@ -11,6 +11,7 @@ using System.CommandLine;
 using System.Linq;
 using System.Text.Json;
 using Nbuild.Helpers;
+using NbuildTasks;
 using Sdo.Interfaces;
 using Sdo.Services;
 using Sdo.Mapping;
@@ -896,26 +897,11 @@ namespace Sdo.Commands
         {
             try
             {
-                var processInfo = new System.Diagnostics.ProcessStartInfo
+                var gitWrapper = new GitWrapper();
+                var branch = gitWrapper.Branch;
+                if (!string.IsNullOrEmpty(branch))
                 {
-                    FileName = "git",
-                    Arguments = "branch --show-current",
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    CreateNoWindow = true
-                };
-
-                using (var process = System.Diagnostics.Process.Start(processInfo))
-                {
-                    if (process != null)
-                    {
-                        var output = process.StandardOutput.ReadToEnd().Trim();
-                        process.WaitForExit();
-                        if (!string.IsNullOrEmpty(output))
-                        {
-                            return output;
-                        }
-                    }
+                    return branch;
                 }
             }
             catch (Exception)

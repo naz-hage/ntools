@@ -215,7 +215,7 @@ public class PullRequestCommandTests
             var method = typeof(PullRequestCommand).GetMethod("UpdatePullRequest", BindingFlags.NonPublic | BindingFlags.Instance);
             Assert.NotNull(method);
 
-            var task = (Task<int>)method.Invoke(command, new object[] { 0, null, null, null, false })!;
+            var task = (Task<int>)method!.Invoke(command, new object[] { 0, null!, null!, null!, false })!;
             var result = await task;
 
             // Should return error code 1
@@ -232,7 +232,7 @@ public class PullRequestCommandTests
             var method = typeof(PullRequestCommand).GetMethod("UpdatePullRequest", BindingFlags.NonPublic | BindingFlags.Instance);
             Assert.NotNull(method);
 
-            var task = (Task<int>)method.Invoke(command, new object[] { -1, null, null, null, false })!;
+            var task = (Task<int>)method!.Invoke(command, new object[] { -1, null!, null!, null!, false })!;
             var result = await task;
 
             // Should return error code 1
@@ -249,7 +249,7 @@ public class PullRequestCommandTests
             var method = typeof(PullRequestCommand).GetMethod("UpdatePullRequest", BindingFlags.NonPublic | BindingFlags.Instance);
             Assert.NotNull(method);
 
-            var task = (Task<int>)method.Invoke(command, new object[] { 0, null, null, null, false })!;
+            var task = (Task<int>)method!.Invoke(command, new object[] { 0, null!, null!, null!, false })!;
             await task;
 
             var output = capture.GetOutput();
@@ -328,7 +328,7 @@ public class PullRequestCommandTests
             var method = typeof(PullRequestCommand).GetMethod("UpdatePullRequest", BindingFlags.NonPublic | BindingFlags.Instance);
             Assert.NotNull(method);
 
-            var task = (Task<int>)method.Invoke(command, new object[] { 0, null, null, null, false })!;
+            var task = (Task<int>)method!.Invoke(command, new object[] { 0, null!, null!, null!, false })!;
             await task;
 
             var output = capture.GetOutput();
