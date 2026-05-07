@@ -1125,6 +1125,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#wi-close" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        wi close
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#wi-comment" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2959,16 +2970,23 @@ sdo<span class="w"> </span>wi<span class="w"> </span>start<span class="w"> </spa
 Ready to start implementing work item #247
 </code></pre></div></p>
 <h4 id="wi-update">wi update<a class="headerlink" href="#wi-update" title="Anchor link to this section for reference">&para;</a></h4>
-<p>Update work item properties.</p>
+<p>Update work item properties. The <code>--id</code> option is optional; if omitted, the work item ID is auto-detected from the current branch name (if not on main).</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--state<span class="w"> </span>Done<span class="w">                    </span><span class="c1"># Update state</span>
-sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--title<span class="w"> </span><span class="s2">&quot;New Title&quot;</span><span class="w">            </span><span class="c1"># Update title</span>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w">                                          </span><span class="c1"># Auto-detect ID from branch, requires at least one property</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--state<span class="w"> </span>Done<span class="w">                             </span><span class="c1"># Auto-detect ID, update state</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--state<span class="w"> </span>Done<span class="w">                    </span><span class="c1"># Update state with explicit ID</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--title<span class="w"> </span><span class="s2">&quot;New Title&quot;</span><span class="w">             </span><span class="c1"># Update title</span>
 sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--assignee<span class="w"> </span>user@example.com<span class="w">    </span><span class="c1"># Change assignee</span>
 sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--state<span class="w"> </span>Done<span class="w"> </span>--title<span class="w"> </span><span class="s2">&quot;Title&quot;</span><span class="w">   </span><span class="c1"># Multiple fields</span>
-sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--state<span class="w"> </span><span class="k">done</span><span class="w">                   </span><span class="c1"># Case-insensitive</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--state<span class="w"> </span><span class="k">done</span><span class="w">                             </span><span class="c1"># Case-insensitive</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--state<span class="w"> </span>Done<span class="w"> </span>--verbose<span class="w">                  </span><span class="c1"># Show mapping with auto-detection</span>
 </code></pre></div></p>
+<p><strong>Auto-Detection:</strong></p>
+<p>When no <code>--id</code> is provided:
+- If on main branch: Requires <code>--id</code> (error if not provided)
+- If on feature branch: Extracts ID from branch name (e.g., <code>123-feature-name</code> → ID 123)</p>
 <p><strong>Options:</strong>
-- <code>--id &lt;id&gt;</code> — Work item ID (required)
+- <code>--id &lt;id&gt;</code> — Work item ID (optional; auto-detected from branch name if not on main)
 - <code>--title &lt;title&gt;</code> — Update work item title
 - <code>--state &lt;state&gt;</code> — Update work item state
 - <code>--assignee &lt;assignee&gt;</code> — Update assigned user
@@ -2976,6 +2994,47 @@ sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </sp
 - <code>--verbose</code> — Show mapping</p>
 <p><strong>Valid States</strong> (case-insensitive):
 - <code>New</code>, <code>Approved</code>, <code>Committed</code>, <code>Done</code>, <code>To Do</code>, <code>In Progress</code></p>
+<h4 id="wi-close">wi close<a class="headerlink" href="#wi-close" title="Anchor link to this section for reference">&para;</a></h4>
+<p>Close a work item and delete the feature branch. Auto-detects work item ID from the current branch name. Performs git operations: checkout main, pull latest, and delete feature branch.</p>
+<p><strong>Usage:</strong>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>wi<span class="w"> </span>close<span class="w">                         </span><span class="c1"># Auto-detect ID from branch name and close</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>close<span class="w"> </span><span class="m">243</span><span class="w">                     </span><span class="c1"># Close with explicit ID</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>close<span class="w"> </span>--verbose<span class="w">               </span><span class="c1"># Show detailed output during close</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>close<span class="w"> </span><span class="m">243</span><span class="w"> </span>--verbose<span class="w">           </span><span class="c1"># Close with explicit ID and verbose output</span>
+</code></pre></div></p>
+<p><strong>Auto-Detection:</strong></p>
+<p>When no ID argument is provided:
+- If on main branch: Requires explicit ID (e.g., <code>sdo wi close 123</code>)
+- If on feature branch: Extracts ID from branch name (e.g., <code>123-feature-name</code> → ID 123)</p>
+<p><strong>What it does:</strong>
+1. Validates the work item exists on the current platform (GitHub or Azure DevOps)
+2. Checks out the main branch
+3. Pulls the latest changes from main
+4. Deletes the feature branch locally</p>
+<p><strong>Options:</strong>
+- <code>&lt;id&gt;</code> — Work item ID (optional; auto-detected from branch name if not on main)
+- <code>--verbose</code> — Show detailed output including validation and execution phases</p>
+<p><strong>Example Workflow:</strong>
+<div class="highlight"><pre><span></span><code><span class="c1"># 1. Start work on issue 243</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>start<span class="w"> </span><span class="m">243</span>
+<span class="c1"># Creates branch: 243-issue-description</span>
+
+<span class="c1"># 2. Work on the feature...</span>
+<span class="c1"># (make changes, commit, create PR, merge)</span>
+
+<span class="c1"># 3. Close the work item and clean up</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>close
+<span class="c1"># Auto-detects ID 243 from branch name</span>
+<span class="c1"># Checks out main</span>
+<span class="c1"># Pulls latest</span>
+<span class="c1"># Deletes 243-issue-description branch</span>
+</code></pre></div></p>
+<p><strong>Branch Name Format:</strong>
+- Expected format: <code>&lt;number&gt;-&lt;description&gt;</code>
+- Examples:
+  - ✓ <code>244-issue</code> → Work item ID 244
+  - ✓ <code>123-feature-name</code> → Work item ID 123
+  - ✗ <code>feature</code> → Error (no number found)</p>
 <h4 id="wi-comment">wi comment<a class="headerlink" href="#wi-comment" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Add comment to work item.</p>
 <p><strong>Usage:</strong>
