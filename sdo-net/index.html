@@ -2841,16 +2841,28 @@ Summary:
   OPEN: 18
 </code></pre></div></p>
 <h4 id="wi-show">wi show<a class="headerlink" href="#wi-show" title="Anchor link to this section for reference">&para;</a></h4>
-<p>Display full details of a work item.</p>
+<p>Display full details of a work item. The <code>--id</code> option is optional; if omitted, the work item ID is auto-detected from the current branch name (if not on main).</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>wi<span class="w"> </span>show<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w">                </span><span class="c1"># Show item details</span>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>wi<span class="w"> </span>show<span class="w">                         </span><span class="c1"># Auto-detect from branch name</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>show<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w">                </span><span class="c1"># Show item details with explicit ID</span>
 sdo<span class="w"> </span>wi<span class="w"> </span>show<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--comments<span class="w">     </span><span class="c1"># Include comments</span>
 sdo<span class="w"> </span>wi<span class="w"> </span>show<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--verbose<span class="w">      </span><span class="c1"># Show API command</span>
 </code></pre></div></p>
+<p><strong>Auto-Detection:</strong></p>
+<p>When no <code>--id</code> is provided:
+- If on main branch: Requires <code>--id</code> (error if not provided)
+- If on feature branch: Extracts ID from branch name (e.g., <code>123-feature-name</code> → ID 123)</p>
 <p><strong>Options:</strong>
-- <code>--id &lt;id&gt;</code> — Work item ID (required)
+- <code>--id &lt;id&gt;</code> — Work item ID (optional; auto-detected from branch name if not on main)
 - <code>-c, --comments</code> — Show comments/discussion
 - <code>--verbose</code> — Show mapping</p>
+<p><strong>Branch Name Format:</strong>
+- Expected format: <code>&lt;number&gt;-&lt;description&gt;</code>
+- Examples:
+  - ✓ <code>244-issue</code> → Work item ID 244
+  - ✓ <code>123-feature-name</code> → Work item ID 123
+  - ✗ <code>issue-244</code> → Error (number must be at start)
+  - ✗ <code>feature</code> → Error (no number found)</p>
 <h4 id="wi-create">wi create<a class="headerlink" href="#wi-create" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Create new work item from markdown file. The <code>-f</code> option is optional; if omitted, <code>.temp\wi.md</code> is auto-detected.</p>
 <p><strong>Usage:</strong>
@@ -2914,23 +2926,32 @@ sdo<span class="w"> </span>wi<span class="w"> </span>create
   - Start work: sdo wi start
 </code></pre></div></p>
 <h4 id="wi-start">wi start<a class="headerlink" href="#wi-start" title="Anchor link to this section for reference">&para;</a></h4>
-<p>Start work on a work item by creating a feature branch and PR template. The <code>--id</code> option is optional; if omitted, the work item ID is auto-detected from the current branch name or renamed file (<code>.temp\&lt;id&gt;-*.md</code>).</p>
+<p>Start work on a work item by creating a feature branch and PR template. The work item ID is optional; if omitted, it is auto-detected from the current branch name (if not on main).</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>wi<span class="w"> </span>start<span class="w">                         </span><span class="c1"># Auto-detect from branch/file</span>
-sdo<span class="w"> </span>wi<span class="w"> </span>start<span class="w"> </span>--id<span class="w"> </span><span class="m">247</span><span class="w">                </span><span class="c1"># Explicit work item ID</span>
-sdo<span class="w"> </span>wi<span class="w"> </span>start<span class="w"> </span>--id<span class="w"> </span><span class="m">247</span><span class="w"> </span>--verbose<span class="w">      </span><span class="c1"># Show mapping and details</span>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>wi<span class="w"> </span>start<span class="w">                        </span><span class="c1"># Auto-detect from branch name</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>start<span class="w"> </span><span class="m">243</span><span class="w">                    </span><span class="c1"># Start item 243 with explicit ID</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>start<span class="w"> </span><span class="m">243</span><span class="w"> </span>--verbose<span class="w">          </span><span class="c1"># Verbose output showing detection steps</span>
 </code></pre></div></p>
 <p><strong>Auto-Detection:</strong></p>
-<p>When no <code>--id</code> is provided, the tool attempts to extract the work item ID from:
-1. Current Git branch name (e.g., <code>feat/247-github-issue-title</code> → detects <code>247</code>)
-2. Renamed work item file in <code>.temp\</code> (e.g., <code>.temp\247-issue.md</code> → detects <code>247</code>)</p>
+<p>When no ID is provided:
+- If on main branch: Requires ID (error if not provided)
+- If on feature branch: Extracts ID from branch name (e.g., <code>123-feature-name</code> → ID 123)</p>
+<p><strong>Arguments:</strong>
+- <code>[id]</code> — Work item ID (optional; auto-detected from branch name if not on main)</p>
 <p><strong>Options:</strong>
-- <code>--id &lt;id&gt;</code> — Work item ID (optional; auto-detected if not provided)
-- <code>--verbose</code> — Show mapping and API commands</p>
-<p><strong>What it does:</strong>
-1. Creates a feature branch from the work item ID and title
-2. Generates a PR template with work item metadata
-3. Prepares the workspace for implementation</p>
+- <code>--verbose</code> — Enable verbose output</p>
+<p><strong>Branch Name Format:</strong>
+- Expected format: <code>&lt;number&gt;-&lt;description&gt;</code>
+- Examples:
+  - ✓ <code>244-issue</code> → Work item ID 244
+  - ✓ <code>123-feature-name</code> → Work item ID 123
+  - ✗ <code>issue-244</code> → Error (number must be at start)
+  - ✗ <code>feature</code> → Error (no number found)</p>
+<p><strong>Workflow:</strong>
+1. Switches to main branch and syncs with remote
+2. Creates feature branch named <code>&lt;id&gt;-&lt;slugified-title&gt;</code>
+3. Copies PR template to <code>.temp/&lt;id&gt;-pr-message.md</code>
+4. Ready for development and PR creation</p>
 <p><strong>Output Example:</strong>
 <div class="highlight"><pre><span></span><code>Starting work on work item 247...
 ✓ Feature branch created: feat/247-github-issue-title
