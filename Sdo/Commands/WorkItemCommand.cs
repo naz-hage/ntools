@@ -2399,14 +2399,14 @@ namespace Sdo.Commands
                     }
                     if (verbose) ConsoleHelper.WriteLine($"✓ Issue found: {issue.Title}", ConsoleColor.Yellow);
 
-                    // Validate: Issue state is closed
+                    // Validate: Issue state is closed or done
                     if (verbose) ConsoleHelper.WriteLine("\nValidating: Issue State", ConsoleColor.Cyan);
-                    if (issue.State != "closed")
+                    if (issue.State != "closed" && issue.State != "done")
                     {
                         ConsoleHelper.WriteLine($"X Issue #{id} is not closed (state: {issue.State}). Please close the issue first.", ConsoleColor.Red);
                         return 1;
                     }
-                    if (verbose) ConsoleHelper.WriteLine($"✓ Issue is closed", ConsoleColor.Yellow);
+                    if (verbose) ConsoleHelper.WriteLine($"✓ Issue is in completed state ({issue.State})", ConsoleColor.Yellow);
                 }
                 else if (platform == Platform.AzureDevOps)
                 {
@@ -2438,14 +2438,14 @@ namespace Sdo.Commands
                     }
                     if (verbose) ConsoleHelper.WriteLine($"✓ Work item found: {workItem.Title}", ConsoleColor.Yellow);
 
-                    // Validate: Work item state is done
+                    // Validate: Work item state is closed or done
                     if (verbose) ConsoleHelper.WriteLine("\nValidating: Work Item State", ConsoleColor.Cyan);
-                    if (workItem.State != "Done")
+                    if (workItem.State != "Closed" && workItem.State != "Done")
                     {
-                        ConsoleHelper.WriteLine($"X Work item {id} is not in 'Done' state (state: {workItem.State}). Please complete the work item first.", ConsoleColor.Red);
+                        ConsoleHelper.WriteLine($"X Work item {id} is not in completed state (state: {workItem.State}). Please complete the work item first.", ConsoleColor.Red);
                         return 1;
                     }
-                    if (verbose) ConsoleHelper.WriteLine($"✓ Work item state is Done", ConsoleColor.Yellow);
+                    if (verbose) ConsoleHelper.WriteLine($"✓ Work item state is completed ({workItem.State})", ConsoleColor.Yellow);
                 }
                 else
                 {
