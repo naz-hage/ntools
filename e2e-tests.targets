@@ -94,17 +94,18 @@
 		      Condition="!Exists('$(SolutionDir)\sdo-e2e-test\bin\Debug\net10.0\sdo.runtimeconfig.json')" />
 	</Target>
 
-	<!-- Run SDO E2E tests -->
-	<Target Name="RUN_SDO_E2E_TESTS" DependsOnTargets="COPY_SDO_EXECUTABLE">
-		<Message Text="Running SDO E2E tests..." Importance="high" />
-		<PropertyGroup>
-			<SdoE2eTestExe>.\sdo-e2e-test.exe</SdoE2eTestExe>
-			<SdoE2eTestDir>$(SolutionDir)\sdo-e2e-test\bin\Debug\net10.0\</SdoE2eTestDir>
-		</PropertyGroup>
-		<Exec Command="$(SdoE2eTestExe) test --verbose"
-		      WorkingDirectory="$(SdoE2eTestDir)"
-		      EnvironmentVariables="SOLUTION_DIR=$(SolutionDir)" />
-		<Message Text="✓ SDO E2E tests completed" Importance="high" />
+	<!-- Main E2E target - builds and runs all E2E tests via sdo-e2e-test CLI -->
+	<Target Name="E2E" DependsOnTargets="COPY_SDO_EXECUTABLE;DELETE_E2E_LOG;CLEANUP_TEST_BRANCHES">
+		<Message Text="======================================" Importance="high" />
+		<Message Text="Running all E2E tests via sdo-e2e-test CLI..." Importance="high" />
+		<Message Text="======================================" Importance="high" />
+		<Exec Command=".\sdo-e2e-test.exe test --verbose --log-file $(E2ELogFile)"
+		      WorkingDirectory="$(SolutionDir)\sdo-e2e-test\bin\Debug\net10.0\"
+		      ContinueOnError="false" />
+		<Message Text="======================================" Importance="high" />
+		<Message Text="✓ All E2E tests completed successfully" Importance="high" />
+		<Message Text="======================================" Importance="high" />
+		<Message Text="Test output log: $(E2ELogFile)" Importance="normal" />
 	</Target>
 
 	<!-- Run GitHub Pipeline Creation test -->
@@ -539,20 +540,6 @@
 	<Target Name="E2E_PIPELINES" DependsOnTargets="ARTIFACTS;DELETE_E2E_LOG;RUN_GITHUB_PIPELINE_TEST;RUN_AZDO_PIPELINE_TEST">
 		<Message Text="======================================" Importance="high" />
 		<Message Text="✓ All Pipeline Creation tests completed successfully" Importance="high" />
-		<Message Text="======================================" Importance="high" />
-		<Message Text="Test output log: $(E2ELogFile)" Importance="normal" />
-	</Target>
-
-	<!-- Main E2E target - builds and runs all E2E tests via sdo-e2e-test CLI -->
-	<Target Name="E2E" DependsOnTargets="COPY_SDO_EXECUTABLE;DELETE_E2E_LOG;CLEANUP_TEST_BRANCHES">
-		<Message Text="======================================" Importance="high" />
-		<Message Text="Running all E2E tests via sdo-e2e-test CLI..." Importance="high" />
-		<Message Text="======================================" Importance="high" />
-		<Exec Command=".\sdo-e2e-test.exe test --verbose --log-file $(E2ELogFile)"
-		      WorkingDirectory="$(SolutionDir)\sdo-e2e-test\bin\Debug\net10.0\"
-		      ContinueOnError="false" />
-		<Message Text="======================================" Importance="high" />
-		<Message Text="✓ All E2E tests completed successfully" Importance="high" />
 		<Message Text="======================================" Importance="high" />
 		<Message Text="Test output log: $(E2ELogFile)" Importance="normal" />
 	</Target>
