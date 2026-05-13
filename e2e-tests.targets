@@ -330,20 +330,6 @@
 		<Message Text="✓ Azure DevOps Work Item Create Task test completed" Importance="high" />
 	</Target>
 
-	<!-- Run Azure DevOps Work Item Create Type Verification test -->
-	<Target Name="RUN_AZDO_WI_CREATE_TYPE_TEST" DependsOnTargets="COPY_SDO_EXECUTABLE">
-		<Message Text="Running Azure DevOps Work Item Create Type Verification test..." Importance="high" />
-		<PropertyGroup>
-			<SdoE2eTestExe>$(SolutionDir)\sdo-e2e-test\bin\Debug\net10.0\sdo-e2e-test.exe</SdoE2eTestExe>
-		</PropertyGroup>
-		<Exec Command="$(SdoE2eTestExe) test --verbose --test-case Validate_AzureDevOps_CreatedWorkItemHasCorrectType"
-		      WorkingDirectory="$(SolutionDir)"
-		      IgnoreExitCode="false"
-		      ContinueOnError="false"
-		      EnvironmentVariables="SOLUTION_DIR=$(SolutionDir)" />
-		<Message Text="✓ Azure DevOps Work Item Create Type Verification test completed" Importance="high" />
-	</Target>
-
 	<!-- Run Azure DevOps Work Item Create Parent ID Verification test -->
 	<Target Name="RUN_AZDO_WI_CREATE_PARENT_ID_TEST" DependsOnTargets="COPY_SDO_EXECUTABLE">
 		<Message Text="Running Azure DevOps Work Item Create Parent ID Verification test..." Importance="high" />

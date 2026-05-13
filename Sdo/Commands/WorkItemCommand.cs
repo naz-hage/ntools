@@ -1686,6 +1686,17 @@ namespace Sdo.Commands
             // Display Assigned To field
             Console.WriteLine($"Assigned To: {issue.Assignee?.Login ?? "Not assigned"}");
 
+            // Display Labels field
+            if (issue.Labels != null && issue.Labels.Any())
+            {
+                var labelNames = string.Join(", ", issue.Labels.Select(l => l.Name));
+                Console.WriteLine($"Labels:      {labelNames}");
+            }
+            else
+            {
+                Console.WriteLine("Labels:      (none)");
+            }
+
             if (!string.IsNullOrEmpty(issue.Body))
             {
                 Console.WriteLine();
@@ -1723,6 +1734,16 @@ namespace Sdo.Commands
             Console.WriteLine($"Area:        {workItem.Area ?? "Not assigned"}");
             Console.WriteLine($"Iteration:   {workItem.Sprint ?? "Not assigned"}");
             Console.WriteLine($"Assigned To: {workItem.AssignedTo ?? "Not assigned"}");
+
+            // Display Labels (Tags) field
+            if (!string.IsNullOrEmpty(workItem.Tags))
+            {
+                Console.WriteLine($"Labels:      {workItem.Tags}");
+            }
+            else
+            {
+                Console.WriteLine("Labels:      (none)");
+            }
 
             if (!string.IsNullOrEmpty(workItem.Description))
             {
