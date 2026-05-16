@@ -795,7 +795,10 @@ namespace Sdo.Commands
                     }
                 }
 
-                var workItems = await client.ListWorkItemsAsync(top, areaPath, iteration, verbose);
+                // When filtering might be applied, fetch more items than requested
+                // to ensure we have enough after filtering is done
+                int fetchCount = top > 0 ? Math.Max(200, top * 5) : 500;
+                var workItems = await client.ListWorkItemsAsync(fetchCount, areaPath, iteration, verbose);
 
                 if (workItems == null)
                 {
