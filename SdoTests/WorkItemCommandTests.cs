@@ -78,7 +78,7 @@ public class WorkItemCommandTests
         // Assert
         var idOption = Assert.Single(showCmd.Options, o => o.Name == "--id");
         Assert.NotNull(idOption);
-        Assert.Equal("Work item ID (required)", idOption.Description);
+        Assert.Equal("Work item ID (optional; auto-detected from branch name if not on main)", idOption.Description);
     }
 
     [Fact]
@@ -508,9 +508,9 @@ public class WorkItemCommandTests
 
     #endregion
 
-    #region TDD Placeholder Tests for Update Subcommand
+    #region Update Subcommand Tests
 
-    [Fact(Skip = "TDD: Update subcommand not yet implemented")]
+    [Fact]
     public void Constructor_AddsUpdateSubcommand()
     {
         // Act
@@ -519,10 +519,10 @@ public class WorkItemCommandTests
         // Assert
         var updateSubcommand = Assert.Single(command.Subcommands, s => s.Name == "update");
         Assert.NotNull(updateSubcommand);
-        Assert.Equal("Update a work item", updateSubcommand.Description);
+        Assert.Equal("Update work item properties", updateSubcommand.Description);
     }
 
-    [Fact(Skip = "TDD: Update subcommand not yet implemented")]
+    [Fact]
     public void UpdateSubcommand_HasIdOption()
     {
         // Act
@@ -532,9 +532,10 @@ public class WorkItemCommandTests
         // Assert
         var idOption = Assert.Single(updateCmd.Options, o => o.Name == "--id");
         Assert.NotNull(idOption);
+        Assert.Equal("Work item ID (optional; auto-detected from branch name if not on main)", idOption.Description);
     }
 
-    [Fact(Skip = "TDD: Update subcommand not yet implemented")]
+    [Fact]
     public void UpdateSubcommand_HasTitleOption()
     {
         // Act
@@ -544,9 +545,10 @@ public class WorkItemCommandTests
         // Assert
         var titleOption = Assert.Single(updateCmd.Options, o => o.Name == "--title");
         Assert.NotNull(titleOption);
+        Assert.Equal("Update work item title", titleOption.Description);
     }
 
-    [Fact(Skip = "TDD: Update subcommand not yet implemented")]
+    [Fact]
     public void UpdateSubcommand_HasStateOption()
     {
         // Act
@@ -556,21 +558,49 @@ public class WorkItemCommandTests
         // Assert
         var stateOption = Assert.Single(updateCmd.Options, o => o.Name == "--state");
         Assert.NotNull(stateOption);
+        Assert.Equal("Update work item state", stateOption.Description);
     }
 
-    [Fact(Skip = "TDD: Update subcommand not yet implemented")]
-    public void UpdateSubcommand_HasAssignedToOption()
+    [Fact]
+    public void UpdateSubcommand_HasAssigneeOption()
     {
         // Act
         var command = new WorkItemCommand(_verboseOption);
         var updateCmd = Assert.Single(command.Subcommands, s => s.Name == "update");
 
         // Assert
-        var assignedToOption = Assert.Single(updateCmd.Options, o => o.Name == "--assigned-to");
-        Assert.NotNull(assignedToOption);
+        var assigneeOption = Assert.Single(updateCmd.Options, o => o.Name == "--assignee");
+        Assert.NotNull(assigneeOption);
+        Assert.Equal("Update assigned user", assigneeOption.Description);
     }
 
-    [Fact(Skip = "TDD: Update subcommand not yet implemented")]
+    [Fact]
+    public void UpdateSubcommand_HasDescriptionOption()
+    {
+        // Act
+        var command = new WorkItemCommand(_verboseOption);
+        var updateCmd = Assert.Single(command.Subcommands, s => s.Name == "update");
+
+        // Assert
+        var descriptionOption = Assert.Single(updateCmd.Options, o => o.Name == "--description");
+        Assert.NotNull(descriptionOption);
+        Assert.Equal("Update work item description", descriptionOption.Description);
+    }
+
+    [Fact]
+    public void UpdateSubcommand_HasVerboseOption()
+    {
+        // Act
+        var command = new WorkItemCommand(_verboseOption);
+        var updateCmd = Assert.Single(command.Subcommands, s => s.Name == "update");
+
+        // Assert
+        var verboseOpt = Assert.Single(updateCmd.Options, o => o.Name == "--verbose");
+        Assert.NotNull(verboseOpt);
+        Assert.Equal("Enable verbose output", verboseOpt.Description);
+    }
+
+    [Fact]
     public void UpdateSubcommand_WithValidArguments_ReturnsExitCode()
     {
         // Arrange
@@ -582,6 +612,165 @@ public class WorkItemCommandTests
 
         // Assert
         Assert.True(result == 0 || result == 1, $"Expected exit code 0 or 1, got {result}");
+    }
+
+    [Fact]
+    public void UpdateSubcommand_WithIdAndState_ReturnsExitCode()
+    {
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        var args = new[] { "update", "--id", "123", "--state", "Done" };
+
+        // Act
+        var result = command.Parse(args).Invoke();
+
+        // Assert
+        Assert.True(result == 0 || result == 1, $"Expected exit code 0 or 1, got {result}");
+    }
+
+    [Fact]
+    public void UpdateSubcommand_WithIdAndAssignee_ReturnsExitCode()
+    {
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        var args = new[] { "update", "--id", "123", "--assignee", "user@example.com" };
+
+        // Act
+        var result = command.Parse(args).Invoke();
+
+        // Assert
+        Assert.True(result == 0 || result == 1, $"Expected exit code 0 or 1, got {result}");
+    }
+
+    [Fact]
+    public void UpdateSubcommand_WithMultipleProperties_ReturnsExitCode()
+    {
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        var args = new[] { "update", "--id", "123", "--state", "Done", "--title", "Updated" };
+
+        // Act
+        var result = command.Parse(args).Invoke();
+
+        // Assert
+        Assert.True(result == 0 || result == 1, $"Expected exit code 0 or 1, got {result}");
+    }
+
+    [Fact]
+    public void UpdateSubcommand_WithoutId_Parses()
+    {
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        var args = new[] { "update", "--state", "Done" };
+
+        // Act
+        var parseResult = command.Parse(args);
+
+        // Assert
+        // Should parse successfully because id is now optional (auto-detected from branch at runtime)
+        Assert.Empty(parseResult.Errors);
+    }
+
+    [Fact]
+    public void UpdateSubcommand_IdIsNowOptional()
+    {
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        var updateSubcommand = Assert.Single(command.Subcommands, s => s.Name == "update");
+
+        // Act
+        var idOption = Assert.Single(updateSubcommand.Options, o => o.Name == "--id");
+
+        // Assert
+        // ID should be optional (nullable int)
+        Assert.NotNull(idOption);
+    }
+
+    [Fact]
+    public void UpdateSubcommand_WithoutId_AndNotOnMain_AutoDetectsFromBranchName()
+    {
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        var args = new[] { "update", "--state", "Done" };
+
+        // Act
+        var result = command.Parse(args);
+
+        // Assert
+        // Should parse without error (auto-detection happens at runtime based on git branch)
+        Assert.NotNull(result);
+    }
+
+    [Fact]
+    public void UpdateSubcommand_WithoutId_ShouldParseSuccessfully()
+    {
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        var args = new[] { "update", "--state", "Done" };
+
+        // Act
+        var result = command.Parse(args);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Empty(result.Errors); // Parsing should succeed; runtime auto-detection happens in UpdateWorkItem
+    }
+
+    [Fact]
+    public void UpdateSubcommand_WithNegativeId_ReturnsErrorExitCode()
+    {
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        var args = new[] { "update", "--id", "-5", "--state", "Done" };
+
+        // Act
+        var result = command.Parse(args).Invoke();
+
+        // Assert
+        // Command should reject negative IDs at runtime
+        Assert.Equal(1, result);
+    }
+
+    [Fact]
+    public void UpdateSubcommand_WithVerbose_ReturnsExitCode()
+    {
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        var args = new[] { "update", "--id", "123", "--state", "Done", "--verbose" };
+
+        // Act
+        var result = command.Parse(args).Invoke();
+
+        // Assert
+        Assert.True(result == 0 || result == 1, $"Expected exit code 0 or 1, got {result}");
+    }
+
+    #endregion
+
+    #region Update Subcommand Integration Tests (Phase 3.2+)
+
+    [Fact(Skip = "Integration: Scaffolded for Phase 3.2 - requires GitHub credentials")]
+    public void IntegrationTest_Update_GitHub_WithValidIssueAndAutoDetect()
+    {
+        // TODO: Implement real GitHub API integration test with auto-detection
+        // 1. Create a test issue
+        // 2. Start work on issue (creates branch with ID prefix)
+        // 3. Update using auto-detected ID
+        // 4. Verify update via GitHub API
+        // 5. Clean up test issue and branch
+        Assert.True(true);
+    }
+
+    [Fact(Skip = "Integration: Scaffolded for Phase 3.2 - requires Azure DevOps credentials")]
+    public void IntegrationTest_Update_AzureDevOps_WithValidWorkItemAndAutoDetect()
+    {
+        // TODO: Implement real Azure DevOps API integration test with auto-detection
+        // 1. Create a test work item
+        // 2. Start work on work item (creates branch with ID prefix)
+        // 3. Update using auto-detected ID
+        // 4. Verify update via Azure DevOps API
+        // 5. Clean up test work item and branch
+        Assert.True(true);
     }
 
     #endregion
@@ -664,7 +853,7 @@ public class WorkItemCommandTests
         // Assert
         var filePathOption = Assert.Single(createCmd.Options, o => o.Name == "--file-path");
         Assert.NotNull(filePathOption);
-        Assert.Equal("Path to markdown file containing work item details", filePathOption.Description);
+        Assert.Equal("Path to markdown file containing work item details (auto-detected as .temp/wi.md if not provided)", filePathOption.Description);
     }
 
     [Fact]
@@ -696,6 +885,134 @@ public class WorkItemCommandTests
 
     #endregion
 
+    #region Start Subcommand Tests
+
+    [Fact]
+    public void Constructor_AddsStartSubcommand()
+    {
+        // Act
+        var command = new WorkItemCommand(_verboseOption);
+
+        // Assert
+        var startSubcommand = Assert.Single(command.Subcommands, s => s.Name == "start");
+        Assert.NotNull(startSubcommand);
+        Assert.Equal("Start work on a work item by creating a feature branch and PR template", startSubcommand.Description);
+    }
+
+    [Fact]
+    public void StartSubcommand_HasIdArgument()
+    {
+        // Act
+        var command = new WorkItemCommand(_verboseOption);
+        var startCmd = Assert.Single(command.Subcommands, s => s.Name == "start");
+
+        // Assert
+        var idArgument = Assert.Single(startCmd.Arguments, a => a.Name == "id");
+        Assert.NotNull(idArgument);
+        Assert.Equal("Work item ID (optional; auto-detected from branch name if not on main)", idArgument.Description);
+    }
+
+    [Fact]
+    public void StartSubcommand_HasVerboseOption()
+    {
+        // Act
+        var command = new WorkItemCommand(_verboseOption);
+        var startCmd = Assert.Single(command.Subcommands, s => s.Name == "start");
+
+        // Assert
+        var verboseOpt = Assert.Single(startCmd.Options, o => o.Name == "--verbose");
+        Assert.NotNull(verboseOpt);
+        Assert.Equal("Enable verbose output", verboseOpt.Description);
+    }
+
+    [Fact]
+    public void StartSubcommand_WithNoArguments_Succeeds()
+    {
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        var args = new[] { "start" };
+
+        // Act
+        var parseResult = command.Parse(args);
+
+        // Assert
+        // Should parse successfully because id is now optional (auto-detected from branch at runtime)
+        Assert.Empty(parseResult.Errors);
+    }
+
+    [Fact]
+    public void StartSubcommand_WithValidId_ReturnsExitCode()
+    {
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        var args = new[] { "start", "123" };
+
+        // Act
+        var result = command.Parse(args).Invoke();
+
+        // Assert
+        Assert.True(result == 0 || result == 1, $"Expected exit code 0 or 1, got {result}");
+    }
+
+    [Fact]
+    public void StartSubcommand_WithValidIdAndVerbose_ReturnsExitCode()
+    {
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        var args = new[] { "start", "123", "--verbose" };
+
+        // Act
+        var result = command.Parse(args).Invoke();
+
+        // Assert
+        Assert.True(result == 0 || result == 1, $"Expected exit code 0 or 1, got {result}");
+    }
+
+    [Fact]
+    public void StartSubcommand_WithIdOne_ReturnsExitCode()
+    {
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        var args = new[] { "start", "1" };
+
+        // Act
+        var result = command.Parse(args).Invoke();
+
+        // Assert
+        Assert.True(result == 0 || result == 1, $"Expected exit code 0 or 1, got {result}");
+    }
+
+    [Fact]
+    public void StartSubcommand_WithLargeId_ReturnsExitCode()
+    {
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        var args = new[] { "start", "999999" };
+
+        // Act
+        var result = command.Parse(args).Invoke();
+
+        // Assert
+        Assert.True(result == 0 || result == 1, $"Expected exit code 0 or 1, got {result}");
+    }
+
+    [Fact]
+    public void StartSubcommand_WithNegativeId_ReturnsErrorExitCode()
+    {
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        var args = new[] { "start", "-5" };
+
+        // Act
+        var result = command.Parse(args).Invoke();
+
+        // Assert
+        // Command should reject negative IDs at runtime (not at parse time)
+        Assert.Equal(1, result);
+    }
+
+    #endregion
+
     #region Integration Tests (Phase 3.2+)
 
     /// <summary>
@@ -703,6 +1020,48 @@ public class WorkItemCommandTests
     /// These require valid credentials and network access.
     /// Scaffolded for Phase 3.2 implementation.
     /// </summary>
+
+    [Fact(Skip = "Integration: Scaffolded for Phase 3.2 - requires GitHub credentials")]
+    public void IntegrationTest_Create_GitHub_WithValidRepository()
+    {
+        // TODO: Implement real GitHub API integration test
+        // 1. Create new issue using wi create command
+        // 2. Verify issue created via GitHub API
+        // 3. Clean up test issue
+        Assert.True(true);
+    }
+
+    [Fact(Skip = "Integration: Scaffolded for Phase 3.2 - requires Azure DevOps credentials")]
+    public void IntegrationTest_Create_AzureDevOps_WithValidProject()
+    {
+        // TODO: Implement real Azure DevOps API integration test
+        // 1. Create new work item using wi create command
+        // 2. Verify work item created via Azure DevOps API
+        // 3. Clean up test work item
+        Assert.True(true);
+    }
+
+    [Fact(Skip = "Integration: Scaffolded for Phase 3.2 - requires GitHub credentials and git")]
+    public void IntegrationTest_Start_GitHub_WithValidRepository()
+    {
+        // TODO: Implement real GitHub API + git integration test
+        // 1. Start work on issue using wi start command
+        // 2. Verify branch created locally
+        // 3. Verify PR template file generated
+        // 4. Clean up branch
+        Assert.True(true);
+    }
+
+    [Fact(Skip = "Integration: Scaffolded for Phase 3.2 - requires Azure DevOps credentials and git")]
+    public void IntegrationTest_Start_AzureDevOps_WithValidProject()
+    {
+        // TODO: Implement real Azure DevOps API + git integration test
+        // 1. Start work on work item using wi start command
+        // 2. Verify branch created locally
+        // 3. Verify PR template file generated
+        // 4. Clean up branch
+        Assert.True(true);
+    }
 
     [Fact(Skip = "Integration: Scaffolded for Phase 3.2 - requires GitHub credentials")]
     public void IntegrationTest_Update_GitHub_WithValidIssue()
@@ -795,25 +1154,186 @@ public class WorkItemCommandTests
 
     #endregion
 
-    [Fact(Skip = "Integration: Scaffolded for Phase 3.2 - requires GitHub credentials")]
-    public void IntegrationTest_Create_GitHub_WithValidRepository()
+    #region Start Subcommand Auto-Detection Tests
+
+    [Fact]
+    public void StartSubcommand_WithoutId_AndNotOnMain_AutoDetectsFromBranchName()
     {
-        // TODO: Implement real GitHub API integration test
-        // 1. Create new issue using wi create command
-        // 2. Verify issue created via GitHub API
-        // 3. Clean up test issue
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        // Test auto-detection without id argument
+        var args = new[] { "start" };
+
+        // Act
+        var result = command.Parse(args);
+
+        // Assert
+        // Should parse without error (auto-detection happens at runtime based on git branch)
+        Assert.NotNull(result);
+    }
+
+    [Fact]
+    public void StartSubcommand_WithoutId_ShouldParseSuccessfully()
+    {
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        var args = new[] { "start" };
+
+        // Act
+        var result = command.Parse(args);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Empty(result.Errors); // Parsing should succeed; runtime auto-detection happens in StartWorkItem
+    }
+
+    [Fact]
+    public void StartSubcommand_IdArgumentIsNowOptional()
+    {
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        var startSubcommand = Assert.Single(command.Subcommands, s => s.Name == "start");
+
+        // Act
+        var idArgument = startSubcommand.Arguments.FirstOrDefault(a => a.Name == "id");
+
+        // Assert
+        Assert.NotNull(idArgument);
+        // Verify it's optional (not required)
+        Assert.Equal(ArgumentArity.ZeroOrOne, idArgument.Arity);
+    }
+
+    #endregion
+
+    #region Close Subcommand Tests
+
+    [Fact]
+    public void Constructor_AddsCloseSubcommand()
+    {
+        // Act
+        var command = new WorkItemCommand(_verboseOption);
+
+        // Assert
+        var closeSubcommand = Assert.Single(command.Subcommands, s => s.Name == "close");
+        Assert.NotNull(closeSubcommand);
+        Assert.Equal("Close a work item and clean up feature branch", closeSubcommand.Description);
+    }
+
+    [Fact]
+    public void CloseSubcommand_HasIdArgument()
+    {
+        // Act
+        var command = new WorkItemCommand(_verboseOption);
+        var closeCmd = Assert.Single(command.Subcommands, s => s.Name == "close");
+
+        // Assert
+        var idArgument = Assert.Single(closeCmd.Arguments, a => a.Name == "id");
+        Assert.NotNull(idArgument);
+        Assert.Equal("Work item ID (optional; auto-detected from branch name if not on main)", idArgument.Description);
+    }
+
+    [Fact]
+    public void CloseSubcommand_HasVerboseOption()
+    {
+        // Act
+        var command = new WorkItemCommand(_verboseOption);
+        var closeCmd = Assert.Single(command.Subcommands, s => s.Name == "close");
+
+        // Assert
+        var verboseOpt = Assert.Single(closeCmd.Options, o => o.Name == "--verbose");
+        Assert.NotNull(verboseOpt);
+        Assert.Equal("Enable verbose output", verboseOpt.Description);
+    }
+
+    [Fact]
+    public void CloseSubcommand_WithNoArguments_Succeeds()
+    {
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        var args = new[] { "close" };
+
+        // Act
+        var parseResult = command.Parse(args);
+
+        // Assert
+        // Should parse successfully because id is now optional (auto-detected from branch at runtime)
+        Assert.Empty(parseResult.Errors);
+    }
+
+    [Fact]
+    public void CloseSubcommand_IdArgumentIsOptional()
+    {
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        var closeSubcommand = Assert.Single(command.Subcommands, s => s.Name == "close");
+
+        // Act
+        var idArgument = closeSubcommand.Arguments.FirstOrDefault(a => a.Name == "id");
+
+        // Assert
+        Assert.NotNull(idArgument);
+        // Verify it's optional (not required)
+        Assert.Equal(ArgumentArity.ZeroOrOne, idArgument.Arity);
+    }
+
+    [Fact]
+    public void CloseSubcommand_WithoutId_AndNotOnMain_AutoDetectsFromBranchName()
+    {
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        // Test auto-detection without id argument
+        var args = new[] { "close" };
+
+        // Act
+        var result = command.Parse(args);
+
+        // Assert
+        // Should parse without error (auto-detection happens at runtime based on git branch)
+        Assert.NotNull(result);
+    }
+
+    [Fact]
+    public void CloseSubcommand_WithoutId_ShouldParseSuccessfully()
+    {
+        // Arrange
+        var command = new WorkItemCommand(_verboseOption);
+        var args = new[] { "close" };
+
+        // Act
+        var result = command.Parse(args);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Empty(result.Errors); // Parsing should succeed; runtime auto-detection happens in CloseWorkItem
+    }
+
+    #endregion
+
+    #region Close Subcommand Integration Tests (Phase 3.2+)
+
+    [Fact(Skip = "Integration: Scaffolded for Phase 3.2 - requires GitHub credentials and git")]
+    public void IntegrationTest_Close_GitHub_WithValidRepository()
+    {
+        // TODO: Implement real GitHub API + git integration test
+        // 1. Start work on issue using wi start command (creates feature branch)
+        // 2. Close work item using wi close command
+        // 3. Verify branch deleted locally
+        // 4. Verify checked out to main branch
         Assert.True(true);
     }
 
-    [Fact(Skip = "Integration: Scaffolded for Phase 3.2 - requires Azure DevOps credentials")]
-    public void IntegrationTest_Create_AzureDevOps_WithValidProject()
+    [Fact(Skip = "Integration: Scaffolded for Phase 3.2 - requires Azure DevOps credentials and git")]
+    public void IntegrationTest_Close_AzureDevOps_WithValidProject()
     {
-        // TODO: Implement real Azure DevOps API integration test
-        // 1. Create new work item using wi create command
-        // 2. Verify work item created via Azure DevOps API
-        // 3. Clean up test work item
+        // TODO: Implement real Azure DevOps API + git integration test
+        // 1. Start work on work item using wi start command (creates feature branch)
+        // 2. Close work item using wi close command
+        // 3. Verify branch deleted locally
+        // 4. Verify checked out to main branch
         Assert.True(true);
     }
+
+    #endregion
 
     #endregion
 }

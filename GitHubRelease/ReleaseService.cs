@@ -1039,11 +1039,19 @@ namespace GitHubRelease
 
             var preReleases = releases
                 .Where(r => r.GetProperty("prerelease").GetBoolean())
+                .Take(3)
                 .ToList();
 
             var latestStable = stableReleases.FirstOrDefault();
             var latestPreRelease = preReleases.FirstOrDefault();
 
+            // If no stable releases found, return pre-releases instead
+            if (stableReleases.Count == 0)
+            {
+                return preReleases;
+            }
+
+            // If we have stable releases, insert pre-release if it's newer
             if (IsPreReleaseNewer(latestPreRelease, latestStable))
             {
                 stableReleases.Insert(0, latestPreRelease);

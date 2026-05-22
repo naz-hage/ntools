@@ -567,6 +567,96 @@ namespace NbuildTasks
             return Branch == branch;
         }
 
+        /// <summary>
+        /// Pulls the latest changes from the remote branch with rebase.
+        /// </summary>
+        /// <returns><c>true</c> if the pull with rebase is successful; otherwise, <c>false</c>.</returns>
+        public bool PullWithRebase()
+        {
+            Process.StartInfo.Arguments = "pull --rebase";
+            var result = Process.LockStart(Verbose);
+            
+            if (result.Code == 0)
+            {
+                if (result.Output.Count >= 1 && CheckForErrorAndDisplayOutput(result.Output))
+                {
+                    return false;
+                }
+                return true;
+            }
+            
+            return false;
+        }
+
+        /// <summary>
+        /// Commits changes to the current branch.
+        /// </summary>
+        /// <param name="message">The commit message.</param>
+        /// <returns><c>true</c> if the commit is successful; otherwise, <c>false</c>.</returns>
+        public bool Commit(string message)
+        {
+            if (string.IsNullOrEmpty(message))
+                return false;
+
+            Process.StartInfo.Arguments = $"commit -m \"{message.Replace("\"", "\\\"")  }\"";
+            var result = Process.LockStart(Verbose);
+
+            if (result.Code == 0)
+            {
+                if (result.Output.Count >= 1 && CheckForErrorAndDisplayOutput(result.Output))
+                {
+                    return false;
+                }
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Pushes commits to the remote repository.
+        /// </summary>
+        /// <param name="branch">The branch to push (if null, pushes current branch).</param>
+        /// <returns><c>true</c> if the push is successful; otherwise, <c>false</c>.</returns>
+        public bool Push(string branch = null)
+        {
+            var pushArgs = string.IsNullOrWhiteSpace(branch) ? "push" : $"push origin {branch}";
+            Process.StartInfo.Arguments = pushArgs;
+            var result = Process.LockStart(Verbose);
+
+            if (result.Code == 0)
+            {
+                if (result.Output.Count >= 1 && CheckForErrorAndDisplayOutput(result.Output))
+                {
+                    return false;
+                }
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Stages all changes to the staging area.
+        /// </summary>
+        /// <returns><c>true</c> if the add is successful; otherwise, <c>false</c>.</returns>
+        public bool StageAllChanges()
+        {
+            Process.StartInfo.Arguments = "add -A";
+            var result = Process.LockStart(Verbose);
+
+            if (result.Code == 0)
+            {
+                if (result.Output.Count >= 1 && CheckForErrorAndDisplayOutput(result.Output))
+                {
+                    return false;
+                }
+                return true;
+            }
+
+            return false;
+        }
+
         public bool BranchExists(string branch)
         {
             return !string.IsNullOrEmpty(branch) && ListBranches().Contains(branch);
@@ -624,6 +714,39 @@ namespace NbuildTasks
                 }
             }
             return deletedBranches;
+        }
+
+        /// <summary>
+        /// Deletes a specific local git branch.
+        /// </summary>
+        /// <param name="branch">The branch name to delete.</param>
+        /// <returns>True if the branch was successfully deleted, false otherwise.</returns>
+        public bool DeleteBranch(string branch)
+        {
+            if (string.IsNullOrEmpty(branch) || branch.Equals("main", StringComparison.OrdinalIgnoreCase))
+            {
+                if (Verbose) Console.WriteLine($"Cannot delete branch: {branch}");
+                return false;
+            }
+
+            Process.StartInfo.Arguments = $"branch -D {branch}";
+            var result = Process.LockStart(Verbose);
+            if (result.Code == 0)
+            {
+                return true;
+            }
+            else
+            {
+                if (Verbose)
+                {
+                    Console.WriteLine($"Failed to delete branch: {branch}");
+                    foreach (var line in result.Output)
+                    {
+                        Console.WriteLine(line);
+                    }
+                }
+                return false;
+            }
         }
 
         private bool CheckForErrorAndDisplayOutput(List<string> lines)

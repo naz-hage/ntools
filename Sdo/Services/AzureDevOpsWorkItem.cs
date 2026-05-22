@@ -76,5 +76,10 @@ namespace Sdo.Services
         /// Gets or sets the parent work item ID.
         /// </summary>
         public int? ParentId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the tags assigned to the work item.
+        /// </summary>
+        public string? Tags { get; set; }
     }
 }
