@@ -36,6 +36,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\GitHubRelease\GitHubRelease.csproj" />
 		<ProjectReference Include="..\Nbuild\Nbuild.csproj" />
+		<ProjectReference Include="..\NbuildTasks\NbuildTasks.csproj" />
 	</ItemGroup>
 
 </Project>

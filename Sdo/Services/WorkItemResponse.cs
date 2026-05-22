@@ -146,6 +146,16 @@ namespace Sdo.Services
                         }
                     }
                 }
+
+                // Extract tags
+                if (Fields.ContainsKey("System.Tags"))
+                {
+                    var tagsField = Fields["System.Tags"];
+                    if (tagsField != null)
+                    {
+                        item.Tags = tagsField.ToString();
+                    }
+                }
             }
 
             return item;
