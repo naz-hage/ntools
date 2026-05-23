@@ -4,7 +4,7 @@
 
 **Key Features:**
 - Build and run custom targets with a single command
-- Install, uninstall, and list development tools from a manifest file or by name/version from current directory JSON files
+- Install, uninstall, and list development tools from a manifest file or by name/version from current directory and `C:\program files\nbuild` JSON files
 - Download tools and assets for your environment
 - Integrate with Git for tagging, branching, and release automation
 - Automate GitHub releases and asset downloads
@@ -45,7 +45,7 @@ Options:
   --version       Show version information
 
 Commands:
-  install                Install tools and applications specified in the manifest file or by name/version from current directory JSON files.
+  install                Install tools and applications specified in the manifest file or by name/version from current directory and C:\program files\nbuild JSON files.
   uninstall              Uninstall tools and applications specified in the manifest file.
   list                   Display a formatted table of all tools and their versions.
                          Use this command to audit, compare, or document the state of your development environment.
@@ -69,43 +69,6 @@ Additional Arguments:
 ```
 
 ## Dry-run contract
-  pre_release_create     Creates a GitHub pre-release.
-
-                         Required options:
-                           --repo   Git repository (formats: repoName, userName/repoName, or full GitHub URL)
-                           --tag    Tag to use for the pre-release (e.g., 1.24.33)
-                           --branch Branch name to release from (e.g., main)
-                           --file   Asset file name (full path required)
-
-Example:
-                           nb pre_release_create --repo user/repo --tag 1.24.33 --branch main --file C:\path\to\asset.zip
-  release_download       Downloads a specific asset from a GitHub release.
-
-                         Required options:
-                           --repo   Git repository (formats: repoName, userName/repoName, or full GitHub URL)
-                           --tag    Tag to use for the release (e.g., 1.24.33)
-                           --path   Path to download asset to (default: current directory)
-
-Example:
-                           nb release_download --repo user/repo --tag 1.24.33 --path C:\downloads
-  list_release           Lists the latest 3 releases for the specified repository, and the latest pre-release if newer.
-
-                         Required option:
-                           --repo   Git repository (formats: repoName, userName/repoName, or full GitHub URL)
-
-Example:
-                           nb list_release --repo user/repo
-  targets                Displays all available build targets for the current solution or project.
-
-You can run any listed target directly using nb.exe.
-                         Example: If 'core' is listed, you can run:
-                           nb core
-
-Additional Arguments:
-  Arguments passed to the application that is being run.
-```
-
-## Dry-run contract
 
 When `--dry-run` is supplied to `nb.exe` the CLI will not perform any state-changing
 operations. The intent of `--dry-run` is to provide a safe, predictable preview of
@@ -123,7 +86,6 @@ Key points:
   avoid network access in dry-run and print a short simulated message. If a
   project requires read-only network access during dry-run, it should be made
   explicit (for example `--dry-run=fetch`) in a follow-up PBI.
-> **Tip:** If the `--json` option is not specified, the default manifest file `C:\Program Files\NBuild\ntools.json` is used.
 
 ---
 
@@ -164,18 +126,20 @@ Below are practical examples for using `nb.exe`. These examples assume you are r
 
 ### 1. Install Applications
 
-#### Install from JSON file (traditional method):
+#### Install from JSON file (optional):
 ```cmd
 nb.exe install --json "C:\Program Files\tools.json"
 ```
-Installs applications specified in the manifest file. (Requires admin privileges.)
+Installs applications specified in the manifest file. The `--json` parameter is optional. If not specified, the command defaults to searching in `C:\program files\nbuild`. (Requires admin privileges.)
 
-#### Install by name from current directory JSON files (new method):
+#### Install by name from current directory and default location:
 ```cmd
 nb.exe install --name "MyApp"
 nb.exe install --name "MyApp" --appversion "1.2.3"
 ```
-Searches for JSON files in the current directory and installs the application matching the specified name. The `--appversion` parameter is optional and overrides the version specified in the JSON file. This method automatically discovers and parses all JSON files in the current directory to find the matching application.
+Searches for JSON files in both the current directory and `C:\program files\nbuild`, then installs the application matching the specified name. The `--appversion` parameter is optional and overrides the version specified in the JSON file. This method automatically discovers and parses all JSON files in both locations to find the matching application.
+
+**Search order:** Current directory is searched first, then `C:\program files\nbuild`. If an app is found in the current directory, it takes precedence over the same app in the default location.
 
 **Note:** If you specify both `--json` and `--name`, the command is allowed, but `--json` takes precedence and a warning is emitted. The `--name` method provides a more convenient way to install applications without needing to know the exact path to the JSON configuration file.
 
@@ -200,7 +164,6 @@ Downloads tools and applications specified in the manifest file.
 
 ### 5. Display Path Segments
 ```cmd
-nb.exe path
 nb.exe path
 ```
 Displays each segment of the effective PATH environment variable on a separate line, with duplicates removed. Shows the complete PATH that processes actually use (Machine + User PATH combined). Use `--verbose` for additional output.
