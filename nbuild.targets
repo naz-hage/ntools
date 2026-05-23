@@ -318,7 +318,7 @@
 	<Target Name="UPDATE_DOC_VERSIONS" DependsOnTargets="PROPERTIES">
 		<UpdateVersionsInDocs 
 			DevSetupPath="$(SolutionDir)\dev-setup" 
-			DocsPath="$(SolutionDir)\docs\ntools\ntools.md" />
+			DocsPath="$(SolutionDir)\docs\ntools.md" />
 		<Message Text="Documentation versions updated successfully." />
 		<Message Text="==> DONE"/>
 	</Target>

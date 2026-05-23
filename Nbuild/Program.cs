@@ -620,8 +620,8 @@ namespace Nbuild
             // Enable strict option validation for this subcommand
             installCommand.TreatUnmatchedTokensAsErrors = true;
 
-            var jsonOption = new Option<string>("--json") { Description = "Full path to the manifest file containing your tool definitions.\nIf the path contains spaces, use double quotes.\nOptional - defaults to c:\\program files\\nbuild if not specified.\nWhen specified, --name and --appversion are ignored.", Required = false };
-            var nameOption = new Option<string>("--name") { Description = "Name of the application to install from current directory or c:\\program files\\nbuild JSON files.\nRequired when --json is not specified.", Required = false };
+            var jsonOption = new Option<string>("--json") { Description = "Full path to the manifest file containing your tool definitions.\nIf the path contains spaces, use double quotes.\nOptional - searches all .json files in c:\\program files\\nbuild if not specified.\nWhen specified, --name and --appversion are ignored.", Required = false };
+            var nameOption = new Option<string>("--name") { Description = "Name of the application to install by searching all .json files in current directory first, then c:\\program files\\nbuild.\nRequired when --json is not specified.", Required = false };
             var versionOption = new Option<string>("--appversion") { Description = "Version of the application to install.\nOverrides the version specified in the JSON file.\nOptional - uses JSON version if not specified.", Required = false };
 
             installCommand.Options.Add(jsonOption);

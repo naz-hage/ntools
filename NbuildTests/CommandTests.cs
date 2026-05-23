@@ -1059,12 +1059,12 @@ namespace NbuildTests
                 }";
                 File.WriteAllText("apps.json", jsonContent);
 
-                // Act
-                var apps = Command.GetAppsFromCurrentDirectory("docker", null, out var availableApps);
+                // Act - Use a unique app name that definitely doesn't exist in any system-wide ntools.json
+                var apps = Command.GetAppsFromCurrentDirectory("zzz-test-nonexistent-app-xyz", null, out var availableApps);
 
                 // Assert
                 Assert.AreEqual(0, apps.Count, "Should find no apps");
-                Assert.AreEqual(2, availableApps.Count, "Should return list of available apps");
+                Assert.IsTrue(availableApps.Count >= 2, "Should return list of available apps from current directory (may include program files apps)");
                 Assert.IsTrue(availableApps.Any(x => x.Contains("nodejs")), "Available apps should contain nodejs");
                 Assert.IsTrue(availableApps.Any(x => x.Contains("python")), "Available apps should contain python");
                 Assert.IsTrue(availableApps.Any(x => x.Contains("22.0.0")), "Available apps should contain nodejs version");
