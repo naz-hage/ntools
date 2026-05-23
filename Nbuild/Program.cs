@@ -620,8 +620,8 @@ namespace Nbuild
             // Enable strict option validation for this subcommand
             installCommand.TreatUnmatchedTokensAsErrors = true;
 
-            var jsonOption = new Option<string>("--json") { Description = "Full path to the manifest file containing your tool definitions.\nIf the path contains spaces, use double quotes.\nWhen specified, --name and --appversion are ignored.", Required = false };
-            var nameOption = new Option<string>("--name") { Description = "Name of the application to install from current directory JSON files.\nRequired when --json is not specified.", Required = false };
+            var jsonOption = new Option<string>("--json") { Description = "Full path to the manifest file containing your tool definitions.\nIf the path contains spaces, use double quotes.\nOptional - defaults to c:\\program files\\nbuild if not specified.\nWhen specified, --name and --appversion are ignored.", Required = false };
+            var nameOption = new Option<string>("--name") { Description = "Name of the application to install from current directory or c:\\program files\\nbuild JSON files.\nRequired when --json is not specified.", Required = false };
             var versionOption = new Option<string>("--appversion") { Description = "Version of the application to install.\nOverrides the version specified in the JSON file.\nOptional - uses JSON version if not specified.", Required = false };
 
             installCommand.Options.Add(jsonOption);
@@ -640,7 +640,7 @@ namespace Nbuild
                 if (string.IsNullOrEmpty(json) && string.IsNullOrEmpty(name))
                 {
                     Console.Error.WriteLine("Error: Either --json or --name must be specified.");
-                    Console.Error.WriteLine("Use --json for direct file path, or --name to search current directory.");
+                    Console.Error.WriteLine("Use --json for direct file path, or --name to search current directory and c:\\program files\\nbuild.");
                     return 1;
                 }
 
@@ -769,6 +769,16 @@ namespace Nbuild
             try
             {
                 var result = Command.Install(json, name, version, verbose, dryRun);
+                
+                // Output error message if installation failed
+                if (!result.IsSuccess() && result.Output.Count > 0)
+                {
+                    foreach (var line in result.Output)
+                    {
+                        Console.Error.WriteLine(line);
+                    }
+                }
+                
                 return result.Code;
             }
             catch (Exception ex)

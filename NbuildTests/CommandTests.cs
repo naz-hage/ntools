@@ -781,7 +781,7 @@ namespace NbuildTests
                 File.WriteAllText("test.json", jsonContent);
 
                 // Act
-                var apps = Command.GetAppsFromCurrentDirectory("testapp", null).ToList();
+                var apps = Command.GetAppsFromCurrentDirectory("testapp", null, out var availableApps);
 
                 // Assert
                 Assert.AreEqual(1, apps.Count);
@@ -828,7 +828,7 @@ namespace NbuildTests
                 File.WriteAllText("test.json", jsonContent);
 
                 // Act - version parameter should override the JSON version
-                var apps = Command.GetAppsFromCurrentDirectory("testapp", "2.0.0").ToList();
+                var apps = Command.GetAppsFromCurrentDirectory("testapp", "2.0.0", out var availableApps);
 
                 // Assert
                 Assert.AreEqual(1, apps.Count);
@@ -894,7 +894,7 @@ namespace NbuildTests
 
                 // Act & Assert
                 var ex = Assert.ThrowsException<ArgumentException>(() =>
-                    Command.GetAppsFromCurrentDirectory("testapp", null).ToList());
+                    Command.GetAppsFromCurrentDirectory("testapp", null, out var availableApps));
                 Assert.IsTrue(ex.Message.Contains("Multiple apps found with name 'testapp'"));
                 Assert.IsTrue(ex.Message.Contains("Please specify a version"));
             }
@@ -957,7 +957,7 @@ namespace NbuildTests
                 File.WriteAllText("good.json", jsonContent2);
 
                 // Act
-                var apps = Command.GetAppsFromCurrentDirectory("goodapp", null).ToList();
+                var apps = Command.GetAppsFromCurrentDirectory("goodapp", null, out var availableApps);
 
                 // Assert - should find the good app despite the bad one
                 Assert.AreEqual(1, apps.Count);
@@ -1003,10 +1003,128 @@ namespace NbuildTests
                 File.WriteAllText("test.json", jsonContent);
 
                 // Act
-                var apps = Command.GetAppsFromCurrentDirectory("nonexistent", null).ToList();
+                var apps = Command.GetAppsFromCurrentDirectory("nonexistent", null, out var availableApps);
 
                 // Assert
                 Assert.AreEqual(0, apps.Count);
+            }
+            finally
+            {
+                Directory.SetCurrentDirectory(originalDir);
+                Directory.Delete(tempDir, true);
+            }
+        }
+
+        [TestMethod()]
+        public void GetAppsFromCurrentDirectory_PopulatesAvailableAppsWhenNoMatch()
+        {
+            // Arrange
+            var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            Directory.CreateDirectory(tempDir);
+            var originalDir = Directory.GetCurrentDirectory();
+
+            try
+            {
+                Directory.SetCurrentDirectory(tempDir);
+
+                // Create test JSON files with multiple apps
+                var jsonContent = @"{
+                    ""Version"": ""1.2.0"",
+                    ""NbuildAppList"": [
+                        {
+                            ""Name"": ""nodejs"",
+                            ""Version"": ""22.0.0"",
+                            ""AppFileName"": ""node.exe"",
+                            ""WebDownloadFile"": ""https://example.com/node.zip"",
+                            ""DownloadedFile"": ""node.zip"",
+                            ""InstallCommand"": ""echo"",
+                            ""InstallArgs"": ""installed"",
+                            ""InstallPath"": ""C:\\apps\\nodejs"",
+                            ""UninstallCommand"": ""echo"",
+                            ""UninstallArgs"": ""uninstalled""
+                        },
+                        {
+                            ""Name"": ""python"",
+                            ""Version"": ""3.14.0"",
+                            ""AppFileName"": ""python.exe"",
+                            ""WebDownloadFile"": ""https://example.com/python.zip"",
+                            ""DownloadedFile"": ""python.zip"",
+                            ""InstallCommand"": ""echo"",
+                            ""InstallArgs"": ""installed"",
+                            ""InstallPath"": ""C:\\apps\\python"",
+                            ""UninstallCommand"": ""echo"",
+                            ""UninstallArgs"": ""uninstalled""
+                        }
+                    ]
+                }";
+                File.WriteAllText("apps.json", jsonContent);
+
+                // Act
+                var apps = Command.GetAppsFromCurrentDirectory("docker", null, out var availableApps);
+
+                // Assert
+                Assert.AreEqual(0, apps.Count, "Should find no apps");
+                Assert.AreEqual(2, availableApps.Count, "Should return list of available apps");
+                Assert.IsTrue(availableApps.Any(x => x.Contains("nodejs")), "Available apps should contain nodejs");
+                Assert.IsTrue(availableApps.Any(x => x.Contains("python")), "Available apps should contain python");
+                Assert.IsTrue(availableApps.Any(x => x.Contains("22.0.0")), "Available apps should contain nodejs version");
+                Assert.IsTrue(availableApps.Any(x => x.Contains("3.14.0")), "Available apps should contain python version");
+            }
+            finally
+            {
+                Directory.SetCurrentDirectory(originalDir);
+                Directory.Delete(tempDir, true);
+            }
+        }
+
+        [TestMethod()]
+        public void Install_WithNameNotFound_DisplaysAvailableApps()
+        {
+            // Skip test if not running in admin mode
+            if (!CurrentProcess.IsElevated())
+            {
+                Assert.Inconclusive("Test skipped because it requires admin privileges.");
+            }
+
+            // Arrange
+            var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            Directory.CreateDirectory(tempDir);
+            var originalDir = Directory.GetCurrentDirectory();
+
+            try
+            {
+                Directory.SetCurrentDirectory(tempDir);
+
+                // Create test JSON file
+                var jsonContent = @"{
+                    ""Version"": ""1.2.0"",
+                    ""NbuildAppList"": [
+                        {
+                            ""Name"": ""nodejs"",
+                            ""Version"": ""22.0.0"",
+                            ""AppFileName"": ""node.exe"",
+                            ""WebDownloadFile"": ""https://example.com/node.zip"",
+                            ""DownloadedFile"": ""node.zip"",
+                            ""InstallCommand"": ""echo"",
+                            ""InstallArgs"": ""installed"",
+                            ""InstallPath"": ""C:\\apps\\nodejs"",
+                            ""UninstallCommand"": ""echo"",
+                            ""UninstallArgs"": ""uninstalled""
+                        }
+                    ]
+                }";
+                File.WriteAllText("apps.json", jsonContent);
+
+                // Act - Use dryRun=false to trigger the actual logic
+                var result = Command.Install(null, "nonexistent-app", null, false, false);
+
+                // Assert
+                Assert.IsFalse(result.IsSuccess());
+                var errorOutput = result.GetFirstOutput();
+                Assert.IsTrue(errorOutput.Contains("No apps found matching 'nonexistent-app'"));
+                Assert.IsTrue(errorOutput.Contains("Available applications"));
+                Assert.IsTrue(errorOutput.Contains("nodejs"));
+                Assert.IsTrue(errorOutput.Contains("22.0.0"));
             }
             finally
             {
