@@ -138,7 +138,8 @@ namespace Sdo.Services
                         RedirectStandardOutput = true,
                         RedirectStandardError = true,
                         UseShellExecute = false,
-                        CreateNoWindow = true
+                        CreateNoWindow = true,
+                        WorkingDirectory = Environment.CurrentDirectory
                     }
                 };
 

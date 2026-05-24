@@ -715,9 +715,13 @@ namespace Nbuild
             var jsonOption = new Option<string>("--json") { Description = "Full path to the manifest file containing your tool definitions.\nIf the path contains spaces, use double quotes." };
             jsonOption.DefaultValueFactory = _ =>
             {
-                var programFiles = Environment.GetEnvironmentVariable("ProgramFiles") ?? "C:\\Program Files";
-                var defaultPath = $"{programFiles}\\NBuild\\ntools.json";
-                return $"\"{defaultPath}\"";
+                // For testing, check environment variable; otherwise use the default from Command
+                if (Environment.GetEnvironmentVariable("ProgramFiles") is string customProgramFiles)
+                {
+                    var customPath = Path.Combine(customProgramFiles, "nbuild", "apps.json");
+                    return $"\"{customPath}\"";
+                }
+                return $"\"{Command.DefaultAppsFile}\"";
             };
             listCommand.Options.Add(jsonOption);
             listCommand.SetAction((System.CommandLine.ParseResult parseResult) =>

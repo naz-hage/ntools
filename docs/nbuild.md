@@ -2,9 +2,11 @@
 
 `Nbuild` (`nb.exe`) is a powerful command-line utility for .NET developers. It wraps the [.NET SDK](https://dotnet.microsoft.com/download) to simplify building solutions, running custom targets, and managing your development toolchain.
 
+> **⚠️ BREAKING CHANGE (v1.76+):** The `nb install --name` command now searches **only for `apps.json` files** instead of all JSON files in a directory. If you have multiple JSON files with application definitions, consolidate them into a single `apps.json` file. See [Install by name](#install-by-name-from-current-directory-and-default-location) for details.
+
 **Key Features:**
 - Build and run custom targets with a single command
-- Install, uninstall, and list development tools from a manifest file or by name/version from current directory and `C:\program files\nbuild` JSON files
+- Install, uninstall, and list development tools from a manifest file or by name/version from `apps.json` in current directory and `C:\program files\nbuild`
 - Download tools and assets for your environment
 - Integrate with Git for tagging, branching, and release automation
 - Automate GitHub releases and asset downloads
@@ -45,7 +47,7 @@ Options:
   --version       Show version information
 
 Commands:
-  install                Install tools and applications specified in the manifest file or by name/version from current directory and C:\program files\nbuild JSON files.
+  install                Install tools and applications specified in the manifest file or by name/version from apps.json in current directory and C:\program files\nbuild.
   uninstall              Uninstall tools and applications specified in the manifest file.
   list                   Display a formatted table of all tools and their versions.
                          Use this command to audit, compare, or document the state of your development environment.
@@ -137,9 +139,11 @@ Installs applications specified in the manifest file. The `--json` parameter is 
 nb.exe install --name "MyApp"
 nb.exe install --name "MyApp" --appversion "1.2.3"
 ```
-Searches for JSON files in both the current directory and `C:\program files\nbuild`, then installs the application matching the specified name. The `--appversion` parameter is optional and overrides the version specified in the JSON file. This method automatically discovers and parses all JSON files in both locations to find the matching application.
+Searches for `apps.json` in both the current directory and `C:\program files\nbuild`, then installs the application matching the specified name. The `--appversion` parameter is optional and overrides the version specified in the JSON file.
 
-**Search order:** Current directory is searched first, then `C:\program files\nbuild`. If an app is found in the current directory, it takes precedence over the same app in the default location.
+**BREAKING CHANGE (v1.76+):** This command now searches ONLY for `apps.json` files, not all JSON files. You must consolidate your application definitions into a single `apps.json` file in the target directory or move it to `C:\program files\nbuild\apps.json`.
+
+**Search order:** Current directory is searched first for `apps.json`, then `C:\program files\nbuild\apps.json`. If an app is found in the current directory, it takes precedence over the same app in the default location.
 
 **Note:** If you specify both `--json` and `--name`, the command is allowed, but `--json` takes precedence and a warning is emitted. The `--name` method provides a more convenient way to install applications without needing to know the exact path to the JSON configuration file.
 
@@ -150,12 +154,13 @@ nb.exe install --name "MyApp" --appversion "1.2.3" --dry-run
 ```
 
 **Behavior in dry-run mode:**
-- Searches for the application in both the current directory and `C:\program files\nbuild`
-- If app is found: displays `DRY-RUN: would install app 'MyApp'` and lists version details
-- If app is not found: displays `No apps found matching 'MyApp'` and lists available applications
+- Searches for `apps.json` in both the current directory and `C:\program files\nbuild` (search order: current directory first)
+- If app is found: displays `DRY-RUN: would install app 'MyApp'` in yellow and lists version details
+- If app is not found: displays `No apps found matching 'MyApp'` in red, lists the search directories (current directory and `C:\program files\nbuild`), and lists available applications found in those `apps.json` files
+- Dry-run always returns exit code 0 (success), even when app is not found, as it is a preview/simulation mode
 - Always succeeds (exit code 0) because dry-run is a preview, not actual installation
 - No files are downloaded, installed, or modified
-- Output is prefixed with color-coded messages (yellow for dry-run, red for not found)
+- Output uses color coding: yellow for dry-run messages, red for not-found messages
 
 ### 2. Uninstall Applications
 ```cmd

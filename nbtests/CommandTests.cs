@@ -100,7 +100,7 @@ namespace NbuildTests
         public void DownloadManifestFile_DryRun_ShouldNotPerformDownload()
         {
             // Reproduce the user's reported command:
-            // .\Nbuild\bin\Release\nb.exe download --json ".\dev-setup\ntools.json" --dry-run
+            // .\nb\bin\Release\nb.exe download --json ".\dev-setup\ntools.json" --dry-run
             var manifestPath = @"C:\source\ntools\dev-setup\ntools.json";
             var result = Command.Download(manifestPath, false, true);
 
@@ -114,7 +114,7 @@ namespace NbuildTests
 
 
         // Resource location for test setup
-        private readonly string ResourceLocation = "Nbuild.ntools.json"; //"Nbuild.resources.ntools.json";
+        private readonly string ResourceLocation = "nb.ntools.json";
 
         // Method to teardown test mode flag
         private void TeardownTestModeFlag()
@@ -775,7 +775,7 @@ namespace NbuildTests
                         }
                     ]
                 }";
-                File.WriteAllText("test.json", jsonContent);
+                File.WriteAllText("apps.json", jsonContent);
 
                 // Act
                 var apps = Command.GetAppsFromCurrentDirectory("testapp", null, out var availableApps);
@@ -822,7 +822,7 @@ namespace NbuildTests
                         }
                     ]
                 }";
-                File.WriteAllText("test.json", jsonContent);
+                File.WriteAllText("apps.json", jsonContent);
 
                 // Act - version parameter should override the JSON version
                 var apps = Command.GetAppsFromCurrentDirectory("testapp", "2.0.0", out var availableApps);
@@ -850,9 +850,8 @@ namespace NbuildTests
             try
             {
                 Directory.SetCurrentDirectory(tempDir);
-
-                // Create test JSON files with same name but different versions
-                var jsonContent1 = @"{
+                // Create a single apps.json with both versions of the same app
+                var jsonContentFinal = @"{
                     ""Version"": ""1.2.0"",
                     ""NbuildAppList"": [
                         {
@@ -866,12 +865,7 @@ namespace NbuildTests
                             ""InstallPath"": ""C:\\Temp\\testapp"",
                             ""UninstallCommand"": ""echo"",
                             ""UninstallArgs"": ""uninstalled""
-                        }
-                    ]
-                }";
-                var jsonContent2 = @"{
-                    ""Version"": ""1.2.0"",
-                    ""NbuildAppList"": [
+                        },
                         {
                             ""Name"": ""testapp"",
                             ""Version"": ""2.0.0"",
@@ -886,10 +880,9 @@ namespace NbuildTests
                         }
                     ]
                 }";
-                File.WriteAllText("test1.json", jsonContent1);
-                File.WriteAllText("test2.json", jsonContent2);
+                File.WriteAllText("apps.json", jsonContentFinal);
 
-                // Act & Assert
+                // Act & Assert - should fail because multiple apps with same name exist without version specified
                 var ex = Assert.ThrowsException<ArgumentException>(() =>
                     Command.GetAppsFromCurrentDirectory("testapp", null, out var availableApps));
                 Assert.IsTrue(ex.Message.Contains("Multiple apps found with name 'testapp'"));
@@ -914,8 +907,8 @@ namespace NbuildTests
             {
                 Directory.SetCurrentDirectory(tempDir);
 
-                // Create a test JSON file with unsupported version
-                var jsonContent1 = @"{
+                // Create apps.json with unsupported version - this file will be skipped
+                var jsonContentBadVersion = @"{
                     ""Version"": ""99.0.0"",
                     ""NbuildAppList"": [
                         {
@@ -932,33 +925,13 @@ namespace NbuildTests
                         }
                     ]
                 }";
-                // Create a valid JSON file
-                var jsonContent2 = @"{
-                    ""Version"": ""1.2.0"",
-                    ""NbuildAppList"": [
-                        {
-                            ""Name"": ""goodapp"",
-                            ""Version"": ""1.0.0"",
-                            ""AppFileName"": ""goodapp.exe"",
-                            ""WebDownloadFile"": ""https://example.com/goodapp.zip"",
-                            ""DownloadedFile"": ""goodapp.zip"",
-                            ""InstallCommand"": ""echo"",
-                            ""InstallArgs"": ""installed"",
-                            ""InstallPath"": ""C:\\Temp\\goodapp"",
-                            ""UninstallCommand"": ""echo"",
-                            ""UninstallArgs"": ""uninstalled""
-                        }
-                    ]
-                }";
-                File.WriteAllText("bad.json", jsonContent1);
-                File.WriteAllText("good.json", jsonContent2);
+                File.WriteAllText("apps.json", jsonContentBadVersion);
 
-                // Act
-                var apps = Command.GetAppsFromCurrentDirectory("goodapp", null, out var availableApps);
+                // Act - when apps.json has unsupported version, it is skipped
+                var apps = Command.GetAppsFromCurrentDirectory("anyapp", null, out var availableApps);
 
-                // Assert - should find the good app despite the bad one
-                Assert.AreEqual(1, apps.Count);
-                Assert.AreEqual("goodapp", apps[0].Name);
+                // Assert - should return empty because the only file has unsupported version (gets skipped)
+                Assert.AreEqual(0, apps.Count);
             }
             finally
             {
@@ -997,7 +970,7 @@ namespace NbuildTests
                         }
                     ]
                 }";
-                File.WriteAllText("test.json", jsonContent);
+                File.WriteAllText("apps.json", jsonContent);
 
                 // Act
                 var apps = Command.GetAppsFromCurrentDirectory("nonexistent", null, out var availableApps);

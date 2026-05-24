@@ -3,7 +3,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using NbuildTasks;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 
 namespace NbuildTasksTests
@@ -16,16 +18,27 @@ namespace NbuildTasksTests
         private string _docsPath;
         private UpdateVersionsInDocs _task;
         private Mock<IBuildEngine> _mockBuildEngine;
+        private List<(string toolName, string version)> _toolsToAdd;
 
         [TestInitialize]
         public void TestInitialize()
         {
-            // Create temporary test directory
+            // Reset tools list
+            _toolsToAdd = new List<(string toolName, string version)>();
+
+            // Create temporary test directory structure:
+            // _testDirectory/
+            //   ├── go/
+            //   │   └── apps.json
+            //   └── docs/
+            //       └── ntools.md
             _testDirectory = Path.Combine(Path.GetTempPath(), "UpdateVersionsInDocsTests", Guid.NewGuid().ToString());
             _devSetupPath = Path.Combine(_testDirectory, "dev-setup");
+            var goPath = Path.Combine(_testDirectory, "go");
             _docsPath = Path.Combine(_testDirectory, "docs", "ntools.md");
 
             Directory.CreateDirectory(_devSetupPath);
+            Directory.CreateDirectory(goPath);
             Directory.CreateDirectory(Path.GetDirectoryName(_docsPath));
 
             // Setup task with mock build engine
@@ -107,13 +120,14 @@ namespace NbuildTasksTests
         {
             // Arrange
             CreateTestMarkdownFile();
-            // Don't create any JSON files
+            // Create empty apps.json with no tools
+            CreateEmptyAppsJson();
 
             // Act
             bool result = _task.Execute();
 
             // Assert
-            Assert.IsTrue(result, "Task should succeed even with no JSON files");
+            Assert.IsTrue(result, "Task should succeed even with no tools in apps.json");
         }
 
         [TestMethod]
@@ -194,34 +208,63 @@ namespace NbuildTasksTests
             Assert.IsTrue(updatedContent.Contains("[Node.js]"), "Should preserve tool links");
         }
 
-        private void CreateTestJsonFile(string fileName, string toolName, string version)
+        private void CreateEmptyAppsJson()
         {
+            var appsJsonPath = Path.Combine(_testDirectory, "go", "apps.json");
+            
             var jsonData = new
             {
-                NbuildAppList = new[]
-                {
-                    new
-                    {
-                        Name = toolName,
-                        Version = version,
-                        Description = $"{toolName} tool"
-                    }
-                }
+                Version = "1.2.0",
+                NbuildAppList = new List<object>()
             };
 
             var jsonString = JsonSerializer.Serialize(jsonData, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(Path.Combine(_devSetupPath, fileName), jsonString);
+            File.WriteAllText(appsJsonPath, jsonString);
+        }
+
+        private void CreateTestJsonFile(string fileName, string toolName, string version)
+        {
+            // Add tool to the list - it will be written to apps.json
+            _toolsToAdd.Add((toolName, version));
+            CreateAppsJson();
+        }
+
+        private void CreateAppsJson()
+        {
+            var appsJsonPath = Path.Combine(_testDirectory, "go", "apps.json");
+            
+            var appList = _toolsToAdd.Select(t => new
+            {
+                Name = t.toolName,
+                Version = t.version,
+                Description = $"{t.toolName} tool"
+            }).ToList();
+
+            var jsonData = new
+            {
+                Version = "1.2.0",
+                NbuildAppList = appList
+            };
+
+            var jsonString = JsonSerializer.Serialize(jsonData, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(appsJsonPath, jsonString);
         }
 
         private void CreateInvalidJsonFile(string fileName)
         {
-            File.WriteAllText(Path.Combine(_devSetupPath, fileName), "{ invalid json content");
+            // Invalid JSON - task should handle gracefully
+            var appsJsonPath = Path.Combine(_testDirectory, "go", "apps.json");
+            File.WriteAllText(appsJsonPath, "{ invalid json content");
         }
 
         private void CreateJsonFileWithoutVersion(string fileName, string toolName)
         {
+            // Add tool without version - it will be skipped during update
+            var appsJsonPath = Path.Combine(_testDirectory, "go", "apps.json");
+
             var jsonData = new
             {
+                Version = "1.2.0",
                 NbuildAppList = new[]
                 {
                     new
@@ -234,7 +277,7 @@ namespace NbuildTasksTests
             };
 
             var jsonString = JsonSerializer.Serialize(jsonData, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(Path.Combine(_devSetupPath, fileName), jsonString);
+            File.WriteAllText(appsJsonPath, jsonString);
         }
 
         private void CreateTestMarkdownFile()

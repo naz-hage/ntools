@@ -58,8 +58,37 @@ namespace NbuildTests
         [Fact]
         public void ListCommand_WithoutJson_UsesDefaultAndReturnsSuccess()
         {
-            var exitCode = Program.Main(new string[] { "list" });
-            Assert.Equal(0, exitCode);
+            // Create a temporary directory structure that matches the default path
+            var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            var nbuildDir = Path.Combine(tempDir, "nbuild");
+            Directory.CreateDirectory(nbuildDir);
+            
+            var tempAppsJson = Path.Combine(nbuildDir, "apps.json");
+            File.WriteAllText(tempAppsJson, GetTestJsonContent());
+            
+            try
+            {
+                // Set ProgramFiles to temp directory so the default path points to our test file
+                var originalProgramFiles = Environment.GetEnvironmentVariable("ProgramFiles");
+                Environment.SetEnvironmentVariable("ProgramFiles", tempDir);
+                
+                try
+                {
+                    var exitCode = Program.Main(new string[] { "list" });
+                    Assert.Equal(0, exitCode);
+                }
+                finally
+                {
+                    // Restore original ProgramFiles
+                    if (originalProgramFiles != null)
+                        Environment.SetEnvironmentVariable("ProgramFiles", originalProgramFiles);
+                }
+            }
+            finally
+            {
+                if (Directory.Exists(tempDir))
+                    Directory.Delete(tempDir, true);
+            }
         }
 
         [Fact]

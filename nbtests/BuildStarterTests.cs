@@ -65,9 +65,9 @@ namespace Nbuild.Tests
             Assert.IsNotNull(executingAssemblyDirectory);
 
             string resourcePath = Path.Combine(executingAssemblyDirectory, NbuildAssemblyName);
-            string targetFileName = Path.Combine(executingAssemblyDirectory, "commom.targets");
+            string targetFileName = Path.Combine(executingAssemblyDirectory, "common.targets");
 
-            ResourceHelper.ExtractEmbeddedResourceFromAssembly(resourcePath, "Nbuild.resources.common.targets", targetFileName);
+            ResourceHelper.ExtractEmbeddedResourceFromAssembly(resourcePath, "nb.resources.common.targets", targetFileName);
             return targetFileName;
         }
 
@@ -81,7 +81,7 @@ namespace Nbuild.Tests
             string resourcePath = Path.Combine(executingAssemblyDirectory, NbuildAssemblyName);
             string targetFileName = Path.Combine(executingAssemblyDirectory, "nbuild.targets");
 
-            ResourceHelper.ExtractEmbeddedResourceFromAssembly(resourcePath, "Nbuild.resources.nbuild.targets", targetFileName);
+            ResourceHelper.ExtractEmbeddedResourceFromAssembly(resourcePath, "nb.resources.nbuild.targets", targetFileName);
 
             // Act
             var fileNames = BuildStarter.GetImportAttributes(targetFileName, "Project");

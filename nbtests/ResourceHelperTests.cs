@@ -12,11 +12,11 @@ namespace NbuildTests
         public void ExtractEmbeddedResourceFromAssemblyTest()
         {
             // Arrange
-            string resourceLocation = "Nbuild.resources.common.targets";
+            string resourceLocation = "nb.resources.common.targets";
             string? executingAssemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             Assert.IsNotNull(executingAssemblyDirectory);
 
-            string targetFileName = Path.Combine(executingAssemblyDirectory, "commom.targets");
+            string targetFileName = Path.Combine(executingAssemblyDirectory, "common.targets");
             var assembly = Path.Combine(executingAssemblyDirectory, NbuildAssemblyName);
 
             // Act

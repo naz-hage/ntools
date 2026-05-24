@@ -150,7 +150,7 @@ ntools/
 ├── e2e-tests.targets             # E2E test targets
 │
 ├── Nbuild/                       # Main Nbuild executable project
-│   ├── Nbuild.csproj
+│   ├── nb.csproj
 │   ├── Program.cs
 │   └── Commands/                 # CLI command implementations
 │
