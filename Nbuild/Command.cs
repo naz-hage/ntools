@@ -133,28 +133,40 @@ namespace Nbuild
                 }
                 else if (!string.IsNullOrEmpty(name))
                 {
-                    msg = $"DRY-RUN: would install app '{name}'{(version != null ? $" version {version}" : "")} from current directory (JSON discovery)";
-                    
                     // Even in dry-run, search to check if app exists and list available if not found
                     try
                     {
                         var foundApps = GetAppsFromCurrentDirectory(name, version, out var availableApps);
-                        if (!foundApps.Any() && availableApps.Any())
+                        if (!foundApps.Any())
                         {
-                            msg += "\nAvailable applications in current directory:";
-                            foreach (var app in availableApps)
+                            // No matching app found - fail just like non-dry-run mode
+                            ConsoleHelper.WriteLine($"No apps found matching '{name}'", ConsoleColor.Red);
+                            if (availableApps.Any())
                             {
-                                msg += $"\n  - {app}";
+                                ConsoleHelper.WriteLine("Available applications in current directory:");
+                                foreach (var app in availableApps)
+                                {
+                                    ConsoleHelper.WriteLine($"  - {app}");
+                                }
                             }
+                            return ResultHelper.Fail(1, $"No apps found matching '{name}'");
                         }
+
+                        // Found apps - show details in dry-run
+                        msg = $"DRY-RUN: would install app '{name}' from current directory (JSON discovery)";
+                        ConsoleHelper.WriteLine(msg, ConsoleColor.Yellow);
+                        
+                        // Show version details of found apps
+                        foreach (var app in foundApps)
+                        {
+                            ConsoleHelper.WriteLine($"  - {app.Name} - Version: {app.Version}", ConsoleColor.Yellow);
+                        }
+                        return ResultHelper.Success(msg);
                     }
                     catch (Exception ex)
                     {
-                        // If search fails, just log it but don't break dry-run
-                        if (Verbose)
-                        {
-                            ConsoleHelper.WriteLine($"Warning: Could not search for apps: {ex.Message}", ConsoleColor.Yellow);
-                        }
+                        // If search fails, fail the dry-run
+                        return ResultHelper.Fail(1, $"Error searching for apps: {ex.Message}");
                     }
                 }
                 else
@@ -907,7 +919,7 @@ namespace Nbuild
         /// <returns>An enumerable of matching NbuildApp objects.</returns>
         public static List<NbuildApp> GetAppsFromCurrentDirectory(string name, string? version, out List<string> availableApps)
         {
-            availableApps = new List<string>();
+            var availableAppsSet = new HashSet<string>();
             var result = new List<NbuildApp>();
 
             if (string.IsNullOrEmpty(name))
@@ -976,7 +988,7 @@ namespace Nbuild
 
                         foreach (var appData in listAppData.NbuildAppList)
                         {
-                            availableApps.Add($"{appData.Name} - Version: {appData.Version}");
+                            availableAppsSet.Add($"{appData.Name} - Version: {appData.Version}");
 
                             // Match by name only - version parameter is for override, not filtering
                             if (string.Equals(appData.Name, name, StringComparison.OrdinalIgnoreCase))
@@ -1035,6 +1047,9 @@ namespace Nbuild
 
                 result.Add(foundApp);
             }
+
+            // Convert HashSet to List for out parameter (ensures no duplicates)
+            availableApps = availableAppsSet.ToList();
 
             return result;
         }
