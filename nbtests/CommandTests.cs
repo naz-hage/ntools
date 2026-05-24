@@ -112,10 +112,6 @@ namespace NbuildTests
             Assert.IsFalse(result.Output.Any(x => x.Contains("apps to download") || x.Contains("Downloaded file") || x.Contains("| App name")), "Dry-run should not list actual downloads or table output.");
         }
 
-
-        // Resource location for test setup
-        private readonly string ResourceLocation = "nb.ntools.json";
-
         // Method to teardown test mode flag
         private void TeardownTestModeFlag()
         {
@@ -258,6 +254,7 @@ namespace NbuildTests
 
         // Test method for install from JSON file functionality
         [TestMethod()]
+        [Ignore("Removed - ntools.json is no longer embedded as a resource. Use go/apps.json instead.")]
         public void InstallFromJsonFileTest()
         {
             SetupTestModeFlag();
@@ -281,7 +278,7 @@ namespace NbuildTests
                 Console.WriteLine(resource);
             }
 
-            ResourceHelper.ExtractEmbeddedResourceFromAssembly(assembly, ResourceLocation, json);
+            ResourceHelper.ExtractEmbeddedResourceFromAssembly(assembly, "nb.ntools.json", json);
 
             // Replace C:\\Program Files\\Nbuild with C:\\Temp\\nbuild2
             string jsonContent = File.ReadAllText(json);
