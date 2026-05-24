@@ -143,6 +143,20 @@ Searches for JSON files in both the current directory and `C:\program files\nbui
 
 **Note:** If you specify both `--json` and `--name`, the command is allowed, but `--json` takes precedence and a warning is emitted. The `--name` method provides a more convenient way to install applications without needing to know the exact path to the JSON configuration file.
 
+#### Dry-run mode for install:
+```cmd
+nb.exe install --name "MyApp" --dry-run
+nb.exe install --name "MyApp" --appversion "1.2.3" --dry-run
+```
+
+**Behavior in dry-run mode:**
+- Searches for the application in both the current directory and `C:\program files\nbuild`
+- If app is found: displays `DRY-RUN: would install app 'MyApp'` and lists version details
+- If app is not found: displays `No apps found matching 'MyApp'` and lists available applications
+- Always succeeds (exit code 0) because dry-run is a preview, not actual installation
+- No files are downloaded, installed, or modified
+- Output is prefixed with color-coded messages (yellow for dry-run, red for not found)
+
 ### 2. Uninstall Applications
 ```cmd
 nb.exe uninstall --json "C:\Program Files\example-tool.json"

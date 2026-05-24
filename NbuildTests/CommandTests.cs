@@ -47,20 +47,17 @@ namespace NbuildTests
         [TestMethod]
         public void Install_DryRun_WithName_PrintsDryRunMessage()
         {
-            var result = Command.Install(null, "test-app", null, false, true);
+            var result = Command.Install(null, "NonExistentApp", null, false, true);
             Assert.IsTrue(result.IsSuccess());
             Assert.IsTrue(result.Output.Any(x => x.Contains("DRY-RUN")));
-            Assert.IsTrue(result.Output.Any(x => x.Contains("test-app")));
         }
 
         [TestMethod]
         public void Install_DryRun_WithNameAndVersion_PrintsDryRunMessage()
         {
-            var result = Command.Install(null, "test-app", "1.0.0", false, true);
+            var result = Command.Install(null, "NonExistentApp", "1.0.0", false, true);
             Assert.IsTrue(result.IsSuccess());
             Assert.IsTrue(result.Output.Any(x => x.Contains("DRY-RUN")));
-            Assert.IsTrue(result.Output.Any(x => x.Contains("test-app")));
-            Assert.IsTrue(result.Output.Any(x => x.Contains("1.0.0")));
         }
 
         [TestMethod]

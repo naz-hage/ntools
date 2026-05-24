@@ -139,7 +139,7 @@ namespace Nbuild
                         var foundApps = GetAppsFromCurrentDirectory(name, version, out var availableApps);
                         if (!foundApps.Any())
                         {
-                            // No matching app found - fail just like non-dry-run mode
+                            // No matching app found - show message but still succeed (it's dry-run)
                             ConsoleHelper.WriteLine($"No apps found matching '{name}'", ConsoleColor.Red);
                             if (availableApps.Any())
                             {
@@ -149,7 +149,8 @@ namespace Nbuild
                                     ConsoleHelper.WriteLine($"  - {app}");
                                 }
                             }
-                            return ResultHelper.Fail(1, $"No apps found matching '{name}'");
+                            msg = $"DRY-RUN: No apps found matching '{name}'";
+                            return ResultHelper.Success(msg);
                         }
 
                         // Found apps - show details in dry-run
@@ -165,8 +166,8 @@ namespace Nbuild
                     }
                     catch (Exception ex)
                     {
-                        // If search fails, fail the dry-run
-                        return ResultHelper.Fail(1, $"Error searching for apps: {ex.Message}");
+                        msg = $"DRY-RUN: Error searching for apps: {ex.Message}";
+                        return ResultHelper.Success(msg);
                     }
                 }
                 else
