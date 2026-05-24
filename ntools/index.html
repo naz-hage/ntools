@@ -1739,10 +1739,10 @@
   <h1>Development Tools</h1>
 
 <h2 id="tool-version-automation">Tool version automation<a class="headerlink" href="#tool-version-automation" title="Anchor link to this section for reference">&para;</a></h2>
-<p>Tool versions in this table are automatically updated from the JSON install definitions in the <code>dev-setup</code> folder using the <code>UpdateVersionsInDocs</code> MSBuild task (C#). To update the table, run:</p>
+<p>Tool versions in this table are automatically updated from the single <code>apps.json</code> file (located at <code>go/apps.json</code>) using the <code>UpdateVersionsInDocs</code> MSBuild task (C#). To update the table, run:</p>
 <div class="highlight"><pre><span></span><code>nb update_doc_versions
 </code></pre></div>
-<p>This will extract all tool/version pairs from every <code>NbuildAppList</code> entry in every <code>*.json</code> file in <code>dev-setup</code> and update the documentation table accordingly. No PowerShell script is needed or maintained for this process.
+<p>This will extract all tool/version pairs from the <code>NbuildAppList</code> entries in <code>go/apps.json</code> and update the documentation table accordingly. The <code>go/apps.json</code> file serves as the <strong>single source of truth</strong> for all developer tools managed by ntools. No PowerShell script is needed or maintained for this process.
 The <a href="https://learn.microsoft.com/en-us/windows/dev-environment/">Windows dev environment</a> has good information on how to setup a Windows dev environment.</p>
 <ul>
 <li>The table below list the latest dev tools used in Ntools.</li>
@@ -1758,13 +1758,13 @@ The <a href="https://learn.microsoft.com/en-us/windows/dev-environment/">Windows
 <tbody>
 <tr>
 <td style="text-align: left;"><a href="https://github.com/argoproj/argo-cd/releases/">Argo CD</a></td>
-<td style="text-align: left;">2.14.11</td>
-<td style="text-align: left;">23-Oct-25</td>
+<td style="text-align: left;">3.2.0</td>
+<td style="text-align: left;">24-May-26</td>
 </tr>
 <tr>
 <td style="text-align: left;"><a href="https://learn.microsoft.com/en-us/cli/azure/install-azure-cli-windows?pivots=msi">Azure CLI</a></td>
 <td style="text-align: left;">2.78.0</td>
-<td style="text-align: left;">22-May-26</td>
+<td style="text-align: left;">24-May-26</td>
 </tr>
 <tr>
 <td style="text-align: left;"><a href="https://portswigger.net/burp/communitydownload">Burp Suite</a></td>
@@ -1774,7 +1774,7 @@ The <a href="https://learn.microsoft.com/en-us/windows/dev-environment/">Windows
 <tr>
 <td style="text-align: left;"><a href="https://dotnet.microsoft.com/en-us/download/dotnet">Dotnet Runtime</a></td>
 <td style="text-align: left;">9.0.2</td>
-<td style="text-align: left;">23-Oct-25</td>
+<td style="text-align: left;">24-May-26</td>
 </tr>
 <tr>
 <td style="text-align: left;"><a href="https://dotnet.microsoft.com/en-us/download/dotnet">Dotnet8 SDK</a></td>
@@ -1794,7 +1794,7 @@ The <a href="https://learn.microsoft.com/en-us/windows/dev-environment/">Windows
 <tr>
 <td style="text-align: left;"><a href="https://git-scm.com/downloads">Git for Windows</a></td>
 <td style="text-align: left;">2.51.1</td>
-<td style="text-align: left;">22-May-26</td>
+<td style="text-align: left;">24-May-26</td>
 </tr>
 <tr>
 <td style="text-align: left;"><a href="https://docs.docker.com/docker-for-windows/install/">Install Docker Desktop on Windows</a></td>
@@ -1804,42 +1804,42 @@ The <a href="https://learn.microsoft.com/en-us/windows/dev-environment/">Windows
 <tr>
 <td style="text-align: left;"><a href="https://github.com/kubernetes/kubernetes/releases">kubernetes</a></td>
 <td style="text-align: left;">1.34.1</td>
-<td style="text-align: left;">22-May-26</td>
+<td style="text-align: left;">24-May-26</td>
 </tr>
 <tr>
 <td style="text-align: left;"><a href="https://github.com/kubernetes/minikube/releases/">minikube</a></td>
 <td style="text-align: left;">1.37.0</td>
-<td style="text-align: left;">22-May-26</td>
+<td style="text-align: left;">24-May-26</td>
 </tr>
 <tr>
 <td style="text-align: left;"><a href="https://www.mongodb.com/try/download/community">MongoDB Community Server</a></td>
 <td style="text-align: left;">8.2.1</td>
-<td style="text-align: left;">22-May-26</td>
+<td style="text-align: left;">24-May-26</td>
 </tr>
 <tr>
 <td style="text-align: left;"><a href="https://nodejs.org/en/download/">Node.js</a></td>
 <td style="text-align: left;">22.21.0</td>
-<td style="text-align: left;">22-May-26</td>
+<td style="text-align: left;">24-May-26</td>
 </tr>
 <tr>
 <td style="text-align: left;"><a href="https://github.com/naz-hage/ntools/releases">Ntools</a></td>
 <td style="text-align: left;">1.47.0</td>
-<td style="text-align: left;">22-May-26</td>
+<td style="text-align: left;">24-May-26</td>
 </tr>
 <tr>
 <td style="text-align: left;"><a href="https://github.com/cli/cli/releases">GitHub CLI</a></td>
 <td style="text-align: left;">2.82.1</td>
-<td style="text-align: left;">23-Oct-25</td>
+<td style="text-align: left;">24-May-26</td>
 </tr>
 <tr>
 <td style="text-align: left;"><a href="https://www.nuget.org/downloads">NuGet</a></td>
 <td style="text-align: left;">6.12.1</td>
-<td style="text-align: left;">22-May-26</td>
+<td style="text-align: left;">24-May-26</td>
 </tr>
 <tr>
 <td style="text-align: left;"><a href="https://pnpm.io/">pnpm</a></td>
 <td style="text-align: left;">10.19.0</td>
-<td style="text-align: left;">22-May-26</td>
+<td style="text-align: left;">24-May-26</td>
 </tr>
 <tr>
 <td style="text-align: left;"><a href="https://www.postman.com/downloads/">Postman Get Started for Free</a></td>
@@ -1849,27 +1849,27 @@ The <a href="https://learn.microsoft.com/en-us/windows/dev-environment/">Windows
 <tr>
 <td style="text-align: left;"><a href="https://github.com/PowerShell/PowerShell/releases">PowerShell</a></td>
 <td style="text-align: left;">7.5.4</td>
-<td style="text-align: left;">22-May-26</td>
+<td style="text-align: left;">24-May-26</td>
 </tr>
 <tr>
 <td style="text-align: left;"><a href="https://www.python.org/downloads/">Python</a></td>
 <td style="text-align: left;">3.14.0</td>
-<td style="text-align: left;">22-May-26</td>
+<td style="text-align: left;">24-May-26</td>
 </tr>
 <tr>
 <td style="text-align: left;"><a href="https://learn.microsoft.com/en-us/sysinternals/">SysInternals</a></td>
 <td style="text-align: left;">2.90.0.0</td>
-<td style="text-align: left;">23-Oct-25</td>
+<td style="text-align: left;">24-May-26</td>
 </tr>
 <tr>
 <td style="text-align: left;"><a href="https://releases.hashicorp.com/terraform">Terraform</a></td>
 <td style="text-align: left;">1.13.4</td>
-<td style="text-align: left;">22-May-26</td>
+<td style="text-align: left;">24-May-26</td>
 </tr>
 <tr>
 <td style="text-align: left;"><a href="https://github.com/terraform-linters/tflint/releases">Terraform Lint</a></td>
 <td style="text-align: left;">0.55.1</td>
-<td style="text-align: left;">22-May-26</td>
+<td style="text-align: left;">24-May-26</td>
 </tr>
 <tr>
 <td style="text-align: left;"><a href="https://visualstudio.microsoft.com/vs/community/">Visual Studio 2022 Community Edition</a></td>
@@ -1879,7 +1879,7 @@ The <a href="https://learn.microsoft.com/en-us/windows/dev-environment/">Windows
 <tr>
 <td style="text-align: left;"><a href="https://code.visualstudio.com/download">Visual Studio Code</a></td>
 <td style="text-align: left;">1.105.1</td>
-<td style="text-align: left;">22-May-26</td>
+<td style="text-align: left;">24-May-26</td>
 </tr>
 <tr>
 <td style="text-align: left;"><a href="https://www.microsoft.com/en-us/p/windows-terminal/9n0dx20hk701">Windows Terminal</a></td>
