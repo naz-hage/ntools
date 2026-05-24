@@ -889,6 +889,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#dry-run-mode-for-install" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dry-run mode for install:
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2250,6 +2261,17 @@ nb.exe install --name &quot;MyApp&quot; --appversion &quot;1.2.3&quot;
 Searches for JSON files in both the current directory and <code>C:\program files\nbuild</code>, then installs the application matching the specified name. The <code>--appversion</code> parameter is optional and overrides the version specified in the JSON file. This method automatically discovers and parses all JSON files in both locations to find the matching application.</p>
 <p><strong>Search order:</strong> Current directory is searched first, then <code>C:\program files\nbuild</code>. If an app is found in the current directory, it takes precedence over the same app in the default location.</p>
 <p><strong>Note:</strong> If you specify both <code>--json</code> and <code>--name</code>, the command is allowed, but <code>--json</code> takes precedence and a warning is emitted. The <code>--name</code> method provides a more convenient way to install applications without needing to know the exact path to the JSON configuration file.</p>
+<h4 id="dry-run-mode-for-install">Dry-run mode for install:<a class="headerlink" href="#dry-run-mode-for-install" title="Anchor link to this section for reference">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>nb.exe install --name &quot;MyApp&quot; --dry-run
+nb.exe install --name &quot;MyApp&quot; --appversion &quot;1.2.3&quot; --dry-run
+</code></pre></div>
+<p><strong>Behavior in dry-run mode:</strong>
+- Searches for the application in both the current directory and <code>C:\program files\nbuild</code>
+- If app is found: displays <code>DRY-RUN: would install app 'MyApp'</code> and lists version details
+- If app is not found: displays <code>No apps found matching 'MyApp'</code> and lists available applications
+- Always succeeds (exit code 0) because dry-run is a preview, not actual installation
+- No files are downloaded, installed, or modified
+- Output is prefixed with color-coded messages (yellow for dry-run, red for not found)</p>
 <h3 id="2-uninstall-applications">2. Uninstall Applications<a class="headerlink" href="#2-uninstall-applications" title="Anchor link to this section for reference">&para;</a></h3>
 <p><div class="highlight"><pre><span></span><code>nb.exe uninstall --json &quot;C:\Program Files\example-tool.json&quot;
 </code></pre></div>
