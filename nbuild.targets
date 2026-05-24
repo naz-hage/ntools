@@ -253,7 +253,6 @@
 		</PropertyGroup>
 		<ItemGroup>
 			<SourceFiles Include="
-						 $(SRC)\ntools.json;
 						 $(SRC)\*.targets" />
 		</ItemGroup>
 		<Copy SourceFiles="@(SourceFiles)" DestinationFolder="$(DST)" />
