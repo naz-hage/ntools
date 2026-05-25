@@ -181,97 +181,131 @@ nb.exe download --json "C:\Program Files\NBuild\ntools.json"
 ```
 Downloads tools and applications specified in the manifest file.
 
-### 5. Display Path Segments
+### 5. Error Handling for JSON Manifest Files
+
+The `list`, `install`, `uninstall`, and `download` commands require valid JSON manifest files. The following errors may occur:
+
+#### File Not Found
+```
+Error: JSON file not found: 'C:\invalid\path\apps.json'. Please provide a valid path to the apps.json file.
+Exit code: -1
+```
+
+**Resolution**: Verify the file path is correct. Common locations:
+- Current directory: `.\apps.json`
+- Program Files: `C:\Program Files\nbuild\apps.json`
+- Relative path: `.\dev-setup\apps.json`
+
+#### Invalid JSON Format
+```
+Error: Invalid JSON format: '.' is an invalid start of a value. Please check the JSON file for proper escaping of backslashes and quotes.
+Exit code: -1
+```
+
+**Resolution**: Validate your JSON file:
+- Use a JSON validator tool (e.g., jsonlint.com)
+- Ensure backslashes in Windows paths are escaped: `C:\\Program Files\\...`
+- Ensure quotes in JSON strings are properly escaped: `\"text\"`
+
+#### Unsupported Version
+```
+Error: Json Version 1.0.0 is not supported. Please use version 1.2.0
+Exit code: -1
+```
+
+**Resolution**: Update your manifest file to use the correct version in the `"version"` field.
+
+### 6. Display Path Segments
 ```cmd
 nb.exe path
 ```
 Displays each segment of the effective PATH environment variable on a separate line, with duplicates removed. Shows the complete PATH that processes actually use (Machine + User PATH combined). Use `--verbose` for additional output.
 
-### 6. Display Git Information
+### 7. Display Git Information
 ```cmd
 nb.exe git_info
 ```
 Displays the current git branch and latest tag information for the local repository.
 
-### 7. Set a Specific Git Tag
+### 8. Set a Specific Git Tag
 ```cmd
 nb.exe git_settag --tag 1.24.33
 ```
 Sets the specified git tag in the local repository.
 
-### 8. Automatically Set the Next Git Tag
+### 9. Automatically Set the Next Git Tag
 ```cmd
 nb.exe git_autotag --buildtype STAGE
 ```
 Automatically sets the next git tag based on the specified build type (`STAGE` or `PROD`).
 
-### 9. Push the Next Git Tag to Remote
+### 10. Push the Next Git Tag to Remote
 ```cmd
 nb.exe git_push_autotag --buildtype PROD
 ```
 Sets the next git tag based on build type and pushes it to the remote repository.
 
-### 10. Display the Current Git Branch
+### 11. Display the Current Git Branch
 ```cmd
 nb.exe git_branch
 ```
 Displays the current git branch in the local repository.
 
-### 11. Clone a Git Repository
+### 12. Clone a Git Repository
 ```cmd
 nb.exe git_clone --url https://github.com/example/repo --path C:\Projects
 ```
 Clones the specified git repository into the specified path. Use `--verbose` for detailed output.
 
-### 12. Delete a Specific Tag
+### 13. Delete a Specific Tag
 ```cmd
 nb.exe git_deletetag --tag 1.24.33
 ```
 Deletes the specified git tag from the local repository.
 
-### 13. Creating a Release
+### 14. Creating a Release
 ```cmd
 nb.exe release_create --repo userName/my-repo --tag 1.24.33 --branch main --file C:\Releases\1.0.0.zip
 ```
 Creates a GitHub release for the specified repository, tag, branch, and asset file.
 
-### 14. Creating a Pre-Release
+### 15. Creating a Pre-Release
 ```cmd
 nb.exe pre_release_create --repo userName/my-repo --tag 1.24.33 --branch main --file C:\Releases\1.0.0.zip
 ```
 Creates a GitHub pre-release for the specified repository, tag, branch, and asset file.
 
-### 15. Downloading an Asset
+### 16. Downloading an Asset
 ```cmd
 nb.exe release_download --repo userName/my-repo --tag 1.24.33 --path C:\Downloads
 ```
 Downloads an asset from the specified release to the given path.
 
-### 16. Creating a Release with Full GitHub URL
+### 17. Creating a Release with Full GitHub URL
 ```cmd
 nb.exe release_create --repo https://github.com/userName/my-repo --tag 1.24.33 --branch main --file C:\Releases\1.0.0.zip
 ```
 Creates a GitHub release using the full GitHub repository URL.
 
-### 17. Downloading an Asset with Full GitHub URL
+### 18. Downloading an Asset with Full GitHub URL
 ```cmd
 nb.exe release_download --repo https://github.com/userName/my-repo --tag 1.24.33 --path C:\Downloads
 ```
 Downloads an asset using the full GitHub repository URL.
 
-### 18. List Latest Releases
+### 19. List Latest Releases
 ```cmd
 nb.exe list_release --repo https://github.com/userName/my-repo
 ```
 Lists the latest 3 releases and the newest pre-release (if newer than the latest release). Use `--verbose` for detailed output.
 
-### 19. List Build Targets
+### 20. List Build Targets
 ```cmd
 nb.exe targets
 ```
 Lists all available build targets for the current solution or project.
 
-### 20. Run Any Listed Target
+### 21. Run Any Listed Target
 ```cmd
 nb.exe core
 ```
