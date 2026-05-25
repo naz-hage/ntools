@@ -129,6 +129,13 @@
         <Message Text="All SDO unit tests complete." />
     </Target>
 
+    <!-- Unit tests for all nbtests -->
+    <Target Name="UNIT_TEST_NBTESTS">
+        <Message Text="Running all nbtests..." />
+        <Exec Command='dotnet test "$(SolutionDir)\nbtests\nbtests.csproj" --configuration Release --logger trx --results-directory:$(SolutionDir)TestResults' WorkingDirectory="$(SolutionDir)" />
+        <Message Text="All nbtests completed." />
+    </Target>
+
     <!-- Run all unit tests -->
     <Target Name="UNIT_TEST_ALL" DependsOnTargets="UNIT_TEST_CLI_VALIDATION;UNIT_TEST_BUILD_STARTER;UNIT_TEST_CLI;UNIT_TEST_COMMAND;UNIT_TEST_NB_COMMAND;UNIT_TEST_GIT_CLONE_COMMAND;UNIT_TEST_NTOOLS_JSON;UNIT_TEST_RELEASE_SERVICE_FACTORY;UNIT_TEST_RESOURCE_HELPER;UNIT_TEST_WORKITEM_COMMAND;UNIT_TEST_PIPELINE_COMMAND;UNIT_TEST_WORKITEM_STATE_TRANSLATOR">
         <Message Text="All unit tests completed." />

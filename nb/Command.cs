@@ -501,10 +501,19 @@ namespace Nbuild
             catch (AggregateException aggEx)
             {
                 var ex = aggEx.Flatten().InnerException ?? aggEx;
-                // Try GitHub authenticated fallback if applicable
+                
+                // Try GitHub authenticated fallback first (before checking for 404)
                 var uri = new Uri(nbuildApp.WebDownloadFile);
                 var fb = TryGithubFallback(uri, fileName, ex);
                 if (fb != null) return fb;
+                
+                // Check if this is a 404 (version not found) error
+                if (ex.Message.Contains("404") || ex.Message.Contains("not found", StringComparison.OrdinalIgnoreCase))
+                {
+                    ConsoleHelper.WriteLine($"Installation of {nbuildApp.Name} version {nbuildApp.Version} is not found", ConsoleColor.Red);
+                    if (Verbose) ConsoleHelper.WriteLine($"[VERBOSE] 404 - Version not available: {nbuildApp.Version}", ConsoleColor.Red);
+                    return ResultHelper.Fail(-1, $"Installation of {nbuildApp.Name} version {nbuildApp.Version} is not found");
+                }
 
                 if (Verbose)
                 {
@@ -515,9 +524,18 @@ namespace Nbuild
             }
             catch (Exception ex)
             {
+                // Try GitHub authenticated fallback first (before checking for 404)
                 var uri = new Uri(nbuildApp.WebDownloadFile);
                 var fb = TryGithubFallback(uri, fileName, ex);
                 if (fb != null) return fb;
+                
+                // Check if this is a 404 (version not found) error
+                if (ex.Message.Contains("404") || ex.Message.Contains("not found", StringComparison.OrdinalIgnoreCase))
+                {
+                    ConsoleHelper.WriteLine($"Installation of {nbuildApp.Name} version {nbuildApp.Version} is not found", ConsoleColor.Red);
+                    if (Verbose) ConsoleHelper.WriteLine($"[VERBOSE] 404 - Version not available: {nbuildApp.Version}", ConsoleColor.Red);
+                    return ResultHelper.Fail(-1, $"Installation of {nbuildApp.Name} version {nbuildApp.Version} is not found");
+                }
 
                 if (Verbose)
                 {
@@ -618,6 +636,8 @@ namespace Nbuild
                 ConsoleHelper.WriteLine($"{nbuildApp.Name} {nbuildApp.Version} downloaded.", ConsoleColor.Yellow);
 
                 // Install the Downloaded file
+                ConsoleHelper.WriteLine($" Installing {nbuildApp.Name} {nbuildApp.Version}", ConsoleColor.Yellow);
+                
                 var process = new Process
                 {
                     StartInfo =
@@ -835,6 +855,10 @@ namespace Nbuild
             var versionGreater = false;
             var hashMatch = IsFileHashEqual(nbuildApp.AppFileName, nbuildApp.StoredHash);
 
+            if (Verbose)
+            {
+                ConsoleHelper.WriteLine($"[VERSION CHECK] App: {nbuildApp.Name}, Requested Version: {nbuildApp.Version}, Installed: {currentVersion}", ConsoleColor.Cyan);
+            }
 
             if (currentVersion == null)
             {
@@ -848,6 +872,11 @@ namespace Nbuild
 
                 if (!Version.TryParse(nbuildApp.Version, out Version? versionParsed)) return false;
                 versionGreater = currentVersionParsed >= versionParsed;
+                
+                if (Verbose)
+                {
+                    ConsoleHelper.WriteLine($"[VERSION COMPARE] {currentVersionParsed} >= {versionParsed} = {versionGreater}", ConsoleColor.Cyan);
+                }
             }
 
             return versionGreater || hashMatch;
@@ -959,6 +988,11 @@ namespace Nbuild
                 }
 
                 appsFileFound = true;
+                
+                if (Verbose)
+                {
+                    ConsoleHelper.WriteLine($"Found apps.json: {appsFilePath}", ConsoleColor.Cyan);
+                }
 
                 try
                 {
@@ -1036,9 +1070,18 @@ namespace Nbuild
 
             if (foundApp != null)
             {
+                if (Verbose)
+                {
+                    ConsoleHelper.WriteLine($"Matched app: {foundApp.Name} (Version: {foundApp.Version})", ConsoleColor.Green);
+                }
+                
                 // Apply version override if specified BEFORE processing templates
                 if (!string.IsNullOrEmpty(version))
                 {
+                    if (Verbose)
+                    {
+                        ConsoleHelper.WriteLine($"Overriding version: {foundApp.Version} -> {version}", ConsoleColor.Green);
+                    }
                     foundApp.Version = version;
                 }
 
