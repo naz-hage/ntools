@@ -1054,7 +1054,11 @@ namespace Nbuild
                         }
                     }
 
-                    // Continue to next file to check for multiple matches when no version specified
+                    // If we found a match in a higher-priority file (current directory) and no version specified, stop searching
+                    if (foundApp != null && string.IsNullOrEmpty(version))
+                    {
+                        break; // Use the first match found (current directory takes precedence)
+                    }
                 }
                 catch (Exception ex) when (ex is not ArgumentException)
                 {

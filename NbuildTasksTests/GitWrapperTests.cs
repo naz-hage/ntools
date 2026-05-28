@@ -373,7 +373,8 @@ namespace NbuildTasks.Tests
         {
             // Arrange
             var tag = GitWrapper.Tag;
-            GitWrapper.SetTag(tag);
+            var setTagResult = GitWrapper.SetTag(tag);
+            Assert.IsTrue(setTagResult, "Failed to set initial tag for PushTagTest - setup validation failed");
             // Arrange add a tag
             tag = GitWrapper.SetAutoTag(Enums.BuildType.STAGE.ToString());
 

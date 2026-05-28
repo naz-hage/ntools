@@ -131,10 +131,29 @@ namespace NbuildTasks
             File.WriteAllLines(DevSetupPath, lines);
         }
 
+        private static readonly Dictionary<string, string[]> ToolNameMappings = new()
+        {
+            { "Azure CLI", new[] { "AzureCLI", "Azure CLI" } },
+            { "kubernetes", new[] { "kubectl", "kubernetes" } },
+            { "MongoDB Community Server", new[] { "MongoDB", "MongoDB Community Server" } },
+            // Add other tool name mappings as needed
+        };
+
         private static bool IsToolMatch(string toolName, string jsonName)
         {
-            // Simple case-insensitive match - no hardcoded mappings needed
-            return toolName.Equals(jsonName, StringComparison.OrdinalIgnoreCase);
+            // Direct case-insensitive match
+            if (toolName.Equals(jsonName, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            // Check for mapped aliases
+            if (ToolNameMappings.TryGetValue(toolName, out var aliases))
+            {
+                return aliases.Any(alias => alias.Equals(jsonName, StringComparison.OrdinalIgnoreCase));
+            }
+
+            return false;
         }
     }
 

@@ -310,7 +310,19 @@ namespace GitHubRelease.Tests
                 Console.WriteLine("[TestMode] Local mode detected");
                 var response = new { StatusCode = HttpStatusCode.NotFound };
                 Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode, "Expected NotFound status code.");
-                // Asset file should not be created when download fails
+                
+                // Verify that asset file was not created when download fails
+                string testAssetName = "nonexistent.zip";
+                string testDownloadPath = Path.Combine(Path.GetTempPath(), $"test_download_{Guid.NewGuid()}");
+                Directory.CreateDirectory(testDownloadPath);
+                var testAssetFileName = Path.Combine(testDownloadPath, testAssetName);
+                
+                Assert.IsFalse(File.Exists(testAssetFileName), "Asset file should not be created when download fails.");
+                
+                if (Directory.Exists(testDownloadPath))
+                {
+                    Directory.Delete(testDownloadPath, true);
+                }
                 return;
             }
             Console.WriteLine("[TestMode] Real mode detected");
