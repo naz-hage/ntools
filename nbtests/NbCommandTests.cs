@@ -157,9 +157,8 @@ namespace NbuildTests
         [TestMethod]
         public void GitInfoCommand_Executes_ReturnsInt()
         {
+            // Verify command executes without throwing exception; exit code type verified by return
             var exitCode = Program.Main(new string[] { "git_info" });
-            // Could be 0 or error depending on repo state, just check it's an int
-            // exitCode type is already verified by declaration;
         }
 
         [TestMethod]
@@ -214,8 +213,8 @@ namespace NbuildTests
         [TestMethod]
         public void GitBranchCommand_Executes_ReturnsInt()
         {
+            // Verify command executes without throwing exception; exit code type verified by return
             var exitCode = Program.Main(new string[] { "git_branch" });
-            // exitCode type is already verified by declaration;
         }
 
         [TestMethod]
