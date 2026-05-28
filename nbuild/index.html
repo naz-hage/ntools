@@ -868,10 +868,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#install-from-json-file-optional" class="md-nav__link">
+  <a href="#install-from-json-file" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Install from JSON file (optional):
+        Install from JSON file:
       
     </span>
   </a>
@@ -2303,26 +2303,26 @@ configuration, or registry state.</p>
 <h2 id="examples">Examples<a class="headerlink" href="#examples" title="Anchor link to this section for reference">&para;</a></h2>
 <p>Below are practical examples for using <code>nb.exe</code>. These examples assume you are running in a PowerShell terminal.</p>
 <h3 id="1-install-applications">1. Install Applications<a class="headerlink" href="#1-install-applications" title="Anchor link to this section for reference">&para;</a></h3>
-<h4 id="install-from-json-file-optional">Install from JSON file (optional):<a class="headerlink" href="#install-from-json-file-optional" title="Anchor link to this section for reference">&para;</a></h4>
+<h4 id="install-from-json-file">Install from JSON file:<a class="headerlink" href="#install-from-json-file" title="Anchor link to this section for reference">&para;</a></h4>
 <p><div class="highlight"><pre><span></span><code>nb.exe install --json &quot;C:\Program Files\tools.json&quot;
 </code></pre></div>
-Installs applications specified in the manifest file. The <code>--json</code> parameter is optional. If not specified, the command defaults to searching in <code>C:\program files\nbuild</code>. (Requires admin privileges.)</p>
+Installs applications specified in the manifest file. The <code>--json</code> parameter is optional if <code>--name</code> is provided. If <code>--json</code> is specified, <code>--name</code> is ignored. (Requires admin privileges.)</p>
 <h4 id="install-by-name-from-current-directory-and-default-location">Install by name from current directory and default location:<a class="headerlink" href="#install-by-name-from-current-directory-and-default-location" title="Anchor link to this section for reference">&para;</a></h4>
 <p><div class="highlight"><pre><span></span><code>nb.exe install --name &quot;MyApp&quot;
 nb.exe install --name &quot;MyApp&quot; --appversion &quot;1.2.3&quot;
 </code></pre></div>
-Searches for <code>apps.json</code> in both the current directory and <code>C:\program files\nbuild</code>, then installs the application matching the specified name. The <code>--appversion</code> parameter is optional and overrides the version specified in the JSON file.</p>
-<p><strong>BREAKING CHANGE (v1.76+):</strong> This command now searches ONLY for <code>apps.json</code> files, not all JSON files. You must consolidate your application definitions into a single <code>apps.json</code> file in the target directory or move it to <code>C:\program files\nbuild\apps.json</code>.</p>
-<p><strong>Search order:</strong> Current directory is searched first for <code>apps.json</code>, then <code>C:\program files\nbuild\apps.json</code>. If an app is found in the current directory, it takes precedence over the same app in the default location.</p>
+Searches for <code>apps.json</code> in both the current directory and the default installation directory, then installs the application matching the specified name. The <code>--name</code> parameter is optional if <code>--json</code> is provided. The <code>--appversion</code> parameter is optional and overrides the version specified in the JSON file.</p>
+<p><strong>BREAKING CHANGE (v1.76+):</strong> This command now searches ONLY for <code>apps.json</code> files, not all JSON files. You must consolidate your application definitions into a single <code>apps.json</code> file in the target directory or move it to the default installation directory.</p>
+<p><strong>Search order:</strong> Current directory is searched first for <code>apps.json</code>, then the default installation directory. If an app is found in the current directory, it takes precedence over the same app in the default installation directory.</p>
 <p><strong>Note:</strong> If you specify both <code>--json</code> and <code>--name</code>, the command is allowed, but <code>--json</code> takes precedence and a warning is emitted. The <code>--name</code> method provides a more convenient way to install applications without needing to know the exact path to the JSON configuration file.</p>
 <h4 id="dry-run-mode-for-install">Dry-run mode for install:<a class="headerlink" href="#dry-run-mode-for-install" title="Anchor link to this section for reference">&para;</a></h4>
 <div class="highlight"><pre><span></span><code>nb.exe install --name &quot;MyApp&quot; --dry-run
 nb.exe install --name &quot;MyApp&quot; --appversion &quot;1.2.3&quot; --dry-run
 </code></pre></div>
 <p><strong>Behavior in dry-run mode:</strong>
-- Searches for <code>apps.json</code> in both the current directory and <code>C:\program files\nbuild</code> (search order: current directory first)
+- Searches for <code>apps.json</code> in both the current directory and the default installation directory (search order: current directory first)
 - If app is found: displays <code>DRY-RUN: would install app 'MyApp'</code> in yellow and lists version details
-- If app is not found: displays <code>No apps found matching 'MyApp'</code> in red, lists the search directories (current directory and <code>C:\program files\nbuild</code>), and lists available applications found in those <code>apps.json</code> files
+- If app is not found: displays <code>No apps found matching 'MyApp'</code> in red, lists the search directories (current directory and default installation directory), and lists available applications found in those <code>apps.json</code> files
 - Dry-run always returns exit code 0 (success), even when app is not found, as it is a preview/simulation mode
 - Always succeeds (exit code 0) because dry-run is a preview, not actual installation
 - No files are downloaded, installed, or modified
