@@ -37,7 +37,6 @@ namespace Nbuild.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
         public async Task ValidateRepo_ShouldThrowException_ForNonGitHubDomain()
         {
             // Arrange
@@ -46,15 +45,19 @@ namespace Nbuild.Tests
                 Repo = "https://gitlab.com/userName/repoName"
             };
 
-            // Act
-            await cli.ValidateRepo();
-
-            // Assert
-            // Exception is expected
+            // Act & Assert
+            try
+            {
+                await cli.ValidateRepo();
+                Assert.Fail("Expected ArgumentException to be thrown");
+            }
+            catch (ArgumentException)
+            {
+                // Exception is expected
+            }
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
         public async Task ValidateRepo_ShouldThrowException_ForInvalidRepoFormat()
         {
             // Arrange
@@ -63,11 +66,16 @@ namespace Nbuild.Tests
                 Repo = "invalid/repo/format"
             };
 
-            // Act
-            await cli.ValidateRepo();
-
-            // Assert
-            // Exception is expected
+            // Act & Assert
+            try
+            {
+                await cli.ValidateRepo();
+                Assert.Fail("Expected ArgumentException to be thrown");
+            }
+            catch (ArgumentException)
+            {
+                // Exception is expected
+            }
         }
 
         [TestMethod]
@@ -105,12 +113,12 @@ namespace Nbuild.Tests
             };
 
             // Act & Assert - expect exception
-            var exception = await Assert.ThrowsExceptionAsync<InvalidOperationException>(
-                async () => await cli.ValidateRepo()
-            );
-
-            // Verify the exception message is appropriate
-            Assert.IsNotNull(exception, "Expected InvalidOperationException to be thrown");
+            try
+            {
+                await cli.ValidateRepo();
+                Assert.Fail("Expected InvalidOperationException to be thrown");
+            }
+            catch (InvalidOperationException) { /* Exception is expected */ }
         }
 
         [TestMethod]
@@ -127,15 +135,22 @@ namespace Nbuild.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
         public void GetCommandType_InvalidCommand_ShouldThrowException()
         {
             // Arrange
             var cli = new Cli();
             cli.Command = (Cli.CommandType)999; // Invalid command
 
-            // Act
-            cli.GetCommandType();
+            // Act & Assert
+            try
+            {
+                cli.GetCommandType();
+                Assert.Fail("Expected ArgumentException to be thrown");
+            }
+            catch (ArgumentException)
+            {
+                // Exception is expected
+            }
         }
 
         [TestMethod]
@@ -156,7 +171,6 @@ namespace Nbuild.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
         public void Validate_MissingRepo_ShouldThrowException()
         {
             // Arrange
@@ -168,12 +182,19 @@ namespace Nbuild.Tests
                 AssetFileName = "file.zip"
             };
 
-            // Act
-            cli.Validate();
+            // Act & Assert
+            try
+            {
+                cli.Validate();
+                Assert.Fail("Expected ArgumentException to be thrown");
+            }
+            catch (ArgumentException)
+            {
+                // Exception is expected
+            }
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
         public void Validate_InvalidRepoFormat_ShouldThrowException()
         {
             // Arrange
@@ -192,12 +213,19 @@ namespace Nbuild.Tests
                 return;
             }
 
-            // Act
-            cli.Validate();
+            // Act & Assert
+            try
+            {
+                cli.Validate();
+                Assert.Fail("Expected ArgumentException to be thrown");
+            }
+            catch (ArgumentException)
+            {
+                // Exception is expected
+            }
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
         public void Validate_MissingTag_ShouldThrowException()
         {
             // Arrange
@@ -209,12 +237,19 @@ namespace Nbuild.Tests
                 AssetFileName = "file.zip"
             };
 
-            // Act
-            cli.Validate();
+            // Act & Assert
+            try
+            {
+                cli.Validate();
+                Assert.Fail("Expected ArgumentException to be thrown");
+            }
+            catch (ArgumentException)
+            {
+                // Exception is expected
+            }
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
         public void Validate_MissingFileForCreateCommand_ShouldThrowException()
         {
             // Arrange
@@ -226,8 +261,16 @@ namespace Nbuild.Tests
                 Branch = "main"
             };
 
-            // Act
-            cli.Validate();
+            // Act & Assert
+            try
+            {
+                cli.Validate();
+                Assert.Fail("Expected ArgumentException to be thrown");
+            }
+            catch (ArgumentException)
+            {
+                // Exception is expected
+            }
         }
 
         [TestMethod]
@@ -244,7 +287,6 @@ namespace Nbuild.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
         public async Task ValidateRepo_InvalidRepo_ShouldThrowException()
         {
             // Arrange
@@ -253,8 +295,16 @@ namespace Nbuild.Tests
                 Repo = "invalid/repo"
             };
 
-            // Act
-            await cli.ValidateRepo();
+            // Act & Assert
+            try
+            {
+                await cli.ValidateRepo();
+                Assert.Fail("Expected ArgumentException to be thrown");
+            }
+            catch (ArgumentException)
+            {
+                // Exception is expected
+            }
         }
 
         [TestMethod]
@@ -281,14 +331,17 @@ namespace Nbuild.Tests
             };
 
             // Act & Assert - expect exception
-            var exception = await Assert.ThrowsExceptionAsync<ArgumentException>(
-                async () => await cli.ValidateRepositoryExists()
-            );
-
-            // Verify the exception message is appropriate
-            Assert.IsNotNull(exception, "Expected ArgumentException to be thrown");
-            Assert.IsTrue(exception.Message.Contains("invalid/repo"),
-                "Exception message should mention the invalid repository");
+            try
+            {
+                await cli.ValidateRepositoryExists();
+                Assert.Fail("Expected ArgumentException to be thrown");
+            }
+            catch (ArgumentException ex)
+            {
+                // Verify the exception message mentions the invalid repository
+                Assert.IsTrue(ex.Message.Contains("invalid/repo"),
+                    "Exception message should mention the invalid repository");
+            }
         }
 
         [TestMethod]

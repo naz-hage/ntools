@@ -345,13 +345,20 @@ namespace NbuildTests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void RestoreSnapshot_NullSnapshot_ThrowsException()
         {
-            // Act
+            // Act & Assert
+            try
+            {
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type
-            PathManager.RestoreSnapshot(null);
+                PathManager.RestoreSnapshot(null);
 #pragma warning restore CS8625
+                Assert.Fail("Expected ArgumentNullException to be thrown");
+            }
+            catch (ArgumentNullException)
+            {
+                // Exception is expected
+            }
         }
 
         [TestMethod]

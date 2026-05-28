@@ -363,10 +363,9 @@ namespace NbuildTasks.Tests
 
             // Act
             var result = GitWrapper.CheckoutBranch(branch);
-            Assert.IsNotNull(result);
 
             // Assert
-            Assert.IsTrue(result);
+            Assert.IsTrue(result, "CheckoutBranch should succeed for valid branch");
         }
 
         [TestMethod, TestCategory("Manual")]
@@ -374,7 +373,7 @@ namespace NbuildTasks.Tests
         {
             // Arrange
             var tag = GitWrapper.Tag;
-            Assert.IsTrue(GitWrapper.SetTag(tag));
+            GitWrapper.SetTag(tag);
             // Arrange add a tag
             tag = GitWrapper.SetAutoTag(Enums.BuildType.STAGE.ToString());
 

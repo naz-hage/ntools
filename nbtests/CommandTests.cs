@@ -496,7 +496,7 @@ namespace NbuildTests
             // Assert a failed json parsing is returned 
             Assert.IsFalse(result.IsSuccess());
 
-            Assert.AreEqual(result.GetFirstOutput().Trim(' '), "Invalid json input: AppFileName is required");
+            Assert.AreEqual("Invalid json input: AppFileName is required", result.GetFirstOutput().Trim(' '));
         }
 
         // Test method for install exception when WebDownloadFile is not defined
@@ -533,7 +533,7 @@ namespace NbuildTests
             // Assert a failed json parsing is returned 
             Assert.IsFalse(result.IsSuccess());
 
-            Assert.AreEqual(result.GetFirstOutput().Trim(' '), "Invalid json input: WebDownloadFile is required");
+            Assert.AreEqual("Invalid json input: WebDownloadFile is required", result.GetFirstOutput().Trim(' '));
         }
 
         // Test method for install exception when DownloadedFile is not defined
@@ -576,7 +576,7 @@ namespace NbuildTests
             // Assert a failed json parsing is returned 
             Assert.IsFalse(result.IsSuccess());
 
-            Assert.AreEqual(result.GetFirstOutput().Trim(' '), "Invalid json input: DownloadedFile is required");
+            Assert.AreEqual("Invalid json input: DownloadedFile is required", result.GetFirstOutput().Trim(' '));
         }
 
         // Test method for install exception when InstallCommand is not defined
@@ -619,7 +619,7 @@ namespace NbuildTests
             // Assert a failed json parsing is returned 
             Assert.IsFalse(result.IsSuccess());
 
-            Assert.AreEqual(result.GetFirstOutput(), "Invalid json input: InstallCommand is required");
+            Assert.AreEqual("Invalid json input: InstallCommand is required", result.GetFirstOutput());
         }
 
         // Test method for install exception when InstallArgs is not defined
@@ -662,7 +662,7 @@ namespace NbuildTests
             // Assert a failed json parsing is returned 
             Assert.IsFalse(result.IsSuccess());
 
-            Assert.AreEqual(result.GetFirstOutput().Trim(' '), "Invalid json input: InstallArgs is required");
+            Assert.AreEqual("Invalid json input: InstallArgs is required", result.GetFirstOutput().Trim(' '));
         }
 
         // Test method for install exception when InstallPath is not defined
@@ -705,7 +705,7 @@ namespace NbuildTests
             // Assert a failed json parsing is returned 
             Assert.IsFalse(result.IsSuccess());
 
-            Assert.AreEqual(result.GetFirstOutput(), "Invalid json input: InstallPath is required");
+            Assert.AreEqual("Invalid json input: InstallPath is required", result.GetFirstOutput());
         }
 
 
@@ -880,10 +880,16 @@ namespace NbuildTests
                 File.WriteAllText("apps.json", jsonContentFinal);
 
                 // Act & Assert - should fail because multiple apps with same name exist without version specified
-                var ex = Assert.ThrowsException<ArgumentException>(() =>
-                    Command.GetAppsFromCurrentDirectory("testapp", null, out var availableApps));
-                Assert.IsTrue(ex.Message.Contains("Multiple apps found with name 'testapp'"));
-                Assert.IsTrue(ex.Message.Contains("Please specify a version"));
+                try
+                {
+                    Command.GetAppsFromCurrentDirectory("testapp", null, out var availableApps);
+                    Assert.Fail("Expected ArgumentException to be thrown");
+                }
+                catch (ArgumentException ex)
+                {
+                    Assert.IsTrue(ex.Message.Contains("Multiple apps found with name 'testapp'"));
+                    Assert.IsTrue(ex.Message.Contains("Please specify a version"));
+                }
             }
             finally
             {
