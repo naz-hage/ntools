@@ -50,7 +50,7 @@ namespace SdoTests
             // Invoke private CreatePullRequest with dryRun=true and verbose=true
             var method = typeof(PullRequestCommand).GetMethod("CreatePullRequest", BindingFlags.NonPublic | BindingFlags.Instance);
             Assert.NotNull(method);
-            var task = (Task<int>)method.Invoke(cmd, new object[] { tmp, 0, false, true, true })!;
+            var task = (Task<int>)method.Invoke(cmd, new object[] { tmp, 1, false, true, true })!;
             var result = await task;
             Assert.Equal(0, result);
 

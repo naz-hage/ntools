@@ -720,17 +720,26 @@ commands:
                 // Force garbage collection to release file handles
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
+                GC.Collect(); // Second GC to ensure cleanup
                 // Retry logic for file system operations on Windows
-                for (int attempt = 0; attempt < 3; attempt++)
+                int maxAttempts = 5;
+                for (int attempt = 0; attempt < maxAttempts; attempt++)
                 {
                     try
                     {
-                        Directory.Delete(tempDir, recursive: true);
+                        if (Directory.Exists(tempDir))
+                        {
+                            Directory.Delete(tempDir, recursive: true);
+                        }
                         break;
                     }
-                    catch (IOException) when (attempt < 2)
+                    catch (IOException) when (attempt < maxAttempts - 1)
                     {
-                        System.Threading.Thread.Sleep(100);
+                        System.Threading.Thread.Sleep(200 + (attempt * 100)); // Exponential backoff
+                    }
+                    catch (UnauthorizedAccessException) when (attempt < maxAttempts - 1)
+                    {
+                        System.Threading.Thread.Sleep(200 + (attempt * 100)); // Exponential backoff
                     }
                 }
             }

@@ -19,6 +19,16 @@ public class PlatformServiceTests
     private void SetupWorkingDirectory()
     {
         // Set working directory to the solution root (ntools) to ensure Git repository is accessible
+        
+        // For GitHub Actions, use the GITHUB_WORKSPACE environment variable
+        var githubWorkspace = Environment.GetEnvironmentVariable("GITHUB_WORKSPACE");
+        if (!string.IsNullOrEmpty(githubWorkspace) && Directory.Exists(Path.Combine(githubWorkspace, ".git")))
+        {
+            Environment.CurrentDirectory = githubWorkspace;
+            return;
+        }
+        
+        // For local development, use the original relative path approach
         var currentDir = Directory.GetCurrentDirectory();
         var solutionDir = Path.Combine(currentDir, "..", "..", "..");
         var normalizedPath = Path.GetFullPath(solutionDir);

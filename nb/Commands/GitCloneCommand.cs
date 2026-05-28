@@ -26,7 +26,7 @@ namespace Nbuild.Commands
     ///   keeps parsing/validation separate from domain logic and makes testing
     ///   the handler straightforward (inject a fake service and assert calls).
     /// </remarks>
-    internal static class GitCloneCommand
+    public static class GitCloneCommand
     {
         /// <summary>
         /// Register the <c>git_clone</c> command on the supplied <paramref name="rootCommand"/>.

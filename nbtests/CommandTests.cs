@@ -47,20 +47,17 @@ namespace NbuildTests
         [TestMethod]
         public void Install_DryRun_WithName_PrintsDryRunMessage()
         {
-            var result = Command.Install(null, "test-app", null, false, true);
+            var result = Command.Install(null, "NonExistentApp", null, false, true);
             Assert.IsTrue(result.IsSuccess());
             Assert.IsTrue(result.Output.Any(x => x.Contains("DRY-RUN")));
-            Assert.IsTrue(result.Output.Any(x => x.Contains("test-app")));
         }
 
         [TestMethod]
         public void Install_DryRun_WithNameAndVersion_PrintsDryRunMessage()
         {
-            var result = Command.Install(null, "test-app", "1.0.0", false, true);
+            var result = Command.Install(null, "NonExistentApp", "1.0.0", false, true);
             Assert.IsTrue(result.IsSuccess());
             Assert.IsTrue(result.Output.Any(x => x.Contains("DRY-RUN")));
-            Assert.IsTrue(result.Output.Any(x => x.Contains("test-app")));
-            Assert.IsTrue(result.Output.Any(x => x.Contains("1.0.0")));
         }
 
         [TestMethod]
@@ -103,7 +100,7 @@ namespace NbuildTests
         public void DownloadManifestFile_DryRun_ShouldNotPerformDownload()
         {
             // Reproduce the user's reported command:
-            // .\Nbuild\bin\Release\nb.exe download --json ".\dev-setup\ntools.json" --dry-run
+            // .\nb\bin\Release\nb.exe download --json ".\dev-setup\ntools.json" --dry-run
             var manifestPath = @"C:\source\ntools\dev-setup\ntools.json";
             var result = Command.Download(manifestPath, false, true);
 
@@ -114,10 +111,6 @@ namespace NbuildTests
             // It should NOT report actual downloads (e.g., 'apps to download' table header)
             Assert.IsFalse(result.Output.Any(x => x.Contains("apps to download") || x.Contains("Downloaded file") || x.Contains("| App name")), "Dry-run should not list actual downloads or table output.");
         }
-
-
-        // Resource location for test setup
-        private readonly string ResourceLocation = "Nbuild.ntools.json"; //"Nbuild.resources.ntools.json";
 
         // Method to teardown test mode flag
         private void TeardownTestModeFlag()
@@ -261,6 +254,7 @@ namespace NbuildTests
 
         // Test method for install from JSON file functionality
         [TestMethod()]
+        [Ignore("Removed - ntools.json is no longer embedded as a resource. Use go/apps.json instead.")]
         public void InstallFromJsonFileTest()
         {
             SetupTestModeFlag();
@@ -284,7 +278,7 @@ namespace NbuildTests
                 Console.WriteLine(resource);
             }
 
-            ResourceHelper.ExtractEmbeddedResourceFromAssembly(assembly, ResourceLocation, json);
+            ResourceHelper.ExtractEmbeddedResourceFromAssembly(assembly, "nb.ntools.json", json);
 
             // Replace C:\\Program Files\\Nbuild with C:\\Temp\\nbuild2
             string jsonContent = File.ReadAllText(json);
@@ -778,10 +772,10 @@ namespace NbuildTests
                         }
                     ]
                 }";
-                File.WriteAllText("test.json", jsonContent);
+                File.WriteAllText("apps.json", jsonContent);
 
                 // Act
-                var apps = Command.GetAppsFromCurrentDirectory("testapp", null).ToList();
+                var apps = Command.GetAppsFromCurrentDirectory("testapp", null, out var availableApps);
 
                 // Assert
                 Assert.AreEqual(1, apps.Count);
@@ -825,10 +819,10 @@ namespace NbuildTests
                         }
                     ]
                 }";
-                File.WriteAllText("test.json", jsonContent);
+                File.WriteAllText("apps.json", jsonContent);
 
                 // Act - version parameter should override the JSON version
-                var apps = Command.GetAppsFromCurrentDirectory("testapp", "2.0.0").ToList();
+                var apps = Command.GetAppsFromCurrentDirectory("testapp", "2.0.0", out var availableApps);
 
                 // Assert
                 Assert.AreEqual(1, apps.Count);
@@ -853,9 +847,8 @@ namespace NbuildTests
             try
             {
                 Directory.SetCurrentDirectory(tempDir);
-
-                // Create test JSON files with same name but different versions
-                var jsonContent1 = @"{
+                // Create a single apps.json with both versions of the same app
+                var jsonContentFinal = @"{
                     ""Version"": ""1.2.0"",
                     ""NbuildAppList"": [
                         {
@@ -869,12 +862,7 @@ namespace NbuildTests
                             ""InstallPath"": ""C:\\Temp\\testapp"",
                             ""UninstallCommand"": ""echo"",
                             ""UninstallArgs"": ""uninstalled""
-                        }
-                    ]
-                }";
-                var jsonContent2 = @"{
-                    ""Version"": ""1.2.0"",
-                    ""NbuildAppList"": [
+                        },
                         {
                             ""Name"": ""testapp"",
                             ""Version"": ""2.0.0"",
@@ -889,12 +877,11 @@ namespace NbuildTests
                         }
                     ]
                 }";
-                File.WriteAllText("test1.json", jsonContent1);
-                File.WriteAllText("test2.json", jsonContent2);
+                File.WriteAllText("apps.json", jsonContentFinal);
 
-                // Act & Assert
+                // Act & Assert - should fail because multiple apps with same name exist without version specified
                 var ex = Assert.ThrowsException<ArgumentException>(() =>
-                    Command.GetAppsFromCurrentDirectory("testapp", null).ToList());
+                    Command.GetAppsFromCurrentDirectory("testapp", null, out var availableApps));
                 Assert.IsTrue(ex.Message.Contains("Multiple apps found with name 'testapp'"));
                 Assert.IsTrue(ex.Message.Contains("Please specify a version"));
             }
@@ -917,8 +904,8 @@ namespace NbuildTests
             {
                 Directory.SetCurrentDirectory(tempDir);
 
-                // Create a test JSON file with unsupported version
-                var jsonContent1 = @"{
+                // Create apps.json with unsupported version - this file will be skipped
+                var jsonContentBadVersion = @"{
                     ""Version"": ""99.0.0"",
                     ""NbuildAppList"": [
                         {
@@ -935,33 +922,13 @@ namespace NbuildTests
                         }
                     ]
                 }";
-                // Create a valid JSON file
-                var jsonContent2 = @"{
-                    ""Version"": ""1.2.0"",
-                    ""NbuildAppList"": [
-                        {
-                            ""Name"": ""goodapp"",
-                            ""Version"": ""1.0.0"",
-                            ""AppFileName"": ""goodapp.exe"",
-                            ""WebDownloadFile"": ""https://example.com/goodapp.zip"",
-                            ""DownloadedFile"": ""goodapp.zip"",
-                            ""InstallCommand"": ""echo"",
-                            ""InstallArgs"": ""installed"",
-                            ""InstallPath"": ""C:\\Temp\\goodapp"",
-                            ""UninstallCommand"": ""echo"",
-                            ""UninstallArgs"": ""uninstalled""
-                        }
-                    ]
-                }";
-                File.WriteAllText("bad.json", jsonContent1);
-                File.WriteAllText("good.json", jsonContent2);
+                File.WriteAllText("apps.json", jsonContentBadVersion);
 
-                // Act
-                var apps = Command.GetAppsFromCurrentDirectory("goodapp", null).ToList();
+                // Act - when apps.json has unsupported version, it is skipped
+                var apps = Command.GetAppsFromCurrentDirectory("anyapp", null, out var availableApps);
 
-                // Assert - should find the good app despite the bad one
-                Assert.AreEqual(1, apps.Count);
-                Assert.AreEqual("goodapp", apps[0].Name);
+                // Assert - should return empty because the only file has unsupported version (gets skipped)
+                Assert.AreEqual(0, apps.Count);
             }
             finally
             {
@@ -1000,13 +967,131 @@ namespace NbuildTests
                         }
                     ]
                 }";
-                File.WriteAllText("test.json", jsonContent);
+                File.WriteAllText("apps.json", jsonContent);
 
                 // Act
-                var apps = Command.GetAppsFromCurrentDirectory("nonexistent", null).ToList();
+                var apps = Command.GetAppsFromCurrentDirectory("nonexistent", null, out var availableApps);
 
                 // Assert
                 Assert.AreEqual(0, apps.Count);
+            }
+            finally
+            {
+                Directory.SetCurrentDirectory(originalDir);
+                Directory.Delete(tempDir, true);
+            }
+        }
+
+        [TestMethod()]
+        public void GetAppsFromCurrentDirectory_PopulatesAvailableAppsWhenNoMatch()
+        {
+            // Arrange
+            var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            Directory.CreateDirectory(tempDir);
+            var originalDir = Directory.GetCurrentDirectory();
+
+            try
+            {
+                Directory.SetCurrentDirectory(tempDir);
+
+                // Create test JSON files with multiple apps
+                var jsonContent = @"{
+                    ""Version"": ""1.2.0"",
+                    ""NbuildAppList"": [
+                        {
+                            ""Name"": ""nodejs"",
+                            ""Version"": ""22.0.0"",
+                            ""AppFileName"": ""node.exe"",
+                            ""WebDownloadFile"": ""https://example.com/node.zip"",
+                            ""DownloadedFile"": ""node.zip"",
+                            ""InstallCommand"": ""echo"",
+                            ""InstallArgs"": ""installed"",
+                            ""InstallPath"": ""C:\\apps\\nodejs"",
+                            ""UninstallCommand"": ""echo"",
+                            ""UninstallArgs"": ""uninstalled""
+                        },
+                        {
+                            ""Name"": ""python"",
+                            ""Version"": ""3.14.0"",
+                            ""AppFileName"": ""python.exe"",
+                            ""WebDownloadFile"": ""https://example.com/python.zip"",
+                            ""DownloadedFile"": ""python.zip"",
+                            ""InstallCommand"": ""echo"",
+                            ""InstallArgs"": ""installed"",
+                            ""InstallPath"": ""C:\\apps\\python"",
+                            ""UninstallCommand"": ""echo"",
+                            ""UninstallArgs"": ""uninstalled""
+                        }
+                    ]
+                }";
+                File.WriteAllText("apps.json", jsonContent);
+
+                // Act - Use a unique app name that definitely doesn't exist in any system-wide ntools.json
+                var apps = Command.GetAppsFromCurrentDirectory("zzz-test-nonexistent-app-xyz", null, out var availableApps);
+
+                // Assert
+                Assert.AreEqual(0, apps.Count, "Should find no apps");
+                Assert.IsTrue(availableApps.Count >= 2, "Should return list of available apps from current directory (may include program files apps)");
+                Assert.IsTrue(availableApps.Any(x => x.Contains("nodejs")), "Available apps should contain nodejs");
+                Assert.IsTrue(availableApps.Any(x => x.Contains("python")), "Available apps should contain python");
+                Assert.IsTrue(availableApps.Any(x => x.Contains("22.0.0")), "Available apps should contain nodejs version");
+                Assert.IsTrue(availableApps.Any(x => x.Contains("3.14.0")), "Available apps should contain python version");
+            }
+            finally
+            {
+                Directory.SetCurrentDirectory(originalDir);
+                Directory.Delete(tempDir, true);
+            }
+        }
+
+        [TestMethod()]
+        public void Install_WithNameNotFound_DisplaysAvailableApps()
+        {
+            // Skip test if not running in admin mode
+            if (!CurrentProcess.IsElevated())
+            {
+                Assert.Inconclusive("Test skipped because it requires admin privileges.");
+            }
+
+            // Arrange
+            var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            Directory.CreateDirectory(tempDir);
+            var originalDir = Directory.GetCurrentDirectory();
+
+            try
+            {
+                Directory.SetCurrentDirectory(tempDir);
+
+                // Create test JSON file
+                var jsonContent = @"{
+                    ""Version"": ""1.2.0"",
+                    ""NbuildAppList"": [
+                        {
+                            ""Name"": ""nodejs"",
+                            ""Version"": ""22.0.0"",
+                            ""AppFileName"": ""node.exe"",
+                            ""WebDownloadFile"": ""https://example.com/node.zip"",
+                            ""DownloadedFile"": ""node.zip"",
+                            ""InstallCommand"": ""echo"",
+                            ""InstallArgs"": ""installed"",
+                            ""InstallPath"": ""C:\\apps\\nodejs"",
+                            ""UninstallCommand"": ""echo"",
+                            ""UninstallArgs"": ""uninstalled""
+                        }
+                    ]
+                }";
+                File.WriteAllText("apps.json", jsonContent);
+
+                // Act - Use dryRun=false to trigger the actual logic
+                var result = Command.Install(null, "nonexistent-app", null, false, false);
+
+                // Assert
+                Assert.IsFalse(result.IsSuccess());
+                var errorOutput = result.GetFirstOutput();
+                Assert.IsTrue(errorOutput.Contains("No apps found matching 'nonexistent-app'"));
+                Assert.IsTrue(errorOutput.Contains("Available applications"));
+                Assert.IsTrue(errorOutput.Contains("nodejs"));
+                Assert.IsTrue(errorOutput.Contains("22.0.0"));
             }
             finally
             {

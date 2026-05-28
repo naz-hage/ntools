@@ -16,6 +16,7 @@ namespace Nbuild
     {
         private const string SupportedVersion = "1.2.0";
         private const int MsiReturnCodeRestartRequired = 1603;
+        public static readonly string DefaultAppsFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "nbuild", "apps.json");
         private static readonly string DownloadsDirectory = $"{Environment.GetEnvironmentVariable("Temp")}\\nb"; // "C:\\NToolsDownloads" $"{Environment.GetEnvironmentVariable("Temp")}\\nb"
         private static bool Verbose = false;
         private static bool ValidJson = false;
@@ -133,7 +134,45 @@ namespace Nbuild
                 }
                 else if (!string.IsNullOrEmpty(name))
                 {
-                    msg = $"DRY-RUN: would install app '{name}'{(version != null ? $" version {version}" : "")} from current directory (JSON discovery)";
+                    // Even in dry-run, search to check if app exists and list available if not found
+                    try
+                    {
+                        var foundApps = GetAppsFromCurrentDirectory(name, version, out var availableApps);
+                        if (!foundApps.Any())
+                        {
+                            // No matching app found - show message but still succeed (it's dry-run)
+                            ConsoleHelper.WriteLine($"No apps found matching '{name}'", ConsoleColor.Red);
+                            if (availableApps.Any())
+                            {
+                                ConsoleHelper.WriteLine("Available applications found in:");
+                                ConsoleHelper.WriteLine($"  - {Directory.GetCurrentDirectory()}");
+                                ConsoleHelper.WriteLine($"  - {Path.GetDirectoryName(DefaultAppsFile)}");
+                                ConsoleHelper.WriteLine("Applications:");
+                                foreach (var app in availableApps.OrderBy(a => a))
+                                {
+                                    ConsoleHelper.WriteLine($"  - {app}");
+                                }
+                            }
+                            msg = $"DRY-RUN: No apps found matching '{name}'";
+                            return ResultHelper.Success(msg);
+                        }
+
+                        // Found apps - show details in dry-run
+                        msg = $"DRY-RUN: would install app '{name}' from current directory (JSON discovery)";
+                        ConsoleHelper.WriteLine(msg, ConsoleColor.Yellow);
+                        
+                        // Show version details of found apps
+                        foreach (var app in foundApps)
+                        {
+                            ConsoleHelper.WriteLine($"  - {app.Name} - Version: {app.Version}", ConsoleColor.Yellow);
+                        }
+                        return ResultHelper.Success(msg);
+                    }
+                    catch (Exception ex)
+                    {
+                        msg = $"DRY-RUN: Error searching for apps: {ex.Message}";
+                        return ResultHelper.Success(msg);
+                    }
                 }
                 else
                 {
@@ -155,21 +194,57 @@ namespace Nbuild
             else if (!string.IsNullOrEmpty(name))
             {
                 // New behavior: search current directory for app by name/version
-                apps = GetAppsFromCurrentDirectory(name, version);
+                apps = GetAppsFromCurrentDirectory(name, version, out var availableApps);
+                // Materialize the enumerable to avoid multiple enumeration
+                var appsList = apps.ToList();
+
+                if (!appsList.Any())
+                {
+                    string errorMsg = $"No apps found matching '{name}'";
+                    if (availableApps.Any())
+                    {
+                        errorMsg += "\nAvailable applications found in:";
+                        errorMsg += $"\n  - {Directory.GetCurrentDirectory()}";
+                        errorMsg += $"\n  - {Path.GetDirectoryName(DefaultAppsFile)}";
+                        errorMsg += "\nApplications:";
+                        foreach (var app in availableApps.OrderBy(a => a))
+                        {
+                            errorMsg += $"\n  - {app}";
+                        }
+                    }
+                    return ResultHelper.Fail(-1, errorMsg);
+                }
+
+                foreach (var app in appsList)
+                {
+                    result = Install(app, verbose);
+                    if (!result.IsSuccess())
+                    {
+                        break;
+                    }
+
+                    // Print the stored hash of the app file name
+                    if (!string.IsNullOrEmpty(app.StoredHash))
+                    {
+                        ConsoleHelper.WriteLine($"Stored hash for {app.AppFileName}: {app.StoredHash}", ConsoleColor.Yellow);
+                    }
+                }
+
+                return result;
             }
             else
             {
                 return ResultHelper.Fail(-1, "Either json file path or app name must be provided");
             }
 
-            // Materialize the enumerable to avoid multiple enumeration
-            var appsList = apps.ToList();
+            // This code path is for JSON-based installs only
+            var jsonAppsList = apps.ToList();
 
-            if (!appsList.Any()) return ResultHelper.Fail(-1, $"No apps found to install");
+            if (!jsonAppsList.Any()) return ResultHelper.Fail(-1, $"No apps found to install");
 
-            if (Verbose) ConsoleHelper.WriteLine($"{appsList.Count} apps to install.", ConsoleColor.Yellow);
+            if (Verbose) ConsoleHelper.WriteLine($"{jsonAppsList.Count} apps to install.", ConsoleColor.Yellow);
 
-            foreach (var app in appsList)
+            foreach (var app in jsonAppsList)
             {
                 result = Install(app, verbose);
                 if (!result.IsSuccess())
@@ -426,10 +501,19 @@ namespace Nbuild
             catch (AggregateException aggEx)
             {
                 var ex = aggEx.Flatten().InnerException ?? aggEx;
-                // Try GitHub authenticated fallback if applicable
+                
+                // Try GitHub authenticated fallback first (before checking for 404)
                 var uri = new Uri(nbuildApp.WebDownloadFile);
                 var fb = TryGithubFallback(uri, fileName, ex);
                 if (fb != null) return fb;
+                
+                // Check if this is a 404 (version not found) error
+                if (ex.Message.Contains("404") || ex.Message.Contains("not found", StringComparison.OrdinalIgnoreCase))
+                {
+                    ConsoleHelper.WriteLine($"Installation of {nbuildApp.Name} version {nbuildApp.Version} is not found", ConsoleColor.Red);
+                    if (Verbose) ConsoleHelper.WriteLine($"[VERBOSE] 404 - Version not available: {nbuildApp.Version}", ConsoleColor.Red);
+                    return ResultHelper.Fail(-1, $"Installation of {nbuildApp.Name} version {nbuildApp.Version} is not found");
+                }
 
                 if (Verbose)
                 {
@@ -440,9 +524,18 @@ namespace Nbuild
             }
             catch (Exception ex)
             {
+                // Try GitHub authenticated fallback first (before checking for 404)
                 var uri = new Uri(nbuildApp.WebDownloadFile);
                 var fb = TryGithubFallback(uri, fileName, ex);
                 if (fb != null) return fb;
+                
+                // Check if this is a 404 (version not found) error
+                if (ex.Message.Contains("404") || ex.Message.Contains("not found", StringComparison.OrdinalIgnoreCase))
+                {
+                    ConsoleHelper.WriteLine($"Installation of {nbuildApp.Name} version {nbuildApp.Version} is not found", ConsoleColor.Red);
+                    if (Verbose) ConsoleHelper.WriteLine($"[VERBOSE] 404 - Version not available: {nbuildApp.Version}", ConsoleColor.Red);
+                    return ResultHelper.Fail(-1, $"Installation of {nbuildApp.Name} version {nbuildApp.Version} is not found");
+                }
 
                 if (Verbose)
                 {
@@ -543,6 +636,8 @@ namespace Nbuild
                 ConsoleHelper.WriteLine($"{nbuildApp.Name} {nbuildApp.Version} downloaded.", ConsoleColor.Yellow);
 
                 // Install the Downloaded file
+                ConsoleHelper.WriteLine($" Installing {nbuildApp.Name} {nbuildApp.Version}", ConsoleColor.Yellow);
+                
                 var process = new Process
                 {
                     StartInfo =
@@ -760,6 +855,10 @@ namespace Nbuild
             var versionGreater = false;
             var hashMatch = IsFileHashEqual(nbuildApp.AppFileName, nbuildApp.StoredHash);
 
+            if (Verbose)
+            {
+                ConsoleHelper.WriteLine($"[VERSION CHECK] App: {nbuildApp.Name}, Requested Version: {nbuildApp.Version}, Installed: {currentVersion}", ConsoleColor.Cyan);
+            }
 
             if (currentVersion == null)
             {
@@ -773,6 +872,11 @@ namespace Nbuild
 
                 if (!Version.TryParse(nbuildApp.Version, out Version? versionParsed)) return false;
                 versionGreater = currentVersionParsed >= versionParsed;
+                
+                if (Verbose)
+                {
+                    ConsoleHelper.WriteLine($"[VERSION COMPARE] {currentVersionParsed} >= {versionParsed} = {versionGreater}", ConsoleColor.Cyan);
+                }
             }
 
             return versionGreater || hashMatch;
@@ -849,33 +953,50 @@ namespace Nbuild
         /// </summary>
         /// <param name="name">The name of the application to search for.</param>
         /// <param name="version">Optional version override. If specified, overrides the version in the JSON file.</param>
-        /// <returns>An enumerable of matching NbuildApp objects.</returns>
-        public static IEnumerable<NbuildApp> GetAppsFromCurrentDirectory(string name, string? version = null)
+        /// <param name="availableApps">Output parameter that returns a list of available apps found during the search (name and version).</param>
+        /// <returns>A list of matching NbuildApp objects. If multiple apps share the same name and no version is specified, an exception is thrown.</returns>
+        public static List<NbuildApp> GetAppsFromCurrentDirectory(string name, string? version, out List<string> availableApps)
         {
+            var availableAppsSet = new HashSet<string>();
+            var result = new List<NbuildApp>();
+
             if (string.IsNullOrEmpty(name))
             {
                 throw new ArgumentNullException(nameof(name));
             }
 
-            // Get the current working directory
-            var currentDirectory = Directory.GetCurrentDirectory();
-
-            // Get all JSON files in current directory
-            var jsonFiles = Directory.GetFiles(currentDirectory, "*.json");
-
-            if (jsonFiles.Length == 0)
-            {
-                throw new FileNotFoundException($"No JSON files found in current directory: {currentDirectory}");
-            }
-
             NbuildApp? foundApp = null;
-            var availableApps = new List<string>();
 
-            foreach (var jsonFile in jsonFiles)
+            // Search for apps.json in order: current directory first, then default program files directory
+            var searchFilePaths = new[]
             {
+                Path.Combine(Directory.GetCurrentDirectory(), "apps.json"),
+                DefaultAppsFile
+            };
+
+            var appsFileFound = false;
+
+            foreach (var appsFilePath in searchFilePaths)
+            {
+                if (!File.Exists(appsFilePath))
+                {
+                    if (Verbose)
+                    {
+                        ConsoleHelper.WriteLine($"apps.json file does not exist: {appsFilePath}", ConsoleColor.Yellow);
+                    }
+                    continue;
+                }
+
+                appsFileFound = true;
+                
+                if (Verbose)
+                {
+                    ConsoleHelper.WriteLine($"Found apps.json: {appsFilePath}", ConsoleColor.Cyan);
+                }
+
                 try
                 {
-                    var jsonContent = File.ReadAllText(jsonFile);
+                    var jsonContent = File.ReadAllText(appsFilePath);
 
                     // Parse JSON directly without calling GetApps to avoid premature template processing
                     NbuildApps? listAppData;
@@ -885,7 +1006,7 @@ namespace Nbuild
                     }
                     catch (JsonException ex)
                     {
-                        throw new ArgumentException($"Invalid JSON format: {ex.Message}. Please check the JSON file for proper escaping of backslashes and quotes.", ex);
+                        throw new ArgumentException($"Invalid JSON format in {appsFilePath}: {ex.Message}. Please check the JSON file for proper escaping of backslashes and quotes.", ex);
                     }
 
                     if (listAppData == null || listAppData.NbuildAppList == null)
@@ -897,13 +1018,13 @@ namespace Nbuild
                     if (listAppData.Version != SupportedVersion)
                     {
                         // Log warning but continue searching other files
-                        ConsoleHelper.WriteLine($"Warning: Skipping {Path.GetFileName(jsonFile)} - unsupported version {listAppData.Version}. Supported version: {SupportedVersion}", ConsoleColor.Yellow);
+                        ConsoleHelper.WriteLine($"Warning: Skipping {Path.GetFileName(appsFilePath)} - unsupported version {listAppData.Version}. Supported version: {SupportedVersion}", ConsoleColor.Yellow);
                         continue;
                     }
 
                     foreach (var appData in listAppData.NbuildAppList)
                     {
-                        availableApps.Add($"{appData.Name} - Version: {appData.Version}");
+                        availableAppsSet.Add($"{appData.Name} - Version: {appData.Version}");
 
                         // Match by name only - version parameter is for override, not filtering
                         if (string.Equals(appData.Name, name, StringComparison.OrdinalIgnoreCase))
@@ -938,27 +1059,43 @@ namespace Nbuild
                 catch (Exception ex) when (ex is not ArgumentException)
                 {
                     // Log warning but continue searching other files
-                    ConsoleHelper.WriteLine($"Warning: Failed to parse {Path.GetFileName(jsonFile)}: {ex.Message}", ConsoleColor.Yellow);
+                    ConsoleHelper.WriteLine($"Warning: Failed to parse {Path.GetFileName(appsFilePath)}: {ex.Message}", ConsoleColor.Yellow);
                 }
             }
 
-            if (foundApp == null)
+            if (!appsFileFound)
             {
-                // Return empty - caller will handle "not found" appropriately
-                yield break;
+                throw new FileNotFoundException($"No apps.json file found in search paths: {string.Join(", ", searchFilePaths)}");
             }
 
-            // Apply version override if specified BEFORE processing templates
-            if (!string.IsNullOrEmpty(version))
+            if (foundApp != null)
             {
-                foundApp.Version = version;
+                if (Verbose)
+                {
+                    ConsoleHelper.WriteLine($"Matched app: {foundApp.Name} (Version: {foundApp.Version})", ConsoleColor.Green);
+                }
+                
+                // Apply version override if specified BEFORE processing templates
+                if (!string.IsNullOrEmpty(version))
+                {
+                    if (Verbose)
+                    {
+                        ConsoleHelper.WriteLine($"Overriding version: {foundApp.Version} -> {version}", ConsoleColor.Green);
+                    }
+                    foundApp.Version = version;
+                }
+
+                // Now validate and update environment variables with the correct version
+                Validate(foundApp);
+                UpdateEnvironmentVariables(foundApp);
+
+                result.Add(foundApp);
             }
 
-            // Now validate and update environment variables with the correct version
-            Validate(foundApp);
-            UpdateEnvironmentVariables(foundApp);
+            // Convert HashSet to List for out parameter (ensures no duplicates)
+            availableApps = availableAppsSet.ToList();
 
-            yield return foundApp;
+            return result;
         }
 
         private static void Validate(NbuildApp nbuildApp)

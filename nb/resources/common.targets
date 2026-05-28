@@ -444,7 +444,7 @@
 
 	<!--Example how to build a single project -->
 	<Target Name="SingleProject" >
-		<Exec Command='dotnet build $(SolutionDir)\nbuild\nbuild.csproj --configuration $(TargetRelease) --runtime win-x64 /p:FileVersion=$(ProductVersion) /p:AssemblyVersion=$(ProductVersion)'></Exec>
+		<Exec Command='dotnet build $(SolutionDir)\nbuild\nb.csproj --configuration $(TargetRelease) --runtime win-x64 /p:FileVersion=$(ProductVersion) /p:AssemblyVersion=$(ProductVersion)'></Exec>
 	</Target>
 
 	<!--Error handling placeholder -->

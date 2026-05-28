@@ -133,14 +133,42 @@ Library for GitHub integration including release creation and management, asset 
 #### ApiVersions
 Utility library for API version management and tracking.
 
+### Manifest File Processing (GetApps Method)
+
+The `Command.GetApps()` method in the Nbuild executable (`nb\Command.cs`) handles loading and parsing manifest JSON files for tool installation and management. This method implements strict file validation:
+
+#### File Validation
+- **Purpose**: Ensures clear, actionable error messages when JSON manifest files are missing or invalid
+- **Validation Steps**:
+  1. **File Existence Check**: Verifies the specified file path exists before attempting to parse
+  2. **File Reading**: Reads the file contents into memory
+  3. **JSON Parsing**: Deserializes the JSON content into `NbuildApps` object
+  4. **Version Verification**: Validates that the manifest's version matches the supported version
+
+#### Error Handling
+| Scenario | Error Message |
+|----------|---------------|
+| File not found | `JSON file not found: '<path>'. Please provide a valid path to the apps.json file.` |
+| Invalid JSON format | `Invalid JSON format: <error details>. Please check the JSON file for proper escaping of backslashes and quotes.` |
+| Unsupported version | `Json Version <version> is not supported. Please use version <supported_version>` |
+
+#### Benefits
+- **Early validation**: Fails fast with clear error messages instead of confusing JSON parse errors
+- **User-friendly**: Distinguishes between file not found vs. invalid JSON content
+- **Consistent**: All commands (`nb list`, `nb install`, `nb uninstall`, `nb download`) use the same validation logic
+
 ### File Structure
 
 ```
 ntools/
 ├── ntools.sln                    # Main solution file
 ├── prebuild.bat                  # Pre-build setup script
+├── publish-local.ps1             # Local publishing script
 ├── mkdocs.yml                    # Documentation configuration
-
+├── docs-requirements.txt         # Python dependencies for documentation
+├── sdo-2e2-test.code-workspace  # VS Code workspace configuration
+├── test-workflow.yml             # Test workflow configuration
+│
 ├── CHANGELOG.md                  # Change log
 ├── README.md                     # Project documentation
 ├── targets.md                    # Build targets documentation
@@ -149,10 +177,20 @@ ntools/
 ├── unit-tests.targets            # Unit test targets
 ├── e2e-tests.targets             # E2E test targets
 │
-├── Nbuild/                       # Main Nbuild executable project
-│   ├── Nbuild.csproj
-│   ├── Program.cs
-│   └── Commands/                 # CLI command implementations
+├── nb/                           # Main Nbuild executable project
+│   ├── nb.csproj
+│   ├── Program.cs                # CLI setup and command registration
+│   ├── Command.cs                # Core command implementations with GetApps() method
+│   │                               # GetApps() - Loads and validates manifest JSON files
+│   │                               # Install, Uninstall, List, Download command logic
+│   └── resources/                # Embedded resources and templates
+│
+├── nbtests/                      # Unit tests for Nbuild
+│   ├── nbtests.csproj
+│   ├── CommandTests.cs           # Tests for Command class
+│   ├── AppsJsonTests.cs          # Tests for JSON manifest loading
+│   ├── CliTests.cs               # CLI tests
+│   └── other test files/
 │
 ├── NbuildTasks/                  # Shared library
 │   ├── NbuildTasks.csproj
@@ -161,11 +199,19 @@ ntools/
 │   ├── BuildTasks.cs             # Build task implementations
 │   └── Common/                   # Shared utilities
 │
+├── NbuildTasksTests/             # Unit tests for NbuildTasks
+│   ├── NbuildTasksTests.csproj
+│   └── test files/
+│
 ├── GitHubRelease/                # GitHub integration library
 │   ├── GitHubRelease.csproj
 │   ├── ReleaseManager.cs         # Release management
 │   ├── AssetUploader.cs          # Asset upload functionality
 │   └── RepositoryOps.cs          # Repository operations
+│
+├── GitHubReleaseTests/           # Unit tests for GitHubRelease
+│   ├── GitHubReleaseTests.csproj
+│   └── ReleaseTests.cs
 │
 ├── ApiVersions/                  # API version management
 │   ├── ApiVersions.csproj
@@ -177,65 +223,102 @@ ntools/
 │   ├── Program.cs
 │   └── BackupEngine.cs           # Backup logic
 │
+├── nBackupTests/                 # Unit tests for Nbackup
+│   ├── nBackupTests.csproj
+│   └── BackupTests.cs
+│
 ├── lf/                           # File listing utility
 │   ├── lf.csproj
 │   ├── Program.cs
 │   └── FileLister.cs             # File listing implementation
+│
+├── lfTests/                      # Unit tests for lf
+│   ├── lfTests.csproj
+│   └── FileListerTests.cs
 │
 ├── go/                           # Go-based utilities
 │   ├── build-apps/               # Application builder
 │   ├── other-tools/              # Additional Go tools
 │   └── build-scripts/            # Go build scripts
 │
-├── GitHubReleaseTests/           # Unit tests for GitHubRelease
-│   ├── GitHubReleaseTests.csproj
-│   └── ReleaseTests.cs
+├── Sdo/                          # sdo (C# executable) - Simple DevOps Operations Tool
+│   ├── Sdo.csproj
+│   ├── Program.cs                # Main entry point and CLI setup
+│   ├── Commands/                 # Command implementations
+│   │   ├── WorkItemCommand.cs
+│   │   ├── RepositoryCommand.cs
+│   │   ├── PullRequestCommand.cs
+│   │   └── PipelineCommand.cs
+│   ├── Services/                 # Business logic
+│   │   ├── WorkItemService.cs
+│   │   ├── RepositoryService.cs
+│   │   ├── PullRequestService.cs
+│   │   └── PipelineService.cs
+│   ├── Platforms/                # Platform implementations
+│   │   ├── IPlatform.cs
+│   │   ├── AzureDevOpsPlatform.cs
+│   │   └── GitHubPlatform.cs
+│   ├── Models/                   # Data models
+│   ├── Credentials/              # Authentication handling
+│   ├── Helpers/                  # Utility helpers
+│   └── bin/Debug/sdo.exe         # Compiled executable
 │
-├── lfTests/                      # Unit tests for lf
-│   ├── lfTests.csproj
-│   └── FileListerTests.cs
+├── SdoTests/                     # Unit tests for Sdo
+│   ├── SdoTests.csproj
+│   ├── WorkItemCommandTests.cs
+│   ├── PullRequestCommandTests.cs
+│   └── other test files/
 │
-├── nBackupTests/                 # Unit tests for Nbackup
-│   ├── nBackupTests.csproj
-│   └── BackupTests.cs
+├── sdo-e2e-test/                 # E2E tests for Sdo
+│   ├── sdo-e2e-test.csproj
+│   ├── SmokeTests.cs
+│   └── integration tests/
 │
-├── docs/                         # Documentation
+├── test-framework/               # Shared test framework utilities
+│   ├── test-framework.csproj
+│   └── test helpers/
+│
+├── docs/                         # Documentation (MkDocs)
 │   ├── index.md
+│   ├── nbuild.md                 # Nbuild documentation
 │   ├── devops-tools-suite-architecture.md
+│   ├── ntools.md
+│   ├── sdo-net.md
 │   └── other-docs/
 │
 ├── dev-setup/                    # Development setup scripts
-├── Debug/                        # Debug build outputs
-├── ArtifactsFolder/              # Build artifacts
-├── logs/                         # Build and test logs
+│   ├── ntools.json               # Application manifest
+│   ├── apps.json                 # Tool definitions
+│   └── setup scripts/
+│
 ├── atools/                       # Automated tools and installers
-│   ├── tests/                    # Tests for installation scripts
-│   │   └── test_install_ntools.py # Tests for the NTools installer
 │   ├── install-ntools.py         # NTools installation script
 │   ├── requirements.txt           # Python dependencies for installers
-│   └── requirements-dev.txt       # Development dependencies
+│   ├── requirements-dev.txt       # Development dependencies
+│   └── tests/                    # Tests for installation scripts
+│       └── test_install_ntools.py
 │
-└── Sdo/                          # sdo (C# executable)
-    ├── Sdo.csproj                # C# project file
-    ├── Program.cs                # Main entry point and CLI setup
-    ├── Commands/                 # Command implementations
-    │   ├── WorkItemCommand.cs
-    │   ├── RepositoryCommand.cs
-    │   ├── PullRequestCommand.cs
-    │   └── PipelineCommand.cs
-    ├── Services/                 # Business logic
-    │   ├── WorkItemService.cs
-    │   ├── RepositoryService.cs
-    │   ├── PullRequestService.cs
-    │   └── PipelineService.cs
-    ├── Platforms/                # Platform implementations
-    │   ├── IPlatform.cs
-    │   ├── AzureDevOpsPlatform.cs
-    │   └── GitHubPlatform.cs
-    ├── Models/                   # Data models
-    ├── Credentials/              # Authentication handling
-    ├── Helpers/                  # Utility helpers
-    └── bin/Debug/sdo.exe         # Compiled executable
+├── CoverageReport/               # Test coverage reports
+│   ├── index.html
+│   └── coverage data/
+│
+├── site/                         # Generated documentation site
+│   └── (MkDocs output)
+│
+├── Release/                      # Release build outputs
+│   └── published artifacts/
+│
+├── Debug/                        # Debug build outputs
+│   └── build artifacts/
+│
+├── ArtifactsFolder/              # Build artifacts
+│   └── intermediate outputs/
+│
+├── scripts/                      # Utility scripts
+│   └── build and deployment scripts/
+│
+├── GitHubReleaseTests/           # (already listed above)
+└── (other support directories)/
 ```
 
 ### Build System

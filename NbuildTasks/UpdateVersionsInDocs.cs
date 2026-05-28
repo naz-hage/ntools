@@ -17,63 +17,55 @@ namespace NbuildTasks
         [Required]
         public string DocsPath { get; set; }
 
-        // Static readonly mapping for better performance - avoid recreating on every invocation
-        private static readonly Dictionary<string, string[]> Mappings = new Dictionary<string, string[]>
-        {
-            { "Node.js", new[] { "Node.js" } },
-            { "PowerShell", new[] { "Powershell" } },
-            { "Python", new[] { "Python" } },
-            { "Git for Windows", new[] { "Git for Windows" } },
-            { "Visual Studio Code", new[] { "Visual Studio Code" } },
-            { "NuGet", new[] { "Nuget" } },
-            { "Terraform", new[] { "Terraform" } },
-            { "Terraform Lint", new[] { "terraform lint" } },
-            { "kubernetes", new[] { "kubectl" } },
-            { "minikube", new[] { "minikube" } },
-            { "Azure CLI", new[] { "AzureCLI" } },
-            { "MongoDB Community Server", new[] { "MongoDB" } },
-            { "pnpm", new[] { "pnpm" } },
-            { "Ntools", new[] { "Ntools" } }
-        };
-
         public override bool Execute()
         {
             try
             {
-                Log.LogMessage(MessageImportance.High, "Starting version update process...");
+                // Build path to apps.json: dev-setup/../go/apps.json
+                var appsJsonPath = Path.Combine(DevSetupPath, "..", "go", "apps.json");
+                appsJsonPath = Path.GetFullPath(appsJsonPath); // Normalize the path
 
-                var jsonFiles = Directory.GetFiles(DevSetupPath, "*.json");
+                if (!File.Exists(appsJsonPath))
+                {
+                    Log.LogError($"apps.json not found at: {appsJsonPath}");
+                    return false;
+                }
+
+                Log.LogMessage(MessageImportance.High, $"Starting version update process from: {appsJsonPath}");
+
                 var versionMap = new Dictionary<string, (string Name, string Version)>();
 
-                // Extract versions from all NbuildAppList entries in all JSON files
-                foreach (var jsonFile in jsonFiles)
+                try
                 {
-                    try
-                    {
-                        var jsonContent = File.ReadAllText(jsonFile);
-                        var jsonDoc = JsonDocument.Parse(jsonContent);
+                    var jsonContent = File.ReadAllText(appsJsonPath);
+                    var jsonDoc = JsonDocument.Parse(jsonContent);
 
-                        if (jsonDoc.RootElement.TryGetProperty("NbuildAppList", out var appList) &&
-                            appList.ValueKind == JsonValueKind.Array)
+                    // Extract versions from apps.json NbuildAppList entries
+                    if (jsonDoc.RootElement.TryGetProperty("NbuildAppList", out var appList) &&
+                        appList.ValueKind == JsonValueKind.Array)
+                    {
+                        foreach (var app in appList.EnumerateArray())
                         {
-                            foreach (var app in appList.EnumerateArray())
+                            if (app.TryGetProperty("Name", out var nameElement) &&
+                                app.TryGetProperty("Version", out var versionElement))
                             {
-                                if (app.TryGetProperty("Name", out var nameElement) &&
-                                    app.TryGetProperty("Version", out var versionElement))
-                                {
-                                    var name = nameElement.GetString();
-                                    var version = versionElement.GetString();
-                                    // Use tool name as key to allow multiple tools from multiple files
-                                    versionMap[name] = (name, version);
-                                    Log.LogMessage(MessageImportance.Normal, $"Found {name}: {version}");
-                                }
+                                var name = nameElement.GetString();
+                                var version = versionElement.GetString();
+                                // Use tool name as key; if multiple versions exist, last one wins
+                                versionMap[name] = (name, version);
+                                Log.LogMessage(MessageImportance.Normal, $"Found {name}: {version}");
                             }
                         }
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        Log.LogWarning($"Failed to parse {jsonFile}: {ex.Message}");
+                        Log.LogWarning($"No NbuildAppList found in {appsJsonPath}");
                     }
+                }
+                catch (Exception ex)
+                {
+                    Log.LogError($"Failed to parse {appsJsonPath}: {ex.Message}");
+                    return false;
                 }
 
                 // Update markdown file
@@ -102,6 +94,7 @@ namespace NbuildTasks
                 if (match.Success)
                 {
                     var toolName = match.Groups[1].Value;
+                    var toolFound = false;
 
                     // Find matching version
                     foreach (var kvp in versionMap)
@@ -121,9 +114,16 @@ namespace NbuildTasks
                                           tableMatch.Groups[5].Value;
 
                                 Log.LogMessage(MessageImportance.Normal, $"Updated {toolName}: {version}");
+                                toolFound = true;
                                 break;
                             }
                         }
+                    }
+
+                    if (!toolFound)
+                    {
+                        Log.LogWarning($"Tool '{toolName}' not found in apps.json - skipping version update");
+                        // Insert a new entry filling the entire row with "TBD" except for the tool name and date
                     }
                 }
             }
@@ -133,8 +133,8 @@ namespace NbuildTasks
 
         private static bool IsToolMatch(string toolName, string jsonName)
         {
-            return Mappings.ContainsKey(toolName) &&
-                   Mappings[toolName].Any(m => m.Equals(jsonName, StringComparison.OrdinalIgnoreCase));
+            // Simple case-insensitive match - no hardcoded mappings needed
+            return toolName.Equals(jsonName, StringComparison.OrdinalIgnoreCase);
         }
     }
 
