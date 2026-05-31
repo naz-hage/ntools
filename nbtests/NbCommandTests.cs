@@ -1,8 +1,9 @@
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Nbuild;
-using Xunit;
 
 namespace NbuildTests
 {
+    [TestClass]
     public class NbCommandTests
     {
         static NbCommandTests()
@@ -39,7 +40,7 @@ namespace NbuildTests
             try
             {
                 var exitCode = Program.Main(new string[] { command, "--json", jsonPath });
-                Assert.Equal(0, exitCode);
+                Assert.AreEqual(0, exitCode);
             }
             finally
             {
@@ -48,14 +49,14 @@ namespace NbuildTests
             }
         }
 
-        [Fact]
+        [TestMethod]
         public void ListCommand_Help_ReturnsSuccess()
         {
             var exitCode = Program.Main(new string[] { "list", "--help" });
-            Assert.Equal(0, exitCode);
+            Assert.AreEqual(0, exitCode);
         }
 
-        [Fact]
+        [TestMethod]
         public void ListCommand_WithoutJson_UsesDefaultAndReturnsSuccess()
         {
             // Create a temporary directory structure that matches the default path
@@ -75,7 +76,7 @@ namespace NbuildTests
                 try
                 {
                     var exitCode = Program.Main(new string[] { "list" });
-                    Assert.Equal(0, exitCode);
+                    Assert.AreEqual(0, exitCode);
                 }
                 finally
                 {
@@ -91,214 +92,213 @@ namespace NbuildTests
             }
         }
 
-        [Fact]
+        [TestMethod]
         public void ListCommand_WithJson_PrintsListAndReturnsSuccess()
         {
             RunCommandWithJson("list", "test_list.json");
         }
 
-        [Fact]
+        [TestMethod]
         public void DownloadCommand_Help_ReturnsSuccess()
         {
             var exitCode = Program.Main(new string[] { "download", "--help" });
-            Assert.Equal(0, exitCode);
+            Assert.AreEqual(0, exitCode);
         }
 
-        [Fact]
+        [TestMethod]
         public void DownloadCommand_WithoutJson_ReturnsError()
         {
             var exitCode = Program.Main(new string[] { "download" });
-            Assert.NotEqual(0, exitCode);
+            Assert.AreNotEqual(0, exitCode);
         }
 
-        [Fact]
+        [TestMethod]
         public void DownloadCommand_WithJson_DownloadsAndReturnsSuccess()
         {
             RunCommandWithJson("download", "test_download.json");
         }
 
-        [Fact]
+        [TestMethod]
         public void InstallCommand_Help_ReturnsSuccess()
         {
             var exitCode = Program.Main(new string[] { "install", "--help" });
-            Assert.Equal(0, exitCode);
+            Assert.AreEqual(0, exitCode);
         }
 
-        [Fact]
+        [TestMethod]
         public void InstallCommand_WithoutJson_ReturnsError()
         {
             var exitCode = Program.Main(new string[] { "install" });
-            Assert.NotEqual(0, exitCode);
+            Assert.AreNotEqual(0, exitCode);
         }
 
-        [Fact]
+        [TestMethod]
         public void UninstallCommand_Help_ReturnsSuccess()
         {
             var exitCode = Program.Main(new string[] { "uninstall", "--help" });
-            Assert.Equal(0, exitCode);
+            Assert.AreEqual(0, exitCode);
         }
 
-        [Fact]
+        [TestMethod]
         public void UninstallCommand_WithoutJson_ReturnsError()
         {
             var exitCode = Program.Main(new string[] { "uninstall" });
-            Assert.NotEqual(0, exitCode);
+            Assert.AreNotEqual(0, exitCode);
         }
 
 
-        [Fact]
+        [TestMethod]
         public void GitInfoCommand_Help_ReturnsSuccess()
         {
             var exitCode = Program.Main(new string[] { "git_info", "--help" });
-            Assert.Equal(0, exitCode);
+            Assert.AreEqual(0, exitCode);
         }
 
-        [Fact]
+        [TestMethod]
         public void GitInfoCommand_Executes_ReturnsInt()
         {
+            // Verify command executes without throwing exception; exit code type verified by return
             var exitCode = Program.Main(new string[] { "git_info" });
-            // Could be 0 or error depending on repo state, just check it's an int
-            Assert.IsType<int>(exitCode);
         }
 
-        [Fact]
+        [TestMethod]
         public void GitSetTagCommand_Help_ReturnsSuccess()
         {
             var exitCode = Program.Main(new string[] { "git_settag", "--help" });
-            Assert.Equal(0, exitCode);
+            Assert.AreEqual(0, exitCode);
         }
 
-        [Fact]
+        [TestMethod]
         public void GitSetTagCommand_WithoutTag_ReturnsError()
         {
             var exitCode = Program.Main(new string[] { "git_settag" });
-            Assert.NotEqual(0, exitCode);
+            Assert.AreNotEqual(0, exitCode);
         }
 
-        [Fact]
+        [TestMethod]
         public void GitAutoTagCommand_Help_ReturnsSuccess()
         {
             var exitCode = Program.Main(new string[] { "git_autotag", "--help" });
-            Assert.Equal(0, exitCode);
+            Assert.AreEqual(0, exitCode);
         }
 
-        [Fact]
+        [TestMethod]
         public void GitAutoTagCommand_WithoutBuildType_ReturnsError()
         {
             var exitCode = Program.Main(new string[] { "git_autotag" });
-            Assert.NotEqual(0, exitCode);
+            Assert.AreNotEqual(0, exitCode);
         }
 
-        [Fact]
+        [TestMethod]
         public void GitPushAutoTagCommand_Help_ReturnsSuccess()
         {
             var exitCode = Program.Main(new string[] { "git_push_autotag", "--help" });
-            Assert.Equal(0, exitCode);
+            Assert.AreEqual(0, exitCode);
         }
 
-        [Fact]
+        [TestMethod]
         public void GitPushAutoTagCommand_WithoutBuildType_ReturnsError()
         {
             var exitCode = Program.Main(new string[] { "git_push_autotag" });
-            Assert.NotEqual(0, exitCode);
+            Assert.AreNotEqual(0, exitCode);
         }
 
-        [Fact]
+        [TestMethod]
         public void GitBranchCommand_Help_ReturnsSuccess()
         {
             var exitCode = Program.Main(new string[] { "git_branch", "--help" });
-            Assert.Equal(0, exitCode);
+            Assert.AreEqual(0, exitCode);
         }
 
-        [Fact]
+        [TestMethod]
         public void GitBranchCommand_Executes_ReturnsInt()
         {
+            // Verify command executes without throwing exception; exit code type verified by return
             var exitCode = Program.Main(new string[] { "git_branch" });
-            Assert.IsType<int>(exitCode);
         }
 
-        [Fact]
+        [TestMethod]
         public void GitCloneCommand_Help_ReturnsSuccess()
         {
             var exitCode = Program.Main(new string[] { "git_clone", "--help" });
-            Assert.Equal(0, exitCode);
+            Assert.AreEqual(0, exitCode);
         }
 
-        [Fact]
+        [TestMethod]
         public void GitCloneCommand_WithoutUrlOrPath_ReturnsError()
         {
             var exitCode = Program.Main(new string[] { "git_clone" });
-            Assert.NotEqual(0, exitCode);
+            Assert.AreNotEqual(0, exitCode);
         }
 
-        [Fact]
+        [TestMethod]
         public void GitDeleteTagCommand_Help_ReturnsSuccess()
         {
             var exitCode = Program.Main(new string[] { "git_deletetag", "--help" });
-            Assert.Equal(0, exitCode);
+            Assert.AreEqual(0, exitCode);
         }
 
-        [Fact]
+        [TestMethod]
         public void GitDeleteTagCommand_WithoutTag_ReturnsError()
         {
             var exitCode = Program.Main(new string[] { "git_deletetag" });
-            Assert.NotEqual(0, exitCode);
+            Assert.AreNotEqual(0, exitCode);
         }
 
-        [Fact]
+        [TestMethod]
         public void ReleaseCreateCommand_Help_ReturnsSuccess()
         {
             var exitCode = Program.Main(new string[] { "release_create", "--help" });
-            Assert.Equal(0, exitCode);
+            Assert.AreEqual(0, exitCode);
         }
 
-        [Fact]
+        [TestMethod]
         public void ReleaseCreateCommand_WithoutArgs_ReturnsError()
         {
             var exitCode = Program.Main(new string[] { "release_create" });
-            Assert.NotEqual(0, exitCode);
+            Assert.AreNotEqual(0, exitCode);
         }
 
-        [Fact]
+        [TestMethod]
         public void PreReleaseCreateCommand_Help_ReturnsSuccess()
         {
             var exitCode = Program.Main(new string[] { "pre_release_create", "--help" });
-            Assert.Equal(0, exitCode);
+            Assert.AreEqual(0, exitCode);
         }
 
-        [Fact]
+        [TestMethod]
         public void PreReleaseCreateCommand_WithoutArgs_ReturnsError()
         {
             var exitCode = Program.Main(new string[] { "pre_release_create" });
-            Assert.NotEqual(0, exitCode);
+            Assert.AreNotEqual(0, exitCode);
         }
 
-        [Fact]
+        [TestMethod]
         public void ReleaseDownloadCommand_Help_ReturnsSuccess()
         {
             var exitCode = Program.Main(new string[] { "release_download", "--help" });
-            Assert.Equal(0, exitCode);
+            Assert.AreEqual(0, exitCode);
         }
 
-        [Fact]
+        [TestMethod]
         public void ReleaseDownloadCommand_WithoutArgs_ReturnsError()
         {
             var exitCode = Program.Main(new string[] { "release_download" });
-            Assert.NotEqual(0, exitCode);
+            Assert.AreNotEqual(0, exitCode);
         }
 
-        [Fact]
+        [TestMethod]
         public void ListReleaseCommand_Help_ReturnsSuccess()
         {
             var exitCode = Program.Main(new string[] { "list_release", "--help" });
-            Assert.Equal(0, exitCode);
+            Assert.AreEqual(0, exitCode);
         }
 
-        [Fact]
+        [TestMethod]
         public void ListReleaseCommand_WithoutRepo_ReturnsError()
         {
             var exitCode = Program.Main(new string[] { "list_release" });
-            Assert.NotEqual(0, exitCode);
+            Assert.AreNotEqual(0, exitCode);
         }
 
     }

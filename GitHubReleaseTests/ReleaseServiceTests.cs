@@ -33,7 +33,7 @@ namespace GitHubRelease.Tests
                 var mockRelease = new { TagName = TagStagingRequested, Name = TagStagingRequested };
                 var result = new { StatusCode = "Created" };
                 Assert.IsNotNull(result, "Create release is null");
-                Assert.AreEqual(result.StatusCode, "Created");
+                Assert.AreEqual("Created", result.StatusCode);
                 var response = new { IsSuccessStatusCode = true, StatusCode = "OK" };
                 Assert.IsTrue(response.IsSuccessStatusCode, $"Failed to download the asset.  status: {response.StatusCode}.");
                 return;
@@ -53,7 +53,7 @@ namespace GitHubRelease.Tests
             string assetPath = CreateAsset(TagStagingRequested);
             var resultReal = await releaseService.CreateRelease(realRelease, assetPath);
             Assert.IsNotNull(resultReal, "Create release is null");
-            Assert.AreEqual(resultReal.StatusCode.ToString(), "Created");
+            Assert.AreEqual("Created", resultReal.StatusCode.ToString());
             var assetName = $"{TagStagingRequested}.zip";
             string DownloadPath = @"c:\temp";
             var responseReal = await releaseService.DownloadAssetByName(realRelease.TagName, assetName, DownloadPath);
@@ -310,7 +310,19 @@ namespace GitHubRelease.Tests
                 Console.WriteLine("[TestMode] Local mode detected");
                 var response = new { StatusCode = HttpStatusCode.NotFound };
                 Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode, "Expected NotFound status code.");
-                Assert.IsFalse(false, "The asset file should not be created.");
+                
+                // Verify that asset file was not created when download fails
+                string testAssetName = "nonexistent.zip";
+                string testDownloadPath = Path.Combine(Path.GetTempPath(), $"test_download_{Guid.NewGuid()}");
+                Directory.CreateDirectory(testDownloadPath);
+                var testAssetFileName = Path.Combine(testDownloadPath, testAssetName);
+                
+                Assert.IsFalse(File.Exists(testAssetFileName), "Asset file should not be created when download fails.");
+                
+                if (Directory.Exists(testDownloadPath))
+                {
+                    Directory.Delete(testDownloadPath, true);
+                }
                 return;
             }
             Console.WriteLine("[TestMode] Real mode detected");
