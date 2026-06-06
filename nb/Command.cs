@@ -91,7 +91,7 @@ namespace Nbuild
                             RedirectStandardOutput = true,
                             RedirectStandardError = true,
                             WindowStyle = ProcessWindowStyle.Hidden,
-                            CreateNoWindow = false,
+                            CreateNoWindow = true,
                             UseShellExecute = false
                         }
                 };
