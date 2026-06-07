@@ -117,8 +117,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nBackup", "nBackup\nBackup.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiVersions", "ApiVersions\ApiVersions.csproj", "{71123CA7-06B4-BEC1-ED29-A55FCC7F22BB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sdo-e2e-test", "sdo-e2e-test\sdo-e2e-test.csproj", "{3A5E84C5-475B-C1BC-6AAB-2629E088CD0B}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -285,18 +283,6 @@ Global
 		{71123CA7-06B4-BEC1-ED29-A55FCC7F22BB}.Release|x64.Build.0 = Release|Any CPU
 		{71123CA7-06B4-BEC1-ED29-A55FCC7F22BB}.Release|x86.ActiveCfg = Release|Any CPU
 		{71123CA7-06B4-BEC1-ED29-A55FCC7F22BB}.Release|x86.Build.0 = Release|Any CPU
-		{3A5E84C5-475B-C1BC-6AAB-2629E088CD0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3A5E84C5-475B-C1BC-6AAB-2629E088CD0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3A5E84C5-475B-C1BC-6AAB-2629E088CD0B}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{3A5E84C5-475B-C1BC-6AAB-2629E088CD0B}.Debug|x64.Build.0 = Debug|Any CPU
-		{3A5E84C5-475B-C1BC-6AAB-2629E088CD0B}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{3A5E84C5-475B-C1BC-6AAB-2629E088CD0B}.Debug|x86.Build.0 = Debug|Any CPU
-		{3A5E84C5-475B-C1BC-6AAB-2629E088CD0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3A5E84C5-475B-C1BC-6AAB-2629E088CD0B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3A5E84C5-475B-C1BC-6AAB-2629E088CD0B}.Release|x64.ActiveCfg = Release|Any CPU
-		{3A5E84C5-475B-C1BC-6AAB-2629E088CD0B}.Release|x64.Build.0 = Release|Any CPU
-		{3A5E84C5-475B-C1BC-6AAB-2629E088CD0B}.Release|x86.ActiveCfg = Release|Any CPU
-		{3A5E84C5-475B-C1BC-6AAB-2629E088CD0B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
