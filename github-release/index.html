@@ -1946,39 +1946,39 @@
 <h3 id="github-actions-workflow-example">GitHub Actions Workflow Example<a class="headerlink" href="#github-actions-workflow-example" title="Anchor link to this section for reference">&para;</a></h3>
 <p>Here is an example of how to set up authentication in a GitHub Actions workflow file. You can use either a personal access token or GitHub CLI authentication:</p>
 <p><strong>Option 1: Personal Access Token (Recommended for CI/CD)</strong>
-<div class="highlight"><pre><span></span><code>- name: Build using ntools
-  run: |
-    &amp; &quot;$env:ProgramFilesPath/nbuild/nb.exe&quot; ${{ env.Build_Type }} -v ${{ env.Enable_Logging }}
-  shell: pwsh
-  working-directory: ${{ github.workspace }}
-  env:
-    OWNER: ${{ github.repository_owner }}
-    API_GITHUB_KEY: ${{ secrets.API_GITHUB_KEY }}
+<div class="highlight"><pre><span></span><code><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Build using ntools</span>
+<span class="w">  </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">    </span><span class="no">&amp; "$env:ProgramFilesPath/nbuild/nb.exe" ${{ env.Build_Type }} -v ${{ env.Enable_Logging }}</span>
+<span class="w">  </span><span class="nt">shell</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pwsh</span>
+<span class="w">  </span><span class="nt">working-directory</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ github.workspace }}</span>
+<span class="w">  </span><span class="nt">env</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">OWNER</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ github.repository_owner }}</span>
+<span class="w">    </span><span class="nt">API_GITHUB_KEY</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ secrets.API_GITHUB_KEY }}</span>
 </code></pre></div></p>
 <p><strong>Option 2: GitHub CLI Authentication</strong>
-<div class="highlight"><pre><span></span><code>- name: Authenticate with GitHub CLI
-  run: |
-    gh auth login --with-token &lt;&lt;&lt; ${{ secrets.GITHUB_TOKEN }}
-  shell: bash
+<div class="highlight"><pre><span></span><code><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Authenticate with GitHub CLI</span>
+<span class="w">  </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">    </span><span class="no">gh auth login --with-token &lt;&lt;&lt; ${{ secrets.GITHUB_TOKEN }}</span>
+<span class="w">  </span><span class="nt">shell</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bash</span>
 
-- name: Build using ntools
-  run: |
-    &amp; &quot;$env:ProgramFilesPath/nbuild/nb.exe&quot; ${{ env.Build_Type }} -v ${{ env.Enable_Logging }}
-  shell: pwsh
-  working-directory: ${{ github.workspace }}
-  env:
-    OWNER: ${{ github.repository_owner }}
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Build using ntools</span>
+<span class="w">  </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">    </span><span class="no">&amp; "$env:ProgramFilesPath/nbuild/nb.exe" ${{ env.Build_Type }} -v ${{ env.Enable_Logging }}</span>
+<span class="w">  </span><span class="nt">shell</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pwsh</span>
+<span class="w">  </span><span class="nt">working-directory</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ github.workspace }}</span>
+<span class="w">  </span><span class="nt">env</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">OWNER</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ github.repository_owner }}</span>
 </code></pre></div></p>
 <p>The above actions build, test, and create releases using the GitHubRelease tool and upload to GitHub.</p>
 <h3 id="branch-checkout-example">Branch Checkout Example<a class="headerlink" href="#branch-checkout-example" title="Anchor link to this section for reference">&para;</a></h3>
 <p>Before running the tool, you must checkout a branch. Here is an example of how to checkout a branch in a GitHub Actions workflow file:</p>
-<div class="highlight"><pre><span></span><code>- name: Checkout Repository
-  uses: actions/checkout@v4
-  with:
-    token: ${{ secrets.API_GITHUB_KEY }}
-    fetch-depth: 0
-    ref: ${{ github.event.pull_request.head.ref }}
-    repository: ${{ github.event.pull_request.head.repo.full_name }}
+<div class="highlight"><pre><span></span><code><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Checkout Repository</span>
+<span class="w">  </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/checkout@v4</span>
+<span class="w">  </span><span class="nt">with</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">token</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ secrets.API_GITHUB_KEY }}</span>
+<span class="w">    </span><span class="nt">fetch-depth</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="w">    </span><span class="nt">ref</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ github.event.pull_request.head.ref }}</span>
+<span class="w">    </span><span class="nt">repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ github.event.pull_request.head.repo.full_name }}</span>
 </code></pre></div>
 <h2 id="repository-visibility-based-authentication">Repository Visibility-Based Authentication<a class="headerlink" href="#repository-visibility-based-authentication" title="Anchor link to this section for reference">&para;</a></h2>
 <p><strong>New Feature</strong>: NTools now intelligently determines when authentication is required based on repository visibility and operation type.</p>
@@ -2094,7 +2094,7 @@ winget<span class="w"> </span>install<span class="w"> </span>--id<span class="w"
 gh<span class="w"> </span>auth<span class="w"> </span>login
 </code></pre></div>
 - <strong>Environment Variable Setup:</strong>
-  <div class="highlight"><pre><span></span><code><span class="nv">$env:API_GITHUB_KEY</span> <span class="p">=</span> <span class="s1">&#39;ghp_XXXX&#39;</span>
+  <div class="highlight"><pre><span></span><code><span class="nv">$env:API_GITHUB_KEY</span> <span class="p">=</span> <span class="s1">'ghp_XXXX'</span>
 <span class="p">.\</span><span class="n">Release</span><span class="p">\</span><span class="n">nb</span><span class="p">.</span><span class="n">exe</span> <span class="n">install</span> <span class="p">-</span><span class="n">-json</span> <span class="n">private-repo</span><span class="p">.</span><span class="n">json</span> <span class="p">-</span><span class="n">-verbose</span>
 </code></pre></div></p>
 <p>Behavior

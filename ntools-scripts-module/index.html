@@ -1770,13 +1770,13 @@
 <h2 id="quick-start">Quick start<a class="headerlink" href="#quick-start" title="Anchor link to this section for reference">&para;</a></h2>
 <p>Follow these minimal steps to start using the module locally or in CI.</p>
 <div class="highlight"><pre><span></span><code><span class="c"># Import for local development</span>
-<span class="nb">Import-Module</span> <span class="s2">&quot;./scripts/module-package/ntools-scripts.psm1&quot;</span> <span class="n">-Force</span>
+<span class="nb">Import-Module</span> <span class="s2">"./scripts/module-package/ntools-scripts.psm1"</span> <span class="n">-Force</span>
 
 <span class="c"># Check the module version</span>
 <span class="nb">Get-NtoolsScriptsVersion</span>
 
 <span class="c"># Install NTools using a local configuration file</span>
-<span class="nb">Install-NTools</span> <span class="n">-NtoolsJsonPath</span> <span class="s2">&quot;./dev-setup/ntools.json&quot;</span>
+<span class="nb">Install-NTools</span> <span class="n">-NtoolsJsonPath</span> <span class="s2">"./dev-setup/ntools.json"</span>
 </code></pre></div>
 <h2 id="table-of-contents">Table of contents<a class="headerlink" href="#table-of-contents" title="Anchor link to this section for reference">&para;</a></h2>
 <ul>
@@ -1810,7 +1810,7 @@ Test-NToolsScriptsModule
 <div class="highlight"><pre><span></span><code>## Manual Installation
 ```powershell
 # Install module manually for development
-Install-NToolsScriptsModule -InstallPath &quot;$env:ProgramFiles\WindowsPowerShell\Modules\ntools-scripts&quot; -Force
+Install-NToolsScriptsModule -InstallPath "$env:ProgramFiles\WindowsPowerShell\Modules\ntools-scripts" -Force
 </code></pre></div></p>
 <h2 id="module-information">Module Information<a class="headerlink" href="#module-information" title="Anchor link to this section for reference">&para;</a></h2>
 <p><strong>Version</strong>: 2.3.0<br />
@@ -1877,7 +1877,7 @@ Install-NToolsScriptsModule -InstallPath &quot;$env:ProgramFiles\WindowsPowerShe
 <li>docs/ntools/ntools-scripts-module-api.md</li>
 </ul>
 <p>For quick discovery at runtime, import the module and list commands:</p>
-<div class="highlight"><pre><span></span><code><span class="nb">Import-Module</span> <span class="s2">&quot;./scripts/module-package/ntools-scripts.psm1&quot;</span> <span class="n">-Force</span>
+<div class="highlight"><pre><span></span><code><span class="nb">Import-Module</span> <span class="s2">"./scripts/module-package/ntools-scripts.psm1"</span> <span class="n">-Force</span>
 <span class="nb">Get-Command</span> <span class="n">-Module</span> <span class="n">ntools-scripts</span> <span class="p">|</span> <span class="nb">Select-Object</span> <span class="n">Name</span>
 </code></pre></div>
 <h2 id="usage-examples">Usage Examples<a class="headerlink" href="#usage-examples" title="Anchor link to this section for reference">&para;</a></h2>
@@ -1893,20 +1893,20 @@ Install-NToolsScriptsModule -InstallPath &quot;$env:ProgramFiles\WindowsPowerShe
 <div class="highlight"><pre><span></span><code><span class="c"># Install using specific ntools.json file (PowerShell wrapper is deprecated)</span>
 <span class="c"># Prefer the cross-platform Python script for CI and cross-platform installs:</span>
 <span class="c"># python atools/install-ntools.py --version 1.32.0 --json dev-setup/ntools.json</span>
-<span class="nb">Install-NTools</span> <span class="n">-NtoolsJsonPath</span> <span class="s2">&quot;./dev-setup/ntools.json&quot;</span>
+<span class="nb">Install-NTools</span> <span class="n">-NtoolsJsonPath</span> <span class="s2">"./dev-setup/ntools.json"</span>
 
 <span class="c"># Install specific version</span>
-<span class="nb">Install-NTools</span> <span class="n">-Version</span> <span class="s2">&quot;1.29.7&quot;</span> <span class="n">-DownloadsDirectory</span> <span class="s2">&quot;C:\MyDownloads&quot;</span>
+<span class="nb">Install-NTools</span> <span class="n">-Version</span> <span class="s2">"1.29.7"</span> <span class="n">-DownloadsDirectory</span> <span class="s2">"C:\MyDownloads"</span>
 </code></pre></div>
 <h3 id="publish-projects-with-deterministic-path">Publish Projects with Deterministic Path<a class="headerlink" href="#publish-projects-with-deterministic-path" title="Anchor link to this section for reference">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="c"># Publish all projects with explicit repository root</span>
-<span class="nb">Publish-AllProjects</span> <span class="n">-OutputDir</span> <span class="s2">&quot;C:\Artifacts&quot;</span> <span class="n">-Version</span> <span class="s2">&quot;1.0.0&quot;</span> <span class="n">-RepositoryRoot</span> <span class="s2">&quot;C:\MyRepo&quot;</span>
+<span class="nb">Publish-AllProjects</span> <span class="n">-OutputDir</span> <span class="s2">"C:\Artifacts"</span> <span class="n">-Version</span> <span class="s2">"1.0.0"</span> <span class="n">-RepositoryRoot</span> <span class="s2">"C:\MyRepo"</span>
 </code></pre></div>
 <h3 id="run-tests-and-coverage">Run Tests and Coverage<a class="headerlink" href="#run-tests-and-coverage" title="Anchor link to this section for reference">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="c"># Run code coverage</span>
 <span class="nb">Invoke-CodeCoverage</span>
 
-<span class="c"># Test MSBuild delegation (also available via &#39;nb smoke_test&#39;)</span>
+<span class="c"># Test MSBuild delegation (also available via 'nb smoke_test')</span>
 <span class="nb">Test-MSBuildDelegation</span>
 
 <span class="c"># Or use the comprehensive smoke test target</span>
@@ -1919,12 +1919,12 @@ Install-NToolsScriptsModule -InstallPath &quot;$env:ProgramFiles\WindowsPowerShe
 <h3 id="artifact-verification-msbuild">Artifact Verification (MSBuild)<a class="headerlink" href="#artifact-verification-msbuild" title="Anchor link to this section for reference">&para;</a></h3>
 <p>The module exposes <code>Invoke-VerifyArtifacts</code> which is also wired into MSBuild via the <code>VERIFY_ARTIFACTS</code> target in <code>nbuild.targets</code>.</p>
 <p>PowerShell example (local):
-<div class="highlight"><pre><span></span><code><span class="nb">Import-Module</span> <span class="s2">&quot;./scripts/module-package/ntools-scripts.psm1&quot;</span> <span class="n">-Force</span>
-<span class="nb">Invoke-VerifyArtifacts</span> <span class="n">-ArtifactsPath</span> <span class="s2">&quot;C:\Artifacts\MySolution\Release\1.2.3&quot;</span> <span class="n">-ProductVersion</span> <span class="s2">&quot;1.2.3&quot;</span>
+<div class="highlight"><pre><span></span><code><span class="nb">Import-Module</span> <span class="s2">"./scripts/module-package/ntools-scripts.psm1"</span> <span class="n">-Force</span>
+<span class="nb">Invoke-VerifyArtifacts</span> <span class="n">-ArtifactsPath</span> <span class="s2">"C:\Artifacts\MySolution\Release\1.2.3"</span> <span class="n">-ProductVersion</span> <span class="s2">"1.2.3"</span>
 </code></pre></div></p>
 <p>MSBuild / nb CLI example:
 <div class="highlight"><pre><span></span><code><span class="c1"># Run the MSBuild target from the repo root (nb delegates to MSBuild)</span>
-nb<span class="w"> </span>verify_artifacts<span class="w"> </span>/p:ArtifactsFolder<span class="o">=</span><span class="s2">&quot;C:\Artifacts\MySolution\Release\1.2.3&quot;</span><span class="w"> </span>/p:ProductVersion<span class="o">=</span><span class="s2">&quot;1.2.3&quot;</span>
+nb<span class="w"> </span>verify_artifacts<span class="w"> </span>/p:ArtifactsFolder<span class="o">=</span><span class="s2">"C:\Artifacts\MySolution\Release\1.2.3"</span><span class="w"> </span>/p:ProductVersion<span class="o">=</span><span class="s2">"1.2.3"</span>
 </code></pre></div></p>
 <h3 id="msbuild-integration">MSBuild Integration<a class="headerlink" href="#msbuild-integration" title="Anchor link to this section for reference">&para;</a></h3>
 <ul>
@@ -1945,7 +1945,7 @@ nb<span class="w"> </span>smoke_test
 <h3 id="github-actions-integration">GitHub Actions Integration<a class="headerlink" href="#github-actions-integration" title="Anchor link to this section for reference">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Install ntools using ntools-scripts module</span>
 <span class="w">  </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
-<span class="w">    </span><span class="no">Import-Module &quot;./scripts/module-package/ntools-scripts.psm1&quot; -Force</span>
+<span class="w">    </span><span class="no">Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force</span>
 <span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">python atools/install-ntools.py --version 1.32.0 --json dev-setup/ntools.json --downloads-dir ${{ runner.temp }} --dry-run</span>
 </code></pre></div>
 <h2 id="module-development">Module Development<a class="headerlink" href="#module-development" title="Anchor link to this section for reference">&para;</a></h2>
@@ -1959,12 +1959,12 @@ nb<span class="w"> </span>smoke_test
 </ol>
 <h3 id="testing">Testing<a class="headerlink" href="#testing" title="Anchor link to this section for reference">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="c"># Test the module</span>
-<span class="nb">Import-Module</span> <span class="s2">&quot;./scripts/module-package/ntools-scripts.psm1&quot;</span> <span class="n">-Force</span>
+<span class="nb">Import-Module</span> <span class="s2">"./scripts/module-package/ntools-scripts.psm1"</span> <span class="n">-Force</span>
 <span class="nb">Test-NToolsScriptsModule</span>
 </code></pre></div>
 <h3 id="installation">Installation<a class="headerlink" href="#installation" title="Anchor link to this section for reference">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="c"># Install module manually for development</span>
-<span class="nb">Install-NToolsScriptsModule</span> <span class="n">-InstallPath</span> <span class="s2">&quot;$env:ProgramFiles\WindowsPowerShell\Modules\ntools-scripts&quot;</span> <span class="n">-Force</span>
+<span class="nb">Install-NToolsScriptsModule</span> <span class="n">-InstallPath</span> <span class="s2">"$env:ProgramFiles\WindowsPowerShell\Modules\ntools-scripts"</span> <span class="n">-Force</span>
 </code></pre></div>
 <h2 id="best-practices">Best Practices<a class="headerlink" href="#best-practices" title="Anchor link to this section for reference">&para;</a></h2>
 <ol>
@@ -1977,17 +1977,17 @@ nb<span class="w"> </span>smoke_test
 <h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Anchor link to this section for reference">&para;</a></h2>
 <h3 id="module-not-found">Module Not Found<a class="headerlink" href="#module-not-found" title="Anchor link to this section for reference">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="c"># Verify module location</span>
-<span class="nb">Test-Path</span> <span class="s2">&quot;./scripts/module-package/ntools-scripts.psm1&quot;</span>
+<span class="nb">Test-Path</span> <span class="s2">"./scripts/module-package/ntools-scripts.psm1"</span>
 
 <span class="c"># Check if installed</span>
-<span class="nb">Test-Path</span> <span class="s2">&quot;$env:ProgramFiles\nbuild\modules\ntools-scripts\ntools-scripts.psm1&quot;</span>
+<span class="nb">Test-Path</span> <span class="s2">"$env:ProgramFiles\nbuild\modules\ntools-scripts\ntools-scripts.psm1"</span>
 </code></pre></div>
 <h3 id="version-issues">Version Issues<a class="headerlink" href="#version-issues" title="Anchor link to this section for reference">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="c"># Check module version</span>
 <span class="nb">Get-NtoolsScriptsVersion</span>
 
 <span class="c"># Check installed version vs source</span>
-<span class="nb">Import-Module</span> <span class="s2">&quot;./scripts/module-package/ntools-scripts.psm1&quot;</span> <span class="n">-Force</span>
+<span class="nb">Import-Module</span> <span class="s2">"./scripts/module-package/ntools-scripts.psm1"</span> <span class="n">-Force</span>
 <span class="nb">Get-NtoolsScriptsVersion</span>
 </code></pre></div>
 <h3 id="function-not-available">Function Not Available<a class="headerlink" href="#function-not-available" title="Anchor link to this section for reference">&para;</a></h3>

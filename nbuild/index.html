@@ -2304,20 +2304,20 @@ configuration, or registry state.</p>
 <p>Below are practical examples for using <code>nb.exe</code>. These examples assume you are running in a PowerShell terminal.</p>
 <h3 id="1-install-applications">1. Install Applications<a class="headerlink" href="#1-install-applications" title="Anchor link to this section for reference">&para;</a></h3>
 <h4 id="install-from-json-file">Install from JSON file:<a class="headerlink" href="#install-from-json-file" title="Anchor link to this section for reference">&para;</a></h4>
-<p><div class="highlight"><pre><span></span><code>nb.exe install --json &quot;C:\Program Files\tools.json&quot;
+<p><div class="highlight"><pre><span></span><code>nb.exe install --json "C:\Program Files\tools.json"
 </code></pre></div>
 Installs applications specified in the manifest file. The <code>--json</code> parameter is optional if <code>--name</code> is provided. If <code>--json</code> is specified, <code>--name</code> is ignored. (Requires admin privileges.)</p>
 <h4 id="install-by-name-from-current-directory-and-default-location">Install by name from current directory and default location:<a class="headerlink" href="#install-by-name-from-current-directory-and-default-location" title="Anchor link to this section for reference">&para;</a></h4>
-<p><div class="highlight"><pre><span></span><code>nb.exe install --name &quot;MyApp&quot;
-nb.exe install --name &quot;MyApp&quot; --appversion &quot;1.2.3&quot;
+<p><div class="highlight"><pre><span></span><code>nb.exe install --name "MyApp"
+nb.exe install --name "MyApp" --appversion "1.2.3"
 </code></pre></div>
 Searches for <code>apps.json</code> in both the current directory and the default installation directory, then installs the application matching the specified name. The <code>--name</code> parameter is optional if <code>--json</code> is provided. The <code>--appversion</code> parameter is optional and overrides the version specified in the JSON file.</p>
 <p><strong>BREAKING CHANGE (v1.76+):</strong> This command now searches ONLY for <code>apps.json</code> files, not all JSON files. You must consolidate your application definitions into a single <code>apps.json</code> file in the target directory or move it to the default installation directory.</p>
 <p><strong>Search order:</strong> Current directory is searched first for <code>apps.json</code>, then the default installation directory. If an app is found in the current directory, it takes precedence over the same app in the default installation directory.</p>
 <p><strong>Note:</strong> If you specify both <code>--json</code> and <code>--name</code>, the command is allowed, but <code>--json</code> takes precedence and a warning is emitted. The <code>--name</code> method provides a more convenient way to install applications without needing to know the exact path to the JSON configuration file.</p>
 <h4 id="dry-run-mode-for-install">Dry-run mode for install:<a class="headerlink" href="#dry-run-mode-for-install" title="Anchor link to this section for reference">&para;</a></h4>
-<div class="highlight"><pre><span></span><code>nb.exe install --name &quot;MyApp&quot; --dry-run
-nb.exe install --name &quot;MyApp&quot; --appversion &quot;1.2.3&quot; --dry-run
+<div class="highlight"><pre><span></span><code>nb.exe install --name "MyApp" --dry-run
+nb.exe install --name "MyApp" --appversion "1.2.3" --dry-run
 </code></pre></div>
 <p><strong>Behavior in dry-run mode:</strong>
 - Searches for <code>apps.json</code> in both the current directory and the default installation directory (search order: current directory first)
@@ -2328,22 +2328,22 @@ nb.exe install --name &quot;MyApp&quot; --appversion &quot;1.2.3&quot; --dry-run
 - No files are downloaded, installed, or modified
 - Output uses color coding: yellow for dry-run messages, red for not-found messages</p>
 <h3 id="2-uninstall-applications">2. Uninstall Applications<a class="headerlink" href="#2-uninstall-applications" title="Anchor link to this section for reference">&para;</a></h3>
-<p><div class="highlight"><pre><span></span><code>nb.exe uninstall --json &quot;C:\Program Files\example-tool.json&quot;
+<p><div class="highlight"><pre><span></span><code>nb.exe uninstall --json "C:\Program Files\example-tool.json"
 </code></pre></div>
 Uninstalls applications as specified in the manifest file. (Requires admin privileges.)</p>
 <h3 id="3-list-installed-applications">3. List Installed Applications<a class="headerlink" href="#3-list-installed-applications" title="Anchor link to this section for reference">&para;</a></h3>
 <p><div class="highlight"><pre><span></span><code>nb.exe list
-nb.exe list --json &quot;C:\Program Files\NBuild\ntools.json&quot;
+nb.exe list --json "C:\Program Files\NBuild\ntools.json"
 </code></pre></div>
 Lists all applications specified in the provided JSON file. If no <code>--json</code> option is specified, the default file is used.</p>
 <h3 id="4-download-applications">4. Download Applications<a class="headerlink" href="#4-download-applications" title="Anchor link to this section for reference">&para;</a></h3>
-<p><div class="highlight"><pre><span></span><code>nb.exe download --json &quot;C:\Program Files\NBuild\ntools.json&quot;
+<p><div class="highlight"><pre><span></span><code>nb.exe download --json "C:\Program Files\NBuild\ntools.json"
 </code></pre></div>
 Downloads tools and applications specified in the manifest file.</p>
 <h3 id="5-error-handling-for-json-manifest-files">5. Error Handling for JSON Manifest Files<a class="headerlink" href="#5-error-handling-for-json-manifest-files" title="Anchor link to this section for reference">&para;</a></h3>
 <p>The <code>list</code>, <code>install</code>, <code>uninstall</code>, and <code>download</code> commands require valid JSON manifest files. The following errors may occur:</p>
 <h4 id="file-not-found">File Not Found<a class="headerlink" href="#file-not-found" title="Anchor link to this section for reference">&para;</a></h4>
-<div class="highlight"><pre><span></span><code>Error: JSON file not found: &#39;C:\invalid\path\apps.json&#39;. Please provide a valid path to the apps.json file.
+<div class="highlight"><pre><span></span><code>Error: JSON file not found: 'C:\invalid\path\apps.json'. Please provide a valid path to the apps.json file.
 Exit code: -1
 </code></pre></div>
 <p><strong>Resolution</strong>: Verify the file path is correct. Common locations:
@@ -2351,7 +2351,7 @@ Exit code: -1
 - Program Files: <code>C:\Program Files\nbuild\apps.json</code>
 - Relative path: <code>.\dev-setup\apps.json</code></p>
 <h4 id="invalid-json-format">Invalid JSON Format<a class="headerlink" href="#invalid-json-format" title="Anchor link to this section for reference">&para;</a></h4>
-<div class="highlight"><pre><span></span><code>Error: Invalid JSON format: &#39;.&#39; is an invalid start of a value. Please check the JSON file for proper escaping of backslashes and quotes.
+<div class="highlight"><pre><span></span><code>Error: Invalid JSON format: '.' is an invalid start of a value. Please check the JSON file for proper escaping of backslashes and quotes.
 Exit code: -1
 </code></pre></div>
 <p><strong>Resolution</strong>: Validate your JSON file:

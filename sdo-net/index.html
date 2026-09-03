@@ -2820,12 +2820,12 @@ Commands:
 <div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w">                                    </span><span class="c1"># List active items</span>
 sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--top<span class="w"> </span><span class="m">20</span><span class="w">                           </span><span class="c1"># Limit to 20 items</span>
 sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--state<span class="w"> </span>Done<span class="w">                       </span><span class="c1"># Show Done items</span>
-sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--state<span class="w"> </span><span class="s2">&quot;In Progress&quot;</span><span class="w"> </span>--top<span class="w"> </span><span class="m">10</span><span class="w">    </span><span class="c1"># Show In Progress, limit 10</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--state<span class="w"> </span><span class="s2">"In Progress"</span><span class="w"> </span>--top<span class="w"> </span><span class="m">10</span><span class="w">    </span><span class="c1"># Show In Progress, limit 10</span>
 sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--assigned-to<span class="w"> </span>user@example.com<span class="w">    </span><span class="c1"># Filter by assignee</span>
 sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--assigned-to-me<span class="w">                  </span><span class="c1"># Your items</span>
 sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--type<span class="w"> </span>PBI<span class="w">                         </span><span class="c1"># Filter by type (Azure DevOps)</span>
-sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--area<span class="w"> </span><span class="s2">&quot;Project\Area&quot;</span><span class="w">             </span><span class="c1"># Filter by area (Azure DevOps)</span>
-sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--iteration<span class="w"> </span><span class="s2">&quot;Project\Sprint 1&quot;</span><span class="w">    </span><span class="c1"># Filter by iteration (Azure DevOps)</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--area<span class="w"> </span><span class="s2">"Project\Area"</span><span class="w">             </span><span class="c1"># Filter by area (Azure DevOps)</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--iteration<span class="w"> </span><span class="s2">"Project\Sprint 1"</span><span class="w">    </span><span class="c1"># Filter by iteration (Azure DevOps)</span>
 sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--verbose<span class="w">                         </span><span class="c1"># Show API commands</span>
 </code></pre></div></p>
 <p><strong>Valid States:</strong>
@@ -2913,8 +2913,8 @@ This is the description.
 <div class="highlight"><pre><span></span><code>---
 work_item_type: PBI
 assignee: user@example.com
-labels: &quot;feature, backlog&quot;
-<span class="gu">target: &quot;github&quot;  # or &quot;azdo&quot;</span>
+labels: "feature, backlog"
+<span class="gu">target: "github"  # or "azdo"</span>
 <span class="gu">---</span>
 
 <span class="gh"># Title</span>
@@ -2975,9 +2975,9 @@ Ready to start implementing work item #247
 <div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w">                                          </span><span class="c1"># Auto-detect ID from branch, requires at least one property</span>
 sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--state<span class="w"> </span>Done<span class="w">                             </span><span class="c1"># Auto-detect ID, update state</span>
 sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--state<span class="w"> </span>Done<span class="w">                    </span><span class="c1"># Update state with explicit ID</span>
-sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--title<span class="w"> </span><span class="s2">&quot;New Title&quot;</span><span class="w">             </span><span class="c1"># Update title</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--title<span class="w"> </span><span class="s2">"New Title"</span><span class="w">             </span><span class="c1"># Update title</span>
 sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--assignee<span class="w"> </span>user@example.com<span class="w">    </span><span class="c1"># Change assignee</span>
-sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--state<span class="w"> </span>Done<span class="w"> </span>--title<span class="w"> </span><span class="s2">&quot;Title&quot;</span><span class="w">   </span><span class="c1"># Multiple fields</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--state<span class="w"> </span>Done<span class="w"> </span>--title<span class="w"> </span><span class="s2">"Title"</span><span class="w">   </span><span class="c1"># Multiple fields</span>
 sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--state<span class="w"> </span><span class="k">done</span><span class="w">                             </span><span class="c1"># Case-insensitive</span>
 sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--state<span class="w"> </span>Done<span class="w"> </span>--verbose<span class="w">                  </span><span class="c1"># Show mapping with auto-detection</span>
 </code></pre></div></p>
@@ -3038,8 +3038,8 @@ sdo<span class="w"> </span>wi<span class="w"> </span>close
 <h4 id="wi-comment">wi comment<a class="headerlink" href="#wi-comment" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Add comment to work item.</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>wi<span class="w"> </span>comment<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--message<span class="w"> </span><span class="s2">&quot;This is my comment&quot;</span>
-sdo<span class="w"> </span>wi<span class="w"> </span>comment<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--message<span class="w"> </span><span class="s2">&quot;Looks good!&quot;</span><span class="w"> </span>--verbose
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>wi<span class="w"> </span>comment<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--message<span class="w"> </span><span class="s2">"This is my comment"</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>comment<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--message<span class="w"> </span><span class="s2">"Looks good!"</span><span class="w"> </span>--verbose
 </code></pre></div></p>
 <p><strong>Options:</strong>
 - <code>--id &lt;id&gt;</code> — Work item ID (required)
@@ -3145,10 +3145,10 @@ sdo<span class="w"> </span>pr<span class="w"> </span>status<span class="w"> </sp
 <h4 id="pr-update">pr update<a class="headerlink" href="#pr-update" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Update pull request properties.</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pr<span class="w"> </span>update<span class="w"> </span>--pr-id<span class="w"> </span><span class="m">12</span><span class="w"> </span>--title<span class="w"> </span><span class="s2">&quot;Updated title&quot;</span>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pr<span class="w"> </span>update<span class="w"> </span>--pr-id<span class="w"> </span><span class="m">12</span><span class="w"> </span>--title<span class="w"> </span><span class="s2">"Updated title"</span>
 sdo<span class="w"> </span>pr<span class="w"> </span>update<span class="w"> </span>--pr-id<span class="w"> </span><span class="m">12</span><span class="w"> </span>--file<span class="w"> </span>updated.md
 sdo<span class="w"> </span>pr<span class="w"> </span>update<span class="w"> </span>--pr-id<span class="w"> </span><span class="m">12</span><span class="w"> </span>--status<span class="w"> </span>closed
-sdo<span class="w"> </span>pr<span class="w"> </span>update<span class="w"> </span>--pr-id<span class="w"> </span><span class="m">12</span><span class="w"> </span>--title<span class="w"> </span><span class="s2">&quot;New title&quot;</span><span class="w"> </span>--status<span class="w"> </span>merged
+sdo<span class="w"> </span>pr<span class="w"> </span>update<span class="w"> </span>--pr-id<span class="w"> </span><span class="m">12</span><span class="w"> </span>--title<span class="w"> </span><span class="s2">"New title"</span><span class="w"> </span>--status<span class="w"> </span>merged
 </code></pre></div></p>
 <p><strong>Options:</strong>
 - <code>--pr-id &lt;pr-id&gt;</code> — PR ID to update (required)
@@ -3201,7 +3201,7 @@ sdo<span class="w"> </span>repo<span class="w"> </span>show<span class="w"> </sp
 <p>Create a new repository.</p>
 <p><strong>Usage:</strong>
 <div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>repo<span class="w"> </span>create<span class="w"> </span>myrepo<span class="w">                          </span><span class="c1"># Create repo</span>
-sdo<span class="w"> </span>repo<span class="w"> </span>create<span class="w"> </span>myrepo<span class="w"> </span>--description<span class="w"> </span><span class="s2">&quot;My repo&quot;</span><span class="w">  </span><span class="c1"># With description</span>
+sdo<span class="w"> </span>repo<span class="w"> </span>create<span class="w"> </span>myrepo<span class="w"> </span>--description<span class="w"> </span><span class="s2">"My repo"</span><span class="w">  </span><span class="c1"># With description</span>
 sdo<span class="w"> </span>repo<span class="w"> </span>create<span class="w"> </span>myrepo<span class="w"> </span>--private<span class="w">                </span><span class="c1"># Make private</span>
 sdo<span class="w"> </span>repo<span class="w"> </span>create<span class="w"> </span>myrepo<span class="w"> </span>--private<span class="w"> </span>--verbose<span class="w">      </span><span class="c1"># With mapping</span>
 </code></pre></div></p>
@@ -3332,7 +3332,7 @@ sdo<span class="w"> </span>pipeline<span class="w"> </span>lastbuild<span class=
 <p><strong>Usage:</strong>
 <div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>pipeline<span class="w"> </span>update<span class="w"> </span>--file<span class="w"> </span>updated.yml
 sdo<span class="w"> </span>pipeline<span class="w"> </span>update<span class="w"> </span>--file<span class="w"> </span>updated.yml<span class="w"> </span>--pipeline<span class="w"> </span>myworkflow
-sdo<span class="w"> </span>pipeline<span class="w"> </span>update<span class="w"> </span>--file<span class="w"> </span>updated.yml<span class="w"> </span>--message<span class="w"> </span><span class="s2">&quot;Update CI config&quot;</span><span class="w"> </span>--branch<span class="w"> </span>main
+sdo<span class="w"> </span>pipeline<span class="w"> </span>update<span class="w"> </span>--file<span class="w"> </span>updated.yml<span class="w"> </span>--message<span class="w"> </span><span class="s2">"Update CI config"</span><span class="w"> </span>--branch<span class="w"> </span>main
 </code></pre></div></p>
 <p><strong>Options:</strong>
 - <code>--file &lt;file&gt;</code> — Path to pipeline/workflow YAML file to update (required)
@@ -3396,9 +3396,9 @@ sdo<span class="w"> </span>user<span class="w"> </span>show<span class="w"> </sp
 <h4 id="user-search">user search<a class="headerlink" href="#user-search" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Search for users.</p>
 <p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>user<span class="w"> </span>search<span class="w"> </span>--query<span class="w"> </span><span class="s2">&quot;naz&quot;</span><span class="w">              </span><span class="c1"># Search for users</span>
-sdo<span class="w"> </span>user<span class="w"> </span>search<span class="w"> </span>--query<span class="w"> </span><span class="s2">&quot;naz&quot;</span><span class="w"> </span>--top<span class="w"> </span><span class="m">20</span><span class="w">     </span><span class="c1"># Limit to 20</span>
-sdo<span class="w"> </span>user<span class="w"> </span>search<span class="w"> </span>--query<span class="w"> </span><span class="s2">&quot;naz&quot;</span><span class="w"> </span>--verbose<span class="w">    </span><span class="c1"># Show API command</span>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>user<span class="w"> </span>search<span class="w"> </span>--query<span class="w"> </span><span class="s2">"naz"</span><span class="w">              </span><span class="c1"># Search for users</span>
+sdo<span class="w"> </span>user<span class="w"> </span>search<span class="w"> </span>--query<span class="w"> </span><span class="s2">"naz"</span><span class="w"> </span>--top<span class="w"> </span><span class="m">20</span><span class="w">     </span><span class="c1"># Limit to 20</span>
+sdo<span class="w"> </span>user<span class="w"> </span>search<span class="w"> </span>--query<span class="w"> </span><span class="s2">"naz"</span><span class="w"> </span>--verbose<span class="w">    </span><span class="c1"># Show API command</span>
 </code></pre></div></p>
 <p><strong>Options:</strong>
 - <code>--query &lt;term&gt;</code> — Search term (required)
@@ -3429,11 +3429,11 @@ gh<span class="w"> </span>auth<span class="w"> </span>status
 gh<span class="w"> </span>auth<span class="w"> </span>login
 
 <span class="c1"># Or set token explicitly</span>
-<span class="nv">$env</span>:GITHUB_TOKEN<span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;your_github_token&quot;</span>
+<span class="nv">$env</span>:GITHUB_TOKEN<span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"your_github_token"</span>
 </code></pre></div></p>
 <p>Azure DevOps:
 <div class="highlight"><pre><span></span><code><span class="c1"># Set personal access token</span>
-<span class="nv">$env</span>:AZURE_DEVOPS_PAT<span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;your_azure_pat&quot;</span>
+<span class="nv">$env</span>:AZURE_DEVOPS_PAT<span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"your_azure_pat"</span>
 </code></pre></div></p>
 <hr />
 <h2 id="advanced-automation-features">Advanced Automation Features<a class="headerlink" href="#advanced-automation-features" title="Anchor link to this section for reference">&para;</a></h2>
@@ -3457,13 +3457,13 @@ gh<span class="w"> </span>auth<span class="w"> </span>login
 <div class="highlight"><pre><span></span><code><span class="nt">commands</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">wi</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">list</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">area_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Project\\Warriors&quot;</span>
-<span class="w">      </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;To</span><span class="nv"> </span><span class="s">Do,In</span><span class="nv"> </span><span class="s">Progress&quot;</span>
+<span class="w">      </span><span class="nt">area_path</span><span class="p">:</span><span class="w"> </span><span class="s">"Project\\Warriors"</span>
+<span class="w">      </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">"To</span><span class="nv"> </span><span class="s">Do,In</span><span class="nv"> </span><span class="s">Progress"</span>
 <span class="w">      </span><span class="nt">top</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">9</span>
 </code></pre></div>
 <h4 id="usage-examples">Usage Examples<a class="headerlink" href="#usage-examples" title="Anchor link to this section for reference">&para;</a></h4>
 <p><strong>Without Configuration</strong>:
-<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--area<span class="w"> </span><span class="s2">&quot;Project\Warriors&quot;</span><span class="w"> </span>--state<span class="w"> </span><span class="s2">&quot;To Do,In Progress&quot;</span><span class="w"> </span>--top<span class="w"> </span><span class="m">9</span>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--area<span class="w"> </span><span class="s2">"Project\Warriors"</span><span class="w"> </span>--state<span class="w"> </span><span class="s2">"To Do,In Progress"</span><span class="w"> </span>--top<span class="w"> </span><span class="m">9</span>
 <span class="c1"># Returns: 9 work items from Warriors area in To Do or In Progress states</span>
 </code></pre></div></p>
 <p><strong>With Configuration File</strong>:
@@ -3474,7 +3474,7 @@ sdo<span class="w"> </span>wi<span class="w"> </span>list
 </code></pre></div></p>
 <p><strong>Override Configuration Defaults</strong>:
 <div class="highlight"><pre><span></span><code><span class="c1"># CLI parameters override config defaults</span>
-sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--state<span class="w"> </span><span class="s2">&quot;Done&quot;</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--state<span class="w"> </span><span class="s2">"Done"</span>
 <span class="c1"># Returns: All work items in Done state (ignores config state filter)</span>
 </code></pre></div></p>
 <h4 id="configuration-discovery">Configuration Discovery<a class="headerlink" href="#configuration-discovery" title="Anchor link to this section for reference">&para;</a></h4>
@@ -3488,7 +3488,7 @@ sdo<span class="w"> </span>wi<span class="w"> </span>list
 </code></pre></div>
 <h4 id="explicit-configuration-path">Explicit Configuration Path<a class="headerlink" href="#explicit-configuration-path" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Specify a custom configuration path:</p>
-<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--config<span class="w"> </span><span class="s2">&quot;C:\my-configs\standard.yaml&quot;</span>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--config<span class="w"> </span><span class="s2">"C:\my-configs\standard.yaml"</span>
 </code></pre></div>
 <h4 id="supported-configuration-keys">Supported Configuration Keys<a class="headerlink" href="#supported-configuration-keys" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Under <code>commands.wi.list</code> in the YAML file:</p>
@@ -3541,14 +3541,14 @@ sdo<span class="w"> </span>wi<span class="w"> </span>list
 <span class="nt">commands</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">wi</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">list</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">area_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;MyProject\\Backend&quot;</span>
-<span class="w">      </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;In</span><span class="nv"> </span><span class="s">Progress&quot;</span>
+<span class="w">      </span><span class="nt">area_path</span><span class="p">:</span><span class="w"> </span><span class="s">"MyProject\\Backend"</span>
+<span class="w">      </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">"In</span><span class="nv"> </span><span class="s">Progress"</span>
 <span class="w">      </span><span class="nt">top</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20</span>
 </code></pre></div></p>
 <p>All team members get consistent results without remembering filters:
 <div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/myorg/myproject
 <span class="nb">cd</span><span class="w"> </span>myproject
-sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w">  </span><span class="c1"># Gets team&#39;s standard view automatically</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w">  </span><span class="c1"># Gets team's standard view automatically</span>
 </code></pre></div></p>
 <p><strong>Scenario 2: Sprint Planning</strong></p>
 <p>Create sprint-specific configuration:
@@ -3556,8 +3556,8 @@ sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w">  </spa
 <span class="nt">commands</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">wi</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">list</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">iteration</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;MyProject\\Sprint</span><span class="nv"> </span><span class="s">5&quot;</span>
-<span class="w">      </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;New,Approved,Committed&quot;</span>
+<span class="w">      </span><span class="nt">iteration</span><span class="p">:</span><span class="w"> </span><span class="s">"MyProject\\Sprint</span><span class="nv"> </span><span class="s">5"</span>
+<span class="w">      </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">"New,Approved,Committed"</span>
 </code></pre></div></p>
 <p>Use it explicitly:
 <div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w"> </span>--config<span class="w"> </span>.temp/sdo-sprint-5.yaml
@@ -3568,8 +3568,8 @@ sdo<span class="w"> </span>wi<span class="w"> </span>list<span class="w">  </spa
 <span class="nt">commands</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">wi</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">list</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Done&quot;</span>
-<span class="w">      </span><span class="nt">area_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;MyProject\\Release&quot;</span>
+<span class="w">      </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">"Done"</span>
+<span class="w">      </span><span class="nt">area_path</span><span class="p">:</span><span class="w"> </span><span class="s">"MyProject\\Release"</span>
 <span class="w">      </span><span class="nt">top</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100</span>
 </code></pre></div></p>
 <p>Verify release readiness:
@@ -3612,8 +3612,8 @@ public void DoSomething()
 work_item_type: PBI
 priority: High
 assignee: user@example.com
-labels: &quot;feature, backend, auth&quot;
-target: &quot;azdo&quot;  # azdo or github
+labels: "feature, backend, auth"
+target: "azdo"  # azdo or github
 ---
 
 # Authentication Service Design
@@ -3711,7 +3711,7 @@ sdo<span class="w"> </span>wi<span class="w"> </span>create<span class="w"> </sp
 
 <span class="c1"># Errors include:</span>
 <span class="c1"># - Line number and content</span>
-<span class="c1"># - Specific issue (e.g., &quot;Title is required&quot;, &quot;Malformed header&quot;)</span>
+<span class="c1"># - Specific issue (e.g., "Title is required", "Malformed header")</span>
 <span class="c1"># - Warnings for minor issues (unclosed code blocks, etc.)</span>
 </code></pre></div>
 <h4 id="example-scenarios_1">Example Scenarios<a class="headerlink" href="#example-scenarios_1" title="Anchor link to this section for reference">&para;</a></h4>
@@ -3721,7 +3721,7 @@ sdo<span class="w"> </span>wi<span class="w"> </span>create<span class="w"> </sp
 work_item_type: PBI
 priority: High
 assignee: alice@company.com
-<span class="gu">labels: &quot;backend, security, authentication&quot;</span>
+<span class="gu">labels: "backend, security, authentication"</span>
 <span class="gu">---</span>
 
 <span class="gh"># Redesign Authentication System</span>
@@ -3752,7 +3752,7 @@ sdo wi create --file-path features/auth-redesign.md
 <div class="highlight"><pre><span></span><code>---
 work_item_type: Bug
 priority: Critical
-<span class="gu">target: &quot;github&quot;</span>
+<span class="gu">target: "github"</span>
 <span class="gu">---</span>
 
 <span class="gh"># Parser Crashes on Malformed Markdown</span>
@@ -3774,7 +3774,7 @@ Create `prs/feature-merge.md`:
 ```markdown
 ---
 work_item_type: Pull Request
-target: &quot;github&quot;
+target: "github"
 ---
 
 # Add User Authentication to Dashboard
@@ -3876,8 +3876,8 @@ sdo-e2e-tests.exe<span class="w"> </span>--test-case<span class="w"> </span>Vali
 <span class="c1"># Or in Azure Pipelines</span>
 -<span class="w"> </span>task:<span class="w"> </span>PowerShell@2
 <span class="w">  </span>inputs:
-<span class="w">    </span>scriptType:<span class="w"> </span><span class="s1">&#39;inline&#39;</span>
-<span class="w">    </span>script:<span class="w"> </span><span class="s1">&#39;nb RUN_GITHUB_WI_ASSIGNED_TO_ME_TEST&#39;</span>
+<span class="w">    </span>scriptType:<span class="w"> </span><span class="s1">'inline'</span>
+<span class="w">    </span>script:<span class="w"> </span><span class="s1">'nb RUN_GITHUB_WI_ASSIGNED_TO_ME_TEST'</span>
 </code></pre></div>
 <hr />
 <h2 id="service-enhancements">Service Enhancements<a class="headerlink" href="#service-enhancements" title="Anchor link to this section for reference">&para;</a></h2>
@@ -3928,7 +3928,7 @@ git<span class="w"> </span>remote<span class="w"> </span>add<span class="w"> </s
 <p><strong>Solution:</strong>
 <div class="highlight"><pre><span></span><code><span class="c1"># Use valid state with exact casing (or lowercase)</span>
 sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">170</span><span class="w"> </span>--state<span class="w"> </span>Done<span class="w">          </span><span class="c1"># Correct</span>
-sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">170</span><span class="w"> </span>--state<span class="w"> </span><span class="s2">&quot;In Progress&quot;</span><span class="w">  </span><span class="c1"># Correct</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">170</span><span class="w"> </span>--state<span class="w"> </span><span class="s2">"In Progress"</span><span class="w">  </span><span class="c1"># Correct</span>
 sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">170</span><span class="w"> </span>--state<span class="w"> </span><span class="k">done</span><span class="w">           </span><span class="c1"># Also works (case-insensitive)</span>
 </code></pre></div></p>
 <p>Valid states:
@@ -3967,7 +3967,7 @@ sdo<span class="w"> </span>wi<span class="w"> </span>show<span class="w"> </span
 <p><strong>Mixing GitHub and Azure DevOps states:</strong>
 <div class="highlight"><pre><span></span><code><span class="c1"># ❌ GitHub state on Azure DevOps repo</span>
 git<span class="w"> </span>remote<span class="w"> </span>set-url<span class="w"> </span>origin<span class="w"> </span>https://dev.azure.com/org/project/_git/repo
-sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--state<span class="w"> </span>closed<span class="w">  </span><span class="c1"># Won&#39;t work</span>
+sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--state<span class="w"> </span>closed<span class="w">  </span><span class="c1"># Won't work</span>
 
 <span class="c1"># ✓ Correct</span>
 sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--state<span class="w"> </span>Done
