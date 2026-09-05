@@ -91,14 +91,14 @@ namespace GitHubRelease
                     Client.DefaultRequestHeaders.Add("Authorization", $"Bearer {Credentials.GetToken()}");
                     if (Verbose)
                     {
-                        Console.WriteLine($"[VERBOSE] Authentication required for {operation} operation on {repositoryUrl}");
+                        Console.WriteLine($" Authentication required for {operation} operation on {repositoryUrl}");
                     }
                 }
                 else
                 {
                     if (Verbose)
                     {
-                        Console.WriteLine($"[VERBOSE] No authentication required for {operation} operation on {repositoryUrl}");
+                        Console.WriteLine($" No authentication required for {operation} operation on {repositoryUrl}");
                     }
                 }
             }
@@ -111,14 +111,14 @@ namespace GitHubRelease
                     Client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
                     if (Verbose)
                     {
-                        Console.WriteLine($"[VERBOSE] Using legacy authentication (no GitHubAuthService provided)");
+                        Console.WriteLine($"Using legacy authentication (no GitHubAuthService provided)");
                     }
                 }
                 else
                 {
                     if (Verbose)
                     {
-                        Console.WriteLine($"[VERBOSE] No authentication token available, proceeding without authentication");
+                        Console.WriteLine($"No authentication token available, proceeding without authentication");
                     }
                 }
             }

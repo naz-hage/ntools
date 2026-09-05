@@ -1437,7 +1437,7 @@ namespace Nbuild
         /// It utilizes the ReleaseService to interact with the GitHub API.
         /// If the release creation is successful, it returns true; otherwise, it logs the error and returns false.
         /// </remarks>
-        public static async Task<ResultHelper> CreateRelease(string repo, string tag, string branch, string assetFileName, bool preRelease = false, bool dryRun = false)
+        public static async Task<ResultHelper> CreateRelease(string repo, string tag, string branch, string assetFileName, bool preRelease = false, bool dryRun = false, bool verbose = false)
         {
             if (dryRun)
             {
@@ -1458,7 +1458,7 @@ namespace Nbuild
             };
 
             // Create a release
-            var responseMessage = await releaseService.CreateRelease(release, assetFileName);
+            var responseMessage = await releaseService.CreateRelease(release, assetFileName, verbose);
             if (responseMessage.IsSuccessStatusCode)
             {
                 return ResultHelper.Success();

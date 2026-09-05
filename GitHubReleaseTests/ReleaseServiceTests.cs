@@ -51,7 +51,7 @@ namespace GitHubRelease.Tests
                 Prerelease = false
             };
             string assetPath = CreateAsset(TagStagingRequested);
-            var resultReal = await releaseService.CreateRelease(realRelease, assetPath);
+            var resultReal = await releaseService.CreateRelease(realRelease, assetPath, verbose: true);
             Assert.IsNotNull(resultReal, "Create release is null");
             Assert.AreEqual("Created", resultReal.StatusCode.ToString());
             var assetName = $"{TagStagingRequested}.zip";

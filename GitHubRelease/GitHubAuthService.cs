@@ -97,7 +97,7 @@ namespace GitHubRelease
                     // When visibility is unknown, require authentication to be safe
                     if (_verbose)
                     {
-                        Console.WriteLine("[VERBOSE] Repository visibility unknown, requiring authentication for safety");
+                        Console.WriteLine("Repository visibility unknown, requiring authentication for safety");
                     }
                     return true;
             }
@@ -164,7 +164,7 @@ namespace GitHubRelease
                     // Rate limited or blocked - assume private for safety
                     if (_verbose)
                     {
-                        Console.WriteLine($"[VERBOSE] API access forbidden for {owner}/{repo}, assuming private");
+                        Console.WriteLine($"API access forbidden for {owner}/{repo}, assuming private");
                     }
                     return RepositoryVisibility.Private;
                 }
@@ -172,7 +172,7 @@ namespace GitHubRelease
                 {
                     if (_verbose)
                     {
-                        Console.WriteLine($"[VERBOSE] Unexpected API response ({response.StatusCode}) for {owner}/{repo}");
+                        Console.WriteLine($"Unexpected API response ({response.StatusCode}) for {owner}/{repo}");
                     }
                     return RepositoryVisibility.Unknown;
                 }
@@ -181,7 +181,7 @@ namespace GitHubRelease
             {
                 if (_verbose)
                 {
-                    Console.WriteLine($"[VERBOSE] Error checking repository visibility: {ex.Message}");
+                    Console.WriteLine($"Error checking repository visibility: {ex.Message}");
                 }
                 return RepositoryVisibility.Unknown;
             }
