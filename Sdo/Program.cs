@@ -51,7 +51,7 @@ namespace Sdo
             rootCommand.Subcommands.Add(new Commands.AuthCommand(verboseOption));
             rootCommand.Subcommands.Add(new Commands.PipelineCommand(verboseOption));
             rootCommand.Subcommands.Add(new Commands.PullRequestCommand(verboseOption));
-            rootCommand.Subcommands.Add(new Commands.RepositoryCommand(verboseOption));
+            rootCommand.Subcommands.Add(new Commands.RepositoryCommand(verboseOption, dryRunOption: dryRunOption));
             rootCommand.Subcommands.Add(new Commands.WorkItemCommand(verboseOption));
             rootCommand.Subcommands.Add(new Commands.UserCommand(verboseOption));
 
@@ -60,7 +60,7 @@ namespace Sdo
             rootCommand.Subcommands.Add(new Commands.ToolCommand(verboseOption));
             rootCommand.Subcommands.Add(new Commands.EnvironmentCommand(verboseOption));
             rootCommand.Subcommands.Add(new Commands.BuildCommand(verboseOption));
-            rootCommand.Subcommands.Add(new Command("release", "GitHub and Azure DevOps release management"));
+            rootCommand.Subcommands.Add(new Commands.ReleaseCommand(verboseOption, dryRunOption));
             rootCommand.Subcommands.Add(new Command("backup", "Environment and workspace backup utilities"));
             rootCommand.Subcommands.Add(new Commands.FileCommand(verboseOption));
 

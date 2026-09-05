@@ -21,22 +21,51 @@ namespace Sdo.Commands
         private readonly PlatformService _platformDetector;
         private readonly Sdo.Mapping.IMappingGenerator _mappingGenerator;
         private readonly Sdo.Mapping.IMappingPresenter _mappingPresenter;
+        private readonly Option<bool>? _dryRunOption;
 
         /// <summary>
         /// Initializes a new instance of the RepositoryCommand class.
         /// </summary>
         /// <param name="verboseOption">Option for verbose output.</param>
-        public RepositoryCommand(Option<bool> verboseOption, Sdo.Mapping.IMappingGenerator? mappingGenerator = null, Sdo.Mapping.IMappingPresenter? mappingPresenter = null) : base("repo", "Repository management commands")
+        public RepositoryCommand(Option<bool> verboseOption, Sdo.Mapping.IMappingGenerator? mappingGenerator = null, Sdo.Mapping.IMappingPresenter? mappingPresenter = null, Option<bool>? dryRunOption = null) : base("repo", "Repository management commands")
         {
             _platformDetector = new PlatformService();
             _mappingGenerator = mappingGenerator ?? new Sdo.Mapping.MappingGenerator();
             _mappingPresenter = mappingPresenter ?? new Sdo.Mapping.ConsoleMappingPresenter();
+            _dryRunOption = dryRunOption;
 
             // Add subcommands (in alphabetical order)
             AddCreateCommand(verboseOption);
             AddDeleteCommand(verboseOption);
+            AddInfoCommand(verboseOption);
             AddListCommand(verboseOption);
             AddShowCommand(verboseOption);
+        }
+
+        private void AddInfoCommand(Option<bool> verboseOption)
+        {
+            var infoCommand = new System.CommandLine.Command(
+                "info",
+                "Display local Git repository information, including the current branch and latest tag");
+
+            infoCommand.Add(verboseOption);
+            if (_dryRunOption != null)
+            {
+                infoCommand.Add(_dryRunOption);
+            }
+            infoCommand.SetAction((parseResult) =>
+            {
+                var verbose = parseResult.GetValue(verboseOption);
+                var dryRun = _dryRunOption != null && parseResult.GetValue(_dryRunOption);
+                if (verbose)
+                {
+                    ConsoleHelper.WriteLine("[VERBOSE] Displaying Git repository information.", ConsoleColor.Gray);
+                }
+
+                return Nbuild.Command.DisplayGitInfo(verbose, dryRun).Code;
+            });
+
+            Subcommands.Add(infoCommand);
         }
 
         private void AddCreateCommand(Option<bool> verboseOption)

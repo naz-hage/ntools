@@ -65,6 +65,14 @@ public class ProgramTests
     }
 
     [Fact]
+    public void Main_WithRepositoryInfoCommand_ReturnsZero()
+    {
+        var result = Program.Main("repo", "info", "--dry-run");
+
+        Assert.Equal(0, result);
+    }
+
+    [Fact]
     public void Main_WithToolListInvalidManifest_ReturnsNonZero()
     {
         var result = Program.Main("tool", "list", "--json", "missing-apps.json");
@@ -98,5 +106,13 @@ public class ProgramTests
             Console.SetOut(originalOutput);
             Directory.Delete(testRoot, true);
         }
+    }
+
+    [Fact]
+    public void Main_WithReleaseListWithoutRepository_ReturnsNonZero()
+    {
+        var result = Program.Main("release", "list");
+
+        Assert.NotEqual(0, result);
     }
 }

@@ -45,6 +45,14 @@ public class RepositoryCommandTests
     }
 
     [Fact]
+    public void Constructor_AddsInfoSubcommand()
+    {
+        var command = new RepositoryCommand(_verboseOption);
+        var infoCmd = Assert.Single(command.Subcommands, s => s.Name == "info");
+        Assert.NotNull(infoCmd);
+    }
+
+    [Fact]
     public void Constructor_AddsShowSubcommand()
     {
         var command = new RepositoryCommand(_verboseOption);
@@ -57,7 +65,7 @@ public class RepositoryCommandTests
     {
         var command = new RepositoryCommand(_verboseOption);
         var subcommandNames = command.Subcommands.Select(s => s.Name).ToList();
-        Assert.Equal(new[] { "create", "delete", "list", "show" }, subcommandNames);
+        Assert.Equal(new[] { "create", "delete", "info", "list", "show" }, subcommandNames);
     }
 
     [Fact]
