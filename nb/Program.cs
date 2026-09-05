@@ -38,7 +38,8 @@ namespace Nbuild
         public static int Main(params string[] args)
         {
             ConsoleHelper.WriteLine($"{Nversion.Get()}\n", ConsoleColor.Yellow);
-            
+            DeprecationNotice.DisplayWarning();
+
             // Pre-process arguments to move global options to the front so they work regardless of position
             args = PreProcessGlobalOptions(args);
             

@@ -20,6 +20,8 @@ namespace Nbackup
             try { nv = Nversion.Get(); } catch { nv = "ntools (version unknown)"; }
             Colorizer.WriteLine($"[{ConsoleColor.Yellow}!{nv}]\n");
 
+            DeprecationNotice.DisplayWarning();
+
             if (!Parser.TryParse(args, out Cli options))
             {
                 ReturnCode = ResultHelper.InvalidParameter;

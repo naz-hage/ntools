@@ -22,6 +22,9 @@ using System.CommandLine;
 /// </summary>
 string nv;
 try { nv = Nversion.Get(); } catch { nv = "ntools (version unknown)"; }
+
+DeprecationNotice.DisplayWarning();
+
 var rootCommand = new RootCommand($"File and folder listing utility {Environment.NewLine} {nv}");
 
 /// <summary>
