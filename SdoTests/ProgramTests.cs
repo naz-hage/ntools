@@ -47,4 +47,56 @@ public class ProgramTests
         // Assert
         Assert.NotEqual(0, result);
     }
+
+    [Fact]
+    public void Main_WithEnvironmentPathCommand_ReturnsZero()
+    {
+        var result = Program.Main("env", "path");
+
+        Assert.Equal(0, result);
+    }
+
+    [Fact]
+    public void Main_WithBuildTargetsCommand_ReturnsZero()
+    {
+        var result = Program.Main("build", "targets");
+
+        Assert.Equal(0, result);
+    }
+
+    [Fact]
+    public void Main_WithToolListInvalidManifest_ReturnsNonZero()
+    {
+        var result = Program.Main("tool", "list", "--json", "missing-apps.json");
+
+        Assert.NotEqual(0, result);
+    }
+
+    [Fact]
+    public void Main_WithFileCommands_SearchesFilesAndFolders()
+    {
+        var testRoot = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        Directory.CreateDirectory(Path.Combine(testRoot, "plans"));
+        File.WriteAllText(Path.Combine(testRoot, "plan.md"), "test");
+
+        var originalOutput = Console.Out;
+        using var output = new StringWriter();
+        Console.SetOut(output);
+
+        try
+        {
+            var filesResult = Program.Main("file", "files", "-d", testRoot, "-e", ".md");
+            var foldersResult = Program.Main("file", "folders", "-d", testRoot, "-n", "plans");
+
+            Assert.Equal(0, filesResult);
+            Assert.Equal(0, foldersResult);
+            Assert.Contains("plan.md", output.ToString());
+            Assert.Contains("plans", output.ToString());
+        }
+        finally
+        {
+            Console.SetOut(originalOutput);
+            Directory.Delete(testRoot, true);
+        }
+    }
 }

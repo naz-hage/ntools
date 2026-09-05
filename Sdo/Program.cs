@@ -39,7 +39,12 @@ namespace Sdo
             {
                 Description = "Enable verbose output"
             };
+            var dryRunOption = new Option<bool>("--dry-run")
+            {
+                Description = "Perform a dry run without side effects"
+            };
             rootCommand.Options.Add(verboseOption);
+            rootCommand.Options.Add(dryRunOption);
 
             // Add commands
             rootCommand.Subcommands.Add(new Commands.MapCommand(verboseOption));
@@ -50,10 +55,19 @@ namespace Sdo
             rootCommand.Subcommands.Add(new Commands.WorkItemCommand(verboseOption));
             rootCommand.Subcommands.Add(new Commands.UserCommand(verboseOption));
 
+            // Migration command groups. Implementations are added incrementally while
+            // the legacy nb, nbackup, and lf commands remain available.
+            rootCommand.Subcommands.Add(new Commands.ToolCommand(verboseOption));
+            rootCommand.Subcommands.Add(new Commands.EnvironmentCommand(verboseOption));
+            rootCommand.Subcommands.Add(new Commands.BuildCommand(verboseOption));
+            rootCommand.Subcommands.Add(new Command("release", "GitHub and Azure DevOps release management"));
+            rootCommand.Subcommands.Add(new Command("backup", "Environment and workspace backup utilities"));
+            rootCommand.Subcommands.Add(new Commands.FileCommand(verboseOption));
+
             // Set a default action for the root command when no subcommand is specified
             rootCommand.SetAction((parseResult) =>
             {
-                Console.WriteLine("Error: Please specify a command (map, auth, pipeline, pr, repo, wi, user)");
+                Console.WriteLine("Error: Please specify a command (map, auth, pipeline, pr, repo, wi, user, tool, env, build, release, backup, file)");
                 Console.WriteLine("Run 'sdo --help' for usage information.");
                 return 1;
             });
