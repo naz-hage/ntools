@@ -547,7 +547,7 @@ namespace Sdo.Commands
                         _mappingPresenter.Present(_mappingGenerator.RepoCreateGitHub(name, isPrivate, description!));
                     }
                     var repo = await client.CreateRepositoryAsync(name, description, isPrivate);
-                    ConsoleHelper.WriteLine($"✓ Repository '{repo!.Name}' created successfully", ConsoleColor.Green);
+                    ConsoleHelper.WriteSuccess($"Repository '{repo!.Name}' created successfully");
                     Console.WriteLine($"  URL: {repo.Url}");
                     return 0;
                 }
@@ -596,7 +596,7 @@ namespace Sdo.Commands
                         ConsoleHelper.WriteError($"{cleanError}");
                         return 1;
                     }
-                    ConsoleHelper.WriteLine($"✓ Repository '{repo.Name}' created successfully", ConsoleColor.Green);
+                    ConsoleHelper.WriteSuccess($"Repository '{repo.Name}' created successfully");
                     Console.WriteLine($"  URL: {repo.Url}");
                     return 0;
                 }
@@ -656,7 +656,7 @@ namespace Sdo.Commands
 
                     using var client = new GitHubClient(token);
                     await client.DeleteRepositoryAsync(repoInfo.Owner ?? "", repoInfo.Repo ?? "");
-                    ConsoleHelper.WriteLine($"✓ Repository '{repoInfo.Repo}' deleted successfully", ConsoleColor.Green);
+                    ConsoleHelper.WriteSuccess($"Repository '{repoInfo.Repo}' deleted successfully");
                     return 0;
                 }
                 else if (platform == Platform.AzureDevOps)
@@ -704,7 +704,7 @@ namespace Sdo.Commands
                         ConsoleHelper.WriteError($"{cleanError}");
                         return 1;
                     }
-                    ConsoleHelper.WriteLine($"✓ Repository '{repoInfo.Repo}' deleted successfully", ConsoleColor.Green);
+                    ConsoleHelper.WriteSuccess($"Repository '{repoInfo.Repo}' deleted successfully");
                     return 0;
                 }
 

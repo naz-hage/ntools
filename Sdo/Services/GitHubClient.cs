@@ -292,7 +292,7 @@ namespace Sdo.Services
 
                     if (!response.IsSuccessStatusCode)
                     {
-                        ConsoleHelper.WriteLine($"GitHub API error: {response.StatusCode} {response.ReasonPhrase}", ConsoleColor.Red);
+                        ConsoleHelper.WriteError($"GitHub API error: {response.StatusCode} {response.ReasonPhrase}");
                         return allIssues.Count > 0 ? allIssues : null;
                     }
 

@@ -23,18 +23,18 @@ namespace Sdo.Services
                         ConsoleHelper.WriteLine($"Found {matchingDirectories.Length} folders containing '{folderName}':");
                         foreach (var directory in matchingDirectories)
                         {
-                            ConsoleHelper.WriteLine(directory, ConsoleColor.Green);
+                            ConsoleHelper.WriteSuccess(directory);
                         }
                     }
                     else
                     {
-                        ConsoleHelper.WriteLine($"No folders found containing the name '{folderName}'.", ConsoleColor.Red);
+                        ConsoleHelper.WriteError($"No folders found containing the name '{folderName}'.");
                     }
                 }
             }
             catch (Exception exception)
             {
-                ConsoleHelper.WriteLine($"An error occurred while searching for folders: {exception.Message}", ConsoleColor.Red);
+                ConsoleHelper.WriteError($"An error occurred while searching for folders: {exception.Message}");
             }
         }
 
@@ -62,7 +62,7 @@ namespace Sdo.Services
                 var files = Directory.GetFiles(directory, $"*{extension}", SearchOption.TopDirectoryOnly);
                 foreach (var file in files)
                 {
-                    ConsoleHelper.WriteLine(file, ConsoleColor.Green);
+                    ConsoleHelper.WriteSuccess(file);
                     foundCount++;
                 }
 
@@ -81,7 +81,7 @@ namespace Sdo.Services
             }
             catch (Exception exception)
             {
-                ConsoleHelper.WriteLine($"An error occurred: {exception.Message}", ConsoleColor.Red);
+                ConsoleHelper.WriteError($"An error occurred: {exception.Message}");
             }
         }
     }

@@ -300,7 +300,7 @@ namespace Sdo.Commands
 
                 if (verbose)
                 {
-                    ConsoleHelper.WriteLine($"Detecting platform and retrieving work item {id}...", ConsoleColor.Green);
+                    ConsoleHelper.WriteSuccess($"Detecting platform and retrieving work item {id}...");
                 }
 
                 var platform = _platformDetector.DetectPlatform();
@@ -332,7 +332,7 @@ namespace Sdo.Commands
                         _mappingPresenter.Present(mappingCmd);
                     }
 
-                    ConsoleHelper.WriteLine($"Detected platform: {platform}", ConsoleColor.Green);
+                    ConsoleHelper.WriteSuccess($"Detected platform: {platform}");
                 }
 
                 if (platform == Platform.GitHub)
@@ -634,7 +634,7 @@ namespace Sdo.Commands
                 int pageSize = Math.Max(100, top);
                 if (verbose)
                 {
-                    ConsoleHelper.WriteLine($"Fetching with perPage={pageSize} (filtering results to {top})", ConsoleColor.Green);
+                    ConsoleHelper.WriteSuccess($"Fetching with perPage={pageSize} (filtering results to {top})");
                 }
 
                 // Determine which GitHub API state to request (open/closed/all)
@@ -993,11 +993,11 @@ namespace Sdo.Commands
                     {
                         if (!string.IsNullOrEmpty(ghState))
                         {
-                            ConsoleHelper.WriteLine($"✓ GitHub issue #{id} updated successfully to state: {ghState}", ConsoleColor.Green);
+                            ConsoleHelper.WriteSuccess($"GitHub issue #{id} updated successfully to state: {ghState}");
                         }
                         else
                         {
-                            ConsoleHelper.WriteLine($"✓ GitHub issue #{id} updated successfully", ConsoleColor.Green);
+                            ConsoleHelper.WriteSuccess($"GitHub issue #{id} updated successfully");
                         }
                         if (verbose)
                         {
@@ -1070,11 +1070,11 @@ namespace Sdo.Commands
                     {
                         if (!string.IsNullOrEmpty(adoState))
                         {
-                            ConsoleHelper.WriteLine($"✓ Work item {id} updated successfully to state: {adoState}", ConsoleColor.Green);
+                            ConsoleHelper.WriteSuccess($"Work item {id} updated successfully to state: {adoState}");
                         }
                         else
                         {
-                            ConsoleHelper.WriteLine($"✓ Work item {id} updated successfully", ConsoleColor.Green);
+                            ConsoleHelper.WriteSuccess($"Work item {id} updated successfully");
                         }
                         if (verbose)
                         {
@@ -1178,7 +1178,7 @@ namespace Sdo.Commands
 
                     if (success)
                     {
-                        ConsoleHelper.WriteLine($"✓ Comment added to GitHub issue #{id}", ConsoleColor.Green);
+                        ConsoleHelper.WriteSuccess($"Comment added to GitHub issue #{id}");
                         return 0;
                     }
                     else
@@ -1428,9 +1428,9 @@ namespace Sdo.Commands
 
                     if (createdIssue != null)
                     {
-                        ConsoleHelper.WriteLine($"✓ Created GitHub issue #{createdIssue.Number}: {title}", ConsoleColor.Green);
+                        ConsoleHelper.WriteSuccess($"Created GitHub issue #{createdIssue.Number}: {title}");
                         if (!string.IsNullOrEmpty(createdIssue.HtmlUrl))
-                            ConsoleHelper.WriteLine($"   URL: {createdIssue.HtmlUrl}", ConsoleColor.Green);
+                            ConsoleHelper.WriteSuccess($"   URL: {createdIssue.HtmlUrl}");
                         
                         // Rename file if it was auto-detected from default path
                         if (string.IsNullOrEmpty(filePath) && sourceFilePath != null)
@@ -1567,7 +1567,7 @@ namespace Sdo.Commands
 
                         if (result.TryGetValue("id", out var idObj))
                         {
-                            ConsoleHelper.WriteLine($"✓ Work item {idObj} created successfully", ConsoleColor.Green);
+                            ConsoleHelper.WriteSuccess($"Work item {idObj} created successfully");
                             if (result.TryGetValue("url", out var urlObj) && urlObj != null)
                             {
                                 ConsoleHelper.WriteLine($"  URL: {urlObj}", ConsoleColor.Yellow);
@@ -2111,7 +2111,7 @@ namespace Sdo.Commands
 
                 if (verbose)
                 {
-                    ConsoleHelper.WriteLine($"Starting work on work item {id}...", ConsoleColor.Green);
+                    ConsoleHelper.WriteSuccess($"Starting work on work item {id}...");
                 }
 
                 // ===== VALIDATION PHASE (no repository changes) =====
@@ -2312,9 +2312,9 @@ namespace Sdo.Commands
 
                 // Success!
                 Console.WriteLine();
-                ConsoleHelper.WriteLine($"✓ Work item {id} ready for development", ConsoleColor.Green);
-                ConsoleHelper.WriteLine($"  Branch: {branchName}", ConsoleColor.Green);
-                ConsoleHelper.WriteLine($"  PR Message: {prMessageFile}", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess($"Work item {id} ready for development");
+                ConsoleHelper.WriteSuccess($"  Branch: {branchName}");
+                ConsoleHelper.WriteSuccess($"  PR Message: {prMessageFile}");
                 Console.WriteLine();
                 ConsoleHelper.WriteLine("Next steps:", ConsoleColor.Cyan);
                 ConsoleHelper.WriteLine($"  1. Implement changes for work item {id}", ConsoleColor.Cyan);
@@ -2364,7 +2364,7 @@ namespace Sdo.Commands
 
                 if (verbose)
                 {
-                    ConsoleHelper.WriteLine($"Closing work item {id}...", ConsoleColor.Green);
+                    ConsoleHelper.WriteSuccess($"Closing work item {id}...");
                 }
 
                 // ===== VALIDATION PHASE (no repository changes) =====
@@ -2527,9 +2527,9 @@ namespace Sdo.Commands
 
                 // Success!
                 Console.WriteLine();
-                ConsoleHelper.WriteLine($"✓ Work item {id} closed successfully", ConsoleColor.Green);
-                ConsoleHelper.WriteLine($"  Deleted branch: {currentBranchBeforeClose}", ConsoleColor.Green);
-                ConsoleHelper.WriteLine($"  Current branch: main", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess($"Work item {id} closed successfully");
+                ConsoleHelper.WriteSuccess($"  Deleted branch: {currentBranchBeforeClose}");
+                ConsoleHelper.WriteSuccess("  Current branch: main");
                 Console.WriteLine();
 
                 return 0;
@@ -2611,7 +2611,7 @@ namespace Sdo.Commands
 
             if (verbose)
             {
-                ConsoleHelper.WriteLine($"Auto-detected work item ID {workItemId} from branch '{currentBranch}'", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess($"Auto-detected work item ID {workItemId} from branch '{currentBranch}'");
             }
 
             return workItemId;

@@ -439,7 +439,7 @@ namespace Sdo.Commands
         {
             try
             {
-                ConsoleHelper.WriteLine($"✓ GitHub Repository: {owner}/{repo}", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess($"GitHub Repository: {owner}/{repo}");
 
                 string filterDisplay = showAll ? "all workflows" : "workflows for this repository";
                 if (!string.IsNullOrEmpty(filterRepo))
@@ -510,7 +510,7 @@ namespace Sdo.Commands
         {
             try
             {
-                ConsoleHelper.WriteLine($"✓ Azure DevOps Project: {organization ?? "unknown"}/{project ?? "unknown"}", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess($"Azure DevOps Project: {organization ?? "unknown"}/{project ?? "unknown"}");
 
                 string filterDisplay = showAll ? "all pipelines" : "pipelines for this project";
                 if (!string.IsNullOrEmpty(filterRepo))
@@ -707,7 +707,7 @@ namespace Sdo.Commands
                         return 1;
                     }
 
-                    ConsoleHelper.WriteLine($"[OK] Workflow dispatch triggered (workflow id: {workflowId.Value})", ConsoleColor.Green);
+                    ConsoleHelper.WriteSuccess($"Workflow dispatch triggered (workflow id: {workflowId.Value})");
 
                     // Try to find the created run
                     var runs = await client.ListPipelineRunsAsync(repoInfo.Owner, repoInfo.Repo, workflowId, 5);
@@ -786,7 +786,7 @@ namespace Sdo.Commands
                         return 1;
                     }
 
-                    ConsoleHelper.WriteLine($"[OK] Build queued (ID: {buildId})", ConsoleColor.Green);
+                    ConsoleHelper.WriteSuccess($"Build queued (ID: {buildId})");
 
                     // Prefer neutral pipeline run wrapper
                     var run = await client.GetPipelineRunAsync(repoInfo.Project, buildId);
@@ -867,7 +867,7 @@ namespace Sdo.Commands
         {
             try
             {
-                ConsoleHelper.WriteLine($"✓ GitHub Repository: {owner}/{repo}", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess($"GitHub Repository: {owner}/{repo}");
 
                 if (verbose)
                 {
@@ -915,8 +915,8 @@ namespace Sdo.Commands
         {
             try
             {
-                ConsoleHelper.WriteLine($"✓ Azure DevOps Project: {organization ?? "unknown"}/{project ?? "unknown"}", ConsoleColor.Green);
-                ConsoleHelper.WriteLine($"✓ Repository: {repository ?? "unknown"}", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess($"Azure DevOps Project: {organization ?? "unknown"}/{project ?? "unknown"}");
+                ConsoleHelper.WriteSuccess($"Repository: {repository ?? "unknown"}");
 
                 if (verbose)
                 {
@@ -1010,7 +1010,7 @@ namespace Sdo.Commands
         {
             try
             {
-                ConsoleHelper.WriteLine($"✓ GitHub Repository: {owner}/{repo}", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess($"GitHub Repository: {owner}/{repo}");
 
                 if (verbose)
                 {
@@ -1038,7 +1038,7 @@ namespace Sdo.Commands
 
                 // For GitHub, workflow deletion requires disabling the workflow file in the repository
                 // This would typically be done via a commit that removes or disables the workflow
-                ConsoleHelper.WriteLine($"[OK] Workflow deletion would be processed", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess("Workflow deletion would be processed");
                 Console.WriteLine();
                 ConsoleHelper.WriteLine($"To delete this workflow:", ConsoleColor.Cyan);
                 Console.WriteLine($"  1. Delete or rename the {workflowId}.yml file from .github/workflows/");
@@ -1058,7 +1058,7 @@ namespace Sdo.Commands
         {
             try
             {
-                ConsoleHelper.WriteLine($"✓ Azure DevOps Project: {organization ?? "unknown"}/{project ?? "unknown"}", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess($"Azure DevOps Project: {organization ?? "unknown"}/{project ?? "unknown"}");
 
                 if (verbose)
                 {
@@ -1104,7 +1104,7 @@ namespace Sdo.Commands
                         return 1;
                     }
 
-                    ConsoleHelper.WriteLine($"[OK] Pipeline '{pipelineId}' deleted successfully.", ConsoleColor.Green);
+                    ConsoleHelper.WriteSuccess($"Pipeline '{pipelineId}' deleted successfully.");
                 }
 
                 return 0;
@@ -1120,7 +1120,7 @@ namespace Sdo.Commands
         {
             try
             {
-                ConsoleHelper.WriteLine($"✓ GitHub Repository: {owner}/{repo}", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess($"GitHub Repository: {owner}/{repo}");
 
                 if (verbose)
                 {
@@ -1171,7 +1171,7 @@ namespace Sdo.Commands
         {
             try
             {
-                ConsoleHelper.WriteLine($"✓ Azure DevOps Project: {organization ?? "unknown"}/{project ?? "unknown"}", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess($"Azure DevOps Project: {organization ?? "unknown"}/{project ?? "unknown"}");
 
                 if (verbose)
                 {
@@ -1242,7 +1242,7 @@ namespace Sdo.Commands
             try
             {
                 var fileName = Path.GetFileName(filePath);
-                ConsoleHelper.WriteLine($"✓ GitHub Repository: {owner}/{repo}", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess($"GitHub Repository: {owner}/{repo}");
 
                 if (verbose)
                 {
@@ -1280,7 +1280,7 @@ namespace Sdo.Commands
 
                 // Workflow validation passed
                 var workflowPath = Path.Combine(".github", "workflows", fileName);
-                ConsoleHelper.WriteLine($"[OK] Workflow definition validated successfully", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess("Workflow definition validated successfully");
                 Console.WriteLine();
                 ConsoleHelper.WriteLine($"Workflow Details:", ConsoleColor.Cyan);
                 Console.WriteLine($"  Repository: {owner}/{repo}");
@@ -1308,7 +1308,7 @@ namespace Sdo.Commands
             try
             {
                 var fileName = Path.GetFileName(filePath);
-                ConsoleHelper.WriteLine($"✓ Azure DevOps Project: {organization ?? "unknown"}/{project ?? "unknown"}", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess($"Azure DevOps Project: {organization ?? "unknown"}/{project ?? "unknown"}");
 
                 if (verbose)
                 {
@@ -1357,7 +1357,7 @@ namespace Sdo.Commands
                         return 1;
                     }
 
-                    ConsoleHelper.WriteLine($"[OK] Pipeline created successfully", ConsoleColor.Green);
+                    ConsoleHelper.WriteSuccess("Pipeline created successfully");
                     Console.WriteLine();
                     ConsoleHelper.WriteLine($"Pipeline Details:", ConsoleColor.Cyan);
                     Console.WriteLine($"  Organization: {organization}");
@@ -1464,7 +1464,7 @@ namespace Sdo.Commands
         {
             try
             {
-                ConsoleHelper.WriteLine($"✓ GitHub Repository: {owner}/{repo}", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess($"GitHub Repository: {owner}/{repo}");
 
                 using var client = new Sdo.Services.GitHubClient();
                 PipelineRun? run;
@@ -1522,8 +1522,8 @@ namespace Sdo.Commands
         {
             try
             {
-                ConsoleHelper.WriteLine($"✓ Azure DevOps Project: {organization ?? "unknown"}/{project ?? "unknown"}", ConsoleColor.Green);
-                ConsoleHelper.WriteLine($"✓ Repository: {repository ?? "unknown"}", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess($"Azure DevOps Project: {organization ?? "unknown"}/{project ?? "unknown"}");
+                ConsoleHelper.WriteSuccess($"Repository: {repository ?? "unknown"}");
 
                 if (string.IsNullOrEmpty(organization) || string.IsNullOrEmpty(project))
                 {
@@ -1589,7 +1589,7 @@ namespace Sdo.Commands
         {
             try
             {
-                ConsoleHelper.WriteLine($"✓ GitHub Repository: {owner}/{repo}", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess($"GitHub Repository: {owner}/{repo}");
 
                 using var client = new Sdo.Services.GitHubClient();
                 PipelineRun? run;
@@ -1656,8 +1656,8 @@ namespace Sdo.Commands
         {
             try
             {
-                ConsoleHelper.WriteLine($"✓ Azure DevOps Project: {organization ?? "unknown"}/{project ?? "unknown"}", ConsoleColor.Green);
-                ConsoleHelper.WriteLine($"✓ Repository: {repository ?? "unknown"}", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess($"Azure DevOps Project: {organization ?? "unknown"}/{project ?? "unknown"}");
+                ConsoleHelper.WriteSuccess($"Repository: {repository ?? "unknown"}");
 
                 if (string.IsNullOrEmpty(organization) || string.IsNullOrEmpty(project))
                 {
@@ -1839,7 +1839,7 @@ namespace Sdo.Commands
                     return 1;
                 }
 
-                ConsoleHelper.WriteLine("[OK] Pipeline/workflow file updated and pushed.", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess("Pipeline/workflow file updated and pushed.");
 
                 // Attempt API-driven update for Azure DevOps definitions when a pipeline id was provided
                 if (platform == Platform.AzureDevOps && !string.IsNullOrWhiteSpace(pipelineId))
@@ -1862,7 +1862,7 @@ namespace Sdo.Commands
                                     var ok = await client.UpdatePipelineDefinitionYamlAsync(repoInfo.Project, defId, filePath!);
                                     if (ok)
                                     {
-                                        ConsoleHelper.WriteLine("[OK] Azure DevOps pipeline definition updated via REST API.", ConsoleColor.Green);
+                                        ConsoleHelper.WriteSuccess("Azure DevOps pipeline definition updated via REST API.");
                                     }
                                     else
                                     {

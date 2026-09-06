@@ -92,7 +92,7 @@ namespace Sdo.Commands
             try
             {
                 var platform = _platformDetector.DetectPlatform();
-                if (verbose) ConsoleHelper.WriteLine($"Detected platform: {platform}", ConsoleColor.Green);
+                if (verbose) ConsoleHelper.WriteSuccess($"Detected platform: {platform}");
 
                 if (platform == Platform.GitHub)
                 {
@@ -205,7 +205,7 @@ namespace Sdo.Commands
                     if (collabs == null || collabs.Count == 0) { Console.WriteLine("No users found"); return 0; }
 
                     // Header similar to saz output
-                    ConsoleHelper.WriteLine($"Users in repository '{repo.Owner}/{repo.Repo}' ({collabs.Count} total):", ConsoleColor.Green);
+                    ConsoleHelper.WriteSuccess($"Users in repository '{repo.Owner}/{repo.Repo}' ({collabs.Count} total):");
                     Console.WriteLine(new string('-', 80));
                     foreach (var c in collabs)
                     {
@@ -235,7 +235,7 @@ namespace Sdo.Commands
                     if (users == null || users.Count == 0) { Console.WriteLine("No users found"); return 0; }
 
                     // Print extracted info and a friendly header like the Python saz output
-                    ConsoleHelper.WriteLine("✓ Extracted Azure DevOps information from Git remote:", ConsoleColor.Green);
+                    ConsoleHelper.WriteSuccess("Extracted Azure DevOps information from Git remote:");
                     Console.WriteLine($"  Organization: {org}");
                     Console.WriteLine($"  Project: {project}");
                     Console.WriteLine();

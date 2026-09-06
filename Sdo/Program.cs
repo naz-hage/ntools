@@ -84,7 +84,7 @@ namespace Sdo
                 {
                     var target = unmatched[0];
                     var verbose = parseResult.GetValue(verboseOption);
-                    ConsoleHelper.WriteLine($"Executing target: {target}", ConsoleColor.Green);
+                    ConsoleHelper.WriteSuccess($"Executing target: {target}");
                     var result = Nbuild.BuildStarter.Build(target, verbose);
                     if (result.IsFail())
                     {

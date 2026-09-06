@@ -309,7 +309,7 @@ namespace Sdo.Commands
 
                 if (verbose)
                 {
-                    ConsoleHelper.WriteLine("✓ Authentication token retrieved successfully", ConsoleColor.Green);
+                    ConsoleHelper.WriteSuccess("Authentication token retrieved successfully");
                 }
 
                 if (platform == Platform.GitHub)
@@ -383,9 +383,9 @@ namespace Sdo.Commands
                                 }
 
                                 if (!string.IsNullOrEmpty(detail))
-                                    ConsoleHelper.WriteLine($"X Error: {detail}", ConsoleColor.Red);
+                                    ConsoleHelper.WriteError($"Error: {detail}");
                                 else
-                                    ConsoleHelper.WriteLine($"X Error: {main}", ConsoleColor.Red);
+                                    ConsoleHelper.WriteError($"Error: {main}");
 
                                 return 1;
                             }
@@ -831,7 +831,7 @@ namespace Sdo.Commands
                         return 1;
                     }
 
-                    ConsoleHelper.WriteLine($"✓ Successfully updated pull request #{pr.Number}", ConsoleColor.Green);
+                    ConsoleHelper.WriteSuccess($"Successfully updated pull request #{pr.Number}");
                     ConsoleHelper.WriteLine($"PR URL: {pr.Url}");
                     return 0;
                 }
@@ -862,7 +862,7 @@ namespace Sdo.Commands
                         return 1;
                     }
 
-                    ConsoleHelper.WriteLine($"✓ Successfully updated pull request #{pr.Number}", ConsoleColor.Green);
+                    ConsoleHelper.WriteSuccess($"Successfully updated pull request #{pr.Number}");
                     ConsoleHelper.WriteLine($"PR URL: {pr.Url}");
                     return 0;
                 }

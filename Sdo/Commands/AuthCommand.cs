@@ -98,15 +98,15 @@ namespace Sdo.Commands
             }
             catch (InvalidOperationException ex)
             {
-                ConsoleHelper.WriteLine(ex.Message, ConsoleColor.Red);
+                ConsoleHelper.WriteError(ex.Message);
                 return 1;
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteLine($"X Authentication verification failed: {ex.Message}", ConsoleColor.Red);
+                ConsoleHelper.WriteError($"Authentication verification failed: {ex.Message}");
                 if (verbose)
                 {
-                    ConsoleHelper.WriteLine(ex.StackTrace!, ConsoleColor.Red);
+                    ConsoleHelper.WriteError(ex.StackTrace!);
                 }
                 return 1;
             }
@@ -126,7 +126,7 @@ namespace Sdo.Commands
                 ConsoleHelper.WriteError("GitHub authentication failed - check your token");
                 if (verbose)
                 {
-                    ConsoleHelper.WriteLine("No API_GITHUB_KEY environment variable, GitHub CLI auth, or Windows Credential Manager token found", ConsoleColor.Red);
+                    ConsoleHelper.WriteError("No API_GITHUB_KEY environment variable, GitHub CLI auth, or Windows Credential Manager token found");
                 }
                 return 1;
             }
@@ -144,11 +144,11 @@ namespace Sdo.Commands
                 var user = await client.GetUserAsync();
                 if (user != null)
                 {
-                    ConsoleHelper.WriteLine($"✓ Authenticated as GitHub user: {user.Login}", ConsoleColor.Green);
+                    ConsoleHelper.WriteSuccess($"Authenticated as GitHub user: {user.Login}");
                 }
             }
 
-            ConsoleHelper.WriteLine("✓ GitHub authentication successful", ConsoleColor.Green);
+            ConsoleHelper.WriteSuccess("GitHub authentication successful");
             return 0;
         }
 
@@ -166,7 +166,7 @@ namespace Sdo.Commands
                 ConsoleHelper.WriteError("Azure DevOps authentication failed - check your token");
                 if (verbose)
                 {
-                    ConsoleHelper.WriteLine("No AZURE_DEVOPS_PAT environment variable found", ConsoleColor.Red);
+                    ConsoleHelper.WriteError("No AZURE_DEVOPS_PAT environment variable found");
                 }
                 return 1;
             }
@@ -190,13 +190,13 @@ namespace Sdo.Commands
                 organization = overrideOrg;
                 if (verbose)
                 {
-                    ConsoleHelper.WriteLine($"✓ Organization overridden via AZURE_DEVOPS_ORG: {organization}", ConsoleColor.Green);
+                    ConsoleHelper.WriteSuccess($"Organization overridden via AZURE_DEVOPS_ORG: {organization}");
                 }
             }
 
             if (verbose)
             {
-                ConsoleHelper.WriteLine($"✓ Using organization: {organization}", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess($"Using organization: {organization}");
             }
 
             var project = _platformDetector.GetProject();
@@ -208,10 +208,10 @@ namespace Sdo.Commands
                 var scopes = await client.GetTokenScopesAsync();
                 if (scopes != null && scopes.Count > 0)
                 {
-                    ConsoleHelper.WriteLine("\n  Token Permissions:", ConsoleColor.Green);
+                    ConsoleHelper.WriteSuccess("\n  Token Permissions:");
                     foreach (var kvp in scopes)
                     {
-                        ConsoleHelper.WriteLine($"    {kvp.Key}: {kvp.Value}", ConsoleColor.Green);
+                        ConsoleHelper.WriteSuccess($"    {kvp.Key}: {kvp.Value}");
                     }
                 }
             }
