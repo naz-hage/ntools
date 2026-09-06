@@ -6,12 +6,12 @@
 // Command handler for pipeline/workflow management operations.
 // Supports both GitHub Actions workflows and Azure DevOps pipelines.
 
-using System.CommandLine;
-using System.Diagnostics;
 using Nbuild.Helpers;
 using NbuildTasks;
 using Sdo.Interfaces;
 using Sdo.Services;
+using System.CommandLine;
+using System.Diagnostics;
 
 namespace Sdo.Commands
 {
@@ -480,7 +480,7 @@ namespace Sdo.Commands
                     }
 
                     Console.WriteLine();
-                    ConsoleHelper.WriteLine("✓ Workflows in this repository:", ConsoleColor.Cyan);
+                    ConsoleHelper.WriteSuccess("Workflows in this repository:");
                     Console.WriteLine();
                     Console.WriteLine($"{"Name",-40} {"State",-10} {"ID"}");
                     Console.WriteLine(new string('-', 60));
@@ -561,7 +561,7 @@ namespace Sdo.Commands
                     }
 
                     Console.WriteLine();
-                    ConsoleHelper.WriteLine("✓ Pipelines in this project:", ConsoleColor.Cyan);
+                    ConsoleHelper.WriteSuccess("Pipelines in this project:");
                     Console.WriteLine();
                     Console.WriteLine($"{"Name",-40} {"Status",-15} {"ID"}");
                     Console.WriteLine(new string('-', 60));
@@ -886,7 +886,7 @@ namespace Sdo.Commands
                     }
 
                     Console.WriteLine();
-                    ConsoleHelper.WriteLine("✓ Workflows in this repository:", ConsoleColor.Cyan);
+                    ConsoleHelper.WriteSuccess("Workflows in this repository:");
                     Console.WriteLine();
 
                     foreach (var def in definitions)
@@ -947,7 +947,7 @@ namespace Sdo.Commands
                         }
 
                         Console.WriteLine();
-                        ConsoleHelper.WriteLine("✓ Pipeline details:", ConsoleColor.Cyan);
+                        ConsoleHelper.WriteSuccess("Pipeline details:");
                         Console.WriteLine($"  Name: {pipeline.Name ?? "Unnamed Pipeline"}");
                         Console.WriteLine($"  ID: {pipeline.PlatformId}");
                         Console.WriteLine($"  Status: {pipeline.State ?? "unknown"}");
@@ -977,7 +977,7 @@ namespace Sdo.Commands
                     }
 
                     Console.WriteLine();
-                    ConsoleHelper.WriteLine("✓ Pipelines in this project:", ConsoleColor.Cyan);
+                    ConsoleHelper.WriteSuccess("Pipelines in this project:");
                     Console.WriteLine();
 
                     foreach (var pipeline in pipelines)
@@ -1140,7 +1140,7 @@ namespace Sdo.Commands
                     }
 
                     Console.WriteLine();
-                    ConsoleHelper.WriteLine("✓ Latest workflow runs:", ConsoleColor.Cyan);
+                    ConsoleHelper.WriteSuccess("Latest workflow runs:");
                     Console.WriteLine();
                     Console.WriteLine($"{"Run ID",-12} {"Workflow Name",-35} {"Last Run",-20} {"Status",-12} {"Result"}");
                     Console.WriteLine(new string('-', 90));
@@ -1210,7 +1210,7 @@ namespace Sdo.Commands
                     }
 
                     Console.WriteLine();
-                    ConsoleHelper.WriteLine("✓ Recent builds:", ConsoleColor.Cyan);
+                    ConsoleHelper.WriteSuccess("Recent builds:");
                     Console.WriteLine();
                     Console.WriteLine($"{"Pipeline Name",-40} {"Last Build",-20} {"Status"}");
                     Console.WriteLine(new string('-', 70));
@@ -1490,7 +1490,7 @@ namespace Sdo.Commands
                 }
 
                 Console.WriteLine();
-                ConsoleHelper.WriteLine("✓ Workflow Run Status", ConsoleColor.Cyan);
+                ConsoleHelper.WriteSuccess("Workflow Run Status");
                 Console.WriteLine($"  Run ID:     {run.PlatformId}");
                 Console.WriteLine($"  Name:       {run.Name ?? "unknown"}");
                 Console.WriteLine($"  Branch:     {run.Branch ?? "unknown"}");
@@ -1560,7 +1560,7 @@ namespace Sdo.Commands
                 }
 
                 Console.WriteLine();
-                ConsoleHelper.WriteLine("✓ Build Status", ConsoleColor.Cyan);
+                ConsoleHelper.WriteSuccess("Build Status");
                 Console.WriteLine($"  Build ID:    {run.PlatformId}");
                 Console.WriteLine($"  Number:      {run.Name ?? "unknown"}");
                 Console.WriteLine($"  Pipeline:    {run.Name ?? "unknown"}");
@@ -1615,7 +1615,7 @@ namespace Sdo.Commands
                 }
 
                 Console.WriteLine();
-                ConsoleHelper.WriteLine("✓ Workflow Run Logs", ConsoleColor.Cyan);
+                ConsoleHelper.WriteSuccess("Workflow Run Logs");
                 Console.WriteLine($"  Run ID:      {run.PlatformId}");
                 Console.WriteLine($"  Name:        {run.Name ?? "unknown"}");
                 Console.WriteLine($"  Status:      {run.Status ?? "unknown"}");
@@ -1694,7 +1694,7 @@ namespace Sdo.Commands
                 }
 
                 Console.WriteLine();
-                ConsoleHelper.WriteLine("✓ Build Logs", ConsoleColor.Cyan);
+                ConsoleHelper.WriteSuccess("Build Logs");
                 Console.WriteLine($"  Build ID:    {run.PlatformId}");
                 Console.WriteLine($"  Number:      {run.Name ?? "unknown"}");
                 Console.WriteLine($"  Status:      {run.Status ?? "unknown"}");

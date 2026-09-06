@@ -22,12 +22,12 @@ namespace Sdo.Commands
         public MapCommand(Option<bool> verboseOption) : base("map", "Show command mappings between SDO and native CLI tools")
         {
             // Add platform option (optional)
-            var platformOption = new Option<string>("--platform");
+            var platformOption = new Option<string>("--platform", "-p");
             platformOption.Description = "Platform to show mappings for (gh=github, azdo=azure-devops, leave empty for auto-detect)";
             Add(platformOption);
 
             // Add --all option
-            var allOption = new Option<bool>("--all");
+            var allOption = new Option<bool>("--all", "-a");
             allOption.Description = "Show all mappings for both platforms";
             Add(allOption);
 

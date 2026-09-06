@@ -6,10 +6,10 @@
 // This file contains the AuthCommand class for verifying authentication
 // with GitHub and Azure DevOps platforms based on detected Git remote.
 
-using System.CommandLine;
 using Nbuild.Helpers;
 using Sdo.Interfaces;
 using Sdo.Services;
+using System.CommandLine;
 
 namespace Sdo.Commands
 {
@@ -78,8 +78,9 @@ namespace Sdo.Commands
                 {
                     Console.WriteLine($"Detected platform: {platform}");                    var organization = _platformDetector.GetOrganization();
                     var project = _platformDetector.GetProject();
-                    Console.WriteLine($"✓ Organization: {organization ?? "null"}");
-                    Console.WriteLine($"✓ Project: {project ?? "null"}");                }
+                    ConsoleHelper.WriteSuccess($"Organization: {organization ?? "null"}");
+                    ConsoleHelper.WriteSuccess($"Project: {project ?? "null"}");
+                }
 
                 // Verify authentication based on platform
                 if (platform == Platform.GitHub)
