@@ -1,6 +1,6 @@
 using System.CommandLine;
 using System.Reflection;
-using System.Text.Json;
+using Sdo.Services;
 
 namespace Sdo.Commands
 {
@@ -69,40 +69,7 @@ namespace Sdo.Commands
                 var verbose = parseResult.GetValue(verboseOption);
                 var dryRun = parseResult.GetValue(dryRunOption);
 
-                if (!File.Exists(inputPath))
-                {
-                    Console.Error.WriteLine($"Input file '{inputPath}' not found");
-                    return 2;
-                }
-
-                try
-                {
-                    using var document = JsonDocument.Parse(File.ReadAllText(inputPath));
-                    if (!document.RootElement.TryGetProperty("BackupsList", out var backups) || backups.ValueKind != JsonValueKind.Array)
-                    {
-                        Console.Error.WriteLine("Error: Backup configuration must contain a BackupsList array.");
-                        return 1;
-                    }
-
-                    if (verbose)
-                    {
-                        Console.WriteLine($"Validated {backups.GetArrayLength()} backup configuration(s).");
-                    }
-
-                    if (dryRun)
-                    {
-                        Console.WriteLine("DRY-RUN: backup execution skipped.");
-                        return 0;
-                    }
-
-                    Console.Error.WriteLine("Error: Backup execution is not yet enabled in SDO.");
-                    return 1;
-                }
-                catch (JsonException exception)
-                {
-                    Console.Error.WriteLine($"Error: {exception.Message}");
-                    return 1;
-                }
+                return new BackupRunner().Run(inputPath, verbose, dryRun);
             });
 
             Subcommands.Add(runCommand);
