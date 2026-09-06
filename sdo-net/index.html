@@ -3364,9 +3364,10 @@ sdo<span class="w"> </span>release<span class="w"> </span>download<span class="w
 </code></pre></div>
 <h4 id="backup">backup<a class="headerlink" href="#backup" title="Anchor link to this section for reference">&para;</a></h4>
 <div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>backup<span class="w"> </span>init<span class="w"> </span>--output<span class="w"> </span>nbackup.json
+sdo<span class="w"> </span>backup<span class="w"> </span>--input<span class="w"> </span>nbackup.json<span class="w"> </span>--dry-run
 sdo<span class="w"> </span>backup<span class="w"> </span>run<span class="w"> </span>--input<span class="w"> </span>nbackup.json<span class="w"> </span>--dry-run
 </code></pre></div>
-<p><code>backup run</code> resolves environment variables, applies configured exclusions and log options, and invokes <code>robocopy</code> only when <code>--dry-run</code> is not specified.</p>
+<p><code>backup</code> accepts the backup options directly and implicitly runs the backup operation. The explicit <code>backup run</code> form remains supported and executes the same logic. Both forms resolve environment variables, apply configured exclusions and log options, and invoke <code>robocopy</code> only when <code>--dry-run</code> is not specified.</p>
 <h4 id="file">file<a class="headerlink" href="#file" title="Anchor link to this section for reference">&para;</a></h4>
 <div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>file<span class="w"> </span>files<span class="w"> </span>--directoryPath<span class="w"> </span>C:<span class="se">\w</span>ork<span class="w"> </span>--extensions<span class="w"> </span>.cs
 sdo<span class="w"> </span>file<span class="w"> </span>folders<span class="w"> </span>--directoryPath<span class="w"> </span>C:<span class="se">\w</span>ork<span class="w"> </span>--name<span class="w"> </span>src
