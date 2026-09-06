@@ -64,9 +64,42 @@ namespace Sdo
             rootCommand.Subcommands.Add(new Commands.BackupCommand(verboseOption, dryRunOption));
             rootCommand.Subcommands.Add(new Commands.FileCommand(verboseOption));
 
-            // Set a default action for the root command when no subcommand is specified
+            // Preserve nb compatibility: one unmatched token is an MSBuild target.
+            rootCommand.TreatUnmatchedTokensAsErrors = false;
             rootCommand.SetAction((parseResult) =>
             {
+                var unmatched = parseResult.UnmatchedTokens;
+                var potentialOptions = unmatched.Where(token => token.StartsWith("-", StringComparison.Ordinal)).ToList();
+                if (potentialOptions.Count > 0)
+                {
+                    foreach (var option in potentialOptions)
+                    {
+                        Console.Error.WriteLine($"Unknown option '{option}'. Run 'sdo --help' to see available options.");
+                    }
+
+                    return 1;
+                }
+
+                if (unmatched.Count == 1)
+                {
+                    var target = unmatched[0];
+                    var verbose = parseResult.GetValue(verboseOption);
+                    ConsoleHelper.WriteLine($"Executing target: {target}", ConsoleColor.Green);
+                    var result = Nbuild.BuildStarter.Build(target, verbose);
+                    if (result.IsFail())
+                    {
+                        ConsoleHelper.WriteLine($"Failed to execute target '{target}': {result.GetFirstOutput()}", ConsoleColor.Red);
+                    }
+
+                    return result.Code;
+                }
+
+                if (unmatched.Count > 1)
+                {
+                    Console.Error.WriteLine($"Unknown command or too many arguments: {string.Join(' ', unmatched)}");
+                    return 1;
+                }
+
                 Console.WriteLine("Error: Please specify a command (map, auth, pipeline, pr, repo, wi, user, tool, env, build, release, backup, file)");
                 Console.WriteLine("Run 'sdo --help' for usage information.");
                 return 1;
