@@ -231,4 +231,26 @@ public class ProgramTests
             }
         }
     }
+
+    [Fact]
+    public void Main_WithBackupDirectExecutionDryRun_ReturnsZero()
+    {
+        var outputPath = Path.Combine(Path.GetTempPath(), $"sdo-backup-{Guid.NewGuid():N}.json");
+
+        try
+        {
+            var initResult = Program.Main("backup", "init", "--output", outputPath);
+            var runResult = Program.Main("backup", "-i", outputPath, "-v", "-dr");
+
+            Assert.Equal(0, initResult);
+            Assert.Equal(0, runResult);
+        }
+        finally
+        {
+            if (File.Exists(outputPath))
+            {
+                File.Delete(outputPath);
+            }
+        }
+    }
 }

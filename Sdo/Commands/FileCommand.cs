@@ -23,11 +23,11 @@ namespace Sdo.Commands
             var filesCommand = new System.CommandLine.Command(
                 "files",
                 "List files with specified extensions in a directory (recursively).");
-            var directoryPathOption = new Option<string>("--directoryPath", new[] { "-d" })
+            var directoryPathOption = new Option<string>("--directoryPath", ["-d"])
             {
-                Description = "Directory path to search in"
+                Description = "Directory path to search in",
+                DefaultValueFactory = _ => Directory.GetCurrentDirectory()
             };
-            directoryPathOption.DefaultValueFactory = _ => Directory.GetCurrentDirectory();
             var extensionsOption = new Option<string>("--extensions", new[] { "-e" })
             {
                 Description = "Comma-separated file extensions to search for (e.g., .yml,.yaml)"

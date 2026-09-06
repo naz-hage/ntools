@@ -11,8 +11,29 @@ namespace Sdo.Commands
         public BackupCommand(Option<bool> verboseOption, Option<bool> dryRunOption)
             : base("backup", "Environment and workspace backup utilities")
         {
+            AddDefaultRunOptions(verboseOption, dryRunOption);
             AddInitCommand();
             AddRunCommand(verboseOption, dryRunOption);
+        }
+
+        private void AddDefaultRunOptions(Option<bool> verboseOption, Option<bool> dryRunOption)
+        {
+            var inputOption = new Option<string>("--input", ["-i"])
+            {
+                Description = "Path to the backup JSON configuration",
+                Required = true
+            };
+            Add(inputOption);
+            Add(verboseOption);
+            Add(dryRunOption);
+            SetAction(parseResult =>
+            {
+                var inputPath = parseResult.GetValue(inputOption)!;
+                var verbose = parseResult.GetValue(verboseOption);
+                var dryRun = parseResult.GetValue(dryRunOption);
+
+                return new BackupRunner().Run(inputPath, verbose, dryRun);
+            });
         }
 
         private void AddInitCommand()
@@ -55,7 +76,7 @@ namespace Sdo.Commands
         private void AddRunCommand(Option<bool> verboseOption, Option<bool> dryRunOption)
         {
             var runCommand = new System.CommandLine.Command("run", "Validate or perform a configured backup.");
-            var inputOption = new Option<string>("--input")
+            var inputOption = new Option<string>("--input", ["-i"])
             {
                 Description = "Path to the backup JSON configuration",
                 Required = true

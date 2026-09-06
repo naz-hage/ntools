@@ -35,11 +35,11 @@ namespace Sdo
             var rootCommand = new RootCommand("Simple DevOps Operations CLI tool for Azure DevOps and GitHub");
 
             // Add global options
-            var verboseOption = new Option<bool>("--verbose")
+            var verboseOption = new Option<bool>("--verbose", ["-v"])
             {
                 Description = "Enable verbose output"
             };
-            var dryRunOption = new Option<bool>("--dry-run")
+            var dryRunOption = new Option<bool>("--dry-run", ["-dr"])
             {
                 Description = "Perform a dry run without side effects"
             };

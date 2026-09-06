@@ -813,10 +813,11 @@ sdo release download --repo owner/repository --tag v1.0.0 --dry-run
 
 ```bash
 sdo backup init --output nbackup.json
+sdo backup --input nbackup.json --dry-run
 sdo backup run --input nbackup.json --dry-run
 ```
 
-`backup run` resolves environment variables, applies configured exclusions and log options, and invokes `robocopy` only when `--dry-run` is not specified.
+`backup` accepts the backup options directly and implicitly runs the backup operation. The explicit `backup run` form remains supported and executes the same logic. Both forms resolve environment variables, apply configured exclusions and log options, and invoke `robocopy` only when `--dry-run` is not specified.
 
 #### file
 
