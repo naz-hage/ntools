@@ -39,7 +39,7 @@ namespace Sdo
             {
                 Description = "Enable verbose output"
             };
-            var dryRunOption = new Option<bool>("--dry-run", ["-dr"])
+            var dryRunOption = new Option<bool>("--dry-run", ["-n"])
             {
                 Description = "Perform a dry run without side effects"
             };

@@ -25,15 +25,15 @@ namespace Sdo.Commands
         private void AddCreateCommand(Option<bool> verboseOption, Option<bool> dryRunOption)
         {
             var createCommand = new System.CommandLine.Command("create", "Creates a GitHub release.");
-            var repositoryOption = new Option<string>("--repo")
+            var repositoryOption = new Option<string>("--repo", ["-r"])
             {
                 Description = "GitHub repository in owner/name or URL format",
                 Required = true
             };
-            var tagOption = new Option<string>("--tag") { Description = "Release tag", Required = true };
-            var branchOption = new Option<string>("--branch") { Description = "Release target branch", Required = true };
-            var fileOption = new Option<string>("--file") { Description = "Release asset file path", Required = true };
-            var prereleaseOption = new Option<bool>("--prerelease") { Description = "Create a pre-release" };
+            var tagOption = new Option<string>("--tag", ["-t"]) { Description = "Release tag", Required = true };
+            var branchOption = new Option<string>("--branch", ["-b"]) { Description = "Release target branch", Required = true };
+            var fileOption = new Option<string>("--file", ["-f"]) { Description = "Release asset file path", Required = true };
+            var prereleaseOption = new Option<bool>("--prerelease", ["-p"]) { Description = "Create a pre-release" };
 
             createCommand.Add(repositoryOption);
             createCommand.Add(tagOption);
@@ -80,13 +80,13 @@ namespace Sdo.Commands
         private void AddDownloadCommand(Option<bool> verboseOption, Option<bool> dryRunOption)
         {
             var downloadCommand = new System.CommandLine.Command("download", "Downloads a release asset.");
-            var repositoryOption = new Option<string>("--repo")
+            var repositoryOption = new Option<string>("--repo", ["-r"])
             {
                 Description = "GitHub repository in owner/name or URL format",
                 Required = true
             };
-            var tagOption = new Option<string>("--tag") { Description = "Release tag", Required = true };
-            var pathOption = new Option<string?>("--path") { Description = "Absolute directory for the downloaded asset" };
+            var tagOption = new Option<string>("--tag", ["-t"]) { Description = "Release tag", Required = true };
+            var pathOption = new Option<string?>("--path", ["-p"]) { Description = "Absolute directory for the downloaded asset" };
 
             downloadCommand.Add(repositoryOption);
             downloadCommand.Add(tagOption);
@@ -131,7 +131,7 @@ namespace Sdo.Commands
             var listCommand = new System.CommandLine.Command(
                 "list",
                 "Lists the latest releases for the specified repository.");
-            var repositoryOption = new Option<string>("--repo")
+            var repositoryOption = new Option<string>("--repo", ["-r"])
             {
                 Description = "GitHub repository in owner/name or URL format",
                 Required = true

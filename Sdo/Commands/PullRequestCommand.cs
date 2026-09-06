@@ -48,16 +48,16 @@ namespace Sdo.Commands
         private void AddCreateCommand(Option<bool> verboseOption)
         {
             var createCommand = new System.CommandLine.Command("create", "Create a pull request from markdown file");
-            var fileOption = new Option<string?>("--file", new[] { "-f" }) 
+            var fileOption = new Option<string?>("--file", ["-f"]) 
             { 
                 Description = "Path to markdown file containing PR details (auto-detected as .temp/<work-item-id>-pr-message.md if not provided)" 
             };
-            var workItemOption = new Option<int?>("--work-item") 
+            var workItemOption = new Option<int?>("--work-item", ["-w"]) 
             { 
                 Description = "Work item ID to link to the pull request (auto-detected from branch name if not provided)" 
             };
-            var draftOption = new Option<bool>("--draft") { Description = "Create as draft pull request" };
-            var dryRunOption = new Option<bool>("--dry-run") { Description = "Parse and preview PR creation without creating it" };
+            var draftOption = new Option<bool>("--draft", ["-d"]) { Description = "Create as draft pull request" };
+            var dryRunOption = new Option<bool>("--dry-run", ["-n"]) { Description = "Parse and preview PR creation without creating it" };
 
             createCommand.Add(fileOption);
             createCommand.Add(workItemOption);

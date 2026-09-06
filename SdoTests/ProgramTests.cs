@@ -240,7 +240,7 @@ public class ProgramTests
         try
         {
             var initResult = Program.Main("backup", "init", "--output", outputPath);
-            var runResult = Program.Main("backup", "-i", outputPath, "-v", "-dr");
+            var runResult = Program.Main("backup", "-i", outputPath, "-v", "-n");
 
             Assert.Equal(0, initResult);
             Assert.Equal(0, runResult);

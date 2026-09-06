@@ -254,7 +254,7 @@ namespace Sdo.Commands
         {
             var createCommand = new Command("create", "Create a new work item");
             // Only allow markdown-file-driven creation; all fields must be in the file
-            var filePathOption = new Option<string?>("--file-path", new[] { "-f" }) 
+            var filePathOption = new Option<string?>("--file-path", ["-f"]) 
             { 
                 Description = "Path to markdown file containing work item details (auto-detected as .temp/wi.md if not provided)" 
             };
