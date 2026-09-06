@@ -3304,10 +3304,11 @@ sdo<span class="w"> </span>repo<span class="w"> </span>clone<span class="w"> </s
 <h4 id="repo-tag">repo tag<a class="headerlink" href="#repo-tag" title="Anchor link to this section for reference">&para;</a></h4>
 <div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>repo<span class="w"> </span>tag<span class="w"> </span><span class="nb">set</span><span class="w"> </span>--tag<span class="w"> </span><span class="m">1</span>.2.3<span class="w"> </span>--dry-run
 sdo<span class="w"> </span>repo<span class="w"> </span>tag<span class="w"> </span>auto<span class="w"> </span>--buildtype<span class="w"> </span>stage<span class="w"> </span>--dry-run
+sdo<span class="w"> </span>repo<span class="w"> </span>tag<span class="w"> </span>auto<span class="w"> </span>-b<span class="w"> </span>stage<span class="w"> </span>--dry-run
 sdo<span class="w"> </span>repo<span class="w"> </span>tag<span class="w"> </span>push-auto<span class="w"> </span>--buildtype<span class="w"> </span>stage<span class="w"> </span>--dry-run
 sdo<span class="w"> </span>repo<span class="w"> </span>tag<span class="w"> </span>delete<span class="w"> </span>--tag<span class="w"> </span><span class="m">1</span>.2.3<span class="w"> </span>--dry-run
 </code></pre></div>
-<p><code>--buildtype</code> belongs to <code>auto</code> and <code>push-auto</code>; it is invalid for <code>tag set</code> and <code>tag delete</code>.</p>
+<p><code>--buildtype</code> belongs to <code>auto</code> and <code>push-auto</code>; <code>repo tag auto</code> also accepts <code>-b</code> as its short form. It is invalid for <code>tag set</code> and <code>tag delete</code>.</p>
 <h4 id="repo-list">repo list<a class="headerlink" href="#repo-list" title="Anchor link to this section for reference">&para;</a></h4>
 <p>List repositories for your organization.</p>
 <p><strong>Usage:</strong>
