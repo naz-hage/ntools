@@ -1236,10 +1236,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#repo-list" class="md-nav__link">
+  <a href="#repo-info" class="md-nav__link">
     <span class="md-ellipsis">
       
-        repo list
+        repo info
       
     </span>
   </a>
@@ -1247,10 +1247,32 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#repo-show" class="md-nav__link">
+  <a href="#repo-clone" class="md-nav__link">
     <span class="md-ellipsis">
       
-        repo show
+        repo clone
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#repo-tag" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        repo tag
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#repo-list" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        repo list
       
     </span>
   </a>
@@ -1273,6 +1295,78 @@
     <span class="md-ellipsis">
       
         repo delete
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tool-env-build-release-backup-and-file-local-automation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        tool, env, build, release, backup, and file — Local Automation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="tool, env, build, release, backup, and file — Local Automation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        tool
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#env-and-build" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        env and build
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#release" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        release
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#backup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        backup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        file
       
     </span>
   </a>
@@ -2665,6 +2759,7 @@
 <li><a href="#pr--pull-request-operations">pr — Pull Request Operations</a></li>
 <li><a href="#pipeline--pipelineworkflow-management">pipeline — Pipeline/Workflow Management</a></li>
 <li><a href="#repo--repository-management">repo — Repository Management</a></li>
+<li><a href="#tool-env-build-release-backup-and-file--local-automation">tool, env, build, release, backup, and file — Local Automation</a></li>
 <li><a href="#user--user-management">user — User Management</a></li>
 <li><a href="#troubleshooting">Troubleshooting</a></li>
 </ul>
@@ -2698,7 +2793,8 @@
 <li><strong>Work Item Management</strong> — Create, list, show, update work items with cross-platform state translation</li>
 <li><strong>Pull Requests</strong> — List, show, create pull requests</li>
 <li><strong>Pipelines/Workflows</strong> — Create, list, show, run, view logs for GitHub Actions and Azure Pipelines</li>
-<li><strong>Repositories</strong> — List and inspect repositories</li>
+<li><strong>Repositories</strong> — List, inspect, clone, and tag repositories</li>
+<li><strong>Local Automation</strong> — Build targets, manage tools, inspect PATH, create releases, run backups, and search files</li>
 <li><strong>Users &amp; Permissions</strong> — List users, check permissions, search</li>
 <li><strong>Platform Auto-Detection</strong> — Automatically detects GitHub or Azure DevOps from Git remote</li>
 <li><strong>CLI Mapping</strong> — Shows sdo command equivalents in native CLIs (<code>gh</code>, <code>az</code>)</li>
@@ -2717,6 +2813,7 @@ Usage:
   sdo [command] [options]
 
 Options:
+  --dry-run       Perform a dry run without side effects
   --verbose       Enable verbose output
   -?, -h, --help  Show help and usage information
   --version       Show version information
@@ -2727,6 +2824,12 @@ Commands:
   pipeline  Pipeline/workflow management commands (create, show, list, run, status, logs, delete, lastbuild, update)
   pr        Pull request operations
   repo      Repository management commands
+  tool      Tool installation and download commands
+  env       Environment inspection commands
+  build     Build automation and target management
+  release   GitHub release operations
+  backup    Backup configuration and execution
+  file      File and folder search commands
   wi        Work item management commands
   user      User management commands for GitHub and Azure DevOps
 </code></pre></div>
@@ -3158,10 +3261,12 @@ sdo<span class="w"> </span>pr<span class="w"> </span>update<span class="w"> </sp
 - <code>--verbose</code> — Show mapping</p>
 <hr />
 <h3 id="repo-repository-management">repo — Repository Management<a class="headerlink" href="#repo-repository-management" title="Anchor link to this section for reference">&para;</a></h3>
-<p>Create, delete, list, and inspect repositories for your organization.</p>
+<p>Create, delete, list, inspect, clone, and tag repositories.</p>
 <p><strong>Subcommands:</strong>
 - <code>list</code> — List repositories
-- <code>show</code> — Display repo details
+- <code>info</code> — Display current Git branch, tag, and remote repository information
+- <code>clone</code> — Clone a Git repository
+- <code>tag</code> — Set, auto-create, push, or delete Git tags
 - <code>create</code> — Create new repository
 - <code>delete</code> — Delete repository</p>
 <p><strong>Help:</strong>
@@ -3177,8 +3282,32 @@ Commands:
   create &lt;name&gt;  Create a new repository
   delete         Delete a repository
   list           List repositories
-  show           Display repository information from current Git remote
+  info           Display local Git and remote repository information
+  clone          Clone a Git repository
+  tag            Git tag operations
 </code></pre></div></p>
+<p>An unmatched single token is treated as an MSBuild target, matching legacy <code>nb</code> behavior:</p>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>build<span class="w">                         </span><span class="c1"># Display available targets</span>
+sdo<span class="w"> </span><span class="nb">test</span><span class="w"> </span>--verbose<span class="w">                </span><span class="c1"># Build the `test` target through MSBuild</span>
+</code></pre></div>
+<p>The target is resolved from <code>nbuild.targets</code> in the current directory. Multiple unmatched tokens and unknown options return an error.</p>
+<h4 id="repo-info">repo info<a class="headerlink" href="#repo-info" title="Anchor link to this section for reference">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>repo<span class="w"> </span>info
+sdo<span class="w"> </span>repo<span class="w"> </span>info<span class="w"> </span>--verbose
+</code></pre></div>
+<p><code>repo info</code> combines the local Git branch, project/tag details, and repository metadata from the current Git remote. Use <code>--dry-run</code> to display the local information without contacting the hosting service.</p>
+<h4 id="repo-clone">repo clone<a class="headerlink" href="#repo-clone" title="Anchor link to this section for reference">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>repo<span class="w"> </span>clone<span class="w"> </span>--url<span class="w"> </span>https://github.com/owner/repository
+sdo<span class="w"> </span>repo<span class="w"> </span>clone<span class="w"> </span>--url<span class="w"> </span>https://github.com/owner/repository<span class="w"> </span>--path<span class="w"> </span>C:<span class="se">\w</span>ork<span class="se">\r</span>epository
+sdo<span class="w"> </span>repo<span class="w"> </span>clone<span class="w"> </span>--url<span class="w"> </span>https://github.com/owner/repository<span class="w"> </span>--dry-run
+</code></pre></div>
+<h4 id="repo-tag">repo tag<a class="headerlink" href="#repo-tag" title="Anchor link to this section for reference">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>repo<span class="w"> </span>tag<span class="w"> </span><span class="nb">set</span><span class="w"> </span>--tag<span class="w"> </span><span class="m">1</span>.2.3<span class="w"> </span>--dry-run
+sdo<span class="w"> </span>repo<span class="w"> </span>tag<span class="w"> </span>auto<span class="w"> </span>--buildtype<span class="w"> </span>stage<span class="w"> </span>--dry-run
+sdo<span class="w"> </span>repo<span class="w"> </span>tag<span class="w"> </span>push-auto<span class="w"> </span>--buildtype<span class="w"> </span>stage<span class="w"> </span>--dry-run
+sdo<span class="w"> </span>repo<span class="w"> </span>tag<span class="w"> </span>delete<span class="w"> </span>--tag<span class="w"> </span><span class="m">1</span>.2.3<span class="w"> </span>--dry-run
+</code></pre></div>
+<p><code>--buildtype</code> belongs to <code>auto</code> and <code>push-auto</code>; it is invalid for <code>tag set</code> and <code>tag delete</code>.</p>
 <h4 id="repo-list">repo list<a class="headerlink" href="#repo-list" title="Anchor link to this section for reference">&para;</a></h4>
 <p>List repositories for your organization.</p>
 <p><strong>Usage:</strong>
@@ -3188,14 +3317,6 @@ sdo<span class="w"> </span>repo<span class="w"> </span>list<span class="w"> </sp
 </code></pre></div></p>
 <p><strong>Options:</strong>
 - <code>--top &lt;top&gt;</code> — Return top N repositories
-- <code>--verbose</code> — Show mapping</p>
-<h4 id="repo-show">repo show<a class="headerlink" href="#repo-show" title="Anchor link to this section for reference">&para;</a></h4>
-<p>Display repository information from current Git remote.</p>
-<p><strong>Usage:</strong>
-<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>repo<span class="w"> </span>show<span class="w">                       </span><span class="c1"># Show current repo</span>
-sdo<span class="w"> </span>repo<span class="w"> </span>show<span class="w"> </span>--verbose<span class="w">             </span><span class="c1"># Show API command</span>
-</code></pre></div></p>
-<p><strong>Options:</strong>
 - <code>--verbose</code> — Show mapping</p>
 <h4 id="repo-create">repo create<a class="headerlink" href="#repo-create" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Create a new repository.</p>
@@ -3220,6 +3341,37 @@ sdo<span class="w"> </span>repo<span class="w"> </span>delete<span class="w"> </
 <p><strong>Options:</strong>
 - <code>--force</code> — Skip confirmation prompt
 - <code>--verbose</code> — Show mapping</p>
+<hr />
+<h3 id="tool-env-build-release-backup-and-file-local-automation">tool, env, build, release, backup, and file — Local Automation<a class="headerlink" href="#tool-env-build-release-backup-and-file-local-automation" title="Anchor link to this section for reference">&para;</a></h3>
+<p>These command groups migrate the local <code>nb</code>, <code>nbackup</code>, and <code>lf</code> workflows into SDO. The original executables remain available during the migration.</p>
+<h4 id="tool">tool<a class="headerlink" href="#tool" title="Anchor link to this section for reference">&para;</a></h4>
+<p>Manage tools from an apps manifest:</p>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>tool<span class="w"> </span>list
+sdo<span class="w"> </span>tool<span class="w"> </span>list<span class="w"> </span>--json<span class="w"> </span>apps.json
+sdo<span class="w"> </span>tool<span class="w"> </span>install<span class="w"> </span>--json<span class="w"> </span>apps.json<span class="w"> </span>--dry-run
+sdo<span class="w"> </span>tool<span class="w"> </span>uninstall<span class="w"> </span>--json<span class="w"> </span>apps.json<span class="w"> </span>--dry-run
+sdo<span class="w"> </span>tool<span class="w"> </span>download<span class="w"> </span>--json<span class="w"> </span>apps.json<span class="w"> </span>--dry-run
+</code></pre></div>
+<h4 id="env-and-build">env and build<a class="headerlink" href="#env-and-build" title="Anchor link to this section for reference">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>env<span class="w"> </span>path
+sdo<span class="w"> </span>build<span class="w"> </span>targets
+</code></pre></div>
+<p><code>sdo env path</code> displays the effective PATH. <code>sdo build targets</code> lists targets and updates <code>targets.md</code> using the existing build-target discovery behavior.</p>
+<h4 id="release">release<a class="headerlink" href="#release" title="Anchor link to this section for reference">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>release<span class="w"> </span>list<span class="w"> </span>--dry-run
+sdo<span class="w"> </span>release<span class="w"> </span>create<span class="w"> </span>--repo<span class="w"> </span>owner/repository<span class="w"> </span>--tag<span class="w"> </span>v1.0.0<span class="w"> </span>--branch<span class="w"> </span>main<span class="w"> </span>--file<span class="w"> </span>release.zip<span class="w"> </span>--dry-run
+sdo<span class="w"> </span>release<span class="w"> </span>download<span class="w"> </span>--repo<span class="w"> </span>owner/repository<span class="w"> </span>--tag<span class="w"> </span>v1.0.0<span class="w"> </span>--dry-run
+</code></pre></div>
+<h4 id="backup">backup<a class="headerlink" href="#backup" title="Anchor link to this section for reference">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>backup<span class="w"> </span>init<span class="w"> </span>--output<span class="w"> </span>nbackup.json
+sdo<span class="w"> </span>backup<span class="w"> </span>run<span class="w"> </span>--input<span class="w"> </span>nbackup.json<span class="w"> </span>--dry-run
+</code></pre></div>
+<p><code>backup run</code> resolves environment variables, applies configured exclusions and log options, and invokes <code>robocopy</code> only when <code>--dry-run</code> is not specified.</p>
+<h4 id="file">file<a class="headerlink" href="#file" title="Anchor link to this section for reference">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>file<span class="w"> </span>files<span class="w"> </span>--directoryPath<span class="w"> </span>C:<span class="se">\w</span>ork<span class="w"> </span>--extensions<span class="w"> </span>.cs
+sdo<span class="w"> </span>file<span class="w"> </span>folders<span class="w"> </span>--directoryPath<span class="w"> </span>C:<span class="se">\w</span>ork<span class="w"> </span>--name<span class="w"> </span>src
+</code></pre></div>
+<p>Both searches are recursive and preserve the legacy LF filters and output behavior.</p>
 <hr />
 <h3 id="pipeline-pipelineworkflow-management">pipeline — Pipeline/Workflow Management<a class="headerlink" href="#pipeline-pipelineworkflow-management" title="Anchor link to this section for reference">&para;</a></h3>
 <p>Manage GitHub Actions workflows and Azure Pipelines. <strong>Read-only operations</strong> are safe; <strong>write operations</strong> require permissions.</p>
