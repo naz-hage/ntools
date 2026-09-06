@@ -81,9 +81,9 @@ public class ProgramTests
     }
 
     [Fact]
-    public void Main_WithRepositoryBranchCommand_ReturnsZero()
+    public void Main_WithRepositoryInfoDryRun_ReturnsZero()
     {
-        var result = Program.Main("repo", "branch");
+        var result = Program.Main("repo", "info", "--dry-run");
 
         Assert.Equal(0, result);
     }

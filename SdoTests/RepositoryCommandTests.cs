@@ -29,14 +29,6 @@ public class RepositoryCommandTests
     }
 
     [Fact]
-    public void Constructor_AddsBranchSubcommand()
-    {
-        var command = new RepositoryCommand(_verboseOption);
-        var branchCmd = Assert.Single(command.Subcommands, s => s.Name == "branch");
-        Assert.NotNull(branchCmd);
-    }
-
-    [Fact]
     public void Constructor_AddsCloneSubcommandWithUrlAndPathOptions()
     {
         var command = new RepositoryCommand(_verboseOption, dryRunOption: new Option<bool>("--dry-run"));
@@ -81,19 +73,11 @@ public class RepositoryCommandTests
     }
 
     [Fact]
-    public void Constructor_AddsShowSubcommand()
-    {
-        var command = new RepositoryCommand(_verboseOption);
-        var showCmd = Assert.Single(command.Subcommands, s => s.Name == "show");
-        Assert.NotNull(showCmd);
-    }
-
-    [Fact]
     public void Constructor_RegistersSubcommandsInAlphabeticalOrder()
     {
         var command = new RepositoryCommand(_verboseOption);
         var subcommandNames = command.Subcommands.Select(s => s.Name).ToList();
-        Assert.Equal(new[] { "branch", "clone", "create", "delete", "info", "list", "show", "tag" }, subcommandNames);
+        Assert.Equal(new[] { "clone", "create", "delete", "info", "list", "tag" }, subcommandNames);
     }
 
     [Fact]

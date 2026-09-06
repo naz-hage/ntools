@@ -15,6 +15,7 @@ Unified CLI for managing work items, pull requests, pipelines, and repositories 
   - [pr — Pull Request Operations](#pr--pull-request-operations)
   - [pipeline — Pipeline/Workflow Management](#pipeline--pipelineworkflow-management)
   - [repo — Repository Management](#repo--repository-management)
+  - [tool, env, build, release, backup, and file — Local Automation](#tool-env-build-release-backup-and-file--local-automation)
   - [user — User Management](#user--user-management)
 - [Troubleshooting](#troubleshooting)
 
@@ -58,7 +59,8 @@ git remote -v
 - **Work Item Management** — Create, list, show, update work items with cross-platform state translation
 - **Pull Requests** — List, show, create pull requests
 - **Pipelines/Workflows** — Create, list, show, run, view logs for GitHub Actions and Azure Pipelines
-- **Repositories** — List and inspect repositories
+- **Repositories** — List, inspect, clone, and tag repositories
+- **Local Automation** — Build targets, manage tools, inspect PATH, create releases, run backups, and search files
 - **Users & Permissions** — List users, check permissions, search
 - **Platform Auto-Detection** — Automatically detects GitHub or Azure DevOps from Git remote
 - **CLI Mapping** — Shows sdo command equivalents in native CLIs (`gh`, `az`)
@@ -79,6 +81,7 @@ Usage:
   sdo [command] [options]
 
 Options:
+  --dry-run       Perform a dry run without side effects
   --verbose       Enable verbose output
   -?, -h, --help  Show help and usage information
   --version       Show version information
@@ -89,6 +92,12 @@ Commands:
   pipeline  Pipeline/workflow management commands (create, show, list, run, status, logs, delete, lastbuild, update)
   pr        Pull request operations
   repo      Repository management commands
+  tool      Tool installation and download commands
+  env       Environment inspection commands
+  build     Build automation and target management
+  release   GitHub release operations
+  backup    Backup configuration and execution
+  file      File and folder search commands
   wi        Work item management commands
   user      User management commands for GitHub and Azure DevOps
 ```
@@ -651,11 +660,13 @@ sdo pr update --pr-id 12 --title "New title" --status merged
 
 ### repo — Repository Management
 
-Create, delete, list, and inspect repositories for your organization.
+Create, delete, list, inspect, clone, and tag repositories.
 
 **Subcommands:**
 - `list` — List repositories
-- `show` — Display repo details
+- `info` — Display current Git branch, tag, and remote repository information
+- `clone` — Clone a Git repository
+- `tag` — Set, auto-create, push, or delete Git tags
 - `create` — Create new repository
 - `delete` — Delete repository
 
@@ -673,8 +684,47 @@ Commands:
   create <name>  Create a new repository
   delete         Delete a repository
   list           List repositories
-  show           Display repository information from current Git remote
+  info           Display local Git and remote repository information
+  clone          Clone a Git repository
+  tag            Git tag operations
 ```
+
+An unmatched single token is treated as an MSBuild target, matching legacy `nb` behavior:
+
+```bash
+sdo build                         # Display available targets
+sdo test --verbose                # Build the `test` target through MSBuild
+```
+
+The target is resolved from `nbuild.targets` in the current directory. Multiple unmatched tokens and unknown options return an error.
+
+#### repo info
+
+```bash
+sdo repo info
+sdo repo info --verbose
+```
+
+`repo info` combines the local Git branch, project/tag details, and repository metadata from the current Git remote. Use `--dry-run` to display the local information without contacting the hosting service.
+
+#### repo clone
+
+```bash
+sdo repo clone --url https://github.com/owner/repository
+sdo repo clone --url https://github.com/owner/repository --path C:\work\repository
+sdo repo clone --url https://github.com/owner/repository --dry-run
+```
+
+#### repo tag
+
+```bash
+sdo repo tag set --tag 1.2.3 --dry-run
+sdo repo tag auto --buildtype stage --dry-run
+sdo repo tag push-auto --buildtype stage --dry-run
+sdo repo tag delete --tag 1.2.3 --dry-run
+```
+
+`--buildtype` belongs to `auto` and `push-auto`; it is invalid for `tag set` and `tag delete`.
 
 #### repo list
 
@@ -689,19 +739,6 @@ sdo repo list --verbose             # Show API commands
 
 **Options:**
 - `--top <top>` — Return top N repositories
-- `--verbose` — Show mapping
-
-#### repo show
-
-Display repository information from current Git remote.
-
-**Usage:**
-```bash
-sdo repo show                       # Show current repo
-sdo repo show --verbose             # Show API command
-```
-
-**Options:**
 - `--verbose` — Show mapping
 
 #### repo create
@@ -736,6 +773,59 @@ sdo repo delete --force --verbose   # Show mapping
 **Options:**
 - `--force` — Skip confirmation prompt
 - `--verbose` — Show mapping
+
+---
+
+### tool, env, build, release, backup, and file — Local Automation
+
+These command groups migrate the local `nb`, `nbackup`, and `lf` workflows into SDO. The original executables remain available during the migration.
+
+#### tool
+
+Manage tools from an apps manifest:
+
+```bash
+sdo tool list
+sdo tool list --json apps.json
+sdo tool install --json apps.json --dry-run
+sdo tool uninstall --json apps.json --dry-run
+sdo tool download --json apps.json --dry-run
+```
+
+#### env and build
+
+```bash
+sdo env path
+sdo build targets
+```
+
+`sdo env path` displays the effective PATH. `sdo build targets` lists targets and updates `targets.md` using the existing build-target discovery behavior.
+
+#### release
+
+```bash
+sdo release list --dry-run
+sdo release create --repo owner/repository --tag v1.0.0 --branch main --file release.zip --dry-run
+sdo release download --repo owner/repository --tag v1.0.0 --dry-run
+```
+
+#### backup
+
+```bash
+sdo backup init --output nbackup.json
+sdo backup run --input nbackup.json --dry-run
+```
+
+`backup run` resolves environment variables, applies configured exclusions and log options, and invokes `robocopy` only when `--dry-run` is not specified.
+
+#### file
+
+```bash
+sdo file files --directoryPath C:\work --extensions .cs
+sdo file folders --directoryPath C:\work --name src
+```
+
+Both searches are recursive and preserve the legacy LF filters and output behavior.
 
 ---
 

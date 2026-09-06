@@ -35,35 +35,12 @@ namespace Sdo.Commands
             _dryRunOption = dryRunOption;
 
             // Add subcommands (in alphabetical order)
-            AddBranchCommand(verboseOption);
             AddCloneCommand(verboseOption);
             AddCreateCommand(verboseOption);
             AddDeleteCommand(verboseOption);
             AddInfoCommand(verboseOption);
             AddListCommand(verboseOption);
-            AddShowCommand(verboseOption);
             AddTagCommand(verboseOption);
-        }
-
-        private void AddBranchCommand(Option<bool> verboseOption)
-        {
-            var branchCommand = new System.CommandLine.Command(
-                "branch",
-                "Display the current branch in the local Git repository");
-
-            branchCommand.Add(verboseOption);
-            branchCommand.SetAction(parseResult =>
-            {
-                var verbose = parseResult.GetValue(verboseOption);
-                if (verbose)
-                {
-                    ConsoleHelper.WriteLine("[VERBOSE] Displaying git branch.", ConsoleColor.Gray);
-                }
-
-                return Nbuild.Command.DisplayGitBranch().Code;
-            });
-
-            Subcommands.Add(branchCommand);
         }
 
         private void AddCloneCommand(Option<bool> verboseOption)
@@ -239,14 +216,14 @@ namespace Sdo.Commands
         {
             var infoCommand = new System.CommandLine.Command(
                 "info",
-                "Display local Git repository information, including the current branch and latest tag");
+                "Display local Git and remote repository information");
 
             infoCommand.Add(verboseOption);
             if (_dryRunOption != null)
             {
                 infoCommand.Add(_dryRunOption);
             }
-            infoCommand.SetAction((parseResult) =>
+            infoCommand.SetAction(async (parseResult) =>
             {
                 var verbose = parseResult.GetValue(verboseOption);
                 var dryRun = _dryRunOption != null && parseResult.GetValue(_dryRunOption);
@@ -255,7 +232,15 @@ namespace Sdo.Commands
                     ConsoleHelper.WriteLine("[VERBOSE] Displaying Git repository information.", ConsoleColor.Gray);
                 }
 
-                return Nbuild.Command.DisplayGitInfo(verbose, dryRun).Code;
+                var localResult = dryRun
+                    ? Nbuild.Command.DisplayGitInfo(verbose, dryRun)
+                    : Nbuild.Command.DisplayGitBranch();
+                if (!localResult.IsSuccess())
+                {
+                    return localResult.Code;
+                }
+
+                return dryRun ? 0 : await ShowRepository(verbose);
             });
 
             Subcommands.Add(infoCommand);
@@ -319,21 +304,6 @@ namespace Sdo.Commands
             });
 
             Subcommands.Add(listCommand);
-        }
-
-        private void AddShowCommand(Option<bool> verboseOption)
-        {
-            var showCommand = new System.CommandLine.Command("show", "Display repository information from current Git remote");
-
-            showCommand.Add(verboseOption);
-
-            showCommand.SetAction(async (parseResult) =>
-            {
-                var verbose = parseResult.GetValue(verboseOption);
-                return await ShowRepository(verbose);
-            });
-
-            Subcommands.Add(showCommand);
         }
 
         /// <summary>
