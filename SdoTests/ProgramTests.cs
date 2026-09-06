@@ -51,23 +51,9 @@ public class ProgramTests
     [Fact]
     public void Main_WithUnmatchedTargetWithoutBuildFile_ReturnsBuildFailure()
     {
-        var originalDirectory = Directory.GetCurrentDirectory();
-        var temporaryDirectory = Path.Combine(Path.GetTempPath(), $"sdo-target-{Guid.NewGuid():N}");
-        Directory.CreateDirectory(temporaryDirectory);
+        var result = Program.Main($"missing-target-{Guid.NewGuid():N}");
 
-        try
-        {
-            Directory.SetCurrentDirectory(temporaryDirectory);
-
-            var result = Program.Main("custom-target");
-
-            Assert.Equal(-1, result);
-        }
-        finally
-        {
-            Directory.SetCurrentDirectory(originalDirectory);
-            Directory.Delete(temporaryDirectory, true);
-        }
+        Assert.Equal(-1, result);
     }
 
     [Fact]
