@@ -1,6 +1,6 @@
-using System.CommandLine;
-using System.Reflection;
+using Nbuild.Helpers;
 using Sdo.Services;
+using System.CommandLine;
 
 namespace Sdo.Commands
 {
@@ -39,7 +39,7 @@ namespace Sdo.Commands
         private void AddInitCommand()
         {
             var initCommand = new System.CommandLine.Command("init", "Extract the sample backup configuration.");
-            var outputOption = new Option<string>("--output")
+            var outputOption = new Option<string>("--output", ["-o"])
             {
                 Description = "Output path for the sample backup configuration",
                 Required = true
@@ -54,18 +54,18 @@ namespace Sdo.Commands
                     using var stream = assembly.GetManifestResourceStream(ResourceName);
                     if (stream == null)
                     {
-                        Console.Error.WriteLine("Error: Embedded backup configuration was not found.");
+                        ConsoleHelper.WriteError("Embedded backup configuration was not found.");
                         return 1;
                     }
 
                     using var file = File.Create(outputPath);
                     stream.CopyTo(file);
-                    Console.WriteLine($"Extracted sample nbackup.json to {outputPath}");
+                    ConsoleHelper.WriteSuccess($"Extracted sample nbackup.json to {outputPath}");
                     return 0;
                 }
                 catch (Exception exception)
                 {
-                    Console.Error.WriteLine($"Error: {exception.Message}");
+                    ConsoleHelper.WriteError($"Error: {exception.Message}");
                     return 1;
                 }
             });

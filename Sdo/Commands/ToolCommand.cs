@@ -24,9 +24,9 @@ namespace Sdo.Commands
         private void AddInstallCommand(Option<bool> verboseOption, Option<bool>? dryRunOption)
         {
             var installCommand = new System.CommandLine.Command("install", "Install tools from a manifest or by application name.");
-            var jsonOption = new Option<string?>("--json") { Description = "Path to the tools manifest" };
-            var nameOption = new Option<string?>("--name") { Description = "Application name to find in apps.json" };
-            var versionOption = new Option<string?>("--appversion") { Description = "Optional application version override" };
+            var jsonOption = new Option<string?>("--json", ["-j"]) { Description = "Path to the tools manifest" };
+            var nameOption = new Option<string?>("--name", ["-n"]) { Description = "Application name to find in apps.json" };
+            var versionOption = new Option<string?>("--appversion", ["-av"]) { Description = "Optional application version override" };
 
             installCommand.Add(jsonOption);
             installCommand.Add(nameOption);
@@ -43,7 +43,7 @@ namespace Sdo.Commands
 
                 if (string.IsNullOrEmpty(json) && string.IsNullOrEmpty(name))
                 {
-                    Console.Error.WriteLine("Error: Either --json or --name must be specified.");
+                    Console.Error.WriteLine("Error: Either --json (-j) or --name (-n) must be specified.");
                     return 1;
                 }
 
@@ -91,7 +91,7 @@ namespace Sdo.Commands
         private void AddDownloadCommand(Option<bool> verboseOption, Option<bool>? dryRunOption)
         {
             var downloadCommand = new System.CommandLine.Command("download", "Download tools from a manifest.");
-            var jsonOption = new Option<string>("--json") { Description = "Path to the tools manifest", Required = true };
+            var jsonOption = new Option<string>("--json", ["-j"]) { Description = "Path to the tools manifest", Required = true };
             downloadCommand.Add(jsonOption);
             downloadCommand.Add(verboseOption);
             AddDryRunOption(downloadCommand, dryRunOption);
@@ -142,7 +142,7 @@ namespace Sdo.Commands
                 "Display a formatted table of all tools and their versions.");
             listCommand.TreatUnmatchedTokensAsErrors = true;
 
-            var jsonOption = new Option<string>("--json")
+            var jsonOption = new Option<string>("--json", ["-j"])
             {
                 Description = "Full path to the manifest file containing your tool definitions."
             };

@@ -110,19 +110,19 @@ namespace Sdo.Commands
                     var token = await auth.GetGitHubTokenAsync();
                     if (string.IsNullOrEmpty(token))
                     {
-                        ConsoleHelper.WriteLine("X No GitHub token found", ConsoleColor.Red);
+                        ConsoleHelper.WriteError("No GitHub token found");
                         return 1;
                     }
                     var client = new GitHubClient(token);
                     if (string.IsNullOrEmpty(login))
                     {
                         var user = await client.GetUserAsync();
-                        if (user == null) { ConsoleHelper.WriteLine("X User not found", ConsoleColor.Red); return 1; }
+                        if (user == null) { ConsoleHelper.WriteError("User not found"); return 1; }
                         Console.WriteLine($"User: {user.Login} — {user.Name}");
                         return 0;
                     }
                     var found = await client.GetUserAsync(login);
-                    if (found == null) { ConsoleHelper.WriteLine("X User not found", ConsoleColor.Red); return 1; }
+                    if (found == null) { ConsoleHelper.WriteError("User not found"); return 1; }
                     Console.WriteLine($"User: {found.Login} — {found.Name}");
                     return 0;
                 }
@@ -138,25 +138,25 @@ namespace Sdo.Commands
                     }
                     var auth = new AuthenticationService();
                     var token = await auth.GetAzureDevOpsTokenAsync();
-                    if (string.IsNullOrEmpty(token)) { ConsoleHelper.WriteLine("X No Azure DevOps PAT found", ConsoleColor.Red); return 1; }
+                    if (string.IsNullOrEmpty(token)) { ConsoleHelper.WriteError("No Azure DevOps PAT found"); return 1; }
                     var org = _platformDetector.GetOrganization();
-                    if (string.IsNullOrEmpty(org)) { ConsoleHelper.WriteLine("X Could not determine organization", ConsoleColor.Red); return 1; }
+                    if (string.IsNullOrEmpty(org)) { ConsoleHelper.WriteError("Could not determine organization"); return 1; }
                     var client = new AzureDevOpsClient(token, org);
                     // Azure DevOps user lookup placeholder — implementation depends on Graph APIs
                     var user = await client.GetUserAsync(login);
-                    if (user == null) { ConsoleHelper.WriteLine("X User not found", ConsoleColor.Red); return 1; }
+                    if (user == null) { ConsoleHelper.WriteError("User not found"); return 1; }
                     Console.WriteLine($"User: {user.DisplayName} — {user.UniqueName}");
                     return 0;
                 }
                 else
                 {
-                    ConsoleHelper.WriteLine("X Unsupported platform", ConsoleColor.Red);
+                    ConsoleHelper.WriteError("Unsupported platform");
                     return 1;
                 }
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteLine($"X Error: {ex.Message}", ConsoleColor.Red);
+                ConsoleHelper.WriteLine($"X Error: {ex.Message}");
                 return 1;
             }
         }
@@ -191,10 +191,10 @@ namespace Sdo.Commands
                 {
                     var auth = new AuthenticationService();
                     var token = await auth.GetGitHubTokenAsync();
-                    if (string.IsNullOrEmpty(token)) { ConsoleHelper.WriteLine("X No GitHub token found", ConsoleColor.Red); return 1; }
+                    if (string.IsNullOrEmpty(token)) { ConsoleHelper.WriteError("No GitHub token found"); return 1; }
                     var client = new GitHubClient(token);
                     var repo = _platformDetector.GetRepositoryInfo();
-                    if (repo == null) { ConsoleHelper.WriteLine("X Could not determine repository", ConsoleColor.Red); return 1; }
+                    if (repo == null) { ConsoleHelper.WriteError("Could not determine repository"); return 1; }
 
                     if (verbose)
                     {
@@ -219,9 +219,9 @@ namespace Sdo.Commands
                 {
                     var auth = new AuthenticationService();
                     var token = await auth.GetAzureDevOpsTokenAsync();
-                    if (string.IsNullOrEmpty(token)) { ConsoleHelper.WriteLine("X No Azure DevOps PAT found", ConsoleColor.Red); return 1; }
+                    if (string.IsNullOrEmpty(token)) { ConsoleHelper.WriteError("No Azure DevOps PAT found"); return 1; }
                     var org = _platformDetector.GetOrganization();
-                    if (string.IsNullOrEmpty(org)) { ConsoleHelper.WriteLine("X Could not determine organization", ConsoleColor.Red); return 1; }
+                    if (string.IsNullOrEmpty(org)) { ConsoleHelper.WriteError("Could not determine organization"); return 1; }
                     var client = new AzureDevOpsClient(token, org);
                     var project = _platformDetector.GetProject();
 
@@ -278,12 +278,12 @@ namespace Sdo.Commands
                     Console.WriteLine(new string('-', 80));
                     return 0;
                 }
-                ConsoleHelper.WriteLine("X Unsupported platform", ConsoleColor.Red);
+                ConsoleHelper.WriteError("Unsupported platform");
                 return 1;
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteLine($"X Error: {ex.Message}", ConsoleColor.Red);
+                ConsoleHelper.WriteLine($"X Error: {ex.Message}");
                 return 1;
             }
         }
@@ -292,7 +292,7 @@ namespace Sdo.Commands
         {
             if (string.IsNullOrEmpty(query))
             {
-                ConsoleHelper.WriteLine("X Query is required for search", ConsoleColor.Red);
+                ConsoleHelper.WriteError("Query is required for search");
                 return 1;
             }
             try
@@ -308,7 +308,7 @@ namespace Sdo.Commands
                     }
                     var auth = new AuthenticationService();
                     var token = await auth.GetGitHubTokenAsync();
-                    if (string.IsNullOrEmpty(token)) { ConsoleHelper.WriteLine("X No GitHub token found", ConsoleColor.Red); return 1; }
+                    if (string.IsNullOrEmpty(token)) { ConsoleHelper.WriteError("No GitHub token found"); return 1; }
                     var client = new GitHubClient(token);
                     var results = await client.SearchUsersAsync(query);
                     if (results == null || results.Count == 0) { Console.WriteLine("No users found"); return 0; }
@@ -317,13 +317,13 @@ namespace Sdo.Commands
                 }
                 else
                 {
-                    ConsoleHelper.WriteLine("X Search is only supported for GitHub in this version", ConsoleColor.Yellow);
+                    ConsoleHelper.WriteWarning("Search is only supported for GitHub in this version");
                     return 1;
                 }
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteLine($"X Error: {ex.Message}", ConsoleColor.Red);
+                ConsoleHelper.WriteError($"Error: {ex.Message}");
                 return 1;
             }
         }
@@ -362,10 +362,10 @@ namespace Sdo.Commands
                 {
                     var auth = new AuthenticationService();
                     var token = await auth.GetGitHubTokenAsync();
-                    if (string.IsNullOrEmpty(token)) { ConsoleHelper.WriteLine("X No GitHub token found", ConsoleColor.Red); return 1; }
+                    if (string.IsNullOrEmpty(token)) { ConsoleHelper.WriteError("No GitHub token found"); return 1; }
                     var client = new GitHubClient(token);
                     var repo = _platformDetector.GetRepositoryInfo();
-                    if (repo == null) { ConsoleHelper.WriteLine("X Could not determine repository", ConsoleColor.Red); return 1; }
+                    if (repo == null) { ConsoleHelper.WriteError("Could not determine repository"); return 1; }
                     var perm = await client.GetRepositoryPermissionAsync(repo.Owner!, repo.Repo!, user, verbose);
                     Console.WriteLine(perm ?? "No permission info available");
                     return 0;
@@ -374,9 +374,9 @@ namespace Sdo.Commands
                 {
                     var auth = new AuthenticationService();
                     var token = await auth.GetAzureDevOpsTokenAsync();
-                    if (string.IsNullOrEmpty(token)) { ConsoleHelper.WriteLine("X No Azure DevOps PAT found", ConsoleColor.Red); return 1; }
+                    if (string.IsNullOrEmpty(token)) { ConsoleHelper.WriteError("No Azure DevOps PAT found"); return 1; }
                     var org = _platformDetector.GetOrganization();
-                    if (string.IsNullOrEmpty(org)) { ConsoleHelper.WriteLine("X Could not determine organization", ConsoleColor.Red); return 1; }
+                    if (string.IsNullOrEmpty(org)) { ConsoleHelper.WriteError("Could not determine organization"); return 1; }
                     var client = new AzureDevOpsClient(token, org);
                     var perms = await client.GetUserPermissionsAsync(user, verbose);
                     if (perms == null) { Console.WriteLine("No permission info available"); return 0; }
@@ -385,13 +385,13 @@ namespace Sdo.Commands
                 }
                 else
                 {
-                    ConsoleHelper.WriteLine("X Unsupported platform", ConsoleColor.Red);
+                    ConsoleHelper.WriteError("Unsupported platform");
                     return 1;
                 }
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteLine($"X Error: {ex.Message}", ConsoleColor.Red);
+                ConsoleHelper.WriteLine($"X Error: {ex.Message}");
                 return 1;
             }
         }

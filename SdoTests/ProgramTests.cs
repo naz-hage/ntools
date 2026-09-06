@@ -210,6 +210,14 @@ public class ProgramTests
     }
 
     [Fact]
+    public void Main_WithToolInstallNameShortAliasAndDryRun_ReturnsZero()
+    {
+        var result = Program.Main("tool", "install", "-n", "NonExistentApp", "-dr");
+
+        Assert.Equal(0, result);
+    }
+
+    [Fact]
     public void Main_WithBackupInitAndRunDryRun_ReturnZero()
     {
         var outputPath = Path.Combine(Path.GetTempPath(), $"sdo-backup-{Guid.NewGuid():N}.json");
@@ -240,7 +248,7 @@ public class ProgramTests
         try
         {
             var initResult = Program.Main("backup", "init", "--output", outputPath);
-            var runResult = Program.Main("backup", "-i", outputPath, "-v", "-n");
+            var runResult = Program.Main("backup", "-i", outputPath, "-v", "-dr");
 
             Assert.Equal(0, initResult);
             Assert.Equal(0, runResult);

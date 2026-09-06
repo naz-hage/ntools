@@ -720,11 +720,12 @@ sdo repo clone --url https://github.com/owner/repository --dry-run
 ```bash
 sdo repo tag set --tag 1.2.3 --dry-run
 sdo repo tag auto --buildtype stage --dry-run
+sdo repo tag auto -b stage --dry-run
 sdo repo tag push-auto --buildtype stage --dry-run
 sdo repo tag delete --tag 1.2.3 --dry-run
 ```
 
-`--buildtype` belongs to `auto` and `push-auto`; it is invalid for `tag set` and `tag delete`.
+`--buildtype` belongs to `auto` and `push-auto`; `repo tag auto` also accepts `-b` as its short form. It is invalid for `tag set` and `tag delete`.
 
 #### repo list
 

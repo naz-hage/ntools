@@ -39,7 +39,7 @@ namespace Sdo
             {
                 Description = "Enable verbose output"
             };
-            var dryRunOption = new Option<bool>("--dry-run", ["-n"])
+            var dryRunOption = new Option<bool>("--dry-run", ["-dr"])
             {
                 Description = "Perform a dry run without side effects"
             };
@@ -88,7 +88,7 @@ namespace Sdo
                     var result = Nbuild.BuildStarter.Build(target, verbose);
                     if (result.IsFail())
                     {
-                        ConsoleHelper.WriteLine($"Failed to execute target '{target}': {result.GetFirstOutput()}", ConsoleColor.Red);
+                        ConsoleHelper.WriteError($"Failed to execute target '{target}': {result.GetFirstOutput()}");
                     }
 
                     return result.Code;
@@ -100,7 +100,7 @@ namespace Sdo
                     return 1;
                 }
 
-                Console.WriteLine("Error: Please specify a command (map, auth, pipeline, pr, repo, wi, user, tool, env, build, release, backup, file)");
+                ConsoleHelper.WriteError("Error: Please specify a command (map, auth, pipeline, pr, repo, wi, user, tool, env, build, release, backup, file)");
                 Console.WriteLine("Run 'sdo --help' for usage information.");
                 return 1;
             });

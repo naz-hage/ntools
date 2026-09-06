@@ -97,7 +97,7 @@ namespace Sdo.Commands
             var autoCommand = new System.CommandLine.Command(
                 "auto",
                 "Automatically set the next Git tag based on build type");
-            var buildTypeOption = new Option<string>("--buildtype")
+            var buildTypeOption = new Option<string>("--buildtype", ["-b"])
             {
                 Description = "Build type: STAGE or PROD",
                 Required = true
@@ -122,7 +122,7 @@ namespace Sdo.Commands
             var deleteCommand = new System.CommandLine.Command(
                 "delete",
                 "Delete a Git tag");
-            var tagOption = new Option<string>("--tag")
+            var tagOption = new Option<string>("--tag", ["-t"])
             {
                 Description = "Tag to delete",
                 Required = true
@@ -147,7 +147,7 @@ namespace Sdo.Commands
             var pushAutoCommand = new System.CommandLine.Command(
                 "push-auto",
                 "Automatically set and push the next Git tag based on build type");
-            var buildTypeOption = new Option<string>("--buildtype")
+            var buildTypeOption = new Option<string>("--buildtype", ["-b"])
             {
                 Description = "Build type: STAGE or PROD",
                 Required = true
@@ -172,7 +172,7 @@ namespace Sdo.Commands
             var setCommand = new System.CommandLine.Command(
                 "set",
                 "Set a Git tag");
-            var tagOption = new Option<string>("--tag")
+            var tagOption = new Option<string>("--tag", ["-t"])
             {
                 Description = "Tag to set",
                 Required = true
@@ -355,7 +355,7 @@ namespace Sdo.Commands
                     var token = await GetAuthenticationTokenAsync(Platform.GitHub);
                     if (string.IsNullOrEmpty(token))
                     {
-                        ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
+                        ConsoleHelper.WriteError("Error: No authentication token found. Run 'sdo auth' to setup authentication.");
                         return 1;
                     }
 
@@ -394,7 +394,7 @@ namespace Sdo.Commands
                     var pat = await GetAuthenticationTokenAsync(Platform.AzureDevOps);
                     if (string.IsNullOrEmpty(pat))
                     {
-                        ConsoleHelper.WriteError("X Error: No authentication token found. Run 'sdo auth' to setup authentication.");
+                        ConsoleHelper.WriteError("Error: No authentication token found. Run 'sdo auth' to setup authentication.");
                         return 1;
                     }
 
@@ -402,7 +402,7 @@ namespace Sdo.Commands
                     var project = _platformDetector.GetProject();
                     if (string.IsNullOrEmpty(organization) || string.IsNullOrEmpty(project))
                     {
-                        ConsoleHelper.WriteError("X Unable to determine Azure DevOps organization or project");
+                        ConsoleHelper.WriteError("Unable to determine Azure DevOps organization or project");
                         return 1;
                     }
 
@@ -432,12 +432,12 @@ namespace Sdo.Commands
                     return 0;
                 }
 
-                ConsoleHelper.WriteError("X Unsupported platform");
+                ConsoleHelper.WriteError("Unsupported platform");
                 return 1;
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteError($"X Error: {ex.Message}");
+                ConsoleHelper.WriteError($"Error: {ex.Message}");
                 return 1;
             }
         }
@@ -453,7 +453,7 @@ namespace Sdo.Commands
 
                 if (repoInfo == null || (string.IsNullOrEmpty(repoInfo.Owner) || string.IsNullOrEmpty(repoInfo.Repo)))
                 {
-                    ConsoleHelper.WriteError("X Unable to determine repository from current Git remote");
+                    ConsoleHelper.WriteError("Unable to determine repository from current Git remote");
                     return 1;
                 }
 
@@ -462,7 +462,7 @@ namespace Sdo.Commands
                     var token = await GetAuthenticationTokenAsync(Platform.GitHub);
                     if (string.IsNullOrEmpty(token))
                     {
-                        ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
+                        ConsoleHelper.WriteError("Error: No authentication token found. Run 'sdo auth' to setup authentication.");
                         return 1;
                     }
 
@@ -470,7 +470,7 @@ namespace Sdo.Commands
                     var repo = await client.GetRepositoryAsync(repoInfo.Owner ?? "", repoInfo.Repo ?? "");
                     if (repo == null)
                     {
-                        ConsoleHelper.WriteError("X Repository not found");
+                        ConsoleHelper.WriteError("Repository not found");
                         return 1;
                     }
                     Console.WriteLine("Repository Information:");
@@ -486,14 +486,14 @@ namespace Sdo.Commands
                     var pat = await GetAuthenticationTokenAsync(Platform.AzureDevOps);
                     if (string.IsNullOrEmpty(pat))
                     {
-                        ConsoleHelper.WriteError("X Error: No authentication token found. Run 'sdo auth' to setup authentication.");
+                        ConsoleHelper.WriteError("Error: No authentication token found. Run 'sdo auth' to setup authentication.");
                         return 1;
                     }
 
                     var organization = _platformDetector.GetOrganization();
                     if (string.IsNullOrEmpty(organization))
                     {
-                        ConsoleHelper.WriteError("X Could not determine Azure DevOps organization");
+                        ConsoleHelper.WriteError("Could not determine Azure DevOps organization");
                         return 1;
                     }
 
@@ -502,7 +502,7 @@ namespace Sdo.Commands
                     var repo = await client.GetRepositoryAsync(project ?? "", repoInfo.Repo ?? "");
                     if (repo == null)
                     {
-                        ConsoleHelper.WriteError("X Repository not found");
+                        ConsoleHelper.WriteError("Repository not found");
                         return 1;
                     }
                     Console.WriteLine("Repository Information:");
@@ -514,12 +514,12 @@ namespace Sdo.Commands
                     return 0;
                 }
 
-                ConsoleHelper.WriteError("X Unsupported platform");
+                ConsoleHelper.WriteError("Unsupported platform");
                 return 1;
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteError($"X Error: {ex.Message}");
+                ConsoleHelper.WriteError($"Error: {ex.Message}");
                 return 1;
             }
         }
@@ -536,7 +536,7 @@ namespace Sdo.Commands
                     var token = await GetAuthenticationTokenAsync(Platform.GitHub);
                     if (string.IsNullOrEmpty(token))
                     {
-                        ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
+                        ConsoleHelper.WriteError("Error: No authentication token found. Run 'sdo auth' to setup authentication.");
                         return 1;
                     }
 
@@ -558,7 +558,7 @@ namespace Sdo.Commands
                     var pat = await GetAuthenticationTokenAsync(Platform.AzureDevOps);
                     if (string.IsNullOrEmpty(pat))
                     {
-                        ConsoleHelper.WriteError("X Error: No authentication token found. Run 'sdo auth' to setup authentication.");
+                        ConsoleHelper.WriteError("Error: No authentication token found. Run 'sdo auth' to setup authentication.");
                         return 1;
                     }
 
@@ -566,7 +566,7 @@ namespace Sdo.Commands
                     var project = _platformDetector.GetProject();
                     if (string.IsNullOrEmpty(organization) || string.IsNullOrEmpty(project))
                     {
-                        ConsoleHelper.WriteError("X Unable to determine Azure DevOps organization or project");
+                        ConsoleHelper.WriteError("Unable to determine Azure DevOps organization or project");
                         return 1;
                     }
 
@@ -585,7 +585,7 @@ namespace Sdo.Commands
                     if (projectInfo == null)
                     {
                         var cleanError = ExtractErrorMessage(client.LastError ?? "Failed to get project details");
-                        ConsoleHelper.WriteError($"X {cleanError}");
+                        ConsoleHelper.WriteError($"{cleanError}");
                         return 1;
                     }
 
@@ -593,7 +593,7 @@ namespace Sdo.Commands
                     if (repo == null)
                     {
                         var cleanError = ExtractErrorMessage(client.LastError ?? "Failed to create repository");
-                        ConsoleHelper.WriteError($"X {cleanError}");
+                        ConsoleHelper.WriteError($"{cleanError}");
                         return 1;
                     }
                     ConsoleHelper.WriteLine($"✓ Repository '{repo.Name}' created successfully", ConsoleColor.Green);
@@ -601,13 +601,13 @@ namespace Sdo.Commands
                     return 0;
                 }
 
-                ConsoleHelper.WriteError("X Unsupported platform");
+                ConsoleHelper.WriteError("Unsupported platform");
                 return 1;
             }
             catch (Exception ex)
             {
                 var errorMsg = ExtractErrorMessage(ex.Message);
-                ConsoleHelper.WriteError($"X Error: {errorMsg}");
+                ConsoleHelper.WriteError($"Error: {errorMsg}");
                 return 1;
             }
         }
@@ -621,7 +621,7 @@ namespace Sdo.Commands
 
                 if (repoInfo == null || (string.IsNullOrEmpty(repoInfo.Owner) || string.IsNullOrEmpty(repoInfo.Repo)))
                 {
-                    ConsoleHelper.WriteError("X Unable to determine repository from current Git remote");
+                    ConsoleHelper.WriteError("Unable to determine repository from current Git remote");
                     return 1;
                 }
 
@@ -650,7 +650,7 @@ namespace Sdo.Commands
                     var token = await GetAuthenticationTokenAsync(Platform.GitHub);
                     if (string.IsNullOrEmpty(token))
                     {
-                        ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
+                        ConsoleHelper.WriteError("Error: No authentication token found. Run 'sdo auth' to setup authentication.");
                         return 1;
                     }
 
@@ -664,7 +664,7 @@ namespace Sdo.Commands
                     var pat = await GetAuthenticationTokenAsync(Platform.AzureDevOps);
                     if (string.IsNullOrEmpty(pat))
                     {
-                        ConsoleHelper.WriteError("X Error: No authentication token found. Run 'sdo auth' to setup authentication.");
+                        ConsoleHelper.WriteError("Error: No authentication token found. Run 'sdo auth' to setup authentication.");
                         return 1;
                     }
 
@@ -672,7 +672,7 @@ namespace Sdo.Commands
                     var project = _platformDetector.GetProject();
                     if (string.IsNullOrEmpty(organization) || string.IsNullOrEmpty(project))
                     {
-                        ConsoleHelper.WriteError("X Unable to determine Azure DevOps organization or project");
+                        ConsoleHelper.WriteError("Unable to determine Azure DevOps organization or project");
                         return 1;
                     }
 
@@ -683,7 +683,7 @@ namespace Sdo.Commands
                     var projectInfo = await client.GetProjectAsync(project);
                     if (projectInfo == null)
                     {
-                        ConsoleHelper.WriteError($"X {client.LastError ?? "Failed to get project details"}");
+                        ConsoleHelper.WriteError($"{client.LastError ?? "Failed to get project details"}");
                         return 1;
                     }
 
@@ -693,7 +693,7 @@ namespace Sdo.Commands
                     if (repoDetails == null)
                     {
                         var cleanError = ExtractErrorMessage(client.LastError ?? "Repository not found");
-                        ConsoleHelper.WriteError($"X {cleanError}");
+                        ConsoleHelper.WriteError($"{cleanError}");
                         return 1;
                     }
 
@@ -701,20 +701,20 @@ namespace Sdo.Commands
                     if (!success)
                     {
                         var cleanError = ExtractErrorMessage(client.LastError ?? "Failed to delete repository");
-                        ConsoleHelper.WriteError($"X {cleanError}");
+                        ConsoleHelper.WriteError($"{cleanError}");
                         return 1;
                     }
                     ConsoleHelper.WriteLine($"✓ Repository '{repoInfo.Repo}' deleted successfully", ConsoleColor.Green);
                     return 0;
                 }
 
-                ConsoleHelper.WriteError("X Unsupported platform");
+                ConsoleHelper.WriteError("Unsupported platform");
                 return 1;
             }
             catch (Exception ex)
             {
                 var errorMsg = ExtractErrorMessage(ex.Message);
-                ConsoleHelper.WriteError($"X Error: {errorMsg}");
+                ConsoleHelper.WriteError($"Error: {errorMsg}");
                 return 1;
             }
         }

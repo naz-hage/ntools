@@ -49,6 +49,17 @@ public class RepositoryCommandTests
     }
 
     [Fact]
+    public void AutoTagSubcommand_HasBuildTypeShortAlias()
+    {
+        var command = new RepositoryCommand(_verboseOption);
+        var tagCmd = command.Subcommands.First(s => s.Name == "tag");
+        var autoCmd = tagCmd.Subcommands.First(s => s.Name == "auto");
+        var buildTypeOption = autoCmd.Options.First(o => o.Name == "--buildtype");
+
+        Assert.Contains("-b", buildTypeOption.Aliases);
+    }
+
+    [Fact]
     public void Constructor_AddsDeleteSubcommand()
     {
         var command = new RepositoryCommand(_verboseOption);

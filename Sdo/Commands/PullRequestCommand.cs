@@ -178,7 +178,7 @@ namespace Sdo.Commands
                     
                     if (!workItem.HasValue || workItem <= 0)
                     {
-                        ConsoleHelper.WriteError("X Error: Could not determine work item ID");
+                        ConsoleHelper.WriteError("Error: Could not determine work item ID");
                         Console.WriteLine($"\nCurrent branch: '{currentBranch}'");
                         Console.WriteLine("\nExpected branch name format: <number>-<description>");
                         Console.WriteLine("  - Must start with digits (e.g., 244)");
@@ -216,7 +216,7 @@ namespace Sdo.Commands
                 // Validate file exists
                 if (!System.IO.File.Exists(file))
                 {
-                    ConsoleHelper.WriteError($"X Error: File not found: {file}");
+                    ConsoleHelper.WriteError($"Error: File not found: {file}");
                     Console.WriteLine("\nExpected file path format: .temp/<work-item-id>-pr-message.md");
                     Console.WriteLine($"Example for work item {workItem}: .temp/{workItem}-pr-message.md");
                     Console.WriteLine("\nIf you want to auto-detect the file path:");
@@ -259,7 +259,7 @@ namespace Sdo.Commands
 
                 if (string.IsNullOrEmpty(title))
                 {
-                    ConsoleHelper.WriteError("X Error: Could not extract PR title from file");
+                    ConsoleHelper.WriteError("Error: Could not extract PR title from file");
                     return 1;
                 }
 
@@ -303,7 +303,7 @@ namespace Sdo.Commands
 
                 if (string.IsNullOrEmpty(pat))
                 {
-                    ConsoleHelper.WriteError("X Error: No authentication token found. Run 'sdo auth' to setup authentication.");
+                    ConsoleHelper.WriteError("Error: No authentication token found. Run 'sdo auth' to setup authentication.");
                     return 1;
                 }
 
@@ -317,7 +317,7 @@ namespace Sdo.Commands
                     var repoInfo = _platformDetector.GetRepositoryInfo();
                     if (repoInfo == null || (string.IsNullOrEmpty(repoInfo.Owner) || string.IsNullOrEmpty(repoInfo.Repo)))
                     {
-                        ConsoleHelper.WriteError("X Error: Could not determine repository information.");
+                        ConsoleHelper.WriteError("Error: Could not determine repository information.");
                         return 1;
                     }
 
@@ -333,7 +333,7 @@ namespace Sdo.Commands
                     // Check if the current branch exists on the remote before attempting to create PR
                     if (!BranchExistsOnRemote(currentBranch))
                     {
-                        ConsoleHelper.WriteError($"X Error: Branch '{currentBranch}' does not exist on remote 'origin'");
+                        ConsoleHelper.WriteError($"Error: Branch '{currentBranch}' does not exist on remote 'origin'");
                         Console.WriteLine("\nTo fix this, push your branch first:");
                         Console.WriteLine($"  git push -u origin {currentBranch}");
                         Console.WriteLine("\nThen retry the PR creation command.");
@@ -347,11 +347,11 @@ namespace Sdo.Commands
 
                         if (pr == null)
                         {
-                            ConsoleHelper.WriteError("X Error: Failed to create pull request");
+                            ConsoleHelper.WriteError("Error: Failed to create pull request");
                             return 1;
                         }
 
-                        Console.WriteLine("✓ Pull request created successfully!");
+                        ConsoleHelper.WriteSuccess("Pull request created successfully!");
                         Console.WriteLine($"URL: {pr.Url}");
                         if (verbose)
                         {
@@ -395,12 +395,12 @@ namespace Sdo.Commands
                             // Fall through to generic message
                         }
 
-                        ConsoleHelper.WriteError($"X Error: {ex.Message}");
+                        ConsoleHelper.WriteError($"Error: {ex.Message}");
                         return 1;
                     }
                     catch (Exception ex)
                     {
-                        ConsoleHelper.WriteError($"X Error: {ex.Message}");
+                        ConsoleHelper.WriteError($"Error: {ex.Message}");
                         return 1;
                     }
                 }
@@ -412,7 +412,7 @@ namespace Sdo.Commands
 
                     if (string.IsNullOrEmpty(organization) || string.IsNullOrEmpty(project) || repoInfo == null || string.IsNullOrEmpty(repoInfo.Repo))
                     {
-                        ConsoleHelper.WriteError("X Error: Could not determine Azure DevOps project/repository information.");
+                        ConsoleHelper.WriteError("Error: Could not determine Azure DevOps project/repository information.");
                         return 1;
                     }
 
@@ -429,7 +429,7 @@ namespace Sdo.Commands
                     // Check if the current branch exists on the remote before attempting to create PR
                     if (!BranchExistsOnRemote(currentBranch))
                     {
-                        ConsoleHelper.WriteError($"X Error: Branch '{currentBranch}' does not exist on remote 'origin'");
+                        ConsoleHelper.WriteError($"Error: Branch '{currentBranch}' does not exist on remote 'origin'");
                         Console.WriteLine("\nTo fix this, push your branch first:");
                         Console.WriteLine($"  git push -u origin {currentBranch}");
                         Console.WriteLine("\nThen retry the PR creation command.");
@@ -441,11 +441,11 @@ namespace Sdo.Commands
 
                     if (pr == null)
                     {
-                        ConsoleHelper.WriteError($"X Error: {client.LastError ?? "Failed to create pull request"}");
+                        ConsoleHelper.WriteError($"Error: {client.LastError ?? "Failed to create pull request"}");
                         return 1;
                     }
 
-                    Console.WriteLine("✓ Pull request created successfully!");
+                    ConsoleHelper.WriteSuccess("Pull request created successfully!");
                     Console.WriteLine($"URL: {pr.Url}");
                     // If a work item ID was provided, attempt to link it to the created PR
                     if (workItem.HasValue && workItem.Value > 0)
@@ -468,13 +468,13 @@ namespace Sdo.Commands
                 }
                 else
                 {
-                    ConsoleHelper.WriteError("X Error: Unknown platform.");
+                    ConsoleHelper.WriteError("Error: Unknown platform.");
                     return 1;
                 }
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteError($"X Error: {ex.Message}");
+                ConsoleHelper.WriteError($"Error: {ex.Message}");
                 return 1;
             }
         }
@@ -491,7 +491,7 @@ namespace Sdo.Commands
                 var pat = await GetAuthenticationTokenAsync(platform);
                 if (string.IsNullOrEmpty(pat))
                 {
-                    ConsoleHelper.WriteError("X Error: No authentication token found. Run 'sdo auth' to setup authentication.");
+                    ConsoleHelper.WriteError("Error: No authentication token found. Run 'sdo auth' to setup authentication.");
                     return 1;
                 }
                 if (platform == Platform.GitHub)
@@ -499,7 +499,7 @@ namespace Sdo.Commands
                     var repoInfo = _platformDetector.GetRepositoryInfo();
                     if (repoInfo == null || (string.IsNullOrEmpty(repoInfo.Owner) || string.IsNullOrEmpty(repoInfo.Repo)))
                     {
-                        ConsoleHelper.WriteError("X Error: Could not determine repository information.");
+                        ConsoleHelper.WriteError("Error: Could not determine repository information.");
                         return 1;
                     }
 
@@ -514,7 +514,7 @@ namespace Sdo.Commands
 
                     if (prs == null)
                     {
-                        ConsoleHelper.WriteError("X Error: Failed to list pull requests");
+                        ConsoleHelper.WriteError("Error: Failed to list pull requests");
                         return 1;
                     }
 
@@ -544,7 +544,7 @@ namespace Sdo.Commands
 
                     if (string.IsNullOrEmpty(organization) || string.IsNullOrEmpty(project) || repoInfo == null || string.IsNullOrEmpty(repoInfo.Repo))
                     {
-                        ConsoleHelper.WriteError("X Error: Could not determine Azure DevOps project/repository information.");
+                        ConsoleHelper.WriteError("Error: Could not determine Azure DevOps project/repository information.");
                         return 1;
                     }
 
@@ -559,7 +559,7 @@ namespace Sdo.Commands
 
                     if (prs == null)
                     {
-                        ConsoleHelper.WriteError($"X Error: {client.LastError ?? "Failed to list pull requests"}");
+                        ConsoleHelper.WriteError($"Error: {client.LastError ?? "Failed to list pull requests"}");
                         return 1;
                     }
 
@@ -586,13 +586,13 @@ namespace Sdo.Commands
                 }
                 else
                 {
-                    ConsoleHelper.WriteError("X Error: Unknown platform.");
+                    ConsoleHelper.WriteError("Error: Unknown platform.");
                     return 1;
                 }
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteError($"X Error: {ex.Message}");
+                ConsoleHelper.WriteError($"Error: {ex.Message}");
                 return 1;
             }
         }
@@ -604,7 +604,7 @@ namespace Sdo.Commands
                 // Validate that PR ID was provided
                 if (prId <= 0)
                 {
-                    ConsoleHelper.WriteError("X Error: PR ID is required. Use the positional argument or --pr-id option");
+                    ConsoleHelper.WriteError("Error: PR ID is required. Use the positional argument or --pr-id option");
                     Console.WriteLine("\nExample:");
                     Console.WriteLine("  sdo pr show 123");
                     Console.WriteLine("  sdo pr show --pr-id 123");
@@ -617,7 +617,7 @@ namespace Sdo.Commands
                 var pat = await GetAuthenticationTokenAsync(platform);
                 if (string.IsNullOrEmpty(pat))
                 {
-                    ConsoleHelper.WriteError("X Error: No authentication token found. Run 'sdo auth' to setup authentication.");
+                    ConsoleHelper.WriteError("Error: No authentication token found. Run 'sdo auth' to setup authentication.");
                     return 1;
                 }
                 if (platform == Platform.GitHub)
@@ -625,7 +625,7 @@ namespace Sdo.Commands
                     var repoInfo = _platformDetector.GetRepositoryInfo();
                     if (repoInfo == null || (string.IsNullOrEmpty(repoInfo.Owner) || string.IsNullOrEmpty(repoInfo.Repo)))
                     {
-                        ConsoleHelper.WriteError("X Error: Could not determine repository information.");
+                        ConsoleHelper.WriteError("Error: Could not determine repository information.");
                         return 1;
                     }
 
@@ -640,7 +640,7 @@ namespace Sdo.Commands
                     var pr = await client.GetPullRequestAsync(repoInfo.Owner, repoInfo.Repo, prId);
                     if (pr == null)
                     {
-                        ConsoleHelper.WriteError($"X Error: Pull request #{prId} not found");
+                        ConsoleHelper.WriteError($"Error: Pull request #{prId} not found");
                         return 1;
                     }
 
@@ -676,7 +676,7 @@ namespace Sdo.Commands
 
                     if (string.IsNullOrEmpty(organization) || string.IsNullOrEmpty(project) || repoInfo == null || string.IsNullOrEmpty(repoInfo.Repo))
                     {
-                        ConsoleHelper.WriteError("X Error: Could not determine Azure DevOps project/repository information.");
+                        ConsoleHelper.WriteError("Error: Could not determine Azure DevOps project/repository information.");
                         return 1;
                     }
 
@@ -691,7 +691,7 @@ namespace Sdo.Commands
                     var pr = await client.GetPullRequestAsync(project, repoInfo.Repo, prId);
                     if (pr == null)
                     {
-                        ConsoleHelper.WriteError($"X Error: {client.LastError ?? $"Pull request #{prId} not found"}");
+                        ConsoleHelper.WriteError($"Error: {client.LastError ?? $"Pull request #{prId} not found"}");
                         return 1;
                     }
 
@@ -725,13 +725,13 @@ namespace Sdo.Commands
                 }
                 else
                 {
-                    ConsoleHelper.WriteError("X Error: Unknown platform.");
+                    ConsoleHelper.WriteError("Error: Unknown platform.");
                     return 1;
                 }
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteError($"X Error: {ex.Message}");
+                ConsoleHelper.WriteError($"Error: {ex.Message}");
                 return 1;
             }
         }
@@ -743,7 +743,7 @@ namespace Sdo.Commands
                 // Validate that PR ID was provided
                 if (prId <= 0)
                 {
-                    ConsoleHelper.WriteError("X Error: PR ID is required. Use --pr-id <number>");
+                    ConsoleHelper.WriteError("Error: PR ID is required. Use --pr-id <number>");
                     Console.WriteLine("\nExample:");
                     Console.WriteLine("  sdo pr update --pr-id 123 -f ./pr-message.md");
                     Console.WriteLine("  sdo pr update --pr-id 123 --title \"New Title\"");
@@ -758,7 +758,7 @@ namespace Sdo.Commands
                 {
                     if (!System.IO.File.Exists(file))
                     {
-                        ConsoleHelper.WriteError($"X Error: File not found: {file}");
+                        ConsoleHelper.WriteError($"Error: File not found: {file}");
                         return 1;
                     }
 
@@ -799,7 +799,7 @@ namespace Sdo.Commands
                 var pat = await GetAuthenticationTokenAsync(platform);
                 if (string.IsNullOrEmpty(pat))
                 {
-                    ConsoleHelper.WriteError("X Error: No authentication token found. Run 'sdo auth' to setup authentication.");
+                    ConsoleHelper.WriteError("Error: No authentication token found. Run 'sdo auth' to setup authentication.");
                     return 1;
                 }
                 if (platform == Platform.GitHub)
@@ -807,7 +807,7 @@ namespace Sdo.Commands
                     var repoInfo = _platformDetector.GetRepositoryInfo();
                     if (repoInfo == null || (string.IsNullOrEmpty(repoInfo.Owner) || string.IsNullOrEmpty(repoInfo.Repo)))
                     {
-                        ConsoleHelper.WriteError("X Error: Could not determine repository information.");
+                        ConsoleHelper.WriteError("Error: Could not determine repository information.");
                         return 1;
                     }
 
@@ -827,7 +827,7 @@ namespace Sdo.Commands
                     var pr = await client.UpdatePullRequestAsync(repoInfo.Owner, repoInfo.Repo, prId, title, body, status);
                     if (pr == null)
                     {
-                        ConsoleHelper.WriteError($"X Error: {client.LastError ?? "Failed to update pull request"}");
+                        ConsoleHelper.WriteError($"Error: {client.LastError ?? "Failed to update pull request"}");
                         return 1;
                     }
 
@@ -843,7 +843,7 @@ namespace Sdo.Commands
 
                     if (string.IsNullOrEmpty(organization) || string.IsNullOrEmpty(project) || repoInfo == null || string.IsNullOrEmpty(repoInfo.Repo))
                     {
-                        ConsoleHelper.WriteError("X Error: Could not determine Azure DevOps project/repository information.");
+                        ConsoleHelper.WriteError("Error: Could not determine Azure DevOps project/repository information.");
                         return 1;
                     }
 
@@ -858,7 +858,7 @@ namespace Sdo.Commands
                     var pr = await client.UpdatePullRequestAsync(project, repoInfo.Repo, prId, title, body, status);
                     if (pr == null)
                     {
-                        ConsoleHelper.WriteError($"X Error: {client.LastError ?? "Failed to update pull request"}");
+                        ConsoleHelper.WriteError($"Error: {client.LastError ?? "Failed to update pull request"}");
                         return 1;
                     }
 
@@ -868,13 +868,13 @@ namespace Sdo.Commands
                 }
                 else
                 {
-                    ConsoleHelper.WriteError("X Error: Unknown platform.");
+                    ConsoleHelper.WriteError("Error: Unknown platform.");
                     return 1;
                 }
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteError($"X Error: {ex.Message}");
+                ConsoleHelper.WriteError($"Error: {ex.Message}");
                 return 1;
             }
         }

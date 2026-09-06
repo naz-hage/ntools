@@ -92,7 +92,7 @@ namespace Sdo.Commands
                 }
                 else
                 {
-                    ConsoleHelper.WriteLine("X Unsupported platform detected", ConsoleColor.Red);
+                    ConsoleHelper.WriteError("Unsupported platform detected");
                     return 1;
                 }
             }
@@ -123,7 +123,7 @@ namespace Sdo.Commands
             var token = await auth.GetGitHubTokenAsync();
             if (string.IsNullOrEmpty(token))
             {
-                ConsoleHelper.WriteLine("X GitHub authentication failed - check your token", ConsoleColor.Red);
+                ConsoleHelper.WriteError("GitHub authentication failed - check your token");
                 if (verbose)
                 {
                     ConsoleHelper.WriteLine("No API_GITHUB_KEY environment variable, GitHub CLI auth, or Windows Credential Manager token found", ConsoleColor.Red);
@@ -135,7 +135,7 @@ namespace Sdo.Commands
             var isAuthenticated = await client.VerifyAuthenticationAsync();
             if (!isAuthenticated)
             {
-                ConsoleHelper.WriteLine("X GitHub authentication failed - invalid token", ConsoleColor.Red);
+                ConsoleHelper.WriteError("GitHub authentication failed - invalid token");
                 return 1;
             }
 
@@ -163,7 +163,7 @@ namespace Sdo.Commands
             var token = await auth.GetAzureDevOpsTokenAsync();
             if (string.IsNullOrEmpty(token))
             {
-                ConsoleHelper.WriteLine("X Azure DevOps authentication failed - check your token", ConsoleColor.Red);
+                ConsoleHelper.WriteError("Azure DevOps authentication failed - check your token");
                 if (verbose)
                 {
                     ConsoleHelper.WriteLine("No AZURE_DEVOPS_PAT environment variable found", ConsoleColor.Red);
@@ -173,13 +173,13 @@ namespace Sdo.Commands
 
             if (verbose)
             {
-                ConsoleHelper.WriteLine($"✓ Found AZURE_DEVOPS_PAT (length: {token.Length})", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess($"Found AZURE_DEVOPS_PAT (length: {token.Length})");
             }
 
             var organization = _platformDetector.GetOrganization();
             if (string.IsNullOrEmpty(organization))
             {
-                ConsoleHelper.WriteLine("X Azure DevOps authentication failed - could not determine organization", ConsoleColor.Red);
+                ConsoleHelper.WriteError("Azure DevOps authentication failed - could not determine organization");
                 return 1;
             }
 
@@ -219,7 +219,7 @@ namespace Sdo.Commands
             var isAuthenticated = await client.VerifyAuthenticationAsync(verbose);
             if (!isAuthenticated)
             {
-                ConsoleHelper.WriteLine("X Azure DevOps authentication failed - invalid token or organization", ConsoleColor.Red);
+                ConsoleHelper.WriteError("Azure DevOps authentication failed - invalid token or organization");
                 return 1;
             }
 
@@ -228,11 +228,11 @@ namespace Sdo.Commands
                 var user = await client.GetUserAsync();
                 if (user != null)
                 {
-                    ConsoleHelper.WriteLine($"✓ Authenticated as Azure DevOps user: {user.DisplayName}", ConsoleColor.Green);
+                    ConsoleHelper.WriteSuccess($"Authenticated as Azure DevOps user: {user.DisplayName}");
                 }
             }
 
-            ConsoleHelper.WriteLine("✓ Azure DevOps authentication successful", ConsoleColor.Green);
+            ConsoleHelper.WriteSuccess("Azure DevOps authentication successful");
             return 0;
         }
     }
