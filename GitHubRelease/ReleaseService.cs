@@ -55,7 +55,7 @@ namespace GitHubRelease
         /// <exception cref="InvalidOperationException">
         /// Thrown if the tag name or target commitish is missing or invalid, or if the branch name cannot be determined in a detached HEAD state.
         /// </exception>
-        public async Task<HttpResponseMessage> CreateRelease(Release release, string assetPath)
+        public async Task<HttpResponseMessage> CreateRelease(Release release, string assetPath, bool verbose)
         {
             ValidateAssetPath(assetPath);
             await DeleteExistingRelease(release);
@@ -85,7 +85,7 @@ namespace GitHubRelease
                 }
             }
 
-            return await CreateReleaseAndUploadAsset(release, assetPath);
+            return await CreateReleaseAndUploadAsset(release, assetPath, verbose);
         }
 
         /// <summary>
@@ -269,34 +269,34 @@ namespace GitHubRelease
         /// <exception cref="InvalidOperationException">
         /// Thrown if the release creation or asset upload fails, or if the upload URL cannot be extracted from the GitHub API response.
         /// </exception>
-        private async Task<HttpResponseMessage> CreateReleaseAndUploadAsset(Release release, string assetPath)
+        private async Task<HttpResponseMessage> CreateReleaseAndUploadAsset(Release release, string assetPath, bool verbose)
         {
             var context = new JsonContext();
             string jsonBody = JsonSerializer.Serialize(release, context.Release);
 
             // Verbose logging: show all key elements
-            Console.WriteLine("[VERBOSE] --- CreateReleaseAndUploadAsset ---");
-            Console.WriteLine($"[VERBOSE] Repo: {Repo}");
-            Console.WriteLine($"[VERBOSE] Release Tag: {release.TagName}");
-            Console.WriteLine($"[VERBOSE] Target Commitish: {release.TargetCommitish}");
-            Console.WriteLine($"[VERBOSE] Asset Path: {assetPath}");
-            Console.WriteLine($"[VERBOSE] Release JSON Body: {jsonBody}");
+            Console.WriteLine(" --- CreateReleaseAndUploadAsset ---");
+            Console.WriteLine($" Repo: {Repo}");
+            Console.WriteLine($" Release Tag: {release.TagName}");
+            Console.WriteLine($" Target Commitish: {release.TargetCommitish}");
+            Console.WriteLine($" Asset Path: {assetPath}");
+            if (verbose) Console.WriteLine($" Release JSON Body: {jsonBody}");
 
             // Send a POST request to create a new release on GitHub
             var uri = $"{Constants.GitHubApiPrefix}/{Repo}/releases";
-            Console.WriteLine($"[VERBOSE] POST URI: {uri}");
+            if (verbose) Console.WriteLine($"POST URI: {uri}");
             var response = await ApiService.PostAsync(uri, new StringContent(jsonBody, Encoding.UTF8, "application/json"));
 
             var responseContent = await response.Content.ReadAsStringAsync();
-            Console.WriteLine($"[VERBOSE] Release creation response status: {response.StatusCode}");
-            Console.WriteLine($"[VERBOSE] Release creation response body: {responseContent}");
+            Console.WriteLine($"Release creation response status: {response.StatusCode}");
+            if (verbose) Console.WriteLine($"[VERBOSE] Release creation response body: {responseContent}");
 
             if (!response.IsSuccessStatusCode)
             {
                 throw new InvalidOperationException($"Error: Could not create a release: {release.TagName}. Response: {responseContent}");
             }
 
-            Console.WriteLine($"[VERBOSE] Successfully created a release {release.TagName}. Uploading asset...");
+            Console.WriteLine($"Successfully created a release {release.TagName}. Uploading asset...");
 
             // Extract the upload URL from the response
             var responseObject = JsonDocument.Parse(responseContent);
@@ -304,7 +304,7 @@ namespace GitHubRelease
             if (uploadUrlDynamic is string uploadUrl)
             {
                 uploadUrl = uploadUrl.Replace("{?name,label}", $"?name={Path.GetFileName(assetPath)}");
-                Console.WriteLine($"[VERBOSE] Asset upload URL: {uploadUrl}");
+                if (verbose) Console.WriteLine($"Asset upload URL: {uploadUrl}");
             }
             else
             {
@@ -313,16 +313,16 @@ namespace GitHubRelease
             }
 
             // Upload the asset
-            response = await UploadAsset(assetPath, uploadUrl);
+            response = await UploadAsset(assetPath, uploadUrl, verbose);
             var assetUploadContent = await response.Content.ReadAsStringAsync();
-            Console.WriteLine($"[VERBOSE] Asset upload response status: {response.StatusCode}");
-            Console.WriteLine($"[VERBOSE] Asset upload response body: {assetUploadContent}");
+            Console.WriteLine($"Asset upload response status: {response.StatusCode}");
+            if (verbose) Console.WriteLine($"Asset upload response body: {assetUploadContent}");
             if (!response.IsSuccessStatusCode)
             {
                 throw new InvalidOperationException($"Error: Could not upload the asset: {assetPath}. Response: {assetUploadContent}");
             }
 
-            Console.WriteLine($"[VERBOSE] Successfully uploaded the asset: {assetPath}.");
+            Console.WriteLine($"Successfully uploaded the asset: {assetPath}.");
             return response;
         }
 
@@ -641,7 +641,7 @@ namespace GitHubRelease
         /// The content type is set to <c>application/octet-stream</c>.
         /// The method logs details about the upload and the response.
         /// </remarks>
-        private async Task<HttpResponseMessage> UploadAsset(string assetPath, string uploadUrl)
+        private async Task<HttpResponseMessage> UploadAsset(string assetPath, string uploadUrl, bool verbose)
         {
             if (!File.Exists(assetPath))
             {
@@ -661,10 +661,10 @@ namespace GitHubRelease
             byteArrayContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(assetMimeType);
 
             // Log the request details
-            Console.WriteLine($"Uploading asset to URL: {uploadUrl}");
-            Console.WriteLine($"Asset Path: {assetPath}");
-            Console.WriteLine($"Asset MIME Type: {assetMimeType}");
-            Console.WriteLine($"Asset Content Length: {assetContent.Length} bytes");
+            if (verbose) Console.WriteLine($"Uploading asset to URL: {uploadUrl}");
+            if (verbose) Console.WriteLine($"Asset Path: {assetPath}");
+            if (verbose) Console.WriteLine($"Asset MIME Type: {assetMimeType}");
+            if (verbose) Console.WriteLine($"Asset Content Length: {assetContent.Length} bytes");
 
             // Make the POST request with the specified assetMimeType to upload the asset
             var uploadResponse = await ApiService.PostAsync(uploadUrl, byteArrayContent);
@@ -672,7 +672,7 @@ namespace GitHubRelease
             // Log the response details
             Console.WriteLine($"Response Status Code: {uploadResponse.StatusCode}");
             var responseContent = await uploadResponse.Content.ReadAsStringAsync();
-            Console.WriteLine($"Response Content: {responseContent}");
+            if (verbose) Console.WriteLine($"Response Content: {responseContent}");
             return uploadResponse;
         }
         /// <summary>

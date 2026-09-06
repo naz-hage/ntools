@@ -71,7 +71,7 @@ public class BuildStarter
                 RedirectStandardOutput = false,
                 RedirectStandardError = false,
                 UseShellExecute = false,
-                CreateNoWindow = false,
+                CreateNoWindow = true,
             }
         };
 

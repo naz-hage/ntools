@@ -29,7 +29,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NbackupTests", "nBackupTest
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NbuildTasks", "NbuildTasks\NbuildTasks.csproj", "{36875C3B-0953-4936-BB31-2402515DCBAA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NbuildTests", "nbtests\nbtests.csproj", "{EFB85C8C-26C3-4A6F-919F-3534CD238975}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nbtests", "nbtests\nbtests.csproj", "{EFB85C8C-26C3-4A6F-919F-3534CD238975}"
 	ProjectSection(ProjectDependencies) = postProject
 		{36875C3B-0953-4936-BB31-2402515DCBAA} = {36875C3B-0953-4936-BB31-2402515DCBAA}
 	EndProjectSection
@@ -107,7 +107,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lf", "lf\lf.csproj", "{524E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lfTests", "lfTests\lfTests.csproj", "{B70A8112-F9C0-5646-4C66-B34C8E8AB203}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nbuild", "nb\nb.csproj", "{CB80CD10-DC2F-48A6-91D6-192C84AD765A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nb", "nb\nb.csproj", "{CB80CD10-DC2F-48A6-91D6-192C84AD765A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sdo", "Sdo\Sdo.csproj", "{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}"
 EndProject

@@ -38,7 +38,8 @@ namespace Nbuild
         public static int Main(params string[] args)
         {
             ConsoleHelper.WriteLine($"{Nversion.Get()}\n", ConsoleColor.Yellow);
-            
+            DeprecationNotice.DisplayWarning();
+
             // Pre-process arguments to move global options to the front so they work regardless of position
             args = PreProcessGlobalOptions(args);
             
@@ -228,7 +229,7 @@ namespace Nbuild
             {
                 var verbose = parseResult.GetValue(verboseOption);
                 PathManager.DisplayPathSegments();
-                if (verbose) ConsoleHelper.WriteLine("[VERBOSE] Displaying PATH segments.", ConsoleColor.Gray);
+                if (verbose) ConsoleHelper.WriteLine("Displaying PATH segments.", ConsoleColor.Gray);
                 return 0;
             });
             rootCommand.Subcommands.Add(cmd);
@@ -437,7 +438,7 @@ namespace Nbuild
                     ConsoleHelper.WriteLine($"[VERBOSE] OWNER env: {Environment.GetEnvironmentVariable("OWNER")}", ConsoleColor.Gray);
                     ConsoleHelper.WriteLine($"[VERBOSE] API_GITHUB_KEY env: {(string.IsNullOrEmpty(Environment.GetEnvironmentVariable("API_GITHUB_KEY")) ? "(not set)" : "(set)")}", ConsoleColor.Gray);
                 }
-                var exitCode = await HandleReleaseCreateCommand(repo, tag, branch, file, false, dryRun);
+                var exitCode = await HandleReleaseCreateCommand(repo, tag, branch, file, false, dryRun, verbose);
                 return exitCode;
             });
             rootCommand.Subcommands.Add(releaseCreateCommand);
@@ -497,7 +498,7 @@ namespace Nbuild
                     }
                 }
 
-                var exitCode = await HandleReleaseCreateCommand(repo, tag, branch, file, true, dryRun);
+                var exitCode = await HandleReleaseCreateCommand(repo, tag, branch, file, true, dryRun, verbose);
                 return exitCode;
             });
             rootCommand.Subcommands.Add(preReleaseCreateCommand);
@@ -571,7 +572,7 @@ namespace Nbuild
                     ConsoleHelper.WriteLine("DRY-RUN: running in dry-run mode; no destructive actions will be performed.", ConsoleColor.Yellow);
                 }
                 if (verbose) ConsoleHelper.WriteLine($"Verbose mode enabled", ConsoleColor.Yellow);
-                if (verbose) ConsoleHelper.WriteLine($"[VERBOSE] Listing releases for repo: {repo}", ConsoleColor.Gray);
+                if (verbose) ConsoleHelper.WriteLine($"Listing releases for repo: {repo}", ConsoleColor.Gray);
                 var exitCode = await HandleListReleasesCommand(repo, verbose, dryRun);
                 return exitCode;
             });
@@ -983,11 +984,11 @@ namespace Nbuild
         /// It integrates with GitHub's release API for automated release management.
         /// Supports both regular releases and pre-releases.
         /// </remarks>
-        private static async Task<int> HandleReleaseCreateCommand(string repo, string tag, string branch, string file, bool preRelease, bool dryRun)
+        private static async Task<int> HandleReleaseCreateCommand(string repo, string tag, string branch, string file, bool preRelease, bool dryRun, bool verbose)
         {
             try
             {
-                var result = await Command.CreateRelease(repo, tag, branch, file, preRelease, dryRun);
+                var result = await Command.CreateRelease(repo, tag, branch, file, preRelease, dryRun, verbose);
                 return result.Code;
             }
             catch (Exception ex)
