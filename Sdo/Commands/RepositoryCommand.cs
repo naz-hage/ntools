@@ -35,11 +35,197 @@ namespace Sdo.Commands
             _dryRunOption = dryRunOption;
 
             // Add subcommands (in alphabetical order)
+            AddBranchCommand(verboseOption);
+            AddCloneCommand(verboseOption);
             AddCreateCommand(verboseOption);
             AddDeleteCommand(verboseOption);
             AddInfoCommand(verboseOption);
             AddListCommand(verboseOption);
             AddShowCommand(verboseOption);
+            AddTagCommand(verboseOption);
+        }
+
+        private void AddBranchCommand(Option<bool> verboseOption)
+        {
+            var branchCommand = new System.CommandLine.Command(
+                "branch",
+                "Display the current branch in the local Git repository");
+
+            branchCommand.Add(verboseOption);
+            branchCommand.SetAction(parseResult =>
+            {
+                var verbose = parseResult.GetValue(verboseOption);
+                if (verbose)
+                {
+                    ConsoleHelper.WriteLine("[VERBOSE] Displaying git branch.", ConsoleColor.Gray);
+                }
+
+                return Nbuild.Command.DisplayGitBranch().Code;
+            });
+
+            Subcommands.Add(branchCommand);
+        }
+
+        private void AddCloneCommand(Option<bool> verboseOption)
+        {
+            var cloneCommand = new System.CommandLine.Command(
+                "clone",
+                "Clone a Git repository to a specified path");
+            var urlOption = new Option<string>("--url")
+            {
+                Description = "Git repository URL",
+                Required = true
+            };
+            var pathOption = new Option<string?>("--path")
+            {
+                Description = "Destination path; defaults to the current directory"
+            };
+
+            cloneCommand.Add(urlOption);
+            cloneCommand.Add(pathOption);
+            cloneCommand.Add(verboseOption);
+            if (_dryRunOption != null)
+            {
+                cloneCommand.Add(_dryRunOption);
+            }
+
+            cloneCommand.SetAction(parseResult =>
+            {
+                var url = parseResult.GetValue(urlOption);
+                var path = parseResult.GetValue(pathOption);
+                var verbose = parseResult.GetValue(verboseOption);
+                var dryRun = _dryRunOption != null && parseResult.GetValue(_dryRunOption);
+                return Nbuild.Command.Clone(url, path, verbose, dryRun).Code;
+            });
+
+            Subcommands.Add(cloneCommand);
+        }
+
+        private void AddTagCommand(Option<bool> verboseOption)
+        {
+            var tagCommand = new System.CommandLine.Command(
+                "tag",
+                "Manage Git tags");
+
+            AddAutoTagCommand(tagCommand, verboseOption);
+            AddDeleteTagCommand(tagCommand, verboseOption);
+            AddPushAutoTagCommand(tagCommand, verboseOption);
+            AddSetTagCommand(tagCommand, verboseOption);
+
+            Subcommands.Add(tagCommand);
+        }
+
+        private void AddAutoTagCommand(System.CommandLine.Command tagCommand, Option<bool> verboseOption)
+        {
+            var autoCommand = new System.CommandLine.Command(
+                "auto",
+                "Automatically set the next Git tag based on build type");
+            var buildTypeOption = new Option<string>("--buildtype")
+            {
+                Description = "Build type: STAGE or PROD",
+                Required = true
+            };
+
+            autoCommand.Add(buildTypeOption);
+            autoCommand.Add(verboseOption);
+            AddDryRunOption(autoCommand);
+            autoCommand.SetAction(parseResult =>
+            {
+                var buildType = parseResult.GetValue(buildTypeOption);
+                var verbose = parseResult.GetValue(verboseOption);
+                var dryRun = GetDryRunValue(parseResult);
+                return Nbuild.Command.SetAutoTag(buildType, false, verbose, dryRun).Code;
+            });
+
+            tagCommand.Subcommands.Add(autoCommand);
+        }
+
+        private void AddDeleteTagCommand(System.CommandLine.Command tagCommand, Option<bool> verboseOption)
+        {
+            var deleteCommand = new System.CommandLine.Command(
+                "delete",
+                "Delete a Git tag");
+            var tagOption = new Option<string>("--tag")
+            {
+                Description = "Tag to delete",
+                Required = true
+            };
+
+            deleteCommand.Add(tagOption);
+            deleteCommand.Add(verboseOption);
+            AddDryRunOption(deleteCommand);
+            deleteCommand.SetAction(parseResult =>
+            {
+                var tag = parseResult.GetValue(tagOption);
+                var verbose = parseResult.GetValue(verboseOption);
+                var dryRun = GetDryRunValue(parseResult);
+                return Nbuild.Command.DeleteTag(tag, verbose, dryRun).Code;
+            });
+
+            tagCommand.Subcommands.Add(deleteCommand);
+        }
+
+        private void AddPushAutoTagCommand(System.CommandLine.Command tagCommand, Option<bool> verboseOption)
+        {
+            var pushAutoCommand = new System.CommandLine.Command(
+                "push-auto",
+                "Automatically set and push the next Git tag based on build type");
+            var buildTypeOption = new Option<string>("--buildtype")
+            {
+                Description = "Build type: STAGE or PROD",
+                Required = true
+            };
+
+            pushAutoCommand.Add(buildTypeOption);
+            pushAutoCommand.Add(verboseOption);
+            AddDryRunOption(pushAutoCommand);
+            pushAutoCommand.SetAction(parseResult =>
+            {
+                var buildType = parseResult.GetValue(buildTypeOption);
+                var verbose = parseResult.GetValue(verboseOption);
+                var dryRun = GetDryRunValue(parseResult);
+                return Nbuild.Command.SetAutoTag(buildType, true, verbose, dryRun).Code;
+            });
+
+            tagCommand.Subcommands.Add(pushAutoCommand);
+        }
+
+        private void AddSetTagCommand(System.CommandLine.Command tagCommand, Option<bool> verboseOption)
+        {
+            var setCommand = new System.CommandLine.Command(
+                "set",
+                "Set a Git tag");
+            var tagOption = new Option<string>("--tag")
+            {
+                Description = "Tag to set",
+                Required = true
+            };
+
+            setCommand.Add(tagOption);
+            setCommand.Add(verboseOption);
+            AddDryRunOption(setCommand);
+            setCommand.SetAction(parseResult =>
+            {
+                var tag = parseResult.GetValue(tagOption);
+                var verbose = parseResult.GetValue(verboseOption);
+                var dryRun = GetDryRunValue(parseResult);
+                return Nbuild.Command.SetTag(tag, verbose, dryRun).Code;
+            });
+
+            tagCommand.Subcommands.Add(setCommand);
+        }
+
+        private void AddDryRunOption(System.CommandLine.Command command)
+        {
+            if (_dryRunOption != null)
+            {
+                command.Add(_dryRunOption);
+            }
+        }
+
+        private bool GetDryRunValue(System.CommandLine.ParseResult parseResult)
+        {
+            return _dryRunOption != null && parseResult.GetValue(_dryRunOption);
         }
 
         private void AddInfoCommand(Option<bool> verboseOption)

@@ -29,6 +29,34 @@ public class RepositoryCommandTests
     }
 
     [Fact]
+    public void Constructor_AddsBranchSubcommand()
+    {
+        var command = new RepositoryCommand(_verboseOption);
+        var branchCmd = Assert.Single(command.Subcommands, s => s.Name == "branch");
+        Assert.NotNull(branchCmd);
+    }
+
+    [Fact]
+    public void Constructor_AddsCloneSubcommandWithUrlAndPathOptions()
+    {
+        var command = new RepositoryCommand(_verboseOption, dryRunOption: new Option<bool>("--dry-run"));
+        var cloneCmd = Assert.Single(command.Subcommands, s => s.Name == "clone");
+
+        Assert.NotNull(cloneCmd.Options.FirstOrDefault(o => o.Name == "--url"));
+        Assert.NotNull(cloneCmd.Options.FirstOrDefault(o => o.Name == "--path"));
+    }
+
+    [Fact]
+    public void Constructor_AddsTagSubcommandWithNestedCommands()
+    {
+        var command = new RepositoryCommand(_verboseOption, dryRunOption: new Option<bool>("--dry-run"));
+        var tagCmd = Assert.Single(command.Subcommands, s => s.Name == "tag");
+        var nestedNames = tagCmd.Subcommands.Select(s => s.Name).ToList();
+
+        Assert.Equal(new[] { "auto", "delete", "push-auto", "set" }, nestedNames);
+    }
+
+    [Fact]
     public void Constructor_AddsDeleteSubcommand()
     {
         var command = new RepositoryCommand(_verboseOption);
@@ -65,7 +93,7 @@ public class RepositoryCommandTests
     {
         var command = new RepositoryCommand(_verboseOption);
         var subcommandNames = command.Subcommands.Select(s => s.Name).ToList();
-        Assert.Equal(new[] { "create", "delete", "info", "list", "show" }, subcommandNames);
+        Assert.Equal(new[] { "branch", "clone", "create", "delete", "info", "list", "show", "tag" }, subcommandNames);
     }
 
     [Fact]
