@@ -108,9 +108,23 @@ public class ProgramTests
     {
         var setResult = Program.Main("repo", "tag", "set", "--tag", "1.2.3", "--dry-run");
         var deleteResult = Program.Main("repo", "tag", "delete", "--tag", "1.2.3", "--dry-run");
+        var pushAutoResult = Program.Main("repo", "tag", "push-auto", "--buildtype", "stage", "--dry-run");
 
         Assert.Equal(0, setResult);
         Assert.Equal(0, deleteResult);
+        Assert.Equal(0, pushAutoResult);
+    }
+
+    [Fact]
+    public void Main_WithBuildTypeOnRepositoryTagSet_ReturnsNonZero()
+    {
+        var result = Program.Main(
+            "repo", "tag", "set",
+            "--tag", "push-auto",
+            "--buildtype", "stage",
+            "--dry-run");
+
+        Assert.NotEqual(0, result);
     }
 
     [Fact]

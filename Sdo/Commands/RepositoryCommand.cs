@@ -204,8 +204,15 @@ namespace Sdo.Commands
             setCommand.Add(tagOption);
             setCommand.Add(verboseOption);
             AddDryRunOption(setCommand);
+            setCommand.TreatUnmatchedTokensAsErrors = true;
             setCommand.SetAction(parseResult =>
             {
+                if (parseResult.UnmatchedTokens.Count > 0)
+                {
+                    Console.Error.WriteLine($"Unknown option or argument: {string.Join(' ', parseResult.UnmatchedTokens)}");
+                    return 1;
+                }
+
                 var tag = parseResult.GetValue(tagOption);
                 var verbose = parseResult.GetValue(verboseOption);
                 var dryRun = GetDryRunValue(parseResult);
