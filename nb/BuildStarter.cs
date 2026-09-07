@@ -9,6 +9,7 @@ namespace Nbuild;
 public class BuildStarter
 {
     public static string LogFile { get; set; } = "nbuild.log";
+    private static readonly TimeSpan BuildTimeout = TimeSpan.FromMinutes(3);
     private const string BuildFileName = "nbuild.targets";
     private const string CommonBuildFileName = "common.targets";
     private const string TargetsMd = "targets.md";
@@ -84,6 +85,75 @@ public class BuildStarter
 
         DisplayLog(5);
         return result;
+    }
+
+    /// <summary>
+    /// Runs the build process and handles output, timeout, and exit code. (A placeholder for future enhancements to handle output and errors more gracefully.)
+    /// can be called : var result = RunBuildProcess(process, target, verbose)
+    /// </summary>
+    /// <param name="process">The process to run.</param>
+    /// <param name="target">The build target.</param>
+    /// <param name="verbose">Specifies whether to display verbose output.</param>
+    /// <returns>A <see cref="ResultHelper"/> object representing the result of the build operation.</returns>
+    private static ResultHelper RunBuildProcess(Process process, string? target, bool verbose)
+    {
+        try
+        {
+            if (!process.Start())
+            {
+                return ResultHelper.Fail(-1, $"Failed to start {process.StartInfo.FileName}");
+            }
+
+            var spinner = new[] { '|', '/', '-', '\\' };
+            var spinnerIndex = 0;
+            var startedAt = Stopwatch.StartNew();
+            var spinnerEnabled = !Console.IsOutputRedirected;
+            var status = $"Build '{target}' may take up to 3 minutes";
+
+            if (spinnerEnabled)
+            {
+                Console.Write($"{status} {spinner[spinnerIndex]}");
+            }
+            else
+            {
+                Console.WriteLine(status);
+            }
+
+            while (!process.WaitForExit(250))
+            {
+                if (startedAt.Elapsed >= BuildTimeout)
+                {
+                    process.Kill(entireProcessTree: true);
+                    process.WaitForExit();
+                    Console.WriteLine();
+                    return ResultHelper.Fail(-1, $"Build '{target}' exceeded the 3-minute timeout.");
+                }
+
+                if (spinnerEnabled)
+                {
+                    spinnerIndex = (spinnerIndex + 1) % spinner.Length;
+                    Console.Write($"\r{status} {spinner[spinnerIndex]}");
+                }
+            }
+
+            if (spinnerEnabled)
+            {
+                Console.WriteLine($"\r{status} done.   ");
+            }
+
+            var result = ResultHelper.New();
+            result.Code = process.ExitCode;
+            if (result.Code != 0)
+            {
+                result.Output.Add($"MSBuild exited with code {result.Code}.");
+            }
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            return ResultHelper.Fail(-1, $"Exception while running build: {ex.Message}");
+        }
     }
 
     // <summary>

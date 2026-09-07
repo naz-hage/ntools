@@ -26,6 +26,7 @@
 
 	<ItemGroup>
 	<EmbeddedResource Include="mapping.md" />
+	<EmbeddedResource Include="..\Nbackup\Resources\Nbackup.json" Link="Resources\Nbackup.json" />
 	</ItemGroup>
 
 	<ItemGroup>

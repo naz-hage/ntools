@@ -6,12 +6,12 @@
 // Command handler for pipeline/workflow management operations.
 // Supports both GitHub Actions workflows and Azure DevOps pipelines.
 
-using System.CommandLine;
-using System.Diagnostics;
 using Nbuild.Helpers;
 using NbuildTasks;
 using Sdo.Interfaces;
 using Sdo.Services;
+using System.CommandLine;
+using System.Diagnostics;
 
 namespace Sdo.Commands
 {
@@ -244,14 +244,14 @@ namespace Sdo.Commands
                 // Validate file exists
                 if (!File.Exists(filePath))
                 {
-                    ConsoleHelper.WriteError($"X File not found: {filePath}");
+                    ConsoleHelper.WriteError($"File not found: {filePath}");
                     return 1;
                 }
 
                 var fileExtension = Path.GetExtension(filePath).ToLowerInvariant();
                 if (fileExtension != ".yml" && fileExtension != ".yaml")
                 {
-                    ConsoleHelper.WriteError("X Pipeline definition file must be in YAML format (.yml or .yaml)");
+                    ConsoleHelper.WriteError("Pipeline definition file must be in YAML format (.yml or .yaml)");
                     return 1;
                 }
 
@@ -262,7 +262,7 @@ namespace Sdo.Commands
 
                 if (repoInfo == null || string.IsNullOrEmpty(repoInfo.Owner) || string.IsNullOrEmpty(repoInfo.Repo))
                 {
-                    ConsoleHelper.WriteError("X Unable to determine repository from current Git remote");
+                    ConsoleHelper.WriteError("Unable to determine repository from current Git remote");
                     if (verbose)
                     {
                         Console.WriteLine("Make sure you're in a Git repository with a GitHub or Azure DevOps remote.");
@@ -287,12 +287,12 @@ namespace Sdo.Commands
                     return await CreateAzureDevOpsPipeline(repoInfo.Organization, repoInfo.Project, filePath, verbose);
                 }
 
-                ConsoleHelper.WriteError("X Unable to detect platform from Git remote");
+                ConsoleHelper.WriteError("Unable to detect platform from Git remote");
                 return 1;
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteError($"X Error creating pipeline: {ex.Message}");
+                ConsoleHelper.WriteError($"Error creating pipeline: {ex.Message}");
                 return 1;
             }
         }
@@ -308,7 +308,7 @@ namespace Sdo.Commands
 
                 if (repoInfo == null || string.IsNullOrEmpty(repoInfo.Owner) || string.IsNullOrEmpty(repoInfo.Repo))
                 {
-                    ConsoleHelper.WriteError("X Unable to determine repository from current Git remote");
+                    ConsoleHelper.WriteError("Unable to determine repository from current Git remote");
                     if (verbose)
                     {
                         Console.WriteLine("Make sure you're in a Git repository with a GitHub or Azure DevOps remote.");
@@ -333,12 +333,12 @@ namespace Sdo.Commands
                     return await DeleteAzureDevOpsPipeline(repoInfo.Organization, repoInfo.Project, pipelineId, force, verbose);
                 }
 
-                ConsoleHelper.WriteError("X Unable to detect platform from Git remote");
+                ConsoleHelper.WriteError("Unable to detect platform from Git remote");
                 return 1;
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteError($"X Error deleting pipeline: {ex.Message}");
+                ConsoleHelper.WriteError($"Error deleting pipeline: {ex.Message}");
                 return 1;
             }
         }
@@ -354,7 +354,7 @@ namespace Sdo.Commands
 
                 if (repoInfo == null || string.IsNullOrEmpty(repoInfo.Owner) || string.IsNullOrEmpty(repoInfo.Repo))
                 {
-                    ConsoleHelper.WriteError("X Unable to determine repository from current Git remote");
+                    ConsoleHelper.WriteError("Unable to determine repository from current Git remote");
                     if (verbose)
                     {
                         Console.WriteLine("Make sure you're in a Git repository with a GitHub or Azure DevOps remote.");
@@ -379,12 +379,12 @@ namespace Sdo.Commands
                     return await GetAzureDevOpsLastBuild(repoInfo.Organization, repoInfo.Project, pipelineName, verbose);
                 }
 
-                ConsoleHelper.WriteError("X Unable to detect platform from Git remote");
+                ConsoleHelper.WriteError("Unable to detect platform from Git remote");
                 return 1;
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteError($"X Error retrieving last build: {ex.Message}");
+                ConsoleHelper.WriteError($"Error retrieving last build: {ex.Message}");
                 return 1;
             }
         }
@@ -400,7 +400,7 @@ namespace Sdo.Commands
 
                 if (repoInfo == null || string.IsNullOrEmpty(repoInfo.Owner) || string.IsNullOrEmpty(repoInfo.Repo))
                 {
-                    ConsoleHelper.WriteError("X Unable to determine repository from current Git remote");
+                    ConsoleHelper.WriteError("Unable to determine repository from current Git remote");
                     if (verbose)
                     {
                         Console.WriteLine("Make sure you're in a Git repository with a GitHub or Azure DevOps remote.");
@@ -425,12 +425,12 @@ namespace Sdo.Commands
                     return await ListAzureDevOpsPipelines(repoInfo.Organization, repoInfo.Project, repo, showAll, verbose);
                 }
 
-                ConsoleHelper.WriteError("X Unable to detect platform from Git remote");
+                ConsoleHelper.WriteError("Unable to detect platform from Git remote");
                 return 1;
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteError($"X Error listing pipelines: {ex.Message}");
+                ConsoleHelper.WriteError($"Error listing pipelines: {ex.Message}");
                 return 1;
             }
         }
@@ -439,7 +439,7 @@ namespace Sdo.Commands
         {
             try
             {
-                ConsoleHelper.WriteLine($"✓ GitHub Repository: {owner}/{repo}", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess($"GitHub Repository: {owner}/{repo}");
 
                 string filterDisplay = showAll ? "all workflows" : "workflows for this repository";
                 if (!string.IsNullOrEmpty(filterRepo))
@@ -480,7 +480,7 @@ namespace Sdo.Commands
                     }
 
                     Console.WriteLine();
-                    ConsoleHelper.WriteLine("✓ Workflows in this repository:", ConsoleColor.Cyan);
+                    ConsoleHelper.WriteSuccess("Workflows in this repository:");
                     Console.WriteLine();
                     Console.WriteLine($"{"Name",-40} {"State",-10} {"ID"}");
                     Console.WriteLine(new string('-', 60));
@@ -501,7 +501,7 @@ namespace Sdo.Commands
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteError($"X Failed to list GitHub workflows: {ex.Message}");
+                ConsoleHelper.WriteError($"Failed to list GitHub workflows: {ex.Message}");
                 return 1;
             }
         }
@@ -510,7 +510,7 @@ namespace Sdo.Commands
         {
             try
             {
-                ConsoleHelper.WriteLine($"✓ Azure DevOps Project: {organization ?? "unknown"}/{project ?? "unknown"}", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess($"Azure DevOps Project: {organization ?? "unknown"}/{project ?? "unknown"}");
 
                 string filterDisplay = showAll ? "all pipelines" : "pipelines for this project";
                 if (!string.IsNullOrEmpty(filterRepo))
@@ -526,7 +526,7 @@ namespace Sdo.Commands
 
                 if (string.IsNullOrEmpty(organization) || string.IsNullOrEmpty(project))
                 {
-                    ConsoleHelper.WriteError("X Organization and project are required for Azure DevOps");
+                    ConsoleHelper.WriteError("Organization and project are required for Azure DevOps");
                     return 1;
                 }
 
@@ -561,7 +561,7 @@ namespace Sdo.Commands
                     }
 
                     Console.WriteLine();
-                    ConsoleHelper.WriteLine("✓ Pipelines in this project:", ConsoleColor.Cyan);
+                    ConsoleHelper.WriteSuccess("Pipelines in this project:");
                     Console.WriteLine();
                     Console.WriteLine($"{"Name",-40} {"Status",-15} {"ID"}");
                     Console.WriteLine(new string('-', 60));
@@ -583,7 +583,7 @@ namespace Sdo.Commands
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteError($"X Failed to list Azure DevOps pipelines: {ex.Message}");
+                ConsoleHelper.WriteError($"Failed to list Azure DevOps pipelines: {ex.Message}");
                 return 1;
             }
         }
@@ -599,7 +599,7 @@ namespace Sdo.Commands
 
                 if (repoInfo == null || string.IsNullOrEmpty(repoInfo.Owner) || string.IsNullOrEmpty(repoInfo.Repo))
                 {
-                    ConsoleHelper.WriteError("X Unable to determine repository from current Git remote");
+                    ConsoleHelper.WriteError("Unable to determine repository from current Git remote");
                     if (verbose)
                     {
                         Console.WriteLine("Make sure you're in a Git repository with a GitHub or Azure DevOps remote.");
@@ -624,12 +624,12 @@ namespace Sdo.Commands
                     return await GetAzureDevOpsLogs(repoInfo.Organization, repoInfo.Project, repoInfo.Repository, buildId, verbose);
                 }
 
-                ConsoleHelper.WriteError("X Unable to detect platform from Git remote");
+                ConsoleHelper.WriteError("Unable to detect platform from Git remote");
                 return 1;
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteError($"X Error retrieving logs: {ex.Message}");
+                ConsoleHelper.WriteError($"Error retrieving logs: {ex.Message}");
                 return 1;
             }
         }
@@ -640,7 +640,7 @@ namespace Sdo.Commands
             {
                 if (string.IsNullOrWhiteSpace(branch))
                 {
-                    ConsoleHelper.WriteError("X Branch is required to run a pipeline. Use --branch <name>");
+                    ConsoleHelper.WriteError("Branch is required to run a pipeline. Use --branch <name>");
                     return 1;
                 }
 
@@ -649,7 +649,7 @@ namespace Sdo.Commands
 
                 if (repoInfo == null || string.IsNullOrEmpty(repoInfo.Owner) || string.IsNullOrEmpty(repoInfo.Repo))
                 {
-                    ConsoleHelper.WriteError("X Unable to determine repository from current Git remote");
+                    ConsoleHelper.WriteError("Unable to determine repository from current Git remote");
                     return 1;
                 }
 
@@ -670,7 +670,7 @@ namespace Sdo.Commands
                         var defs = await client.ListPipelineDefinitionsAsync(repoInfo.Owner, repoInfo.Repo);
                         if (defs == null || defs.Count == 0)
                         {
-                            ConsoleHelper.WriteError("X No workflows found in repository");
+                            ConsoleHelper.WriteError("No workflows found in repository");
                             return 1;
                         }
 
@@ -686,7 +686,7 @@ namespace Sdo.Commands
                             var first = defs.FirstOrDefault(d => string.Equals(d.State, "active", StringComparison.OrdinalIgnoreCase)) ?? defs.First();
                             if (!long.TryParse(first.PlatformId, out var fid))
                             {
-                                ConsoleHelper.WriteError("X Could not parse workflow id");
+                                ConsoleHelper.WriteError("Could not parse workflow id");
                                 return 1;
                             }
                             workflowId = fid;
@@ -695,7 +695,7 @@ namespace Sdo.Commands
 
                     if (!workflowId.HasValue)
                     {
-                        ConsoleHelper.WriteError("X Could not resolve workflow to run");
+                        ConsoleHelper.WriteError("Could not resolve workflow to run");
                         return 1;
                     }
 
@@ -703,11 +703,11 @@ namespace Sdo.Commands
                     var triggered = await client.TriggerPipelineAsync(repoInfo.Owner, repoInfo.Repo, workflowId.Value, branchRef);
                     if (!triggered)
                     {
-                        ConsoleHelper.WriteError("X Failed to trigger GitHub workflow");
+                        ConsoleHelper.WriteError("Failed to trigger GitHub workflow");
                         return 1;
                     }
 
-                    ConsoleHelper.WriteLine($"[OK] Workflow dispatch triggered (workflow id: {workflowId.Value})", ConsoleColor.Green);
+                    ConsoleHelper.WriteSuccess($"Workflow dispatch triggered (workflow id: {workflowId.Value})");
 
                     // Try to find the created run
                     var runs = await client.ListPipelineRunsAsync(repoInfo.Owner, repoInfo.Repo, workflowId, 5);
@@ -723,7 +723,7 @@ namespace Sdo.Commands
                 {
                     if (string.IsNullOrEmpty(repoInfo.Organization) || string.IsNullOrEmpty(repoInfo.Project))
                     {
-                        ConsoleHelper.WriteError("X Organization and project are required for Azure DevOps");
+                        ConsoleHelper.WriteError("Organization and project are required for Azure DevOps");
                         return 1;
                     }
 
@@ -744,7 +744,7 @@ namespace Sdo.Commands
                         var pipelines = await client.ListPipelineDefinitionsAsync(repoInfo.Project);
                         if (pipelines == null || pipelines.Count == 0)
                         {
-                            ConsoleHelper.WriteError("X No pipelines found in project");
+                            ConsoleHelper.WriteError("No pipelines found in project");
                             return 1;
                         }
 
@@ -766,7 +766,7 @@ namespace Sdo.Commands
                             // Fallback to first pipeline
                             if (!int.TryParse(pipelines.First().PlatformId, out var fid))
                             {
-                                ConsoleHelper.WriteError("X Failed to resolve pipeline id");
+                                ConsoleHelper.WriteError("Failed to resolve pipeline id");
                                 return 1;
                             }
                             definitionId = fid;
@@ -775,18 +775,18 @@ namespace Sdo.Commands
 
                     if (!definitionId.HasValue)
                     {
-                        ConsoleHelper.WriteError("X Could not resolve pipeline definition id to run");
+                        ConsoleHelper.WriteError("Could not resolve pipeline definition id to run");
                         return 1;
                     }
 
                     var buildId = await client.RunPipelineAsync(repoInfo.Project, definitionId.Value, branch);
                     if (buildId < 0)
                     {
-                        ConsoleHelper.WriteError($"X Failed to queue build: {client.LastError}");
+                        ConsoleHelper.WriteError($"Failed to queue build: {client.LastError}");
                         return 1;
                     }
 
-                    ConsoleHelper.WriteLine($"[OK] Build queued (ID: {buildId})", ConsoleColor.Green);
+                    ConsoleHelper.WriteSuccess($"Build queued (ID: {buildId})");
 
                     // Prefer neutral pipeline run wrapper
                     var run = await client.GetPipelineRunAsync(repoInfo.Project, buildId);
@@ -807,12 +807,12 @@ namespace Sdo.Commands
                     return 0;
                 }
 
-                ConsoleHelper.WriteError("X Unable to detect platform from Git remote");
+                ConsoleHelper.WriteError("Unable to detect platform from Git remote");
                 return 1;
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteError($"X Error running pipeline: {ex.Message}");
+                ConsoleHelper.WriteError($"Error running pipeline: {ex.Message}");
                 return 1;
             }
         }
@@ -828,7 +828,7 @@ namespace Sdo.Commands
 
                 if (repoInfo == null || string.IsNullOrEmpty(repoInfo.Owner) || string.IsNullOrEmpty(repoInfo.Repo))
                 {
-                    ConsoleHelper.WriteError("X Unable to determine repository from current Git remote");
+                    ConsoleHelper.WriteError("Unable to determine repository from current Git remote");
                     if (verbose)
                     {
                         Console.WriteLine("Make sure you're in a Git repository with a GitHub or Azure DevOps remote.");
@@ -853,12 +853,12 @@ namespace Sdo.Commands
                     return await ShowAzureDevOpsPipeline(repoInfo.Organization, repoInfo.Project, repoInfo.Repository, pipelineIdOrName, verbose);
                 }
 
-                ConsoleHelper.WriteError("X Unable to detect platform from Git remote");
+                ConsoleHelper.WriteError("Unable to detect platform from Git remote");
                 return 1;
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteError($"X Error showing pipeline: {ex.Message}");
+                ConsoleHelper.WriteError($"Error showing pipeline: {ex.Message}");
                 return 1;
             }
         }
@@ -867,7 +867,7 @@ namespace Sdo.Commands
         {
             try
             {
-                ConsoleHelper.WriteLine($"✓ GitHub Repository: {owner}/{repo}", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess($"GitHub Repository: {owner}/{repo}");
 
                 if (verbose)
                 {
@@ -886,7 +886,7 @@ namespace Sdo.Commands
                     }
 
                     Console.WriteLine();
-                    ConsoleHelper.WriteLine("✓ Workflows in this repository:", ConsoleColor.Cyan);
+                    ConsoleHelper.WriteSuccess("Workflows in this repository:");
                     Console.WriteLine();
 
                     foreach (var def in definitions)
@@ -906,7 +906,7 @@ namespace Sdo.Commands
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteError($"X Failed to show GitHub workflows: {ex.Message}");
+                ConsoleHelper.WriteError($"Failed to show GitHub workflows: {ex.Message}");
                 return 1;
             }
         }
@@ -915,8 +915,8 @@ namespace Sdo.Commands
         {
             try
             {
-                ConsoleHelper.WriteLine($"✓ Azure DevOps Project: {organization ?? "unknown"}/{project ?? "unknown"}", ConsoleColor.Green);
-                ConsoleHelper.WriteLine($"✓ Repository: {repository ?? "unknown"}", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess($"Azure DevOps Project: {organization ?? "unknown"}/{project ?? "unknown"}");
+                ConsoleHelper.WriteSuccess($"Repository: {repository ?? "unknown"}");
 
                 if (verbose)
                 {
@@ -925,7 +925,7 @@ namespace Sdo.Commands
 
                 if (string.IsNullOrEmpty(organization) || string.IsNullOrEmpty(project))
                 {
-                    ConsoleHelper.WriteError("X Organization and project are required for Azure DevOps");
+                    ConsoleHelper.WriteError("Organization and project are required for Azure DevOps");
                     return 1;
                 }
 
@@ -942,12 +942,12 @@ namespace Sdo.Commands
                         if (pipeline == null)
                         {
                             var details = string.IsNullOrEmpty(client.LastError) ? string.Empty : $": {client.LastError}";
-                            ConsoleHelper.WriteError($"X Pipeline not found{details}");
+                            ConsoleHelper.WriteError($"Pipeline not found{details}");
                             return 1;
                         }
 
                         Console.WriteLine();
-                        ConsoleHelper.WriteLine("✓ Pipeline details:", ConsoleColor.Cyan);
+                        ConsoleHelper.WriteSuccess("Pipeline details:");
                         Console.WriteLine($"  Name: {pipeline.Name ?? "Unnamed Pipeline"}");
                         Console.WriteLine($"  ID: {pipeline.PlatformId}");
                         Console.WriteLine($"  Status: {pipeline.State ?? "unknown"}");
@@ -977,7 +977,7 @@ namespace Sdo.Commands
                     }
 
                     Console.WriteLine();
-                    ConsoleHelper.WriteLine("✓ Pipelines in this project:", ConsoleColor.Cyan);
+                    ConsoleHelper.WriteSuccess("Pipelines in this project:");
                     Console.WriteLine();
 
                     foreach (var pipeline in pipelines)
@@ -1001,7 +1001,7 @@ namespace Sdo.Commands
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteError($"X Failed to show Azure DevOps pipelines: {ex.Message}");
+                ConsoleHelper.WriteError($"Failed to show Azure DevOps pipelines: {ex.Message}");
                 return 1;
             }
         }
@@ -1010,7 +1010,7 @@ namespace Sdo.Commands
         {
             try
             {
-                ConsoleHelper.WriteLine($"✓ GitHub Repository: {owner}/{repo}", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess($"GitHub Repository: {owner}/{repo}");
 
                 if (verbose)
                 {
@@ -1020,7 +1020,7 @@ namespace Sdo.Commands
 
                 if (string.IsNullOrEmpty(workflowId))
                 {
-                    ConsoleHelper.WriteError("X Workflow ID or name is required");
+                    ConsoleHelper.WriteError("Workflow ID or name is required");
                     return 1;
                 }
 
@@ -1038,7 +1038,7 @@ namespace Sdo.Commands
 
                 // For GitHub, workflow deletion requires disabling the workflow file in the repository
                 // This would typically be done via a commit that removes or disables the workflow
-                ConsoleHelper.WriteLine($"[OK] Workflow deletion would be processed", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess("Workflow deletion would be processed");
                 Console.WriteLine();
                 ConsoleHelper.WriteLine($"To delete this workflow:", ConsoleColor.Cyan);
                 Console.WriteLine($"  1. Delete or rename the {workflowId}.yml file from .github/workflows/");
@@ -1049,7 +1049,7 @@ namespace Sdo.Commands
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteError($"X Failed to delete GitHub workflow: {ex.Message}");
+                ConsoleHelper.WriteError($"Failed to delete GitHub workflow: {ex.Message}");
                 return 1;
             }
         }
@@ -1058,7 +1058,7 @@ namespace Sdo.Commands
         {
             try
             {
-                ConsoleHelper.WriteLine($"✓ Azure DevOps Project: {organization ?? "unknown"}/{project ?? "unknown"}", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess($"Azure DevOps Project: {organization ?? "unknown"}/{project ?? "unknown"}");
 
                 if (verbose)
                 {
@@ -1068,13 +1068,13 @@ namespace Sdo.Commands
 
                 if (string.IsNullOrEmpty(pipelineId))
                 {
-                    ConsoleHelper.WriteError("X Pipeline ID or name is required");
+                    ConsoleHelper.WriteError("Pipeline ID or name is required");
                     return 1;
                 }
 
                 if (string.IsNullOrEmpty(organization) || string.IsNullOrEmpty(project))
                 {
-                    ConsoleHelper.WriteError("X Organization and project are required for Azure DevOps");
+                    ConsoleHelper.WriteError("Organization and project are required for Azure DevOps");
                     return 1;
                 }
 
@@ -1100,18 +1100,18 @@ namespace Sdo.Commands
                     var success = await client.DeletePipelineAsync(project, pipelineId);
                     if (!success)
                     {
-                        ConsoleHelper.WriteError($"X Failed to delete pipeline: {client.LastError}");
+                        ConsoleHelper.WriteError($"Failed to delete pipeline: {client.LastError}");
                         return 1;
                     }
 
-                    ConsoleHelper.WriteLine($"[OK] Pipeline '{pipelineId}' deleted successfully.", ConsoleColor.Green);
+                    ConsoleHelper.WriteSuccess($"Pipeline '{pipelineId}' deleted successfully.");
                 }
 
                 return 0;
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteError($"X Failed to delete Azure DevOps pipeline: {ex.Message}");
+                ConsoleHelper.WriteError($"Failed to delete Azure DevOps pipeline: {ex.Message}");
                 return 1;
             }
         }
@@ -1120,7 +1120,7 @@ namespace Sdo.Commands
         {
             try
             {
-                ConsoleHelper.WriteLine($"✓ GitHub Repository: {owner}/{repo}", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess($"GitHub Repository: {owner}/{repo}");
 
                 if (verbose)
                 {
@@ -1140,7 +1140,7 @@ namespace Sdo.Commands
                     }
 
                     Console.WriteLine();
-                    ConsoleHelper.WriteLine("✓ Latest workflow runs:", ConsoleColor.Cyan);
+                    ConsoleHelper.WriteSuccess("Latest workflow runs:");
                     Console.WriteLine();
                     Console.WriteLine($"{"Run ID",-12} {"Workflow Name",-35} {"Last Run",-20} {"Status",-12} {"Result"}");
                     Console.WriteLine(new string('-', 90));
@@ -1162,7 +1162,7 @@ namespace Sdo.Commands
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteError($"X Failed to get GitHub last run: {ex.Message}");
+                ConsoleHelper.WriteError($"Failed to get GitHub last run: {ex.Message}");
                 return 1;
             }
         }
@@ -1171,7 +1171,7 @@ namespace Sdo.Commands
         {
             try
             {
-                ConsoleHelper.WriteLine($"✓ Azure DevOps Project: {organization ?? "unknown"}/{project ?? "unknown"}", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess($"Azure DevOps Project: {organization ?? "unknown"}/{project ?? "unknown"}");
 
                 if (verbose)
                 {
@@ -1181,7 +1181,7 @@ namespace Sdo.Commands
 
                 if (string.IsNullOrEmpty(organization) || string.IsNullOrEmpty(project))
                 {
-                    ConsoleHelper.WriteError("X Organization and project are required for Azure DevOps");
+                    ConsoleHelper.WriteError("Organization and project are required for Azure DevOps");
                     return 1;
                 }
 
@@ -1210,7 +1210,7 @@ namespace Sdo.Commands
                     }
 
                     Console.WriteLine();
-                    ConsoleHelper.WriteLine("✓ Recent builds:", ConsoleColor.Cyan);
+                    ConsoleHelper.WriteSuccess("Recent builds:");
                     Console.WriteLine();
                     Console.WriteLine($"{"Pipeline Name",-40} {"Last Build",-20} {"Status"}");
                     Console.WriteLine(new string('-', 70));
@@ -1232,7 +1232,7 @@ namespace Sdo.Commands
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteError($"X Failed to get Azure DevOps last build: {ex.Message}");
+                ConsoleHelper.WriteError($"Failed to get Azure DevOps last build: {ex.Message}");
                 return 1;
             }
         }
@@ -1242,7 +1242,7 @@ namespace Sdo.Commands
             try
             {
                 var fileName = Path.GetFileName(filePath);
-                ConsoleHelper.WriteLine($"✓ GitHub Repository: {owner}/{repo}", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess($"GitHub Repository: {owner}/{repo}");
 
                 if (verbose)
                 {
@@ -1253,14 +1253,14 @@ namespace Sdo.Commands
                 // Validate file exists
                 if (!File.Exists(filePath))
                 {
-                    ConsoleHelper.WriteError($"X File not found: {filePath}");
+                    ConsoleHelper.WriteError($"File not found: {filePath}");
                     return 1;
                 }
 
                 var yamlContent = await File.ReadAllTextAsync(filePath);
                 if (string.IsNullOrWhiteSpace(yamlContent))
                 {
-                    ConsoleHelper.WriteError("X YAML file is empty");
+                    ConsoleHelper.WriteError("YAML file is empty");
                     return 1;
                 }
 
@@ -1274,13 +1274,13 @@ namespace Sdo.Commands
                 var success = await githubClient.CreateWorkflowAsync(owner, repo, fileName, filePath);
                 if (!success)
                 {
-                    ConsoleHelper.WriteError($"X Workflow validation failed: Repository {owner}/{repo} not found or not accessible");
+                    ConsoleHelper.WriteError($"Workflow validation failed: Repository {owner}/{repo} not found or not accessible");
                     return 1;
                 }
 
                 // Workflow validation passed
                 var workflowPath = Path.Combine(".github", "workflows", fileName);
-                ConsoleHelper.WriteLine($"[OK] Workflow definition validated successfully", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess("Workflow definition validated successfully");
                 Console.WriteLine();
                 ConsoleHelper.WriteLine($"Workflow Details:", ConsoleColor.Cyan);
                 Console.WriteLine($"  Repository: {owner}/{repo}");
@@ -1298,7 +1298,7 @@ namespace Sdo.Commands
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteError($"X Failed to create GitHub workflow: {ex.Message}");
+                ConsoleHelper.WriteError($"Failed to create GitHub workflow: {ex.Message}");
                 return 1;
             }
         }
@@ -1308,7 +1308,7 @@ namespace Sdo.Commands
             try
             {
                 var fileName = Path.GetFileName(filePath);
-                ConsoleHelper.WriteLine($"✓ Azure DevOps Project: {organization ?? "unknown"}/{project ?? "unknown"}", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess($"Azure DevOps Project: {organization ?? "unknown"}/{project ?? "unknown"}");
 
                 if (verbose)
                 {
@@ -1318,21 +1318,21 @@ namespace Sdo.Commands
 
                 if (string.IsNullOrEmpty(organization) || string.IsNullOrEmpty(project))
                 {
-                    ConsoleHelper.WriteError("X Organization and project are required for Azure DevOps");
+                    ConsoleHelper.WriteError("Organization and project are required for Azure DevOps");
                     return 1;
                 }
 
                 // Validate file exists
                 if (!File.Exists(filePath))
                 {
-                    ConsoleHelper.WriteError($"X File not found: {filePath}");
+                    ConsoleHelper.WriteError($"File not found: {filePath}");
                     return 1;
                 }
 
                 var yamlContent = await File.ReadAllTextAsync(filePath);
                 if (string.IsNullOrWhiteSpace(yamlContent))
                 {
-                    ConsoleHelper.WriteError("X YAML file is empty");
+                    ConsoleHelper.WriteError("YAML file is empty");
                     return 1;
                 }
 
@@ -1353,11 +1353,11 @@ namespace Sdo.Commands
 
                     if (pipelineId < 0)
                     {
-                        ConsoleHelper.WriteError($"X Failed to create pipeline: {client.LastError}");
+                        ConsoleHelper.WriteError($"Failed to create pipeline: {client.LastError}");
                         return 1;
                     }
 
-                    ConsoleHelper.WriteLine($"[OK] Pipeline created successfully", ConsoleColor.Green);
+                    ConsoleHelper.WriteSuccess("Pipeline created successfully");
                     Console.WriteLine();
                     ConsoleHelper.WriteLine($"Pipeline Details:", ConsoleColor.Cyan);
                     Console.WriteLine($"  Organization: {organization}");
@@ -1371,7 +1371,7 @@ namespace Sdo.Commands
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteError($"X Failed to create Azure DevOps pipeline: {ex.Message}");
+                ConsoleHelper.WriteError($"Failed to create Azure DevOps pipeline: {ex.Message}");
                 return 1;
             }
         }
@@ -1400,7 +1400,7 @@ namespace Sdo.Commands
             pat = AzureDevOpsCredentials.GetTokenOrDefault();
             if (string.IsNullOrEmpty(pat))
             {
-                ConsoleHelper.WriteError("X Azure DevOps authentication required.");
+                ConsoleHelper.WriteError("Azure DevOps authentication required.");
                 Console.WriteLine("Please set AZURE_DEVOPS_PAT environment variable or run: sdo auth azdo");
                 return false;
             }
@@ -1425,7 +1425,7 @@ namespace Sdo.Commands
 
                 if (repoInfo == null || string.IsNullOrEmpty(repoInfo.Owner) || string.IsNullOrEmpty(repoInfo.Repo))
                 {
-                    ConsoleHelper.WriteError("X Unable to determine repository from current Git remote");
+                    ConsoleHelper.WriteError("Unable to determine repository from current Git remote");
                     if (verbose)
                     {
                         Console.WriteLine("Make sure you're in a Git repository with a GitHub or Azure DevOps remote.");
@@ -1450,12 +1450,12 @@ namespace Sdo.Commands
                     return await GetAzureDevOpsRunStatus(repoInfo.Organization, repoInfo.Project, repoInfo.Repository, buildId, verbose);
                 }
 
-                ConsoleHelper.WriteError("X Unable to detect platform from Git remote");
+                ConsoleHelper.WriteError("Unable to detect platform from Git remote");
                 return 1;
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteError($"X Error getting pipeline status: {ex.Message}");
+                ConsoleHelper.WriteError($"Error getting pipeline status: {ex.Message}");
                 return 1;
             }
         }
@@ -1464,7 +1464,7 @@ namespace Sdo.Commands
         {
             try
             {
-                ConsoleHelper.WriteLine($"✓ GitHub Repository: {owner}/{repo}", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess($"GitHub Repository: {owner}/{repo}");
 
                 using var client = new Sdo.Services.GitHubClient();
                 PipelineRun? run;
@@ -1474,7 +1474,7 @@ namespace Sdo.Commands
                     run = await client.GetPipelineRunAsync(owner, repo, buildId.Value);
                     if (run == null)
                     {
-                        ConsoleHelper.WriteError($"X Workflow run not found for ID {buildId.Value}");
+                        ConsoleHelper.WriteError($"Workflow run not found for ID {buildId.Value}");
                         return 1;
                     }
                 }
@@ -1490,7 +1490,7 @@ namespace Sdo.Commands
                 }
 
                 Console.WriteLine();
-                ConsoleHelper.WriteLine("✓ Workflow Run Status", ConsoleColor.Cyan);
+                ConsoleHelper.WriteSuccess("Workflow Run Status");
                 Console.WriteLine($"  Run ID:     {run.PlatformId}");
                 Console.WriteLine($"  Name:       {run.Name ?? "unknown"}");
                 Console.WriteLine($"  Branch:     {run.Branch ?? "unknown"}");
@@ -1513,7 +1513,7 @@ namespace Sdo.Commands
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteError($"X Failed to get GitHub run status: {ex.Message}");
+                ConsoleHelper.WriteError($"Failed to get GitHub run status: {ex.Message}");
                 return 1;
             }
         }
@@ -1522,12 +1522,12 @@ namespace Sdo.Commands
         {
             try
             {
-                ConsoleHelper.WriteLine($"✓ Azure DevOps Project: {organization ?? "unknown"}/{project ?? "unknown"}", ConsoleColor.Green);
-                ConsoleHelper.WriteLine($"✓ Repository: {repository ?? "unknown"}", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess($"Azure DevOps Project: {organization ?? "unknown"}/{project ?? "unknown"}");
+                ConsoleHelper.WriteSuccess($"Repository: {repository ?? "unknown"}");
 
                 if (string.IsNullOrEmpty(organization) || string.IsNullOrEmpty(project))
                 {
-                    ConsoleHelper.WriteError("X Organization and project are required for Azure DevOps");
+                    ConsoleHelper.WriteError("Organization and project are required for Azure DevOps");
                     return 1;
                 }
 
@@ -1544,7 +1544,7 @@ namespace Sdo.Commands
                     run = await client.GetPipelineRunAsync(project, (int)buildId.Value);
                     if (run == null)
                     {
-                        ConsoleHelper.WriteError($"X Build not found for ID {buildId.Value}");
+                        ConsoleHelper.WriteError($"Build not found for ID {buildId.Value}");
                         return 1;
                     }
                 }
@@ -1560,7 +1560,7 @@ namespace Sdo.Commands
                 }
 
                 Console.WriteLine();
-                ConsoleHelper.WriteLine("✓ Build Status", ConsoleColor.Cyan);
+                ConsoleHelper.WriteSuccess("Build Status");
                 Console.WriteLine($"  Build ID:    {run.PlatformId}");
                 Console.WriteLine($"  Number:      {run.Name ?? "unknown"}");
                 Console.WriteLine($"  Pipeline:    {run.Name ?? "unknown"}");
@@ -1580,7 +1580,7 @@ namespace Sdo.Commands
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteError($"X Failed to get Azure DevOps build status: {ex.Message}");
+                ConsoleHelper.WriteError($"Failed to get Azure DevOps build status: {ex.Message}");
                 return 1;
             }
         }
@@ -1589,7 +1589,7 @@ namespace Sdo.Commands
         {
             try
             {
-                ConsoleHelper.WriteLine($"✓ GitHub Repository: {owner}/{repo}", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess($"GitHub Repository: {owner}/{repo}");
 
                 using var client = new Sdo.Services.GitHubClient();
                 PipelineRun? run;
@@ -1599,7 +1599,7 @@ namespace Sdo.Commands
                     run = await client.GetPipelineRunAsync(owner, repo, buildId.Value);
                     if (run == null)
                     {
-                        ConsoleHelper.WriteError($"X Workflow run not found for ID {buildId.Value}");
+                        ConsoleHelper.WriteError($"Workflow run not found for ID {buildId.Value}");
                         return 1;
                     }
                 }
@@ -1615,7 +1615,7 @@ namespace Sdo.Commands
                 }
 
                 Console.WriteLine();
-                ConsoleHelper.WriteLine("✓ Workflow Run Logs", ConsoleColor.Cyan);
+                ConsoleHelper.WriteSuccess("Workflow Run Logs");
                 Console.WriteLine($"  Run ID:      {run.PlatformId}");
                 Console.WriteLine($"  Name:        {run.Name ?? "unknown"}");
                 Console.WriteLine($"  Status:      {run.Status ?? "unknown"}");
@@ -1647,7 +1647,7 @@ namespace Sdo.Commands
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteError($"X Failed to get GitHub logs: {ex.Message}");
+                ConsoleHelper.WriteError($"Failed to get GitHub logs: {ex.Message}");
                 return 1;
             }
         }
@@ -1656,12 +1656,12 @@ namespace Sdo.Commands
         {
             try
             {
-                ConsoleHelper.WriteLine($"✓ Azure DevOps Project: {organization ?? "unknown"}/{project ?? "unknown"}", ConsoleColor.Green);
-                ConsoleHelper.WriteLine($"✓ Repository: {repository ?? "unknown"}", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess($"Azure DevOps Project: {organization ?? "unknown"}/{project ?? "unknown"}");
+                ConsoleHelper.WriteSuccess($"Repository: {repository ?? "unknown"}");
 
                 if (string.IsNullOrEmpty(organization) || string.IsNullOrEmpty(project))
                 {
-                    ConsoleHelper.WriteError("X Organization and project are required for Azure DevOps");
+                    ConsoleHelper.WriteError("Organization and project are required for Azure DevOps");
                     return 1;
                 }
 
@@ -1678,7 +1678,7 @@ namespace Sdo.Commands
                     run = await client.GetPipelineRunAsync(project, (int)buildId.Value);
                     if (run == null)
                     {
-                        ConsoleHelper.WriteError($"X Build not found for ID {buildId.Value}");
+                        ConsoleHelper.WriteError($"Build not found for ID {buildId.Value}");
                         return 1;
                     }
                 }
@@ -1694,7 +1694,7 @@ namespace Sdo.Commands
                 }
 
                 Console.WriteLine();
-                ConsoleHelper.WriteLine("✓ Build Logs", ConsoleColor.Cyan);
+                ConsoleHelper.WriteSuccess("Build Logs");
                 Console.WriteLine($"  Build ID:    {run.PlatformId}");
                 Console.WriteLine($"  Number:      {run.Name ?? "unknown"}");
                 Console.WriteLine($"  Status:      {run.Status ?? "unknown"}");
@@ -1725,14 +1725,14 @@ namespace Sdo.Commands
                 }
                 catch (Exception ex)
                 {
-                    ConsoleHelper.WriteError($"X Error downloading build logs: {ex.Message}");
+                    ConsoleHelper.WriteError($"Error downloading build logs: {ex.Message}");
                 }
 
                 return 0;
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteError($"X Failed to get Azure DevOps logs: {ex.Message}");
+                ConsoleHelper.WriteError($"Failed to get Azure DevOps logs: {ex.Message}");
                 return 1;
             }
         }
@@ -1748,7 +1748,7 @@ namespace Sdo.Commands
 
                 if (repoInfo == null || string.IsNullOrEmpty(repoInfo.Owner) || string.IsNullOrEmpty(repoInfo.Repo))
                 {
-                    ConsoleHelper.WriteError("X Unable to determine repository from current Git remote");
+                    ConsoleHelper.WriteError("Unable to determine repository from current Git remote");
                     return 1;
                 }
 
@@ -1775,21 +1775,21 @@ namespace Sdo.Commands
                         return 0;
                     }
 
-                    ConsoleHelper.WriteError("X Unable to detect platform from Git remote");
+                    ConsoleHelper.WriteError("Unable to detect platform from Git remote");
                     return 1;
                 }
 
                 // Validate file
                 if (!File.Exists(filePath))
                 {
-                    ConsoleHelper.WriteError($"X File not found: {filePath}");
+                    ConsoleHelper.WriteError($"File not found: {filePath}");
                     return 1;
                 }
 
                 var ext = Path.GetExtension(filePath).ToLowerInvariant();
                 if (ext != ".yml" && ext != ".yaml")
                 {
-                    ConsoleHelper.WriteError("X Pipeline definition file must be YAML (.yml or .yaml)");
+                    ConsoleHelper.WriteError("Pipeline definition file must be YAML (.yml or .yaml)");
                     return 1;
                 }
 
@@ -1819,7 +1819,7 @@ namespace Sdo.Commands
                         await stageProc.WaitForExitAsync();
                         if (stageProc.ExitCode != 0)
                         {
-                            ConsoleHelper.WriteError($"X git add failed: {sErr.Trim()}");
+                            ConsoleHelper.WriteError($"git add failed: {sErr.Trim()}");
                             return 1;
                         }
                     }
@@ -1835,11 +1835,11 @@ namespace Sdo.Commands
                 // Push to remote
                 if (!gitWrapper.Push(branch))
                 {
-                    ConsoleHelper.WriteError($"X git push failed");
+                    ConsoleHelper.WriteError($"git push failed");
                     return 1;
                 }
 
-                ConsoleHelper.WriteLine("[OK] Pipeline/workflow file updated and pushed.", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess("Pipeline/workflow file updated and pushed.");
 
                 // Attempt API-driven update for Azure DevOps definitions when a pipeline id was provided
                 if (platform == Platform.AzureDevOps && !string.IsNullOrWhiteSpace(pipelineId))
@@ -1862,7 +1862,7 @@ namespace Sdo.Commands
                                     var ok = await client.UpdatePipelineDefinitionYamlAsync(repoInfo.Project, defId, filePath!);
                                     if (ok)
                                     {
-                                        ConsoleHelper.WriteLine("[OK] Azure DevOps pipeline definition updated via REST API.", ConsoleColor.Green);
+                                        ConsoleHelper.WriteSuccess("Azure DevOps pipeline definition updated via REST API.");
                                     }
                                     else
                                     {
@@ -1887,7 +1887,7 @@ namespace Sdo.Commands
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteError($"X Error updating pipeline: {ex.Message}");
+                ConsoleHelper.WriteError($"Error updating pipeline: {ex.Message}");
                 return 1;
             }
         }

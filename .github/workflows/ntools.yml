@@ -48,23 +48,23 @@ jobs:
 
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
       with:
-        token: ${{ secrets.API_GITHUB_KEY }}
+        token: ${{ secrets.API_GITHUB_KEY || github.token }}
         fetch-depth: 0
-        ref: ${{ github.event.pull_request.head.ref }}
-        repository: ${{ github.event.pull_request.head.repo.full_name }}
+        ref: ${{ github.event.pull_request.head.ref || github.ref }}
+        repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
 
     - name: Install .NET Core
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v6
       with:
         dotnet-version: ${{ env.dotnet_version }}
 
     - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v2
+      uses: microsoft/setup-msbuild@v3
 
     - name: Setup Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v7
       with:
         python-version: '3.13.3'
 
@@ -96,20 +96,17 @@ jobs:
         }
 
         Write-Host "Installed NTools version information:"
-        $nbPath = "$env:ProgramFiles\NBuild\nb.exe"
-        if (Test-Path $nbPath) {
-          & $nbPath --version
+        $sdoPath = "$env:ProgramFiles\NBuild\sdo.exe"
+        if (-not (Test-Path $sdoPath)) {
+          Write-Error "sdo.exe was not found at $sdoPath"
+          exit 1
         }
+
+        "SDO_PATH=$sdoPath" | Out-File -FilePath $env:GITHUB_ENV -Append
+        & $sdoPath --version
       shell: pwsh
       working-directory: ${{ github.workspace }}
 
-    - name: Set ProgramFiles Path
-      run: |
-        $programFilesPath = [System.Environment]::GetFolderPath('ProgramFiles')
-        echo "ProgramFilesPath=$programFilesPath" | Out-File -FilePath $env:GITHUB_ENV -Append
-      shell: pwsh
-      working-directory: ${{ github.workspace }}
-   
     - name: Configure Git
       run: |
         git config --global user.name "gitHub-actions"
@@ -148,11 +145,11 @@ jobs:
         $env:API_GITHUB_KEY = '${{ secrets.API_GITHUB_KEY }}'
         $env:DOTNET_CLI_TELEMETRY_OPTOUT = '1'
 
-        Write-Host "Running nb.exe CORE (capturing output to build-core.log)"
-        & "$env:ProgramFilesPath/nbuild/nb.exe" CORE 2>&1 | Tee-Object -FilePath build-core.log
+        Write-Host "Running sdo.exe CORE (capturing output to build-core.log)"
+        & $env:SDO_PATH CORE 2>&1 | Tee-Object -FilePath build-core.log
 
-        Write-Host "Running nb.exe ${{ env.build_type }} (capturing output to build-stage.log)"
-        & "$env:ProgramFilesPath/nbuild/nb.exe" ${{ env.build_type }} 2>&1 | Tee-Object -FilePath build-stage.log
+        Write-Host "Running sdo.exe ${{ env.build_type }} (capturing output to build-stage.log)"
+        & $env:SDO_PATH ${{ env.build_type }} 2>&1 | Tee-Object -FilePath build-stage.log
 
         # Fail the step if any MSBuild 'Build FAILED' lines are present in the captured logs
         $failed = Select-String -Path build-*.log -Pattern 'Build FAILED' -SimpleMatch -Quiet
@@ -193,7 +190,7 @@ jobs:
       if: always()
 
     - name: Upload Test Results
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       if: always()
       with:
         name: test-results-${{ matrix.configuration }}
@@ -207,7 +204,7 @@ jobs:
         retention-days: 30
 
     - name: Upload Code Coverage Reports
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       if: always()
       with:
         name: coverage-reports-${{ matrix.configuration }}
@@ -247,14 +244,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
+          token: ${{ secrets.API_GITHUB_KEY || github.token }}
           fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.ref }}
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: '3.12'
 
@@ -282,7 +280,7 @@ jobs:
           
       - name: Upload pytest results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: pytest-results
           path: TestResults/pytest-results.xml
@@ -302,20 +300,21 @@ jobs:
     needs: [build, python-tests]
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
+          token: ${{ secrets.API_GITHUB_KEY || github.token }}
           fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.ref }}
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
     
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: '3.12'
-      - name: Install dependencies	
-        run: |	
+      - name: Install dependencies
+        run: |
           python -m pip install --upgrade pip	
-          pip install -r docs-requirements.txt	
+          pip install -r docs-requirements.txt
       - name: Update docs
         run: |
           mkdocs build
