@@ -96,20 +96,17 @@ jobs:
         }
 
         Write-Host "Installed NTools version information:"
-        $nbPath = "$env:ProgramFiles\NBuild\nb.exe"
-        if (Test-Path $nbPath) {
-          & $nbPath --version
+        $sdoPath = "$env:ProgramFiles\NBuild\sdo.exe"
+        if (-not (Test-Path $sdoPath)) {
+          Write-Error "sdo.exe was not found at $sdoPath"
+          exit 1
         }
+
+        "SDO_PATH=$sdoPath" | Out-File -FilePath $env:GITHUB_ENV -Append
+        & $sdoPath --version
       shell: pwsh
       working-directory: ${{ github.workspace }}
 
-    - name: Set ProgramFiles Path
-      run: |
-        $programFilesPath = [System.Environment]::GetFolderPath('ProgramFiles')
-        echo "ProgramFilesPath=$programFilesPath" | Out-File -FilePath $env:GITHUB_ENV -Append
-      shell: pwsh
-      working-directory: ${{ github.workspace }}
-   
     - name: Configure Git
       run: |
         git config --global user.name "gitHub-actions"
@@ -148,11 +145,11 @@ jobs:
         $env:API_GITHUB_KEY = '${{ secrets.API_GITHUB_KEY }}'
         $env:DOTNET_CLI_TELEMETRY_OPTOUT = '1'
 
-        Write-Host "Running nb.exe CORE (capturing output to build-core.log)"
-        & "$env:ProgramFilesPath/nbuild/nb.exe" CORE 2>&1 | Tee-Object -FilePath build-core.log
+        Write-Host "Running sdo.exe CORE (capturing output to build-core.log)"
+        & $env:SDO_PATH CORE 2>&1 | Tee-Object -FilePath build-core.log
 
-        Write-Host "Running nb.exe ${{ env.build_type }} (capturing output to build-stage.log)"
-        & "$env:ProgramFilesPath/nbuild/nb.exe" ${{ env.build_type }} 2>&1 | Tee-Object -FilePath build-stage.log
+        Write-Host "Running sdo.exe ${{ env.build_type }} (capturing output to build-stage.log)"
+        & $env:SDO_PATH ${{ env.build_type }} 2>&1 | Tee-Object -FilePath build-stage.log
 
         # Fail the step if any MSBuild 'Build FAILED' lines are present in the captured logs
         $failed = Select-String -Path build-*.log -Pattern 'Build FAILED' -SimpleMatch -Quiet
