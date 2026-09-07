@@ -52,7 +52,7 @@ Before running the tool, you must checkout a branch. Here is an example of how t
 
 ```yml
 - name: Checkout Repository
-  uses: actions/checkout@v4
+  uses: actions/checkout@7
   with:
     token: ${{ secrets.API_GITHUB_KEY }}
     fetch-depth: 0
