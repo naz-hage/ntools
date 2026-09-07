@@ -1761,8 +1761,8 @@
 <td>Download NTools release artifacts (zip/nuget). Usage: <code>Invoke-NToolsDownload -Version 1.2.3 -OutputDir C:\Downloads</code></td>
 </tr>
 <tr>
-<td>Install-NTools</td>
-<td>Install NTools packages based on an ntools.json config. Usage: <code>Install-NTools -NtoolsJsonPath ./dev-setup/ntools.json</code> (deprecated — prefer <code>python atools/install-ntools.py</code>)</td>
+<td>InstallNtools</td>
+<td>Install an NTools version from the PowerShell installation module. Usage: <code>Import-Module ./dev-setup/Install.psm1 -Force; InstallNtools -version 1.74.0</code></td>
 </tr>
 <tr>
 <td>Invoke-VerifyArtifacts</td>
