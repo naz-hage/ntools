@@ -1,8 +1,8 @@
-# Nbuild (`nb.exe`)
+# SDO Command Reference (`sdo.exe`)
 
-`Nbuild` (`nb.exe`) is a powerful command-line utility for .NET developers. It wraps the [.NET SDK](https://dotnet.microsoft.com/download) to simplify building solutions, running custom targets, and managing your development toolchain.
+`sdo.exe` is the current command-line utility for Ntools. For work items, pull requests, repositories, and platform operations, see the [sdo command reference](sdo-net.md). This page retains the build infrastructure reference and compatibility notes for projects that still use `nbuild.targets`.
 
-> **⚠️ BREAKING CHANGE (v1.76+):** The `nb install --name` command now searches **only for `apps.json` files** instead of all JSON files in a directory. If you have multiple JSON files with application definitions, consolidate them into a single `apps.json` file. See [Install by name](#install-by-name-from-current-directory-and-default-location) for details.
+> **⚠️ BREAKING CHANGE (v1.76+):** The `sdo tool install --name` command searches **only for `apps.json` files** instead of all JSON files in a directory. If you have multiple JSON files with application definitions, consolidate them into a single `apps.json` file. See [Install by name](#install-by-name-from-current-directory-and-default-location) for details.
 
 **Key Features:**
 - Build and run custom targets with a single command
@@ -12,33 +12,33 @@
 - Automate GitHub releases and asset downloads
 - **Global options** (`--dry-run`, `--verbose`) available for all commands
 
-## Why Use nb.exe?
+## Why Use sdo.exe?
 
-While you could run `dotnet build` or `dotnet msbuild` directly, `nb.exe` provides practical benefits for .NET development workflows:
+While you could run `dotnet build` or `dotnet msbuild` directly, `sdo.exe` provides practical benefits for .NET development workflows:
 
-- **Simplified commands**: Instead of complex MSBuild parameters, use simple commands like `nb solution` or `nb test`
+- **Simplified commands**: Instead of complex MSBuild parameters, use simple commands like `sdo solution` or `sdo test`
 - **Environment awareness**: Automatically finds dotnet.exe, manages versions, and handles dependencies
 - **Git integration**: Seamlessly works with git tags for versioning and release management
 - **Cross-project consistency**: Standardized build processes that work the same way across different projects
 - **DevOps automation**: Streamlined workflows for testing, packaging, and deployment
 
-For example, `nb solution` doesn't just run `dotnet build`—it ensures dependencies are restored, applies proper versioning from git tags, and uses consistent build configurations.
+For example, `sdo solution` doesn't just run `dotnet build`—it ensures dependencies are restored, applies proper versioning from git tags, and uses consistent build configurations.
 
-> **Note:** `nb.exe` expects the [nbuild.targets](#nbuildtargets) file to be present in your solution folder for build-related commands.
+> **Note:** `sdo.exe` expects the [nbuild.targets](#nbuildtargets) file to be present in your solution folder for build-related commands.
 
 ## Prerequisites
 
-- **.NET SDK**: The .NET SDK must be installed and available in your PATH. If not found, `nb.exe` will display an error message with installation instructions.
+- **.NET SDK**: The .NET SDK must be installed and available in your PATH. If not found, `sdo.exe` will display an error message with installation instructions.
 - **Git**: Git for Windows is required for Git-related operations.
 
 ## Usage
 
 ```cmd
 Description:
-  Nbuild - Build and DevOps Utility
+  SDO - Simple DevOps Operations
 
 Usage:
-  nb [command] [options] [[--] <additional arguments>...]
+  sdo [command] [options] [[--] <additional arguments>...]
 
 Options:
   --dry-run       Perform a dry run: show actions but do not perform side effects
@@ -47,24 +47,22 @@ Options:
   --version       Show version information
 
 Commands:
-  install                Install tools and applications specified in the manifest file or by name/version from apps.json in current directory and C:\program files\nbuild.
-  uninstall              Uninstall tools and applications specified in the manifest file.
-  list                   Display a formatted table of all tools and their versions.
+  tool install           Install tools and applications specified in the manifest file or by name/version from apps.json in current directory and C:\program files\nbuild.
+  tool uninstall         Uninstall tools and applications specified in the manifest file.
+  tool list              Display a formatted table of all tools and their versions.
                          Use this command to audit, compare, or document the state of your development environment.
-  download               Download tools and applications specified in the manifest file.
-  path                   Display each segment of the effective PATH environment variable on a separate line, with duplicates removed. Shows the complete PATH that processes actually use (Machine + User PATH combined).
-  git_info               Displays the current git information for the local repository, including branch, and latest tag.
-  git_settag             Sets a git tag in the local repository.
-  git_autotag            Automatically sets the next git tag based on build type.
-  git_push_autotag       Sets the next git tag based on build type and pushes to remote.
-  git_branch             Displays the current git branch in the local repository.
-  git_clone              Clones a Git repository to a specified path.
-  git_deletetag          Deletes a git tag from the local repository.
-  release_create         Creates a GitHub release.
-  pre_release_create     Creates a GitHub pre-release.
-  release_download       Downloads a specific asset from a GitHub release.
-  list_release           Lists the latest releases for the specified repository.
-  targets                Displays all available build targets for the current solution or project.
+  tool download          Download tools and applications specified in the manifest file.
+  env path               Display each segment of the effective PATH environment variable.
+  repo info              Displays current repository information.
+  repo tag set           Sets a tag in the local repository.
+  repo tag auto          Automatically sets the next tag based on build type.
+  repo tag push-auto     Sets the next tag based on build type and pushes to remote.
+  repo clone             Clones a Git repository to a specified path.
+  repo tag delete        Deletes a tag from the local repository.
+  release create         Creates a GitHub release.
+  release download       Downloads a specific asset from a GitHub release.
+  release list           Lists the latest releases for the specified repository.
+  build targets          Displays all available build targets for the current solution or project.
 
 Additional Arguments:
   Arguments passed to the application that is being run.
@@ -72,7 +70,7 @@ Additional Arguments:
 
 ## Dry-run contract
 
-When `--dry-run` is supplied to `nb.exe` the CLI will not perform any state-changing
+When `--dry-run` is supplied to `sdo.exe` the CLI will not perform any state-changing
 operations. The intent of `--dry-run` is to provide a safe, predictable preview of
 what the CLI would do without modifying remote services, local files, system
 configuration, or registry state.
@@ -124,20 +122,20 @@ Below is a list of common targets defined in the `common.targets` file:
 
 ## Examples
 
-Below are practical examples for using `nb.exe`. These examples assume you are running in a PowerShell terminal.
+Below are practical examples for using `sdo.exe`. These examples assume you are running in a PowerShell terminal.
 
 ### 1. Install Applications
 
 #### Install from JSON file:
 ```cmd
-nb.exe install --json "C:\Program Files\tools.json"
+sdo.exe tool install --json "C:\Program Files\tools.json"
 ```
 Installs applications specified in the manifest file. The `--json` parameter is optional if `--name` is provided. If `--json` is specified, `--name` is ignored. (Requires admin privileges.)
 
 #### Install by name from current directory and default location:
 ```cmd
-nb.exe install --name "MyApp"
-nb.exe install --name "MyApp" --appversion "1.2.3"
+sdo.exe tool install --name "MyApp"
+sdo.exe tool install --name "MyApp" --appversion "1.2.3"
 ```
 Searches for `apps.json` in both the current directory and the default installation directory, then installs the application matching the specified name. The `--name` parameter is optional if `--json` is provided. The `--appversion` parameter is optional and overrides the version specified in the JSON file.
 
@@ -149,8 +147,8 @@ Searches for `apps.json` in both the current directory and the default installat
 
 #### Dry-run mode for install:
 ```cmd
-nb.exe install --name "MyApp" --dry-run
-nb.exe install --name "MyApp" --appversion "1.2.3" --dry-run
+sdo.exe tool install --name "MyApp" --dry-run
+sdo.exe tool install --name "MyApp" --appversion "1.2.3" --dry-run
 ```
 
 **Behavior in dry-run mode:**
@@ -164,20 +162,20 @@ nb.exe install --name "MyApp" --appversion "1.2.3" --dry-run
 
 ### 2. Uninstall Applications
 ```cmd
-nb.exe uninstall --json "C:\Program Files\example-tool.json"
+sdo.exe tool uninstall --json "C:\Program Files\example-tool.json"
 ```
 Uninstalls applications as specified in the manifest file. (Requires admin privileges.)
 
 ### 3. List Installed Applications
 ```cmd
-nb.exe list
-nb.exe list --json "C:\Program Files\NBuild\ntools.json"
+sdo.exe tool list
+sdo.exe tool list --json "C:\Program Files\NBuild\ntools.json"
 ```
 Lists all applications specified in the provided JSON file. If no `--json` option is specified, the default file is used.
 
 ### 4. Download Applications
 ```cmd
-nb.exe download --json "C:\Program Files\NBuild\ntools.json"
+sdo.exe tool download --json "C:\Program Files\NBuild\ntools.json"
 ```
 Downloads tools and applications specified in the manifest file.
 
@@ -217,99 +215,99 @@ Exit code: -1
 
 ### 6. Display Path Segments
 ```cmd
-nb.exe path
+sdo.exe env path
 ```
 Displays each segment of the effective PATH environment variable on a separate line, with duplicates removed. Shows the complete PATH that processes actually use (Machine + User PATH combined). Use `--verbose` for additional output.
 
 ### 7. Display Git Information
 ```cmd
-nb.exe git_info
+sdo.exe repo info
 ```
 Displays the current git branch and latest tag information for the local repository.
 
 ### 8. Set a Specific Git Tag
 ```cmd
-nb.exe git_settag --tag 1.24.33
+sdo.exe repo tag set --tag 1.24.33
 ```
 Sets the specified git tag in the local repository.
 
 ### 9. Automatically Set the Next Git Tag
 ```cmd
-nb.exe git_autotag --buildtype STAGE
+sdo.exe repo tag auto --buildtype STAGE
 ```
 Automatically sets the next git tag based on the specified build type (`STAGE` or `PROD`).
 
 ### 10. Push the Next Git Tag to Remote
 ```cmd
-nb.exe git_push_autotag --buildtype PROD
+sdo.exe repo tag push-auto --buildtype PROD
 ```
 Sets the next git tag based on build type and pushes it to the remote repository.
 
 ### 11. Display the Current Git Branch
 ```cmd
-nb.exe git_branch
+sdo.exe repo info
 ```
 Displays the current git branch in the local repository.
 
 ### 12. Clone a Git Repository
 ```cmd
-nb.exe git_clone --url https://github.com/example/repo --path C:\Projects
+sdo.exe repo clone --url https://github.com/example/repo --path C:\Projects
 ```
 Clones the specified git repository into the specified path. Use `--verbose` for detailed output.
 
 ### 13. Delete a Specific Tag
 ```cmd
-nb.exe git_deletetag --tag 1.24.33
+sdo.exe repo tag delete --tag 1.24.33
 ```
 Deletes the specified git tag from the local repository.
 
 ### 14. Creating a Release
 ```cmd
-nb.exe release_create --repo userName/my-repo --tag 1.24.33 --branch main --file C:\Releases\1.0.0.zip
+sdo.exe release create --repo userName/my-repo --tag 1.24.33 --branch main --file C:\Releases\1.0.0.zip
 ```
 Creates a GitHub release for the specified repository, tag, branch, and asset file.
 
 ### 15. Creating a Pre-Release
 ```cmd
-nb.exe pre_release_create --repo userName/my-repo --tag 1.24.33 --branch main --file C:\Releases\1.0.0.zip
+sdo.exe release create --repo userName/my-repo --tag 1.24.33 --branch main --file C:\Releases\1.0.0.zip --prerelease
 ```
 Creates a GitHub pre-release for the specified repository, tag, branch, and asset file.
 
 ### 16. Downloading an Asset
 ```cmd
-nb.exe release_download --repo userName/my-repo --tag 1.24.33 --path C:\Downloads
+sdo.exe release download --repo userName/my-repo --tag 1.24.33 --path C:\Downloads
 ```
 Downloads an asset from the specified release to the given path.
 
 ### 17. Creating a Release with Full GitHub URL
 ```cmd
-nb.exe release_create --repo https://github.com/userName/my-repo --tag 1.24.33 --branch main --file C:\Releases\1.0.0.zip
+sdo.exe release create --repo https://github.com/userName/my-repo --tag 1.24.33 --branch main --file C:\Releases\1.0.0.zip
 ```
 Creates a GitHub release using the full GitHub repository URL.
 
 ### 18. Downloading an Asset with Full GitHub URL
 ```cmd
-nb.exe release_download --repo https://github.com/userName/my-repo --tag 1.24.33 --path C:\Downloads
+sdo.exe release download --repo https://github.com/userName/my-repo --tag 1.24.33 --path C:\Downloads
 ```
 Downloads an asset using the full GitHub repository URL.
 
 ### 19. List Latest Releases
 ```cmd
-nb.exe list_release --repo https://github.com/userName/my-repo
+sdo.exe release list --repo https://github.com/userName/my-repo
 ```
 Lists the latest 3 releases and the newest pre-release (if newer than the latest release). Use `--verbose` for detailed output.
 
 ### 20. List Build Targets
 ```cmd
-nb.exe targets
+sdo.exe build targets
 ```
 Lists all available build targets for the current solution or project.
 
 ### 21. Run Any Listed Target
 ```cmd
-nb.exe core
+sdo.exe core
 ```
-Runs the target named `core` if it is listed by `nb targets`.
+Runs the target named `core` if it is listed by `sdo build targets`.
 
 ---
 

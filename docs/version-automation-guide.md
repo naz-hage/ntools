@@ -33,7 +33,7 @@ $version = Get-VersionFromJson -JsonFilePath "./dev-setup/ntools.json"
 
 ---
 
-Tool versions in documentation are updated using the MSBuild task (`UpdateVersionsInDocs`) via the `nb update_doc_versions` command. This extracts all tool/version pairs from every `NbuildAppList` entry in every `*.json` file in `dev-setup` and updates the documentation table accordingly. See the documentation in `ntools.md` for details.
+Tool versions in documentation are updated using the MSBuild task (`UpdateVersionsInDocs`) via the `sdo update_doc_versions` command. This extracts all tool/version pairs from every `NbuildAppList` entry in every `*.json` file in `dev-setup` and updates the documentation table accordingly. See the documentation in `ntools.md` for details.
 
 ### NBuild Task Integration
 

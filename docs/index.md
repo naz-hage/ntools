@@ -13,9 +13,7 @@ This repository contains a collection of software tools specifically designed to
 - [Versioning](versioning.md)
 
 ### Core Tools
-- [Nbuild (nb.exe)](nbuild.md) - Main build utility
-- [File and Folder Listing Utility (lf.exe)](lf.md)
-- [Nbackup (nbackup.exe)](nbackup.md) - Backup utility
+- [SDO (sdo.exe)](sdo-net.md) - Main command-line utility
 - [Github Release](github-release.md)
 - [Sdo (sdo.exe) - Simple DevOps Operations](sdo-net.md) - Unified CLI for GitHub and Azure DevOps
   - [Advanced Automation Features](sdo-net.md#advanced-automation-features)

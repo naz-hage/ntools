@@ -689,7 +689,7 @@ Commands:
   tag            Git tag operations
 ```
 
-An unmatched single token is treated as an MSBuild target, matching legacy `nb` behavior:
+An unmatched single token is treated as an MSBuild target, preserving the legacy target-invocation behavior:
 
 ```bash
 sdo build                         # Display available targets
@@ -779,7 +779,7 @@ sdo repo delete --force --verbose   # Show mapping
 
 ### tool, env, build, release, backup, and file — Local Automation
 
-These command groups migrate the local `nb`, `nbackup`, and `lf` workflows into SDO. The original executables remain available during the migration.
+These command groups consolidate the local build, backup, and file-search workflows into SDO.
 
 #### tool
 
@@ -1509,16 +1509,16 @@ Available MSBuild targets for E2E testing:
 
 ```bash
 # Run all Azure DevOps tests
-nb RUN_AZDO_WI_ASSIGNED_TO_ME_TEST
+sdo RUN_AZDO_WI_ASSIGNED_TO_ME_TEST
 
 # Run all GitHub tests  
-nb RUN_GITHUB_WI_ASSIGNED_TO_ME_TEST
+sdo RUN_GITHUB_WI_ASSIGNED_TO_ME_TEST
 
 # Run Azure DevOps pipeline tests
-nb RUN_AZDO_PIPELINE_TEST
+sdo RUN_AZDO_PIPELINE_TEST
 
 # Run GitHub Actions tests
-nb RUN_GITHUB_PIPELINE_TEST
+sdo RUN_GITHUB_PIPELINE_TEST
 ```
 
 #### Example Output
@@ -1585,13 +1585,13 @@ These tests can be integrated into your build pipeline:
 ```bash
 # In your GitHub Actions workflow
 - name: Run E2E Tests
-  run: nb RUN_AZDO_WI_ASSIGNED_TO_ME_TEST
+  run: sdo RUN_AZDO_WI_ASSIGNED_TO_ME_TEST
 
 # Or in Azure Pipelines
 - task: PowerShell@2
   inputs:
     scriptType: 'inline'
-    script: 'nb RUN_GITHUB_WI_ASSIGNED_TO_ME_TEST'
+    script: 'sdo RUN_GITHUB_WI_ASSIGNED_TO_ME_TEST'
 ```
 
 ---

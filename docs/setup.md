@@ -47,7 +47,7 @@ This file provides the installation details for ntools, which is required to man
     {
       "Name": "Ntools",
       "Version": "1.7.0",
-      "AppFileName": "$(InstallPath)\\nb.exe",
+      "AppFileName": "$(InstallPath)\\sdo.exe",
       "WebDownloadFile": "https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip",
       "DownloadedFile": "$(Version).zip",
       "InstallCommand": "powershell.exe",

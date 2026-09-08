@@ -46,7 +46,7 @@ nav:
     - Build Types: buildtypes.md
     - Versioning: versioning.md
   - List of Tools:
-      - Nbuild (nb.exe): nbuild.md
+      - SDO (nb.exe): nbuild.md
       - lf (lf.exe): lf.md
       - Nbackup (nbackup.exe): nbackup.md
       - Github Release : github-release.md

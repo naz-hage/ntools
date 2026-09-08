@@ -45,7 +45,7 @@ Here are examples of custom Tasks that can be used during builds:
 	<!-- This target uses the `FileVersion` task to file version of specified file -->
 	<Target Name="FILE_VERSION">
 		<PropertyGroup>
-			<FileExe>$(ProgramFiles)\Nbuild\nb.exe</FileExe>
+			<FileExe>$(ProgramFiles)\Nbuild\sdo.exe</FileExe>
 		</PropertyGroup>
 
 		<FileVersion Name="$(FileExe)" Condition="Exists('$(FileExe)')" >

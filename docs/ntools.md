@@ -3,7 +3,7 @@
 Tool versions in this table are automatically updated from the single `apps.json` file (located at `go/apps.json`) using the `UpdateVersionsInDocs` MSBuild task (C#). To update the table, run:
 
 ```
-nb update_doc_versions
+sdo update_doc_versions
 ```
 
 This will extract all tool/version pairs from the `NbuildAppList` entries in `go/apps.json` and update the documentation table accordingly. The `go/apps.json` file serves as the **single source of truth** for all developer tools managed by ntools. No PowerShell script is needed or maintained for this process.

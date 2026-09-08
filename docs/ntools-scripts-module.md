@@ -94,13 +94,13 @@ The module exports 36 functions organized by category:
 
 ### Test Functions
 - `Invoke-CodeCoverage` - Run tests with code coverage
-- `Test-MSBuildDelegation` - Test MSBuild target delegation (**Note**: Now automatically integrated into `nb smoke_test` target)
+- `Test-MSBuildDelegation` - Test MSBuild target delegation (**Note**: Now automatically integrated into `sdo smoke_test` target)
 - `Test-QuickTargets` - Quick target validation
 - `Test-NToolsScriptsModule` - Test module functionality
 - `Write-TestResult` - Write formatted test results
 - `Test-TargetExists` - Check if MSBuild targets exist
 - `Test-TargetDependencies` - Validate target dependencies
-- `Test-TargetDelegation` - Test target delegation patterns (**Note**: Core function used by `nb smoke_test` target)
+- `Test-TargetDelegation` - Test target delegation patterns (**Note**: Core function used by `sdo smoke_test` target)
 
 ### Utility Functions
 - `Get-FileHash256` - Calculate SHA256 hash of files
@@ -166,11 +166,11 @@ Publish-AllProjects -OutputDir "C:\Artifacts" -Version "1.0.0" -RepositoryRoot "
 # Run code coverage
 Invoke-CodeCoverage
 
-# Test MSBuild delegation (also available via 'nb smoke_test')
+# Test MSBuild delegation (also available via 'sdo smoke_test')
 Test-MSBuildDelegation
 
 # Or use the comprehensive smoke test target
-# nb smoke_test  # (from command line - includes both artifact validation AND target delegation)
+# sdo smoke_test  # (from command line - includes both artifact validation AND target delegation)
 ```
 
 ### Integration with Build System
@@ -185,10 +185,10 @@ Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
 Invoke-VerifyArtifacts -ArtifactsPath "C:\Artifacts\MySolution\Release\1.2.3" -ProductVersion "1.2.3"
 ```
 
-MSBuild / nb CLI example:
+MSBuild / sdo CLI example:
 ```bash
-# Run the MSBuild target from the repo root (nb delegates to MSBuild)
-nb verify_artifacts /p:ArtifactsFolder="C:\Artifacts\MySolution\Release\1.2.3" /p:ProductVersion="1.2.3"
+# Run the MSBuild target from the repo root (sdo delegates to MSBuild)
+sdo verify_artifacts /p:ArtifactsFolder="C:\Artifacts\MySolution\Release\1.2.3" /p:ProductVersion="1.2.3"
 ```
 
 ### MSBuild Integration
@@ -201,11 +201,11 @@ The comprehensive `SMOKE_TEST` target combines artifact validation with PowerShe
 
 ```bash
 # Comprehensive smoke test (recommended)
-nb smoke_test
+sdo smoke_test
 ```
 
 This target performs:
-1. **Artifact Validation**: Tests 3+ executables (nb.exe, lf.exe, nBackup.exe)
+1. **Artifact Validation**: Tests the packaged `sdo.exe` executable
 2. **Build System Validation**: Uses `Test-TargetDelegation` function to verify MSBuild target relationships
 3. **Consolidated Results**: Single pass/fail result for all validation checks
 

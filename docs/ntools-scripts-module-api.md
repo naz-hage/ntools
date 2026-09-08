@@ -10,12 +10,12 @@ This page lists the exported functions from the `ntools-scripts` PowerShell modu
 | Write-TestResult | Write a standardized test result line. Usage: `Write-TestResult -Name 'smoke' -Passed $true` |
 | Test-TargetExists | Check whether an MSBuild target exists in a project/targets file. Usage: `Test-TargetExists -ProjectFile foo.targets -TargetName Publish` |
 | Test-TargetDependencies | Validate MSBuild target dependencies. Usage: `Test-TargetDependencies -ProjectFile foo.targets -TargetName Publish` |
-| Test-TargetDelegation | Verify MSBuild target delegation patterns used by `nb`. Usage: `Test-TargetDelegation -SolutionDir .` |
-| Get-FileHash256 | Compute SHA256 hash of a file. Usage: `Get-FileHash256 -Path C:\Artifacts\nb.exe` |
-| Get-FileVersionInfo | Read file version metadata (file version/product version). Usage: `Get-FileVersionInfo -Path C:\Artifacts\nb.exe` |
+| Test-TargetDelegation | Verify MSBuild target delegation patterns used by `sdo`. Usage: `Test-TargetDelegation -SolutionDir .` |
+| Get-FileHash256 | Compute SHA256 hash of a file. Usage: `Get-FileHash256 -Path C:\Artifacts\sdo.exe` |
+| Get-FileVersionInfo | Read file version metadata (file version/product version). Usage: `Get-FileVersionInfo -Path C:\Artifacts\sdo.exe` |
 | Invoke-FastForward | Fast-forward a git ref to a specified commit/branch. Usage: `Invoke-FastForward -Repo . -Remote origin -Branch main` |
 | Write-OutputMessage | Consistent formatted output writer (info/warn/error). Usage: `Write-OutputMessage -Level Info -Message 'Starting'` |
-| Get-NToolsFileVersion | Helper to get NTools product version from binaries. Usage: `Get-NToolsFileVersion -FilePath C:\Artifacts\nb.exe` |
+| Get-NToolsFileVersion | Helper to get NTools product version from binaries. Usage: `Get-NToolsFileVersion -FilePath C:\Artifacts\sdo.exe` |
 | Add-DeploymentPathToEnvironment | Add deploy path to PATH for current process/user. Usage: `Add-DeploymentPathToEnvironment -Path C:\My\deploy\bin` |
 | Invoke-NToolsDownload | Download NTools release artifacts (zip/nuget). Usage: `Invoke-NToolsDownload -Version 1.2.3 -OutputDir C:\Downloads` |
 | InstallNtools | Install an NTools version from the PowerShell installation module. Usage: `Import-Module ./dev-setup/Install.psm1 -Force; InstallNtools -version 1.74.0` |

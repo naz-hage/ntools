@@ -18,9 +18,7 @@ A comprehensive CLI tool for work item creation and repository management across
 
 The ntools suite consists of multiple executables that provide various development and DevOps utilities:
 
-- **nb.exe** - Main build automation and DevOps utility tool
-- **Nbackup.exe** - Backup automation tool
-- **lf.exe** - File listing and management utility
+- **sdo.exe** - Main build automation and DevOps utility tool
 - **sdo.exe** - Simple DevOps Operations tool for work item and repository management
 - **Go executables** - Various Go-based utilities in the `go/` directory
 
@@ -30,9 +28,7 @@ The ntools suite consists of multiple executables that provide various developme
 graph TB
     subgraph "ntools Suite"
         subgraph ".NET Executables"
-            NB[nb.exe<br/>Nbuild]
-            NBKP[Nbackup.exe<br/>nBackup]
-            LF[lf.exe<br/>lf]
+            SDO[sdo.exe<br/>SDO]
             SDO[sdo.exe<br/>Simple DevOps Operations Tool]
         end
 
@@ -53,32 +49,22 @@ graph TB
         GO_RUNTIME[Go Runtime<br/>For Go tools]
     end
 
-    NB --> NBL
-    NBKP --> NBL
-    LF --> NBL
-
-    NB --> GHR
-    NB --> API
+    SDO --> NBL
+    SDO --> GHR
+    SDO --> API
 
     GO --> GO_RUNTIME
 
     NBL --> SCL
     GHR --> SCL
-    NB --> SCL
-    NBKP --> SCL
-    LF --> SCL
-
-    NB --> DOTNET
-    NBKP --> DOTNET
-    LF --> DOTNET
+    SDO --> SCL
+    SDO --> DOTNET
     NBL --> DOTNET
     GHR --> DOTNET
     API --> DOTNET
     SDO --> NBL
     SDO --> GHR
-    style NB fill:#e1f5fe
-    style NBKP fill:#f3e5f5
-    style LF fill:#e8f5e8
+    style SDO fill:#e1f5fe
     style NBL fill:#fff3e0
     style GHR fill:#fce4ec
     style API fill:#f1f8e9  
@@ -86,7 +72,7 @@ graph TB
 
 ### Executable Details
 
-#### nb.exe (Nbuild)
+#### sdo.exe (SDO)
 - **Purpose**: Main CLI tool for build automation and DevOps operations
 - **Features**:
   - MSBuild integration
@@ -96,15 +82,6 @@ graph TB
   - Environment setup
 - **Dependencies**: NbuildTasks, GitHubRelease, System.CommandLine
 
-#### Nbackup.exe (nBackup)
-- **Purpose**: Backup automation utility
-- **Features**: Automated backup operations, configuration-based backups
-- **Dependencies**: NbuildTasks, System.CommandLine
-
-#### lf.exe (lf)
-- **Purpose**: File listing and management utility
-- **Features**: Advanced file listing, file operations
-- **Dependencies**: NbuildTasks, System.CommandLine
 #### sdo.exe (Simple DevOps Operations Tool)
 - **Purpose**: Comprehensive CLI for work item creation and repository management across Azure DevOps and GitHub
 - **Features**:
@@ -135,7 +112,7 @@ Utility library for API version management and tracking.
 
 ### Manifest File Processing (GetApps Method)
 
-The `Command.GetApps()` method in the Nbuild executable (`nb\Command.cs`) handles loading and parsing manifest JSON files for tool installation and management. This method implements strict file validation:
+The SDO tool-management command handles loading and parsing manifest JSON files for tool installation and management. This command implements strict file validation:
 
 #### File Validation
 - **Purpose**: Ensures clear, actionable error messages when JSON manifest files are missing or invalid
@@ -155,7 +132,7 @@ The `Command.GetApps()` method in the Nbuild executable (`nb\Command.cs`) handle
 #### Benefits
 - **Early validation**: Fails fast with clear error messages instead of confusing JSON parse errors
 - **User-friendly**: Distinguishes between file not found vs. invalid JSON content
-- **Consistent**: All commands (`nb list`, `nb install`, `nb uninstall`, `nb download`) use the same validation logic
+- **Consistent**: All commands (`sdo tool list`, `sdo tool install`, `sdo tool uninstall`, `sdo tool download`) use the same validation logic
 
 ### File Structure
 
@@ -177,8 +154,8 @@ ntools/
 ├── unit-tests.targets            # Unit test targets
 ├── e2e-tests.targets             # E2E test targets
 │
-├── nb/                           # Main Nbuild executable project
-│   ├── nb.csproj
+├── Sdo/                          # Main SDO executable project
+│   ├── Sdo.csproj
 │   ├── Program.cs                # CLI setup and command registration
 │   ├── Command.cs                # Core command implementations with GetApps() method
 │   │                               # GetApps() - Loads and validates manifest JSON files

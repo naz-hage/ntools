@@ -1,4 +1,4 @@
-nb.exe is also designed to help you create and manage GitHub releases. It also enables you to download release assets, such as files named in the format x.y.z.zip. The tool expects downloaded assets to be in a zip file named ${tag}.zip, where tag must be a valid tag in the repository created by the tool (e.g., ``x.y.z``).  checkout the [versioning](./versioning.md) section for more details.
+sdo.exe is designed to help you create and manage GitHub releases. It also enables you to download release assets, such as files named in the format x.y.z.zip. The tool expects downloaded assets to be in a zip file named ${tag}.zip, where tag must be a valid tag in the repository created by the tool (e.g., ``x.y.z``). Check the [versioning](./versioning.md) section for more details.
 
 ## Requirements
 
@@ -21,7 +21,7 @@ Here is an example of how to set up authentication in a GitHub Actions workflow 
 ```yml
 - name: Build using ntools
   run: |
-    & "$env:ProgramFilesPath/nbuild/nb.exe" ${{ env.Build_Type }} -v ${{ env.Enable_Logging }}
+    & "$env:ProgramFilesPath/nbuild/sdo.exe" ${{ env.Build_Type }} -v ${{ env.Enable_Logging }}
   shell: pwsh
   working-directory: ${{ github.workspace }}
   env:
@@ -38,7 +38,7 @@ Here is an example of how to set up authentication in a GitHub Actions workflow 
 
 - name: Build using ntools
   run: |
-    & "$env:ProgramFilesPath/nbuild/nb.exe" ${{ env.Build_Type }} -v ${{ env.Enable_Logging }}
+    & "$env:ProgramFilesPath/nbuild/sdo.exe" ${{ env.Build_Type }} -v ${{ env.Enable_Logging }}
   shell: pwsh
   working-directory: ${{ github.workspace }}
   env:
@@ -89,14 +89,14 @@ Before running the tool, you must checkout a branch. Here is an example of how t
 - **User-Friendly:** Clear error messages when authentication is needed
 
 ### Stage Release
-- When `nb stage` runs successfully:
+- When `sdo stage` runs successfully:
   - The tool creates a stage release tagged with the next stage release number.
   - The release notes include the commits since the last stage or production tag.
   - The API token from the repository secrets is used to create this release.
   - The release package is uploaded to the release.
 
 ### Production Release
-- When `nb prod` runs successfully:
+- When `sdo prod` runs successfully:
   - The tool creates a production release tagged with the next production release number.
   - The release notes include the commits since the last production tag.
   - All previous stage releases are deleted.
@@ -122,12 +122,12 @@ The access token must have the following permissions:
 ## GitHubRelease Command Line Options
 
 ### Usage
-See [nb.exe](./nbuild.md) for the command line options.
+See [sdo.exe](./sdo-net.md) for the command line options.
 
 ## Manifests and private GitHub release assets
 
-- `nb download` and `nb install` can consume JSON manifests that reference GitHub release assets (for example `WebDownloadFile` entries that point at `https://github.com/OWNER/REPO/releases/download/TAG/asset.zip`).
-- For private repositories, unauthenticated requests to the public `releases/download` URL will return 404. `nb` will attempt an authenticated fallback using the GitHub API when a token is available.
+- `sdo tool download` and `sdo tool install` can consume JSON manifests that reference GitHub release assets (for example `WebDownloadFile` entries that point at `https://github.com/OWNER/REPO/releases/download/TAG/asset.zip`).
+- For private repositories, unauthenticated requests to the public `releases/download` URL will return 404. `sdo` will attempt an authenticated fallback using the GitHub API when a token is available.
 
 How authentication is provided
 - **Multiple authentication methods supported** (tried in order of preference):
@@ -147,11 +147,11 @@ How authentication is provided
 - **Environment Variable Setup:**
   ```powershell
   $env:API_GITHUB_KEY = 'ghp_XXXX'
-  .\Release\nb.exe install --json private-repo.json --verbose
+  .\Release\sdo.exe tool install --json private-repo.json --verbose
   ```
 
 Behavior
-- On download failure (404) for a GitHub release URL, `nb` will parse the owner/repo/tag and call into `GitHubRelease.ReleaseService.DownloadAssetByName(tag, assetName, dest)` which uses the GitHub API to find the asset and download it using the authenticated asset endpoint. This approach supports private repositories when the token has appropriate scopes (typically `repo` and `releases`).
+- On download failure (404) for a GitHub release URL, `sdo` will parse the owner/repo/tag and call into `GitHubRelease.ReleaseService.DownloadAssetByName(tag, assetName, dest)` which uses the GitHub API to find the asset and download it using the authenticated asset endpoint. This approach supports private repositories when the token has appropriate scopes (typically `repo` and `releases`).
 
 Notes and troubleshooting
 - **Authentication Methods:** The tool supports multiple authentication methods. If one method fails, it will try the next available method.
