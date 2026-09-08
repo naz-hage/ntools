@@ -714,7 +714,7 @@
   <span class="md-ellipsis">
     
   
-    Nbuild (nb.exe)
+    SDO (nb.exe)
   
 
     
@@ -735,7 +735,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../lf/" class="md-nav__link">
+      <a href="../lf.md" class="md-nav__link">
         
   
   
@@ -763,7 +763,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../nbackup/" class="md-nav__link">
+      <a href="../nbackup.md" class="md-nav__link">
         
   
   
@@ -2026,7 +2026,7 @@
 <h2 id="msbuild-targets">MSBuild Targets<a class="headerlink" href="#msbuild-targets" title="Anchor link to this section for reference">&para;</a></h2>
 <h3 id="coverage-target">COVERAGE Target<a class="headerlink" href="#coverage-target" title="Anchor link to this section for reference">&para;</a></h3>
 <p>The <code>COVERAGE</code> target generates comprehensive code coverage reports:</p>
-<div class="highlight"><pre><span></span><code>nb<span class="w"> </span>COVERAGE
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>COVERAGE
 </code></pre></div>
 <p>This target:
 1. Installs ReportGenerator tool if not present
@@ -2036,12 +2036,12 @@
 5. Copies coverage files for GitHub Actions</p>
 <h3 id="coverage_summary-target">COVERAGE_SUMMARY Target<a class="headerlink" href="#coverage_summary-target" title="Anchor link to this section for reference">&para;</a></h3>
 <p>For a quick coverage overview:</p>
-<div class="highlight"><pre><span></span><code>nb<span class="w"> </span>COVERAGE_SUMMARY
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>COVERAGE_SUMMARY
 </code></pre></div>
 <p>This displays high-level coverage metrics without generating full reports.</p>
 <h3 id="test-target-with-coverage">TEST Target with Coverage<a class="headerlink" href="#test-target-with-coverage" title="Anchor link to this section for reference">&para;</a></h3>
 <p>The <code>TEST</code> target automatically includes coverage collection when <code>EnableCodeCoverage</code> is true:</p>
-<div class="highlight"><pre><span></span><code>nb<span class="w"> </span>TEST
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>TEST
 </code></pre></div>
 <p>This runs all tests and collects coverage data in a single step.</p>
 <h2 id="output-files">Output Files<a class="headerlink" href="#output-files" title="Anchor link to this section for reference">&para;</a></h2>
@@ -2071,18 +2071,18 @@
 <span class="nt">&lt;/PropertyGroup&gt;</span>
 </code></pre></div>
 <p>Or via command line:</p>
-<div class="highlight"><pre><span></span><code>nb<span class="w"> </span>TEST<span class="w"> </span>-p:EnableCodeCoverage<span class="o">=</span><span class="nb">false</span>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>TEST<span class="w"> </span>-p:EnableCodeCoverage<span class="o">=</span><span class="nb">false</span>
 </code></pre></div>
 <h2 id="examples">Examples<a class="headerlink" href="#examples" title="Anchor link to this section for reference">&para;</a></h2>
 <h3 id="basic-usage">Basic Usage<a class="headerlink" href="#basic-usage" title="Anchor link to this section for reference">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="c1"># Run tests with coverage</span>
-nb<span class="w"> </span>TEST
+sdo<span class="w"> </span>TEST
 
 <span class="c1"># Generate coverage reports</span>
-nb<span class="w"> </span>COVERAGE
+sdo<span class="w"> </span>COVERAGE
 
 <span class="c1"># Quick coverage summary</span>
-nb<span class="w"> </span>COVERAGE_SUMMARY
+sdo<span class="w"> </span>COVERAGE_SUMMARY
 </code></pre></div>
 <h3 id="custom-configuration">Custom Configuration<a class="headerlink" href="#custom-configuration" title="Anchor link to this section for reference">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="nt">&lt;PropertyGroup&gt;</span>
@@ -2093,7 +2093,7 @@ nb<span class="w"> </span>COVERAGE_SUMMARY
 </code></pre></div>
 <h3 id="full-build-pipeline">Full Build Pipeline<a class="headerlink" href="#full-build-pipeline" title="Anchor link to this section for reference">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="c1"># Complete build with tests and coverage</span>
-nb<span class="w"> </span>STAGE
+sdo<span class="w"> </span>STAGE
 </code></pre></div>
 
 

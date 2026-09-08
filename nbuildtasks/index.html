@@ -714,7 +714,7 @@
   <span class="md-ellipsis">
     
   
-    Nbuild (nb.exe)
+    SDO (nb.exe)
   
 
     
@@ -735,7 +735,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../lf/" class="md-nav__link">
+      <a href="../lf.md" class="md-nav__link">
         
   
   
@@ -763,7 +763,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../nbackup/" class="md-nav__link">
+      <a href="../nbackup.md" class="md-nav__link">
         
   
   
@@ -1937,7 +1937,7 @@
 <div class="highlight"><pre><span></span><code><span class="w">    </span><span class="cm">&lt;!-- This target uses the `FileVersion` task to file version of specified file --&gt;</span>
 <span class="w">    </span><span class="nt">&lt;Target</span><span class="w"> </span><span class="na">Name=</span><span class="s">"FILE_VERSION"</span><span class="nt">&gt;</span>
 <span class="w">        </span><span class="nt">&lt;PropertyGroup&gt;</span>
-<span class="w">            </span><span class="nt">&lt;FileExe&gt;</span>$(ProgramFiles)\Nbuild\nb.exe<span class="nt">&lt;/FileExe&gt;</span>
+<span class="w">            </span><span class="nt">&lt;FileExe&gt;</span>$(ProgramFiles)\Nbuild\sdo.exe<span class="nt">&lt;/FileExe&gt;</span>
 <span class="w">        </span><span class="nt">&lt;/PropertyGroup&gt;</span>
 
 <span class="w">        </span><span class="nt">&lt;FileVersion</span><span class="w"> </span><span class="na">Name=</span><span class="s">"$(FileExe)"</span><span class="w"> </span><span class="na">Condition=</span><span class="s">"Exists('$(FileExe)')"</span><span class="w"> </span><span class="nt">&gt;</span>

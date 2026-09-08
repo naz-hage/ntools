@@ -16,7 +16,7 @@
         <link rel="prev" href="../versioning/">
       
       
-        <link rel="next" href="../lf/">
+        <link rel="next" href="../github-release/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Nbuild (nb.exe) - Ntools - Work in Progress</title>
+        <title>SDO (nb.exe) - Ntools - Work in Progress</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#nbuild-nbexe" class="md-skip">
+        <a href="#sdo-command-reference-sdoexe" class="md-skip">
           Skip to content
         </a>
       
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Nbuild (nb.exe)
+              SDO (nb.exe)
             
           </span>
         </div>
@@ -728,7 +728,7 @@
   <span class="md-ellipsis">
     
   
-    Nbuild (nb.exe)
+    SDO (nb.exe)
   
 
     
@@ -746,7 +746,7 @@
   <span class="md-ellipsis">
     
   
-    Nbuild (nb.exe)
+    SDO (nb.exe)
   
 
     
@@ -772,10 +772,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#why-use-nbexe" class="md-nav__link">
+  <a href="#why-use-sdoexe" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Why Use nb.exe?
+        Why Use sdo.exe?
       
     </span>
   </a>
@@ -1185,7 +1185,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../lf/" class="md-nav__link">
+      <a href="../lf.md" class="md-nav__link">
         
   
   
@@ -1213,7 +1213,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../nbackup/" class="md-nav__link">
+      <a href="../nbackup.md" class="md-nav__link">
         
   
   
@@ -2127,10 +2127,10 @@
   
 
 
-<h1 id="nbuild-nbexe">Nbuild (<code>nb.exe</code>)<a class="headerlink" href="#nbuild-nbexe" title="Anchor link to this section for reference">&para;</a></h1>
-<p><code>Nbuild</code> (<code>nb.exe</code>) is a powerful command-line utility for .NET developers. It wraps the <a href="https://dotnet.microsoft.com/download">.NET SDK</a> to simplify building solutions, running custom targets, and managing your development toolchain.</p>
+<h1 id="sdo-command-reference-sdoexe">SDO Command Reference (<code>sdo.exe</code>)<a class="headerlink" href="#sdo-command-reference-sdoexe" title="Anchor link to this section for reference">&para;</a></h1>
+<p><code>sdo.exe</code> is the current command-line utility for Ntools. For work items, pull requests, repositories, and platform operations, see the <a href="../sdo-net/">sdo command reference</a>. This page retains the build infrastructure reference and compatibility notes for projects that still use <code>nbuild.targets</code>.</p>
 <blockquote>
-<p><strong>⚠️ BREAKING CHANGE (v1.76+):</strong> The <code>nb install --name</code> command now searches <strong>only for <code>apps.json</code> files</strong> instead of all JSON files in a directory. If you have multiple JSON files with application definitions, consolidate them into a single <code>apps.json</code> file. See <a href="#install-by-name-from-current-directory-and-default-location">Install by name</a> for details.</p>
+<p><strong>⚠️ BREAKING CHANGE (v1.76+):</strong> The <code>sdo tool install --name</code> command searches <strong>only for <code>apps.json</code> files</strong> instead of all JSON files in a directory. If you have multiple JSON files with application definitions, consolidate them into a single <code>apps.json</code> file. See <a href="#install-by-name-from-current-directory-and-default-location">Install by name</a> for details.</p>
 </blockquote>
 <p><strong>Key Features:</strong>
 - Build and run custom targets with a single command
@@ -2139,30 +2139,30 @@
 - Integrate with Git for tagging, branching, and release automation
 - Automate GitHub releases and asset downloads
 - <strong>Global options</strong> (<code>--dry-run</code>, <code>--verbose</code>) available for all commands</p>
-<h2 id="why-use-nbexe">Why Use nb.exe?<a class="headerlink" href="#why-use-nbexe" title="Anchor link to this section for reference">&para;</a></h2>
-<p>While you could run <code>dotnet build</code> or <code>dotnet msbuild</code> directly, <code>nb.exe</code> provides practical benefits for .NET development workflows:</p>
+<h2 id="why-use-sdoexe">Why Use sdo.exe?<a class="headerlink" href="#why-use-sdoexe" title="Anchor link to this section for reference">&para;</a></h2>
+<p>While you could run <code>dotnet build</code> or <code>dotnet msbuild</code> directly, <code>sdo.exe</code> provides practical benefits for .NET development workflows:</p>
 <ul>
-<li><strong>Simplified commands</strong>: Instead of complex MSBuild parameters, use simple commands like <code>nb solution</code> or <code>nb test</code></li>
+<li><strong>Simplified commands</strong>: Instead of complex MSBuild parameters, use simple commands like <code>sdo solution</code> or <code>sdo test</code></li>
 <li><strong>Environment awareness</strong>: Automatically finds dotnet.exe, manages versions, and handles dependencies</li>
 <li><strong>Git integration</strong>: Seamlessly works with git tags for versioning and release management</li>
 <li><strong>Cross-project consistency</strong>: Standardized build processes that work the same way across different projects</li>
 <li><strong>DevOps automation</strong>: Streamlined workflows for testing, packaging, and deployment</li>
 </ul>
-<p>For example, <code>nb solution</code> doesn't just run <code>dotnet build</code>—it ensures dependencies are restored, applies proper versioning from git tags, and uses consistent build configurations.</p>
+<p>For example, <code>sdo solution</code> doesn't just run <code>dotnet build</code>—it ensures dependencies are restored, applies proper versioning from git tags, and uses consistent build configurations.</p>
 <blockquote>
-<p><strong>Note:</strong> <code>nb.exe</code> expects the <a href="#nbuildtargets">nbuild.targets</a> file to be present in your solution folder for build-related commands.</p>
+<p><strong>Note:</strong> <code>sdo.exe</code> expects the <a href="#nbuildtargets">nbuild.targets</a> file to be present in your solution folder for build-related commands.</p>
 </blockquote>
 <h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Anchor link to this section for reference">&para;</a></h2>
 <ul>
-<li><strong>.NET SDK</strong>: The .NET SDK must be installed and available in your PATH. If not found, <code>nb.exe</code> will display an error message with installation instructions.</li>
+<li><strong>.NET SDK</strong>: The .NET SDK must be installed and available in your PATH. If not found, <code>sdo.exe</code> will display an error message with installation instructions.</li>
 <li><strong>Git</strong>: Git for Windows is required for Git-related operations.</li>
 </ul>
 <h2 id="usage">Usage<a class="headerlink" href="#usage" title="Anchor link to this section for reference">&para;</a></h2>
 <div class="highlight"><pre><span></span><code>Description:
-  Nbuild - Build and DevOps Utility
+  SDO - Simple DevOps Operations
 
 Usage:
-  nb [command] [options] [[--] &lt;additional arguments&gt;...]
+  sdo [command] [options] [[--] &lt;additional arguments&gt;...]
 
 Options:
   --dry-run       Perform a dry run: show actions but do not perform side effects
@@ -2171,30 +2171,28 @@ Options:
   --version       Show version information
 
 Commands:
-  install                Install tools and applications specified in the manifest file or by name/version from apps.json in current directory and C:\program files\nbuild.
-  uninstall              Uninstall tools and applications specified in the manifest file.
-  list                   Display a formatted table of all tools and their versions.
+  tool install           Install tools and applications specified in the manifest file or by name/version from apps.json in current directory and C:\program files\nbuild.
+  tool uninstall         Uninstall tools and applications specified in the manifest file.
+  tool list              Display a formatted table of all tools and their versions.
                          Use this command to audit, compare, or document the state of your development environment.
-  download               Download tools and applications specified in the manifest file.
-  path                   Display each segment of the effective PATH environment variable on a separate line, with duplicates removed. Shows the complete PATH that processes actually use (Machine + User PATH combined).
-  git_info               Displays the current git information for the local repository, including branch, and latest tag.
-  git_settag             Sets a git tag in the local repository.
-  git_autotag            Automatically sets the next git tag based on build type.
-  git_push_autotag       Sets the next git tag based on build type and pushes to remote.
-  git_branch             Displays the current git branch in the local repository.
-  git_clone              Clones a Git repository to a specified path.
-  git_deletetag          Deletes a git tag from the local repository.
-  release_create         Creates a GitHub release.
-  pre_release_create     Creates a GitHub pre-release.
-  release_download       Downloads a specific asset from a GitHub release.
-  list_release           Lists the latest releases for the specified repository.
-  targets                Displays all available build targets for the current solution or project.
+  tool download          Download tools and applications specified in the manifest file.
+  env path               Display each segment of the effective PATH environment variable.
+  repo info              Displays current repository information.
+  repo tag set           Sets a tag in the local repository.
+  repo tag auto          Automatically sets the next tag based on build type.
+  repo tag push-auto     Sets the next tag based on build type and pushes to remote.
+  repo clone             Clones a Git repository to a specified path.
+  repo tag delete        Deletes a tag from the local repository.
+  release create         Creates a GitHub release.
+  release download       Downloads a specific asset from a GitHub release.
+  release list           Lists the latest releases for the specified repository.
+  build targets          Displays all available build targets for the current solution or project.
 
 Additional Arguments:
   Arguments passed to the application that is being run.
 </code></pre></div>
 <h2 id="dry-run-contract">Dry-run contract<a class="headerlink" href="#dry-run-contract" title="Anchor link to this section for reference">&para;</a></h2>
-<p>When <code>--dry-run</code> is supplied to <code>nb.exe</code> the CLI will not perform any state-changing
+<p>When <code>--dry-run</code> is supplied to <code>sdo.exe</code> the CLI will not perform any state-changing
 operations. The intent of <code>--dry-run</code> is to provide a safe, predictable preview of
 what the CLI would do without modifying remote services, local files, system
 configuration, or registry state.</p>
@@ -2301,23 +2299,23 @@ configuration, or registry state.</p>
 </table>
 <hr />
 <h2 id="examples">Examples<a class="headerlink" href="#examples" title="Anchor link to this section for reference">&para;</a></h2>
-<p>Below are practical examples for using <code>nb.exe</code>. These examples assume you are running in a PowerShell terminal.</p>
+<p>Below are practical examples for using <code>sdo.exe</code>. These examples assume you are running in a PowerShell terminal.</p>
 <h3 id="1-install-applications">1. Install Applications<a class="headerlink" href="#1-install-applications" title="Anchor link to this section for reference">&para;</a></h3>
 <h4 id="install-from-json-file">Install from JSON file:<a class="headerlink" href="#install-from-json-file" title="Anchor link to this section for reference">&para;</a></h4>
-<p><div class="highlight"><pre><span></span><code>nb.exe install --json "C:\Program Files\tools.json"
+<p><div class="highlight"><pre><span></span><code>sdo.exe tool install --json "C:\Program Files\tools.json"
 </code></pre></div>
 Installs applications specified in the manifest file. The <code>--json</code> parameter is optional if <code>--name</code> is provided. If <code>--json</code> is specified, <code>--name</code> is ignored. (Requires admin privileges.)</p>
 <h4 id="install-by-name-from-current-directory-and-default-location">Install by name from current directory and default location:<a class="headerlink" href="#install-by-name-from-current-directory-and-default-location" title="Anchor link to this section for reference">&para;</a></h4>
-<p><div class="highlight"><pre><span></span><code>nb.exe install --name "MyApp"
-nb.exe install --name "MyApp" --appversion "1.2.3"
+<p><div class="highlight"><pre><span></span><code>sdo.exe tool install --name "MyApp"
+sdo.exe tool install --name "MyApp" --appversion "1.2.3"
 </code></pre></div>
 Searches for <code>apps.json</code> in both the current directory and the default installation directory, then installs the application matching the specified name. The <code>--name</code> parameter is optional if <code>--json</code> is provided. The <code>--appversion</code> parameter is optional and overrides the version specified in the JSON file.</p>
 <p><strong>BREAKING CHANGE (v1.76+):</strong> This command now searches ONLY for <code>apps.json</code> files, not all JSON files. You must consolidate your application definitions into a single <code>apps.json</code> file in the target directory or move it to the default installation directory.</p>
 <p><strong>Search order:</strong> Current directory is searched first for <code>apps.json</code>, then the default installation directory. If an app is found in the current directory, it takes precedence over the same app in the default installation directory.</p>
 <p><strong>Note:</strong> If you specify both <code>--json</code> and <code>--name</code>, the command is allowed, but <code>--json</code> takes precedence and a warning is emitted. The <code>--name</code> method provides a more convenient way to install applications without needing to know the exact path to the JSON configuration file.</p>
 <h4 id="dry-run-mode-for-install">Dry-run mode for install:<a class="headerlink" href="#dry-run-mode-for-install" title="Anchor link to this section for reference">&para;</a></h4>
-<div class="highlight"><pre><span></span><code>nb.exe install --name "MyApp" --dry-run
-nb.exe install --name "MyApp" --appversion "1.2.3" --dry-run
+<div class="highlight"><pre><span></span><code>sdo.exe tool install --name "MyApp" --dry-run
+sdo.exe tool install --name "MyApp" --appversion "1.2.3" --dry-run
 </code></pre></div>
 <p><strong>Behavior in dry-run mode:</strong>
 - Searches for <code>apps.json</code> in both the current directory and the default installation directory (search order: current directory first)
@@ -2328,16 +2326,16 @@ nb.exe install --name "MyApp" --appversion "1.2.3" --dry-run
 - No files are downloaded, installed, or modified
 - Output uses color coding: yellow for dry-run messages, red for not-found messages</p>
 <h3 id="2-uninstall-applications">2. Uninstall Applications<a class="headerlink" href="#2-uninstall-applications" title="Anchor link to this section for reference">&para;</a></h3>
-<p><div class="highlight"><pre><span></span><code>nb.exe uninstall --json "C:\Program Files\example-tool.json"
+<p><div class="highlight"><pre><span></span><code>sdo.exe tool uninstall --json "C:\Program Files\example-tool.json"
 </code></pre></div>
 Uninstalls applications as specified in the manifest file. (Requires admin privileges.)</p>
 <h3 id="3-list-installed-applications">3. List Installed Applications<a class="headerlink" href="#3-list-installed-applications" title="Anchor link to this section for reference">&para;</a></h3>
-<p><div class="highlight"><pre><span></span><code>nb.exe list
-nb.exe list --json "C:\Program Files\NBuild\ntools.json"
+<p><div class="highlight"><pre><span></span><code>sdo.exe tool list
+sdo.exe tool list --json "C:\Program Files\NBuild\ntools.json"
 </code></pre></div>
 Lists all applications specified in the provided JSON file. If no <code>--json</code> option is specified, the default file is used.</p>
 <h3 id="4-download-applications">4. Download Applications<a class="headerlink" href="#4-download-applications" title="Anchor link to this section for reference">&para;</a></h3>
-<p><div class="highlight"><pre><span></span><code>nb.exe download --json "C:\Program Files\NBuild\ntools.json"
+<p><div class="highlight"><pre><span></span><code>sdo.exe tool download --json "C:\Program Files\NBuild\ntools.json"
 </code></pre></div>
 Downloads tools and applications specified in the manifest file.</p>
 <h3 id="5-error-handling-for-json-manifest-files">5. Error Handling for JSON Manifest Files<a class="headerlink" href="#5-error-handling-for-json-manifest-files" title="Anchor link to this section for reference">&para;</a></h3>
@@ -2364,69 +2362,69 @@ Exit code: -1
 </code></pre></div>
 <p><strong>Resolution</strong>: Update your manifest file to use the correct version in the <code>"version"</code> field.</p>
 <h3 id="6-display-path-segments">6. Display Path Segments<a class="headerlink" href="#6-display-path-segments" title="Anchor link to this section for reference">&para;</a></h3>
-<p><div class="highlight"><pre><span></span><code>nb.exe path
+<p><div class="highlight"><pre><span></span><code>sdo.exe env path
 </code></pre></div>
 Displays each segment of the effective PATH environment variable on a separate line, with duplicates removed. Shows the complete PATH that processes actually use (Machine + User PATH combined). Use <code>--verbose</code> for additional output.</p>
 <h3 id="7-display-git-information">7. Display Git Information<a class="headerlink" href="#7-display-git-information" title="Anchor link to this section for reference">&para;</a></h3>
-<p><div class="highlight"><pre><span></span><code>nb.exe git_info
+<p><div class="highlight"><pre><span></span><code>sdo.exe repo info
 </code></pre></div>
 Displays the current git branch and latest tag information for the local repository.</p>
 <h3 id="8-set-a-specific-git-tag">8. Set a Specific Git Tag<a class="headerlink" href="#8-set-a-specific-git-tag" title="Anchor link to this section for reference">&para;</a></h3>
-<p><div class="highlight"><pre><span></span><code>nb.exe git_settag --tag 1.24.33
+<p><div class="highlight"><pre><span></span><code>sdo.exe repo tag set --tag 1.24.33
 </code></pre></div>
 Sets the specified git tag in the local repository.</p>
 <h3 id="9-automatically-set-the-next-git-tag">9. Automatically Set the Next Git Tag<a class="headerlink" href="#9-automatically-set-the-next-git-tag" title="Anchor link to this section for reference">&para;</a></h3>
-<p><div class="highlight"><pre><span></span><code>nb.exe git_autotag --buildtype STAGE
+<p><div class="highlight"><pre><span></span><code>sdo.exe repo tag auto --buildtype STAGE
 </code></pre></div>
 Automatically sets the next git tag based on the specified build type (<code>STAGE</code> or <code>PROD</code>).</p>
 <h3 id="10-push-the-next-git-tag-to-remote">10. Push the Next Git Tag to Remote<a class="headerlink" href="#10-push-the-next-git-tag-to-remote" title="Anchor link to this section for reference">&para;</a></h3>
-<p><div class="highlight"><pre><span></span><code>nb.exe git_push_autotag --buildtype PROD
+<p><div class="highlight"><pre><span></span><code>sdo.exe repo tag push-auto --buildtype PROD
 </code></pre></div>
 Sets the next git tag based on build type and pushes it to the remote repository.</p>
 <h3 id="11-display-the-current-git-branch">11. Display the Current Git Branch<a class="headerlink" href="#11-display-the-current-git-branch" title="Anchor link to this section for reference">&para;</a></h3>
-<p><div class="highlight"><pre><span></span><code>nb.exe git_branch
+<p><div class="highlight"><pre><span></span><code>sdo.exe repo info
 </code></pre></div>
 Displays the current git branch in the local repository.</p>
 <h3 id="12-clone-a-git-repository">12. Clone a Git Repository<a class="headerlink" href="#12-clone-a-git-repository" title="Anchor link to this section for reference">&para;</a></h3>
-<p><div class="highlight"><pre><span></span><code>nb.exe git_clone --url https://github.com/example/repo --path C:\Projects
+<p><div class="highlight"><pre><span></span><code>sdo.exe repo clone --url https://github.com/example/repo --path C:\Projects
 </code></pre></div>
 Clones the specified git repository into the specified path. Use <code>--verbose</code> for detailed output.</p>
 <h3 id="13-delete-a-specific-tag">13. Delete a Specific Tag<a class="headerlink" href="#13-delete-a-specific-tag" title="Anchor link to this section for reference">&para;</a></h3>
-<p><div class="highlight"><pre><span></span><code>nb.exe git_deletetag --tag 1.24.33
+<p><div class="highlight"><pre><span></span><code>sdo.exe repo tag delete --tag 1.24.33
 </code></pre></div>
 Deletes the specified git tag from the local repository.</p>
 <h3 id="14-creating-a-release">14. Creating a Release<a class="headerlink" href="#14-creating-a-release" title="Anchor link to this section for reference">&para;</a></h3>
-<p><div class="highlight"><pre><span></span><code>nb.exe release_create --repo userName/my-repo --tag 1.24.33 --branch main --file C:\Releases\1.0.0.zip
+<p><div class="highlight"><pre><span></span><code>sdo.exe release create --repo userName/my-repo --tag 1.24.33 --branch main --file C:\Releases\1.0.0.zip
 </code></pre></div>
 Creates a GitHub release for the specified repository, tag, branch, and asset file.</p>
 <h3 id="15-creating-a-pre-release">15. Creating a Pre-Release<a class="headerlink" href="#15-creating-a-pre-release" title="Anchor link to this section for reference">&para;</a></h3>
-<p><div class="highlight"><pre><span></span><code>nb.exe pre_release_create --repo userName/my-repo --tag 1.24.33 --branch main --file C:\Releases\1.0.0.zip
+<p><div class="highlight"><pre><span></span><code>sdo.exe release create --repo userName/my-repo --tag 1.24.33 --branch main --file C:\Releases\1.0.0.zip --prerelease
 </code></pre></div>
 Creates a GitHub pre-release for the specified repository, tag, branch, and asset file.</p>
 <h3 id="16-downloading-an-asset">16. Downloading an Asset<a class="headerlink" href="#16-downloading-an-asset" title="Anchor link to this section for reference">&para;</a></h3>
-<p><div class="highlight"><pre><span></span><code>nb.exe release_download --repo userName/my-repo --tag 1.24.33 --path C:\Downloads
+<p><div class="highlight"><pre><span></span><code>sdo.exe release download --repo userName/my-repo --tag 1.24.33 --path C:\Downloads
 </code></pre></div>
 Downloads an asset from the specified release to the given path.</p>
 <h3 id="17-creating-a-release-with-full-github-url">17. Creating a Release with Full GitHub URL<a class="headerlink" href="#17-creating-a-release-with-full-github-url" title="Anchor link to this section for reference">&para;</a></h3>
-<p><div class="highlight"><pre><span></span><code>nb.exe release_create --repo https://github.com/userName/my-repo --tag 1.24.33 --branch main --file C:\Releases\1.0.0.zip
+<p><div class="highlight"><pre><span></span><code>sdo.exe release create --repo https://github.com/userName/my-repo --tag 1.24.33 --branch main --file C:\Releases\1.0.0.zip
 </code></pre></div>
 Creates a GitHub release using the full GitHub repository URL.</p>
 <h3 id="18-downloading-an-asset-with-full-github-url">18. Downloading an Asset with Full GitHub URL<a class="headerlink" href="#18-downloading-an-asset-with-full-github-url" title="Anchor link to this section for reference">&para;</a></h3>
-<p><div class="highlight"><pre><span></span><code>nb.exe release_download --repo https://github.com/userName/my-repo --tag 1.24.33 --path C:\Downloads
+<p><div class="highlight"><pre><span></span><code>sdo.exe release download --repo https://github.com/userName/my-repo --tag 1.24.33 --path C:\Downloads
 </code></pre></div>
 Downloads an asset using the full GitHub repository URL.</p>
 <h3 id="19-list-latest-releases">19. List Latest Releases<a class="headerlink" href="#19-list-latest-releases" title="Anchor link to this section for reference">&para;</a></h3>
-<p><div class="highlight"><pre><span></span><code>nb.exe list_release --repo https://github.com/userName/my-repo
+<p><div class="highlight"><pre><span></span><code>sdo.exe release list --repo https://github.com/userName/my-repo
 </code></pre></div>
 Lists the latest 3 releases and the newest pre-release (if newer than the latest release). Use <code>--verbose</code> for detailed output.</p>
 <h3 id="20-list-build-targets">20. List Build Targets<a class="headerlink" href="#20-list-build-targets" title="Anchor link to this section for reference">&para;</a></h3>
-<p><div class="highlight"><pre><span></span><code>nb.exe targets
+<p><div class="highlight"><pre><span></span><code>sdo.exe build targets
 </code></pre></div>
 Lists all available build targets for the current solution or project.</p>
 <h3 id="21-run-any-listed-target">21. Run Any Listed Target<a class="headerlink" href="#21-run-any-listed-target" title="Anchor link to this section for reference">&para;</a></h3>
-<p><div class="highlight"><pre><span></span><code>nb.exe core
+<p><div class="highlight"><pre><span></span><code>sdo.exe core
 </code></pre></div>
-Runs the target named <code>core</code> if it is listed by <code>nb targets</code>.</p>
+Runs the target named <code>core</code> if it is listed by <code>sdo build targets</code>.</p>
 <hr />
 
 

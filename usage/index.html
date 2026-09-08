@@ -806,7 +806,7 @@
   <span class="md-ellipsis">
     
   
-    Nbuild (nb.exe)
+    SDO (nb.exe)
   
 
     
@@ -827,7 +827,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../lf/" class="md-nav__link">
+      <a href="../lf.md" class="md-nav__link">
         
   
   
@@ -855,7 +855,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../nbackup/" class="md-nav__link">
+      <a href="../nbackup.md" class="md-nav__link">
         
   
   
@@ -1768,7 +1768,7 @@
 
   <h1>Practice</h1>
 
-<p>Once Ntools is installed, Open a Developer Command prompt for Visual Studio 2022 and navigate to your solution folder (i.e. <code>./ntools</code>). The <a href="https://dotnet.microsoft.com/download">.NET SDK</a> must be installed and available in your PATH for build operations. The <a href="../nbuild/"><code>nb.exe</code></a> is the main executable for the Ntools.  The following are some examples of how to use the Ntools:</p>
+<p>Once Ntools is installed, open a Developer Command Prompt for Visual Studio 2022 and navigate to your solution folder (for example, <code>./ntools</code>). The <a href="https://dotnet.microsoft.com/download">.NET SDK</a> must be installed and available in your PATH for build operations. The <code>sdo</code> executable is the primary command-line interface for Ntools. The following are examples of how to use it:</p>
 <h2 id="global-options">Global Options<a class="headerlink" href="#global-options" title="Anchor link to this section for reference">&para;</a></h2>
 <p>Ntools supports global options that work across all commands:
 - <code>--dry-run</code>: Preview changes without applying them
@@ -1777,20 +1777,20 @@
 <ul>
 <li>Build a solution: Compiles the solution in the solution directory</li>
 </ul>
-<p><div class="highlight"><pre><span></span><code>nb.exe solution
+<p><div class="highlight"><pre><span></span><code>sdo solution
 </code></pre></div>
 - Clean a solution:  Deletes the release/Debug, bin and obj folders in the solution directory</p>
-<p><div class="highlight"><pre><span></span><code>nb.exe clean
+<p><div class="highlight"><pre><span></span><code>sdo clean
 </code></pre></div>
 - Test solution: runs all the tests in the solution with optional code coverage</p>
-<div class="highlight"><pre><span></span><code>nb.exe test
+<div class="highlight"><pre><span></span><code>sdo test
 </code></pre></div>
 <ul>
 <li>
 <p>Run specific unit test suites:
-<div class="highlight"><pre><span></span><code>nb UNIT_TEST_CLI_VALIDATION    # CLI validation tests
-nb UNIT_TEST_GIT_CLONE_COMMAND # Git clone command tests
-nb UNIT_TEST_ALL              # All unit tests (except long-running ones)
+<div class="highlight"><pre><span></span><code>sdo UNIT_TEST_CLI_VALIDATION    # CLI validation tests
+sdo UNIT_TEST_GIT_CLONE_COMMAND # Git clone command tests
+sdo UNIT_TEST_ALL              # All unit tests (except long-running ones)
 </code></pre></div></p>
 </li>
 <li>
@@ -1806,17 +1806,17 @@ nb UNIT_TEST_ALL              # All unit tests (except long-running ones)
 </ul>
 </li>
 </ul>
-<div class="highlight"><pre><span></span><code>nb.exe stage
+<div class="highlight"><pre><span></span><code>sdo stage
 </code></pre></div>
 <ul>
 <li>Comprehensive smoke test: Validates published artifacts and build system integrity</li>
 </ul>
-<div class="highlight"><pre><span></span><code>nb.exe smoke_test
+<div class="highlight"><pre><span></span><code>sdo smoke_test
 </code></pre></div>
 <ul>
 <li>Display available targets:  Lists all the available targets in the targets file</li>
 </ul>
-<div class="highlight"><pre><span></span><code>nb.exe targets
+<div class="highlight"><pre><span></span><code>sdo targets
 </code></pre></div>
 <ul>
 <li>See the complete list of available targets at <a href="../nbuild-targets/">Nbuild Targets</a></li>
@@ -1827,22 +1827,22 @@ nb UNIT_TEST_ALL              # All unit tests (except long-running ones)
 <ul>
 <li>Run Azure DevOps work item filtering tests:</li>
 </ul>
-<div class="highlight"><pre><span></span><code>nb RUN_AZDO_WI_ASSIGNED_TO_ME_TEST
+<div class="highlight"><pre><span></span><code>sdo RUN_AZDO_WI_ASSIGNED_TO_ME_TEST
 </code></pre></div>
 <ul>
 <li>Run GitHub issue filtering tests:</li>
 </ul>
-<div class="highlight"><pre><span></span><code>nb RUN_GITHUB_WI_ASSIGNED_TO_ME_TEST
+<div class="highlight"><pre><span></span><code>sdo RUN_GITHUB_WI_ASSIGNED_TO_ME_TEST
 </code></pre></div>
 <ul>
 <li>Run Azure DevOps pipeline operation tests:</li>
 </ul>
-<div class="highlight"><pre><span></span><code>nb RUN_AZDO_PIPELINE_TEST
+<div class="highlight"><pre><span></span><code>sdo RUN_AZDO_PIPELINE_TEST
 </code></pre></div>
 <ul>
 <li>Run GitHub Actions operation tests:</li>
 </ul>
-<div class="highlight"><pre><span></span><code>nb RUN_GITHUB_PIPELINE_TEST
+<div class="highlight"><pre><span></span><code>sdo RUN_GITHUB_PIPELINE_TEST
 </code></pre></div>
 <p><strong>Output</strong>: Color-coded console (green for [SUCCESS], red for [ERROR]) with detailed logging to <code>sdo-e2e-test.log</code></p>
 <ul>

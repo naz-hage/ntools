@@ -714,7 +714,7 @@
   <span class="md-ellipsis">
     
   
-    Nbuild (nb.exe)
+    SDO (nb.exe)
   
 
     
@@ -735,7 +735,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../lf/" class="md-nav__link">
+      <a href="../lf.md" class="md-nav__link">
         
   
   
@@ -763,7 +763,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../nbackup/" class="md-nav__link">
+      <a href="../nbackup.md" class="md-nav__link">
         
   
   
@@ -1845,13 +1845,13 @@ Install-NToolsScriptsModule -InstallPath "$env:ProgramFiles\WindowsPowerShell\Mo
 <h3 id="test-functions">Test Functions<a class="headerlink" href="#test-functions" title="Anchor link to this section for reference">&para;</a></h3>
 <ul>
 <li><code>Invoke-CodeCoverage</code> - Run tests with code coverage</li>
-<li><code>Test-MSBuildDelegation</code> - Test MSBuild target delegation (<strong>Note</strong>: Now automatically integrated into <code>nb smoke_test</code> target)</li>
+<li><code>Test-MSBuildDelegation</code> - Test MSBuild target delegation (<strong>Note</strong>: Now automatically integrated into <code>sdo smoke_test</code> target)</li>
 <li><code>Test-QuickTargets</code> - Quick target validation</li>
 <li><code>Test-NToolsScriptsModule</code> - Test module functionality</li>
 <li><code>Write-TestResult</code> - Write formatted test results</li>
 <li><code>Test-TargetExists</code> - Check if MSBuild targets exist</li>
 <li><code>Test-TargetDependencies</code> - Validate target dependencies</li>
-<li><code>Test-TargetDelegation</code> - Test target delegation patterns (<strong>Note</strong>: Core function used by <code>nb smoke_test</code> target)</li>
+<li><code>Test-TargetDelegation</code> - Test target delegation patterns (<strong>Note</strong>: Core function used by <code>sdo smoke_test</code> target)</li>
 </ul>
 <h3 id="utility-functions">Utility Functions<a class="headerlink" href="#utility-functions" title="Anchor link to this section for reference">&para;</a></h3>
 <ul>
@@ -1906,11 +1906,11 @@ Install-NToolsScriptsModule -InstallPath "$env:ProgramFiles\WindowsPowerShell\Mo
 <div class="highlight"><pre><span></span><code><span class="c"># Run code coverage</span>
 <span class="nb">Invoke-CodeCoverage</span>
 
-<span class="c"># Test MSBuild delegation (also available via 'nb smoke_test')</span>
+<span class="c"># Test MSBuild delegation (also available via 'sdo smoke_test')</span>
 <span class="nb">Test-MSBuildDelegation</span>
 
 <span class="c"># Or use the comprehensive smoke test target</span>
-<span class="c"># nb smoke_test  # (from command line - includes both artifact validation AND target delegation)</span>
+<span class="c"># sdo smoke_test  # (from command line - includes both artifact validation AND target delegation)</span>
 </code></pre></div>
 <h3 id="integration-with-build-system">Integration with Build System<a class="headerlink" href="#integration-with-build-system" title="Anchor link to this section for reference">&para;</a></h3>
 <ul>
@@ -1922,9 +1922,9 @@ Install-NToolsScriptsModule -InstallPath "$env:ProgramFiles\WindowsPowerShell\Mo
 <div class="highlight"><pre><span></span><code><span class="nb">Import-Module</span> <span class="s2">"./scripts/module-package/ntools-scripts.psm1"</span> <span class="n">-Force</span>
 <span class="nb">Invoke-VerifyArtifacts</span> <span class="n">-ArtifactsPath</span> <span class="s2">"C:\Artifacts\MySolution\Release\1.2.3"</span> <span class="n">-ProductVersion</span> <span class="s2">"1.2.3"</span>
 </code></pre></div></p>
-<p>MSBuild / nb CLI example:
-<div class="highlight"><pre><span></span><code><span class="c1"># Run the MSBuild target from the repo root (nb delegates to MSBuild)</span>
-nb<span class="w"> </span>verify_artifacts<span class="w"> </span>/p:ArtifactsFolder<span class="o">=</span><span class="s2">"C:\Artifacts\MySolution\Release\1.2.3"</span><span class="w"> </span>/p:ProductVersion<span class="o">=</span><span class="s2">"1.2.3"</span>
+<p>MSBuild / sdo CLI example:
+<div class="highlight"><pre><span></span><code><span class="c1"># Run the MSBuild target from the repo root (sdo delegates to MSBuild)</span>
+sdo<span class="w"> </span>verify_artifacts<span class="w"> </span>/p:ArtifactsFolder<span class="o">=</span><span class="s2">"C:\Artifacts\MySolution\Release\1.2.3"</span><span class="w"> </span>/p:ProductVersion<span class="o">=</span><span class="s2">"1.2.3"</span>
 </code></pre></div></p>
 <h3 id="msbuild-integration">MSBuild Integration<a class="headerlink" href="#msbuild-integration" title="Anchor link to this section for reference">&para;</a></h3>
 <ul>
@@ -1935,10 +1935,10 @@ nb<span class="w"> </span>verify_artifacts<span class="w"> </span>/p:ArtifactsFo
 <h3 id="smoke_test-target-integration">SMOKE_TEST Target Integration<a class="headerlink" href="#smoke_test-target-integration" title="Anchor link to this section for reference">&para;</a></h3>
 <p>The comprehensive <code>SMOKE_TEST</code> target combines artifact validation with PowerShell module functions:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Comprehensive smoke test (recommended)</span>
-nb<span class="w"> </span>smoke_test
+sdo<span class="w"> </span>smoke_test
 </code></pre></div>
 <p>This target performs:
-1. <strong>Artifact Validation</strong>: Tests 3+ executables (nb.exe, lf.exe, nBackup.exe)
+1. <strong>Artifact Validation</strong>: Tests the packaged <code>sdo.exe</code> executable
 2. <strong>Build System Validation</strong>: Uses <code>Test-TargetDelegation</code> function to verify MSBuild target relationships
 3. <strong>Consolidated Results</strong>: Single pass/fail result for all validation checks</p>
 <p><strong>Migration Note</strong>: The deprecated <code>TEST_TARGET_DELEGATION</code> target functionality is now integrated into <code>SMOKE_TEST</code>.</p>

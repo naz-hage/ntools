@@ -714,7 +714,7 @@
   <span class="md-ellipsis">
     
   
-    Nbuild (nb.exe)
+    SDO (nb.exe)
   
 
     
@@ -735,7 +735,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../lf/" class="md-nav__link">
+      <a href="../lf.md" class="md-nav__link">
         
   
   
@@ -763,7 +763,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../nbackup/" class="md-nav__link">
+      <a href="../nbackup.md" class="md-nav__link">
         
   
   
@@ -1740,7 +1740,7 @@
 
 <h2 id="tool-version-automation">Tool version automation<a class="headerlink" href="#tool-version-automation" title="Anchor link to this section for reference">&para;</a></h2>
 <p>Tool versions in this table are automatically updated from the single <code>apps.json</code> file (located at <code>go/apps.json</code>) using the <code>UpdateVersionsInDocs</code> MSBuild task (C#). To update the table, run:</p>
-<div class="highlight"><pre><span></span><code>nb update_doc_versions
+<div class="highlight"><pre><span></span><code>sdo update_doc_versions
 </code></pre></div>
 <p>This will extract all tool/version pairs from the <code>NbuildAppList</code> entries in <code>go/apps.json</code> and update the documentation table accordingly. The <code>go/apps.json</code> file serves as the <strong>single source of truth</strong> for all developer tools managed by ntools. No PowerShell script is needed or maintained for this process.
 The <a href="https://learn.microsoft.com/en-us/windows/dev-environment/">Windows dev environment</a> has good information on how to setup a Windows dev environment.</p>

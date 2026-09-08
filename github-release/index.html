@@ -13,7 +13,7 @@
       
       
       
-        <link rel="prev" href="../nbackup/">
+        <link rel="prev" href="../nbuild/">
       
       
         <link rel="next" href="../sdo-net/">
@@ -719,7 +719,7 @@
   <span class="md-ellipsis">
     
   
-    Nbuild (nb.exe)
+    SDO (nb.exe)
   
 
     
@@ -740,7 +740,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../lf/" class="md-nav__link">
+      <a href="../lf.md" class="md-nav__link">
         
   
   
@@ -768,7 +768,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../nbackup/" class="md-nav__link">
+      <a href="../nbackup.md" class="md-nav__link">
         
   
   
@@ -1927,7 +1927,7 @@
 
   <h1>Github Release</h1>
 
-<p>nb.exe is also designed to help you create and manage GitHub releases. It also enables you to download release assets, such as files named in the format x.y.z.zip. The tool expects downloaded assets to be in a zip file named ${tag}.zip, where tag must be a valid tag in the repository created by the tool (e.g., <code>x.y.z</code>).  checkout the <a href="../versioning/">versioning</a> section for more details.</p>
+<p>sdo.exe is designed to help you create and manage GitHub releases. It also enables you to download release assets, such as files named in the format x.y.z.zip. The tool expects downloaded assets to be in a zip file named ${tag}.zip, where tag must be a valid tag in the repository created by the tool (e.g., <code>x.y.z</code>). Check the <a href="../versioning/">versioning</a> section for more details.</p>
 <h2 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Anchor link to this section for reference">&para;</a></h2>
 <h3 id="repository-requirements">Repository Requirements<a class="headerlink" href="#repository-requirements" title="Anchor link to this section for reference">&para;</a></h3>
 <ul>
@@ -1948,7 +1948,7 @@
 <p><strong>Option 1: Personal Access Token (Recommended for CI/CD)</strong>
 <div class="highlight"><pre><span></span><code><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Build using ntools</span>
 <span class="w">  </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
-<span class="w">    </span><span class="no">&amp; "$env:ProgramFilesPath/nbuild/nb.exe" ${{ env.Build_Type }} -v ${{ env.Enable_Logging }}</span>
+<span class="w">    </span><span class="no">&amp; "$env:ProgramFilesPath/nbuild/sdo.exe" ${{ env.Build_Type }} -v ${{ env.Enable_Logging }}</span>
 <span class="w">  </span><span class="nt">shell</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pwsh</span>
 <span class="w">  </span><span class="nt">working-directory</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ github.workspace }}</span>
 <span class="w">  </span><span class="nt">env</span><span class="p">:</span>
@@ -1963,7 +1963,7 @@
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Build using ntools</span>
 <span class="w">  </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
-<span class="w">    </span><span class="no">&amp; "$env:ProgramFilesPath/nbuild/nb.exe" ${{ env.Build_Type }} -v ${{ env.Enable_Logging }}</span>
+<span class="w">    </span><span class="no">&amp; "$env:ProgramFilesPath/nbuild/sdo.exe" ${{ env.Build_Type }} -v ${{ env.Enable_Logging }}</span>
 <span class="w">  </span><span class="nt">shell</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pwsh</span>
 <span class="w">  </span><span class="nt">working-directory</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ github.workspace }}</span>
 <span class="w">  </span><span class="nt">env</span><span class="p">:</span>
@@ -2011,7 +2011,7 @@
 </ul>
 <h3 id="stage-release">Stage Release<a class="headerlink" href="#stage-release" title="Anchor link to this section for reference">&para;</a></h3>
 <ul>
-<li>When <code>nb stage</code> runs successfully:</li>
+<li>When <code>sdo stage</code> runs successfully:</li>
 <li>The tool creates a stage release tagged with the next stage release number.</li>
 <li>The release notes include the commits since the last stage or production tag.</li>
 <li>The API token from the repository secrets is used to create this release.</li>
@@ -2019,7 +2019,7 @@
 </ul>
 <h3 id="production-release">Production Release<a class="headerlink" href="#production-release" title="Anchor link to this section for reference">&para;</a></h3>
 <ul>
-<li>When <code>nb prod</code> runs successfully:</li>
+<li>When <code>sdo prod</code> runs successfully:</li>
 <li>The tool creates a production release tagged with the next production release number.</li>
 <li>The release notes include the commits since the last production tag.</li>
 <li>All previous stage releases are deleted.</li>
@@ -2073,11 +2073,11 @@
 </table>
 <h2 id="githubrelease-command-line-options">GitHubRelease Command Line Options<a class="headerlink" href="#githubrelease-command-line-options" title="Anchor link to this section for reference">&para;</a></h2>
 <h3 id="usage">Usage<a class="headerlink" href="#usage" title="Anchor link to this section for reference">&para;</a></h3>
-<p>See <a href="../nbuild/">nb.exe</a> for the command line options.</p>
+<p>See <a href="../sdo-net/">sdo.exe</a> for the command line options.</p>
 <h2 id="manifests-and-private-github-release-assets">Manifests and private GitHub release assets<a class="headerlink" href="#manifests-and-private-github-release-assets" title="Anchor link to this section for reference">&para;</a></h2>
 <ul>
-<li><code>nb download</code> and <code>nb install</code> can consume JSON manifests that reference GitHub release assets (for example <code>WebDownloadFile</code> entries that point at <code>https://github.com/OWNER/REPO/releases/download/TAG/asset.zip</code>).</li>
-<li>For private repositories, unauthenticated requests to the public <code>releases/download</code> URL will return 404. <code>nb</code> will attempt an authenticated fallback using the GitHub API when a token is available.</li>
+<li><code>sdo tool download</code> and <code>sdo tool install</code> can consume JSON manifests that reference GitHub release assets (for example <code>WebDownloadFile</code> entries that point at <code>https://github.com/OWNER/REPO/releases/download/TAG/asset.zip</code>).</li>
+<li>For private repositories, unauthenticated requests to the public <code>releases/download</code> URL will return 404. <code>sdo</code> will attempt an authenticated fallback using the GitHub API when a token is available.</li>
 </ul>
 <p>How authentication is provided
 - <strong>Multiple authentication methods supported</strong> (tried in order of preference):
@@ -2095,10 +2095,10 @@ gh<span class="w"> </span>auth<span class="w"> </span>login
 </code></pre></div>
 - <strong>Environment Variable Setup:</strong>
   <div class="highlight"><pre><span></span><code><span class="nv">$env:API_GITHUB_KEY</span> <span class="p">=</span> <span class="s1">'ghp_XXXX'</span>
-<span class="p">.\</span><span class="n">Release</span><span class="p">\</span><span class="n">nb</span><span class="p">.</span><span class="n">exe</span> <span class="n">install</span> <span class="p">-</span><span class="n">-json</span> <span class="n">private-repo</span><span class="p">.</span><span class="n">json</span> <span class="p">-</span><span class="n">-verbose</span>
+<span class="p">.\</span><span class="n">Release</span><span class="p">\</span><span class="n">sdo</span><span class="p">.</span><span class="n">exe</span> <span class="n">tool</span> <span class="n">install</span> <span class="p">-</span><span class="n">-json</span> <span class="n">private-repo</span><span class="p">.</span><span class="n">json</span> <span class="p">-</span><span class="n">-verbose</span>
 </code></pre></div></p>
 <p>Behavior
-- On download failure (404) for a GitHub release URL, <code>nb</code> will parse the owner/repo/tag and call into <code>GitHubRelease.ReleaseService.DownloadAssetByName(tag, assetName, dest)</code> which uses the GitHub API to find the asset and download it using the authenticated asset endpoint. This approach supports private repositories when the token has appropriate scopes (typically <code>repo</code> and <code>releases</code>).</p>
+- On download failure (404) for a GitHub release URL, <code>sdo</code> will parse the owner/repo/tag and call into <code>GitHubRelease.ReleaseService.DownloadAssetByName(tag, assetName, dest)</code> which uses the GitHub API to find the asset and download it using the authenticated asset endpoint. This approach supports private repositories when the token has appropriate scopes (typically <code>repo</code> and <code>releases</code>).</p>
 <p>Notes and troubleshooting
 - <strong>Authentication Methods:</strong> The tool supports multiple authentication methods. If one method fails, it will try the next available method.
 - <strong>Token Scopes:</strong> Ensure your authentication method has appropriate scopes:
