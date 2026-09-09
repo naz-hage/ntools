@@ -13,13 +13,8 @@ This repository contains a collection of software tools specifically designed to
 - [Versioning](versioning.md)
 
 ### Core Tools
-- [SDO (sdo.exe)](sdo-net.md) - Main command-line utility
-- [Github Release](github-release.md)
-- [Sdo (sdo.exe) - Simple DevOps Operations](sdo-net.md) - Unified CLI for GitHub and Azure DevOps
-  - [Advanced Automation Features](sdo-net.md#advanced-automation-features)
-    - [Configuration System](sdo-net.md#configuration-system-yaml-based)
-    - [Markdown Parser](sdo-net.md#markdown-parser-for-content-creation)
-    - [E2E Testing Infrastructure](sdo-net.md#e2e-testing-infrastructure)
+- [SDO (sdo.exe)](sdo-net.md) - Unified CLI for GitHub, Azure DevOps, and local automation
+- [GitHub Releases](github-release.md)
 
 ### Development & Modules
 - [PowerShell Module - ntools-scripts](ntools-scripts-module.md)
@@ -36,14 +31,11 @@ This repository contains a collection of software tools specifically designed to
 - [AzDO Payloads Reference](azdo_payloads.md)
 
 ### Work Item Examples
-- [AzDO Bug Example](https://github.com/naz-hage/.github/blob/main/.github/prompts/templates/issue-azdo-bug-example.md)
-- [AzDO Epic Example](https://github.com/naz-hage/.github/blob/main/.github/prompts/templates/issue-azdo-epic-example.md)
-- [AzDO PBI Example](https://github.com/naz-hage/.github/blob/main/.github/prompts/templates/issue-azdo-pbi-example.md)
-- [AzDO Task Example](https://github.com/naz-hage/.github/blob/main/.github/prompts/templates/issue-azdo-task-example.md)
-- [GitHub Issue Example](https://github.com/naz-hage/.github/blob/main/.github/prompts/templates/issue-gh-example.md)
-
-### Resources
-- [TODO List](todo.md)
+- [AzDO Bug Example](https://github.com/naz-hage/.github/blob/main/.github/skills/templates/issue-azdo-bug-example.md)
+- [AzDO Epic Example](https://github.com/naz-hage/.github/blob/main/.github/skills/templates/issue-azdo-epic-example.md)
+- [AzDO PBI Example](https://github.com/naz-hage/.github/blob/main/.github/skills/templates/issue-azdo-pbi-example.md)
+- [AzDO Task Example](https://github.com/naz-hage/.github/blob/main/.github/skills/templates/issue-azdo-task-example.md)
+- [GitHub Issue Example](https://github.com/naz-hage/.github/blob/main/.github/skills/templates/issue-gh-example.md)
 
 ---
 

@@ -91,7 +91,7 @@ sdo RUN_GITHUB_PIPELINE_TEST
 
 **Output**: Color-coded console (green for [SUCCESS], red for [ERROR]) with detailed logging to `sdo-e2e-test.log`
 
-- See the complete list of E2E targets at [Nbuild Targets - E2E Testing](./nbuild-targets.md#e2e-testing-targets)
+- See the complete list of E2E targets in [SDO CLI documentation](./sdo-net.md#e2e-testing-infrastructure)
 
 ## SDO Configuration Management (Advanced Automation Features)
 

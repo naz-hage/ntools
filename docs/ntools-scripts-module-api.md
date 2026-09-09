@@ -1,39 +1,32 @@
 # ntools-scripts Module API
 
-This page lists the exported functions from the `ntools-scripts` PowerShell module in a compact table (Function | Description & common usage). Use this as the canonical reference and link to it from other docs.
+This is the canonical reference for functions exported by the `ntools-scripts` PowerShell module. The list is defined by `FunctionsToExport` in `scripts/module-package/ntools-scripts.psd1`.
 
-| Function | Description & common usage |
+| Function | Description and common usage |
 |---|---|
-| Get-ntoolsScriptsVersion | Returns the module version. Usage: `Get-ntoolsScriptsVersion` |
-| Publish-AllProjects | Build and publish non-test projects to an output directory. Usage: `Publish-AllProjects -OutputDir C:\Artifacts -Version 1.0.0 -RepositoryRoot C:\MyRepo` |
-| Get-VersionFromJson | Read version fields from a JSON file (ntools.json style). Usage: `Get-VersionFromJson -Path ./dev-setup/ntools.json` |
-| Write-TestResult | Write a standardized test result line. Usage: `Write-TestResult -Name 'smoke' -Passed $true` |
-| Test-TargetExists | Check whether an MSBuild target exists in a project/targets file. Usage: `Test-TargetExists -ProjectFile foo.targets -TargetName Publish` |
-| Test-TargetDependencies | Validate MSBuild target dependencies. Usage: `Test-TargetDependencies -ProjectFile foo.targets -TargetName Publish` |
-| Test-TargetDelegation | Verify MSBuild target delegation patterns used by `sdo`. Usage: `Test-TargetDelegation -SolutionDir .` |
-| Get-FileHash256 | Compute SHA256 hash of a file. Usage: `Get-FileHash256 -Path C:\Artifacts\sdo.exe` |
-| Get-FileVersionInfo | Read file version metadata (file version/product version). Usage: `Get-FileVersionInfo -Path C:\Artifacts\sdo.exe` |
-| Invoke-FastForward | Fast-forward a git ref to a specified commit/branch. Usage: `Invoke-FastForward -Repo . -Remote origin -Branch main` |
-| Write-OutputMessage | Consistent formatted output writer (info/warn/error). Usage: `Write-OutputMessage -Level Info -Message 'Starting'` |
-| Get-NToolsFileVersion | Helper to get NTools product version from binaries. Usage: `Get-NToolsFileVersion -FilePath C:\Artifacts\sdo.exe` |
-| Add-DeploymentPathToEnvironment | Add deploy path to PATH for current process/user. Usage: `Add-DeploymentPathToEnvironment -Path C:\My\deploy\bin` |
-| Invoke-NToolsDownload | Download NTools release artifacts (zip/nuget). Usage: `Invoke-NToolsDownload -Version 1.2.3 -OutputDir C:\Downloads` |
-| InstallNtools | Install an NTools version from the PowerShell installation module. Usage: `Import-Module ./dev-setup/Install.psm1 -Force; InstallNtools -version 1.74.0` |
-| Invoke-VerifyArtifacts | Run artifact validation (hashes, versions). Usage: `Invoke-VerifyArtifacts -ArtifactsPath C:\Artifacts\MySolution\Release\1.2.3 -ProductVersion 1.2.3` |
-| Set-DevelopmentEnvironment | Set local dev env variables (DevDrive/MainDir). Usage: `Set-DevelopmentEnvironment -DevDrive 'D:' -MainDir 'source'` |
-| Test-IsAdministrator | Returns true if running elevated. Usage: `Test-IsAdministrator` |
-| Test-MicrosoftPowerShellSecurityModuleLoaded | Check for Microsoft.PowerShell.Security module availability. Usage: `Test-MicrosoftPowerShellSecurityModuleLoaded` |
-| Test-CertificateStore | Validate certificate presence in store. Usage: `Test-CertificateStore -Thumbprint <thumbprint>` |
-| New-SelfSignedCodeCertificate | Create a self-signed code-signing certificate (dev). Usage: `New-SelfSignedCodeCertificate -Subject 'CN=ntools-dev' -ExportPath ./dev-cert.pfx` |
-| Export-CertificateToPfx | Export a certificate object to PFX file. Usage: `Export-CertificateToPfx -Certificate $cert -Password (ConvertTo-SecureString -AsPlainText 'pw' -Force) -Path ./cert.pfx` |
-| Export-CertificateToCer | Export certificate to .cer (DER/PEM). Usage: `Export-CertificateToCer -Certificate $cert -Path ./cert.cer` |
-| Import-CertificateToRoot | Import a certificate to the LocalMachine\Root store. Usage: `Import-CertificateToRoot -Path ./cert.cer` |
-| Import-CertificateToCurrentUser | Import a certificate to CurrentUser store. Usage: `Import-CertificateToCurrentUser -Path ./cert.pfx -Password (ConvertTo-SecureString -AsPlainText 'pw' -Force)` |
-| Set-ScriptSignature | Sign a script file with a certificate. Usage: `Set-ScriptSignature -ScriptPath ./scripts/setup/install.ps1 -CertificateThumbprint <thumbprint>` |
-| Get-ScriptSignature | Get signature information for a script file. Usage: `Get-ScriptSignature -ScriptPath ./scripts/setup/install.ps1` |
-| Set-CodeSigningTrust | Add a certificate to the machine/user trust store for code signing flows. Usage: `Set-CodeSigningTrust -Path ./cert.cer -Scope Machine` |
+| `Publish-AllProjects` | Build and publish non-test projects. `Publish-AllProjects -OutputDir C:\Artifacts -Version 1.0.0 -RepositoryRoot C:\MyRepo` |
+| `Get-ntoolsScriptsVersion` | Return the module version. `Get-NtoolsScriptsVersion` |
+| `Invoke-VerifyArtifacts` | Verify packaged artifacts. `Invoke-VerifyArtifacts -ArtifactsPath C:\Artifacts\Release -ProductVersion 1.2.3` |
+| `Set-DevelopmentEnvironment` | Set local development environment variables. `Set-DevelopmentEnvironment -DevDrive D: -MainDir source` |
+| `Get-VersionFromJson` | Read version fields from an `ntools.json` file. `Get-VersionFromJson -Path ./dev-setup/ntools.json` |
+| `Write-TestResult` | Write a standardized test result. `Write-TestResult -Name smoke -Passed $true` |
+| `Test-TargetExists` | Check whether an MSBuild target exists. `Test-TargetExists -ProjectFile foo.targets -TargetName Publish` |
+| `Test-TargetDependencies` | Validate MSBuild target dependencies. `Test-TargetDependencies -ProjectFile foo.targets -TargetName Publish` |
+| `Test-TargetDelegation` | Verify target delegation used by `sdo`. `Test-TargetDelegation -SolutionDir .` |
+| `Get-FileHash256` | Compute a SHA256 file hash. `Get-FileHash256 -Path C:\Artifacts\sdo.exe` |
+| `Get-FileVersionInfo` | Read file and product version metadata. `Get-FileVersionInfo -Path C:\Artifacts\sdo.exe` |
+| `Invoke-FastForward` | Fast-forward a Git ref. `Invoke-FastForward -Repo . -Remote origin -Branch main` |
+| `Write-OutputMessage` | Write consistently formatted output. `Write-OutputMessage -Level Info -Message Starting` |
+| `Get-NToolsFileVersion` | Read the NTools product version from a binary. `Get-NToolsFileVersion -FilePath C:\Artifacts\sdo.exe` |
+| `Add-DeploymentPathToEnvironment` | Add a deployment path to `PATH`. `Add-DeploymentPathToEnvironment -Path C:\My\deploy\bin` |
+| `Invoke-NToolsDownload` | Download NTools release artifacts. `Invoke-NToolsDownload -Version 1.2.3 -OutputDir C:\Downloads` |
+| `Install-NTools` | Install an NTools version from a release. `Install-NTools -Version 1.74.0` |
 
-Notes:
-- For runtime discovery: `Import-Module './scripts/module-package/ntools-scripts.psm1' -Force; Get-Command -Module ntools-scripts`.
+For runtime discovery:
+
+```powershell
+Import-Module './scripts/module-package/ntools-scripts.psm1' -Force
+Get-Command -Module ntools-scripts
+```
 
 

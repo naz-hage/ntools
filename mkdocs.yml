@@ -37,38 +37,26 @@ markdown_extensions:
       permalink_title: Anchor link to this section for reference
 
 nav:
-  - Getting Started: 
-    - Overview: index.md
-    - Architecture: devops-tools-suite-architecture.md
-    - Installation: installation.md
-    - Practice: usage.md
-    - Setup your project: setup.md
-    - Build Types: buildtypes.md
-    - Versioning: versioning.md
-  - List of Tools:
-      - SDO (nb.exe): nbuild.md
-      - lf (lf.exe): lf.md
-      - Nbackup (nbackup.exe): nbackup.md
-      - Github Release : github-release.md
-      - Sdo (sdo.exe):
-        - Documentation: sdo-net.md
-        - Usage Examples:
-          - AzDO Bug Example: issue-azdo-bug-example.md
-          - AzDO Epic Example: issue-azdo-epic-example.md
-          - AzDO PBI Example: issue-azdo-pbi-example.md
-          - AzDO Task Example: issue-azdo-task-example.md
-          - GitHub Issue Example: issue-gh-example.md
-  - Custom Build Tasks:
-      - Nbuild Tasks: nbuildtasks.md
-  - Developer setup:
-    - Version Automation Guide: version-automation-guide.md
-    - Development Tools: ntools.md
-    - ntools-scripts module:
-      - Module: ntools-scripts-module.md
-      - API: ntools-scripts-module-api.md
-  - Build System Features:
-    - Code Coverage: code-coverage.md
-    - MSBuild Targets: nbuild-targets.md
+  - Home: index.md
+  - Getting Started:
+      - Installation: installation.md
+      - Set Up a Project: setup.md
+      - Usage Guide: usage.md
+  - Using Ntools:
+      - SDO CLI: sdo-net.md
+      - GitHub Releases: github-release.md
+  - Development:
+      - Architecture: devops-tools-suite-architecture.md
+      - Build Types: buildtypes.md
+      - Versioning: versioning.md
+      - Version Automation Guide: version-automation-guide.md
+      - Development Tools: ntools.md
+      - PowerShell Modules:
+          - ntools-scripts Module: ntools-scripts-module.md
+          - ntools-scripts API: ntools-scripts-module-api.md
+  - Build and Test:
+      - Custom Build Tasks: nbuildtasks.md
+      - MSBuild Targets: nbuild-targets.md
+      - Code Coverage: code-coverage.md
   - Reference:
-    - AzDO Payloads: azdo_payloads.md
-  - TODO: todo.md
+      - Azure DevOps Payloads: azdo_payloads.md

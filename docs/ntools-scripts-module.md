@@ -1,6 +1,6 @@
 # ntools-scripts PowerShell Module
 
-This page documents the `ntools-scripts` PowerShell module and serves as the canonical API reference for the module's exported functions and usage.
+This page documents how to install, use, develop, and troubleshoot the `ntools-scripts` PowerShell module. The [module API reference](ntools-scripts-module-api.md) is the canonical list of exported functions.
 
 **Location**: `scripts/module-package/ntools-scripts.psm1`
 
@@ -21,39 +21,31 @@ Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
 
 ## Table of contents
 
-- Quick start
-- Overview
-- Import the Module
-- Usage examples
-- Module information
-- Architecture & migration
-- Module development
-- Troubleshooting
-- Canonical API reference
-
+- [Quick start](#quick-start)
+- [Overview](#overview)
+- [Installation](#installation)
+- [Module information](#module-information)
+- [Usage examples](#usage-examples)
+- [Module development](#module-development)
+- [Troubleshooting](#troubleshooting)
+- [Module API reference](ntools-scripts-module-api.md)
 
 ## Overview
-Module files:
-```
-scripts/
-## Available functions (summary)
 
-The module exports a broad set of functions covering build, CI/devops, setup/install, testing, utilities, and code-signing helpers. For the complete, authoritative list of exported function names and the exact API surface, see the dedicated API reference:
+The module consolidates build, CI, setup, testing, utility, and release functions from the previous script structure. Only the functions listed in `scripts/module-package/ntools-scripts.psd1` are exported.
 
-- [ntools-scripts Module API](ntools-scripts-module-api.md)
-
-If you need to discover functions at runtime, import the module and run:
+Discover the exported commands at runtime:
 
 ```powershell
+Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
 Get-Command -Module ntools-scripts | Sort-Object Name
 ```
-# Test the module
-Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
-Test-NToolsScriptsModule
-```
-## Manual Installation
+
+## Installation
+
+Install the module manually for local development:
+
 ```powershell
-# Install module manually for development
 Install-NToolsScriptsModule -InstallPath "$env:ProgramFiles\WindowsPowerShell\Modules\ntools-scripts" -Force
 ```
 
@@ -66,74 +58,14 @@ Install-NToolsScriptsModule -InstallPath "$env:ProgramFiles\WindowsPowerShell\Mo
 
 ## Architecture
 
-The module consolidates functionality from the previous script structure:
+The module consolidates functionality from the previous script structure. The manifest at `scripts/module-package/ntools-scripts.psd1` controls the public API; see the [module API reference](ntools-scripts-module-api.md) for the exported commands and examples.
 
-## Available Functions
-
-The module exports 36 functions organized by category:
-
-### Build Functions
--- `Publish-AllProjects` - Build and publish all non-test projects with deterministic repository path
--- `Invoke-VerifyArtifacts` - Comprehensive artifact verification
-- `Get-ProjectFiles` - Get project files with filtering
-- `Invoke-ProjectPublish` - Publish individual projects
-
-### DevOps Functions  
-- `Get-AgentPublicIp` - Get public IP for Azure DevOps agents and set pipeline variable
-- `Add-WafAllowRule` - Add Azure WAF allow rule for an IP
-- `Remove-WafCustomRule` - Remove Azure WAF custom rule
-- `Get-VersionFromJson` - Extract version information from JSON files
-
-### Setup Functions
-- `Set-DevelopmentEnvironment` - Set up development environment
-- `Install-DevelopmentApps` - Install development applications
-- `Install-NTools` - Install NTools from releases (with configurable ntools.json path)  **(deprecated: use atools/install-ntools.py)**
-- `Install-NToolsScriptsModule` - Install this module
-
-> Note: `Install-NTools` raises terminating errors on fatal failures (for example, download 404s or archive/extract errors). Callers that need to handle these failures gracefully should wrap the call in try/catch and handle exceptions accordingly.
-
-### Test Functions
-- `Invoke-CodeCoverage` - Run tests with code coverage
-- `Test-MSBuildDelegation` - Test MSBuild target delegation (**Note**: Now automatically integrated into `sdo smoke_test` target)
-- `Test-QuickTargets` - Quick target validation
-- `Test-NToolsScriptsModule` - Test module functionality
-- `Write-TestResult` - Write formatted test results
-- `Test-TargetExists` - Check if MSBuild targets exist
-- `Test-TargetDependencies` - Validate target dependencies
-- `Test-TargetDelegation` - Test target delegation patterns (**Note**: Core function used by `sdo smoke_test` target)
-
-### Utility Functions
-- `Get-FileHash256` - Calculate SHA256 hash of files
-- `Get-FileVersionInfo` - Get file version information
-- `Invoke-FastForward` - Git fast-forward operations
-- `Write-OutputMessage` - Standardized output messaging
-- `Get-NToolsFileVersion` - Get NTools file version information
-- `Add-DeploymentPathToEnvironment` - Add paths to PATH environment variable
-- `Invoke-NToolsDownload` - Download NTools packages
-
-### Common Functions
-- `Write-Info` - Write informational messages
-- `Write-Success` - Write success messages
-- `Write-Warning` - Write warning messages
-- `Write-Error` - Write error messages
-- `Get-NtoolsScriptsVersion` - Get module version information
-
-## Canonical module API (single source of truth)
-
-The complete, authoritative list of exported functions is available in the separate API reference:
-
-- docs/ntools/ntools-scripts-module-api.md
-
-For quick discovery at runtime, import the module and list commands:
+## Usage Examples
+Import the module before calling its exported functions:
 
 ```powershell
 Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
-Get-Command -Module ntools-scripts | Select-Object Name
 ```
-
-
-## Usage Examples
-For import instructions, see the "Import the Module" section near the top of this page.
 
 ### Get Module Information
 ```powershell
