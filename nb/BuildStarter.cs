@@ -62,28 +62,54 @@ public class BuildStarter
             Console.WriteLine($"MSBuild Path: {msbuildPath}");
         }
 
-        var process = new Process
+        // Always add spinner for now, but can be controlled by a flag in the future if needed
+        bool addSpinner = true;
+        ResultHelper result = new();
+        if (addSpinner)
         {
-            StartInfo = new ProcessStartInfo
+            result = RunBuildProcess(new Process
             {
-                WorkingDirectory = Environment.CurrentDirectory,
-                FileName = msbuildPath,
-                Arguments = $"msbuild {cmd}",
-                RedirectStandardOutput = false,
-                RedirectStandardError = false,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-            }
-        };
-
-        if (verbose)
-        {
-            Console.WriteLine($"==> {process.StartInfo.FileName} {process.StartInfo.Arguments}");
+                StartInfo = new ProcessStartInfo
+                {
+                    WorkingDirectory = Environment.CurrentDirectory,
+                    FileName = msbuildPath,
+                    Arguments = $"msbuild {cmd}",
+                    RedirectStandardOutput = false,
+                    RedirectStandardError = false,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                }
+            }, target, verbose);
         }
+        else
+        {
+            Console.WriteLine("Spinner not added.");
 
-        var result = process.LockStart(verbose);
+            
+            var process = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    WorkingDirectory = Environment.CurrentDirectory,
+                    FileName = msbuildPath,
+                    Arguments = $"msbuild {cmd}",
+                    RedirectStandardOutput = false,
+                    RedirectStandardError = false,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                }
+            };
 
-        DisplayLog(5);
+            if (verbose)
+            {
+                Console.WriteLine($"==> {process.StartInfo.FileName} {process.StartInfo.Arguments}");
+            }
+
+            result = process.LockStart(verbose);
+            return result;
+        } // End of addSpinner else block
+
+        DisplayLog();
         return result;
     }
 
@@ -108,7 +134,7 @@ public class BuildStarter
             var spinnerIndex = 0;
             var startedAt = Stopwatch.StartNew();
             var spinnerEnabled = !Console.IsOutputRedirected;
-            var status = $"Build '{target}' may take up to 3 minutes";
+            var status = $"... '{target}'";
 
             if (spinnerEnabled)
             {
@@ -326,26 +352,30 @@ public class BuildStarter
     }
 
     /// <summary>
-    /// Displays the log file content.
+    /// Displays the log file content.  if lastLines is 0, displays the entire log.
     /// </summary>
     /// <param name="lastLines">The number of last lines to display.</param>
-    private static void DisplayLog(int lastLines)
+    private static void DisplayLog(int lastLines = 0)
     {
         string logFilePath = Path.Combine(Environment.CurrentDirectory, LogFile);
-        if (File.Exists(logFilePath))
+        if (!File.Exists(logFilePath))
+            return;
+
+        string[] lines = File.ReadAllLines(logFilePath);
+
+        int start = 0;
+
+        if (lastLines > 0)
         {
-            string[] lines = File.ReadAllLines(logFilePath);
-            int start = lines.Length - lastLines;
-            if (start < 0)
-            {
-                start = 0;
-            }
-            for (int i = start; i < lines.Length; i++)
-            {
-                Console.WriteLine(lines[i]);
-            }
+            start = Math.Max(0, lines.Length - lastLines);
+        }
+
+        for (int i = start; i < lines.Length; i++)
+        {
+            Console.WriteLine(lines[i]);
         }
     }
+
 
     /// <summary>
     /// Reads the common.targets file and returns the specified attributes, with optional replacements for placeholders.
