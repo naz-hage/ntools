@@ -144,7 +144,11 @@ namespace Sdo.Commands
                     var client = new AzureDevOpsClient(token, org);
                     // Azure DevOps user lookup placeholder — implementation depends on Graph APIs
                     var user = await client.GetUserAsync(login);
-                    if (user == null) { ConsoleHelper.WriteError("User not found"); return 1; }
+                    if (user == null) 
+                    {
+                         ConsoleHelper.WriteError($"User not found{(string.IsNullOrEmpty(client.LastError) ? "" : $": {client.LastError}")}"); 
+                         return 1; 
+                    }
                     Console.WriteLine($"User: {user.DisplayName} — {user.UniqueName}");
                     return 0;
                 }
