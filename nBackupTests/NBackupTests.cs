@@ -1,5 +1,4 @@
-﻿using CommandLine;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Nbackup;
 using NbuildTasks;
 using Ntools;
@@ -14,6 +13,12 @@ namespace NbackupTests
     [TestClass()]
     public class NBackupTests
     {
+        [TestMethod()]
+        public void NBackupAssembly_DoesNotExposeExecutableEntryPoint()
+        {
+            Assert.IsNull(typeof(NBackup).Assembly.EntryPoint);
+        }
+
         private static string GetEmbeddedResourcePath(string assemblyPath, string resourceFileName)
         {
             if (!File.Exists(assemblyPath))
@@ -62,7 +67,7 @@ namespace NbackupTests
             }
 
             // Act
-            Assert.IsTrue(Parser.TryParse($"-i {backupInput}", out Cli options));
+            var options = new NBackupOptions { Input = backupInput };
             Console.WriteLine(backupInput);
             ResultHelper result = NBackup.Perform(options);
 
@@ -76,7 +81,7 @@ namespace NbackupTests
             // Arrange
             string backupInput = "\\..\\nBackup\\Data\\TextFile.txt";
 
-            Assert.IsTrue(Parser.TryParse($"-i {backupInput}", out Cli options));
+            var options = new NBackupOptions { Input = backupInput };
 
             // Act
             ResultHelper result = NBackup.Perform(options);
@@ -88,7 +93,7 @@ namespace NbackupTests
         [TestMethod()]
         public void PerformTestInvalidInputBadFormattedJson()
         {
-            Assert.IsTrue(Parser.TryParse($"-i m", out Cli options));
+            var options = new NBackupOptions { Input = "m" };
 
             ResultHelper result = NBackup.Perform(options);
             Assert.AreEqual(ResultHelper.FileNotFound, result.Code);

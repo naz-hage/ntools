@@ -102,14 +102,14 @@ ntools/
 │   ├── VersionManager.cs         # Version tracking
 │   └── ApiClient.cs              # API client utilities
 │
-├── Nbackup/                      # Backup tool
+├── Nbackup/                      # Reusable backup library (nBackup.dll)
 │   ├── Nbackup.csproj
-│   ├── Program.cs
-│   └── BackupEngine.cs           # Backup logic
+│   ├── NBackupOptions.cs         # Library operation options
+│   └── NBackup.cs                # Backup logic
 │
 ├── nBackupTests/                 # Unit tests for Nbackup
 │   ├── nBackupTests.csproj
-│   └── BackupTests.cs
+│   └── NBackupTests.cs
 │
 ├── lf/                           # Reusable file-listing library (lf.dll)
 │   ├── lf.csproj
