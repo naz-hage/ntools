@@ -111,14 +111,13 @@ ntools/
 │   ├── nBackupTests.csproj
 │   └── BackupTests.cs
 │
-├── lf/                           # File listing utility
+├── lf/                           # Reusable file-listing library (lf.dll)
 │   ├── lf.csproj
-│   ├── Program.cs
-│   └── FileLister.cs             # File listing implementation
+│   └── ListSearcher.cs            # File and folder listing implementation
 │
 ├── lfTests/                      # Unit tests for lf
 │   ├── lfTests.csproj
-│   └── FileListerTests.cs
+│   └── ListSearcherTests.cs
 │
 ├── go/                           # Go-based utilities
 │   ├── build-apps/               # Application builder
