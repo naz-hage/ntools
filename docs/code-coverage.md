@@ -45,7 +45,7 @@ Coverage filters use the following syntax:
 The `COVERAGE` target generates comprehensive code coverage reports:
 
 ```bash
-nb COVERAGE
+sdo COVERAGE
 ```
 
 This target:
@@ -60,7 +60,7 @@ This target:
 For a quick coverage overview:
 
 ```bash
-nb COVERAGE_SUMMARY
+sdo COVERAGE_SUMMARY
 ```
 
 This displays high-level coverage metrics without generating full reports.
@@ -70,7 +70,7 @@ This displays high-level coverage metrics without generating full reports.
 The `TEST` target automatically includes coverage collection when `EnableCodeCoverage` is true:
 
 ```bash
-nb TEST
+sdo TEST
 ```
 
 This runs all tests and collects coverage data in a single step.
@@ -110,7 +110,7 @@ To disable coverage collection (e.g., for faster builds):
 Or via command line:
 
 ```bash
-nb TEST -p:EnableCodeCoverage=false
+sdo TEST -p:EnableCodeCoverage=false
 ```
 
 ## Examples
@@ -118,13 +118,13 @@ nb TEST -p:EnableCodeCoverage=false
 ### Basic Usage
 ```bash
 # Run tests with coverage
-nb TEST
+sdo TEST
 
 # Generate coverage reports
-nb COVERAGE
+sdo COVERAGE
 
 # Quick coverage summary
-nb COVERAGE_SUMMARY
+sdo COVERAGE_SUMMARY
 ```
 
 ### Custom Configuration
@@ -139,5 +139,5 @@ nb COVERAGE_SUMMARY
 ### Full Build Pipeline
 ```bash
 # Complete build with tests and coverage
-nb STAGE
+sdo STAGE
 ```

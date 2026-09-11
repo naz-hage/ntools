@@ -19,15 +19,15 @@ namespace Sdo.Commands
         /// Initializes a new instance of the <see cref="MapCommand"/> class.
         /// </summary>
         /// <param name="verboseOption">The global verbose option.</param>
-        public MapCommand(Option<bool> verboseOption) : base("map", "Show command mappings between SDO and native CLI tools")
+        public MapCommand(Option<bool> verboseOption) : base("map", "Show command mappings between SDO and gh/az native CLI tools")
         {
             // Add platform option (optional)
-            var platformOption = new Option<string>("--platform");
+            var platformOption = new Option<string>("--platform", "-p");
             platformOption.Description = "Platform to show mappings for (gh=github, azdo=azure-devops, leave empty for auto-detect)";
             Add(platformOption);
 
             // Add --all option
-            var allOption = new Option<bool>("--all");
+            var allOption = new Option<bool>("--all", "-a");
             allOption.Description = "Show all mappings for both platforms";
             Add(allOption);
 

@@ -2,13 +2,15 @@
 using Ntools;
 using System.Diagnostics;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml;
 
 namespace Nbuild;
 
-public class BuildStarter
+public partial class BuildStarter
 {
     public static string LogFile { get; set; } = "nbuild.log";
+    private static readonly TimeSpan BuildTimeout = TimeSpan.FromMinutes(3);
     private const string BuildFileName = "nbuild.targets";
     private const string CommonBuildFileName = "common.targets";
     private const string TargetsMd = "targets.md";
@@ -61,29 +63,124 @@ public class BuildStarter
             Console.WriteLine($"MSBuild Path: {msbuildPath}");
         }
 
-        var process = new Process
+        // Always add spinner for now, but can be controlled by a flag in the future if needed
+        bool addSpinner = true;
+        ResultHelper result = new();
+        if (addSpinner)
         {
-            StartInfo = new ProcessStartInfo
+            result = RunBuildProcess(new Process
             {
-                WorkingDirectory = Environment.CurrentDirectory,
-                FileName = msbuildPath,
-                Arguments = $"msbuild {cmd}",
-                RedirectStandardOutput = false,
-                RedirectStandardError = false,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-            }
-        };
-
-        if (verbose)
-        {
-            Console.WriteLine($"==> {process.StartInfo.FileName} {process.StartInfo.Arguments}");
+                StartInfo = new ProcessStartInfo
+                {
+                    WorkingDirectory = Environment.CurrentDirectory,
+                    FileName = msbuildPath,
+                    Arguments = $"msbuild {cmd}",
+                    RedirectStandardOutput = false,
+                    RedirectStandardError = false,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                }
+            }, target, verbose);
         }
+        else
+        {
+            Console.WriteLine("Spinner not added.");
 
-        var result = process.LockStart(verbose);
+            
+            var process = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    WorkingDirectory = Environment.CurrentDirectory,
+                    FileName = msbuildPath,
+                    Arguments = $"msbuild {cmd}",
+                    RedirectStandardOutput = false,
+                    RedirectStandardError = false,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                }
+            };
 
-        DisplayLog(5);
+            if (verbose)
+            {
+                Console.WriteLine($"==> {process.StartInfo.FileName} {process.StartInfo.Arguments}");
+            }
+
+            result = process.LockStart(verbose);
+            return result;
+        } // End of addSpinner else block
+
+        DisplayLog();
         return result;
+    }
+
+    /// <summary>
+    /// Runs the build process and handles output, timeout, and exit code. (A placeholder for future enhancements to handle output and errors more gracefully.)
+    /// can be called : var result = RunBuildProcess(process, target, verbose)
+    /// </summary>
+    /// <param name="process">The process to run.</param>
+    /// <param name="target">The build target.</param>
+    /// <param name="verbose">Specifies whether to display verbose output.</param>
+    /// <returns>A <see cref="ResultHelper"/> object representing the result of the build operation.</returns>
+    private static ResultHelper RunBuildProcess(Process process, string? target, bool verbose)
+    {
+        try
+        {
+            if (!process.Start())
+            {
+                return ResultHelper.Fail(-1, $"Failed to start {process.StartInfo.FileName}");
+            }
+
+            var spinner = new[] { '|', '/', '-', '\\' };
+            var spinnerIndex = 0;
+            var startedAt = Stopwatch.StartNew();
+            var spinnerEnabled = !Console.IsOutputRedirected;
+            var status = $"... '{target}'";
+
+            if (spinnerEnabled)
+            {
+                Console.Write($"{status} {spinner[spinnerIndex]}");
+            }
+            else
+            {
+                Console.WriteLine(status);
+            }
+
+            while (!process.WaitForExit(250))
+            {
+                if (startedAt.Elapsed >= BuildTimeout)
+                {
+                    process.Kill(entireProcessTree: true);
+                    process.WaitForExit();
+                    Console.WriteLine();
+                    return ResultHelper.Fail(-1, $"Build '{target}' exceeded the 3-minute timeout.");
+                }
+
+                if (spinnerEnabled)
+                {
+                    spinnerIndex = (spinnerIndex + 1) % spinner.Length;
+                    Console.Write($"\r{status} {spinner[spinnerIndex]}");
+                }
+            }
+
+            if (spinnerEnabled)
+            {
+                Console.WriteLine($"\r{status} done.   ");
+            }
+
+            var result = ResultHelper.New();
+            result.Code = process.ExitCode;
+            if (result.Code != 0)
+            {
+                result.Output.Add($"MSBuild exited with code {result.Code}.");
+            }
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            return ResultHelper.Fail(-1, $"Exception while running build: {ex.Message}");
+        }
     }
 
     // <summary>
@@ -256,26 +353,51 @@ public class BuildStarter
     }
 
     /// <summary>
-    /// Displays the log file content.
+    /// Displays the log file content.  if lastLines is 0, displays the entire log.
     /// </summary>
     /// <param name="lastLines">The number of last lines to display.</param>
-    private static void DisplayLog(int lastLines)
+    private static void DisplayLog(int lastLines = 0)
     {
         string logFilePath = Path.Combine(Environment.CurrentDirectory, LogFile);
-        if (File.Exists(logFilePath))
+        if (!File.Exists(logFilePath))
+            return;
+
+        string[] lines = File.ReadAllLines(logFilePath);
+
+        int start = 0;
+
+        if (lastLines > 0)
         {
-            string[] lines = File.ReadAllLines(logFilePath);
-            int start = lines.Length - lastLines;
-            if (start < 0)
+            start = Math.Max(0, lines.Length - lastLines);
+        }
+
+        for (int i = start; i < lines.Length; i++)
+        {
+            var line = lines[i];
+
+            if (BuildTarget().IsMatch(line))
             {
-                start = 0;
+                Console.ForegroundColor = ConsoleColor.Cyan;
             }
-            for (int i = start; i < lines.Length; i++)
+            else if (Error().IsMatch(line))
             {
-                Console.WriteLine(lines[i]);
+                int count = int.Parse(Count().Match(line).Value);
+                Console.ForegroundColor = count == 0 ? ConsoleColor.Green : ConsoleColor.Red;
             }
+            else if (Warning().IsMatch(line))
+            {
+                int count = int.Parse(Count().Match(line).Value);
+                Console.ForegroundColor = count == 0 ? ConsoleColor.Gray : ConsoleColor.Yellow;
+            }
+            else
+            {
+                // fallback coloring
+                Console.ForegroundColor = ConsoleColor.Gray;
+            }
+            Console.WriteLine(lines[i]);
         }
     }
+
 
     /// <summary>
     /// Reads the common.targets file and returns the specified attributes, with optional replacements for placeholders.
@@ -499,5 +621,17 @@ public class BuildStarter
         }
         return ResultHelper.Success();
     }
+
+    [GeneratedRegex(@"^\s*[A-Z_]+:\s*$")]
+    private static partial Regex BuildTarget();
+    //[GeneratedRegex(@"\b\d+\s+Error", RegexOptions.IgnoreCase, "en-US")]
+    [GeneratedRegex(@"\b\d+\s+Error\b|\berror\b", RegexOptions.IgnoreCase, "en-US")]
+    //private static partial Regex Error();
+
+    private static partial Regex Error();
+    [GeneratedRegex(@"\b\d+\s+Warning", RegexOptions.IgnoreCase, "en-US")]
+    private static partial Regex Warning();
+    [GeneratedRegex(@"\d+")]
+    private static partial Regex Count();
 }
 

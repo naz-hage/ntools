@@ -4,7 +4,7 @@
 The `stage` build type use the following command:
 
 ```powershell
-nb stage
+sdo stage
 ```
 It includes the following steps:
 
@@ -20,7 +20,7 @@ It includes the following steps:
 The `prod` build type use the following command:
 
 ```powershell
-nb prod
+sdo prod
 ```
 It includes the following steps:
 

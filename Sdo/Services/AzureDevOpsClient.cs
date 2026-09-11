@@ -299,66 +299,132 @@ namespace Sdo.Services
         {
             try
             {
-                // Try the /connectionData endpoint first which includes authenticatedUser info
-                var connUrl = $"https://dev.azure.com/{_organization}/_apis/connectionData";
+                static AzureDevOpsUser MapUser(JsonElement source)
+                {
+                    var user = new AzureDevOpsUser();
+                    if (source.TryGetProperty("displayName", out var dn)) user.DisplayName = dn.GetString();
+                    if (string.IsNullOrEmpty(user.DisplayName) && source.TryGetProperty("providerDisplayName", out var pdn)) user.DisplayName = pdn.GetString();
+                    if (string.IsNullOrEmpty(user.DisplayName) && source.TryGetProperty("customDisplayName", out var cdn)) user.DisplayName = cdn.GetString();
+
+                    if (source.TryGetProperty("uniqueName", out var un)) user.UniqueName = un.GetString();
+                    if (string.IsNullOrEmpty(user.UniqueName) && source.TryGetProperty("principalName", out var pn)) user.UniqueName = pn.GetString();
+                    if (string.IsNullOrEmpty(user.UniqueName) && source.TryGetProperty("directoryAlias", out var da)) user.UniqueName = da.GetString();
+
+                    if (source.TryGetProperty("mailAddress", out var ma)) user.PreferredEmail = ma.GetString();
+                    if (string.IsNullOrEmpty(user.PreferredEmail) && source.TryGetProperty("emailAddress", out var ea)) user.PreferredEmail = ea.GetString();
+
+                    if (source.TryGetProperty("id", out var id)) user.Id = id.GetString();
+                    if (string.IsNullOrEmpty(user.Id) && source.TryGetProperty("descriptor", out var desc)) user.Id = desc.GetString();
+                    return user;
+                }
+
+                static bool HasIdentity(AzureDevOpsUser user)
+                {
+                    return !string.IsNullOrEmpty(user.Id)
+                        || !string.IsNullOrEmpty(user.UniqueName)
+                        || !string.IsNullOrEmpty(user.PreferredEmail)
+                        || !string.IsNullOrEmpty(user.DisplayName);
+                }
+
+                static AzureDevOpsUser? TryMapFromUserDataHeader(HttpResponseMessage response)
+                {
+                    if (!response.Headers.TryGetValues("X-VSS-UserData", out var values)) return null;
+                    var raw = values.FirstOrDefault();
+                    if (string.IsNullOrWhiteSpace(raw)) return null;
+
+                    var idx = raw.IndexOf(':');
+                    var id = idx > 0 ? raw.Substring(0, idx) : raw;
+                    var displayName = idx >= 0 && idx < raw.Length - 1 ? raw[(idx + 1)..] : null;
+
+                    var user = new AzureDevOpsUser
+                    {
+                        Id = string.IsNullOrWhiteSpace(id) ? null : id,
+                        DisplayName = string.IsNullOrWhiteSpace(displayName) ? null : displayName
+                    };
+
+                    return HasIdentity(user) ? user : null;
+                }
+
+                string? meUnique = null;
+                string? meEmail = null;
+
+                // Primary source: connectionData authenticated identity
+                var connUrl = $"https://dev.azure.com/{_organization}/_apis/connectiondata?connectOptions=1&lastChangeId=-1&lastChangeId64=-1&api-version=7.0";
                 var connResponse = await _httpClient.GetAsync(connUrl);
                 if (connResponse.IsSuccessStatusCode)
                 {
                     var connContent = await connResponse.Content.ReadAsStringAsync();
                     using var connDoc = JsonDocument.Parse(connContent);
-                    
-                    // Check for authenticatedUser in response
+
                     if (connDoc.RootElement.TryGetProperty("authenticatedUser", out var authUser))
                     {
-                        var user = new AzureDevOpsUser();
-                        if (authUser.TryGetProperty("displayName", out var dn)) user.DisplayName = dn.GetString();
-                        if (authUser.TryGetProperty("uniqueName", out var un)) user.UniqueName = un.GetString();
-                        if (authUser.TryGetProperty("mailAddress", out var ma)) user.PreferredEmail = ma.GetString();
-                        if (authUser.TryGetProperty("id", out var id)) user.Id = id.GetString();
-                        
-                        if (!string.IsNullOrEmpty(user.DisplayName))
-                        {
-                            return user;
-                        }
+                        var user = MapUser(authUser);
+                        if (HasIdentity(user)) return user;
                     }
-                }
-                
-                // Fallback to Graph API - get users and skip first (usually service account)
-                var graphUrl = $"https://vssps.dev.azure.com/{_organization}/_apis/graph/users?api-version=7.1-preview.1&$top=10";
-                var graphResponse = await _httpClient.GetAsync(graphUrl);
-                if (graphResponse.IsSuccessStatusCode)
-                {
-                    var graphContent = await graphResponse.Content.ReadAsStringAsync();
-                    using var graphDoc = JsonDocument.Parse(graphContent);
-                    if (graphDoc.RootElement.TryGetProperty("value", out var valueEl))
+
+                    if (connDoc.RootElement.TryGetProperty("authorizedUser", out var authorizedUser))
                     {
-                        var valueArray = valueEl.EnumerateArray().ToList();
-                        // Skip first user (usually build service) and return second user
-                        if (valueArray.Count > 1)
+                        var user = MapUser(authorizedUser);
+                        if (HasIdentity(user)) return user;
+                    }
+
+                    var headerUser = TryMapFromUserDataHeader(connResponse);
+                    if (headerUser != null) return headerUser;
+                }
+
+                // Secondary source: profile endpoint for current authenticated identity
+                var profileUrl = "https://app.vssps.visualstudio.com/_apis/profile/profiles/me?api-version=7.0";
+                var profileResponse = await _httpClient.GetAsync(profileUrl);
+                if (profileResponse.IsSuccessStatusCode)
+                {
+                    var profileContent = await profileResponse.Content.ReadAsStringAsync();
+                    using var profileDoc = JsonDocument.Parse(profileContent);
+                    var meUser = MapUser(profileDoc.RootElement);
+                    if (HasIdentity(meUser)) return meUser;
+                    meUnique = meUser.UniqueName;
+                    meEmail = meUser.PreferredEmail;
+
+                    var headerUser = TryMapFromUserDataHeader(profileResponse);
+                    if (headerUser != null) return headerUser;
+                }
+
+                // Deterministic fallback only: match Graph user by known identity hints
+                if (!string.IsNullOrWhiteSpace(meUnique) || !string.IsNullOrWhiteSpace(meEmail))
+                {
+                    var graphUrl = $"https://vssps.dev.azure.com/{_organization}/_apis/graph/users?api-version=7.1-preview.1&$top=100";
+                    var graphResponse = await _httpClient.GetAsync(graphUrl);
+                    if (graphResponse.IsSuccessStatusCode)
+                    {
+                        var graphContent = await graphResponse.Content.ReadAsStringAsync();
+                        using var graphDoc = JsonDocument.Parse(graphContent);
+                        if (graphDoc.RootElement.TryGetProperty("value", out var valueEl))
                         {
-                            var userItem = valueArray[1];
-                            var user = new AzureDevOpsUser();
-                            if (userItem.TryGetProperty("displayName", out var displayName)) user.DisplayName = displayName.GetString();
-                            if (userItem.TryGetProperty("principalName", out var pn)) user.UniqueName = pn.GetString();
-                            if (userItem.TryGetProperty("mailAddress", out var ma)) user.PreferredEmail = ma.GetString();
-                            if (userItem.TryGetProperty("descriptor", out var desc)) user.Id = desc.GetString();
-                            return user;
-                        }
-                        // If only one user, return it
-                        else if (valueArray.Count == 1)
-                        {
-                            var userItem = valueArray[0];
-                            var user = new AzureDevOpsUser();
-                            if (userItem.TryGetProperty("displayName", out var displayName)) user.DisplayName = displayName.GetString();
-                            if (userItem.TryGetProperty("principalName", out var pn)) user.UniqueName = pn.GetString();
-                            if (userItem.TryGetProperty("mailAddress", out var ma)) user.PreferredEmail = ma.GetString();
-                            if (userItem.TryGetProperty("descriptor", out var desc)) user.Id = desc.GetString();
-                            return user;
+                            var users = valueEl.EnumerateArray().Select(MapUser).Where(HasIdentity).ToList();
+                            if (!string.IsNullOrWhiteSpace(meUnique))
+                            {
+                                var byUnique = users.FirstOrDefault(u => string.Equals(u.UniqueName, meUnique, StringComparison.OrdinalIgnoreCase));
+                                if (byUnique != null) return byUnique;
+                            }
+
+                            if (!string.IsNullOrWhiteSpace(meEmail))
+                            {
+                                var byEmail = users.FirstOrDefault(u => string.Equals(u.PreferredEmail, meEmail, StringComparison.OrdinalIgnoreCase));
+                                if (byEmail != null) return byEmail;
+                            }
                         }
                     }
                 }
-                
-                _lastError = "No user found";
+
+                // Final fallback: probe any authenticated endpoint and parse X-VSS-UserData response header
+                var probeUrl = $"https://dev.azure.com/{_organization}/_apis/projects?$top=1&api-version=7.0";
+                var probeResponse = await _httpClient.GetAsync(probeUrl);
+                if (probeResponse.IsSuccessStatusCode)
+                {
+                    var headerUser = TryMapFromUserDataHeader(probeResponse);
+                    if (headerUser != null) return headerUser;
+                }
+
+                _lastError = "Could not resolve authenticated user from connection/profile endpoints";
                 return null;
             }
             catch (Exception ex)

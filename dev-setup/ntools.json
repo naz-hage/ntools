@@ -3,8 +3,8 @@
   "NbuildAppList": [
     {
       "Name": "Ntools",
-      "Version": "1.78.0",
-      "AppFileName": "$(InstallPath)\\nb.exe",
+      "Version": "1.79.14",
+      "AppFileName": "$(InstallPath)\\sdo.exe",
       "WebDownloadFile": "https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip",
       "DownloadedFile": "$(Version).zip",
       "InstallCommand": "powershell.exe",

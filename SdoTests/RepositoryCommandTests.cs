@@ -29,6 +29,37 @@ public class RepositoryCommandTests
     }
 
     [Fact]
+    public void Constructor_AddsCloneSubcommandWithUrlAndPathOptions()
+    {
+        var command = new RepositoryCommand(_verboseOption, dryRunOption: new Option<bool>("--dry-run"));
+        var cloneCmd = Assert.Single(command.Subcommands, s => s.Name == "clone");
+
+        Assert.NotNull(cloneCmd.Options.FirstOrDefault(o => o.Name == "--url"));
+        Assert.NotNull(cloneCmd.Options.FirstOrDefault(o => o.Name == "--path"));
+    }
+
+    [Fact]
+    public void Constructor_AddsTagSubcommandWithNestedCommands()
+    {
+        var command = new RepositoryCommand(_verboseOption, dryRunOption: new Option<bool>("--dry-run"));
+        var tagCmd = Assert.Single(command.Subcommands, s => s.Name == "tag");
+        var nestedNames = tagCmd.Subcommands.Select(s => s.Name).ToList();
+
+        Assert.Equal(new[] { "auto", "delete", "push-auto", "set" }, nestedNames);
+    }
+
+    [Fact]
+    public void AutoTagSubcommand_HasBuildTypeShortAlias()
+    {
+        var command = new RepositoryCommand(_verboseOption);
+        var tagCmd = command.Subcommands.First(s => s.Name == "tag");
+        var autoCmd = tagCmd.Subcommands.First(s => s.Name == "auto");
+        var buildTypeOption = autoCmd.Options.First(o => o.Name == "--buildtype");
+
+        Assert.Contains("-b", buildTypeOption.Aliases);
+    }
+
+    [Fact]
     public void Constructor_AddsDeleteSubcommand()
     {
         var command = new RepositoryCommand(_verboseOption);
@@ -45,11 +76,11 @@ public class RepositoryCommandTests
     }
 
     [Fact]
-    public void Constructor_AddsShowSubcommand()
+    public void Constructor_AddsInfoSubcommand()
     {
         var command = new RepositoryCommand(_verboseOption);
-        var showCmd = Assert.Single(command.Subcommands, s => s.Name == "show");
-        Assert.NotNull(showCmd);
+        var infoCmd = Assert.Single(command.Subcommands, s => s.Name == "info");
+        Assert.NotNull(infoCmd);
     }
 
     [Fact]
@@ -57,7 +88,7 @@ public class RepositoryCommandTests
     {
         var command = new RepositoryCommand(_verboseOption);
         var subcommandNames = command.Subcommands.Select(s => s.Name).ToList();
-        Assert.Equal(new[] { "create", "delete", "list", "show" }, subcommandNames);
+        Assert.Equal(new[] { "clone", "create", "delete", "info", "list", "tag" }, subcommandNames);
     }
 
     [Fact]

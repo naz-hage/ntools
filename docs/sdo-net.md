@@ -6,25 +6,29 @@ Unified CLI for managing work items, pull requests, pipelines, and repositories 
 
 - [Overview](#overview)
 - [Prerequisites](#prerequisites)
-- [Key Features](#key-features)
 - [Main Help](#main-help)
 - [Command Reference](#command-reference)
-  - [map — CLI Mappings](#map--cli-mappings)
-  - [auth — Verify Authentication](#auth--verify-authentication)
-  - [wi — Work Item Management](#wi--work-item-management)
-  - [pr — Pull Request Operations](#pr--pull-request-operations)
-  - [pipeline — Pipeline/Workflow Management](#pipeline--pipelineworkflow-management)
-  - [repo — Repository Management](#repo--repository-management)
-  - [user — User Management](#user--user-management)
+  - [map: CLI mappings](#map-cli-mappings)
+  - [auth: Verify authentication](#auth-verify-authentication)
+  - [wi: Work item management](#wi-work-item-management)
+  - [pr: Pull request operations](#pr-pull-request-operations)
+  - [repo: Repository management](#repo-repository-management)
+  - [Local automation](#local-automation)
+  - [pipeline: Pipeline/workflow management](#pipeline-pipelineworkflow-management)
+  - [user: User management](#user-user-management)
 - [Troubleshooting](#troubleshooting)
+- [Configuration](#configuration-system-yaml-based)
+- [Markdown input](#markdown-parser-for-content-creation)
+- [E2E testing](#e2e-testing-infrastructure)
+- [Build targets](#nbuild-targets)
 
 ## Overview
 
-`sdo` (Simple DevOps Operations) is a C# CLI tool providing unified operations across Azure DevOps and GitHub. It:
+`sdo` (Simple DevOps Operations) is a C# CLI tool that unifies Azure DevOps, GitHub, and local build workflows. It:
 - Automatically detects your platform from Git remote configuration
 - Translates work item states and operations between GitHub and Azure DevOps
 - Maps `sdo` commands to native platform CLIs for reference and learning
-- Provides consistent cross-platform tooling for teams
+- Provides consistent tooling for teams
 
 ## Prerequisites
 
@@ -53,18 +57,6 @@ git remote -v
 # origin  https://dev.azure.com/org/project/_git/repo (fetch)  -> Uses Azure DevOps
 ```
 
-## Key Features
-
-- **Work Item Management** — Create, list, show, update work items with cross-platform state translation
-- **Pull Requests** — List, show, create pull requests
-- **Pipelines/Workflows** — Create, list, show, run, view logs for GitHub Actions and Azure Pipelines
-- **Repositories** — List and inspect repositories
-- **Users & Permissions** — List users, check permissions, search
-- **Platform Auto-Detection** — Automatically detects GitHub or Azure DevOps from Git remote
-- **CLI Mapping** — Shows sdo command equivalents in native CLIs (`gh`, `az`)
-- **State Translation** — Automatically maps work item states between platforms
-- **Clean Output** — Emoji-enhanced tables and concise error messages
-
 ## Main Help
 
 ```
@@ -79,6 +71,7 @@ Usage:
   sdo [command] [options]
 
 Options:
+  --dry-run       Perform a dry run without side effects
   --verbose       Enable verbose output
   -?, -h, --help  Show help and usage information
   --version       Show version information
@@ -89,13 +82,19 @@ Commands:
   pipeline  Pipeline/workflow management commands (create, show, list, run, status, logs, delete, lastbuild, update)
   pr        Pull request operations
   repo      Repository management commands
+  tool      Tool installation and download commands
+  env       Environment inspection commands
+  build     Build automation and target management
+  release   GitHub release operations
+  backup    Backup configuration and execution
+  file      File and folder search commands
   wi        Work item management commands
   user      User management commands for GitHub and Azure DevOps
 ```
 
 ## Command Reference
 
-### map — CLI Mappings
+### map: CLI mappings
 
 Show how `sdo` commands map to native platform CLIs (`gh` for GitHub, `az` for Azure DevOps).
 
@@ -128,7 +127,7 @@ With `--verbose`, displays exact native API commands for copy/paste.
 
 ---
 
-### auth — Verify Authentication
+### auth: Verify authentication
 
 Validate credentials are configured for your platform.
 
@@ -170,7 +169,7 @@ sdo auth azdo --verbose     # Show token source details
 
 ---
 
-### wi — Work Item Management
+### wi: Work item management
 
 Create, list, show, update work items, add comments, and start work. Supports GitHub issues and Azure DevOps work items with automatic state translation.
 
@@ -504,7 +503,7 @@ sdo wi comment --id 243 --message "Looks good!" --verbose
 
 ---
 
-### pr — Pull Request Operations
+### pr: Pull request operations
 
 List, show, create, and manage pull requests on GitHub and Azure DevOps. `pr create` intelligently auto-detects work item ID and file path from your current branch name, making PR creation simpler and faster.
 
@@ -649,13 +648,15 @@ sdo pr update --pr-id 12 --title "New title" --status merged
 
 ---
 
-### repo — Repository Management
+### repo: Repository management
 
-Create, delete, list, and inspect repositories for your organization.
+Create, delete, list, inspect, clone, and tag repositories.
 
 **Subcommands:**
 - `list` — List repositories
-- `show` — Display repo details
+- `info` — Display current Git branch, tag, and remote repository information
+- `clone` — Clone a Git repository
+- `tag` — Set, auto-create, push, or delete Git tags
 - `create` — Create new repository
 - `delete` — Delete repository
 
@@ -673,8 +674,48 @@ Commands:
   create <name>  Create a new repository
   delete         Delete a repository
   list           List repositories
-  show           Display repository information from current Git remote
+  info           Display local Git and remote repository information
+  clone          Clone a Git repository
+  tag            Git tag operations
 ```
+
+An unmatched single token is treated as an MSBuild target, preserving the legacy target-invocation behavior:
+
+```bash
+sdo build                         # Display available targets
+sdo test --verbose                # Build the `test` target through MSBuild
+```
+
+The target is resolved from `nbuild.targets` in the current directory. Multiple unmatched tokens and unknown options return an error.
+
+#### repo info
+
+```bash
+sdo repo info
+sdo repo info --verbose
+```
+
+`repo info` combines the local Git branch, project/tag details, and repository metadata from the current Git remote. Use `--dry-run` to display the local information without contacting the hosting service.
+
+#### repo clone
+
+```bash
+sdo repo clone --url https://github.com/owner/repository
+sdo repo clone --url https://github.com/owner/repository --path C:\work\repository
+sdo repo clone --url https://github.com/owner/repository --dry-run
+```
+
+#### repo tag
+
+```bash
+sdo repo tag set --tag 1.2.3 --dry-run
+sdo repo tag auto --buildtype stage --dry-run
+sdo repo tag auto -b stage --dry-run
+sdo repo tag push-auto --buildtype stage --dry-run
+sdo repo tag delete --tag 1.2.3 --dry-run
+```
+
+`--buildtype` belongs to `auto` and `push-auto`; `repo tag auto` also accepts `-b` as its short form. It is invalid for `tag set` and `tag delete`.
 
 #### repo list
 
@@ -689,19 +730,6 @@ sdo repo list --verbose             # Show API commands
 
 **Options:**
 - `--top <top>` — Return top N repositories
-- `--verbose` — Show mapping
-
-#### repo show
-
-Display repository information from current Git remote.
-
-**Usage:**
-```bash
-sdo repo show                       # Show current repo
-sdo repo show --verbose             # Show API command
-```
-
-**Options:**
 - `--verbose` — Show mapping
 
 #### repo create
@@ -739,7 +767,61 @@ sdo repo delete --force --verbose   # Show mapping
 
 ---
 
-### pipeline — Pipeline/Workflow Management
+### Local automation
+
+These command groups consolidate the local build, backup, and file-search workflows into SDO.
+
+#### tool
+
+Manage tools from an apps manifest:
+
+```bash
+sdo tool list
+sdo tool list --json apps.json
+sdo tool install --json apps.json --dry-run
+sdo tool uninstall --json apps.json --dry-run
+sdo tool download --json apps.json --dry-run
+```
+
+#### env and build
+
+```bash
+sdo env path
+sdo build targets
+```
+
+`sdo env path` displays the effective PATH. `sdo build targets` lists targets and updates `targets.md` using the existing build-target discovery behavior.
+
+#### release
+
+```bash
+sdo release list --dry-run
+sdo release create --repo owner/repository --tag v1.0.0 --branch main --file release.zip --dry-run
+sdo release download --repo owner/repository --tag v1.0.0 --dry-run
+```
+
+#### backup
+
+```bash
+sdo backup init --output nbackup.json
+sdo backup --input nbackup.json --dry-run
+sdo backup run --input nbackup.json --dry-run
+```
+
+`backup` accepts the backup options directly and implicitly runs the backup operation. The explicit `backup run` form remains supported and executes the same logic. Both forms resolve environment variables, apply configured exclusions and log options, and invoke `robocopy` only when `--dry-run` is not specified.
+
+#### file
+
+```bash
+sdo file files --directoryPath C:\work --extensions .cs
+sdo file folders --directoryPath C:\work --name src
+```
+
+Both searches are recursive and preserve the legacy LF filters and output behavior.
+
+---
+
+### pipeline: Pipeline/workflow management
 
 Manage GitHub Actions workflows and Azure Pipelines. **Read-only operations** are safe; **write operations** require permissions.
 
@@ -921,7 +1003,7 @@ sdo pipeline delete 1234 --force --verbose
 
 ---
 
-### user — User Management
+### user: User management
 
 List users, search, and check permissions.
 
@@ -1223,10 +1305,10 @@ public void DoSomething()
     // Code here
 }
 ```
-```
+````
 
 **With YAML Frontmatter** (optional):
-```markdown
+````markdown
 ---
 work_item_type: PBI
 priority: High
@@ -1243,7 +1325,7 @@ Implement OAuth2 integration for secure user authentication...
 - [ ] OAuth2 provider integrated
 - [ ] Token refresh mechanism implemented
 - [ ] Session management in place
-```
+````
 
 #### Creating Work Items from Markdown
 
@@ -1313,7 +1395,7 @@ sdo wi create --file-path work-item.md --verbose
 **Scenario 1: Feature Request**
 
 Create `features/auth-redesign.md`:
-```markdown
+````markdown
 ---
 work_item_type: PBI
 priority: High
@@ -1370,12 +1452,12 @@ The markdown parser crashes when encountering headers without proper spacing.
 ```markdown
 #NoSpace Header
 ```
-```
+````
 
 **Scenario 3: Pull Request**
 
 Create `prs/feature-merge.md`:
-```markdown
+````markdown
 ---
 work_item_type: Pull Request
 target: "github"
@@ -1395,7 +1477,7 @@ This PR implements OAuth2 authentication for dashboard access.
 npm test
 npm run lint
 ```
-```
+````
 
 ---
 
@@ -1417,16 +1499,16 @@ Available MSBuild targets for E2E testing:
 
 ```bash
 # Run all Azure DevOps tests
-nb RUN_AZDO_WI_ASSIGNED_TO_ME_TEST
+sdo RUN_AZDO_WI_ASSIGNED_TO_ME_TEST
 
 # Run all GitHub tests  
-nb RUN_GITHUB_WI_ASSIGNED_TO_ME_TEST
+sdo RUN_GITHUB_WI_ASSIGNED_TO_ME_TEST
 
 # Run Azure DevOps pipeline tests
-nb RUN_AZDO_PIPELINE_TEST
+sdo RUN_AZDO_PIPELINE_TEST
 
 # Run GitHub Actions tests
-nb RUN_GITHUB_PIPELINE_TEST
+sdo RUN_GITHUB_PIPELINE_TEST
 ```
 
 #### Example Output
@@ -1493,13 +1575,13 @@ These tests can be integrated into your build pipeline:
 ```bash
 # In your GitHub Actions workflow
 - name: Run E2E Tests
-  run: nb RUN_AZDO_WI_ASSIGNED_TO_ME_TEST
+  run: sdo RUN_AZDO_WI_ASSIGNED_TO_ME_TEST
 
 # Or in Azure Pipelines
 - task: PowerShell@2
   inputs:
     scriptType: 'inline'
-    script: 'nb RUN_GITHUB_WI_ASSIGNED_TO_ME_TEST'
+    script: 'sdo RUN_GITHUB_WI_ASSIGNED_TO_ME_TEST'
 ```
 
 ---
@@ -1627,4 +1709,253 @@ sdo wi update --id 243 --state closed  # Won't work
 # ✓ Correct
 sdo wi update --id 243 --state Done
 ```
+
+## Build and compatibility reference
+
+The command reference above is the source of truth for `sdo.exe`. This section retains the build infrastructure details and compatibility notes for projects that still use `nbuild.targets`.
+
+> **Breaking change (v1.76+):** `sdo tool install --name` searches only for `apps.json` files. Consolidate application definitions into one `apps.json` file when needed. See [Install by name](#install-by-name-from-current-directory-and-default-location).
+
+## Dry-run contract
+
+When `--dry-run` is supplied to `sdo.exe` the CLI will not perform any state-changing
+operations. The intent of `--dry-run` is to provide a safe, predictable preview of
+what the CLI would do without modifying remote services, local files, system
+configuration, or registry state.
+
+Key points:
+- `--dry-run` must never upload files, create or modify GitHub releases, write to
+  Program Files, change PATH, edit the registry, or delete files.
+- For destructive commands (for example `release_create`, `pre_release_create`,
+  `install`, `uninstall`, `upload`) the command will short-circuit and print a
+  concise action summary prefixed with `DRY-RUN:` (for example: `DRY-RUN: would
+  upload asset X to release Y`).
+- For read-only commands (for example `list_release`) the default Behavior is to
+  avoid network access in dry-run and print a short simulated message. If a
+  project requires read-only network access during dry-run, it should be made
+  explicit (for example `--dry-run=fetch`) in a follow-up PBI.
+
+---
+
+## nbuild targets
+See [`nbuild.targets`](https://github.com/naz-hage/ntools/blob/main/Nbuild/resources/nbuild.targets) for more information and checkout other targets in [`Nbuild/resources`](https://github.com/naz-hage/ntools/blob/main/Nbuild/resources).
+
+### common targets
+- The `common.targets` file includes all the defaults targets needed to build, test and deploy a solution.  The `common.targets` file is located in the `$(ProgramFiles)\Nbuild` folder.  The `nbuild.targets` file in the solution folder imports the `common.targets` file
+
+Below is a list of common targets defined in the `common.targets` file:
+
+| **Target Name** | **Description** |
+| --- | --- |
+| PROPERTIES          | Common properties that will be used by all targets |
+| CLEAN               | Clean up the project and artifacts folder |
+| INSTALL_DEP         | Install dependencies |
+| TELEMETRY_OPT_OUT   | Opt out of the DOTNET_CLI_TELEMETRY_OPTOUT - move to common |
+| STAGE             | Create a stage package for testing |
+| PROD          | Create a production package for release |
+| STAGE_DEPLOY      | Create a stage package and deploy for testing |
+| PROD_DEPLOY   | Create a production package and deploy for release |
+| SOLUTION            | Build the solution Release configuration  using dotnet build |
+| SOLUTION_MSBUILD    | Build the solution Release configuration  using MSBuild |
+| PACKAGE             | Create a package for the solution default is a zip file of all artifacts |
+| COPY_ARTIFACTS      | Save the artifacts to the artifacts folder |
+| DEPLOY              | Deploy the package. default is to extract artifacts into DeploymentProperty folder |
+| TEST                | Run all tests using dotnet test in Release mode |
+| TEST_DEBUG          | Run all tests using dotnet test in Debug mode |
+| IS_ADMIN            | Check if current process is running in admin mode AdminCheckExitCode property is set |
+| SingleProject       | Example how to build a single project |
+| HandleError         | Error handling placeholder |
+
+---
+
+## Examples
+
+Below are practical examples for using `sdo.exe`. These examples assume you are running in a PowerShell terminal.
+
+### 1. Install Applications
+
+#### Install from JSON file:
+```cmd
+sdo.exe tool install --json "C:\Program Files\tools.json"
+```
+Installs applications specified in the manifest file. The `--json` parameter is optional if `--name` is provided. If `--json` is specified, `--name` is ignored. (Requires admin privileges.)
+
+#### Install by name from current directory and default location:
+```cmd
+sdo.exe tool install --name "MyApp"
+sdo.exe tool install --name "MyApp" --appversion "1.2.3"
+```
+Searches for `apps.json` in both the current directory and the default installation directory, then installs the application matching the specified name. The `--name` parameter is optional if `--json` is provided. The `--appversion` parameter is optional and overrides the version specified in the JSON file.
+
+**BREAKING CHANGE (v1.76+):** This command now searches ONLY for `apps.json` files, not all JSON files. You must consolidate your application definitions into a single `apps.json` file in the target directory or move it to the default installation directory.
+
+**Search order:** Current directory is searched first for `apps.json`, then the default installation directory. If an app is found in the current directory, it takes precedence over the same app in the default installation directory.
+
+**Note:** If you specify both `--json` and `--name`, the command is allowed, but `--json` takes precedence and a warning is emitted. The `--name` method provides a more convenient way to install applications without needing to know the exact path to the JSON configuration file.
+
+#### Dry-run mode for install:
+```cmd
+sdo.exe tool install --name "MyApp" --dry-run
+sdo.exe tool install --name "MyApp" --appversion "1.2.3" --dry-run
+```
+
+**Behavior in dry-run mode:**
+- Searches for `apps.json` in both the current directory and the default installation directory (search order: current directory first)
+- If app is found: displays `DRY-RUN: would install app 'MyApp'` in yellow and lists version details
+- If app is not found: displays `No apps found matching 'MyApp'` in red, lists the search directories (current directory and default installation directory), and lists available applications found in those `apps.json` files
+- Dry-run always returns exit code 0 (success), even when app is not found, as it is a preview/simulation mode
+- Always succeeds (exit code 0) because dry-run is a preview, not actual installation
+- No files are downloaded, installed, or modified
+- Output uses color coding: yellow for dry-run messages, red for not-found messages
+
+### 2. Uninstall Applications
+```cmd
+sdo.exe tool uninstall --json "C:\Program Files\example-tool.json"
+```
+Uninstalls applications as specified in the manifest file. (Requires admin privileges.)
+
+### 3. List Installed Applications
+```cmd
+sdo.exe tool list
+sdo.exe tool list --json "C:\Program Files\NBuild\ntools.json"
+```
+Lists all applications specified in the provided JSON file. If no `--json` option is specified, the default file is used.
+
+### 4. Download Applications
+```cmd
+sdo.exe tool download --json "C:\Program Files\NBuild\ntools.json"
+```
+Downloads tools and applications specified in the manifest file.
+
+### 5. Error Handling for JSON Manifest Files
+
+The `list`, `install`, `uninstall`, and `download` commands require valid JSON manifest files. The following errors may occur:
+
+#### File Not Found
+```
+Error: JSON file not found: 'C:\invalid\path\apps.json'. Please provide a valid path to the apps.json file.
+Exit code: -1
+```
+
+**Resolution**: Verify the file path is correct. Common locations:
+- Current directory: `.\apps.json`
+- Program Files: `C:\Program Files\nbuild\apps.json`
+- Relative path: `.\dev-setup\apps.json`
+
+#### Invalid JSON Format
+```
+Error: Invalid JSON format: '.' is an invalid start of a value. Please check the JSON file for proper escaping of backslashes and quotes.
+Exit code: -1
+```
+
+**Resolution**: Validate your JSON file:
+- Use a JSON validator tool (e.g., jsonlint.com)
+- Ensure backslashes in Windows paths are escaped: `C:\\Program Files\\...`
+- Ensure quotes in JSON strings are properly escaped: `\"text\"`
+
+#### Unsupported Version
+```
+Error: Json Version 1.0.0 is not supported. Please use version 1.2.0
+Exit code: -1
+```
+
+**Resolution**: Update your manifest file to use the correct version in the `"version"` field.
+
+### 6. Display Path Segments
+```cmd
+sdo.exe env path
+```
+Displays each segment of the effective PATH environment variable on a separate line, with duplicates removed. Shows the complete PATH that processes actually use (Machine + User PATH combined). Use `--verbose` for additional output.
+
+### 7. Display Git Information
+```cmd
+sdo.exe repo info
+```
+Displays the current git branch and latest tag information for the local repository.
+
+### 8. Set a Specific Git Tag
+```cmd
+sdo.exe repo tag set --tag 1.24.33
+```
+Sets the specified git tag in the local repository.
+
+### 9. Automatically Set the Next Git Tag
+```cmd
+sdo.exe repo tag auto --buildtype STAGE
+```
+Automatically sets the next git tag based on the specified build type (`STAGE` or `PROD`).
+
+### 10. Push the Next Git Tag to Remote
+```cmd
+sdo.exe repo tag push-auto --buildtype PROD
+```
+Sets the next git tag based on build type and pushes it to the remote repository.
+
+### 11. Display the Current Git Branch
+```cmd
+sdo.exe repo info
+```
+Displays the current git branch in the local repository.
+
+### 12. Clone a Git Repository
+```cmd
+sdo.exe repo clone --url https://github.com/example/repo --path C:\Projects
+```
+Clones the specified git repository into the specified path. Use `--verbose` for detailed output.
+
+### 13. Delete a Specific Tag
+```cmd
+sdo.exe repo tag delete --tag 1.24.33
+```
+Deletes the specified git tag from the local repository.
+
+### 14. Creating a Release
+```cmd
+sdo.exe release create --repo userName/my-repo --tag 1.24.33 --branch main --file C:\Releases\1.0.0.zip
+```
+Creates a GitHub release for the specified repository, tag, branch, and asset file.
+
+### 15. Creating a Pre-Release
+```cmd
+sdo.exe release create --repo userName/my-repo --tag 1.24.33 --branch main --file C:\Releases\1.0.0.zip --prerelease
+```
+Creates a GitHub pre-release for the specified repository, tag, branch, and asset file.
+
+### 16. Downloading an Asset
+```cmd
+sdo.exe release download --repo userName/my-repo --tag 1.24.33 --path C:\Downloads
+```
+Downloads an asset from the specified release to the given path.
+
+### 17. Creating a Release with Full GitHub URL
+```cmd
+sdo.exe release create --repo https://github.com/userName/my-repo --tag 1.24.33 --branch main --file C:\Releases\1.0.0.zip
+```
+Creates a GitHub release using the full GitHub repository URL.
+
+### 18. Downloading an Asset with Full GitHub URL
+```cmd
+sdo.exe release download --repo https://github.com/userName/my-repo --tag 1.24.33 --path C:\Downloads
+```
+Downloads an asset using the full GitHub repository URL.
+
+### 19. List Latest Releases
+```cmd
+sdo.exe release list --repo https://github.com/userName/my-repo
+```
+Lists the latest 3 releases and the newest pre-release (if newer than the latest release). Use `--verbose` for detailed output.
+
+### 20. List Build Targets
+```cmd
+sdo.exe build targets
+```
+Lists all available build targets for the current solution or project.
+
+### 21. Run Any Listed Target
+```cmd
+sdo.exe core
+```
+Runs the target named `core` if it is listed by `sdo build targets`.
+
+---
 

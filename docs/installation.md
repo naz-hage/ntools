@@ -19,104 +19,15 @@ cd ./ntools
 # Change PowerShell execution policy (one-time setup)
 Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope Process
 
-# Run full development setup
-.\dev-setup\install.ps1
+# Import the installation module
+Import-Module ./dev-setup/Install.psm1 -Force
+
+# Install the requested NTools version
+InstallNtools -version "1.74.0"
 ```
 
-**Or using the ntools-scripts module:**
+The version can be supplied explicitly, or omitted to read the default version from `dev-setup/ntools.json`:
 
-```powershell
-cd ./ntools
-Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
-Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
-Install-DevelopmentApps -JsonPath "./dev-setup/apps.json"
-```
-
-### Option 2: Cross-Platform Installation with install-ntools.py
-
-For a minimal, cross-platform setup, use the install-ntools.py script:
-
-```bash
-# Dry run (recommended first)
-python atools/install-ntools.py --version 1.74.0 --dry-run
-
-# Full installation
-python atools/install-ntools.py --version 1.74.0
-```
-
-#### What install-ntools.py Does
-
-This Python script performs a complete NTools installation:
-
-1. **Downloads** the specified NTools release from GitHub
-2. **Extracts** NTools to the deployment directory
-3. **Updates** system PATH (on Windows)
-4. **Verifies** the installation
-
-#### Command Line Options
-
-| Option | Description | Default |
-|--------|-------------|---------|
-| `--version` | **Required.** Release version to install (e.g., `1.74.0`) | - |
-| `--dry-run` | Show what would be done without making changes | `false` |
-| `--deploy-path` | Custom installation directory | Platform-specific default |
-| `--downloads-dir` | Directory for ZIP downloads | Platform-specific temp directory |
-| `--json` | Path to ntools.json config file | `./dev-setup/ntools.json` |
-| `--no-path-update` | Skip PATH environment variable updates | `false` |
-
-#### Installation Examples
-
-**Basic Installation:**
-```bash
-python atools/install-ntools.py --version 1.74.0
-```
-
-**Development Installation with Custom Path:**
-```bash
-python atools/install-ntools.py --version 1.74.0 --deploy-path ./local-tools
-```
-
-**Offline Verification:**
-```bash
-python atools/install-ntools.py --version 1.74.0 --dry-run
-```
-
-#### Installation Process Output
-
-The installer provides clear visual feedback:
-
-```
-==================================================
-Installing NTools (Build Tools)...
-==================================================
-
-[SUCCESS] NTools installation completed successfully!
-NTools is installed in: C:\Program Files\Nbuild
-You can now use 'ntools' commands from any location.
-```
-
-#### Safety Features
-
-- **Version validation**: Ensures release exists before downloading
-- **Path safety**: Refuses to overwrite critical system directories
-- **Backup protection**: Safe removal of existing installations
-- **Network verification**: HEAD requests to verify download URLs
-- **Cross-platform**: Works on Windows, macOS, and Linux
-
-#### Troubleshooting
-
-**PATH Not Updated**
-- **Windows**: Sign out and sign back in, or restart your command prompt
-- **Unix**: Run `source ~/.bashrc` or restart your terminal
-
-**Permission Errors**
-- **Windows**: Run as Administrator
-- **Unix**: Use `sudo` or install to user directory with `--deploy-path`
-
-**Network Issues**
-- Verify internet connection
-- Check if the version exists on GitHub releases
-- Use `--dry-run` to verify URLs without downloading
 
 ## Post-Installation
 

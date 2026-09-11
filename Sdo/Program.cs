@@ -35,25 +35,72 @@ namespace Sdo
             var rootCommand = new RootCommand("Simple DevOps Operations CLI tool for Azure DevOps and GitHub");
 
             // Add global options
-            var verboseOption = new Option<bool>("--verbose")
+            var verboseOption = new Option<bool>("--verbose", ["-v"])
             {
                 Description = "Enable verbose output"
             };
+            var dryRunOption = new Option<bool>("--dry-run", ["-dr"])
+            {
+                Description = "Perform a dry run without side effects"
+            };
             rootCommand.Options.Add(verboseOption);
+            rootCommand.Options.Add(dryRunOption);
 
             // Add commands
             rootCommand.Subcommands.Add(new Commands.MapCommand(verboseOption));
             rootCommand.Subcommands.Add(new Commands.AuthCommand(verboseOption));
             rootCommand.Subcommands.Add(new Commands.PipelineCommand(verboseOption));
             rootCommand.Subcommands.Add(new Commands.PullRequestCommand(verboseOption));
-            rootCommand.Subcommands.Add(new Commands.RepositoryCommand(verboseOption));
+            rootCommand.Subcommands.Add(new Commands.RepositoryCommand(verboseOption, dryRunOption: dryRunOption));
             rootCommand.Subcommands.Add(new Commands.WorkItemCommand(verboseOption));
             rootCommand.Subcommands.Add(new Commands.UserCommand(verboseOption));
 
-            // Set a default action for the root command when no subcommand is specified
+            // Migration command groups. Implementations are added incrementally while
+            // the legacy nb, nbackup, and lf commands remain available.
+            rootCommand.Subcommands.Add(new Commands.ToolCommand(verboseOption, dryRunOption));
+            rootCommand.Subcommands.Add(new Commands.EnvironmentCommand(verboseOption));
+            rootCommand.Subcommands.Add(new Commands.BuildCommand(verboseOption));
+            rootCommand.Subcommands.Add(new Commands.ReleaseCommand(verboseOption, dryRunOption));
+            rootCommand.Subcommands.Add(new Commands.BackupCommand(verboseOption, dryRunOption));
+            rootCommand.Subcommands.Add(new Commands.FileCommand(verboseOption));
+
+            // Preserve nb compatibility: one unmatched token is an MSBuild target.
+            rootCommand.TreatUnmatchedTokensAsErrors = false;
             rootCommand.SetAction((parseResult) =>
             {
-                Console.WriteLine("Error: Please specify a command (map, auth, pipeline, pr, repo, wi, user)");
+                var unmatched = parseResult.UnmatchedTokens;
+                var potentialOptions = unmatched.Where(token => token.StartsWith("-", StringComparison.Ordinal)).ToList();
+                if (potentialOptions.Count > 0)
+                {
+                    foreach (var option in potentialOptions)
+                    {
+                        Console.Error.WriteLine($"Unknown option '{option}'. Run 'sdo --help' to see available options.");
+                    }
+
+                    return 1;
+                }
+
+                if (unmatched.Count == 1)
+                {
+                    var target = unmatched[0];
+                    var verbose = parseResult.GetValue(verboseOption);
+                    ConsoleHelper.WriteSuccess($"Executing target: {target}");
+                    var result = Nbuild.BuildStarter.Build(target, verbose);
+                    if (result.IsFail())
+                    {
+                        ConsoleHelper.WriteError($"Failed to execute target '{target}': {result.GetFirstOutput()}");
+                    }
+
+                    return result.Code;
+                }
+
+                if (unmatched.Count > 1)
+                {
+                    Console.Error.WriteLine($"Unknown command or too many arguments: {string.Join(' ', unmatched)}");
+                    return 1;
+                }
+
+                ConsoleHelper.WriteError("Error: Please specify a command (map, auth, pipeline, pr, repo, wi, user, tool, env, build, release, backup, file)");
                 Console.WriteLine("Run 'sdo --help' for usage information.");
                 return 1;
             });

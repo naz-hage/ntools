@@ -21,22 +21,229 @@ namespace Sdo.Commands
         private readonly PlatformService _platformDetector;
         private readonly Sdo.Mapping.IMappingGenerator _mappingGenerator;
         private readonly Sdo.Mapping.IMappingPresenter _mappingPresenter;
+        private readonly Option<bool>? _dryRunOption;
 
         /// <summary>
         /// Initializes a new instance of the RepositoryCommand class.
         /// </summary>
         /// <param name="verboseOption">Option for verbose output.</param>
-        public RepositoryCommand(Option<bool> verboseOption, Sdo.Mapping.IMappingGenerator? mappingGenerator = null, Sdo.Mapping.IMappingPresenter? mappingPresenter = null) : base("repo", "Repository management commands")
+        public RepositoryCommand(Option<bool> verboseOption, Sdo.Mapping.IMappingGenerator? mappingGenerator = null, Sdo.Mapping.IMappingPresenter? mappingPresenter = null, Option<bool>? dryRunOption = null) : base("repo", "Repository management commands")
         {
             _platformDetector = new PlatformService();
             _mappingGenerator = mappingGenerator ?? new Sdo.Mapping.MappingGenerator();
             _mappingPresenter = mappingPresenter ?? new Sdo.Mapping.ConsoleMappingPresenter();
+            _dryRunOption = dryRunOption;
 
             // Add subcommands (in alphabetical order)
+            AddCloneCommand(verboseOption);
             AddCreateCommand(verboseOption);
             AddDeleteCommand(verboseOption);
+            AddInfoCommand(verboseOption);
             AddListCommand(verboseOption);
-            AddShowCommand(verboseOption);
+            AddTagCommand(verboseOption);
+        }
+
+        private void AddCloneCommand(Option<bool> verboseOption)
+        {
+            var cloneCommand = new System.CommandLine.Command(
+                "clone",
+                "Clone a Git repository to a specified path");
+            var urlOption = new Option<string>("--url")
+            {
+                Description = "Git repository URL",
+                Required = true
+            };
+            var pathOption = new Option<string?>("--path")
+            {
+                Description = "Destination path; defaults to the current directory"
+            };
+
+            cloneCommand.Add(urlOption);
+            cloneCommand.Add(pathOption);
+            cloneCommand.Add(verboseOption);
+            if (_dryRunOption != null)
+            {
+                cloneCommand.Add(_dryRunOption);
+            }
+
+            cloneCommand.SetAction(parseResult =>
+            {
+                var url = parseResult.GetValue(urlOption);
+                var path = parseResult.GetValue(pathOption);
+                var verbose = parseResult.GetValue(verboseOption);
+                var dryRun = _dryRunOption != null && parseResult.GetValue(_dryRunOption);
+                return Nbuild.Command.Clone(url, path, verbose, dryRun).Code;
+            });
+
+            Subcommands.Add(cloneCommand);
+        }
+
+        private void AddTagCommand(Option<bool> verboseOption)
+        {
+            var tagCommand = new System.CommandLine.Command(
+                "tag",
+                "Manage Git tags");
+
+            AddAutoTagCommand(tagCommand, verboseOption);
+            AddDeleteTagCommand(tagCommand, verboseOption);
+            AddPushAutoTagCommand(tagCommand, verboseOption);
+            AddSetTagCommand(tagCommand, verboseOption);
+
+            Subcommands.Add(tagCommand);
+        }
+
+        private void AddAutoTagCommand(System.CommandLine.Command tagCommand, Option<bool> verboseOption)
+        {
+            var autoCommand = new System.CommandLine.Command(
+                "auto",
+                "Automatically set the next Git tag based on build type");
+            var buildTypeOption = new Option<string>("--buildtype", ["-b"])
+            {
+                Description = "Build type: STAGE or PROD",
+                Required = true
+            };
+
+            autoCommand.Add(buildTypeOption);
+            autoCommand.Add(verboseOption);
+            AddDryRunOption(autoCommand);
+            autoCommand.SetAction(parseResult =>
+            {
+                var buildType = parseResult.GetValue(buildTypeOption);
+                var verbose = parseResult.GetValue(verboseOption);
+                var dryRun = GetDryRunValue(parseResult);
+                return Nbuild.Command.SetAutoTag(buildType, false, verbose, dryRun).Code;
+            });
+
+            tagCommand.Subcommands.Add(autoCommand);
+        }
+
+        private void AddDeleteTagCommand(System.CommandLine.Command tagCommand, Option<bool> verboseOption)
+        {
+            var deleteCommand = new System.CommandLine.Command(
+                "delete",
+                "Delete a Git tag");
+            var tagOption = new Option<string>("--tag", ["-t"])
+            {
+                Description = "Tag to delete",
+                Required = true
+            };
+
+            deleteCommand.Add(tagOption);
+            deleteCommand.Add(verboseOption);
+            AddDryRunOption(deleteCommand);
+            deleteCommand.SetAction(parseResult =>
+            {
+                var tag = parseResult.GetValue(tagOption);
+                var verbose = parseResult.GetValue(verboseOption);
+                var dryRun = GetDryRunValue(parseResult);
+                return Nbuild.Command.DeleteTag(tag, verbose, dryRun).Code;
+            });
+
+            tagCommand.Subcommands.Add(deleteCommand);
+        }
+
+        private void AddPushAutoTagCommand(System.CommandLine.Command tagCommand, Option<bool> verboseOption)
+        {
+            var pushAutoCommand = new System.CommandLine.Command(
+                "push-auto",
+                "Automatically set and push the next Git tag based on build type");
+            var buildTypeOption = new Option<string>("--buildtype", ["-b"])
+            {
+                Description = "Build type: STAGE or PROD",
+                Required = true
+            };
+
+            pushAutoCommand.Add(buildTypeOption);
+            pushAutoCommand.Add(verboseOption);
+            AddDryRunOption(pushAutoCommand);
+            pushAutoCommand.SetAction(parseResult =>
+            {
+                var buildType = parseResult.GetValue(buildTypeOption);
+                var verbose = parseResult.GetValue(verboseOption);
+                var dryRun = GetDryRunValue(parseResult);
+                return Nbuild.Command.SetAutoTag(buildType, true, verbose, dryRun).Code;
+            });
+
+            tagCommand.Subcommands.Add(pushAutoCommand);
+        }
+
+        private void AddSetTagCommand(System.CommandLine.Command tagCommand, Option<bool> verboseOption)
+        {
+            var setCommand = new System.CommandLine.Command(
+                "set",
+                "Set a Git tag");
+            var tagOption = new Option<string>("--tag", ["-t"])
+            {
+                Description = "Tag to set",
+                Required = true
+            };
+
+            setCommand.Add(tagOption);
+            setCommand.Add(verboseOption);
+            AddDryRunOption(setCommand);
+            setCommand.TreatUnmatchedTokensAsErrors = true;
+            setCommand.SetAction(parseResult =>
+            {
+                if (parseResult.UnmatchedTokens.Count > 0)
+                {
+                    Console.Error.WriteLine($"Unknown option or argument: {string.Join(' ', parseResult.UnmatchedTokens)}");
+                    return 1;
+                }
+
+                var tag = parseResult.GetValue(tagOption);
+                var verbose = parseResult.GetValue(verboseOption);
+                var dryRun = GetDryRunValue(parseResult);
+                return Nbuild.Command.SetTag(tag, verbose, dryRun).Code;
+            });
+
+            tagCommand.Subcommands.Add(setCommand);
+        }
+
+        private void AddDryRunOption(System.CommandLine.Command command)
+        {
+            if (_dryRunOption != null)
+            {
+                command.Add(_dryRunOption);
+            }
+        }
+
+        private bool GetDryRunValue(System.CommandLine.ParseResult parseResult)
+        {
+            return _dryRunOption != null && parseResult.GetValue(_dryRunOption);
+        }
+
+        private void AddInfoCommand(Option<bool> verboseOption)
+        {
+            var infoCommand = new System.CommandLine.Command(
+                "info",
+                "Display local Git and remote repository information");
+
+            infoCommand.Add(verboseOption);
+            if (_dryRunOption != null)
+            {
+                infoCommand.Add(_dryRunOption);
+            }
+            infoCommand.SetAction(async (parseResult) =>
+            {
+                var verbose = parseResult.GetValue(verboseOption);
+                var dryRun = _dryRunOption != null && parseResult.GetValue(_dryRunOption);
+                if (verbose)
+                {
+                    ConsoleHelper.WriteLine("[VERBOSE] Displaying Git repository information.", ConsoleColor.Gray);
+                }
+
+                var localResult = dryRun
+                    ? Nbuild.Command.DisplayGitInfo(verbose, dryRun)
+                    : Nbuild.Command.DisplayGitBranch();
+                if (!localResult.IsSuccess())
+                {
+                    return localResult.Code;
+                }
+
+                return dryRun ? 0 : await ShowRepository(verbose);
+            });
+
+            Subcommands.Add(infoCommand);
         }
 
         private void AddCreateCommand(Option<bool> verboseOption)
@@ -99,21 +306,6 @@ namespace Sdo.Commands
             Subcommands.Add(listCommand);
         }
 
-        private void AddShowCommand(Option<bool> verboseOption)
-        {
-            var showCommand = new System.CommandLine.Command("show", "Display repository information from current Git remote");
-
-            showCommand.Add(verboseOption);
-
-            showCommand.SetAction(async (parseResult) =>
-            {
-                var verbose = parseResult.GetValue(verboseOption);
-                return await ShowRepository(verbose);
-            });
-
-            Subcommands.Add(showCommand);
-        }
-
         /// <summary>
         /// Extracts a clean error message from API error responses.
         /// Handles both GitHub and Azure DevOps JSON error formats.
@@ -163,7 +355,7 @@ namespace Sdo.Commands
                     var token = await GetAuthenticationTokenAsync(Platform.GitHub);
                     if (string.IsNullOrEmpty(token))
                     {
-                        ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
+                        ConsoleHelper.WriteError("Error: No authentication token found. Run 'sdo auth' to setup authentication.");
                         return 1;
                     }
 
@@ -202,7 +394,7 @@ namespace Sdo.Commands
                     var pat = await GetAuthenticationTokenAsync(Platform.AzureDevOps);
                     if (string.IsNullOrEmpty(pat))
                     {
-                        ConsoleHelper.WriteError("X Error: No authentication token found. Run 'sdo auth' to setup authentication.");
+                        ConsoleHelper.WriteError("Error: No authentication token found. Run 'sdo auth' to setup authentication.");
                         return 1;
                     }
 
@@ -210,7 +402,7 @@ namespace Sdo.Commands
                     var project = _platformDetector.GetProject();
                     if (string.IsNullOrEmpty(organization) || string.IsNullOrEmpty(project))
                     {
-                        ConsoleHelper.WriteError("X Unable to determine Azure DevOps organization or project");
+                        ConsoleHelper.WriteError("Unable to determine Azure DevOps organization or project");
                         return 1;
                     }
 
@@ -240,12 +432,12 @@ namespace Sdo.Commands
                     return 0;
                 }
 
-                ConsoleHelper.WriteError("X Unsupported platform");
+                ConsoleHelper.WriteError("Unsupported platform");
                 return 1;
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteError($"X Error: {ex.Message}");
+                ConsoleHelper.WriteError($"Error: {ex.Message}");
                 return 1;
             }
         }
@@ -261,7 +453,7 @@ namespace Sdo.Commands
 
                 if (repoInfo == null || (string.IsNullOrEmpty(repoInfo.Owner) || string.IsNullOrEmpty(repoInfo.Repo)))
                 {
-                    ConsoleHelper.WriteError("X Unable to determine repository from current Git remote");
+                    ConsoleHelper.WriteError("Unable to determine repository from current Git remote");
                     return 1;
                 }
 
@@ -270,7 +462,7 @@ namespace Sdo.Commands
                     var token = await GetAuthenticationTokenAsync(Platform.GitHub);
                     if (string.IsNullOrEmpty(token))
                     {
-                        ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
+                        ConsoleHelper.WriteError("Error: No authentication token found. Run 'sdo auth' to setup authentication.");
                         return 1;
                     }
 
@@ -278,7 +470,7 @@ namespace Sdo.Commands
                     var repo = await client.GetRepositoryAsync(repoInfo.Owner ?? "", repoInfo.Repo ?? "");
                     if (repo == null)
                     {
-                        ConsoleHelper.WriteError("X Repository not found");
+                        ConsoleHelper.WriteError("Repository not found");
                         return 1;
                     }
                     Console.WriteLine("Repository Information:");
@@ -294,14 +486,14 @@ namespace Sdo.Commands
                     var pat = await GetAuthenticationTokenAsync(Platform.AzureDevOps);
                     if (string.IsNullOrEmpty(pat))
                     {
-                        ConsoleHelper.WriteError("X Error: No authentication token found. Run 'sdo auth' to setup authentication.");
+                        ConsoleHelper.WriteError("Error: No authentication token found. Run 'sdo auth' to setup authentication.");
                         return 1;
                     }
 
                     var organization = _platformDetector.GetOrganization();
                     if (string.IsNullOrEmpty(organization))
                     {
-                        ConsoleHelper.WriteError("X Could not determine Azure DevOps organization");
+                        ConsoleHelper.WriteError("Could not determine Azure DevOps organization");
                         return 1;
                     }
 
@@ -310,7 +502,7 @@ namespace Sdo.Commands
                     var repo = await client.GetRepositoryAsync(project ?? "", repoInfo.Repo ?? "");
                     if (repo == null)
                     {
-                        ConsoleHelper.WriteError("X Repository not found");
+                        ConsoleHelper.WriteError("Repository not found");
                         return 1;
                     }
                     Console.WriteLine("Repository Information:");
@@ -322,12 +514,12 @@ namespace Sdo.Commands
                     return 0;
                 }
 
-                ConsoleHelper.WriteError("X Unsupported platform");
+                ConsoleHelper.WriteError("Unsupported platform");
                 return 1;
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteError($"X Error: {ex.Message}");
+                ConsoleHelper.WriteError($"Error: {ex.Message}");
                 return 1;
             }
         }
@@ -344,7 +536,7 @@ namespace Sdo.Commands
                     var token = await GetAuthenticationTokenAsync(Platform.GitHub);
                     if (string.IsNullOrEmpty(token))
                     {
-                        ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
+                        ConsoleHelper.WriteError("Error: No authentication token found. Run 'sdo auth' to setup authentication.");
                         return 1;
                     }
 
@@ -355,7 +547,7 @@ namespace Sdo.Commands
                         _mappingPresenter.Present(_mappingGenerator.RepoCreateGitHub(name, isPrivate, description!));
                     }
                     var repo = await client.CreateRepositoryAsync(name, description, isPrivate);
-                    ConsoleHelper.WriteLine($"✓ Repository '{repo!.Name}' created successfully", ConsoleColor.Green);
+                    ConsoleHelper.WriteSuccess($"Repository '{repo!.Name}' created successfully");
                     Console.WriteLine($"  URL: {repo.Url}");
                     return 0;
                 }
@@ -366,7 +558,7 @@ namespace Sdo.Commands
                     var pat = await GetAuthenticationTokenAsync(Platform.AzureDevOps);
                     if (string.IsNullOrEmpty(pat))
                     {
-                        ConsoleHelper.WriteError("X Error: No authentication token found. Run 'sdo auth' to setup authentication.");
+                        ConsoleHelper.WriteError("Error: No authentication token found. Run 'sdo auth' to setup authentication.");
                         return 1;
                     }
 
@@ -374,7 +566,7 @@ namespace Sdo.Commands
                     var project = _platformDetector.GetProject();
                     if (string.IsNullOrEmpty(organization) || string.IsNullOrEmpty(project))
                     {
-                        ConsoleHelper.WriteError("X Unable to determine Azure DevOps organization or project");
+                        ConsoleHelper.WriteError("Unable to determine Azure DevOps organization or project");
                         return 1;
                     }
 
@@ -393,7 +585,7 @@ namespace Sdo.Commands
                     if (projectInfo == null)
                     {
                         var cleanError = ExtractErrorMessage(client.LastError ?? "Failed to get project details");
-                        ConsoleHelper.WriteError($"X {cleanError}");
+                        ConsoleHelper.WriteError($"{cleanError}");
                         return 1;
                     }
 
@@ -401,21 +593,21 @@ namespace Sdo.Commands
                     if (repo == null)
                     {
                         var cleanError = ExtractErrorMessage(client.LastError ?? "Failed to create repository");
-                        ConsoleHelper.WriteError($"X {cleanError}");
+                        ConsoleHelper.WriteError($"{cleanError}");
                         return 1;
                     }
-                    ConsoleHelper.WriteLine($"✓ Repository '{repo.Name}' created successfully", ConsoleColor.Green);
+                    ConsoleHelper.WriteSuccess($"Repository '{repo.Name}' created successfully");
                     Console.WriteLine($"  URL: {repo.Url}");
                     return 0;
                 }
 
-                ConsoleHelper.WriteError("X Unsupported platform");
+                ConsoleHelper.WriteError("Unsupported platform");
                 return 1;
             }
             catch (Exception ex)
             {
                 var errorMsg = ExtractErrorMessage(ex.Message);
-                ConsoleHelper.WriteError($"X Error: {errorMsg}");
+                ConsoleHelper.WriteError($"Error: {errorMsg}");
                 return 1;
             }
         }
@@ -429,7 +621,7 @@ namespace Sdo.Commands
 
                 if (repoInfo == null || (string.IsNullOrEmpty(repoInfo.Owner) || string.IsNullOrEmpty(repoInfo.Repo)))
                 {
-                    ConsoleHelper.WriteError("X Unable to determine repository from current Git remote");
+                    ConsoleHelper.WriteError("Unable to determine repository from current Git remote");
                     return 1;
                 }
 
@@ -458,13 +650,13 @@ namespace Sdo.Commands
                     var token = await GetAuthenticationTokenAsync(Platform.GitHub);
                     if (string.IsNullOrEmpty(token))
                     {
-                        ConsoleHelper.WriteLine("X Error: No authentication token found. Run 'sdo auth' to setup authentication.", ConsoleColor.Red);
+                        ConsoleHelper.WriteError("Error: No authentication token found. Run 'sdo auth' to setup authentication.");
                         return 1;
                     }
 
                     using var client = new GitHubClient(token);
                     await client.DeleteRepositoryAsync(repoInfo.Owner ?? "", repoInfo.Repo ?? "");
-                    ConsoleHelper.WriteLine($"✓ Repository '{repoInfo.Repo}' deleted successfully", ConsoleColor.Green);
+                    ConsoleHelper.WriteSuccess($"Repository '{repoInfo.Repo}' deleted successfully");
                     return 0;
                 }
                 else if (platform == Platform.AzureDevOps)
@@ -472,7 +664,7 @@ namespace Sdo.Commands
                     var pat = await GetAuthenticationTokenAsync(Platform.AzureDevOps);
                     if (string.IsNullOrEmpty(pat))
                     {
-                        ConsoleHelper.WriteError("X Error: No authentication token found. Run 'sdo auth' to setup authentication.");
+                        ConsoleHelper.WriteError("Error: No authentication token found. Run 'sdo auth' to setup authentication.");
                         return 1;
                     }
 
@@ -480,7 +672,7 @@ namespace Sdo.Commands
                     var project = _platformDetector.GetProject();
                     if (string.IsNullOrEmpty(organization) || string.IsNullOrEmpty(project))
                     {
-                        ConsoleHelper.WriteError("X Unable to determine Azure DevOps organization or project");
+                        ConsoleHelper.WriteError("Unable to determine Azure DevOps organization or project");
                         return 1;
                     }
 
@@ -491,7 +683,7 @@ namespace Sdo.Commands
                     var projectInfo = await client.GetProjectAsync(project);
                     if (projectInfo == null)
                     {
-                        ConsoleHelper.WriteError($"X {client.LastError ?? "Failed to get project details"}");
+                        ConsoleHelper.WriteError($"{client.LastError ?? "Failed to get project details"}");
                         return 1;
                     }
 
@@ -501,7 +693,7 @@ namespace Sdo.Commands
                     if (repoDetails == null)
                     {
                         var cleanError = ExtractErrorMessage(client.LastError ?? "Repository not found");
-                        ConsoleHelper.WriteError($"X {cleanError}");
+                        ConsoleHelper.WriteError($"{cleanError}");
                         return 1;
                     }
 
@@ -509,20 +701,20 @@ namespace Sdo.Commands
                     if (!success)
                     {
                         var cleanError = ExtractErrorMessage(client.LastError ?? "Failed to delete repository");
-                        ConsoleHelper.WriteError($"X {cleanError}");
+                        ConsoleHelper.WriteError($"{cleanError}");
                         return 1;
                     }
-                    ConsoleHelper.WriteLine($"✓ Repository '{repoInfo.Repo}' deleted successfully", ConsoleColor.Green);
+                    ConsoleHelper.WriteSuccess($"Repository '{repoInfo.Repo}' deleted successfully");
                     return 0;
                 }
 
-                ConsoleHelper.WriteError("X Unsupported platform");
+                ConsoleHelper.WriteError("Unsupported platform");
                 return 1;
             }
             catch (Exception ex)
             {
                 var errorMsg = ExtractErrorMessage(ex.Message);
-                ConsoleHelper.WriteError($"X Error: {errorMsg}");
+                ConsoleHelper.WriteError($"Error: {errorMsg}");
                 return 1;
             }
         }

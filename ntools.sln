@@ -47,7 +47,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dev-setup", "dev-setup", "{
 		dev-setup\dotnet_runtime.json = dev-setup\dotnet_runtime.json
 		dev-setup\git_for_windows.json = dev-setup\git_for_windows.json
 		dev-setup\go.json = dev-setup\go.json
-		dev-setup\install.log = dev-setup\install.log
 		dev-setup\k8s.json = dev-setup\k8s.json
 		dev-setup\minikube.json = dev-setup\minikube.json
 		dev-setup\mongo-db.json = dev-setup\mongo-db.json

@@ -1,141 +1,25 @@
 # DevOps Tools Suite Architecture
 
-This document provides a comprehensive overview of the DevOps Tools Suite architecture, encompassing the .NET-based ntools suite including sdo (C# implementation of Simple DevOps Operations Tool). These tools provide a complete DevOps workflow from build automation to work item management across multiple platforms.
+## Executable Details
 
-## Suite Overview
+**sdo.exe (Simple DevOps Operations Tool)**
 
-The DevOps Tools Suite consists of two main components:
+* **Purpose**: Unified CLI utility for end-to-end build automation, repository management, work item tracking, and pipeline operations across Azure DevOps and GitHub.
+* **Key Capabilities**:
+* **Build & Utility Automation**: MSBuild integration, tool management (install/uninstall), environment setup, and GitHub release creation.
+* **Work Item Management**: Full CRUD operations and commenting on Azure DevOps work items and GitHub issues.
+* **Repository & PR Operations**: Multi-platform repo creation and deletion, git tagging/branching, and PR creation with branch-based auto-detection.
+* **Pipeline Management**: CI/CD pipeline creation, execution, and monitoring.
+* **Advanced Automation**: Auto-discovering YAML configuration system, Markdown parser for rich content generation, dry-run mode, and cross-platform E2E testing infrastructure.
 
-### 1. ntools Suite (.NET-based)
-A collection of build automation and utility tools written in .NET 10.0, providing core development and DevOps capabilities.
-
-### 2. sdo (Simple DevOps Operations Tool) - .NET/C#
-A comprehensive CLI tool for work item creation and repository management across Azure DevOps and GitHub platforms, written entirely in C# for maximum performance and .NET ecosystem integration.
-
-## ntools Suite Architecture
-
-### Executables Overview
-
-The ntools suite consists of multiple executables that provide various development and DevOps utilities:
-
-- **nb.exe** - Main build automation and DevOps utility tool
-- **Nbackup.exe** - Backup automation tool
-- **lf.exe** - File listing and management utility
-- **sdo.exe** - Simple DevOps Operations tool for work item and repository management
-- **Go executables** - Various Go-based utilities in the `go/` directory
-
-### Architecture Diagram
-
-```mermaid
-graph TB
-    subgraph "ntools Suite"
-        subgraph ".NET Executables"
-            NB[nb.exe<br/>Nbuild]
-            NBKP[Nbackup.exe<br/>nBackup]
-            LF[lf.exe<br/>lf]
-            SDO[sdo.exe<br/>Simple DevOps Operations Tool]
-        end
-
-        subgraph "Go Executables"
-            GO[Go Tools<br/>build-apps.exe<br/>etc.]
-        end
-
-        subgraph "Shared Libraries"
-            NBL[NbuildTasks<br/>Core functionality]
-            GHR[GitHubRelease<br/>GitHub integration]
-            API[ApiVersions<br/>API version management]
-        end
-    end
-
-    subgraph "External Dependencies"
-        SCL[System.CommandLine<br/>CLI framework]
-        DOTNET[.NET 10.0<br/>Runtime]
-        GO_RUNTIME[Go Runtime<br/>For Go tools]
-    end
-
-    NB --> NBL
-    NBKP --> NBL
-    LF --> NBL
-
-    NB --> GHR
-    NB --> API
-
-    GO --> GO_RUNTIME
-
-    NBL --> SCL
-    GHR --> SCL
-    NB --> SCL
-    NBKP --> SCL
-    LF --> SCL
-
-    NB --> DOTNET
-    NBKP --> DOTNET
-    LF --> DOTNET
-    NBL --> DOTNET
-    GHR --> DOTNET
-    API --> DOTNET
-    SDO --> NBL
-    SDO --> GHR
-    style NB fill:#e1f5fe
-    style NBKP fill:#f3e5f5
-    style LF fill:#e8f5e8
-    style NBL fill:#fff3e0
-    style GHR fill:#fce4ec
-    style API fill:#f1f8e9  
-```
-
-### Executable Details
-
-#### nb.exe (Nbuild)
-- **Purpose**: Main CLI tool for build automation and DevOps operations
-- **Features**:
-  - MSBuild integration
-  - Git operations (tagging, branching)
-  - GitHub release management
-  - Tool installation/uninstallation
-  - Environment setup
-- **Dependencies**: NbuildTasks, GitHubRelease, System.CommandLine
-
-#### Nbackup.exe (nBackup)
-- **Purpose**: Backup automation utility
-- **Features**: Automated backup operations, configuration-based backups
-- **Dependencies**: NbuildTasks, System.CommandLine
-
-#### lf.exe (lf)
-- **Purpose**: File listing and management utility
-- **Features**: Advanced file listing, file operations
-- **Dependencies**: NbuildTasks, System.CommandLine
-#### sdo.exe (Simple DevOps Operations Tool)
-- **Purpose**: Comprehensive CLI for work item creation and repository management across Azure DevOps and GitHub
-- **Features**:
-  - Work item management (create, list, show, update, comment)
-  - Repository operations (create, list, delete)
-  - Pull request management (create, list, show, update)
-  - Pipeline management (create, run, monitor)
-  - Dry-run mode for previewing operations
-  - **Advanced Automation Features** (new):
-    - YAML configuration system with auto-discovery
-    - Markdown parser for rich content creation
-    - E2E testing infrastructure with cross-platform support
 #### Go Executables
 - **Purpose**: Various utilities written in Go
 - **Location**: `go/` directory
 - **Examples**: build-apps.exe for building applications
 
-### Shared Components
-
-#### NbuildTasks
-Core library providing Git operations, file system utilities, build task implementations, and common functionality for all executables.
-
-#### GitHubRelease
-Library for GitHub integration including release creation and management, asset uploading, and repository operations.
-
-#### ApiVersions
-Utility library for API version management and tracking.
-
 ### Manifest File Processing (GetApps Method)
 
-The `Command.GetApps()` method in the Nbuild executable (`nb\Command.cs`) handles loading and parsing manifest JSON files for tool installation and management. This method implements strict file validation:
+The SDO tool-management command handles loading and parsing manifest JSON files for tool installation and management. This command implements strict file validation:
 
 #### File Validation
 - **Purpose**: Ensures clear, actionable error messages when JSON manifest files are missing or invalid
@@ -155,7 +39,7 @@ The `Command.GetApps()` method in the Nbuild executable (`nb\Command.cs`) handle
 #### Benefits
 - **Early validation**: Fails fast with clear error messages instead of confusing JSON parse errors
 - **User-friendly**: Distinguishes between file not found vs. invalid JSON content
-- **Consistent**: All commands (`nb list`, `nb install`, `nb uninstall`, `nb download`) use the same validation logic
+- **Consistent**: All commands (`sdo tool list`, `sdo tool install`, `sdo tool uninstall`, `sdo tool download`) use the same validation logic
 
 ### File Structure
 
@@ -177,8 +61,8 @@ ntools/
 ├── unit-tests.targets            # Unit test targets
 ├── e2e-tests.targets             # E2E test targets
 │
-├── nb/                           # Main Nbuild executable project
-│   ├── nb.csproj
+├── Sdo/                          # Main SDO executable project
+│   ├── Sdo.csproj
 │   ├── Program.cs                # CLI setup and command registration
 │   ├── Command.cs                # Core command implementations with GetApps() method
 │   │                               # GetApps() - Loads and validates manifest JSON files

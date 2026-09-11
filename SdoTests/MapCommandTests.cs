@@ -34,7 +34,7 @@ public class MapCommandTests
 
         // Assert
         Assert.Equal("map", command.Name);
-        Assert.Equal("Show command mappings between SDO and native CLI tools", command.Description);
+        Assert.Equal("Show command mappings between SDO and gh/az native CLI tools", command.Description);
     }
 
     [Fact]

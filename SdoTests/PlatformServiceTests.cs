@@ -28,14 +28,17 @@ public class PlatformServiceTests
             return;
         }
         
-        // For local development, use the original relative path approach
-        var currentDir = Directory.GetCurrentDirectory();
-        var solutionDir = Path.Combine(currentDir, "..", "..", "..");
-        var normalizedPath = Path.GetFullPath(solutionDir);
-        
-        if (Directory.Exists(normalizedPath) && Directory.Exists(Path.Combine(normalizedPath, ".git")))
+        // Resolve from the test assembly location so other tests changing the process
+        // working directory cannot make this repository fixture nondeterministic.
+        var candidate = new DirectoryInfo(AppContext.BaseDirectory);
+        while (candidate != null && !Directory.Exists(Path.Combine(candidate.FullName, ".git")))
         {
-            Environment.CurrentDirectory = normalizedPath;
+            candidate = candidate.Parent;
+        }
+
+        if (candidate != null)
+        {
+            Environment.CurrentDirectory = candidate.FullName;
         }
     }
 
