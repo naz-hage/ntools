@@ -2,11 +2,12 @@
 using Ntools;
 using System.Diagnostics;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml;
 
 namespace Nbuild;
 
-public class BuildStarter
+public partial class BuildStarter
 {
     public static string LogFile { get; set; } = "nbuild.log";
     private static readonly TimeSpan BuildTimeout = TimeSpan.FromMinutes(3);
@@ -372,6 +373,27 @@ public class BuildStarter
 
         for (int i = start; i < lines.Length; i++)
         {
+            var line = lines[i];
+
+            if (BuildTarget().IsMatch(line))
+            {
+                Console.ForegroundColor = ConsoleColor.Cyan;
+            }
+            else if (Error().IsMatch(line))
+            {
+                int count = int.Parse(Count().Match(line).Value);
+                Console.ForegroundColor = count == 0 ? ConsoleColor.Green : ConsoleColor.Red;
+            }
+            else if (Warning().IsMatch(line))
+            {
+                int count = int.Parse(Count().Match(line).Value);
+                Console.ForegroundColor = count == 0 ? ConsoleColor.Gray : ConsoleColor.Yellow;
+            }
+            else
+            {
+                // fallback coloring
+                Console.ForegroundColor = ConsoleColor.Gray;
+            }
             Console.WriteLine(lines[i]);
         }
     }
@@ -599,5 +621,17 @@ public class BuildStarter
         }
         return ResultHelper.Success();
     }
+
+    [GeneratedRegex(@"^\s*[A-Z_]+:\s*$")]
+    private static partial Regex BuildTarget();
+    //[GeneratedRegex(@"\b\d+\s+Error", RegexOptions.IgnoreCase, "en-US")]
+    [GeneratedRegex(@"\b\d+\s+Error\b|\berror\b", RegexOptions.IgnoreCase, "en-US")]
+    //private static partial Regex Error();
+
+    private static partial Regex Error();
+    [GeneratedRegex(@"\b\d+\s+Warning", RegexOptions.IgnoreCase, "en-US")]
+    private static partial Regex Warning();
+    [GeneratedRegex(@"\d+")]
+    private static partial Regex Count();
 }
 
