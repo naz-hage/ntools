@@ -26,7 +26,6 @@
 		 <SetupFolder>$(ArtifactsSolutionFolder)\release</SetupFolder>
 		<ArtifactsFolder>$(ArtifactsSolutionFolder)\$(TargetRelease)\$(ProductVersion)</ArtifactsFolder>
 		<ArtifactsTestResultsFolder>$(ArtifactsSolutionFolder)\TestResults\$(ProductVersion)</ArtifactsTestResultsFolder>
-		<NbExe>$(OutputPathRelease)\nb.exe</NbExe>
 
           <!-- Default paths for local builds -->
 		<CoverageFolder>$(ArtifactsSolutionFolder)\CoverageReport\$(ProductVersion)</CoverageFolder>
@@ -62,7 +61,7 @@
 	<!-- Test for FileVersion task and powershell file-version.ps1-->
 	<Target Name="FILE_VERSIONS"  DependsOnTargets="ARTIFACTS">
 		<PropertyGroup>
-			<FileName>$(SolutionDir)\$(TargetRelease)\nb.exe</FileName>
+			<FileName>$(SolutionDir)\$(TargetRelease)\sdo.exe</FileName>
 		</PropertyGroup>
 		<Exec Command='powershell -File "$(SolutionDir)\dev-setup\list-file-version.ps1" "$(FileName)"' ConsoleToMSBuild="true">
 			<Output TaskParameter="ConsoleOutput" PropertyName="Version" />
@@ -544,12 +543,6 @@
         
         <!-- Define executables to test using ItemGroup -->
         <ItemGroup>
-            <ExecutablesToTest Include="$(ArtifactsFolder)\nb.exe">
-                <DisplayName>nb.exe (Core executable)</DisplayName>
-                <TestCommand>--version</TestCommand>
-                <HelpCommand>install --help</HelpCommand>
-                <Required>true</Required>
-            </ExecutablesToTest>
             <!-- Optional executables - only test if they exist -->
             <ExecutablesToTest Include="$(ArtifactsFolder)\GitHubRelease.exe">
                 <DisplayName>GitHubRelease.exe (GitHub release utility)</DisplayName>
@@ -584,24 +577,12 @@
             <Output TaskParameter="ExitCode" PropertyName="ExitCode_%(ExistingExecutables.Filename)" />
         </Exec>
         
-        <!-- Test additional commands for nb.exe -->
-        <Message Text="Testing additional nb.exe commands..." />
-        <Exec Command='"$(ArtifactsFolder)\nb.exe" install --help' 
-              ContinueOnError="true" 
-              IgnoreExitCode="true"
-              Condition="Exists('$(ArtifactsFolder)\nb.exe')">
-            <Output TaskParameter="ExitCode" PropertyName="NbInstallHelpExitCode" />
-        </Exec>
-        
         <!-- Report results for each executable -->
         <Message Text="=== Test Results ===" />
         <Message Text="✅ %(ExistingExecutables.DisplayName): Exit code $(ExitCode_%(ExistingExecutables.Filename))" 
                  Condition="'$(ExitCode_%(ExistingExecutables.Filename))' == '0'" />
         <Message Text="❌ %(ExistingExecutables.DisplayName): Exit code $(ExitCode_%(ExistingExecutables.Filename))" 
 				 Condition="'$(ExitCode_%(ExistingExecutables.Filename))' != '0'" />
-        
-        <Message Text="✅ nb install --help: Exit code $(NbInstallHelpExitCode)" Condition="'$(NbInstallHelpExitCode)' == '0'" />
-        <Message Text="❌ nb install --help: Exit code $(NbInstallHelpExitCode)" Condition="'$(NbInstallHelpExitCode)' != '0'" />
         
         <!-- 2. BUILD SYSTEM VALIDATION -->
         <Message Text="=== 2. Build System Validation ===" />
@@ -637,7 +618,7 @@
         
 		<!-- Calculate overall success. -->
         <PropertyGroup>
-			<AllTestsPassed Condition="'$(ExitCode_nb)' == '0' And '$(NbInstallHelpExitCode)' == '0' And '$(DelegationTestExitCode)' == '0'">true</AllTestsPassed>
+			<AllTestsPassed Condition="'$(DelegationTestExitCode)' == '0'">true</AllTestsPassed>
             <AllTestsPassed Condition="'$(AllTestsPassed)' == ''">false</AllTestsPassed>
         </PropertyGroup>
         
