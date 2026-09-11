@@ -376,25 +376,44 @@ public partial class BuildStarter
         {
             var line = lines[i];
 
-            if (BuildTarget().IsMatch(line))
+            try
             {
-                Console.ForegroundColor = ConsoleColor.Cyan;
+                if (BuildTarget().IsMatch(line))
+                {
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                }
+                else if (Error().IsMatch(line))
+                {
+                    if (int.TryParse(Count().Match(line).Value, out var count))
+                    {
+                        Console.ForegroundColor = count == 0 ? ConsoleColor.Green : ConsoleColor.Red;
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Gray;
+                    }
+                }
+                else if (Warning().IsMatch(line))
+                {
+                    if (int.TryParse(Count().Match(line).Value, out var count))
+                    {
+                        Console.ForegroundColor = count == 0 ? ConsoleColor.Gray : ConsoleColor.Yellow;
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Gray;
+                    }
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Gray;
+                }
             }
-            else if (Error().IsMatch(line))
+            catch (Exception)
             {
-                int count = int.Parse(Count().Match(line).Value);
-                Console.ForegroundColor = count == 0 ? ConsoleColor.Green : ConsoleColor.Red;
-            }
-            else if (Warning().IsMatch(line))
-            {
-                int count = int.Parse(Count().Match(line).Value);
-                Console.ForegroundColor = count == 0 ? ConsoleColor.Gray : ConsoleColor.Yellow;
-            }
-            else
-            {
-                // fallback coloring
                 Console.ForegroundColor = ConsoleColor.Gray;
             }
+
             Console.WriteLine(lines[i]);
         }
     }
