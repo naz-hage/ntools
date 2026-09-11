@@ -1,11 +1,8 @@
-
-
-
-nb git_autotag --buildtype stage
-nb publish
+sdo git_autotag --buildtype stage
+sdo publish
 
 # Get git info and extract version tag and project name
-$gitInfo = nb.exe git_info | Out-String
+$gitInfo = sdo.exe git_info | Out-String
 
 # Extract project name
 $projectMatch = $gitInfo | Select-String -Pattern 'Project \[([^\]]+)\]'
@@ -51,4 +48,4 @@ if ($LASTEXITCODE -le 3) {
 }
 
 # display project info
-nb git_info
+sdo repo info
