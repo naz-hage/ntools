@@ -56,7 +56,7 @@
 	<!-- Common properties that will be used by all targets -->
 	<Target Name="PROPERTIES" DependsOnTargets="TAG">
 		<PropertyGroup>
-			<NbuildExe>"$(BuildTools)\nb.exe"</NbuildExe>
+			<NbuildExe>"$(BuildTools)\sdo.exe"</NbuildExe>
 			<NugetExe>$(BuildTools)\nuget.exe</NugetExe>
 			<ZipExe>$(ProgramFiles)\7-Zip\7z.exe</ZipExe>
 			<TargetRelease>Release</TargetRelease>
@@ -73,7 +73,7 @@
 			
 		</PropertyGroup>
 
-		<RedError Condition="'$(ProductVersion)' == ''" Message="Error: Version property is not defined. Type Nb.exe git_settag -tag 0.0.1" />
+		<RedError Condition="'$(ProductVersion)' == ''" Message="Error: Version property is not defined. Type sdo repo tag set -t 0.0.1"/>
 		<RedError Condition="'$(SolutionName)' == ''" Message="Error: SolutionName property is not defined." />
 		<RedError Condition="'$(DeploymentFolder)' == ''" Message="Error: DeploymentFolder property is not defined." />
 
@@ -156,25 +156,24 @@
   
   </Target>
 
-	<!-- Creates a stage or prod release -->
+	<!-- Creates a prod release -->
 	<Target Name="GITHUB_RELEASE" DependsOnTargets="ARTIFACTS;GIT_BRANCH" AfterTargets="PROD" Condition="'$(GITHUB_ACTIONS)' != ''" >
 		<Git Command="PushTag" TaskParameter="$(ProductVersion)">
 			<Output TaskParameter="Output" PropertyName="PushResult"/>
 		</Git>
 		<RedError Condition="'$(PushResult)' != 'True'" Message="Failed to push tag $(ProductVersion) to remote repository. Build cannot continue with version conflicts." />
-		<Exec Command='"$(BuildTools)\sdo.exe" release create -r $(OWNER)/$(SolutionName) -t $(ProductVersion) -b $(GitBranch) -f $(ArtifactsFolder).zip' WorkingDirectory="$(BuildTools)" />
+		<Exec Command='"$(NbuildExe)" release create -r $(OWNER)/$(SolutionName) -t $(ProductVersion) -b $(GitBranch) -f $(ArtifactsFolder).zip' WorkingDirectory="$(BuildTools)" />
 
 		<Message Text="==> DONE"/>
 	</Target>
 
-	<!-- Creates a stage or prod pre-release -->
+	<!-- Creates a pre-release -->
 	<Target Name="GITHUB_PRE_RELEASE" DependsOnTargets="ARTIFACTS;GIT_BRANCH" AfterTargets="STAGE" Condition="'$(GITHUB_ACTIONS)' != ''" >
 		<Git Command="PushTag" TaskParameter="$(ProductVersion)">
 			<Output TaskParameter="Output" PropertyName="PushResult"/>
 		</Git>
 		<RedError Condition="'$(PushResult)' != 'True'" Message="Failed to push tag $(ProductVersion) to remote repository. Build cannot continue with version conflicts." />
-		<Exec Command='"$(BuildTools)\nb.exe" pre_release_create --repo $(OWNER)/$(SolutionName) --tag $(ProductVersion) --branch $(GitBranch) --file $(ArtifactsFolder).zip' WorkingDirectory="$(BuildTools)" />
-		<Exec Command='"$(BuildTools)\sdo.exe" release create -p -r $(OWNER)/$(SolutionName) -t $(ProductVersion) -b $(GitBranch) -f $(ArtifactsFolder).zip' WorkingDirectory="$(BuildTools)" />
+		<Exec Command='"$(NbuildExe)" release create -p -r $(OWNER)/$(SolutionName) -t $(ProductVersion) -b $(GitBranch) -f $(ArtifactsFolder).zip' WorkingDirectory="$(BuildTools)" />
 
 		<Message Text="==> DONE"/>
 	</Target>
