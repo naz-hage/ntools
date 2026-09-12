@@ -29,7 +29,7 @@ namespace Sdo.Commands
             {
                 if (parseResult.GetValue(verboseOption))
                 {
-                    ConsoleHelper.WriteLine("[VERBOSE] Displaying build targets.", ConsoleColor.Gray);
+                    ConsoleHelper.WriteVerbose("Displaying build targets.");
                 }
 
                 var result = BuildStarter.DisplayTargets(Environment.CurrentDirectory);

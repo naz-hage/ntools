@@ -73,11 +73,11 @@ namespace Sdo.Services
             }
             catch (UnauthorizedAccessException exception)
             {
-                ConsoleHelper.WriteLine($"Access denied to a directory: {exception.Message}", ConsoleColor.Yellow);
+                ConsoleHelper.WriteWarning($"Access denied to a directory: {exception.Message}");
             }
             catch (DirectoryNotFoundException exception)
             {
-                ConsoleHelper.WriteLine($"Directory not found: {exception.Message}", ConsoleColor.Yellow);
+                ConsoleHelper.WriteWarning($"Directory not found: {exception.Message}");
             }
             catch (Exception exception)
             {

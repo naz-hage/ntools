@@ -131,7 +131,7 @@ namespace Sdo.Commands
         {
             if (dryRun)
             {
-                ConsoleHelper.WriteLine("DRY-RUN: running in dry-run mode; no destructive actions will be performed.", ConsoleColor.Yellow);
+                ConsoleHelper.WriteWarning("DRY-RUN: running in dry-run mode; no destructive actions will be performed.");
             }
         }
 

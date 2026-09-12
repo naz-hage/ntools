@@ -546,12 +546,12 @@ namespace Sdo.Commands
 
                 if (verbose && !string.IsNullOrEmpty(mappingCmd))
                 {
-                    ConsoleHelper.WriteLine(mappingCmd, ConsoleColor.Yellow);
+                    ConsoleHelper.WriteWarning(mappingCmd);
                 }
 
                 if (verbose)
                 {
-                    Console.WriteLine($"Detected platform: {platform}");
+                    ConsoleHelper.WriteVerbose($"Detected platform: {platform}");
                     if (!string.IsNullOrEmpty(type)) Console.WriteLine($"Type filter: {type}");
                     if (!string.IsNullOrEmpty(state)) Console.WriteLine($"State filter: {state}");
                     if (assignedToMe) Console.WriteLine("Assigned to me filter: enabled");
@@ -686,7 +686,7 @@ namespace Sdo.Commands
                     // This is here for consistency and future enhancement when labels are used as types
                     if (verbose)
                     {
-                        ConsoleHelper.WriteLine($"Note: --type filter not fully implemented for GitHub issues", ConsoleColor.Yellow);
+                        ConsoleHelper.WriteVerbose($"Note: --type filter not fully implemented for GitHub issues");
                     }
                 }
 
@@ -926,14 +926,14 @@ namespace Sdo.Commands
 
                 if (verbose)
                 {
-                    ConsoleHelper.WriteLine($"Detecting platform and updating work item {id}...", ConsoleColor.Yellow);
+                    ConsoleHelper.WriteVerbose($"Detecting platform and updating work item {id}...");
                 }
 
                 var platform = _platformDetector.DetectPlatform();
 
                 if (verbose)
                 {
-                    ConsoleHelper.WriteLine($"Detected platform: {platform}", ConsoleColor.Yellow);
+                    ConsoleHelper.WriteVerbose($"Detected platform: {platform}");
                 }
 
                 if (platform == Platform.GitHub)
@@ -957,7 +957,7 @@ namespace Sdo.Commands
 
                     if (verbose)
                     {
-                        ConsoleHelper.WriteLine($"Updating GitHub issue #{id} in {repoInfo.Owner}/{repoInfo.Repo}...", ConsoleColor.Yellow);
+                        ConsoleHelper.WriteVerbose($"Updating GitHub issue #{id} in {repoInfo.Owner}/{repoInfo.Repo}...");
                     }
 
                     // Translate state to GitHub API format
@@ -996,8 +996,8 @@ namespace Sdo.Commands
                         }
                         if (verbose)
                         {
-                            ConsoleHelper.WriteLine($"  Title: {result.Title}", ConsoleColor.Yellow);
-                            ConsoleHelper.WriteLine($"  State: {result.State}", ConsoleColor.Yellow);
+                            ConsoleHelper.WriteVerbose($"  Title: {result.Title}");
+                            ConsoleHelper.WriteVerbose($"  State: {result.State}");
                         }
                         return 0;
                     }
@@ -1006,7 +1006,7 @@ namespace Sdo.Commands
                         ConsoleHelper.WriteLine($"X Failed to update GitHub issue #{id}");
                         if (!string.IsNullOrEmpty(ghState))
                         {
-                            ConsoleHelper.WriteLine($"  Supported GitHub states: open, closed", ConsoleColor.Gray);
+                            ConsoleHelper.WriteLine($"  Supported GitHub states: open, closed");
                         }
                         return 1;
                     }
@@ -1034,7 +1034,7 @@ namespace Sdo.Commands
 
                     if (verbose)
                     {
-                        ConsoleHelper.WriteLine($"Updating Azure DevOps work item {id} in {organization}...", ConsoleColor.Yellow);
+                        ConsoleHelper.WriteVerbose($"Updating Azure DevOps work item {id} in {organization}...");
                     }
 
                     // Translate state to Azure DevOps format
@@ -1073,8 +1073,8 @@ namespace Sdo.Commands
                         }
                         if (verbose)
                         {
-                            ConsoleHelper.WriteLine($"  Title: {result.Title}", ConsoleColor.Yellow);
-                            ConsoleHelper.WriteLine($"  State: {result.State}", ConsoleColor.Yellow);
+                            ConsoleHelper.WriteVerbose($"  Title: {result.Title}");
+                            ConsoleHelper.WriteVerbose($"  State: {result.State}");
                         }
                         return 0;
                     }
@@ -1083,7 +1083,7 @@ namespace Sdo.Commands
                         ConsoleHelper.WriteLine($"X Failed to update work item {id}");
                         if (!string.IsNullOrEmpty(adoState))
                         {
-                            ConsoleHelper.WriteLine($"  Supported states: {WorkItemStateTranslator.GetValidStatesForHelp()}", ConsoleColor.Gray);
+                            ConsoleHelper.WriteLine($"  Supported states: {WorkItemStateTranslator.GetValidStatesForHelp()}");
                         }
                         return 1;
                     }
@@ -1135,14 +1135,14 @@ namespace Sdo.Commands
 
                 if (verbose)
                 {
-                    ConsoleHelper.WriteLine($"Detecting platform and adding comment to work item {id}...", ConsoleColor.Gray);
+                    ConsoleHelper.WriteVerbose($"Detecting platform and adding comment to work item {id}...");
                 }
 
                 var platform = _platformDetector.DetectPlatform();
 
                 if (verbose)
                 {
-                    ConsoleHelper.WriteLine($"Detected platform: {platform}", ConsoleColor.Gray);
+                    ConsoleHelper.WriteVerbose($"Detected platform: {platform}");
                 }
 
                 if (platform == Platform.GitHub)
@@ -1166,7 +1166,7 @@ namespace Sdo.Commands
 
                     if (verbose)
                     {
-                        ConsoleHelper.WriteLine($"Adding comment to GitHub issue #{id} in {repoInfo.Owner}/{repoInfo.Repo}...", ConsoleColor.Gray);
+                        ConsoleHelper.WriteVerbose($"Adding comment to GitHub issue #{id} in {repoInfo.Owner}/{repoInfo.Repo}...");
                     }
 
                     var success = await client.AddCommentAsync(repoInfo.Owner!, repoInfo.Repo!, id, message);
@@ -1268,7 +1268,7 @@ namespace Sdo.Commands
                     
                     if (verbose)
                     {
-                        ConsoleHelper.WriteLine($"[VERBOSE] Auto-detected file path: {sourceFilePath}", ConsoleColor.Gray);
+                        ConsoleHelper.WriteVerbose($"[VERBOSE] Auto-detected file path: {sourceFilePath}");
                     }
                 }
 
@@ -1303,7 +1303,7 @@ namespace Sdo.Commands
 
                 if (verbose)
                 {
-                    ConsoleHelper.WriteLine($"Detecting platform and creating new work item...", ConsoleColor.Gray);
+                    ConsoleHelper.WriteVerbose($"Detecting platform and creating new work item...");
                 }
 
                 var platform = _platformDetector.DetectPlatform();
@@ -1356,9 +1356,9 @@ namespace Sdo.Commands
 
                     if (verbose)
                     {
-                        ConsoleHelper.WriteLine($"Creating GitHub issue in {repoInfo.Owner}/{repoInfo.Repo}...", ConsoleColor.Gray);
-                        ConsoleHelper.WriteLine($"  Title: {title}", ConsoleColor.Gray);
-                        ConsoleHelper.WriteLine($"  Description: {description ?? "(none)"}", ConsoleColor.Gray);
+                        ConsoleHelper.WriteVerbose($"Creating GitHub issue in {repoInfo.Owner}/{repoInfo.Repo}...");
+                        ConsoleHelper.WriteVerbose($"  Title: {title}");
+                        ConsoleHelper.WriteVerbose($"  Description: {description ?? "(none)"}");
                     }
 
                     // Show external mapping command when verbose (helpful for users migrating from CLI)
@@ -1380,11 +1380,11 @@ namespace Sdo.Commands
 
                     if (dryRun)
                     {
-                        ConsoleHelper.WriteLine("[dry-run] Would create GitHub issue with:", ConsoleColor.Gray);
-                        ConsoleHelper.WriteLine($"  Repository: {repoInfo.Owner}/{repoInfo.Repo}", ConsoleColor.Gray);
-                        ConsoleHelper.WriteLine($"  Title: {title}", ConsoleColor.Gray);
-                        ConsoleHelper.WriteLine($"  Labels: {(labels.Any() ? string.Join(", ", labels) : "(none)")}", ConsoleColor.Gray);
-                        ConsoleHelper.WriteLine("  Body:", ConsoleColor.Gray);
+                        ConsoleHelper.WriteVerbose("[dry-run] Would create GitHub issue with:");
+                        ConsoleHelper.WriteVerbose($"  Repository: {repoInfo.Owner}/{repoInfo.Repo}");
+                        ConsoleHelper.WriteVerbose($"  Title: {title}");
+                        ConsoleHelper.WriteVerbose($"  Labels: {(labels.Any() ? string.Join(", ", labels) : "(none)")}");
+                        ConsoleHelper.WriteVerbose("  Body:");
                         if (!string.IsNullOrEmpty(description))
                         {
                             Console.WriteLine(description);
@@ -1397,10 +1397,10 @@ namespace Sdo.Commands
                         if (acceptanceCriteria != null && acceptanceCriteria.Any())
                         {
                             Console.WriteLine();
-                            ConsoleHelper.WriteLine("## Acceptance Criteria", ConsoleColor.Gray);
+                            ConsoleHelper.WriteVerbose("## Acceptance Criteria");
                             foreach (var ac in acceptanceCriteria)
                             {
-                                ConsoleHelper.WriteLine($"- [ ] {ac}", ConsoleColor.Gray);
+                                ConsoleHelper.WriteVerbose($"- [ ] {ac}");
                             }
                         }
 
@@ -1449,11 +1449,11 @@ namespace Sdo.Commands
                         
                         // Display next steps
                         Console.WriteLine();
-                        ConsoleHelper.WriteLine("Next steps:", ConsoleColor.Cyan);
-                        ConsoleHelper.WriteLine($"  1. Run: sdo wi start {createdIssue.Number}", ConsoleColor.Cyan);
-                        ConsoleHelper.WriteLine($"  2. Implement changes for issue {createdIssue.Number}", ConsoleColor.Cyan);
-                        ConsoleHelper.WriteLine($"  3. Edit .temp/{createdIssue.Number}-pr-message.md with PR details (optional)", ConsoleColor.Cyan);
-                        ConsoleHelper.WriteLine($"  4. Run: sdo pr create", ConsoleColor.Cyan);
+                        ConsoleHelper.WriteInfo("Next steps:");
+                        ConsoleHelper.WriteInfo($"  1. Run: sdo wi start {createdIssue.Number}");
+                        ConsoleHelper.WriteInfo($"  2. Implement changes for issue {createdIssue.Number}");
+                        ConsoleHelper.WriteInfo($"  3. Edit .temp/{createdIssue.Number}-pr-message.md with PR details (optional)");
+                        ConsoleHelper.WriteInfo($"  4. Run: sdo pr create");
                         
                         return 0;
                     }
@@ -1479,7 +1479,7 @@ namespace Sdo.Commands
                         organization = metadataOrg;
                         if (verbose)
                         {
-                            ConsoleHelper.WriteLine($"[VERBOSE] Organization overridden from metadata: {organization}", ConsoleColor.Gray);
+                            ConsoleHelper.WriteVerbose($"[VERBOSE] Organization overridden from metadata: {organization}");
                         }
                     }
                     
@@ -1497,7 +1497,7 @@ namespace Sdo.Commands
                         project = metadataProject;
                         if (verbose)
                         {
-                            ConsoleHelper.WriteLine($"[VERBOSE] Project overridden from metadata: {project}", ConsoleColor.Gray);
+                            ConsoleHelper.WriteVerbose($"[VERBOSE] Project overridden from metadata: {project}");
                         }
                     }
 
@@ -1505,11 +1505,11 @@ namespace Sdo.Commands
 
                     if (verbose)
                     {
-                        ConsoleHelper.WriteLine($"Creating Azure DevOps work item in {organization}/{project ?? "default"}...", ConsoleColor.Gray);
-                        ConsoleHelper.WriteLine($"  Title: {title}", ConsoleColor.Gray);
-                        ConsoleHelper.WriteLine($"  Type: {type} (normalized: {NormalizeWorkItemType(type ?? "PBI")})", ConsoleColor.Gray);
-                        ConsoleHelper.WriteLine($"  Description: {description ?? "(none)"}", ConsoleColor.Gray);
-                        if (!string.IsNullOrEmpty(assignee)) ConsoleHelper.WriteLine($"  Assignee: {assignee}", ConsoleColor.Gray);
+                        ConsoleHelper.WriteVerbose($"Creating Azure DevOps work item in {organization}/{project ?? "default"}...");
+                        ConsoleHelper.WriteVerbose($"  Title: {title}");
+                        ConsoleHelper.WriteVerbose($"  Type: {type} (normalized: {NormalizeWorkItemType(type ?? "PBI")})");
+                        ConsoleHelper.WriteVerbose($"  Description: {description ?? "(none)"}");
+                        if (!string.IsNullOrEmpty(assignee)) ConsoleHelper.WriteVerbose($"  Assignee: {assignee}");
                     }
 
                     // Normalize work item type: convert abbreviations to full names
@@ -1521,13 +1521,13 @@ namespace Sdo.Commands
                         var mappingCmd = $"az boards work-item create --title \"{title}\" --type \"{normalizedType}\" --org \"{organization}\"";
                         if (!string.IsNullOrEmpty(project)) mappingCmd += $" --project \"{project}\"";
                         if (!string.IsNullOrEmpty(assignee)) mappingCmd += $" --assigned-to \"{assignee}\"";
-                        ConsoleHelper.WriteLine(mappingCmd, ConsoleColor.Yellow);
+                        ConsoleHelper.WriteWarning(mappingCmd);
                     }
 
                     // Use new AzureDevOpsClient.CreateWorkItemAsync implementation
                     if (verbose)
                     {
-                        ConsoleHelper.WriteLine($"Creating Azure DevOps work item in {organization}/{project ?? "default"}...", ConsoleColor.Gray);
+                        ConsoleHelper.WriteVerbose($"Creating Azure DevOps work item in {organization}/{project ?? "default"}...");
                     }
 
                     // Provide area/iteration/parent if available in parsed metadata
@@ -1537,16 +1537,16 @@ namespace Sdo.Commands
 
                     if (verbose && parsed?.Metadata != null)
                     {
-                        ConsoleHelper.WriteLine("[VERBOSE] Parsed metadata:", ConsoleColor.Gray);
+                        ConsoleHelper.WriteVerbose("[VERBOSE] Parsed metadata:");
                         foreach (var kvp in parsed.Metadata)
                         {
-                            ConsoleHelper.WriteLine($"  {kvp.Key} = {kvp.Value}", ConsoleColor.Gray);
+                            ConsoleHelper.WriteVerbose($"  {kvp.Key} = {kvp.Value}");
                         }
                     }
 
                     if (verbose)
                     {
-                        ConsoleHelper.WriteLine($"[VERBOSE] parent ID value: {parent ?? "(null)"}", ConsoleColor.Gray);
+                        ConsoleHelper.WriteVerbose($"[VERBOSE] parent ID value: {parent ?? "(null)"}");
                     }
 
                     var result = await client.CreateWorkItemAsync(project ?? string.Empty, normalizedType, title, description ?? string.Empty, acceptanceCriteria, assignee, area, iteration, parent, dryRun, verbose);
@@ -1556,7 +1556,7 @@ namespace Sdo.Commands
                         // Dry-run preview returns a dictionary with 'dry_run' key
                         if (result.TryGetValue("dry_run", out var dr) && dr is bool drb && drb)
                         {
-                            ConsoleHelper.WriteLine("[dry-run] Azure DevOps preview complete", ConsoleColor.Gray);
+                            ConsoleHelper.WriteInfo("[dry-run] Azure DevOps preview complete");
                             return 0;
                         }
 
@@ -1565,7 +1565,7 @@ namespace Sdo.Commands
                             ConsoleHelper.WriteSuccess($"Work item {idObj} created successfully");
                             if (result.TryGetValue("url", out var urlObj) && urlObj != null)
                             {
-                                ConsoleHelper.WriteLine($"  URL: {urlObj}", ConsoleColor.Yellow);
+                                ConsoleHelper.WriteWarning($"  URL: {urlObj}");
                             }
                             
                             // Rename file if it was auto-detected from default path
@@ -1602,7 +1602,7 @@ namespace Sdo.Commands
                             
                             // Display context-aware next steps
                             Console.WriteLine();
-                            ConsoleHelper.WriteLine("Next steps:", ConsoleColor.Cyan);
+                            ConsoleHelper.WriteInfo("Next steps:");
                             
                             // Check if this is a Task or Bug type - these are implementation items
                             bool isImplementationItem = normalizedType.Equals("Task", StringComparison.OrdinalIgnoreCase) || 
@@ -1611,10 +1611,10 @@ namespace Sdo.Commands
                             if (isImplementationItem)
                             {
                                 // Task/Bug workflow - start working immediately
-                                ConsoleHelper.WriteLine($"  1. Run: sdo wi start {idObj}", ConsoleColor.Cyan);
-                                ConsoleHelper.WriteLine($"  2. Implement changes for work item {idObj}", ConsoleColor.Cyan);
-                                ConsoleHelper.WriteLine($"  3. Edit .temp/{idObj}-pr-message.md with PR details (optional)", ConsoleColor.Cyan);
-                                ConsoleHelper.WriteLine($"  4. Run: sdo pr create", ConsoleColor.Cyan);
+                                ConsoleHelper.WriteInfo($"  1. Run: sdo wi start {idObj}");
+                                ConsoleHelper.WriteInfo($"  2. Implement changes for work item {idObj}");
+                                ConsoleHelper.WriteInfo($"  3. Edit .temp/{idObj}-pr-message.md with PR details (optional)");
+                                ConsoleHelper.WriteInfo($"  4. Run: sdo pr create");
                             }
                             else
                             {
@@ -1625,10 +1625,10 @@ namespace Sdo.Commands
                                 string tempFileName = nextItemType.Equals("PBI", StringComparison.OrdinalIgnoreCase) 
                                     ? ".temp/pbi.md" : ".temp/wi.md";
                                 
-                                ConsoleHelper.WriteLine($"  1. Create a {nextItemType} as a child item", ConsoleColor.Cyan);
-                                ConsoleHelper.WriteLine($"  2. Create {nextItemType} markdown in {tempFileName}", ConsoleColor.Cyan);
-                                ConsoleHelper.WriteLine($"  3. Run: sdo wi create", ConsoleColor.Cyan);
-                                ConsoleHelper.WriteLine($"  4. Then follow the workflow for the {nextItemType}", ConsoleColor.Cyan);
+                                ConsoleHelper.WriteInfo($"  1. Create a {nextItemType} as a child item");
+                                ConsoleHelper.WriteLine($"  2. Create {nextItemType} markdown in {tempFileName}");
+                                ConsoleHelper.WriteLine($"  3. Run: sdo wi create");
+                                ConsoleHelper.WriteLine($"  4. Then follow the workflow for the {nextItemType}");
                             }
                             
                             return 0;
@@ -2112,7 +2112,7 @@ namespace Sdo.Commands
                 // ===== VALIDATION PHASE (no repository changes) =====
                 if (verbose)
                 {
-                    ConsoleHelper.WriteLine("\n=== VALIDATION PHASE ===", ConsoleColor.Cyan);
+                    ConsoleHelper.WriteVerbose("\n=== VALIDATION PHASE ===");
                 }
 
                 // Validate: ID must be positive
@@ -2124,7 +2124,7 @@ namespace Sdo.Commands
                 if (verbose) ConsoleHelper.WriteSuccess("Work item ID is valid");
 
                 // Validate: Detect platform
-                if (verbose) ConsoleHelper.WriteLine("\nValidating: Platform Detection", ConsoleColor.Cyan);
+                if (verbose) ConsoleHelper.WriteVerbose("\nValidating: Platform Detection");
                 var platform = _platformDetector.DetectPlatform();
                 if (verbose)
                 {
@@ -2135,7 +2135,7 @@ namespace Sdo.Commands
                 string? workItemTitle = null;
                 if (platform == Platform.GitHub)
                 {
-                    if (verbose) ConsoleHelper.WriteLine("\nValidating: GitHub Prerequisites", ConsoleColor.Cyan);
+                    if (verbose) ConsoleHelper.WriteVerbose("\nValidating: GitHub Prerequisites");
                     
                     var repoInfo = _platformDetector.GetRepositoryInfo();
                     if (repoInfo == null || repoInfo.Owner == null || repoInfo.Repo == null)
@@ -2165,7 +2165,7 @@ namespace Sdo.Commands
                 }
                 else if (platform == Platform.AzureDevOps)
                 {
-                    if (verbose) ConsoleHelper.WriteLine("\nValidating: Azure DevOps Prerequisites", ConsoleColor.Cyan);
+                    if (verbose) ConsoleHelper.WriteVerbose("\nValidating: Azure DevOps Prerequisites");
                     
                     var pat = await GetAuthenticationTokenAsync(Platform.AzureDevOps);
                     if (string.IsNullOrEmpty(pat))
@@ -2208,12 +2208,12 @@ namespace Sdo.Commands
                 }
 
                 // Validate: Create branch name
-                if (verbose) ConsoleHelper.WriteLine("\nValidating: Branch Name", ConsoleColor.Cyan);
+                if (verbose) ConsoleHelper.WriteVerbose("\nValidating: Branch Name");
                 var branchName = CreateBranchName(id, workItemTitle);
                 if (verbose) ConsoleHelper.WriteSuccess($"Branch name valid: {branchName}");
 
                 // Validate: PR template exists
-                if (verbose) ConsoleHelper.WriteLine("\nValidating: PR Template", ConsoleColor.Cyan);
+                if (verbose) ConsoleHelper.WriteVerbose("\nValidating: PR Template");
                 string prTemplatePath = GetPullRequestTemplatePath(platform);
                 if (string.IsNullOrEmpty(prTemplatePath))
                 {
@@ -2232,7 +2232,7 @@ namespace Sdo.Commands
                 if (verbose) ConsoleHelper.WriteSuccess($"PR template found: {prTemplatePath}");
 
                 // Validate: .temp directory can be created/accessed
-                if (verbose) ConsoleHelper.WriteLine("\nValidating: .temp Directory", ConsoleColor.Cyan);
+                if (verbose) ConsoleHelper.WriteVerbose("\nValidating: .temp Directory");
                 var tempDir = ".temp";
                 try
                 {
@@ -2249,7 +2249,7 @@ namespace Sdo.Commands
                 }
 
                 // Validate: Git is available and main branch exists
-                if (verbose) ConsoleHelper.WriteLine("\nValidating: Git Environment", ConsoleColor.Cyan);
+                if (verbose) ConsoleHelper.WriteVerbose("\nValidating: Git Environment");
                 var gitWrapper = new GitWrapper(verbose: verbose);
                 
                 if (!gitWrapper.BranchExists("main"))
@@ -2262,11 +2262,11 @@ namespace Sdo.Commands
                 // ===== EXECUTION PHASE (all validations passed) =====
                 if (verbose)
                 {
-                    ConsoleHelper.WriteLine("\n=== EXECUTION PHASE ===", ConsoleColor.Cyan);
+                    ConsoleHelper.WriteInfo("\n=== EXECUTION PHASE ===");
                 }
 
                 // Switch to main branch
-                if (verbose) ConsoleHelper.WriteLine("\nStep 1: Switching to main branch", ConsoleColor.Cyan);
+                if (verbose) ConsoleHelper.WriteVerbose("\nStep 1: Switching to main branch");
                 if (!gitWrapper.CheckoutBranch("main"))
                 {
                     ConsoleHelper.WriteError("Failed to switch to main branch");
@@ -2275,7 +2275,7 @@ namespace Sdo.Commands
                 if (verbose) ConsoleHelper.WriteSuccess("Switched to main branch");
 
                 // Git sync (pull latest)
-                if (verbose) ConsoleHelper.WriteLine("\nStep 2: Syncing with remote", ConsoleColor.Cyan);
+                if (verbose) ConsoleHelper.WriteVerbose("\nStep 2: Syncing with remote");
                 if (!gitWrapper.PullWithRebase())
                 {
                     ConsoleHelper.WriteWarning(" Git pull encountered an issue, but continuing...");
@@ -2283,16 +2283,16 @@ namespace Sdo.Commands
                 if (verbose) ConsoleHelper.WriteSuccess("Repository synchronized");
 
                 // Create feature branch
-                if (verbose) ConsoleHelper.WriteLine("\nStep 3: Creating feature branch", ConsoleColor.Cyan);
+                if (verbose) ConsoleHelper.WriteVerbose("\nStep 3: Creating feature branch");
                 if (!gitWrapper.CheckoutBranch(branchName, create: true))
                 {
-                    ConsoleHelper.WriteLine($"X Failed to create branch {branchName}");
+                    ConsoleHelper.WriteWarning($"X Failed to create branch {branchName}");
                     return 1;
                 }
                 if (verbose) ConsoleHelper.WriteSuccess($"Created feature branch: {branchName}");
 
                 // Copy PR template
-                if (verbose) ConsoleHelper.WriteLine("\nStep 4: Copying PR template", ConsoleColor.Cyan);
+                if (verbose) ConsoleHelper.WriteVerbose("\nStep 4: Copying PR template");
                 string prMessageFile = Path.Combine(tempDir, $"{id}-pr-message.md");
                 try
                 {
@@ -2301,7 +2301,7 @@ namespace Sdo.Commands
                 }
                 catch (Exception ex)
                 {
-                    ConsoleHelper.WriteLine($"X Failed to copy PR template: {ex.Message}");
+                    ConsoleHelper.WriteWarning($"X Failed to copy PR template: {ex.Message}");
                     return 1;
                 }
 
@@ -2311,11 +2311,11 @@ namespace Sdo.Commands
                 ConsoleHelper.WriteSuccess($"  Branch: {branchName}");
                 ConsoleHelper.WriteSuccess($"  PR Message: {prMessageFile}");
                 Console.WriteLine();
-                ConsoleHelper.WriteLine("Next steps:", ConsoleColor.Cyan);
-                ConsoleHelper.WriteLine($"  1. Implement changes for work item {id}", ConsoleColor.Cyan);
-                ConsoleHelper.WriteLine($"  2. Commit your changes to the {branchName} branch", ConsoleColor.Cyan);
-                ConsoleHelper.WriteLine($"  3. Edit {prMessageFile} with PR details (optional)", ConsoleColor.Cyan);
-                ConsoleHelper.WriteLine($"  4. Run: sdo pr create", ConsoleColor.Cyan);
+                ConsoleHelper.WriteVerbose("Next steps:");
+                ConsoleHelper.WriteVerbose($"  1. Implement changes for work item {id}");
+                ConsoleHelper.WriteVerbose($"  2. Commit your changes to the {branchName} branch");
+                ConsoleHelper.WriteVerbose($"  3. Edit {prMessageFile} with PR details (optional)");
+                ConsoleHelper.WriteVerbose($"  4. Run: sdo pr create");
 
                 return 0;
             }
@@ -2365,7 +2365,7 @@ namespace Sdo.Commands
                 // ===== VALIDATION PHASE (no repository changes) =====
                 if (verbose)
                 {
-                    ConsoleHelper.WriteLine("\n=== VALIDATION PHASE ===", ConsoleColor.Cyan);
+                    ConsoleHelper.WriteVerbose("\n=== VALIDATION PHASE ===");
                 }
 
                 // Validate: ID must be positive
@@ -2377,7 +2377,7 @@ namespace Sdo.Commands
                 if (verbose) ConsoleHelper.WriteSuccess("Work item ID is valid");
 
                 // Validate: Detect platform
-                if (verbose) ConsoleHelper.WriteLine("\nValidating: Platform Detection", ConsoleColor.Cyan);
+                if (verbose) ConsoleHelper.WriteVerbose("\nValidating: Platform Detection");
                 var platform = _platformDetector.DetectPlatform();
                 if (verbose)
                 {
@@ -2387,7 +2387,7 @@ namespace Sdo.Commands
                 // Validate: Platform-specific prerequisites and work item existence
                 if (platform == Platform.GitHub)
                 {
-                    if (verbose) ConsoleHelper.WriteLine("\nValidating: GitHub Prerequisites", ConsoleColor.Cyan);
+                    if (verbose) ConsoleHelper.WriteVerbose("\nValidating: GitHub Prerequisites");
                     
                     var repoInfo = _platformDetector.GetRepositoryInfo();
                     if (repoInfo == null || repoInfo.Owner == null || repoInfo.Repo == null)
@@ -2415,17 +2415,17 @@ namespace Sdo.Commands
                     if (verbose) ConsoleHelper.WriteSuccess($"Issue found: {issue.Title}");
 
                     // Validate: Issue state is closed or done
-                    if (verbose) ConsoleHelper.WriteLine("\nValidating: Issue State", ConsoleColor.Cyan);
+                    if (verbose) ConsoleHelper.WriteVerbose("\nValidating: Issue State");
                     if (issue.State != "closed" && issue.State != "done")
                     {
-                        ConsoleHelper.WriteLine($"X Issue #{id} is not closed (state: {issue.State}). Please close the issue first.");
+                        ConsoleHelper.WriteWarning($"X Issue #{id} is not closed (state: {issue.State}). Please close the issue first.");
                         return 1;
                     }
                     if (verbose) ConsoleHelper.WriteSuccess($"Issue is in completed state ({issue.State})");
                 }
                 else if (platform == Platform.AzureDevOps)
                 {
-                    if (verbose) ConsoleHelper.WriteLine("\nValidating: Azure DevOps Prerequisites", ConsoleColor.Cyan);
+                    if (verbose) ConsoleHelper.WriteVerbose("\nValidating: Azure DevOps Prerequisites");
                     
                     var pat = await GetAuthenticationTokenAsync(Platform.AzureDevOps);
                     if (string.IsNullOrEmpty(pat))
@@ -2454,10 +2454,10 @@ namespace Sdo.Commands
                     if (verbose) ConsoleHelper.WriteSuccess($"Work item found: {workItem.Title}");
 
                     // Validate: Work item state is closed or done
-                    if (verbose) ConsoleHelper.WriteLine("\nValidating: Work Item State", ConsoleColor.Cyan);
+                    if (verbose) ConsoleHelper.WriteVerbose("\nValidating: Work Item State");
                     if (workItem.State != "Closed" && workItem.State != "Done")
                     {
-                        ConsoleHelper.WriteLine($"X Work item {id} is not in completed state (state: {workItem.State}). Please complete the work item first.");
+                        ConsoleHelper.WriteWarning($"X Work item {id} is not in completed state (state: {workItem.State}). Please complete the work item first.");
                         return 1;
                     }
                     if (verbose) ConsoleHelper.WriteSuccess($"Work item state is completed ({workItem.State})");
@@ -2469,7 +2469,7 @@ namespace Sdo.Commands
                 }
 
                 // Validate: Git is available and main branch exists
-                if (verbose) ConsoleHelper.WriteLine("\nValidating: Git Environment", ConsoleColor.Cyan);
+                if (verbose) ConsoleHelper.WriteVerbose("\nValidating: Git Environment");
                 
                 if (!gitWrapper.BranchExists("main"))
                 {
@@ -2489,11 +2489,11 @@ namespace Sdo.Commands
                 // ===== EXECUTION PHASE (all validations passed) =====
                 if (verbose)
                 {
-                    ConsoleHelper.WriteLine("\n=== EXECUTION PHASE ===", ConsoleColor.Cyan);
+                    ConsoleHelper.WriteVerbose("\n=== EXECUTION PHASE ===");
                 }
 
                 // Switch to main branch
-                if (verbose) ConsoleHelper.WriteLine("\nStep 1: Switching to main branch", ConsoleColor.Cyan);
+                if (verbose) ConsoleHelper.WriteInfo("\nStep 1: Switching to main branch");
                 if (!gitWrapper.CheckoutBranch("main"))
                 {
                     ConsoleHelper.WriteError("Failed to switch to main branch");
@@ -2502,7 +2502,7 @@ namespace Sdo.Commands
                 if (verbose) ConsoleHelper.WriteSuccess("Switched to main branch");
 
                 // Pull latest from origin
-                if (verbose) ConsoleHelper.WriteLine("\nStep 2: Pulling latest changes from main", ConsoleColor.Cyan);
+                if (verbose) ConsoleHelper.WriteInfo("\nStep 2: Pulling latest changes from main");
                 if (!gitWrapper.PullWithRebase())
                 {
                     ConsoleHelper.WriteWarning(" Git pull encountered an issue, but continuing...");
@@ -2510,7 +2510,7 @@ namespace Sdo.Commands
                 if (verbose) ConsoleHelper.WriteSuccess("Main branch synchronized");
 
                 // Delete feature branch
-                if (verbose) ConsoleHelper.WriteLine($"\nStep 3: Deleting feature branch '{currentBranchBeforeClose}'", ConsoleColor.Cyan);
+                if (verbose) ConsoleHelper.WriteInfo($"\nStep 3: Deleting feature branch '{currentBranchBeforeClose}'");
                 if (!gitWrapper.DeleteBranch(currentBranchBeforeClose))
                 {
                     ConsoleHelper.WriteWarning($" Failed to delete branch '{currentBranchBeforeClose}', but work item closed");
