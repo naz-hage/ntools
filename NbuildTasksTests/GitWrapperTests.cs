@@ -40,10 +40,11 @@ namespace NbuildTasks.Tests
             RunGit(sourceRepository, "remote add origin " + Quote(BareRepository));
             RunGit(sourceRepository, "push --set-upstream origin main");
             RunGit(sourceRepository, "push origin 1.0.0");
+            RunGit(BareRepository, "symbolic-ref HEAD refs/heads/main");
 
             var workingRepository = Path.Combine(Path.GetTempPath(), "NbuildTasksTests", ProjectName);
             DeleteDirectory(workingRepository);
-            RunGit(Path.GetDirectoryName(workingRepository), "clone " + Quote(BareRepository) + " " + Quote(workingRepository));
+            RunGit(Path.GetDirectoryName(workingRepository), "clone --branch main " + Quote(BareRepository) + " " + Quote(workingRepository));
             RunGit(workingRepository, "config user.name nbuild-tests");
             RunGit(workingRepository, "config user.email nbuild-tests@example.invalid");
         }
