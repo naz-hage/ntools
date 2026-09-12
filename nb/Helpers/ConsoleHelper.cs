@@ -35,7 +35,7 @@ public static class ConsoleHelper
 
     public static void WriteWarning(string message)
     {
-        WriteLine($"Warning: {message}", ConsoleColor.Yellow);
+        WriteLine($"{message}", ConsoleColor.Yellow);
     }
 
     public static void WriteSuccess(string message)
@@ -52,6 +52,6 @@ public static class ConsoleHelper
 
     public static void WriteInfo(string message)
     {
-        WriteLine($"[I] {message}", ConsoleColor.Cyan);
+        WriteLine($"{message}", ConsoleColor.Cyan);
     }
 }
