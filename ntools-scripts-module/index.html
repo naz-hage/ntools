@@ -1112,17 +1112,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#artifact-verification-msbuild" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Artifact Verification (MSBuild)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#msbuild-integration" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1652,16 +1641,6 @@
 <ul>
 <li><strong>Usage</strong>: <code>PUBLISH</code> target uses <code>Publish-AllProjects</code> function with deterministic repository path</li>
 </ul>
-<h3 id="artifact-verification-msbuild">Artifact Verification (MSBuild)<a class="headerlink" href="#artifact-verification-msbuild" title="Anchor link to this section for reference">&para;</a></h3>
-<p>The module exposes <code>Invoke-VerifyArtifacts</code> which is also wired into MSBuild via the <code>VERIFY_ARTIFACTS</code> target in <code>nbuild.targets</code>.</p>
-<p>PowerShell example (local):
-<div class="highlight"><pre><span></span><code><span class="nb">Import-Module</span> <span class="s2">"./scripts/module-package/ntools-scripts.psm1"</span> <span class="n">-Force</span>
-<span class="nb">Invoke-VerifyArtifacts</span> <span class="n">-ArtifactsPath</span> <span class="s2">"C:\Artifacts\MySolution\Release\1.2.3"</span> <span class="n">-ProductVersion</span> <span class="s2">"1.2.3"</span>
-</code></pre></div></p>
-<p>MSBuild / sdo CLI example:
-<div class="highlight"><pre><span></span><code><span class="c1"># Run the MSBuild target from the repo root (sdo delegates to MSBuild)</span>
-sdo<span class="w"> </span>verify_artifacts<span class="w"> </span>/p:ArtifactsFolder<span class="o">=</span><span class="s2">"C:\Artifacts\MySolution\Release\1.2.3"</span><span class="w"> </span>/p:ProductVersion<span class="o">=</span><span class="s2">"1.2.3"</span>
-</code></pre></div></p>
 <h3 id="msbuild-integration">MSBuild Integration<a class="headerlink" href="#msbuild-integration" title="Anchor link to this section for reference">&para;</a></h3>
 <ul>
 <li><strong>Usage</strong>: <code>PUBLISH</code> target uses <code>Publish-AllProjects</code> function with deterministic repository path</li>
