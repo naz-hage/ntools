@@ -108,21 +108,6 @@ Test-MSBuildDelegation
 ### Integration with Build System
 - **Usage**: `PUBLISH` target uses `Publish-AllProjects` function with deterministic repository path
 
-### Artifact Verification (MSBuild)
-The module exposes `Invoke-VerifyArtifacts` which is also wired into MSBuild via the `VERIFY_ARTIFACTS` target in `nbuild.targets`.
-
-PowerShell example (local):
-```powershell
-Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
-Invoke-VerifyArtifacts -ArtifactsPath "C:\Artifacts\MySolution\Release\1.2.3" -ProductVersion "1.2.3"
-```
-
-MSBuild / sdo CLI example:
-```bash
-# Run the MSBuild target from the repo root (sdo delegates to MSBuild)
-sdo verify_artifacts /p:ArtifactsFolder="C:\Artifacts\MySolution\Release\1.2.3" /p:ProductVersion="1.2.3"
-```
-
 ### MSBuild Integration
 - **Usage**: `PUBLISH` target uses `Publish-AllProjects` function with deterministic repository path
 - **Smoke Testing**: `SMOKE_TEST` target uses `Test-TargetDelegation` function for build system validation
