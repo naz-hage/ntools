@@ -1723,23 +1723,22 @@
 │   ├── VersionManager.cs         # Version tracking
 │   └── ApiClient.cs              # API client utilities
 │
-├── Nbackup/                      # Backup tool
+├── Nbackup/                      # Reusable backup library (nBackup.dll)
 │   ├── Nbackup.csproj
-│   ├── Program.cs
-│   └── BackupEngine.cs           # Backup logic
+│   ├── NBackupOptions.cs         # Library operation options
+│   └── NBackup.cs                # Backup logic
 │
 ├── nBackupTests/                 # Unit tests for Nbackup
 │   ├── nBackupTests.csproj
-│   └── BackupTests.cs
+│   └── NBackupTests.cs
 │
-├── lf/                           # File listing utility
+├── lf/                           # Reusable file-listing library (lf.dll)
 │   ├── lf.csproj
-│   ├── Program.cs
-│   └── FileLister.cs             # File listing implementation
+│   └── ListSearcher.cs            # File and folder listing implementation
 │
 ├── lfTests/                      # Unit tests for lf
 │   ├── lfTests.csproj
-│   └── FileListerTests.cs
+│   └── ListSearcherTests.cs
 │
 ├── go/                           # Go-based utilities
 │   ├── build-apps/               # Application builder
