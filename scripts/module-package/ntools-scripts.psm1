@@ -659,6 +659,22 @@ function Install-NTools {
 
         Write-Host "NTools version $Version installed to $deploymentPath"
         
+        # delete deprecated nb.exe, lf.exe and nbackup if they exist
+        $deprecatedNb = Join-Path -Path $deploymentPath -ChildPath "nb.exe"
+        if (Test-Path -Path $deprecatedNb) {
+            Remove-Item -Path $deprecatedNb -Force
+            Write-Host "Deleted deprecated nb.exe from $deploymentPath"
+        }
+        $deprecatedLf = Join-Path -Path $deploymentPath -ChildPath "lf.exe"
+        if (Test-Path -Path $deprecatedLf) {
+            Remove-Item -Path $deprecatedLf -Force
+            Write-Host "Deleted deprecated lf.exe from $deploymentPath"
+        }
+        $deprecatedNbackup = Join-Path -Path $deploymentPath -ChildPath "nbackup.exe"
+        if (Test-Path -Path $deprecatedNbackup) {
+            Remove-Item -Path $deprecatedNbackup -Force
+            Write-Host "Deleted deprecated nbackup.exe from $deploymentPath"
+        }
         # indicate success to callers
         return $true
     }
