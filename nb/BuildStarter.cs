@@ -12,7 +12,7 @@ public partial class BuildStarter
 {
     public static string LogFile { get; set; } = "sdo.log";
     private const string SdoBuildFileName = "sdo.targets";
-    private const string NbuildFileName = "nbuild.targets";
+    private const string NbuildFileName = "sdo.targets";
     private const string CommonBuildFileName = "common.targets";
     private const string TargetsMd = "targets.md";
     private const string MsbuildExe = "msbuild.exe";

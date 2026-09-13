@@ -67,7 +67,7 @@
 			<!-- Copy sdo and its dependencies -->
 			<SdoFiles Include="$(SolutionDir)\Sdo\bin\Debug\sdo.exe" />
 			<SdoFiles Include="$(SolutionDir)\Sdo\bin\Debug\sdo.dll" />
-			<SdoFiles Include="$(SolutionDir)\Sdo\bin\Debug\nb.dll" />
+			<SdoFiles Include="$(SolutionDir)\Sdo\bin\Debug\sdo.dll" />
 			<SdoFiles Include="$(SolutionDir)\Sdo\bin\Debug\NbuildTasks.dll" />
 			<SdoFiles Include="$(SolutionDir)\Sdo\bin\Debug\GitHubRelease.dll" />
 			<SdoFiles Include="$(SolutionDir)\Sdo\bin\Debug\Launcher.dll" />

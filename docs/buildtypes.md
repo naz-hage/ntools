@@ -33,4 +33,4 @@ It includes the following steps:
 - This build is available for download from the GitHub release page
 - The version is set according to the rules in [versioning](versioning.md)
 
-Your project can have additional build types which you can add to your `nbuild.targets` fille, 
+Your project can have additional build types which you can add to your `sdo.targets` fille, 

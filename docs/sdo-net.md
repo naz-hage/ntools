@@ -686,7 +686,7 @@ sdo build                         # Display available targets
 sdo test --verbose                # Build the `test` target through MSBuild
 ```
 
-The target is resolved from `nbuild.targets` in the current directory. Multiple unmatched tokens and unknown options return an error.
+The target is resolved from `sdo.targets` in the current directory. Multiple unmatched tokens and unknown options return an error.
 
 #### repo info
 
@@ -1712,7 +1712,7 @@ sdo wi update --id 243 --state Done
 
 ## Build and compatibility reference
 
-The command reference above is the source of truth for `sdo.exe`. This section retains the build infrastructure details and compatibility notes for projects that still use `nbuild.targets`.
+The command reference above is the source of truth for `sdo.exe`. This section retains the build infrastructure details and compatibility notes for projects that still use `sdo.targets`.
 
 > **Breaking change (v1.76+):** `sdo tool install --name` searches only for `apps.json` files. Consolidate application definitions into one `apps.json` file when needed. See [Install by name](#install-by-name-from-current-directory-and-default-location).
 
@@ -1738,10 +1738,10 @@ Key points:
 ---
 
 ## nbuild targets
-See [`nbuild.targets`](https://github.com/naz-hage/ntools/blob/main/Nbuild/resources/nbuild.targets) for more information and checkout other targets in [`Nbuild/resources`](https://github.com/naz-hage/ntools/blob/main/Nbuild/resources).
+See [`sdo.targets`](https://github.com/naz-hage/ntools/blob/main/Nbuild/resources/sdo.targets) for more information and checkout other targets in [`Nbuild/resources`](https://github.com/naz-hage/ntools/blob/main/Nbuild/resources).
 
 ### common targets
-- The `common.targets` file includes all the defaults targets needed to build, test and deploy a solution.  The `common.targets` file is located in the `$(ProgramFiles)\Nbuild` folder.  The `nbuild.targets` file in the solution folder imports the `common.targets` file
+- The `common.targets` file includes all the defaults targets needed to build, test and deploy a solution.  The `common.targets` file is located in the `$(ProgramFiles)\Nbuild` folder.  The `sdo.targets` file in the solution folder imports the `common.targets` file
 
 Below is a list of common targets defined in the `common.targets` file:
 

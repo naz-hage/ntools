@@ -85,9 +85,9 @@ namespace Nbuild.Tests
             Assert.IsNotNull(executingAssemblyDirectory);
 
             string resourcePath = Path.Combine(executingAssemblyDirectory, NbuildAssemblyName);
-            string targetFileName = Path.Combine(executingAssemblyDirectory, "nbuild.targets");
+            string targetFileName = Path.Combine(executingAssemblyDirectory, "sdo.targets");
 
-            ResourceHelper.ExtractEmbeddedResourceFromAssembly(resourcePath, "nb.resources.nbuild.targets", targetFileName);
+            ResourceHelper.ExtractEmbeddedResourceFromAssembly(resourcePath, "nb.resources.sdo.targets", targetFileName);
 
             // Act
             var fileNames = BuildStarter.GetImportAttributes(targetFileName, "Project");

@@ -1,6 +1,6 @@
 The table below lists all available targets for the Nbuild tool. 
 
-- **./ntools\nbuild.targets Targets**
+- **./ntools\sdo.targets Targets**
 
 | **Target Name** | **Description** |
 | --- | --- |

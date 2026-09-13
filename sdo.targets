@@ -591,7 +591,7 @@
         <PropertyGroup>
             <SourceTarget Condition="'$(SourceTarget)' == ''">STAGE</SourceTarget>
             <DelegateTarget Condition="'$(DelegateTarget)' == ''">STAGE_NEW</DelegateTarget>
-            <SourceFile Condition="'$(SourceFile)' == ''">$(SolutionDir)\nbuild.targets</SourceFile>
+            <SourceFile Condition="'$(SourceFile)' == ''">$(SolutionDir)\sdo.targets</SourceFile>
             <DelegateFile Condition="'$(DelegateFile)' == ''">$(SolutionDir)\nb\resources\common.targets</DelegateFile>
         </PropertyGroup>
         

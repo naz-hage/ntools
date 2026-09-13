@@ -13,7 +13,7 @@
 	-->
 
 	<PropertyGroup>
-		<!--The SolutionName should be replaced in nbuild.targets-->
+		<!--The SolutionName should be replaced in sdo.targets-->
 		<SolutionName>$([System.IO.Path]::GetFileNameWithoutExtension('$(MSBuildProjectDirectory)'))</SolutionName>
 		<DevDriveRaw>$([System.IO.Path]::GetPathRoot('$(MSBuildProjectDirectory)'))</DevDriveRaw>
 		<MainDirRaw>$(MSBuildProjectDirectory.Replace('$(DevDriveRaw)', '').Replace('$(SolutionName)', ''))</MainDirRaw>
