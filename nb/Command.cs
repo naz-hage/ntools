@@ -1572,10 +1572,10 @@ namespace Nbuild
             {
                 ConsoleHelper.WriteVerbose($"----------------------------------------");
 
-                ConsoleHelper.WriteVerbose($"Tag: {release.TagName}");
-                ConsoleHelper.WriteVerbose($"Name: {release.Name}");
-                ConsoleHelper.WriteVerbose($"Pre-release: {(release.Prerelease ? "Yes" : "No")}");
-                ConsoleHelper.WriteVerbose($"Published: {release.PublishedAt}");
+                ConsoleHelper.WriteWarning($"Tag: {release.TagName}");
+                ConsoleHelper.WriteInfo($"Name: {release.Name}");
+                ConsoleHelper.WriteInfo($"Pre-release: {(release.Prerelease ? "Yes" : "No")}");
+                ConsoleHelper.WriteInfo($"Published: {release.PublishedAt}");
                 if (verbose && !string.IsNullOrEmpty(release.Body))
                 {
                     ConsoleHelper.WriteVerbose($"Description: {release.Body}");
