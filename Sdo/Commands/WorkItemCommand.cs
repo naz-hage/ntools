@@ -346,12 +346,12 @@ namespace Sdo.Commands
             }
             catch (InvalidOperationException ex)
             {
-                ConsoleHelper.WriteLine($"X {ex.Message}");
+                ConsoleHelper.WriteLine($"{ex.Message}");
                 return 1;
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteLine($"X Error: {ex.Message}");
+                ConsoleHelper.WriteLine($"Error: {ex.Message}");
                 if (verbose)
                 {
                     ConsoleHelper.WriteLine($"Stack trace: {ex.StackTrace}");
@@ -732,7 +732,7 @@ namespace Sdo.Commands
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteLine($"X Failed to list GitHub issues: {ex.Message}");
+                ConsoleHelper.WriteLine($"Failed to list GitHub issues: {ex.Message}");
                 return 1;
             }
 
@@ -887,7 +887,7 @@ namespace Sdo.Commands
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteLine($"X Failed to list Azure DevOps work items: {ex.Message}");
+                ConsoleHelper.WriteLine($"Failed to list Azure DevOps work items: {ex.Message}");
                 return 1;
             }
         }
@@ -971,7 +971,7 @@ namespace Sdo.Commands
                         }
                         else
                         {
-                            ConsoleHelper.WriteLine($"X Invalid state '{state}'. Valid states: {WorkItemStateTranslator.GetValidStatesForHelp()}");
+                            ConsoleHelper.WriteLine($"Invalid state '{state}'. Valid states: {WorkItemStateTranslator.GetValidStatesForHelp()}");
                             return 1;
                         }
                     }
@@ -1003,7 +1003,7 @@ namespace Sdo.Commands
                     }
                     else
                     {
-                        ConsoleHelper.WriteLine($"X Failed to update GitHub issue #{id}");
+                        ConsoleHelper.WriteLine($"Failed to update GitHub issue #{id}");
                         if (!string.IsNullOrEmpty(ghState))
                         {
                             ConsoleHelper.WriteLine($"  Supported GitHub states: open, closed");
@@ -1048,7 +1048,7 @@ namespace Sdo.Commands
                         }
                         else
                         {
-                            ConsoleHelper.WriteLine($"X Invalid state '{state}'. Valid states: {WorkItemStateTranslator.GetValidStatesForHelp()}");
+                            ConsoleHelper.WriteLine($"Invalid state '{state}'. Valid states: {WorkItemStateTranslator.GetValidStatesForHelp()}");
                             return 1;
                         }
                     }
@@ -1080,7 +1080,7 @@ namespace Sdo.Commands
                     }
                     else
                     {
-                        ConsoleHelper.WriteLine($"X Failed to update work item {id}");
+                        ConsoleHelper.WriteLine($"Failed to update work item {id}");
                         if (!string.IsNullOrEmpty(adoState))
                         {
                             ConsoleHelper.WriteLine($"  Supported states: {WorkItemStateTranslator.GetValidStatesForHelp()}");
@@ -1096,12 +1096,12 @@ namespace Sdo.Commands
             }
             catch (InvalidOperationException ex)
             {
-                ConsoleHelper.WriteLine($"X {ex.Message}");
+                ConsoleHelper.WriteLine($"{ex.Message}");
                 return 1;
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteLine($"X Error: {ex.Message}");
+                ConsoleHelper.WriteLine($"Error: {ex.Message}");
                 if (verbose)
                 {
                     ConsoleHelper.WriteLine($"Stack trace: {ex.StackTrace}");
@@ -1178,7 +1178,7 @@ namespace Sdo.Commands
                     }
                     else
                     {
-                        ConsoleHelper.WriteLine($"X Failed to add comment to GitHub issue #{id}");
+                        ConsoleHelper.WriteLine($"Failed to add comment to GitHub issue #{id}");
                         return 1;
                     }
                 }
@@ -1217,7 +1217,7 @@ namespace Sdo.Commands
                     }
                     else
                     {
-                        ConsoleHelper.WriteLine($"X Failed to add comment to work item {id}");
+                        ConsoleHelper.WriteLine($"Failed to add comment to work item {id}");
                         if (!string.IsNullOrEmpty(client.LastError))
                         {
                             ConsoleHelper.WriteLine($"  Error: {client.LastError}");
@@ -1233,12 +1233,12 @@ namespace Sdo.Commands
             }
             catch (InvalidOperationException ex)
             {
-                ConsoleHelper.WriteLine($"X {ex.Message}");
+                ConsoleHelper.WriteLine($"{ex.Message}");
                 return 1;
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteLine($"X Error: {ex.Message}");
+                ConsoleHelper.WriteLine($"Error: {ex.Message}");
                 if (verbose)
                 {
                     ConsoleHelper.WriteLine($"Stack trace: {ex.StackTrace}");
@@ -1275,7 +1275,7 @@ namespace Sdo.Commands
                 // Validate file exists
                 if (!File.Exists(sourceFilePath))
                 {
-                    ConsoleHelper.WriteLine($"X Error: File not found: {sourceFilePath}");
+                    ConsoleHelper.WriteLine($"Error: File not found: {sourceFilePath}");
                     Console.WriteLine("\nExpected file path format: .temp/wi.md");
                     Console.WriteLine("If you want to use a different file path:");
                     Console.WriteLine($"  sdo wi create -f <file-path>");
@@ -1290,7 +1290,7 @@ namespace Sdo.Commands
                     parsed = ParseWorkItemFromMarkdown(sourceFilePath);
                     if (parsed == null)
                     {
-                        ConsoleHelper.WriteLine($"X Failed to parse markdown file: {sourceFilePath}");
+                        ConsoleHelper.WriteLine($"Failed to parse markdown file: {sourceFilePath}");
                         return 1;
                     }
 
@@ -1650,12 +1650,12 @@ namespace Sdo.Commands
             }
             catch (InvalidOperationException ex)
             {
-                ConsoleHelper.WriteLine($"X {ex.Message}");
+                ConsoleHelper.WriteLine($"{ex.Message}");
                 return 1;
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteLine($"X Error: {ex.Message}");
+                ConsoleHelper.WriteLine($"Error: {ex.Message}");
                 if (verbose)
                 {
                     ConsoleHelper.WriteLine($"Stack trace: {ex.StackTrace}");
@@ -1977,7 +1977,7 @@ namespace Sdo.Commands
                     {
                         foreach (var error in parseResult.Errors)
                         {
-                            ConsoleHelper.WriteLine($"X Markdown parse error (line {error.LineNumber}): {error.Message}");
+                            ConsoleHelper.WriteLine($"Markdown parse error (line {error.LineNumber}): {error.Message}");
                         }
                     }
                     return null;
@@ -2002,7 +2002,7 @@ namespace Sdo.Commands
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteLine($"X Failed to parse markdown file: {ex.Message}");
+                ConsoleHelper.WriteLine($"Failed to parse markdown file: {ex.Message}");
                 return null;
             }
         }
@@ -2157,7 +2157,7 @@ namespace Sdo.Commands
                     var issue = await client.GetIssueAsync(repoInfo.Owner!, repoInfo.Repo!, id);
                     if (issue == null)
                     {
-                        ConsoleHelper.WriteLine($"X GitHub issue #{id} not found");
+                        ConsoleHelper.WriteLine($"GitHub issue #{id} not found");
                         return 1;
                     }
                     workItemTitle = issue.Title;
@@ -2188,7 +2188,7 @@ namespace Sdo.Commands
                     var workItem = await client.GetWorkItemAsync(id);
                     if (workItem == null)
                     {
-                        ConsoleHelper.WriteLine($"X Work item {id} not found");
+                        ConsoleHelper.WriteLine($"Work item {id} not found");
                         return 1;
                     }
                     workItemTitle = workItem.Title;
@@ -2203,7 +2203,7 @@ namespace Sdo.Commands
                 // Validate: Work item has title
                 if (string.IsNullOrEmpty(workItemTitle))
                 {
-                    ConsoleHelper.WriteLine($"X Work item {id} has no title");
+                    ConsoleHelper.WriteLine($"Work item {id} has no title");
                     return 1;
                 }
 
@@ -2217,12 +2217,12 @@ namespace Sdo.Commands
                 string prTemplatePath = GetPullRequestTemplatePath(platform);
                 if (string.IsNullOrEmpty(prTemplatePath))
                 {
-                    ConsoleHelper.WriteLine($"X Unable to determine PR template path for platform {platform}");
+                    ConsoleHelper.WriteLine($"Unable to determine PR template path for platform {platform}");
                     return 1;
                 }
                 if (!File.Exists(prTemplatePath))
                 {
-                    ConsoleHelper.WriteLine($"X Pull request template not found at: {prTemplatePath}");
+                    ConsoleHelper.WriteLine($"Pull request template not found at: {prTemplatePath}");
                     ConsoleHelper.WriteLine($"");
                     ConsoleHelper.WriteLine($"Expected one of:");
                     ConsoleHelper.WriteLine($"  - .github/PULL_REQUEST_TEMPLATE/pull_request_template.md (GitHub)");
@@ -2244,7 +2244,7 @@ namespace Sdo.Commands
                 }
                 catch (Exception ex)
                 {
-                    ConsoleHelper.WriteLine($"X Cannot access .temp directory: {ex.Message}");
+                    ConsoleHelper.WriteLine($"Cannot access .temp directory: {ex.Message}");
                     return 1;
                 }
 
@@ -2286,7 +2286,7 @@ namespace Sdo.Commands
                 if (verbose) ConsoleHelper.WriteVerbose("\nStep 3: Creating feature branch");
                 if (!gitWrapper.CheckoutBranch(branchName, create: true))
                 {
-                    ConsoleHelper.WriteWarning($"X Failed to create branch {branchName}");
+                    ConsoleHelper.WriteWarning($"Failed to create branch {branchName}");
                     return 1;
                 }
                 if (verbose) ConsoleHelper.WriteSuccess($"Created feature branch: {branchName}");
@@ -2301,7 +2301,7 @@ namespace Sdo.Commands
                 }
                 catch (Exception ex)
                 {
-                    ConsoleHelper.WriteWarning($"X Failed to copy PR template: {ex.Message}");
+                    ConsoleHelper.WriteWarning($"Failed to copy PR template: {ex.Message}");
                     return 1;
                 }
 
@@ -2321,7 +2321,7 @@ namespace Sdo.Commands
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteLine($"X Error: {ex.Message}");
+                ConsoleHelper.WriteLine($"Error: {ex.Message}");
                 if (verbose)
                 {
                     ConsoleHelper.WriteLine($"Stack trace: {ex.StackTrace}");
@@ -2409,7 +2409,7 @@ namespace Sdo.Commands
                     var issue = await client.GetIssueAsync(repoInfo.Owner!, repoInfo.Repo!, id);
                     if (issue == null)
                     {
-                        ConsoleHelper.WriteLine($"X GitHub issue #{id} not found");
+                        ConsoleHelper.WriteLine($"GitHub issue #{id} not found");
                         return 1;
                     }
                     if (verbose) ConsoleHelper.WriteSuccess($"Issue found: {issue.Title}");
@@ -2418,7 +2418,7 @@ namespace Sdo.Commands
                     if (verbose) ConsoleHelper.WriteVerbose("\nValidating: Issue State");
                     if (issue.State != "closed" && issue.State != "done")
                     {
-                        ConsoleHelper.WriteWarning($"X Issue #{id} is not closed (state: {issue.State}). Please close the issue first.");
+                        ConsoleHelper.WriteWarning($"Issue #{id} is not closed (state: {issue.State}). Please close the issue first.");
                         return 1;
                     }
                     if (verbose) ConsoleHelper.WriteSuccess($"Issue is in completed state ({issue.State})");
@@ -2448,7 +2448,7 @@ namespace Sdo.Commands
                     var workItem = await client.GetWorkItemAsync(id);
                     if (workItem == null)
                     {
-                        ConsoleHelper.WriteLine($"X Work item {id} not found");
+                        ConsoleHelper.WriteLine($"Work item {id} not found");
                         return 1;
                     }
                     if (verbose) ConsoleHelper.WriteSuccess($"Work item found: {workItem.Title}");
@@ -2457,7 +2457,7 @@ namespace Sdo.Commands
                     if (verbose) ConsoleHelper.WriteVerbose("\nValidating: Work Item State");
                     if (workItem.State != "Closed" && workItem.State != "Done")
                     {
-                        ConsoleHelper.WriteWarning($"X Work item {id} is not in completed state (state: {workItem.State}). Please complete the work item first.");
+                        ConsoleHelper.WriteWarning($"Work item {id} is not in completed state (state: {workItem.State}). Please complete the work item first.");
                         return 1;
                     }
                     if (verbose) ConsoleHelper.WriteSuccess($"Work item state is completed ({workItem.State})");
@@ -2531,7 +2531,7 @@ namespace Sdo.Commands
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteLine($"X Error: {ex.Message}");
+                ConsoleHelper.WriteLine($"Error: {ex.Message}");
                 if (verbose)
                 {
                     ConsoleHelper.WriteLine($"Stack trace: {ex.StackTrace}");
@@ -2598,7 +2598,7 @@ namespace Sdo.Commands
             var workItemId = ExtractWorkItemIdFromBranch(currentBranch);
             if (!workItemId.HasValue)
             {
-                ConsoleHelper.WriteLine($"X Could not auto-detect work item ID from branch name '{currentBranch}'");
+                ConsoleHelper.WriteLine($"Could not auto-detect work item ID from branch name '{currentBranch}'");
                 ConsoleHelper.WriteLine("  Expected branch format: <number>-<description> (e.g., 123-feature-name)");
                 ConsoleHelper.WriteLine("  Or use --id <number> to specify explicitly");
                 return null;

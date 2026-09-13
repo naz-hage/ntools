@@ -160,7 +160,7 @@ namespace Sdo.Commands
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteLine($"X Error: {ex.Message}");
+                ConsoleHelper.WriteLine($"Error: {ex.Message}");
                 return 1;
             }
         }
@@ -287,7 +287,7 @@ namespace Sdo.Commands
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteLine($"X Error: {ex.Message}");
+                ConsoleHelper.WriteLine($"Error: {ex.Message}");
                 return 1;
             }
         }
@@ -395,7 +395,7 @@ namespace Sdo.Commands
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteLine($"X Error: {ex.Message}");
+                ConsoleHelper.WriteLine($"Error: {ex.Message}");
                 return 1;
             }
         }

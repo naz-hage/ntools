@@ -677,7 +677,7 @@ namespace Nbuild
                 else
                 {
                     // installer failed
-                    ConsoleHelper.WriteError($"X {nbuildApp.Name} {nbuildApp.Version} failed to install: {resultInstall.Code}");
+                    ConsoleHelper.WriteError($"{nbuildApp.Name} {nbuildApp.Version} failed to install: {resultInstall.Code}");
                     if (Verbose) DisplayCodeAndOutput(resultInstall);
                     // print resultInstall.Output
                     foreach (var item in resultInstall.Output)
@@ -742,7 +742,7 @@ namespace Nbuild
                     }
                     else
                     {
-                        ConsoleHelper.WriteError($"X {nbuildApp.Name} {nbuildApp.Version} installed, but file hash does not match.");
+                        ConsoleHelper.WriteError($"{nbuildApp.Name} {nbuildApp.Version} installed, but file hash does not match.");
                         return ResultHelper.Fail(-1, $"File hash does not match for {nbuildApp.AppFileName}");
                     }
                 }
@@ -754,10 +754,10 @@ namespace Nbuild
 
         private static void DisplayCodeAndOutput(ResultHelper result)
         {
-            ConsoleHelper.WriteWarning($"X Code: {result.Code}");
+            ConsoleHelper.WriteWarning($"Code: {result.Code}");
             foreach (var output in result.Output)
             {
-                ConsoleHelper.WriteWarning($"X Output: {output}");
+                ConsoleHelper.WriteWarning($"Output: {output}");
             }
         }
 
@@ -825,7 +825,7 @@ namespace Nbuild
             }
             else
             {
-                ConsoleHelper.WriteError($"X {nbuildApp.Name} {nbuildApp.Version} failed to Uninstall: {result.Code}");
+                ConsoleHelper.WriteError($"{nbuildApp.Name} {nbuildApp.Version} failed to Uninstall: {result.Code}");
                 DisplayCodeAndOutput(result);
                 return ResultHelper.Fail(result.Code, $"Failed to Uninstall {nbuildApp.Name} {nbuildApp.Version}");
             }
@@ -844,7 +844,7 @@ namespace Nbuild
             }
             catch (Exception ex)
             {
-                if (Verbose) ConsoleHelper.WriteError($"X {nbuildApp.Name} {nbuildApp.Version} failed to get file version: {ex.Message}");
+                if (Verbose) ConsoleHelper.WriteError($"{nbuildApp.Name} {nbuildApp.Version} failed to get file version: {ex.Message}");
                 return null;
             }
         }
@@ -1369,7 +1369,7 @@ namespace Nbuild
             }
             else
             {
-                ConsoleHelper.WriteError($"X {result.GetFirstOutput()}");
+                ConsoleHelper.WriteError($"{result.GetFirstOutput()}");
                 return ResultHelper.Fail(-1, "Clone failed");
             }
         }
