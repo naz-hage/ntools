@@ -659,6 +659,22 @@ function Install-NTools {
 
         Write-Host "NTools version $Version installed to $deploymentPath"
         
+        # delete deprecated nb.exe, lf.exe and nbackup if they exist
+        $deprecatedNb = Join-Path -Path $deploymentPath -ChildPath "nb.exe"
+        if (Test-Path -Path $deprecatedNb) {
+            Remove-Item -Path $deprecatedNb -Force
+            Write-Host "Deleted deprecated nb.exe from $deploymentPath"
+        }
+        $deprecatedLf = Join-Path -Path $deploymentPath -ChildPath "lf.exe"
+        if (Test-Path -Path $deprecatedLf) {
+            Remove-Item -Path $deprecatedLf -Force
+            Write-Host "Deleted deprecated lf.exe from $deploymentPath"
+        }
+        $deprecatedNbackup = Join-Path -Path $deploymentPath -ChildPath "nbackup.exe"
+        if (Test-Path -Path $deprecatedNbackup) {
+            Remove-Item -Path $deprecatedNbackup -Force
+            Write-Host "Deleted deprecated nbackup.exe from $deploymentPath"
+        }
         # indicate success to callers
         return $true
     }
@@ -669,176 +685,7 @@ function Install-NTools {
     }
 }
 
-## Export will be declared at the end of the file after all functions are defined
-# Export-ModuleMember -Function ... (deferred)
-
 #endregion
-
-#region ArtifactVerification
-# =============================================================================
-# Artifact verification (migrated from scripts/build/build-verify-artifacts.ps1)
-# =============================================================================
-function Invoke-VerifyArtifacts {
-    param(
-        [Parameter(Mandatory = $true)][string]$ArtifactsPath,
-        [Parameter(Mandatory = $true)][string]$ProductVersion
-    )
-
-    # counters
-    $SuccessCount = 0
-    $WarningCount = 0
-    $ErrorCount = 0
-
-    Write-Host "================================================================" -ForegroundColor Magenta
-    Write-Host "                 NTOOLS ARTIFACT VERIFICATION" -ForegroundColor Magenta
-    Write-Host "================================================================" -ForegroundColor Magenta
-    Write-Info "Starting comprehensive artifact verification..."
-    Write-Info "Artifacts Path: $ArtifactsPath"
-    Write-Info "Product Version: $ProductVersion"
-
-    if (-not (Test-Path $ArtifactsPath)) {
-        Write-Error "Artifacts directory not found: $ArtifactsPath"
-        $ErrorCount++
-        return @{ Success = $SuccessCount; Warning = $WarningCount; Error = $ErrorCount }
-    }
-
-
-    Write-Info "Artifacts directory found: $ArtifactsPath"
-
-    $ExpectedExecutables = @{
-        "nb.exe" = "Build automation CLI"
-        "lf.exe" = "List files utility"
-        "nBackup.exe" = "Backup utility"
-        "wi.exe" = "Work item utility"
-    }
-
-    $ExpectedLibraries = @{
-        "nb.dll" = "Build automation library"
-        "lf.dll" = "List files library"
-        "nBackup.dll" = "Backup library"
-        "wi.dll" = "Work item library"
-        "NbuildTasks.dll" = "Build tasks library"
-        "GitHubRelease.dll" = "GitHub release library"
-        "ApiVersions.dll" = "API versions library"
-    }
-
-    $ExpectedConfigs = @{
-        "nb.runtimeconfig.json" = "nb runtime configuration"
-        "lf.runtimeconfig.json" = "lf runtime configuration"
-        "nBackup.runtimeconfig.json" = "nBackup runtime configuration"
-        "wi.runtimeconfig.json" = "wi runtime configuration"
-        "Nbuild.runtimeconfig.json" = "Nbuild runtime configuration"
-        "backup.json" = "Backup configuration"
-        "ntools.json" = "ntools configuration"
-    }
-
-    $ExpectedTargets = @{
-        "common.targets" = "Common MSBuild targets"
-        "nbuild.targets" = "Nbuild MSBuild targets"
-        "dotnet.targets" = "Dotnet MSBuild targets"
-        "git.targets" = "Git MSBuild targets"
-        "nuget.targets" = "NuGet MSBuild targets"
-        "apps-versions.targets" = "Application versions targets"
-    }
-
-    Write-Info "Verifying executables..."
-    foreach ($exe in $ExpectedExecutables.Keys) {
-        $exePath = Join-Path $ArtifactsPath $exe
-        if (Test-Path $exePath) {
-            Write-Success "Found executable: $exe ($($ExpectedExecutables[$exe]))"
-            $SuccessCount++
-            try {
-                $versionInfo = Get-ItemProperty $exePath | Select-Object VersionInfo
-                if ($versionInfo.VersionInfo.ProductVersion) { Write-Info "  Version: $($versionInfo.VersionInfo.ProductVersion)" }
-            } catch { Write-Warning "  Could not retrieve version info for $exe"; $WarningCount++ }
-        } else {
-            Write-Error "Missing executable: $exe"
-            $ErrorCount++
-        }
-    }
-
-    Write-Info "Verifying libraries..."
-    foreach ($lib in $ExpectedLibraries.Keys) {
-        $libPath = Join-Path $ArtifactsPath $lib
-        if (Test-Path $libPath) {
-            Write-Success "Found library: $lib ($($ExpectedLibraries[$lib]))"
-            $SuccessCount++
-        } else {
-            Write-Error "Missing library: $lib"
-            $ErrorCount++
-        }
-    }
-
-    Write-Info "Verifying configuration files..."
-    foreach ($config in $ExpectedConfigs.Keys) {
-        $configPath = Join-Path $ArtifactsPath $config
-        if (Test-Path $configPath) {
-            Write-Success "Found config: $config ($($ExpectedConfigs[$config]))"
-            $SuccessCount++
-        } else {
-            Write-Warning "Missing config: $config"
-            $WarningCount++
-        }
-    }
-
-    Write-Info "Verifying MSBuild target files..."
-    foreach ($target in $ExpectedTargets.Keys) {
-        $targetPath = Join-Path $ArtifactsPath $target
-        if (Test-Path $targetPath) {
-            Write-Success "Found target file: $target ($($ExpectedTargets[$target]))"
-            $SuccessCount++
-        } else {
-            Write-Warning "Missing target file: $target"
-            $WarningCount++
-        }
-    }
-
-    Write-Info "Checking for unwanted test artifacts..."
-    $testPatterns = @("*Test*.dll", "*Test*.exe", "*test*.dll", "*test*.exe")
-    $foundTestArtifacts = $false
-    foreach ($pattern in $testPatterns) {
-        $testFiles = Get-ChildItem -Path $ArtifactsPath -Filter $pattern -ErrorAction SilentlyContinue
-        foreach ($testFile in $testFiles) {
-            Write-Warning "Found test artifact (should not be in release): $($testFile.Name)"
-            $foundTestArtifacts = $true
-            $WarningCount++
-        }
-    }
-    if (-not $foundTestArtifacts) { Write-Success "No unwanted test artifacts found"; $SuccessCount++ }
-
-    Write-Info "Verifying basic executable functionality..."
-    $nbExe = Join-Path $ArtifactsPath "nb.exe"
-    if (Test-Path $nbExe) {
-        try {
-            $result = & $nbExe --version 2>&1
-            if ($LASTEXITCODE -eq 0) { Write-Success "nb.exe executes successfully"; Write-Info "  Output: $result"; $SuccessCount++ } else { Write-Warning "nb.exe returned non-zero exit code: $LASTEXITCODE"; $WarningCount++ }
-        } catch { Write-Warning "Failed to execute nb.exe: $($_.Exception.Message)"; $WarningCount++ }
-    }
-
-    $lfExe = Join-Path $ArtifactsPath "lf.exe"
-    if (Test-Path $lfExe) {
-        try {
-            $result = & $lfExe --help 2>&1
-            if ($LASTEXITCODE -eq 0) { Write-Success "lf.exe executes successfully"; $SuccessCount++ } else { Write-Warning "lf.exe returned non-zero exit code: $LASTEXITCODE"; $WarningCount++ }
-        } catch { Write-Warning "Failed to execute lf.exe: $($_.Exception.Message)"; $WarningCount++ }
-    }
-
-    Write-Info "Verifying folder structure..."
-    $folderCount = (Get-ChildItem -Path $ArtifactsPath -Directory -ErrorAction SilentlyContinue).Count
-    $fileCount = (Get-ChildItem -Path $ArtifactsPath -File -ErrorAction SilentlyContinue).Count
-    Write-Info "Found $folderCount subdirectories and $fileCount files"
-    if ($fileCount -gt 10) { Write-Success "Artifact count looks reasonable ($fileCount files)"; $SuccessCount++ } else { Write-Warning "Low artifact count - expected more files ($fileCount files)"; $WarningCount++ }
-
-    Write-Host "================================================================" -ForegroundColor Magenta
-    Write-Host "                    VERIFICATION SUMMARY" -ForegroundColor Magenta
-    Write-Host "================================================================" -ForegroundColor Magenta
-    Write-Host "Artifacts Path: $ArtifactsPath" -ForegroundColor White
-    Write-Host "[SUCCESS] Count: $SuccessCount" -ForegroundColor Green
-    Write-Host "[WARNING] Count: $WarningCount" -ForegroundColor Yellow
-    Write-Host "[ERROR] Count: $ErrorCount" -ForegroundColor Red
-
-    return @{ Success = $SuccessCount; Warning = $WarningCount; Error = $ErrorCount }
-}
 
 #endregion
 
@@ -1086,7 +933,7 @@ function Set-CodeSigningTrust {
 
 #region Exports
 # Final export of public functions (including merged signing functions)
-Export-ModuleMember -Function Get-ntoolsScriptsVersion, Publish-AllProjects, Get-VersionFromJson, Write-TestResult, Test-TargetExists, Test-TargetDependencies, Test-TargetDelegation, Get-FileHash256, Get-FileVersionInfo, Invoke-FastForward, Write-OutputMessage, Get-NToolsFileVersion, Add-DeploymentPathToEnvironment, Invoke-NToolsDownload, Install-NTools, Invoke-VerifyArtifacts, Set-DevelopmentEnvironment, Get-AgentPublicIp, Add-WafAllowRule, Remove-WafCustomRule, Test-IsAdministrator, Test-MicrosoftPowerShellSecurityModuleLoaded, Test-CertificateStore, New-SelfSignedCodeCertificate, Export-CertificateToPfx, Export-CertificateToCer, Import-CertificateToRoot, Import-CertificateToCurrentUser, Set-ScriptSignature, Get-ScriptSignature, Set-CodeSigningTrust
+Export-ModuleMember -Function Get-ntoolsScriptsVersion, Publish-AllProjects, Get-VersionFromJson, Write-TestResult, Test-TargetExists, Test-TargetDependencies, Test-TargetDelegation, Get-FileHash256, Get-FileVersionInfo, Invoke-FastForward, Write-OutputMessage, Get-NToolsFileVersion, Add-DeploymentPathToEnvironment, Invoke-NToolsDownload, Install-NTools, Set-DevelopmentEnvironment, Get-AgentPublicIp, Add-WafAllowRule, Remove-WafCustomRule, Test-IsAdministrator, Test-MicrosoftPowerShellSecurityModuleLoaded, Test-CertificateStore, New-SelfSignedCodeCertificate, Export-CertificateToPfx, Export-CertificateToCer, Import-CertificateToRoot, Import-CertificateToCurrentUser, Set-ScriptSignature, Get-ScriptSignature, Set-CodeSigningTrust
 
 #endregion
 

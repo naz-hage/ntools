@@ -26,7 +26,6 @@
 		 <SetupFolder>$(ArtifactsSolutionFolder)\release</SetupFolder>
 		<ArtifactsFolder>$(ArtifactsSolutionFolder)\$(TargetRelease)\$(ProductVersion)</ArtifactsFolder>
 		<ArtifactsTestResultsFolder>$(ArtifactsSolutionFolder)\TestResults\$(ProductVersion)</ArtifactsTestResultsFolder>
-		<NbExe>$(OutputPathRelease)\nb.exe</NbExe>
 
           <!-- Default paths for local builds -->
 		<CoverageFolder>$(ArtifactsSolutionFolder)\CoverageReport\$(ProductVersion)</CoverageFolder>
@@ -62,7 +61,7 @@
 	<!-- Test for FileVersion task and powershell file-version.ps1-->
 	<Target Name="FILE_VERSIONS"  DependsOnTargets="ARTIFACTS">
 		<PropertyGroup>
-			<FileName>$(SolutionDir)\$(TargetRelease)\nb.exe</FileName>
+			<FileName>$(SolutionDir)\$(TargetRelease)\sdo.exe</FileName>
 		</PropertyGroup>
 		<Exec Command='powershell -File "$(SolutionDir)\dev-setup\list-file-version.ps1" "$(FileName)"' ConsoleToMSBuild="true">
 			<Output TaskParameter="ConsoleOutput" PropertyName="Version" />
@@ -544,24 +543,6 @@
         
         <!-- Define executables to test using ItemGroup -->
         <ItemGroup>
-            <ExecutablesToTest Include="$(ArtifactsFolder)\nb.exe">
-                <DisplayName>nb.exe (Core executable)</DisplayName>
-                <TestCommand>--version</TestCommand>
-                <HelpCommand>install --help</HelpCommand>
-                <Required>true</Required>
-            </ExecutablesToTest>
-            <ExecutablesToTest Include="$(ArtifactsFolder)\lf.exe">
-                <DisplayName>lf.exe (List files utility)</DisplayName>
-                <TestCommand>--help</TestCommand>
-                <HelpCommand></HelpCommand>
-                <Required>true</Required>
-            </ExecutablesToTest>
-            <ExecutablesToTest Include="$(ArtifactsFolder)\nBackup.exe">
-                <DisplayName>nBackup.exe (Backup utility)</DisplayName>
-                <TestCommand>--help</TestCommand>
-                <HelpCommand></HelpCommand>
-                <Required>true</Required>
-            </ExecutablesToTest>
             <!-- Optional executables - only test if they exist -->
             <ExecutablesToTest Include="$(ArtifactsFolder)\GitHubRelease.exe">
                 <DisplayName>GitHubRelease.exe (GitHub release utility)</DisplayName>
@@ -596,28 +577,12 @@
             <Output TaskParameter="ExitCode" PropertyName="ExitCode_%(ExistingExecutables.Filename)" />
         </Exec>
         
-        <!-- Test additional commands for nb.exe -->
-        <Message Text="Testing additional nb.exe commands..." />
-        <Exec Command='"$(ArtifactsFolder)\nb.exe" install --help' 
-              ContinueOnError="true" 
-              IgnoreExitCode="true"
-              Condition="Exists('$(ArtifactsFolder)\nb.exe')">
-            <Output TaskParameter="ExitCode" PropertyName="NbInstallHelpExitCode" />
-        </Exec>
-        
         <!-- Report results for each executable -->
         <Message Text="=== Test Results ===" />
         <Message Text="✅ %(ExistingExecutables.DisplayName): Exit code $(ExitCode_%(ExistingExecutables.Filename))" 
                  Condition="'$(ExitCode_%(ExistingExecutables.Filename))' == '0'" />
-        <Message Text="✅ %(ExistingExecutables.DisplayName): Exit code $(ExitCode_%(ExistingExecutables.Filename)) (acceptable for help command)" 
-                 Condition="'%(ExistingExecutables.Filename)' == 'nBackup' And '$(ExitCode_%(ExistingExecutables.Filename))' == '-1'" />
         <Message Text="❌ %(ExistingExecutables.DisplayName): Exit code $(ExitCode_%(ExistingExecutables.Filename))" 
-                 Condition="'$(ExitCode_%(ExistingExecutables.Filename))' != '0' And '%(ExistingExecutables.Filename)' != 'nBackup'" />
-        <Message Text="❌ %(ExistingExecutables.DisplayName): Exit code $(ExitCode_%(ExistingExecutables.Filename))" 
-                 Condition="'%(ExistingExecutables.Filename)' == 'nBackup' And '$(ExitCode_%(ExistingExecutables.Filename))' != '0' And '$(ExitCode_%(ExistingExecutables.Filename))' != '-1'" />
-        
-        <Message Text="✅ nb install --help: Exit code $(NbInstallHelpExitCode)" Condition="'$(NbInstallHelpExitCode)' == '0'" />
-        <Message Text="❌ nb install --help: Exit code $(NbInstallHelpExitCode)" Condition="'$(NbInstallHelpExitCode)' != '0'" />
+				 Condition="'$(ExitCode_%(ExistingExecutables.Filename))' != '0'" />
         
         <!-- 2. BUILD SYSTEM VALIDATION -->
         <Message Text="=== 2. Build System Validation ===" />
@@ -651,13 +616,9 @@
         <!-- 3. SUMMARY -->
         <Message Text="=== Smoke Test Summary ===" />
         
-        <!-- Calculate overall success (all exit codes should be 0, except nBackup which returns -1 for help) -->
+		<!-- Calculate overall success. -->
         <PropertyGroup>
-            <!-- nBackup.exe returns -1 for help command, which is acceptable -->
-            <NBackupSuccess Condition="'$(ExitCode_nBackup)' == '0' Or '$(ExitCode_nBackup)' == '-1'">true</NBackupSuccess>
-            <NBackupSuccess Condition="'$(NBackupSuccess)' == ''">false</NBackupSuccess>
-            
-            <AllTestsPassed Condition="'$(ExitCode_nb)' == '0' And '$(ExitCode_lf)' == '0' And '$(NBackupSuccess)' == 'true' And '$(NbInstallHelpExitCode)' == '0' And '$(DelegationTestExitCode)' == '0'">true</AllTestsPassed>
+			<AllTestsPassed Condition="'$(DelegationTestExitCode)' == '0'">true</AllTestsPassed>
             <AllTestsPassed Condition="'$(AllTestsPassed)' == ''">false</AllTestsPassed>
         </PropertyGroup>
         
@@ -668,13 +629,6 @@
         <Message Text="==> DONE" />
     </Target>
 
-	<!-- Artifact verification: runs consolidated module function Invoke-VerifyArtifacts -->
-	<Target Name="VERIFY_ARTIFACTS" DependsOnTargets="ARTIFACTS">
-		<Message Text="Running artifact verification via ntools-scripts module" Importance="high" />
-		<Exec Command='pwsh -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "Import-Module &apos;.\scripts\module-package\ntools-scripts.psm1&apos; -Force; $r = Invoke-VerifyArtifacts -ArtifactsPath &apos;$(ArtifactsFolder)&apos; -ProductVersion &apos;$(ProductVersion)&apos;; if ($r.Error -gt 0) { exit 1 } else { exit 0 }"' WorkingDirectory="$(SolutionDir)" />
-		<Message Text="VERIFY_ARTIFACTS completed" Importance="high" />
-	</Target>
-		
 	<!-- Override the TEST target from common.targets to run individual test projects -->
 	<!-- This prevents double test execution that causes conflicts -->
 	<Target Name="TEST" DependsOnTargets="ARTIFACTS;TAG">

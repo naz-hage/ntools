@@ -189,7 +189,7 @@ namespace NbuildTests
                 {
                 ""Name"": ""nbuild"",
                 ""Version"": ""1.6.0"",
-                ""AppFileName"": ""nb.exe"",
+                ""AppFileName"": ""sdo.exe"",
                 ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
                 ""DownloadedFile"": ""$(Version).zip"",
                 ""InstallCommand"": ""powershell.exe"",
@@ -319,7 +319,7 @@ namespace NbuildTests
                     {
                         ""Name"": ""nbuild"",
                         ""Version"": ""versionToTest"",
-                        ""AppFileName"": ""$(InstallPath)\\nb.exe"",
+                        ""AppFileName"": ""$(InstallPath)\\sdo.exe"",
                         ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
                         ""DownloadedFile"": ""$(Version).zip"",
                         ""InstallCommand"": ""powershell.exe"",
@@ -373,7 +373,7 @@ namespace NbuildTests
                     {
                         ""Name"": ""nbuild"",
                         ""Version"": ""versionToTest"",
-                        ""AppFileName"": ""$(InstallPath)\\nb.exe"",
+                        ""AppFileName"": ""$(InstallPath)\\sdo.exe"",
                         ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
                         ""DownloadedFile"": ""$(Version).zip"",
                         ""InstallCommand"": ""powershell.exe"",
@@ -428,7 +428,7 @@ namespace NbuildTests
                 ""NbuildAppList"": [
                     {
                     ""Version"": ""1.2.0"",
-                    ""AppFileName"": ""nb.exe"",
+                    ""AppFileName"": ""sdo.exe"",
                     ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
                     ""DownloadedFile"": ""$(Version).zip"",
                     ""InstallCommand"": ""powershell.exe"",
@@ -510,7 +510,7 @@ namespace NbuildTests
                     {
                     ""Name"": ""nbuild"",
                     ""Version"": ""1.2.0"",
-                    ""AppFileName"": ""nb.exe"",
+                    ""AppFileName"": ""sdo.exe"",
                     ""DownloadedFile"": ""$(Version).zip"",
                     ""InstallCommand"": ""powershell.exe"",
                     ""InstallArgs"": ""-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force"",
@@ -553,7 +553,7 @@ namespace NbuildTests
                     {
                     ""Name"": ""nbuild"",
                     ""Version"": ""1.2.0"",
-                    ""AppFileName"": ""nb.exe"",
+                    ""AppFileName"": ""sdo.exe"",
                     ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
                     ""InstallCommand"": ""powershell.exe"",
                     ""InstallArgs"": ""-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force"",
@@ -596,7 +596,7 @@ namespace NbuildTests
                 {
                 ""Name"": ""nbuild"",
                 ""Version"": ""1.2.0"",
-                ""AppFileName"": ""nb.exe"",
+                ""AppFileName"": ""sdo.exe"",
                 ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
                 ""DownloadedFile"": ""$(Version).zip"",
                 ""InstallArgs"": ""-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force"",
@@ -639,7 +639,7 @@ namespace NbuildTests
                 {
                 ""Name"": ""nbuild"",
                 ""Version"": ""1.2.0"",
-                ""AppFileName"": ""nb.exe"",
+                ""AppFileName"": ""sdo.exe"",
                 ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
                 ""DownloadedFile"": ""$(Version).zip"",
                 ""InstallCommand"": ""powershell.exe"",
@@ -682,7 +682,7 @@ namespace NbuildTests
                 {
                 ""Name"": ""nbuild"",
                 ""Version"": ""1.2.0"",
-                ""AppFileName"": ""nb.exe"",
+                ""AppFileName"": ""sdo.exe"",
                 ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
                 ""DownloadedFile"": ""$(Version).zip"",
                 ""InstallCommand"": ""powershell.exe"",

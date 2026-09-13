@@ -15,7 +15,7 @@ A powerful collection of command-line utilities for .NET developers, providing b
 ## Recent Updates
 
 - **.NET 10.0 Upgrade**: Upgraded all projects to .NET 10.0 for C# 14.0 syntax support and latest runtime features
-- **.NET SDK Integration**: Updated nb.exe to use .NET SDK instead of direct MSBuild dependency with automatic dotnet.exe detection
+- **.NET SDK Integration**: Updated sdo.exe to use .NET SDK instead of direct MSBuild dependency with automatic dotnet.exe detection
 - **System.CommandLine 2.0.1**: Upgraded to stable CLI framework with global option support
 - **Enhanced Testing**: Added granular unit testing targets for efficient test execution
 - **Git Clone Support**: New command for repository cloning operations
@@ -74,7 +74,7 @@ nb prod               # Create production release
 ```yml
 - name: Build using ntools
   run: |
-    & "$env:ProgramFilesPath/nbuild/nb.exe" ${{ env.Build_Type }} -v ${{ env.Enable_Logging }}
+    & "$env:ProgramFilesPath/nbuild/sdo.exe" ${{ env.Build_Type }} -v ${{ env.Enable_Logging }}
   shell: pwsh
   working-directory: ${{ github.workspace }}
   env:

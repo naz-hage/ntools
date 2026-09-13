@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+	<OutputType>Library</OutputType>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -39,9 +39,6 @@
 		<None Include="..\go\apps.json" CopyToOutputDirectory="PreserveNewest" Link="apps.json" />
 	</ItemGroup>
 
-	<ItemGroup>
-	<PackageReference Include="System.CommandLine" Version="2.0.11" />
-	</ItemGroup>
  <ItemGroup>
     <ProjectReference Include="..\GitHubRelease\GitHubRelease.csproj" />
     <ProjectReference Include="..\NbuildTasks\NbuildTasks.csproj" />

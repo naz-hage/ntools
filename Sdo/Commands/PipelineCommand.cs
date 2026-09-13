@@ -460,7 +460,7 @@ namespace Sdo.Commands
 
                     if (definitions == null || definitions.Count == 0)
                     {
-                        ConsoleHelper.WriteLine("No workflows found in this repository.", ConsoleColor.Yellow);
+                        ConsoleHelper.WriteWarning("No workflows found in this repository.");
                         return 0;
                     }
 
@@ -474,7 +474,7 @@ namespace Sdo.Commands
 
                         if (definitions.Count == 0)
                         {
-                            ConsoleHelper.WriteLine($"No workflows found matching repository filter: {filterRepo}", ConsoleColor.Yellow);
+                            ConsoleHelper.WriteWarning($"No workflows found matching repository filter: {filterRepo}");
                             return 0;
                         }
                     }
@@ -541,7 +541,7 @@ namespace Sdo.Commands
 
                     if (pipelines == null || pipelines.Count == 0)
                     {
-                        ConsoleHelper.WriteLine("No pipelines found in this project.", ConsoleColor.Yellow);
+                        ConsoleHelper.WriteWarning("No pipelines found in this project.");
                         return 0;
                     }
 
@@ -555,7 +555,7 @@ namespace Sdo.Commands
 
                         if (pipelines.Count == 0)
                         {
-                            ConsoleHelper.WriteLine($"No pipelines found matching repository filter: {filterRepo}", ConsoleColor.Yellow);
+                            ConsoleHelper.WriteWarning($"No pipelines found matching repository filter: {filterRepo}");
                             return 0;
                         }
                     }
@@ -881,7 +881,7 @@ namespace Sdo.Commands
 
                     if (definitions == null || definitions.Count == 0)
                     {
-                        ConsoleHelper.WriteLine("No workflows found in this repository.", ConsoleColor.Yellow);
+                        ConsoleHelper.WriteWarning("No workflows found in this repository.");
                         return 0;
                     }
 
@@ -972,7 +972,7 @@ namespace Sdo.Commands
 
                     if (pipelines == null || pipelines.Count == 0)
                     {
-                        ConsoleHelper.WriteLine("No pipelines found in this project.", ConsoleColor.Yellow);
+                        ConsoleHelper.WriteWarning("No pipelines found in this project.");
                         return 0;
                     }
 
@@ -1040,7 +1040,7 @@ namespace Sdo.Commands
                 // This would typically be done via a commit that removes or disables the workflow
                 ConsoleHelper.WriteSuccess("Workflow deletion would be processed");
                 Console.WriteLine();
-                ConsoleHelper.WriteLine($"To delete this workflow:", ConsoleColor.Cyan);
+                ConsoleHelper.WriteInfo($"To delete this workflow:");
                 Console.WriteLine($"  1. Delete or rename the {workflowId}.yml file from .github/workflows/");
                 Console.WriteLine($"  2. Commit and push the change");
                 Console.WriteLine($"  3. Workflow will be removed from GitHub Actions");
@@ -1135,7 +1135,7 @@ namespace Sdo.Commands
 
                     if (runs == null || runs.Count == 0)
                     {
-                        ConsoleHelper.WriteLine("No workflow runs found in this repository.", ConsoleColor.Yellow);
+                        ConsoleHelper.WriteWarning("No workflow runs found in this repository.");
                         return 0;
                     }
 
@@ -1197,7 +1197,7 @@ namespace Sdo.Commands
 
                     if (pipelines == null || pipelines.Count == 0)
                     {
-                        ConsoleHelper.WriteLine("No pipelines found in this project.", ConsoleColor.Yellow);
+                        ConsoleHelper.WriteWarning("No pipelines found in this project.");
                         return 0;
                     }
 
@@ -1282,12 +1282,12 @@ namespace Sdo.Commands
                 var workflowPath = Path.Combine(".github", "workflows", fileName);
                 ConsoleHelper.WriteSuccess("Workflow definition validated successfully");
                 Console.WriteLine();
-                ConsoleHelper.WriteLine($"Workflow Details:", ConsoleColor.Cyan);
+                ConsoleHelper.WriteInfo($"Workflow Details:");
                 Console.WriteLine($"  Repository: {owner}/{repo}");
                 Console.WriteLine($"  Filename:   {fileName}");
                 Console.WriteLine($"  Path:       {workflowPath}");
                 Console.WriteLine();
-                ConsoleHelper.WriteLine($"To create and activate this workflow:", ConsoleColor.Cyan);
+                ConsoleHelper.WriteInfo($"To create and activate this workflow:");
                 Console.WriteLine($"  1. Copy {fileName} to .github/workflows/ in your repository");
                 Console.WriteLine($"  2. Commit the file: git add {workflowPath}");
                 Console.WriteLine($"  3. Commit changes: git commit -m 'Add GitHub Actions workflow'");
@@ -1359,7 +1359,7 @@ namespace Sdo.Commands
 
                     ConsoleHelper.WriteSuccess("Pipeline created successfully");
                     Console.WriteLine();
-                    ConsoleHelper.WriteLine($"Pipeline Details:", ConsoleColor.Cyan);
+                    ConsoleHelper.WriteInfo($"Pipeline Details:");
                     Console.WriteLine($"  Organization: {organization}");
                     Console.WriteLine($"  Project:      {project}");
                     Console.WriteLine($"  Pipeline ID:  {pipelineId}");
@@ -1380,18 +1380,18 @@ namespace Sdo.Commands
 
         {
             Console.WriteLine();
-            ConsoleHelper.WriteLine("[INFO] GitHub equivalent command:", ConsoleColor.Yellow);
-            ConsoleHelper.WriteLine($"   gh workflow list --repo <owner>/<repo>", ConsoleColor.Yellow);
-            ConsoleHelper.WriteLine($"   gh workflow view <workflow-id> --repo <owner>/<repo>", ConsoleColor.Yellow);
+            ConsoleHelper.WriteInfo("GitHub equivalent command:");
+            ConsoleHelper.WriteInfo($"   gh workflow list --repo <owner>/<repo>");
+            ConsoleHelper.WriteInfo($"   gh workflow view <workflow-id> --repo <owner>/<repo>");
             Console.WriteLine();
         }
 
         private void DisplayAzureDevOpsMapping(string command)
         {
             Console.WriteLine();
-            ConsoleHelper.WriteLine("[INFO] Azure DevOps equivalent command:", ConsoleColor.Yellow);
-            ConsoleHelper.WriteLine($"   az pipelines list --project <project>", ConsoleColor.Yellow);
-            ConsoleHelper.WriteLine($"   az pipelines show --id <pipeline-id> --project <project>", ConsoleColor.Yellow);
+            ConsoleHelper.WriteInfo("Azure DevOps equivalent command:");
+            ConsoleHelper.WriteInfo($"   az pipelines list --project <project>");
+            ConsoleHelper.WriteInfo($"   az pipelines show --id <pipeline-id> --project <project>");
             Console.WriteLine();
         }
 
@@ -1484,7 +1484,7 @@ namespace Sdo.Commands
                     run = runs?.FirstOrDefault();
                     if (run == null)
                     {
-                        ConsoleHelper.WriteLine("No workflow runs found in this repository.", ConsoleColor.Yellow);
+                        ConsoleHelper.WriteWarning("No workflow runs found in this repository.");
                         return 0;
                     }
                 }
@@ -1554,7 +1554,7 @@ namespace Sdo.Commands
                     run = runs?.FirstOrDefault();
                     if (run == null)
                     {
-                        ConsoleHelper.WriteLine("No builds found in this project.", ConsoleColor.Yellow);
+                        ConsoleHelper.WriteWarning("No builds found in this project.");
                         return 0;
                     }
                 }
@@ -1609,7 +1609,7 @@ namespace Sdo.Commands
                     run = runs?.FirstOrDefault();
                     if (run == null)
                     {
-                        ConsoleHelper.WriteLine("No workflow runs found in this repository.", ConsoleColor.Yellow);
+                        ConsoleHelper.WriteWarning("No workflow runs found in this repository.");
                         return 0;
                     }
                 }
@@ -1627,7 +1627,7 @@ namespace Sdo.Commands
                 if (long.TryParse(run.PlatformId, out runId))
                 {
                     Console.WriteLine();
-                    ConsoleHelper.WriteLine("--- Log Content ---", ConsoleColor.Yellow);
+                    ConsoleHelper.WriteInfo("--- Log Content ---");
                     var logText = await client.GetPipelineRunLogsAsync(owner, repo, runId);
                     if (!string.IsNullOrWhiteSpace(logText))
                     {
@@ -1688,7 +1688,7 @@ namespace Sdo.Commands
                     run = runs?.FirstOrDefault();
                     if (run == null)
                     {
-                        ConsoleHelper.WriteLine("No builds found in this project.", ConsoleColor.Yellow);
+                        ConsoleHelper.WriteWarning("No builds found in this project.");
                         return 0;
                     }
                 }
@@ -1710,7 +1710,7 @@ namespace Sdo.Commands
                         if (!string.IsNullOrWhiteSpace(logText))
                         {
                             Console.WriteLine();
-                            ConsoleHelper.WriteLine("--- Log Content ---", ConsoleColor.Yellow);
+                            ConsoleHelper.WriteWarning("--- Log Content ---");
                             Console.WriteLine(logText.TrimEnd());
                         }
                         else
@@ -1758,7 +1758,7 @@ namespace Sdo.Commands
                     if (platform == Platform.GitHub)
                     {
                         if (verbose) DisplayGitHubMapping("workflow update");
-                        ConsoleHelper.WriteLine("[INFO] To update GitHub workflow, modify the .github/workflows/<file>.yml and commit/push the change.", ConsoleColor.Yellow);
+                        ConsoleHelper.WriteInfo("To update GitHub workflow, modify the .github/workflows/<file>.yml and commit/push the change.");
                         Console.WriteLine("  Steps:");
                         Console.WriteLine("    1. Edit .github/workflows/<workflow-file>.yml");
                         Console.WriteLine("    2. git add <file> && git commit -m 'Update workflow' && git push");
@@ -1767,7 +1767,7 @@ namespace Sdo.Commands
                     else if (platform == Platform.AzureDevOps)
                     {
                         if (verbose) DisplayAzureDevOpsMapping("pipeline update");
-                        ConsoleHelper.WriteLine("[INFO] To update an Azure DevOps pipeline, update the YAML in your repository and commit/push. Alternatively, update the pipeline definition via Azure DevOps REST API.", ConsoleColor.Yellow);
+                        ConsoleHelper.WriteInfo("To update an Azure DevOps pipeline, update the YAML in your repository and commit/push. Alternatively, update the pipeline definition via Azure DevOps REST API.");
                         Console.WriteLine("  Steps:");
                         Console.WriteLine("    1. Edit azure-pipelines/<pipeline>.yml");
                         Console.WriteLine("    2. git add <file> && git commit -m 'Update pipeline' && git push");
@@ -1852,7 +1852,7 @@ namespace Sdo.Commands
                             var org = repoInfo?.Organization ?? repoInfo?.Owner ?? string.Empty;
                             if (string.IsNullOrWhiteSpace(org) || string.IsNullOrWhiteSpace(repoInfo?.Project))
                             {
-                                ConsoleHelper.WriteLine("[WARN] Unable to determine Azure DevOps organization/project; skipping REST update.", ConsoleColor.Yellow);
+                                ConsoleHelper.WriteWarning("Unable to determine Azure DevOps organization/project; skipping REST update.");
                             }
                             else
                             {
@@ -1866,18 +1866,18 @@ namespace Sdo.Commands
                                     }
                                     else
                                     {
-                                        ConsoleHelper.WriteLine($"[WARN] Azure DevOps REST update failed: {client.LastError}", ConsoleColor.Yellow);
+                                        ConsoleHelper.WriteWarning($"Azure DevOps REST update failed: {client.LastError}");
                                     }
                                 }
                                 catch (Exception ex)
                                 {
-                                    ConsoleHelper.WriteLine($"[WARN] Exception calling Azure DevOps REST update: {ex.Message}", ConsoleColor.Yellow);
+                                    ConsoleHelper.WriteWarning($"Exception calling Azure DevOps REST update: {ex.Message}");
                                 }
                             }
                         }
                         else
                         {
-                            ConsoleHelper.WriteLine("[INFO] AZURE_DEVOPS_PAT not found; skipping REST update.", ConsoleColor.Yellow);
+                            ConsoleHelper.WriteWarning("AZURE_DEVOPS_PAT not found; skipping REST update.");
                         }
                     }
                 }

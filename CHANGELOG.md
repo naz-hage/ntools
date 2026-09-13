@@ -34,7 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Documentation**: Updated CLI documentation to reflect global options and new testing targets
 
 ### Changed
-- **Build System**: Updated `nb.exe` to use .NET SDK instead of direct MSBuild dependency
+- **Build System**: Updated `sdo.exe` to use .NET SDK instead of direct MSBuild dependency
 - **System.CommandLine Upgrade**: Upgraded from System.CommandLine 2.0.0-beta4 to stable 2.0.1
 - **CLI Architecture**: Refactored command registration to support global options properly
 - **Test Framework**: Enhanced testing infrastructure with Moq for service mocking

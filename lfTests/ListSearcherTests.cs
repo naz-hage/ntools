@@ -5,6 +5,12 @@ public class ListSearcherTests
 {
     private string _testRoot = string.Empty; // Initialize to an empty string to satisfy the non-nullable requirement.
 
+    [TestMethod]
+    public void LfAssembly_DoesNotExposeExecutableEntryPoint()
+    {
+        Assert.IsNull(typeof(ListSearcher).Assembly.EntryPoint);
+    }
+
     [TestInitialize]
     public void Setup()
     {

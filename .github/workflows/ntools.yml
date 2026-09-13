@@ -26,7 +26,7 @@ on:
 
 env:
   solution_name: ntools.sln
-  dotnet_version: 9.0
+  dotnet_version: 10.0
   # Path to the consolidated ntools-scripts module file in the repository
   NTOOLS_SCRIPT_MODULE: './scripts/module-package/ntools-scripts.psm1'
   build_type: ${{ github.ref == 'refs/heads/main' && 'prod' || github.event.inputs.build_type || 'stage' }}

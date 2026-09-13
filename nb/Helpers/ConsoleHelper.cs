@@ -23,6 +23,7 @@ public static class ConsoleHelper
         }
     }
 
+    
     /// <summary>
     /// Writes an error message to the console with a prefix X indicating it's an error message.
     /// </summary>
@@ -34,11 +35,23 @@ public static class ConsoleHelper
 
     public static void WriteWarning(string message)
     {
-        WriteLine($"Warning: {message}", ConsoleColor.Yellow);
+        WriteLine($"{message}", ConsoleColor.Yellow);
     }
 
     public static void WriteSuccess(string message)
     {
-        WriteLine($"✓ {message}", ConsoleColor.Green);
+        // √ ✓
+        WriteLine($"√ {message}", ConsoleColor.Green);
+    }
+
+    public static void WriteVerbose(string message)
+    {
+        WriteLine($"{message}", ConsoleColor.Gray);
+    }
+
+
+    public static void WriteInfo(string message)
+    {
+        WriteLine($"{message}", ConsoleColor.Cyan);
     }
 }

@@ -229,7 +229,7 @@ namespace Sdo.Commands
                 var dryRun = _dryRunOption != null && parseResult.GetValue(_dryRunOption);
                 if (verbose)
                 {
-                    ConsoleHelper.WriteLine("[VERBOSE] Displaying Git repository information.", ConsoleColor.Gray);
+                    ConsoleHelper.WriteVerbose("[VERBOSE] Displaying Git repository information.");
                 }
 
                 var localResult = dryRun
@@ -576,11 +576,11 @@ namespace Sdo.Commands
                     if (verbose)
                     {
                         var mapping = $"az repos create --name \"{name}\" --project \"{project}\" --organization \"{organization}\"";
-                        ConsoleHelper.WriteLine(mapping, ConsoleColor.Yellow);
+                        ConsoleHelper.WriteVerbose(mapping);
                     }
 
                     // Get the project ID (required by Create API)
-                    if (verbose) Console.WriteLine($"  Fetching project ID for '{project}'...");
+                    if (verbose) ConsoleHelper.WriteVerbose($"  Fetching project ID for '{project}'...");
                     var projectInfo = await client.GetProjectAsync(project);
                     if (projectInfo == null)
                     {

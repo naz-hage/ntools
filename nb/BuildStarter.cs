@@ -10,7 +10,6 @@ namespace Nbuild;
 public partial class BuildStarter
 {
     public static string LogFile { get; set; } = "nbuild.log";
-    private static readonly TimeSpan BuildTimeout = TimeSpan.FromMinutes(3);
     private const string BuildFileName = "nbuild.targets";
     private const string CommonBuildFileName = "common.targets";
     private const string TargetsMd = "targets.md";
@@ -122,58 +121,60 @@ public partial class BuildStarter
     /// <param name="target">The build target.</param>
     /// <param name="verbose">Specifies whether to display verbose output.</param>
     /// <returns>A <see cref="ResultHelper"/> object representing the result of the build operation.</returns>
-    private static ResultHelper RunBuildProcess(Process process, string? target, bool verbose)
+    private static ResultHelper RunBuildProcess(
+    Process process,
+    string? target,
+    bool verbose,
+    TimeSpan? timeout = null)   // null = no timeout
     {
+            
         try
         {
             if (!process.Start())
-            {
                 return ResultHelper.Fail(-1, $"Failed to start {process.StartInfo.FileName}");
-            }
 
             var spinner = new[] { '|', '/', '-', '\\' };
             var spinnerIndex = 0;
-            var startedAt = Stopwatch.StartNew();
             var spinnerEnabled = !Console.IsOutputRedirected;
             var status = $"... '{target}'";
 
             if (spinnerEnabled)
-            {
                 Console.Write($"{status} {spinner[spinnerIndex]}");
-            }
             else
-            {
                 Console.WriteLine(status);
-            }
 
-            while (!process.WaitForExit(250))
+            Stopwatch? timer = timeout.HasValue ? Stopwatch.StartNew() : null;
+
+            while (!process.HasExited)
             {
-                if (startedAt.Elapsed >= BuildTimeout)
+                // Optional timeout
+                if (timer != null && timer.Elapsed >= timeout!.Value)
                 {
                     process.Kill(entireProcessTree: true);
                     process.WaitForExit();
                     Console.WriteLine();
-                    return ResultHelper.Fail(-1, $"Build '{target}' exceeded the 3-minute timeout.");
+                    return ResultHelper.Fail(-1,
+                        $"Build '{target}' exceeded the timeout of {timeout.Value.TotalSeconds} seconds.");
                 }
 
+                // Spinner animation
                 if (spinnerEnabled)
                 {
                     spinnerIndex = (spinnerIndex + 1) % spinner.Length;
                     Console.Write($"\r{status} {spinner[spinnerIndex]}");
                 }
+
+                Thread.Sleep(150);
             }
 
             if (spinnerEnabled)
-            {
                 Console.WriteLine($"\r{status} done.   ");
-            }
 
             var result = ResultHelper.New();
             result.Code = process.ExitCode;
+
             if (result.Code != 0)
-            {
                 result.Output.Add($"MSBuild exited with code {result.Code}.");
-            }
 
             return result;
         }
@@ -375,25 +376,44 @@ public partial class BuildStarter
         {
             var line = lines[i];
 
-            if (BuildTarget().IsMatch(line))
+            try
             {
-                Console.ForegroundColor = ConsoleColor.Cyan;
+                if (BuildTarget().IsMatch(line))
+                {
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                }
+                else if (Error().IsMatch(line))
+                {
+                    if (int.TryParse(Count().Match(line).Value, out var count))
+                    {
+                        Console.ForegroundColor = count == 0 ? ConsoleColor.Green : ConsoleColor.Red;
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Gray;
+                    }
+                }
+                else if (Warning().IsMatch(line))
+                {
+                    if (int.TryParse(Count().Match(line).Value, out var count))
+                    {
+                        Console.ForegroundColor = count == 0 ? ConsoleColor.Gray : ConsoleColor.Yellow;
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Gray;
+                    }
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Gray;
+                }
             }
-            else if (Error().IsMatch(line))
+            catch (Exception)
             {
-                int count = int.Parse(Count().Match(line).Value);
-                Console.ForegroundColor = count == 0 ? ConsoleColor.Green : ConsoleColor.Red;
-            }
-            else if (Warning().IsMatch(line))
-            {
-                int count = int.Parse(Count().Match(line).Value);
-                Console.ForegroundColor = count == 0 ? ConsoleColor.Gray : ConsoleColor.Yellow;
-            }
-            else
-            {
-                // fallback coloring
                 Console.ForegroundColor = ConsoleColor.Gray;
             }
+
             Console.WriteLine(lines[i]);
         }
     }

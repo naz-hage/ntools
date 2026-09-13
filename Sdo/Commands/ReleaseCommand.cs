@@ -54,12 +54,12 @@ namespace Sdo.Commands
 
                 if (dryRun)
                 {
-                    ConsoleHelper.WriteLine("DRY-RUN: running in dry-run mode; no destructive actions will be performed.", ConsoleColor.Yellow);
+                    ConsoleHelper.WriteWarning("DRY-RUN: running in dry-run mode; no destructive actions will be performed.");
                 }
 
                 if (verbose)
                 {
-                    ConsoleHelper.WriteLine($"Creating {(prerelease ? "pre-release" : "release")} for repo: {repository}, tag: {tag}, branch: {branch}, file: {file}", ConsoleColor.Gray);
+                    ConsoleHelper.WriteVerbose($"Creating {(prerelease ? "pre-release" : "release")} for repo: {repository}, tag: {tag}, branch: {branch}, file: {file}");
                 }
 
                 try
@@ -69,7 +69,7 @@ namespace Sdo.Commands
                 }
                 catch (Exception exception)
                 {
-                    Console.Error.WriteLine($"Error: {exception.Message}");
+                    ConsoleHelper.WriteError($"Error: {exception.Message}");
                     return -1;
                 }
             });
@@ -103,12 +103,12 @@ namespace Sdo.Commands
 
                 if (dryRun)
                 {
-                    ConsoleHelper.WriteLine("DRY-RUN: running in dry-run mode; no destructive actions will be performed.", ConsoleColor.Yellow);
+                    ConsoleHelper.WriteWarning("DRY-RUN: running in dry-run mode; no destructive actions will be performed.");
                 }
 
                 if (verbose)
                 {
-                    ConsoleHelper.WriteLine($"Downloading asset for repo: {repository}, tag: {tag}, path: {path}", ConsoleColor.Gray);
+                    ConsoleHelper.WriteVerbose($"Downloading asset for repo: {repository}, tag: {tag}, path: {path}");
                 }
 
                 try
@@ -118,7 +118,7 @@ namespace Sdo.Commands
                 }
                 catch (Exception exception)
                 {
-                    Console.Error.WriteLine($"Error: {exception.Message}");
+                    ConsoleHelper.WriteError($"Error: {exception.Message}");
                     return -1;
                 }
             });
@@ -148,12 +148,12 @@ namespace Sdo.Commands
 
                 if (dryRun)
                 {
-                    ConsoleHelper.WriteLine("DRY-RUN: running in dry-run mode; no destructive actions will be performed.", ConsoleColor.Yellow);
+                    ConsoleHelper.WriteWarning("DRY-RUN: running in dry-run mode; no destructive actions will be performed.");
                 }
 
                 if (verbose)
                 {
-                    ConsoleHelper.WriteLine($"Listing releases for repo: {repository}", ConsoleColor.Gray);
+                    ConsoleHelper.WriteVerbose($"Listing releases for repo: {repository}");
                 }
 
                 try
@@ -163,7 +163,7 @@ namespace Sdo.Commands
                 }
                 catch (Exception exception)
                 {
-                    Console.Error.WriteLine($"Error: {exception.Message}");
+                    ConsoleHelper.WriteError($"Error: {exception.Message}");
                     return -1;
                 }
             });
