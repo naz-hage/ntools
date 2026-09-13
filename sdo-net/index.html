@@ -3228,7 +3228,7 @@ Commands:
 <div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>build<span class="w">                         </span><span class="c1"># Display available targets</span>
 sdo<span class="w"> </span><span class="nb">test</span><span class="w"> </span>--verbose<span class="w">                </span><span class="c1"># Build the `test` target through MSBuild</span>
 </code></pre></div>
-<p>The target is resolved from <code>nbuild.targets</code> in the current directory. Multiple unmatched tokens and unknown options return an error.</p>
+<p>The target is resolved from <code>sdo.targets</code> in the current directory. Multiple unmatched tokens and unknown options return an error.</p>
 <h4 id="repo-info">repo info<a class="headerlink" href="#repo-info" title="Anchor link to this section for reference">&para;</a></h4>
 <div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>repo<span class="w"> </span>info
 sdo<span class="w"> </span>repo<span class="w"> </span>info<span class="w"> </span>--verbose
@@ -4064,7 +4064,7 @@ sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </sp
 sdo<span class="w"> </span>wi<span class="w"> </span>update<span class="w"> </span>--id<span class="w"> </span><span class="m">243</span><span class="w"> </span>--state<span class="w"> </span>Done
 </code></pre></div></p>
 <h2 id="build-and-compatibility-reference">Build and compatibility reference<a class="headerlink" href="#build-and-compatibility-reference" title="Anchor link to this section for reference">&para;</a></h2>
-<p>The command reference above is the source of truth for <code>sdo.exe</code>. This section retains the build infrastructure details and compatibility notes for projects that still use <code>nbuild.targets</code>.</p>
+<p>The command reference above is the source of truth for <code>sdo.exe</code>. This section retains the build infrastructure details and compatibility notes for projects that still use <code>sdo.targets</code>.</p>
 <blockquote>
 <p><strong>Breaking change (v1.76+):</strong> <code>sdo tool install --name</code> searches only for <code>apps.json</code> files. Consolidate application definitions into one <code>apps.json</code> file when needed. See <a href="#install-by-name-from-current-directory-and-default-location">Install by name</a>.</p>
 </blockquote>
@@ -4086,10 +4086,10 @@ configuration, or registry state.</p>
   explicit (for example <code>--dry-run=fetch</code>) in a follow-up PBI.</p>
 <hr />
 <h2 id="nbuild-targets">nbuild targets<a class="headerlink" href="#nbuild-targets" title="Anchor link to this section for reference">&para;</a></h2>
-<p>See <a href="https://github.com/naz-hage/ntools/blob/main/Nbuild/resources/nbuild.targets"><code>nbuild.targets</code></a> for more information and checkout other targets in <a href="https://github.com/naz-hage/ntools/blob/main/Nbuild/resources"><code>Nbuild/resources</code></a>.</p>
+<p>See <a href="https://github.com/naz-hage/ntools/blob/main/Nbuild/resources/sdo.targets"><code>sdo.targets</code></a> for more information and checkout other targets in <a href="https://github.com/naz-hage/ntools/blob/main/Nbuild/resources"><code>Nbuild/resources</code></a>.</p>
 <h3 id="common-targets">common targets<a class="headerlink" href="#common-targets" title="Anchor link to this section for reference">&para;</a></h3>
 <ul>
-<li>The <code>common.targets</code> file includes all the defaults targets needed to build, test and deploy a solution.  The <code>common.targets</code> file is located in the <code>$(ProgramFiles)\Nbuild</code> folder.  The <code>nbuild.targets</code> file in the solution folder imports the <code>common.targets</code> file</li>
+<li>The <code>common.targets</code> file includes all the defaults targets needed to build, test and deploy a solution.  The <code>common.targets</code> file is located in the <code>$(ProgramFiles)\Nbuild</code> folder.  The <code>sdo.targets</code> file in the solution folder imports the <code>common.targets</code> file</li>
 </ul>
 <p>Below is a list of common targets defined in the <code>common.targets</code> file:</p>
 <table>
