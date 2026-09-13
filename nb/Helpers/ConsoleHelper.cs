@@ -46,7 +46,7 @@ public static class ConsoleHelper
 
     public static void WriteVerbose(string message)
     {
-        WriteLine($"[V] {message}", ConsoleColor.Gray);
+        WriteLine($"{message}", ConsoleColor.Gray);
     }
 
 
