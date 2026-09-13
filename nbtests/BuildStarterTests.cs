@@ -10,6 +10,12 @@ namespace Nbuild.Tests
         private const string NbuildAssemblyName = "nb.dll"; // "nb.dll"
 
         [TestMethod()]
+        public void LogFileDefaultsToSdoLog()
+        {
+            Assert.AreEqual("sdo.log", BuildStarter.LogFile);
+        }
+
+        [TestMethod()]
         public void GetTargetsTest()
         {
 

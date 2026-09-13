@@ -1,4 +1,5 @@
-﻿using NbuildTasks;
+﻿using Nbuild.Helpers;
+using NbuildTasks;
 using Ntools;
 using System.Diagnostics;
 using System.Text;
@@ -9,8 +10,9 @@ namespace Nbuild;
 
 public partial class BuildStarter
 {
-    public static string LogFile { get; set; } = "nbuild.log";
-    private const string BuildFileName = "nbuild.targets";
+    public static string LogFile { get; set; } = "sdo.log";
+    private const string SdoBuildFileName = "sdo.targets";
+    private const string NbuildFileName = "nbuild.targets";
     private const string CommonBuildFileName = "common.targets";
     private const string TargetsMd = "targets.md";
     private const string MsbuildExe = "msbuild.exe";
@@ -23,28 +25,30 @@ public partial class BuildStarter
     /// <returns>A <see cref="ResultHelper"/> object representing the result of the build operation.</returns>
     public static ResultHelper Build(string? target, bool verbose = false)
     {
-        string nbuildPath = Path.Combine(Environment.CurrentDirectory, BuildFileName);
+        string sdoPath = Path.Combine(Environment.CurrentDirectory, SdoBuildFileName);
+        string nbuildPath = Path.Combine(Environment.CurrentDirectory, NbuildFileName);
+        string buildFilePath = File.Exists(sdoPath) ? sdoPath : nbuildPath;
         string commonBuildXmlPath = Path.Combine($"{Environment.GetEnvironmentVariable("ProgramFiles")}\\nbuild", CommonBuildFileName);
 
-        if (!File.Exists(nbuildPath))
+        if (!File.Exists(buildFilePath))
         {
-            return ResultHelper.Fail(-1, $"'{nbuildPath}' not found.");
+            return ResultHelper.Fail(-1, $"Neither '{sdoPath}' nor '{nbuildPath}' was found.");
         }
 
         // check if target is valid
-        if (!ValidTarget(nbuildPath, target, verbose))
+        if (!ValidTarget(buildFilePath, target, verbose))
         {
             return ResultHelper.Fail(-1, $"Target '{target}' not found");
         }
 
         LogFile = Path.Combine(Environment.CurrentDirectory, LogFile);
         string cmd = string.IsNullOrEmpty(target)
-            ? $"{nbuildPath} -fl -flp:logfile={LogFile};verbosity=normal"
-            : $"{nbuildPath} /t:{target} -p:TargetName={target} -fl -flp:logfile={LogFile};verbosity=normal";
+            ? $"{buildFilePath} -fl -flp:logfile={LogFile};verbosity=normal"
+            : $"{buildFilePath} /t:{target} -p:TargetName={target} -fl -flp:logfile={LogFile};verbosity=normal";
 
         if (verbose)
         {
-            Console.WriteLine($"==> {cmd}");
+            ConsoleHelper.WriteVerbose($"==> {cmd}");
         }
 
         //  Get location of dotnet.exe
