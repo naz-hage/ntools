@@ -52,9 +52,6 @@ sdo repo list
 - Azure DevOps: Set `AZURE_DEVOPS_PAT` environment variable
 - GitHub: Uses GitHub CLI authentication or `GITHUB_TOKEN` environment variable
 
-### Nbuild (nb)
-Nbuild is the core build automation tool providing build system with .NET SDK integration and testing support.
-
 **Key Capabilities:**
 - Build solutions and projects with .NET SDK
 - Run comprehensive unit and integration tests
@@ -64,10 +61,10 @@ Nbuild is the core build automation tool providing build system with .NET SDK in
 
 **Usage:**
 ```bash
-nb build              # Build solution
-nb test               # Run tests
-nb stage              # Create stage release
-nb prod               # Create production release
+sdo solution           # Build solution
+sdo test               # Run tests
+sdo stage              # Create stage release
+sdo prod               # Create production release
 ```
 
 **Example GitHub Actions workflow:**
@@ -104,6 +101,6 @@ GitHubRelease is a tool that allows you to create and manage GitHub releases fro
 
 **Release Management:**
 
-When `nb stage` runs successfully, the tool creates a stage release. This release is tagged with the next tag release number, and the release notes include the commits since the last stage or prod tag. The API token from the repository secrets is used to create this release. The release package is uploaded to the release. The release is also tagged with the next stage release number.
+When `sdo stage` runs successfully, the tool creates a stage release. This release is tagged with the next tag release number, and the release notes include the commits since the last stage or prod tag. The API token from the repository secrets is used to create this release. The release package is uploaded to the release. The release is also tagged with the next stage release number.
 
-When `nb prod` runs successfully, the tool creates a production release. This release is also tagged with the next prod release, and the release notes include the commits since the last production tag. All previous stage releases are deleted. The API token from the repository secrets is used to create this release. The release package is uploaded to the release. The release is also tagged with the next prod release number. All previous stage releases are deleted.
+When `sdo prod` runs successfully, the tool creates a production release. This release is also tagged with the next prod release, and the release notes include the commits since the last production tag. All previous stage releases are deleted. The API token from the repository secrets is used to create this release. The release package is uploaded to the release. The release is also tagged with the next prod release number. All previous stage releases are deleted.

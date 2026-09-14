@@ -323,7 +323,7 @@
 		
 		<!-- Ensure we have test results before generating coverage -->
 		<Error Condition="!Exists('$(ArtifactsTestResultsFolder)')" 
-			   Text="Test results folder not found at: $(ArtifactsTestResultsFolder). Please run tests first with 'nb STAGE' or 'nb TEST'." />
+			   Text="Test results folder not found at: $(ArtifactsTestResultsFolder). Please run tests first with 'sdo STAGE' or 'sdo TEST'." />
 		
 		<!-- Install ReportGenerator tool if not already installed -->
 		<Exec Command="dotnet tool install --global dotnet-reportgenerator-globaltool" 
