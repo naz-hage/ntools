@@ -297,9 +297,9 @@ namespace Nbuild
             ConsoleHelper.WriteWarning($"{apps.Count()} apps to list:");
 
             // print header
-            ConsoleHelper.WriteWarning("┌────────────────────|────────────────|───────────────────┐");
-            ConsoleHelper.WriteWarning("| App name           | Target version | Installed version |");
-            ConsoleHelper.WriteWarning("├────────────────────|────────────────|───────────────────┤");
+            ConsoleHelper.WriteWarning("┌────────────────────┬────────────────┬───────────────────┐");
+            ConsoleHelper.WriteWarning("│ App name           │ Target version │ Installed version │");
+            ConsoleHelper.WriteWarning("├────────────────────┼────────────────┼───────────────────┤");
             foreach (var app in apps)
             {
                 // display app and installed version
