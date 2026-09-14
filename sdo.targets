@@ -4,7 +4,6 @@
 	
 	<Import Project="$(ProgramFiles)\Nbuild\common.targets"/>
 	<Import Project="unit-tests.targets"/>
-	<Import Project="e2e-tests.targets"/>
 
 	<!-- Update documentation versions from JSON configuration files -->
 	<UsingTask TaskName="NbuildTasks.UpdateVersionsInDocs" AssemblyFile="C:\source\ntools\Release\NbuildTasks.dll" />
