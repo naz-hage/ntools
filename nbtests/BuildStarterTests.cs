@@ -10,6 +10,12 @@ namespace Nbuild.Tests
         private const string NbuildAssemblyName = "nb.dll"; // "nb.dll"
 
         [TestMethod()]
+        public void LogFileDefaultsToSdoLog()
+        {
+            Assert.AreEqual("sdo.log", BuildStarter.LogFile);
+        }
+
+        [TestMethod()]
         public void GetTargetsTest()
         {
 
@@ -79,9 +85,9 @@ namespace Nbuild.Tests
             Assert.IsNotNull(executingAssemblyDirectory);
 
             string resourcePath = Path.Combine(executingAssemblyDirectory, NbuildAssemblyName);
-            string targetFileName = Path.Combine(executingAssemblyDirectory, "nbuild.targets");
+            string targetFileName = Path.Combine(executingAssemblyDirectory, "sdo.targets");
 
-            ResourceHelper.ExtractEmbeddedResourceFromAssembly(resourcePath, "nb.resources.nbuild.targets", targetFileName);
+            ResourceHelper.ExtractEmbeddedResourceFromAssembly(resourcePath, "nb.resources.sdo.targets", targetFileName);
 
             // Act
             var fileNames = BuildStarter.GetImportAttributes(targetFileName, "Project");
@@ -243,6 +249,63 @@ namespace Nbuild.Tests
             // Assert not null and ends with dotnet.exe
             Assert.IsNotNull(dotnetPath);
             Assert.IsTrue(dotnetPath.EndsWith("dotnet.exe"));
+        }
+
+        [TestMethod]
+        public void DisplayLog_ErrorWithoutCount_DoesNotThrowAndDisplaysLine()
+        {
+            var output = InvokeDisplayLog("error output without a count");
+
+            StringAssert.Contains(output, "error output without a count");
+        }
+
+        [TestMethod]
+        public void DisplayLog_WarningWithoutCount_DoesNotThrowAndDisplaysLine()
+        {
+            var output = InvokeDisplayLog("warning output without a count");
+
+            StringAssert.Contains(output, "warning output without a count");
+        }
+
+        [TestMethod]
+        public void DisplayLog_CountLines_DisplaysAllLines()
+        {
+            var output = InvokeDisplayLog("0 Error(s)", "2 Warning(s)", "Build completed.");
+
+            StringAssert.Contains(output, "0 Error(s)");
+            StringAssert.Contains(output, "2 Warning(s)");
+            StringAssert.Contains(output, "Build completed.");
+        }
+
+        private static string InvokeDisplayLog(params string[] lines)
+        {
+            string logFile = Path.Combine(Path.GetTempPath(), $"nbuild-{Guid.NewGuid():N}.log");
+            TextWriter originalOutput = Console.Out;
+            string originalLogFile = BuildStarter.LogFile;
+
+            try
+            {
+                File.WriteAllLines(logFile, lines);
+                BuildStarter.LogFile = logFile;
+
+                using StringWriter output = new();
+                Console.SetOut(output);
+
+                var displayLog = typeof(BuildStarter).GetMethod(
+                    "DisplayLog",
+                    BindingFlags.NonPublic | BindingFlags.Static);
+
+                Assert.IsNotNull(displayLog);
+                displayLog.Invoke(null, [0]);
+
+                return output.ToString();
+            }
+            finally
+            {
+                Console.SetOut(originalOutput);
+                BuildStarter.LogFile = originalLogFile;
+                File.Delete(logFile);
+            }
         }
     }
 }

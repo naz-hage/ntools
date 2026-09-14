@@ -1,3 +1,5 @@
+using Nbuild.Helpers;
+
 namespace lf
 {
     /// <summary>
@@ -26,18 +28,18 @@ namespace lf
                         ConsoleHelper.WriteLine($"Found {matchingDirs.Length} folders containing '{folderName}':");
                         foreach (var dir in matchingDirs)
                         {
-                            ConsoleHelper.WriteLine(dir, ConsoleColor.Green);
+                            ConsoleHelper.WriteVerbose(dir);
                         }
                     }
                     else
                     {
-                        ConsoleHelper.WriteLine($"No folders found containing the name '{folderName}'.", ConsoleColor.Red);
+                        ConsoleHelper.WriteVerbose($"No folders found containing the name '{folderName}'.");
                     }
                 }
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteLine($"An error occurred while searching for folders: {ex.Message}", ConsoleColor.Red);
+                ConsoleHelper.WriteError($"An error occurred while searching for folders: {ex.Message}");
             }
         }
 
@@ -71,7 +73,7 @@ namespace lf
                 var files = Directory.GetFiles(directory, $"*{ext}", SearchOption.TopDirectoryOnly);
                 foreach (var file in files)
                 {
-                    ConsoleHelper.WriteLine(file, ConsoleColor.Green);
+                    ConsoleHelper.WriteVerbose(file);
                     foundCount++;
                 }
                 var subdirs = Directory.GetDirectories(directory);
@@ -82,15 +84,15 @@ namespace lf
             }
             catch (UnauthorizedAccessException uaex)
             {
-                ConsoleHelper.WriteLine($"Access denied to a directory: {uaex.Message}", ConsoleColor.Yellow);
+                ConsoleHelper.WriteWarning($"Access denied to a directory: {uaex.Message}");
             }
             catch (DirectoryNotFoundException dnfx)
             {
-                ConsoleHelper.WriteLine($"Directory not found: {dnfx.Message}", ConsoleColor.Yellow);
+                ConsoleHelper.WriteWarning($"Directory not found: {dnfx.Message}");
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteLine($"An error occurred: {ex.Message}", ConsoleColor.Red);
+                ConsoleHelper.WriteError($"An error occurred: {ex.Message}");
             }
         }
     }

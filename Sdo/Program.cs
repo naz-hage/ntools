@@ -29,7 +29,7 @@ namespace Sdo
         /// <returns>Exit code: 0 for success, non-zero for errors.</returns>
         public static int Main(params string[] args)
         {
-            ConsoleHelper.WriteLine($"{Nversion.Get()}\n", ConsoleColor.Yellow);
+            ConsoleHelper.WriteWarning($"{Nversion.Get()}\n");
 
             // Create the root command
             var rootCommand = new RootCommand("Simple DevOps Operations CLI tool for Azure DevOps and GitHub");

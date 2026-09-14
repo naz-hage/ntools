@@ -18,7 +18,7 @@ namespace Nbackup
                 { "APPDATA", Environment.GetEnvironmentVariable("APPDATA") },
             };
 
-        public static ResultHelper Perform(Cli options)
+        public static ResultHelper Perform(NBackupOptions options)
         {
             ResultHelper result = new();
             if ((!string.IsNullOrEmpty(options.Input)) && (File.Exists(options.Input)))

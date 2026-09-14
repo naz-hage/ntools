@@ -15,7 +15,7 @@ namespace NbuildTasks
     {
         private const string GitBinary = "git.exe";
 
-        private static readonly Process Process = new Process
+        private readonly Process Process = new Process
         {
             StartInfo = new ProcessStartInfo
             {

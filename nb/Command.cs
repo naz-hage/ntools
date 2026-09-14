@@ -99,13 +99,13 @@ namespace Nbuild
                 var resultInstall = process.LockStart(Verbose);
                 if (resultInstall.IsSuccess())
                 {
-                    ConsoleHelper.WriteLine($"√ {DownloadsDirectory} ACL updated.", ConsoleColor.Green);
+                    ConsoleHelper.WriteSuccess($"{DownloadsDirectory} ACL updated.");
                     return true;
                 }
                 else
                 {
 
-                    ConsoleHelper.WriteLine($"X {DownloadsDirectory} ACL failed to update: {resultInstall.Output[0]}", ConsoleColor.Red);
+                    ConsoleHelper.WriteError($"{DownloadsDirectory} ACL failed to update: {resultInstall.Output[0]}");
                     return false;
                 }
             }
@@ -113,11 +113,6 @@ namespace Nbuild
             {
                 return true;
             }
-        }
-
-        public static ResultHelper Install(string? json, bool verbose = false, bool dryRun = false)
-        {
-            return Install(json, null, null, verbose, dryRun);
         }
 
         public static ResultHelper Install(string? json, string? name, string? version, bool verbose = false, bool dryRun = false)
@@ -128,20 +123,16 @@ namespace Nbuild
             if (dryRun)
             {
                 string msg;
-                if (!string.IsNullOrEmpty(json))
-                {
-                    msg = $"DRY-RUN: would install apps from json: {json}";
-                }
-                else if (!string.IsNullOrEmpty(name))
+                if (!string.IsNullOrEmpty(name))
                 {
                     // Even in dry-run, search to check if app exists and list available if not found
                     try
                     {
-                        var foundApps = GetAppsFromCurrentDirectory(name, version, out var availableApps);
+                        var foundApps = GetAppsFromCurrentDirectory(name, version, out var availableApps, json);
                         if (!foundApps.Any())
                         {
                             // No matching app found - show message but still succeed (it's dry-run)
-                            ConsoleHelper.WriteLine($"No apps found matching '{name}'", ConsoleColor.Red);
+                            ConsoleHelper.WriteError($"No apps found matching '{name}'");
                             if (availableApps.Any())
                             {
                                 ConsoleHelper.WriteLine("Available applications found in:");
@@ -159,12 +150,12 @@ namespace Nbuild
 
                         // Found apps - show details in dry-run
                         msg = $"DRY-RUN: would install app '{name}' from current directory (JSON discovery)";
-                        ConsoleHelper.WriteLine(msg, ConsoleColor.Yellow);
+                        ConsoleHelper.WriteWarning(msg);
                         
                         // Show version details of found apps
                         foreach (var app in foundApps)
                         {
-                            ConsoleHelper.WriteLine($"  - {app.Name} - Version: {app.Version}", ConsoleColor.Yellow);
+                            ConsoleHelper.WriteWarning($"  - {app.Name} - Version: {app.Version}");
                         }
                         return ResultHelper.Success(msg);
                     }
@@ -174,11 +165,15 @@ namespace Nbuild
                         return ResultHelper.Success(msg);
                     }
                 }
+                else if (!string.IsNullOrEmpty(json))
+                {
+                    msg = $"DRY-RUN: would install apps from json: {json}";
+                }
                 else
                 {
                     msg = "DRY-RUN: would install apps from json: <default>";
                 }
-                ConsoleHelper.WriteLine(msg, ConsoleColor.Yellow);
+                ConsoleHelper.WriteWarning(msg);
                 return ResultHelper.Success(msg);
             }
 
@@ -186,15 +181,10 @@ namespace Nbuild
 
             IEnumerable<NbuildApp> apps;
 
-            if (!string.IsNullOrEmpty(json))
+            if (!string.IsNullOrEmpty(name))
             {
-                // Original behavior: use provided JSON file
-                apps = GetApps(json);
-            }
-            else if (!string.IsNullOrEmpty(name))
-            {
-                // New behavior: search current directory for app by name/version
-                apps = GetAppsFromCurrentDirectory(name, version, out var availableApps);
+                // Named installs search the requested manifest first, then standard locations.
+                apps = GetAppsFromCurrentDirectory(name, version, out var availableApps, json);
                 // Materialize the enumerable to avoid multiple enumeration
                 var appsList = apps.ToList();
 
@@ -226,11 +216,16 @@ namespace Nbuild
                     // Print the stored hash of the app file name
                     if (!string.IsNullOrEmpty(app.StoredHash))
                     {
-                        ConsoleHelper.WriteLine($"Stored hash for {app.AppFileName}: {app.StoredHash}", ConsoleColor.Yellow);
+                        ConsoleHelper.WriteWarning($"Stored hash for {app.AppFileName}: {app.StoredHash}");
                     }
                 }
 
                 return result;
+            }
+            else if (!string.IsNullOrEmpty(json))
+            {
+                // JSON-only installs retain the existing behavior of installing every app in the file.
+                apps = GetApps(json);
             }
             else
             {
@@ -242,7 +237,7 @@ namespace Nbuild
 
             if (!jsonAppsList.Any()) return ResultHelper.Fail(-1, $"No apps found to install");
 
-            if (Verbose) ConsoleHelper.WriteLine($"{jsonAppsList.Count} apps to install.", ConsoleColor.Yellow);
+            if (Verbose) ConsoleHelper.WriteWarning($"{jsonAppsList.Count} apps to install.");
 
             foreach (var app in jsonAppsList)
             {
@@ -255,7 +250,7 @@ namespace Nbuild
                 // Print the stored hash of the app file name
                 if (!string.IsNullOrEmpty(app.StoredHash))
                 {
-                    ConsoleHelper.WriteLine($"Stored hash for {app.AppFileName}: {app.StoredHash}", ConsoleColor.Yellow);
+                    ConsoleHelper.WriteWarning($"Stored hash for {app.AppFileName}: {app.StoredHash}");
                 }
             }
 
@@ -269,7 +264,7 @@ namespace Nbuild
             if (dryRun)
             {
                 var msg = $"DRY-RUN: would uninstall apps from json: {json ?? "<default>"}";
-                ConsoleHelper.WriteLine(msg, ConsoleColor.Yellow);
+                ConsoleHelper.WriteWarning(msg);
                 return ResultHelper.Success(msg);
             }
             if (!CanRunCommand()) return ResultHelper.Fail(-1, $"You must run this command as an administrator");
@@ -277,7 +272,7 @@ namespace Nbuild
             var apps = GetApps(json);
             if (apps == null) return ResultHelper.Fail(-1, $"Invalid json input");
 
-            if (Verbose) ConsoleHelper.WriteLine($"{apps.Count()} apps to Uninstall.", ConsoleColor.Yellow);
+            if (Verbose) ConsoleHelper.WriteWarning($"{apps.Count()} apps to Uninstall.");
 
             foreach (var app in apps)
             {
@@ -285,7 +280,7 @@ namespace Nbuild
                 if (!result.IsSuccess())
                 {
                     // display error message and continue to next app
-                    ConsoleHelper.WriteLine($"{result.GetFirstOutput()}", ConsoleColor.Red);
+                    ConsoleHelper.WriteError($"{result.GetFirstOutput()}");
                 }
             }
 
@@ -299,12 +294,12 @@ namespace Nbuild
             var apps = GetApps(json);
 
             if (apps == null) return ResultHelper.Fail(-1, $"Invalid json input");
-            ConsoleHelper.WriteLine($"{apps.Count()} apps to list:", ConsoleColor.Yellow);
+            ConsoleHelper.WriteWarning($"{apps.Count()} apps to list:");
 
             // print header
-            ConsoleHelper.WriteLine("|--------------------|----------------|-------------------|", ConsoleColor.Yellow);
-            ConsoleHelper.WriteLine("| App name           | Target version | Installed version |", ConsoleColor.Yellow);
-            ConsoleHelper.WriteLine("|--------------------|----------------|-------------------|", ConsoleColor.Yellow);
+            ConsoleHelper.WriteWarning("┌────────────────────┬────────────────┬───────────────────┐");
+            ConsoleHelper.WriteWarning("│ App name           │ Target version │ Installed version │");
+            ConsoleHelper.WriteWarning("├────────────────────┼────────────────┼───────────────────┤");
             foreach (var app in apps)
             {
                 // display app and installed version
@@ -323,6 +318,7 @@ namespace Nbuild
                 }
             }
 
+            ConsoleHelper.WriteWarning("└────────────────────┴────────────────┴───────────────────┘");
             Console.WriteLine();
             return ResultHelper.Success();
         }
@@ -335,7 +331,7 @@ namespace Nbuild
             if (dryRun)
             {
                 var msg = $"DRY-RUN: would download after processing from {json ?? "<default>"}";
-                ConsoleHelper.WriteLine(msg, ConsoleColor.Yellow);
+                ConsoleHelper.WriteWarning(msg);
                 return ResultHelper.Success(msg);
             }
 
@@ -345,12 +341,12 @@ namespace Nbuild
 
             if (apps == null) return ResultHelper.Fail(-1, $"Invalid json input");
 
-            ConsoleHelper.WriteLine($"{apps.ToList().Count} apps to download to {DownloadsDirectory}", ConsoleColor.Yellow);
+            ConsoleHelper.WriteWarning($"{apps.ToList().Count} apps to download to {DownloadsDirectory}");
 
-            // print header
-            ConsoleHelper.WriteLine(" |--------------------|--------------------------------|-----------------|", ConsoleColor.Yellow);
-            ConsoleHelper.WriteLine(" | App name           | Downloaded file                | (hh:mm:ss.ff)   |", ConsoleColor.Yellow);
-            ConsoleHelper.WriteLine(" |--------------------|--------------------------------|-----------------|", ConsoleColor.Yellow);
+            // print header ┌, ┐, └, or ┘
+            ConsoleHelper.WriteWarning("┌───────────────────┬───────────────────────────────┬─────────────────┐");
+            ConsoleHelper.WriteWarning("│ App name          │ Downloaded file               │ (hh:mm:ss.ff)   │");
+            ConsoleHelper.WriteWarning("├───────────────────┼───────────────────────────────┼─────────────────┤");
 
             string webDownloadedFile = string.Empty;
             ResultHelper lastResult = ResultHelper.Success();
@@ -370,13 +366,13 @@ namespace Nbuild
 
                     if (result.IsSuccess())
                     {
-                        ConsoleHelper.WriteLine($" | {app.Name,-18} | {app.DownloadedFile,-30} | {stopWatch.Elapsed,-16:hh\\:mm\\:ss\\.ff}|", ConsoleColor.Green);
+                        ConsoleHelper.WriteSuccess($" | {app.Name,-18} | {app.DownloadedFile,-30} | {stopWatch.Elapsed,-16:hh\\:mm\\:ss\\.ff}|");
                     }
                     else
                     {
-                        ConsoleHelper.WriteLine($" Failed to download {app.WebDownloadFile} to {app.DownloadedFile}", ConsoleColor.Red);
+                        ConsoleHelper.WriteError($" Failed to download {app.WebDownloadFile} to {app.DownloadedFile}");
                         Console.WriteLine($"Return: {result.GetFirstOutput()}");
-                        ConsoleHelper.WriteLine($" | {app.Name,-18} | {app.DownloadedFile,-30} | {stopWatch.Elapsed,-16:hh\\:mm\\:ss\\.ff}|", ConsoleColor.Red);
+                        ConsoleHelper.WriteError($" | {app.Name,-18} | {app.DownloadedFile,-30} | {stopWatch.Elapsed,-16:hh\\:mm\\:ss\\.ff}|");
                     }
 
                 }
@@ -388,6 +384,7 @@ namespace Nbuild
                 return ResultHelper.Fail(-1, errorMessage);
             }
 
+            ConsoleHelper.WriteWarning("└───────────────────┴───────────────────────────────┴─────────────────┘");
             Console.WriteLine();
 
             // If any download failed, return the last failure result
@@ -416,7 +413,7 @@ namespace Nbuild
 
             if (Verbose)
             {
-                ConsoleHelper.WriteLine($"[VERBOSE] Downloading URL: {nbuildApp.WebDownloadFile} -> {fileName}", ConsoleColor.Gray);
+                ConsoleHelper.WriteVerbose($"Downloading URL: {nbuildApp.WebDownloadFile} -> {fileName}");
             }
 
             try
@@ -431,11 +428,11 @@ namespace Nbuild
                     {
                         if (result.DigitallySigned)
                         {
-                            ConsoleHelper.WriteLine($" {fileName} is signed", ConsoleColor.Yellow);
+                            ConsoleHelper.WriteWarning($" {fileName} is signed");
                         }
                         else
                         {
-                            ConsoleHelper.WriteLine($" {fileName} is not signed", ConsoleColor.Yellow);
+                            ConsoleHelper.WriteWarning($" {fileName} is not signed");
                         }
                     }
                     catch (Exception)
@@ -474,7 +471,7 @@ namespace Nbuild
                                         var response = Task.Run(async () => await releaseService.DownloadAssetByName(tag, assetName, downloadFolder)).Result;
                                         if (response != null && response.IsSuccessStatusCode)
                                         {
-                                            if (Verbose) ConsoleHelper.WriteLine($"[VERBOSE] Authenticated download saved to: {fileName}", ConsoleColor.Gray);
+                                            if (Verbose) ConsoleHelper.WriteVerbose($"Authenticated download saved to: {fileName}");
                                             return ResultHelper.Success();
                                         }
                                         else
@@ -482,7 +479,7 @@ namespace Nbuild
                                             if (Verbose)
                                             {
                                                 var status = response == null ? "no response" : response.StatusCode.ToString();
-                                                ConsoleHelper.WriteLine($"[VERBOSE] Authenticated download failed: {status}", ConsoleColor.Gray);
+                                                ConsoleHelper.WriteVerbose($"Authenticated download failed: {status}");
                                             }
                                         }
                                     }
@@ -492,7 +489,7 @@ namespace Nbuild
                     }
                     catch (Exception e)
                     {
-                        if (Verbose) ConsoleHelper.WriteLine($"[VERBOSE] Authenticated fallback failed: {e}", ConsoleColor.Gray);
+                        if (Verbose) ConsoleHelper.WriteVerbose($"Authenticated fallback failed: {e}");
                     }
                 }
 
@@ -510,15 +507,15 @@ namespace Nbuild
                 // Check if this is a 404 (version not found) error
                 if (ex.Message.Contains("404") || ex.Message.Contains("not found", StringComparison.OrdinalIgnoreCase))
                 {
-                    ConsoleHelper.WriteLine($"Installation of {nbuildApp.Name} version {nbuildApp.Version} is not found", ConsoleColor.Red);
-                    if (Verbose) ConsoleHelper.WriteLine($"[VERBOSE] 404 - Version not available: {nbuildApp.Version}", ConsoleColor.Red);
+                    ConsoleHelper.WriteError($"Installation of {nbuildApp.Name} version {nbuildApp.Version} is not found");
+                    if (Verbose) ConsoleHelper.WriteVerbose($"404 - Version not available: {nbuildApp.Version}");
                     return ResultHelper.Fail(-1, $"Installation of {nbuildApp.Name} version {nbuildApp.Version} is not found");
                 }
 
                 if (Verbose)
                 {
-                    ConsoleHelper.WriteLine($"[VERBOSE] Download failed for URL: {nbuildApp.WebDownloadFile}", ConsoleColor.Gray);
-                    ConsoleHelper.WriteLine($"[VERBOSE] Exception: {ex}", ConsoleColor.Gray);
+                    ConsoleHelper.WriteVerbose($"Download failed for URL: {nbuildApp.WebDownloadFile}");
+                    ConsoleHelper.WriteVerbose($"Exception: {ex}");
                 }
                 return ResultHelper.Fail(-1, ex.Message);
             }
@@ -532,15 +529,15 @@ namespace Nbuild
                 // Check if this is a 404 (version not found) error
                 if (ex.Message.Contains("404") || ex.Message.Contains("not found", StringComparison.OrdinalIgnoreCase))
                 {
-                    ConsoleHelper.WriteLine($"Installation of {nbuildApp.Name} version {nbuildApp.Version} is not found", ConsoleColor.Red);
-                    if (Verbose) ConsoleHelper.WriteLine($"[VERBOSE] 404 - Version not available: {nbuildApp.Version}", ConsoleColor.Red);
+                    ConsoleHelper.WriteError($"Installation of {nbuildApp.Name} version {nbuildApp.Version} is not found");
+                    if (Verbose) ConsoleHelper.WriteVerbose($"404 - Version not available: {nbuildApp.Version}");
                     return ResultHelper.Fail(-1, $"Installation of {nbuildApp.Name} version {nbuildApp.Version} is not found");
                 }
 
                 if (Verbose)
                 {
-                    ConsoleHelper.WriteLine($"[VERBOSE] Download failed for URL: {nbuildApp.WebDownloadFile}", ConsoleColor.Gray);
-                    ConsoleHelper.WriteLine($"[VERBOSE] Exception: {ex}", ConsoleColor.Gray);
+                    ConsoleHelper.WriteVerbose($"Download failed for URL: {nbuildApp.WebDownloadFile}");
+                    ConsoleHelper.WriteVerbose($"Exception: {ex}");
                 }
                 return ResultHelper.Fail(-1, ex.Message);
             }
@@ -566,7 +563,7 @@ namespace Nbuild
                     var tag = parts[releasesIdx + 2];
                     var assetName = (parts.Length > releasesIdx + 3) ? parts[releasesIdx + 3] : Path.GetFileName(uri.AbsolutePath);
 
-                    if (Verbose) ConsoleHelper.WriteLine($"[VERBOSE] Attempting authenticated GitHub API download (via ReleaseService) for {owner}/{repoName} tag {tag} asset {assetName}", ConsoleColor.Gray);
+                    if (Verbose) ConsoleHelper.WriteVerbose($"Attempting authenticated GitHub API download (via ReleaseService) for {owner}/{repoName} tag {tag} asset {assetName}");
 
                     var repo = $"{owner}/{repoName}";
                     var downloadFolder = Path.GetDirectoryName(destFile) ?? DownloadsDirectory;
@@ -579,7 +576,7 @@ namespace Nbuild
 
                     if (response != null && response.IsSuccessStatusCode)
                     {
-                        if (Verbose) ConsoleHelper.WriteLine($"[VERBOSE] Authenticated download saved to: {destFile}", ConsoleColor.Gray);
+                        if (Verbose) ConsoleHelper.WriteVerbose($"Authenticated download saved to: {destFile}");
                         return ResultHelper.Success();
                     }
                     else
@@ -587,14 +584,14 @@ namespace Nbuild
                         if (Verbose)
                         {
                             var status = response == null ? "no response" : response.StatusCode.ToString();
-                            ConsoleHelper.WriteLine($"[VERBOSE] Authenticated download failed: {status}", ConsoleColor.Gray);
+                            ConsoleHelper.WriteVerbose($"Authenticated download failed: {status}");
                         }
                         return null;
                     }
                 }
                 catch (Exception e)
                 {
-                    if (Verbose) ConsoleHelper.WriteLine($"[VERBOSE] Authenticated fallback failed: {e}", ConsoleColor.Gray);
+                    if (Verbose) ConsoleHelper.WriteVerbose($"Authenticated fallback failed: {e}");
                     return null;
                 }
             }
@@ -624,19 +621,19 @@ namespace Nbuild
 
             if (IsAppVersionGreaterOrEqual(nbuildApp))
             {
-                ConsoleHelper.WriteLine($"√ {nbuildApp.Name} {GetAppFileVersion(nbuildApp)} already installed.", ConsoleColor.Yellow);
+                ConsoleHelper.WriteWarning($"{nbuildApp.Name} {GetAppFileVersion(nbuildApp)} already installed.");
                 return ResultHelper.Success();
             }
 
-            ConsoleHelper.WriteLine($" Downloading {nbuildApp.Name} {nbuildApp.Version}", ConsoleColor.Yellow);
+            ConsoleHelper.WriteWarning($" Downloading {nbuildApp.Name} {nbuildApp.Version}");
             var result = DownloadApp(nbuildApp);
 
             if (result.IsSuccess())
             {
-                ConsoleHelper.WriteLine($"{nbuildApp.Name} {nbuildApp.Version} downloaded.", ConsoleColor.Yellow);
+                ConsoleHelper.WriteWarning($"{nbuildApp.Name} {nbuildApp.Version} downloaded.");
 
                 // Install the Downloaded file
-                ConsoleHelper.WriteLine($" Installing {nbuildApp.Name} {nbuildApp.Version}", ConsoleColor.Yellow);
+                ConsoleHelper.WriteWarning($" Installing {nbuildApp.Name} {nbuildApp.Version}");
                 
                 var process = new Process
                 {
@@ -656,11 +653,11 @@ namespace Nbuild
 
                 if (Verbose)
                 {
-                    ConsoleHelper.WriteLine($" Working Directory: {process.StartInfo.WorkingDirectory}", ConsoleColor.Yellow);
-                    ConsoleHelper.WriteLine($" FileName: {process.StartInfo.FileName}", ConsoleColor.Yellow);
-                    ConsoleHelper.WriteLine($" Arguments: {process.StartInfo.Arguments}", ConsoleColor.Yellow);
+                    ConsoleHelper.WriteVerbose($" Working Directory: {process.StartInfo.WorkingDirectory}");
+                    ConsoleHelper.WriteVerbose($" FileName: {process.StartInfo.FileName}");
+                    ConsoleHelper.WriteVerbose($" Arguments: {process.StartInfo.Arguments}");
 
-                    ConsoleHelper.WriteLine($" Calling process.LockStart(Verbose)", ConsoleColor.Yellow);
+                    ConsoleHelper.WriteVerbose($" Calling process.LockStart(Verbose)");
                 }
 
                 var resultInstall = process.LockStart(Verbose);
@@ -677,7 +674,7 @@ namespace Nbuild
                 else
                 {
                     // installer failed
-                    ConsoleHelper.WriteLine($"X {nbuildApp.Name} {nbuildApp.Version} failed to install: {resultInstall.Code}", ConsoleColor.Red);
+                    ConsoleHelper.WriteError($"{nbuildApp.Name} {nbuildApp.Version} failed to install: {resultInstall.Code}");
                     if (Verbose) DisplayCodeAndOutput(resultInstall);
                     // print resultInstall.Output
                     foreach (var item in resultInstall.Output)
@@ -717,14 +714,14 @@ namespace Nbuild
         {
             if (IsAppVersionGreaterOrEqual(nbuildApp))
             {
-                ConsoleHelper.WriteLine($"√ {nbuildApp.Name} {GetAppFileVersion(nbuildApp)} installed.", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess($"{nbuildApp.Name} {GetAppFileVersion(nbuildApp)} installed.");
                 return ResultHelper.Success();
             }
             else
             {
                 if (result.Code == MsiReturnCodeRestartRequired)
                 {
-                    ConsoleHelper.WriteLine($"√ {nbuildApp.Name} {nbuildApp.Version} installed.  Restart Required", ConsoleColor.Yellow);
+                    ConsoleHelper.WriteWarning($"{nbuildApp.Name} {nbuildApp.Version} installed.  Restart Required");
                     result.Code = 0;
                     return result;
                 }
@@ -732,17 +729,17 @@ namespace Nbuild
                 // Print the stored hash of the app file name
                 if (!string.IsNullOrEmpty(nbuildApp.StoredHash))
                 {
-                    ConsoleHelper.WriteLine($"Stored hash for {nbuildApp.AppFileName}: {FileHashString(nbuildApp.AppFileName)}", ConsoleColor.Yellow);
+                    ConsoleHelper.WriteWarning($"Stored hash for {nbuildApp.AppFileName}: {FileHashString(nbuildApp.AppFileName)}");
 
                     // Only compare file hash when a StoredHash is provided
                     if (IsFileHashEqual(nbuildApp.AppFileName, nbuildApp.StoredHash))
                     {
-                        ConsoleHelper.WriteLine($"√ {nbuildApp.Name} {nbuildApp.Version} installed.", ConsoleColor.Green);
+                        ConsoleHelper.WriteSuccess($"{nbuildApp.Name} {nbuildApp.Version} installed.");
                         return ResultHelper.Success();
                     }
                     else
                     {
-                        ConsoleHelper.WriteLine($"X {nbuildApp.Name} {nbuildApp.Version} installed, but file hash does not match.", ConsoleColor.Red);
+                        ConsoleHelper.WriteError($"{nbuildApp.Name} {nbuildApp.Version} installed, but file hash does not match.");
                         return ResultHelper.Fail(-1, $"File hash does not match for {nbuildApp.AppFileName}");
                     }
                 }
@@ -754,10 +751,10 @@ namespace Nbuild
 
         private static void DisplayCodeAndOutput(ResultHelper result)
         {
-            ConsoleHelper.WriteLine($"X Code: {result.Code}", ConsoleColor.Yellow);
+            ConsoleHelper.WriteWarning($"Code: {result.Code}");
             foreach (var output in result.Output)
             {
-                ConsoleHelper.WriteLine($"X Output: {output}", ConsoleColor.Yellow);
+                ConsoleHelper.WriteWarning($"Output: {output}");
             }
         }
 
@@ -783,7 +780,7 @@ namespace Nbuild
             // if app is not installed, return success with app not installed message
             if (!IsAppVersionGreaterOrEqual(nbuildApp))
             {
-                ConsoleHelper.WriteLine($"√ {nbuildApp.Name} {nbuildApp.Version} not installed.", ConsoleColor.Yellow);
+                ConsoleHelper.WriteWarning($"{nbuildApp.Name} {nbuildApp.Version} not installed.");
                 return ResultHelper.Success();
             }
 
@@ -804,12 +801,12 @@ namespace Nbuild
             // Update the filename to the full path of executable in the PATH environment variable
             process.StartInfo.FileName = FileMappins.GetFullPathOfFile(process.StartInfo.FileName);
 
-            ConsoleHelper.WriteLine($"Uninstalling {nbuildApp.Name} {nbuildApp.Version}", ConsoleColor.Yellow);
-            if (Verbose) ConsoleHelper.WriteLine($"Working Directory: {process.StartInfo.WorkingDirectory}", ConsoleColor.Yellow);
-            if (Verbose) ConsoleHelper.WriteLine($"FileName: {process.StartInfo.FileName}", ConsoleColor.Yellow);
-            if (Verbose) ConsoleHelper.WriteLine($"Arguments: {process.StartInfo.Arguments}", ConsoleColor.Yellow);
+            ConsoleHelper.WriteWarning($"Uninstalling {nbuildApp.Name} {nbuildApp.Version}");
+            if (Verbose) ConsoleHelper.WriteVerbose($"Working Directory: {process.StartInfo.WorkingDirectory}");
+            if (Verbose) ConsoleHelper.WriteVerbose($"FileName: {process.StartInfo.FileName}");
+            if (Verbose) ConsoleHelper.WriteVerbose($"Arguments: {process.StartInfo.Arguments}");
 
-            if (Verbose) ConsoleHelper.WriteLine($"Calling process.LockStart(Verbose)", ConsoleColor.Yellow);
+            if (Verbose) ConsoleHelper.WriteVerbose($"Calling process.LockStart(Verbose)");
             var result = process.LockStart(Verbose);
             if (result.IsSuccess())
 
@@ -820,12 +817,12 @@ namespace Nbuild
                     PathManager.RemovePath(nbuildApp.InstallPath!);
                 }
 
-                ConsoleHelper.WriteLine($"√ {nbuildApp.Name} {nbuildApp.Version} Uninstalled.", ConsoleColor.Green);
+                ConsoleHelper.WriteSuccess($"{nbuildApp.Name} {nbuildApp.Version} Uninstalled.");
                 return ResultHelper.Success();
             }
             else
             {
-                ConsoleHelper.WriteLine($"X {nbuildApp.Name} {nbuildApp.Version} failed to Uninstall: {result.Code}", ConsoleColor.Red);
+                ConsoleHelper.WriteError($"{nbuildApp.Name} {nbuildApp.Version} failed to Uninstall: {result.Code}");
                 DisplayCodeAndOutput(result);
                 return ResultHelper.Fail(result.Code, $"Failed to Uninstall {nbuildApp.Name} {nbuildApp.Version}");
             }
@@ -844,7 +841,7 @@ namespace Nbuild
             }
             catch (Exception ex)
             {
-                if (Verbose) ConsoleHelper.WriteLine($"X {nbuildApp.Name} {nbuildApp.Version} failed to get file version: {ex.Message}", ConsoleColor.Red);
+                if (Verbose) ConsoleHelper.WriteError($"{nbuildApp.Name} {nbuildApp.Version} failed to get file version: {ex.Message}");
                 return null;
             }
         }
@@ -857,7 +854,7 @@ namespace Nbuild
 
             if (Verbose)
             {
-                ConsoleHelper.WriteLine($"[VERSION CHECK] App: {nbuildApp.Name}, Requested Version: {nbuildApp.Version}, Installed: {currentVersion}", ConsoleColor.Cyan);
+                ConsoleHelper.WriteVerbose($"[VERSION CHECK] App: {nbuildApp.Name}, Requested Version: {nbuildApp.Version}, Installed: {currentVersion}");
             }
 
             if (currentVersion == null)
@@ -866,7 +863,7 @@ namespace Nbuild
             }
             else
             {
-                if (Verbose) ConsoleHelper.WriteLine($"{nbuildApp.Name} {nbuildApp.Version} current version: {currentVersion}", ConsoleColor.Yellow);
+                if (Verbose) ConsoleHelper.WriteVerbose($"{nbuildApp.Name} {nbuildApp.Version} current version: {currentVersion}");
 
                 if (!Version.TryParse(currentVersion, out Version? currentVersionParsed)) return false;
 
@@ -875,7 +872,7 @@ namespace Nbuild
                 
                 if (Verbose)
                 {
-                    ConsoleHelper.WriteLine($"[VERSION COMPARE] {currentVersionParsed} >= {versionParsed} = {versionGreater}", ConsoleColor.Cyan);
+                    ConsoleHelper.WriteVerbose($"[VERSION COMPARE] {currentVersionParsed} >= {versionParsed} = {versionGreater}");
                 }
             }
 
@@ -891,7 +888,7 @@ namespace Nbuild
                 return false;
             }
 
-            if (Verbose) ConsoleHelper.WriteLine($"{nbuildApp.Name} {nbuildApp.Version} current version: {currentVersion}", ConsoleColor.Yellow);
+            if (Verbose) ConsoleHelper.WriteVerbose($"{nbuildApp.Name} {nbuildApp.Version} current version: {currentVersion}");
 
             if (!Version.TryParse(currentVersion, out Version? currentVersionParsed)) return false;
 
@@ -955,7 +952,7 @@ namespace Nbuild
         /// <param name="version">Optional version override. If specified, overrides the version in the JSON file.</param>
         /// <param name="availableApps">Output parameter that returns a list of available apps found during the search (name and version).</param>
         /// <returns>A list of matching NbuildApp objects. If multiple apps share the same name and no version is specified, an exception is thrown.</returns>
-        public static List<NbuildApp> GetAppsFromCurrentDirectory(string name, string? version, out List<string> availableApps)
+        public static List<NbuildApp> GetAppsFromCurrentDirectory(string name, string? version, out List<string> availableApps, string? json = null)
         {
             var availableAppsSet = new HashSet<string>();
             var result = new List<NbuildApp>();
@@ -967,12 +964,17 @@ namespace Nbuild
 
             NbuildApp? foundApp = null;
 
-            // Search for apps.json in order: current directory first, then default program files directory
+            // Named installs search an explicitly supplied manifest before the standard fallback locations.
             var searchFilePaths = new[]
             {
+                json,
                 Path.Combine(Directory.GetCurrentDirectory(), "apps.json"),
                 DefaultAppsFile
-            };
+            }
+            .Where(path => !string.IsNullOrWhiteSpace(path))
+            .Select(path => path!)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
 
             var appsFileFound = false;
 
@@ -982,7 +984,7 @@ namespace Nbuild
                 {
                     if (Verbose)
                     {
-                        ConsoleHelper.WriteLine($"apps.json file does not exist: {appsFilePath}", ConsoleColor.Yellow);
+                        ConsoleHelper.WriteVerbose($"apps.json file does not exist: {appsFilePath}");
                     }
                     continue;
                 }
@@ -991,7 +993,7 @@ namespace Nbuild
                 
                 if (Verbose)
                 {
-                    ConsoleHelper.WriteLine($"Found apps.json: {appsFilePath}", ConsoleColor.Cyan);
+                    ConsoleHelper.WriteVerbose($"Found apps.json: {appsFilePath}");
                 }
 
                 try
@@ -1018,7 +1020,7 @@ namespace Nbuild
                     if (listAppData.Version != SupportedVersion)
                     {
                         // Log warning but continue searching other files
-                        ConsoleHelper.WriteLine($"Warning: Skipping {Path.GetFileName(appsFilePath)} - unsupported version {listAppData.Version}. Supported version: {SupportedVersion}", ConsoleColor.Yellow);
+                        ConsoleHelper.WriteWarning($"Warning: Skipping {Path.GetFileName(appsFilePath)} - unsupported version {listAppData.Version}. Supported version: {SupportedVersion}");
                         continue;
                     }
 
@@ -1063,7 +1065,7 @@ namespace Nbuild
                 catch (Exception ex) when (ex is not ArgumentException)
                 {
                     // Log warning but continue searching other files
-                    ConsoleHelper.WriteLine($"Warning: Failed to parse {Path.GetFileName(appsFilePath)}: {ex.Message}", ConsoleColor.Yellow);
+                    ConsoleHelper.WriteWarning($"Warning: Failed to parse {Path.GetFileName(appsFilePath)}: {ex.Message}");
                 }
             }
 
@@ -1076,7 +1078,7 @@ namespace Nbuild
             {
                 if (Verbose)
                 {
-                    ConsoleHelper.WriteLine($"Matched app: {foundApp.Name} (Version: {foundApp.Version})", ConsoleColor.Green);
+                    ConsoleHelper.WriteVerbose($"Matched app: {foundApp.Name} (Version: {foundApp.Version})");
                 }
                 
                 // Apply version override if specified BEFORE processing templates
@@ -1084,7 +1086,7 @@ namespace Nbuild
                 {
                     if (Verbose)
                     {
-                        ConsoleHelper.WriteLine($"Overriding version: {foundApp.Version} -> {version}", ConsoleColor.Green);
+                        ConsoleHelper.WriteVerbose($"Overriding version: {foundApp.Version} -> {version}");
                     }
                     foundApp.Version = version;
                 }
@@ -1220,17 +1222,17 @@ namespace Nbuild
         {
             if (dryRun)
             {
-                ConsoleHelper.WriteLine("DRY-RUN: Displaying git repository information (read-only operation).", ConsoleColor.Yellow);
+                ConsoleHelper.WriteVerbose("DRY-RUN: Displaying git repository information (read-only operation).");
             }
 
             var project = Path.GetFileName(Directory.GetCurrentDirectory());
             var gitWrapper = new GitWrapper();
             if (string.IsNullOrEmpty(gitWrapper.Branch))
             {
-                ConsoleHelper.WriteLine($"Error: [{project}] directory is not a git repository", ConsoleColor.Red);
+                ConsoleHelper.WriteError($"Error: [{project}] directory is not a git repository");
                 return ResultHelper.Fail(-1, "Not a git repository");
             }
-            ConsoleHelper.WriteLine($"Project [{project}] Branch [{gitWrapper.Branch}] Tag [{gitWrapper.Tag}]", ConsoleColor.DarkMagenta);
+            ConsoleHelper.WriteVerbose($"Project [{project}] Branch [{gitWrapper.Branch}] Tag [{gitWrapper.Tag}]");
             return ResultHelper.Success();
         }
 
@@ -1246,14 +1248,14 @@ namespace Nbuild
             // Project and branch required
             if (string.IsNullOrEmpty(tag))
             {
-                ConsoleHelper.WriteLine($"Error: valid tag is required", ConsoleColor.Red);
+                ConsoleHelper.WriteError($"Error: valid tag is required");
                 return ResultHelper.Fail(-1, "Tag is required");
             }
 
             if (dryRun)
             {
-                ConsoleHelper.WriteLine($"DRY-RUN: Would set git tag: {tag}", ConsoleColor.Yellow);
-                ConsoleHelper.WriteLine($"DRY-RUN: No actual changes will be made to the repository.", ConsoleColor.Yellow);
+                ConsoleHelper.WriteVerbose($"DRY-RUN: Would set git tag: {tag}");
+                ConsoleHelper.WriteVerbose($"DRY-RUN: No actual changes will be made to the repository.");
                 return ResultHelper.Success();
             }
 
@@ -1278,7 +1280,7 @@ namespace Nbuild
 
             if (string.IsNullOrEmpty(buildType))
             {
-                ConsoleHelper.WriteLine($"Error: valid build type is required", ConsoleColor.Red);
+                ConsoleHelper.WriteError($"Error: valid build type is required");
                 return ResultHelper.Fail(-1, "Build type is required");
             }
 
@@ -1290,19 +1292,19 @@ namespace Nbuild
 
             if (dryRun)
             {
-                ConsoleHelper.WriteLine($"DRY-RUN: Would compute and set git tag: {nextTag} (build type: {buildType})", ConsoleColor.Yellow);
+                ConsoleHelper.WriteVerbose($"DRY-RUN: Would compute and set git tag: {nextTag} (build type: {buildType})");
                 if (push)
                 {
-                    ConsoleHelper.WriteLine($"DRY-RUN: Would push tag {nextTag} to remote repository", ConsoleColor.Yellow);
+                    ConsoleHelper.WriteVerbose($"DRY-RUN: Would push tag {nextTag} to remote repository");
                 }
-                ConsoleHelper.WriteLine("DRY-RUN: No actual changes will be made to the repository or remote.", ConsoleColor.Yellow);
+                ConsoleHelper.WriteVerbose("DRY-RUN: No actual changes will be made to the repository or remote.");
                 return ResultHelper.Success();
             }
 
             var result = gitWrapper.SetTag(nextTag) == true ? ResultHelper.Success() : ResultHelper.Fail(-1, "SetTag failed");
             if (result.IsSuccess() && push)
             {
-                ConsoleHelper.WriteLine($"new tag: {gitWrapper.Tag}", ConsoleColor.Green);
+                ConsoleHelper.WriteVerbose($"new tag: {gitWrapper.Tag}");
                 gitWrapper.PushTag(nextTag);
                 DisplayGitInfo();
             }
@@ -1321,10 +1323,10 @@ namespace Nbuild
             var gitWrapper = new GitWrapper();
             if (string.IsNullOrEmpty(gitWrapper.Branch))
             {
-                ConsoleHelper.WriteLine($"Error: Not a git repository", ConsoleColor.Red);
+                ConsoleHelper.WriteError($"Error: Not a git repository");
                 return ResultHelper.Fail(-1, "Not a git repository");
             }
-            ConsoleHelper.WriteLine($"Current branch: {gitWrapper.Branch}", ConsoleColor.Green);
+            ConsoleHelper.WriteVerbose($"Current branch: {gitWrapper.Branch}");
             DisplayGitInfo();
             return ResultHelper.Success();
         }
@@ -1346,13 +1348,13 @@ namespace Nbuild
             if (dryRun)
             {
                 var msg = $"DRY-RUN: would clone {url} to {path ?? Environment.CurrentDirectory}";
-                ConsoleHelper.WriteLine(msg, ConsoleColor.Yellow);
+                ConsoleHelper.WriteVerbose(msg);
                 return ResultHelper.Success(msg);
             }
             var gitWrapper = new GitWrapper(verbose: verbose);
             if (string.IsNullOrEmpty(url))
             {
-                ConsoleHelper.WriteLine($"Error: valid url is required", ConsoleColor.Red);
+                ConsoleHelper.WriteError($"Error: valid url is required");
                 return ResultHelper.Fail(-1, "Valid url is required");
             }
 
@@ -1364,12 +1366,12 @@ namespace Nbuild
             var result = gitWrapper.CloneProject(url, path);
             if (result.IsSuccess())
             {
-                ConsoleHelper.WriteLine($"√ Project cloned successfully to {path.TrimEnd('\\')}\\{GitWrapper.ProjectNameFromUrl(url)}", ConsoleColor.Green);
+                ConsoleHelper.WriteVerbose($"Project cloned successfully to {path.TrimEnd('\\')}\\{GitWrapper.ProjectNameFromUrl(url)}");
                 return ResultHelper.Success();
             }
             else
             {
-                ConsoleHelper.WriteLine($"X {result.GetFirstOutput()}", ConsoleColor.Red);
+                ConsoleHelper.WriteError($"{result.GetFirstOutput()}");
                 return ResultHelper.Fail(-1, "Clone failed");
             }
         }
@@ -1385,7 +1387,7 @@ namespace Nbuild
 
             if (string.IsNullOrEmpty(tag))
             {
-                ConsoleHelper.WriteLine($"Error: valid tag is required", ConsoleColor.Red);
+                ConsoleHelper.WriteError($"Error: valid tag is required");
                 return ResultHelper.Fail(-1, "Tag is required");
             }
 
@@ -1397,22 +1399,22 @@ namespace Nbuild
 
                 if (localExists && remoteExists)
                 {
-                    ConsoleHelper.WriteLine($"DRY-RUN: Would delete tag '{tag}' from both local and remote repository", ConsoleColor.Yellow);
+                    ConsoleHelper.WriteVerbose($"DRY-RUN: Would delete tag '{tag}' from both local and remote repository");
                 }
                 else if (localExists)
                 {
-                    ConsoleHelper.WriteLine($"DRY-RUN: Would delete tag '{tag}' from local repository", ConsoleColor.Yellow);
+                    ConsoleHelper.WriteVerbose($"DRY-RUN: Would delete tag '{tag}' from local repository");
                 }
                 else if (remoteExists)
                 {
-                    ConsoleHelper.WriteLine($"DRY-RUN: Would delete tag '{tag}' from remote repository", ConsoleColor.Yellow);
+                    ConsoleHelper.WriteVerbose($"DRY-RUN: Would delete tag '{tag}' from remote repository");
                 }
                 else
                 {
-                    ConsoleHelper.WriteLine($"DRY-RUN: Tag '{tag}' does not exist locally or remotely - no action needed", ConsoleColor.Yellow);
+                    ConsoleHelper.WriteVerbose($"DRY-RUN: Tag '{tag}' does not exist locally or remotely - no action needed");
                 }
 
-                ConsoleHelper.WriteLine("DRY-RUN: No actual changes will be made to the repository or remote.", ConsoleColor.Yellow);
+                ConsoleHelper.WriteVerbose("DRY-RUN: No actual changes will be made to the repository or remote.");
                 return ResultHelper.Success();
             }
 
@@ -1442,7 +1444,7 @@ namespace Nbuild
             if (dryRun)
             {
                 var msg = $"DRY-RUN: would create {(preRelease ? "pre-release" : "release")} for {repo} with tag {tag} and asset {assetFileName}";
-                ConsoleHelper.WriteLine(msg, ConsoleColor.Yellow);
+                ConsoleHelper.WriteVerbose(msg);
                 return ResultHelper.Success(msg);
             }
             var releaseService = new ReleaseService(repo);
@@ -1488,7 +1490,7 @@ namespace Nbuild
             if (dryRun)
             {
                 var msg = $"DRY-RUN: would download asset for {repo} tag {tag} to path {assetPath}";
-                ConsoleHelper.WriteLine(msg, ConsoleColor.Yellow);
+                ConsoleHelper.WriteVerbose(msg);
                 return ResultHelper.Success(msg);
             }
 
@@ -1553,8 +1555,8 @@ namespace Nbuild
         {
             if (dryRun)
             {
-                ConsoleHelper.WriteLine($"DRY-RUN: performing read-only fetch for repository: {repo}", ConsoleColor.Yellow);
-                ConsoleHelper.WriteLine($"DRY-RUN: no state-changing operations will be performed.", ConsoleColor.Yellow);
+                ConsoleHelper.WriteVerbose($"DRY-RUN: performing read-only fetch for repository: {repo}");
+                ConsoleHelper.WriteVerbose($"DRY-RUN: no state-changing operations will be performed.");
             }
 
             var authService = new GitHubRelease.GitHubAuthService(verbose);
@@ -1563,41 +1565,41 @@ namespace Nbuild
 
             if (releases == null || !releases.Any())
             {
-                ConsoleHelper.WriteLine($"No releases found for repository: {repo}", ConsoleColor.Yellow);
+                ConsoleHelper.WriteVerbose($"No releases found for repository: {repo}");
                 return ResultHelper.Fail(-1, "No releases found");
             }
 
-            ConsoleHelper.WriteLine($"Releases for repository: {repo}", ConsoleColor.Green);
+            ConsoleHelper.WriteVerbose($"Releases for repository: {repo}");
             foreach (var release in releases)
             {
-                ConsoleHelper.WriteLine($"----------------------------------------", ConsoleColor.Yellow);
+                ConsoleHelper.WriteVerbose($"────────────────────────────────────────");
 
-                ConsoleHelper.WriteLine($"Tag: {release.TagName}", ConsoleColor.Yellow);
-                ConsoleHelper.WriteLine($"Name: {release.Name}", ConsoleColor.Cyan);
-                ConsoleHelper.WriteLine($"Pre-release: {(release.Prerelease ? "Yes" : "No")}", ConsoleColor.Cyan);
-                ConsoleHelper.WriteLine($"Published: {release.PublishedAt}", ConsoleColor.Cyan);
+                ConsoleHelper.WriteWarning($"Tag: {release.TagName}");
+                ConsoleHelper.WriteInfo($"Name: {release.Name}");
+                ConsoleHelper.WriteInfo($"Pre-release: {(release.Prerelease ? "Yes" : "No")}");
+                ConsoleHelper.WriteInfo($"Published: {release.PublishedAt}");
                 if (verbose && !string.IsNullOrEmpty(release.Body))
                 {
-                    ConsoleHelper.WriteLine($"Description: {release.Body}", ConsoleColor.Magenta);
+                    ConsoleHelper.WriteVerbose($"Description: {release.Body}");
                 }
 
                 if (verbose && release.Assets != null && release.Assets.Any())
                 {
-                    ConsoleHelper.WriteLine($"Assets:", ConsoleColor.Cyan);
+                    ConsoleHelper.WriteVerbose($"Assets:");
                     foreach (var asset in release.Assets)
                     {
-                        ConsoleHelper.WriteLine($"  Name: {asset.Name}", ConsoleColor.Cyan);
-                        ConsoleHelper.WriteLine($"  Size: {asset.Size} bytes", ConsoleColor.Cyan);
-                        ConsoleHelper.WriteLine($"  Download URL: {asset.BrowserDownloadUrl}", ConsoleColor.Cyan);
+                        ConsoleHelper.WriteVerbose($"  Name: {asset.Name}");
+                        ConsoleHelper.WriteVerbose($"  Size: {asset.Size} bytes");
+                        ConsoleHelper.WriteVerbose($"  Download URL: {asset.BrowserDownloadUrl}");
                     }
                 }
 
                 if (verbose && release.Author != null)
                 {
-                    ConsoleHelper.WriteLine($"Author: {release.Author}", ConsoleColor.Cyan);
+                    ConsoleHelper.WriteVerbose($"Author: {release.Author}");
                 }
             }
-            ConsoleHelper.WriteLine($"----------------------------------------", ConsoleColor.Yellow);
+            ConsoleHelper.WriteVerbose($"────────────────────────────────────────");
 
             var successMessage = dryRun
                 ? "DRY-RUN: successfully performed read-only fetch of releases"

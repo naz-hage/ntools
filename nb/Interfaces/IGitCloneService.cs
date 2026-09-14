@@ -1,5 +1,3 @@
-using System.CommandLine;
-
 // -----------------------------------------------------------------------------
 // File: IGitCloneService.cs
 // Purpose: Defines the contract for a service that performs git clone operations.
