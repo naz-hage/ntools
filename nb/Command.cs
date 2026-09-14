@@ -115,11 +115,6 @@ namespace Nbuild
             }
         }
 
-        public static ResultHelper Install(string? json, bool verbose = false, bool dryRun = false)
-        {
-            return Install(json, null, null, verbose, dryRun);
-        }
-
         public static ResultHelper Install(string? json, string? name, string? version, bool verbose = false, bool dryRun = false)
         {
             Verbose = verbose;
@@ -128,16 +123,12 @@ namespace Nbuild
             if (dryRun)
             {
                 string msg;
-                if (!string.IsNullOrEmpty(json))
-                {
-                    msg = $"DRY-RUN: would install apps from json: {json}";
-                }
-                else if (!string.IsNullOrEmpty(name))
+                if (!string.IsNullOrEmpty(name))
                 {
                     // Even in dry-run, search to check if app exists and list available if not found
                     try
                     {
-                        var foundApps = GetAppsFromCurrentDirectory(name, version, out var availableApps);
+                        var foundApps = GetAppsFromCurrentDirectory(name, version, out var availableApps, json);
                         if (!foundApps.Any())
                         {
                             // No matching app found - show message but still succeed (it's dry-run)
@@ -174,6 +165,10 @@ namespace Nbuild
                         return ResultHelper.Success(msg);
                     }
                 }
+                else if (!string.IsNullOrEmpty(json))
+                {
+                    msg = $"DRY-RUN: would install apps from json: {json}";
+                }
                 else
                 {
                     msg = "DRY-RUN: would install apps from json: <default>";
@@ -186,15 +181,10 @@ namespace Nbuild
 
             IEnumerable<NbuildApp> apps;
 
-            if (!string.IsNullOrEmpty(json))
+            if (!string.IsNullOrEmpty(name))
             {
-                // Original behavior: use provided JSON file
-                apps = GetApps(json);
-            }
-            else if (!string.IsNullOrEmpty(name))
-            {
-                // New behavior: search current directory for app by name/version
-                apps = GetAppsFromCurrentDirectory(name, version, out var availableApps);
+                // Named installs search the requested manifest first, then standard locations.
+                apps = GetAppsFromCurrentDirectory(name, version, out var availableApps, json);
                 // Materialize the enumerable to avoid multiple enumeration
                 var appsList = apps.ToList();
 
@@ -231,6 +221,11 @@ namespace Nbuild
                 }
 
                 return result;
+            }
+            else if (!string.IsNullOrEmpty(json))
+            {
+                // JSON-only installs retain the existing behavior of installing every app in the file.
+                apps = GetApps(json);
             }
             else
             {
@@ -302,27 +297,28 @@ namespace Nbuild
             ConsoleHelper.WriteWarning($"{apps.Count()} apps to list:");
 
             // print header
-            ConsoleHelper.WriteWarning("|--------------------|----------------|-------------------|");
+            ConsoleHelper.WriteWarning("┌────────────────────|────────────────|───────────────────┐");
             ConsoleHelper.WriteWarning("| App name           | Target version | Installed version |");
-            ConsoleHelper.WriteWarning("|--------------------|----------------|-------------------|");
+            ConsoleHelper.WriteWarning("├────────────────────|────────────────|───────────────────┤");
             foreach (var app in apps)
             {
                 // display app and installed version
                 // InstalledAppFileVersionGreterOrEqual is true, print green, else print red
                 if (IsAppVersionEqual(app))
                 {
-                    ConsoleHelper.WriteSuccess($"| {app.Name,-18} | {app.Version,-14} | {GetAppFileVersion(app),-18}|");
+                    ConsoleHelper.WriteLine($"| {app.Name,-18} | {app.Version,-14} | {GetAppFileVersion(app),-18}|", ConsoleColor.Green);
                 }
                 else if (IsAppVersionGreaterOrEqual(app))
                 {
-                    ConsoleHelper.WriteWarning($"| {app.Name,-18} | {app.Version,-14} | {GetAppFileVersion(app),-18}|");
+                    ConsoleHelper.WriteLine($"| {app.Name,-18} | {app.Version,-14} | {GetAppFileVersion(app),-18}|", ConsoleColor.Cyan);
                 }
                 else
                 {
-                    ConsoleHelper.WriteError($"| {app.Name,-18} | {app.Version,-14} | {GetAppFileVersion(app),-18}|");
+                    ConsoleHelper.WriteLine($"| {app.Name,-18} | {app.Version,-14} | {GetAppFileVersion(app),-18}|", ConsoleColor.Red);
                 }
             }
 
+            ConsoleHelper.WriteWarning("└────────────────────┴────────────────┴───────────────────┘");
             Console.WriteLine();
             return ResultHelper.Success();
         }
@@ -347,10 +343,10 @@ namespace Nbuild
 
             ConsoleHelper.WriteWarning($"{apps.ToList().Count} apps to download to {DownloadsDirectory}");
 
-            // print header
-            ConsoleHelper.WriteWarning(" |--------------------|--------------------------------|-----------------|");
-            ConsoleHelper.WriteWarning(" | App name           | Downloaded file                | (hh:mm:ss.ff)   |");
-            ConsoleHelper.WriteWarning(" |--------------------|--------------------------------|-----------------|");
+            // print header ┌, ┐, └, or ┘
+            ConsoleHelper.WriteWarning("┌───────────────────┬───────────────────────────────┬─────────────────┐");
+            ConsoleHelper.WriteWarning("│ App name          │ Downloaded file               │ (hh:mm:ss.ff)   │");
+            ConsoleHelper.WriteWarning("├───────────────────┼───────────────────────────────┼─────────────────┤");
 
             string webDownloadedFile = string.Empty;
             ResultHelper lastResult = ResultHelper.Success();
@@ -388,6 +384,7 @@ namespace Nbuild
                 return ResultHelper.Fail(-1, errorMessage);
             }
 
+            ConsoleHelper.WriteWarning("└───────────────────┴───────────────────────────────┴─────────────────┘");
             Console.WriteLine();
 
             // If any download failed, return the last failure result
@@ -955,7 +952,7 @@ namespace Nbuild
         /// <param name="version">Optional version override. If specified, overrides the version in the JSON file.</param>
         /// <param name="availableApps">Output parameter that returns a list of available apps found during the search (name and version).</param>
         /// <returns>A list of matching NbuildApp objects. If multiple apps share the same name and no version is specified, an exception is thrown.</returns>
-        public static List<NbuildApp> GetAppsFromCurrentDirectory(string name, string? version, out List<string> availableApps)
+        public static List<NbuildApp> GetAppsFromCurrentDirectory(string name, string? version, out List<string> availableApps, string? json = null)
         {
             var availableAppsSet = new HashSet<string>();
             var result = new List<NbuildApp>();
@@ -967,12 +964,17 @@ namespace Nbuild
 
             NbuildApp? foundApp = null;
 
-            // Search for apps.json in order: current directory first, then default program files directory
+            // Named installs search an explicitly supplied manifest before the standard fallback locations.
             var searchFilePaths = new[]
             {
+                json,
                 Path.Combine(Directory.GetCurrentDirectory(), "apps.json"),
                 DefaultAppsFile
-            };
+            }
+            .Where(path => !string.IsNullOrWhiteSpace(path))
+            .Select(path => path!)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
 
             var appsFileFound = false;
 
@@ -1570,7 +1572,7 @@ namespace Nbuild
             ConsoleHelper.WriteVerbose($"Releases for repository: {repo}");
             foreach (var release in releases)
             {
-                ConsoleHelper.WriteVerbose($"----------------------------------------");
+                ConsoleHelper.WriteVerbose($"────────────────────────────────────────");
 
                 ConsoleHelper.WriteWarning($"Tag: {release.TagName}");
                 ConsoleHelper.WriteInfo($"Name: {release.Name}");
@@ -1597,7 +1599,7 @@ namespace Nbuild
                     ConsoleHelper.WriteVerbose($"Author: {release.Author}");
                 }
             }
-            ConsoleHelper.WriteVerbose($"----------------------------------------");
+            ConsoleHelper.WriteVerbose($"────────────────────────────────────────");
 
             var successMessage = dryRun
                 ? "DRY-RUN: successfully performed read-only fetch of releases"
