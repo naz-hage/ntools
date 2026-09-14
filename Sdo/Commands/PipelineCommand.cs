@@ -41,10 +41,223 @@ namespace Sdo.Commands
             AddLastbuildCommand(verboseOption);
             AddListCommand(verboseOption);
             AddLogsCommand(verboseOption);
+            AddReleaseCommand(verboseOption);
             AddRunCommand(verboseOption);
             AddShowCommand(verboseOption);
             AddStatusCommand(verboseOption);
             AddUpdateCommand(verboseOption);
+        }
+
+        private void AddReleaseCommand(Option<bool> verboseOption)
+        {
+            var releaseCommand = new System.CommandLine.Command("release", "Manage Azure DevOps classic release pipelines");
+
+            var listCommand = new System.CommandLine.Command("list", "List classic release pipelines");
+            AddReleaseTargetOptions(listCommand, out var listOrganizationOption, out var listProjectOption);
+            listCommand.Add(verboseOption);
+            listCommand.SetAction(async parseResult =>
+            {
+                return await ListReleasePipelines(
+                    parseResult.GetValue(listOrganizationOption),
+                    parseResult.GetValue(listProjectOption),
+                    parseResult.GetValue(verboseOption));
+            });
+
+            var showCommand = new System.CommandLine.Command("show", "Display a classic release pipeline");
+            var definitionArg = new Argument<string>("pipeline-id-or-name") { Description = "Release pipeline definition ID or exact name" };
+            showCommand.Add(definitionArg);
+            AddReleaseTargetOptions(showCommand, out var showOrganizationOption, out var showProjectOption);
+            showCommand.Add(verboseOption);
+            showCommand.SetAction(async parseResult =>
+            {
+                return await ShowReleasePipeline(
+                    parseResult.GetValue(definitionArg)!,
+                    parseResult.GetValue(showOrganizationOption),
+                    parseResult.GetValue(showProjectOption),
+                    parseResult.GetValue(verboseOption));
+            });
+
+            releaseCommand.Subcommands.Add(listCommand);
+            releaseCommand.Subcommands.Add(showCommand);
+            Subcommands.Add(releaseCommand);
+        }
+
+        private static void AddReleaseTargetOptions(System.CommandLine.Command command, out Option<string?> organizationOption, out Option<string?> projectOption)
+        {
+            organizationOption = new Option<string?>("--organization") { Description = "Azure DevOps organization (default: current remote or AZURE_DEVOPS_ORG)" };
+            projectOption = new Option<string?>("--project") { Description = "Azure DevOps project (default: current remote project)" };
+            command.Add(organizationOption);
+            command.Add(projectOption);
+        }
+
+        private async Task<int> ListReleasePipelines(string? organizationOverride, string? projectOverride, bool verbose)
+        {
+            if (!TryResolveReleaseTarget(organizationOverride, projectOverride, out var organization, out var project))
+            {
+                return 1;
+            }
+
+            try
+            {
+                if (verbose)
+                {
+                    Console.WriteLine($"[INFO] Listing classic release pipelines from {organization}/{project}...");
+                }
+
+                if (!ValidateAzureDevOpsCredentials(out var pat))
+                {
+                    return 1;
+                }
+
+                using var client = new AzureDevOpsClient(pat!, organization, project);
+                var definitions = await client.ListReleaseDefinitionsAsync(project);
+                if (definitions == null)
+                {
+                    ConsoleHelper.WriteError($"Failed to list release pipelines{FormatClientError(client)}");
+                    return 1;
+                }
+
+                if (definitions.Count == 0)
+                {
+                    ConsoleHelper.WriteWarning("No classic release pipelines found in this project.");
+                    return 0;
+                }
+
+                ConsoleHelper.WriteSuccess($"Classic release pipelines in {organization}/{project}:");
+                Console.WriteLine();
+                Console.WriteLine($"{"ID",-8} {"Name",-45} {"Definition state",-18} {"Modified"}");
+                Console.WriteLine(new string('-', 90));
+                foreach (var definition in definitions)
+                {
+                    Console.WriteLine($"{definition.Id,-8} {Truncate(definition.Name, 45),-45} {definition.DefinitionState,-18} {FormatLocalDateTime(definition.ModifiedOn)}");
+                }
+
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                ConsoleHelper.WriteError($"Failed to list release pipelines: {ex.Message}");
+                return 1;
+            }
+        }
+
+        private async Task<int> ShowReleasePipeline(string pipelineIdOrName, string? organizationOverride, string? projectOverride, bool verbose)
+        {
+            if (!TryResolveReleaseTarget(organizationOverride, projectOverride, out var organization, out var project))
+            {
+                return 1;
+            }
+
+            try
+            {
+                if (verbose)
+                {
+                    Console.WriteLine($"[INFO] Retrieving classic release pipeline from {organization}/{project}...");
+                }
+
+                if (!ValidateAzureDevOpsCredentials(out var pat))
+                {
+                    return 1;
+                }
+
+                using var client = new AzureDevOpsClient(pat!, organization, project);
+                var definition = await client.GetReleaseDefinitionAsync(project, pipelineIdOrName);
+                if (definition == null)
+                {
+                    ConsoleHelper.WriteError($"Release pipeline not found{FormatClientError(client)}");
+                    return 1;
+                }
+
+                ConsoleHelper.WriteSuccess("Classic release pipeline details:");
+                Console.WriteLine($"  Organization: {organization}");
+                Console.WriteLine($"  Project:      {project}");
+                Console.WriteLine($"  ID:           {definition.Id}");
+                Console.WriteLine($"  Name:         {definition.Name ?? "Unnamed Release Pipeline"}");
+                Console.WriteLine($"  Definition:   {definition.DefinitionState}");
+                Console.WriteLine($"  Path:         {definition.Path ?? "unknown"}");
+                Console.WriteLine($"  Created:      {FormatLocalDateTime(definition.CreatedOn)}");
+                Console.WriteLine($"  Modified:     {FormatLocalDateTime(definition.ModifiedOn)}");
+                Console.WriteLine($"  Artifacts:    {definition.Artifacts?.Count ?? 0}");
+                if (!string.IsNullOrWhiteSpace(definition.Url))
+                {
+                    Console.WriteLine($"  API URL:      {definition.Url}");
+                }
+                Console.WriteLine($"  Browser URL:  https://dev.azure.com/{Uri.EscapeDataString(organization)}/{Uri.EscapeDataString(project)}/_release?_a=releases&view=mine&definitionId={definition.Id}");
+
+                var releases = await client.ListReleasesAsync(project, definition.Id);
+                if (releases == null)
+                {
+                    ConsoleHelper.WriteWarning($"Unable to list releases{FormatClientError(client)}");
+                }
+                else if (releases.Count > 0)
+                {
+                    Console.WriteLine();
+                    ConsoleHelper.WriteInfo($"Releases ({releases.Count}):");
+                    foreach (var release in releases)
+                    {
+                        Console.WriteLine($"  - {release.Name ?? $"Release {release.Id}"} (ID: {release.Id}, Status: {release.Status ?? "unknown"}, Created: {FormatLocalDateTime(release.CreatedOn)})");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine();
+                    ConsoleHelper.WriteInfo("Releases: none");
+                }
+
+                if (definition.Artifacts is { Count: > 0 })
+                {
+                    Console.WriteLine();
+                    ConsoleHelper.WriteInfo("Artifacts:");
+                    foreach (var artifact in definition.Artifacts)
+                    {
+                        var artifactName = artifact.DefinitionReference?.GetValueOrDefault("definition")?.Name;
+                        Console.WriteLine($"  - {artifact.Alias ?? artifactName ?? "unnamed"} ({artifact.Type ?? "unknown"}){(string.IsNullOrWhiteSpace(artifactName) ? string.Empty : $": {artifactName}")}");
+                    }
+                }
+
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                ConsoleHelper.WriteError($"Failed to show release pipeline: {ex.Message}");
+                return 1;
+            }
+        }
+
+        private bool TryResolveReleaseTarget(string? organizationOverride, string? projectOverride, out string organization, out string project)
+        {
+            var repoInfo = _platformDetector.GetRepositoryInfo();
+            organization = FirstNonEmpty(organizationOverride, repoInfo?.Organization, AzureDevOpsCredentials.GetOrganizationOrDefault());
+            project = FirstNonEmpty(projectOverride, repoInfo?.Project, Environment.GetEnvironmentVariable("SYSTEM_TEAM_PROJECT"), Environment.GetEnvironmentVariable("SYSTEM_TEAMPROJECT"));
+
+            if (string.IsNullOrWhiteSpace(organization) || string.IsNullOrWhiteSpace(project))
+            {
+                ConsoleHelper.WriteError("Azure DevOps organization and project are required. Use --organization and --project or run from an Azure DevOps repository.");
+                return false;
+            }
+
+            return true;
+        }
+
+        private static string FirstNonEmpty(params string?[] values)
+        {
+            return values.FirstOrDefault(value => !string.IsNullOrWhiteSpace(value)) ?? string.Empty;
+        }
+
+        private static string FormatClientError(AzureDevOpsClient client)
+        {
+            return string.IsNullOrWhiteSpace(client.LastError) ? string.Empty : $": {client.LastError}";
+        }
+
+        private static string Truncate(string? value, int maxLength)
+        {
+            var text = value ?? "Unnamed Release Pipeline";
+            return text.Length <= maxLength ? text : text[..(maxLength - 3)] + "...";
+        }
+
+        private static string FormatLocalDateTime(DateTime? value)
+        {
+            return value.HasValue ? value.Value.ToLocalTime().ToString("g") : "unknown";
         }
 
         private void AddCreateCommand(Option<bool> verboseOption)
@@ -1895,3 +2108,5 @@ namespace Sdo.Commands
         #endregion
     }
 }
+
+

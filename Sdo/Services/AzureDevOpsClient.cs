@@ -2459,6 +2459,139 @@ namespace Sdo.Services
             }
         }
 
+        /// <summary>
+        /// Lists classic release pipeline definitions in a project.
+        /// </summary>
+        /// <param name="project">The Azure DevOps project name.</param>
+        /// <returns>Release pipeline definitions, or null if the request fails.</returns>
+        public async Task<List<AzureDevOpsReleaseDefinition>?> ListReleaseDefinitionsAsync(string project)
+        {
+            try
+            {
+                var url = $"https://vsrm.dev.azure.com/{_organization}/{System.Uri.EscapeDataString(project)}/_apis/release/definitions?$expand=artifacts&api-version=7.1";
+                var response = await _httpClient.GetAsync(url);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _lastError = $"List release pipelines failed ({response.StatusCode}): {response.ReasonPhrase}";
+                    return null;
+                }
+
+                var content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var definitions = JsonSerializer.Deserialize<AzureDevOpsReleaseDefinitionListResponse>(content, options);
+                return definitions?.Value;
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Error listing Azure DevOps release pipelines: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets a classic release pipeline definition by numeric ID.
+        /// </summary>
+        /// <param name="project">The Azure DevOps project name.</param>
+        /// <param name="definitionId">The release definition ID.</param>
+        /// <returns>The release definition, or null if the request fails.</returns>
+        public async Task<AzureDevOpsReleaseDefinition?> GetReleaseDefinitionAsync(string project, int definitionId)
+        {
+            try
+            {
+                var url = $"https://vsrm.dev.azure.com/{_organization}/{System.Uri.EscapeDataString(project)}/_apis/release/definitions/{definitionId}?$expand=artifacts&api-version=7.1";
+                var response = await _httpClient.GetAsync(url);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _lastError = $"Get release pipeline failed ({response.StatusCode}): {response.ReasonPhrase}";
+                    return null;
+                }
+
+                var content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                return JsonSerializer.Deserialize<AzureDevOpsReleaseDefinition>(content, options);
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Error fetching Azure DevOps release pipeline {definitionId}: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets a classic release pipeline definition by ID or exact name.
+        /// </summary>
+        public async Task<AzureDevOpsReleaseDefinition?> GetReleaseDefinitionAsync(string project, string definitionIdOrName)
+        {
+            if (string.IsNullOrWhiteSpace(definitionIdOrName))
+            {
+                _lastError = "Release pipeline ID or name is required.";
+                return null;
+            }
+
+            if (int.TryParse(definitionIdOrName, out var definitionId))
+            {
+                return await GetReleaseDefinitionAsync(project, definitionId);
+            }
+
+            var definitions = await ListReleaseDefinitionsAsync(project);
+            if (definitions == null || definitions.Count == 0)
+            {
+                if (string.IsNullOrEmpty(_lastError))
+                {
+                    _lastError = "No release pipelines found in this project.";
+                }
+                return null;
+            }
+
+            var match = definitions.FirstOrDefault(definition =>
+                string.Equals(definition.Name, definitionIdOrName, StringComparison.OrdinalIgnoreCase));
+
+            if (match == null)
+            {
+                _lastError = $"Release pipeline not found by name: {definitionIdOrName}";
+            }
+
+            return match;
+        }
+
+        /// <summary>
+        /// Lists releases created from a classic release pipeline definition.
+        /// </summary>
+        /// <param name="project">The Azure DevOps project name.</param>
+        /// <param name="definitionId">The release definition ID.</param>
+        /// <param name="top">Maximum number of releases to return.</param>
+        /// <returns>Release instances, or null if the request fails.</returns>
+        public async Task<List<AzureDevOpsRelease>?> ListReleasesAsync(string project, int definitionId, int top = 50)
+        {
+            try
+            {
+                var safeTop = Math.Max(1, top);
+                var url = $"https://vsrm.dev.azure.com/{_organization}/{System.Uri.EscapeDataString(project)}/_apis/release/releases?definitionId={definitionId}&$top={safeTop}&api-version=7.1";
+                var response = await _httpClient.GetAsync(url);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _lastError = $"List releases failed ({response.StatusCode}): {response.ReasonPhrase}";
+                    return null;
+                }
+
+                var content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var releases = JsonSerializer.Deserialize<AzureDevOpsReleaseListResponse>(content, options);
+                return releases?.Value;
+            }
+            catch (Exception ex)
+            {
+                _lastError = $"Error listing Azure DevOps releases: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine(_lastError);
+                return null;
+            }
+        }
+
         // ------------------ Neutral model wrappers ------------------
 
         public async Task<List<PipelineDefinition>?> ListPipelineDefinitionsAsync(string project)
@@ -2822,3 +2955,5 @@ namespace Sdo.Services
         }
     }
 }
+
+
