@@ -7,7 +7,7 @@ namespace Sdo.Mapping
         public void Present(string mapping)
         {
             if (string.IsNullOrEmpty(mapping)) return;
-            ConsoleHelper.WriteLine(mapping, System.ConsoleColor.Yellow);
+            ConsoleHelper.WriteWarning(mapping);
         }
     }
 }

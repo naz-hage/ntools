@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+	<OutputType>Library</OutputType>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -28,7 +28,7 @@
 		<EmbeddedResource Include="resources\common.targets" />
 		<EmbeddedResource Include="resources\dotnet.targets" />
 		<EmbeddedResource Include="resources\mongodb.targets" />
-		<EmbeddedResource Include="resources\nbuild.targets" />
+		<EmbeddedResource Include="resources\sdo.targets" />
 		<EmbeddedResource Include="resources\node.targets" />
 		<EmbeddedResource Include="resources\nuget.targets">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -39,9 +39,6 @@
 		<None Include="..\go\apps.json" CopyToOutputDirectory="PreserveNewest" Link="apps.json" />
 	</ItemGroup>
 
-	<ItemGroup>
-	<PackageReference Include="System.CommandLine" Version="2.0.11" />
-	</ItemGroup>
  <ItemGroup>
     <ProjectReference Include="..\GitHubRelease\GitHubRelease.csproj" />
     <ProjectReference Include="..\NbuildTasks\NbuildTasks.csproj" />

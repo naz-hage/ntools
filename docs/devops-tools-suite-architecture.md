@@ -57,7 +57,7 @@ ntools/
 ├── README.md                     # Project documentation
 ├── targets.md                    # Build targets documentation
 ├── coverage.cobertura.xml        # Test coverage report
-├── nbuild.targets                # MSBuild targets
+├── sdo.targets                # MSBuild targets
 ├── unit-tests.targets            # Unit test targets
 ├── e2e-tests.targets             # E2E test targets
 │
@@ -102,23 +102,22 @@ ntools/
 │   ├── VersionManager.cs         # Version tracking
 │   └── ApiClient.cs              # API client utilities
 │
-├── Nbackup/                      # Backup tool
+├── Nbackup/                      # Reusable backup library (nBackup.dll)
 │   ├── Nbackup.csproj
-│   ├── Program.cs
-│   └── BackupEngine.cs           # Backup logic
+│   ├── NBackupOptions.cs         # Library operation options
+│   └── NBackup.cs                # Backup logic
 │
 ├── nBackupTests/                 # Unit tests for Nbackup
 │   ├── nBackupTests.csproj
-│   └── BackupTests.cs
+│   └── NBackupTests.cs
 │
-├── lf/                           # File listing utility
+├── lf/                           # Reusable file-listing library (lf.dll)
 │   ├── lf.csproj
-│   ├── Program.cs
-│   └── FileLister.cs             # File listing implementation
+│   └── ListSearcher.cs            # File and folder listing implementation
 │
 ├── lfTests/                      # Unit tests for lf
 │   ├── lfTests.csproj
-│   └── FileListerTests.cs
+│   └── ListSearcherTests.cs
 │
 ├── go/                           # Go-based utilities
 │   ├── build-apps/               # Application builder
@@ -210,7 +209,7 @@ ntools/
 All .NET executables are built using:
 - .NET 10.0 SDK
 - MSBuild
-- Custom build targets (nbuild.targets)
+- Custom build targets (sdo.targets)
 - Shared build tasks (NbuildTasks)
 
 Go executables are built using the Go toolchain and custom build scripts.

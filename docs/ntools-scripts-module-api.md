@@ -6,7 +6,6 @@ This is the canonical reference for functions exported by the `ntools-scripts` P
 |---|---|
 | `Publish-AllProjects` | Build and publish non-test projects. `Publish-AllProjects -OutputDir C:\Artifacts -Version 1.0.0 -RepositoryRoot C:\MyRepo` |
 | `Get-ntoolsScriptsVersion` | Return the module version. `Get-NtoolsScriptsVersion` |
-| `Invoke-VerifyArtifacts` | Verify packaged artifacts. `Invoke-VerifyArtifacts -ArtifactsPath C:\Artifacts\Release -ProductVersion 1.2.3` |
 | `Set-DevelopmentEnvironment` | Set local development environment variables. `Set-DevelopmentEnvironment -DevDrive D: -MainDir source` |
 | `Get-VersionFromJson` | Read version fields from an `ntools.json` file. `Get-VersionFromJson -Path ./dev-setup/ntools.json` |
 | `Write-TestResult` | Write a standardized test result. `Write-TestResult -Name smoke -Passed $true` |

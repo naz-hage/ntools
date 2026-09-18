@@ -1,6 +1,6 @@
 
 
-Once Ntools is installed, open a Developer Command Prompt for Visual Studio 2022 and navigate to your solution folder (for example, `./ntools`). The [.NET SDK](https://dotnet.microsoft.com/download) must be installed and available in your PATH for build operations. The `sdo` executable is the primary command-line interface for Ntools. The following are examples of how to use it:
+Once Ntools is installed, open a Developer Command Prompt for Visual Studio 2026 and navigate to your solution folder (for example, `./ntools`). The [.NET SDK](https://dotnet.microsoft.com/download) must be installed and available in your PATH for build operations. The `sdo` executable is the primary command-line interface for Ntools. The following are examples of how to use it:
 
 ## Global Options
 

@@ -30,7 +30,7 @@ namespace Sdo.Commands
                 PathManager.DisplayPathSegments();
                 if (parseResult.GetValue(verboseOption))
                 {
-                    ConsoleHelper.WriteLine("Displaying PATH segments.", ConsoleColor.Gray);
+                    ConsoleHelper.WriteVerbose ("Displaying PATH segments.");
                 }
 
                 return 0;

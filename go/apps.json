@@ -206,8 +206,8 @@
     },
     {
       "Name": "Ntools",
-      "Version": "1.78.0",
-      "AppFileName": "$(InstallPath)\\nb.exe",
+      "Version": "1.80.0",
+      "AppFileName": "$(InstallPath)\\sdo.exe",
       "WebDownloadFile": "https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip",
       "DownloadedFile": "$(Version).zip",
       "InstallCommand": "powershell.exe",
@@ -307,20 +307,8 @@
       "AddToPath": true
     },
     {
-      "Name": "Visual Studio 2022",
-      "Version": "17.11.3",
-      "AppFileName": "$(InstallPath)\\Common7\\IDE\\devenv.exe",
-      "WebDownloadFile": "https://aka.ms/vs/17/release/vs_Community.exe",
-      "DownloadedFile": "vs_Community.exe",
-      "InstallCommand": "$(DownloadedFile)",
-      "InstallArgs": "--add Microsoft.VisualStudio.Workload.CoreEditor Microsoft.VisualStudio.Workload.Azure Microsoft.VisualStudio.Workload.ManagedDesktop Microsoft.VisualStudio.Workload.NativeDesktop Microsoft.VisualStudio.Workload.NetWeb Microsoft.VisualStudio.Workload.NetDesktop Microsoft.VisualStudio.Workload.Azure Microsoft.VisualStudio.Workload.Data --quiet --wait",
-      "InstallPath": "$(ProgramFiles)\\Microsoft Visual Studio\\2022\\Community",
-      "UninstallCommand": "$(ProgramFilesX86)\\Microsoft Visual Studio\\Installer\\vs_installer.exe",
-      "UninstallArgs": "uninstall --quiet --installPath $(InstallPath)"
-    },
-    {
       "Name": "Visual Studio Code",
-      "Version": "1.105.1",
+      "Version": "1.137.1",
       "AppFileName": "$(InstallPath)\\Code.exe",
       "WebDownloadFile": "https://aka.ms/win32-x64-system-stable",
       "DownloadedFile": "VSCodeSetup-x64-$(Version).exe",

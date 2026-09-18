@@ -154,7 +154,7 @@ Your project folder should look like this:
 │   │   ├── apps.json
 │   │   ├── dev-setup.ps1
 │   ├── ... other project and test files
-│   └── nbuild.targets  (this file is required in the solution folder)
+│   └── sdo.targets  (this file is required in the solution folder)
 ```
 
 ---

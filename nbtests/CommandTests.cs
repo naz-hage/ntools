@@ -39,7 +39,7 @@ namespace NbuildTests
         [TestMethod]
         public void Install_DryRun_PrintsDryRunMessage()
         {
-            var result = Command.Install("{\"NbuildAppList\":[]}", false, true);
+            var result = Command.Install("{\"NbuildAppList\":[]}", null, null, false, true);
             Assert.IsTrue(result.IsSuccess());
             Assert.IsTrue(result.Output.Any(x => x.Contains("DRY-RUN")));
         }
@@ -189,7 +189,7 @@ namespace NbuildTests
                 {
                 ""Name"": ""nbuild"",
                 ""Version"": ""1.6.0"",
-                ""AppFileName"": ""nb.exe"",
+                ""AppFileName"": ""sdo.exe"",
                 ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
                 ""DownloadedFile"": ""$(Version).zip"",
                 ""InstallCommand"": ""powershell.exe"",
@@ -290,7 +290,7 @@ namespace NbuildTests
 
 
             // Act
-            var result = Command.Install(jsonContent, true);
+            var result = Command.Install(jsonContent, null, null, true);
 
             if (!result.IsSuccess() && result.Output.Count > 0)
             {
@@ -319,7 +319,7 @@ namespace NbuildTests
                     {
                         ""Name"": ""nbuild"",
                         ""Version"": ""versionToTest"",
-                        ""AppFileName"": ""$(InstallPath)\\nb.exe"",
+                        ""AppFileName"": ""$(InstallPath)\\sdo.exe"",
                         ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
                         ""DownloadedFile"": ""$(Version).zip"",
                         ""InstallCommand"": ""powershell.exe"",
@@ -334,7 +334,7 @@ namespace NbuildTests
             json = json.Replace("versionToTest", VersionToTest);
 
             // Act
-            var result = Command.Install(json, verbose: true, dryRun: false);
+            var result = Command.Install(json, null, null, verbose: true, dryRun: false);
 
             if (!result.IsSuccess() && result.Output.Count > 0)
             {
@@ -373,7 +373,7 @@ namespace NbuildTests
                     {
                         ""Name"": ""nbuild"",
                         ""Version"": ""versionToTest"",
-                        ""AppFileName"": ""$(InstallPath)\\nb.exe"",
+                        ""AppFileName"": ""$(InstallPath)\\sdo.exe"",
                         ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
                         ""DownloadedFile"": ""$(Version).zip"",
                         ""InstallCommand"": ""powershell.exe"",
@@ -389,7 +389,7 @@ namespace NbuildTests
             json = json.Replace("versionToTest", VersionToTest);
 
             // Install the app first before uninstalling
-            var result = Command.Install(json);
+            var result = Command.Install(json, null, null);
             Assert.IsTrue(result.IsSuccess());
 
 
@@ -428,7 +428,7 @@ namespace NbuildTests
                 ""NbuildAppList"": [
                     {
                     ""Version"": ""1.2.0"",
-                    ""AppFileName"": ""nb.exe"",
+                    ""AppFileName"": ""sdo.exe"",
                     ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
                     ""DownloadedFile"": ""$(Version).zip"",
                     ""InstallCommand"": ""powershell.exe"",
@@ -442,7 +442,7 @@ namespace NbuildTests
             // Act
             try
             {
-                result = Command.Install(json);
+                result = Command.Install(json, null, null);
             }
             catch (Exception ex)
             {
@@ -486,7 +486,7 @@ namespace NbuildTests
             // Act
             try
             {
-                result = Command.Install(json);
+                result = Command.Install(json, null, null);
             }
             catch (Exception ex)
             {
@@ -510,7 +510,7 @@ namespace NbuildTests
                     {
                     ""Name"": ""nbuild"",
                     ""Version"": ""1.2.0"",
-                    ""AppFileName"": ""nb.exe"",
+                    ""AppFileName"": ""sdo.exe"",
                     ""DownloadedFile"": ""$(Version).zip"",
                     ""InstallCommand"": ""powershell.exe"",
                     ""InstallArgs"": ""-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force"",
@@ -523,7 +523,7 @@ namespace NbuildTests
             // Act
             try
             {
-                result = Command.Install(json);
+                result = Command.Install(json, null, null);
             }
             catch (Exception ex)
             {
@@ -553,7 +553,7 @@ namespace NbuildTests
                     {
                     ""Name"": ""nbuild"",
                     ""Version"": ""1.2.0"",
-                    ""AppFileName"": ""nb.exe"",
+                    ""AppFileName"": ""sdo.exe"",
                     ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
                     ""InstallCommand"": ""powershell.exe"",
                     ""InstallArgs"": ""-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force"",
@@ -566,7 +566,7 @@ namespace NbuildTests
             // Act
             try
             {
-                result = Command.Install(json);
+                result = Command.Install(json, null, null);
             }
             catch (Exception ex)
             {
@@ -596,7 +596,7 @@ namespace NbuildTests
                 {
                 ""Name"": ""nbuild"",
                 ""Version"": ""1.2.0"",
-                ""AppFileName"": ""nb.exe"",
+                ""AppFileName"": ""sdo.exe"",
                 ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
                 ""DownloadedFile"": ""$(Version).zip"",
                 ""InstallArgs"": ""-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force"",
@@ -609,7 +609,7 @@ namespace NbuildTests
             // Act
             try
             {
-                result = Command.Install(json);
+                result = Command.Install(json, null, null);
             }
             catch (Exception ex)
             {
@@ -639,7 +639,7 @@ namespace NbuildTests
                 {
                 ""Name"": ""nbuild"",
                 ""Version"": ""1.2.0"",
-                ""AppFileName"": ""nb.exe"",
+                ""AppFileName"": ""sdo.exe"",
                 ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
                 ""DownloadedFile"": ""$(Version).zip"",
                 ""InstallCommand"": ""powershell.exe"",
@@ -652,7 +652,7 @@ namespace NbuildTests
             // Act
             try
             {
-                result = Command.Install(json);
+                result = Command.Install(json, null, null);
             }
             catch (Exception ex)
             {
@@ -682,7 +682,7 @@ namespace NbuildTests
                 {
                 ""Name"": ""nbuild"",
                 ""Version"": ""1.2.0"",
-                ""AppFileName"": ""nb.exe"",
+                ""AppFileName"": ""sdo.exe"",
                 ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
                 ""DownloadedFile"": ""$(Version).zip"",
                 ""InstallCommand"": ""powershell.exe"",
@@ -695,7 +695,7 @@ namespace NbuildTests
             // Act
             try
             {
-                result = Command.Install(json);
+                result = Command.Install(json, null, null);
             }
             catch (Exception ex)
             {
@@ -834,6 +834,61 @@ namespace NbuildTests
                 Directory.SetCurrentDirectory(originalDir);
                 Directory.Delete(tempDir, true);
             }
+        }
+
+        [TestMethod]
+        public void GetAppsFromCurrentDirectory_PrefersExplicitJsonAndFallsBackWhenAppIsMissing()
+        {
+            var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            Directory.CreateDirectory(tempDir);
+            var originalDir = Directory.GetCurrentDirectory();
+
+            try
+            {
+                Directory.SetCurrentDirectory(tempDir);
+                var explicitJson = Path.Combine(tempDir, "custom-apps.json");
+                File.WriteAllText(explicitJson, CreateAppManifest("testapp", "1.0.0"));
+                File.WriteAllText("apps.json", CreateAppManifest("testapp", "2.0.0"));
+
+                var explicitApps = Command.GetAppsFromCurrentDirectory("testapp", "3.0.0", out _, explicitJson);
+
+                Assert.AreEqual(1, explicitApps.Count);
+                Assert.AreEqual("3.0.0", explicitApps[0].Version);
+
+                File.WriteAllText(explicitJson, CreateAppManifest("otherapp", "1.0.0"));
+                var fallbackApps = Command.GetAppsFromCurrentDirectory("testapp", null, out _, explicitJson);
+
+                Assert.AreEqual(1, fallbackApps.Count);
+                Assert.AreEqual("2.0.0", fallbackApps[0].Version);
+            }
+            finally
+            {
+                Directory.SetCurrentDirectory(originalDir);
+                Directory.Delete(tempDir, true);
+            }
+        }
+
+        private static string CreateAppManifest(string name, string version)
+        {
+            return $$"""
+            {
+                "Version": "1.2.0",
+                "NbuildAppList": [
+                    {
+                        "Name": "{{name}}",
+                        "Version": "{{version}}",
+                        "AppFileName": "testapp.exe",
+                        "WebDownloadFile": "https://example.com/testapp.zip",
+                        "DownloadedFile": "testapp.zip",
+                        "InstallCommand": "echo",
+                        "InstallArgs": "installed",
+                        "InstallPath": "C:\\Temp\\testapp",
+                        "UninstallCommand": "echo",
+                        "UninstallArgs": "uninstalled"
+                    }
+                ]
+            }
+            """;
         }
 
         [TestMethod]

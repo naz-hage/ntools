@@ -1,4 +1,5 @@
-﻿using NbuildTasks;
+﻿using Nbuild.Helpers;
+using NbuildTasks;
 using Ntools;
 using System.Diagnostics;
 using System.Text;
@@ -9,9 +10,9 @@ namespace Nbuild;
 
 public partial class BuildStarter
 {
-    public static string LogFile { get; set; } = "nbuild.log";
-    private static readonly TimeSpan BuildTimeout = TimeSpan.FromMinutes(3);
-    private const string BuildFileName = "nbuild.targets";
+    public static string LogFile { get; set; } = "sdo.log";
+    private const string SdoBuildFileName = "sdo.targets";
+    private const string NbuildFileName = "nbuild.targets";
     private const string CommonBuildFileName = "common.targets";
     private const string TargetsMd = "targets.md";
     private const string MsbuildExe = "msbuild.exe";
@@ -24,28 +25,30 @@ public partial class BuildStarter
     /// <returns>A <see cref="ResultHelper"/> object representing the result of the build operation.</returns>
     public static ResultHelper Build(string? target, bool verbose = false)
     {
-        string nbuildPath = Path.Combine(Environment.CurrentDirectory, BuildFileName);
+        string sdoPath = Path.Combine(Environment.CurrentDirectory, SdoBuildFileName);
+        string nbuildPath = Path.Combine(Environment.CurrentDirectory, NbuildFileName);
+        string buildFilePath = File.Exists(sdoPath) ? sdoPath : nbuildPath;
         string commonBuildXmlPath = Path.Combine($"{Environment.GetEnvironmentVariable("ProgramFiles")}\\nbuild", CommonBuildFileName);
 
-        if (!File.Exists(nbuildPath))
+        if (!File.Exists(buildFilePath))
         {
-            return ResultHelper.Fail(-1, $"'{nbuildPath}' not found.");
+            return ResultHelper.Fail(-1, $"Neither '{sdoPath}' nor '{nbuildPath}' was found.");
         }
 
         // check if target is valid
-        if (!ValidTarget(nbuildPath, target, verbose))
+        if (!ValidTarget(buildFilePath, target, verbose))
         {
             return ResultHelper.Fail(-1, $"Target '{target}' not found");
         }
 
         LogFile = Path.Combine(Environment.CurrentDirectory, LogFile);
         string cmd = string.IsNullOrEmpty(target)
-            ? $"{nbuildPath} -fl -flp:logfile={LogFile};verbosity=normal"
-            : $"{nbuildPath} /t:{target} -p:TargetName={target} -fl -flp:logfile={LogFile};verbosity=normal";
+            ? $"{buildFilePath} -fl -flp:logfile={LogFile};verbosity=normal"
+            : $"{buildFilePath} /t:{target} -p:TargetName={target} -fl -flp:logfile={LogFile};verbosity=normal";
 
         if (verbose)
         {
-            Console.WriteLine($"==> {cmd}");
+            ConsoleHelper.WriteVerbose($"==> {cmd}");
         }
 
         //  Get location of dotnet.exe
@@ -122,58 +125,60 @@ public partial class BuildStarter
     /// <param name="target">The build target.</param>
     /// <param name="verbose">Specifies whether to display verbose output.</param>
     /// <returns>A <see cref="ResultHelper"/> object representing the result of the build operation.</returns>
-    private static ResultHelper RunBuildProcess(Process process, string? target, bool verbose)
+    private static ResultHelper RunBuildProcess(
+    Process process,
+    string? target,
+    bool verbose,
+    TimeSpan? timeout = null)   // null = no timeout
     {
+            
         try
         {
             if (!process.Start())
-            {
                 return ResultHelper.Fail(-1, $"Failed to start {process.StartInfo.FileName}");
-            }
 
             var spinner = new[] { '|', '/', '-', '\\' };
             var spinnerIndex = 0;
-            var startedAt = Stopwatch.StartNew();
             var spinnerEnabled = !Console.IsOutputRedirected;
             var status = $"... '{target}'";
 
             if (spinnerEnabled)
-            {
                 Console.Write($"{status} {spinner[spinnerIndex]}");
-            }
             else
-            {
                 Console.WriteLine(status);
-            }
 
-            while (!process.WaitForExit(250))
+            Stopwatch? timer = timeout.HasValue ? Stopwatch.StartNew() : null;
+
+            while (!process.HasExited)
             {
-                if (startedAt.Elapsed >= BuildTimeout)
+                // Optional timeout
+                if (timer != null && timer.Elapsed >= timeout!.Value)
                 {
                     process.Kill(entireProcessTree: true);
                     process.WaitForExit();
                     Console.WriteLine();
-                    return ResultHelper.Fail(-1, $"Build '{target}' exceeded the 3-minute timeout.");
+                    return ResultHelper.Fail(-1,
+                        $"Build '{target}' exceeded the timeout of {timeout.Value.TotalSeconds} seconds.");
                 }
 
+                // Spinner animation
                 if (spinnerEnabled)
                 {
                     spinnerIndex = (spinnerIndex + 1) % spinner.Length;
                     Console.Write($"\r{status} {spinner[spinnerIndex]}");
                 }
+
+                Thread.Sleep(150);
             }
 
             if (spinnerEnabled)
-            {
                 Console.WriteLine($"\r{status} done.   ");
-            }
 
             var result = ResultHelper.New();
             result.Code = process.ExitCode;
+
             if (result.Code != 0)
-            {
                 result.Output.Add($"MSBuild exited with code {result.Code}.");
-            }
 
             return result;
         }
@@ -375,25 +380,44 @@ public partial class BuildStarter
         {
             var line = lines[i];
 
-            if (BuildTarget().IsMatch(line))
+            try
             {
-                Console.ForegroundColor = ConsoleColor.Cyan;
+                if (BuildTarget().IsMatch(line))
+                {
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                }
+                else if (Error().IsMatch(line))
+                {
+                    if (int.TryParse(Count().Match(line).Value, out var count))
+                    {
+                        Console.ForegroundColor = count == 0 ? ConsoleColor.Green : ConsoleColor.Red;
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Gray;
+                    }
+                }
+                else if (Warning().IsMatch(line))
+                {
+                    if (int.TryParse(Count().Match(line).Value, out var count))
+                    {
+                        Console.ForegroundColor = count == 0 ? ConsoleColor.Gray : ConsoleColor.Yellow;
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Gray;
+                    }
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Gray;
+                }
             }
-            else if (Error().IsMatch(line))
+            catch (Exception)
             {
-                int count = int.Parse(Count().Match(line).Value);
-                Console.ForegroundColor = count == 0 ? ConsoleColor.Green : ConsoleColor.Red;
-            }
-            else if (Warning().IsMatch(line))
-            {
-                int count = int.Parse(Count().Match(line).Value);
-                Console.ForegroundColor = count == 0 ? ConsoleColor.Gray : ConsoleColor.Yellow;
-            }
-            else
-            {
-                // fallback coloring
                 Console.ForegroundColor = ConsoleColor.Gray;
             }
+
             Console.WriteLine(lines[i]);
         }
     }

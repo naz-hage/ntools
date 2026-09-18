@@ -99,7 +99,7 @@ namespace Nbuild.Services
             {
                 var newPath = string.Join(PathSeparator.ToString(), filteredSegments);
                 SetUserPath(newPath);
-                ConsoleHelper.WriteLine($"√ {pathSegment} removed from user PATH.", ConsoleColor.Green);
+                ConsoleHelper.WriteVerbose($"{pathSegment} removed from user PATH.");
             }
         }
 
@@ -166,10 +166,10 @@ namespace Nbuild.Services
         {
             var path = Environment.GetEnvironmentVariable("PATH") ?? string.Empty;
             var pathSegments = RemoveDuplicatePathSegments(path);
-            ConsoleHelper.WriteLine($"PATH Segments:", ConsoleColor.Yellow);
+            ConsoleHelper.WriteVerbose($"PATH Segments:");
             foreach (var segment in GetPathSegments(pathSegments))
             {
-                Console.WriteLine($" '{segment}'");
+                ConsoleHelper.WriteVerbose($" '{segment}'");
             }
         }
 
@@ -231,12 +231,12 @@ namespace Nbuild.Services
 
             if (IsPathPresent(installPath))
             {
-                ConsoleHelper.WriteLine($"{installPath} is already in PATH.", ConsoleColor.Yellow);
+                ConsoleHelper.WriteWarning($"{installPath} is already in PATH.");
                 return;
             }
 
             AddPath(installPath);
-            ConsoleHelper.WriteLine($"√ {installPath} added to user PATH.", ConsoleColor.Green);
+            ConsoleHelper.WriteVerbose($"{installPath} added to user PATH.");
         }
     }
 

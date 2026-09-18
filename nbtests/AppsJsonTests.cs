@@ -8,7 +8,7 @@
 /// - apps.json contains at least one application entry in the NbuildAppList
 /// 
 /// The apps.json file is the single source of truth for all developer tools
-/// managed by nbuild and is used by the nb install command to discover applications.
+/// managed by nbuild and is used by the sdo tool install command to discover applications.
 /// </summary>
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;

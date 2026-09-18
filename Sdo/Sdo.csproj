@@ -30,7 +30,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	<PackageReference Include="System.CommandLine" Version="2.0.11" />
+	<PackageReference Include="System.CommandLine" Version="2.0.12" />
 	<PackageReference Include="YamlDotNet" Version="18.1.0" />
 	</ItemGroup>
 

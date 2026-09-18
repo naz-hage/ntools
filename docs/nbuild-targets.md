@@ -1,6 +1,6 @@
 The table below lists all available targets for the Nbuild tool. 
 
-- **./ntools\nbuild.targets Targets**
+- **./ntools\sdo.targets Targets**
 
 | **Target Name** | **Description** |
 | --- | --- |
@@ -33,7 +33,6 @@ The table below lists all available targets for the Nbuild tool.
 | --- | --- |
 | BUILD_E2E_FRAMEWORK | Build the E2E test framework library |
 | BUILD_SDO_E2E | Build the SDO service for E2E testing |
-| BUILD_SDO_E2E_TESTS | Build the E2E test projects |
 | COPY_SDO_EXECUTABLE | Copy SDO executable to test directory |
 | RUN_AZDO_WI_ASSIGNED_TO_ME_TEST | Run Azure DevOps work item filtering test |
 | RUN_GITHUB_WI_ASSIGNED_TO_ME_TEST | Run GitHub issue filtering test |

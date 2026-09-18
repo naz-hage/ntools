@@ -103,7 +103,7 @@ namespace Sdo.Commands
                             if (repo != null && !string.IsNullOrEmpty(repo.Owner) && !string.IsNullOrEmpty(repo.Repo))
                             {
                                 var mappingCmd = mappingGen.CollaboratorsListGitHub(repo.Owner, repo.Repo, 100);
-                                if (!string.IsNullOrEmpty(mappingCmd)) ConsoleHelper.WriteLine(mappingCmd, ConsoleColor.Yellow);
+                                if (!string.IsNullOrEmpty(mappingCmd)) ConsoleHelper.WriteWarning(mappingCmd);
                             }
                     }
                     var auth = new AuthenticationService();
@@ -134,7 +134,7 @@ namespace Sdo.Commands
                         var mappingOrg = _platformDetector.GetOrganization() ?? "(organization)";
                         var mappingProject = _platformDetector.GetProject() ?? "(project)";
                         var mappingCmd = mappingGen.ListUsersAzure(mappingOrg, mappingProject, 1000);
-                        if (!string.IsNullOrEmpty(mappingCmd)) ConsoleHelper.WriteLine(mappingCmd, ConsoleColor.Yellow);
+                        if (!string.IsNullOrEmpty(mappingCmd)) ConsoleHelper.WriteWarning(mappingCmd);
                     }
                     var auth = new AuthenticationService();
                     var token = await auth.GetAzureDevOpsTokenAsync();
@@ -160,7 +160,7 @@ namespace Sdo.Commands
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteLine($"X Error: {ex.Message}");
+                ConsoleHelper.WriteLine($"Error: {ex.Message}");
                 return 1;
             }
         }
@@ -180,7 +180,7 @@ namespace Sdo.Commands
                         if (repo != null && !string.IsNullOrEmpty(repo.Owner) && !string.IsNullOrEmpty(repo.Repo))
                         {
                             var mappingCmd = mappingGen.CollaboratorsListGitHub(repo.Owner, repo.Repo, top > 0 ? top : 100);
-                            if (!string.IsNullOrEmpty(mappingCmd)) ConsoleHelper.WriteLine(mappingCmd, ConsoleColor.Yellow);
+                            if (!string.IsNullOrEmpty(mappingCmd)) ConsoleHelper.WriteWarning(mappingCmd);
                         }
                     }
                     else if (platform == Platform.AzureDevOps)
@@ -188,7 +188,7 @@ namespace Sdo.Commands
                         var mappingOrg = _platformDetector.GetOrganization() ?? "(organization)";
                         var mappingProject = _platformDetector.GetProject() ?? "(project)";
                         var mappingCmd = mappingGen.ListUsersAzure(mappingOrg, mappingProject, top > 0 ? top : 1000);
-                        if (!string.IsNullOrEmpty(mappingCmd)) ConsoleHelper.WriteLine(mappingCmd, ConsoleColor.Yellow);
+                        if (!string.IsNullOrEmpty(mappingCmd)) ConsoleHelper.WriteWarning(mappingCmd);
                     }
                 }
                 if (platform == Platform.GitHub)
@@ -287,7 +287,7 @@ namespace Sdo.Commands
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteLine($"X Error: {ex.Message}");
+                ConsoleHelper.WriteLine($"Error: {ex.Message}");
                 return 1;
             }
         }
@@ -308,7 +308,7 @@ namespace Sdo.Commands
                     {
                         var mappingGen = new Sdo.Mapping.MappingGenerator();
                         var mappingCmd = mappingGen.SearchUsersGitHub(query, 100);
-                        if (!string.IsNullOrEmpty(mappingCmd)) ConsoleHelper.WriteLine(mappingCmd, ConsoleColor.Yellow);
+                        if (!string.IsNullOrEmpty(mappingCmd)) ConsoleHelper.WriteWarning(mappingCmd);
                     }
                     var auth = new AuthenticationService();
                     var token = await auth.GetGitHubTokenAsync();
@@ -359,7 +359,7 @@ namespace Sdo.Commands
 
                     if (!string.IsNullOrEmpty(mappingCmd))
                     {
-                        ConsoleHelper.WriteLine(mappingCmd, ConsoleColor.Yellow);
+                        ConsoleHelper.WriteWarning(mappingCmd);
                     }
                 }
                 if (platform == Platform.GitHub)
@@ -395,7 +395,7 @@ namespace Sdo.Commands
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteLine($"X Error: {ex.Message}");
+                ConsoleHelper.WriteLine($"Error: {ex.Message}");
                 return 1;
             }
         }

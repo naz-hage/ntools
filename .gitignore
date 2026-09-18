@@ -429,3 +429,4 @@ docs/todo.md
 
 # Code coverage reports
 /CoverageReport/
+/dev-setup/ntools-scripts.psm1

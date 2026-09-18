@@ -686,7 +686,7 @@ sdo build                         # Display available targets
 sdo test --verbose                # Build the `test` target through MSBuild
 ```
 
-The target is resolved from `nbuild.targets` in the current directory. Multiple unmatched tokens and unknown options return an error.
+The target is resolved from `sdo.targets` in the current directory. Multiple unmatched tokens and unknown options return an error.
 
 #### repo info
 
@@ -1712,7 +1712,7 @@ sdo wi update --id 243 --state Done
 
 ## Build and compatibility reference
 
-The command reference above is the source of truth for `sdo.exe`. This section retains the build infrastructure details and compatibility notes for projects that still use `nbuild.targets`.
+The command reference above is the source of truth for `sdo.exe`. This section retains the build infrastructure details and compatibility notes for projects that still use `sdo.targets`.
 
 > **Breaking change (v1.76+):** `sdo tool install --name` searches only for `apps.json` files. Consolidate application definitions into one `apps.json` file when needed. See [Install by name](#install-by-name-from-current-directory-and-default-location).
 
@@ -1738,10 +1738,10 @@ Key points:
 ---
 
 ## nbuild targets
-See [`nbuild.targets`](https://github.com/naz-hage/ntools/blob/main/Nbuild/resources/nbuild.targets) for more information and checkout other targets in [`Nbuild/resources`](https://github.com/naz-hage/ntools/blob/main/Nbuild/resources).
+See [`sdo.targets`](https://github.com/naz-hage/ntools/blob/main/Nbuild/resources/sdo.targets) for more information and checkout other targets in [`Nbuild/resources`](https://github.com/naz-hage/ntools/blob/main/Nbuild/resources).
 
 ### common targets
-- The `common.targets` file includes all the defaults targets needed to build, test and deploy a solution.  The `common.targets` file is located in the `$(ProgramFiles)\Nbuild` folder.  The `nbuild.targets` file in the solution folder imports the `common.targets` file
+- The `common.targets` file includes all the defaults targets needed to build, test and deploy a solution.  The `common.targets` file is located in the `$(ProgramFiles)\Nbuild` folder.  The `sdo.targets` file in the solution folder imports the `common.targets` file
 
 Below is a list of common targets defined in the `common.targets` file:
 
@@ -1778,20 +1778,20 @@ Below are practical examples for using `sdo.exe`. These examples assume you are 
 ```cmd
 sdo.exe tool install --json "C:\Program Files\tools.json"
 ```
-Installs applications specified in the manifest file. The `--json` parameter is optional if `--name` is provided. If `--json` is specified, `--name` is ignored. (Requires admin privileges.)
+Installs applications specified in the manifest file. The `--json` parameter is optional. When `--name` is provided, the named install searches the explicit `--json` manifest first, then `apps.json` in the current directory, and finally `C:\Program Files\nbuild\apps.json`. (Requires admin privileges.)
 
 #### Install by name from current directory and default location:
 ```cmd
 sdo.exe tool install --name "MyApp"
 sdo.exe tool install --name "MyApp" --appversion "1.2.3"
 ```
-Searches for `apps.json` in both the current directory and the default installation directory, then installs the application matching the specified name. The `--name` parameter is optional if `--json` is provided. The `--appversion` parameter is optional and overrides the version specified in the JSON file.
+Searches for the requested application in the explicit `--json` manifest first when one is provided, then in `apps.json` in the current directory, and finally in the default installation directory. The `--appversion` parameter is optional and overrides the version specified in the JSON file.
 
 **BREAKING CHANGE (v1.76+):** This command now searches ONLY for `apps.json` files, not all JSON files. You must consolidate your application definitions into a single `apps.json` file in the target directory or move it to the default installation directory.
 
-**Search order:** Current directory is searched first for `apps.json`, then the default installation directory. If an app is found in the current directory, it takes precedence over the same app in the default installation directory.
+**Search order:** When `--json` is provided, that file is searched first, followed by `apps.json` in the current directory, then `C:\Program Files\nbuild\apps.json`. Without `--json`, the current directory is searched first, followed by the default installation directory. The first matching app takes precedence.
 
-**Note:** If you specify both `--json` and `--name`, the command is allowed, but `--json` takes precedence and a warning is emitted. The `--name` method provides a more convenient way to install applications without needing to know the exact path to the JSON configuration file.
+**Note:** If you specify both `--json` and `--name`, the command searches the specified JSON file first and falls back to the standard locations if the app is not found there. The `--name` method provides a convenient way to install applications without needing to know the exact path to the JSON configuration file.
 
 #### Dry-run mode for install:
 ```cmd
@@ -1800,7 +1800,7 @@ sdo.exe tool install --name "MyApp" --appversion "1.2.3" --dry-run
 ```
 
 **Behavior in dry-run mode:**
-- Searches for `apps.json` in both the current directory and the default installation directory (search order: current directory first)
+- Searches the explicit `--json` file first when provided, then `apps.json` in the current directory, then the default installation directory
 - If app is found: displays `DRY-RUN: would install app 'MyApp'` in yellow and lists version details
 - If app is not found: displays `No apps found matching 'MyApp'` in red, lists the search directories (current directory and default installation directory), and lists available applications found in those `apps.json` files
 - Dry-run always returns exit code 0 (success), even when app is not found, as it is a preview/simulation mode
