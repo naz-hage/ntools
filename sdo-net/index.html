@@ -1056,10 +1056,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#test" class="md-nav__link">
+  <a href="#e2e" class="md-nav__link">
     <span class="md-ellipsis">
       
-        test
+        e2e
       
     </span>
   </a>
@@ -1067,10 +1067,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#env-and-build" class="md-nav__link">
+  <a href="#env" class="md-nav__link">
     <span class="md-ellipsis">
       
-        env and build
+        env
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        build
       
     </span>
   </a>
@@ -2669,34 +2680,39 @@
 <h2 id="main-help">Main Help<a class="headerlink" href="#main-help" title="Anchor link to this section for reference">&para;</a></h2>
 <div class="highlight"><pre><span></span><code>$ sdo --help
 
-sdo v1.73.7 - Simple DevOps Operations by naz-hage (2020-2026)
+sdo v1.81.4 - Simple DevOps Operations by naz-hage (2020-2026)
 
 Description:
   Simple DevOps Operations CLI tool for Azure DevOps and GitHub
 
 Usage:
-  sdo [command] [options]
+  sdo [command] [options] [[--] &lt;additional arguments&gt;...]
 
 Options:
-  --dry-run       Perform a dry run without side effects
-  --verbose       Enable verbose output
+  -v, --verbose   Enable verbose output
+  -dr, --dry-run  Perform a dry run without side effects
   -?, -h, --help  Show help and usage information
   --version       Show version information
 
 Commands:
-  map       Show command mappings between SDO and native CLI tools
+  map       Show command mappings between SDO and gh/az native CLI tools
   auth      Verify authentication with GitHub or Azure DevOps
   pipeline  Pipeline/workflow management commands (create, show, list, run, status, logs, delete, lastbuild, update)
   pr        Pull request operations
   repo      Repository management commands
-  tool      Tool installation and download commands
-  env       Environment inspection commands
-  build     Build automation and target management
-  release   GitHub release operations
-  backup    Backup configuration and execution
-  file      File and folder search commands
   wi        Work item management commands
   user      User management commands for GitHub and Azure DevOps
+  tool      Environment tool installation, auditing, and manifest management
+  run       Execute a YAML Launcher workflow manifest
+  e2e       Run ntools-launcher YAML test metadata
+  env       Environment and local system utilities
+  build     Build automation and target management
+  release   GitHub and Azure DevOps release management
+  backup    Environment and workspace backup utilities
+  file      File and folder listing utilities
+
+Additional Arguments:
+  Arguments passed to the application that is being run.
 </code></pre></div>
 <h2 id="command-reference">Command Reference<a class="headerlink" href="#command-reference" title="Anchor link to this section for reference">&para;</a></h2>
 <h3 id="map-cli-mappings">map: CLI mappings<a class="headerlink" href="#map-cli-mappings" title="Anchor link to this section for reference">&para;</a></h3>
@@ -3153,7 +3169,7 @@ Commands:
 </code></pre></div></p>
 <p>An unmatched single token is treated as an MSBuild target, preserving the legacy target-invocation behavior:</p>
 <div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>build<span class="w">                         </span><span class="c1"># Display available targets</span>
-sdo<span class="w"> </span><span class="nb">test</span><span class="w"> </span>--verbose<span class="w">                </span><span class="c1"># Build the `test` target through MSBuild</span>
+sdo<span class="w"> </span>TEST<span class="w"> </span>--verbose<span class="w">                </span><span class="c1"># Build the `TEST` target through MSBuild</span>
 </code></pre></div>
 <p>The target is resolved from <code>sdo.targets</code> in the current directory. Multiple unmatched tokens and unknown options return an error.</p>
 <h4 id="repo-info">repo info<a class="headerlink" href="#repo-info" title="Anchor link to this section for reference">&para;</a></h4>
@@ -3211,8 +3227,13 @@ sdo<span class="w"> </span>repo<span class="w"> </span>delete<span class="w"> </
 <h3 id="local-automation">Local automation<a class="headerlink" href="#local-automation" title="Anchor link to this section for reference">&para;</a></h3>
 <p>These command groups consolidate the local build, backup, and file-search workflows into SDO.</p>
 <h4 id="tool">tool<a class="headerlink" href="#tool" title="Anchor link to this section for reference">&para;</a></h4>
-<p>Manage tools from JSON or YAML application manifests. <code>--manifest</code> is shared
-by all four operations; <code>--json</code> remains supported for existing scripts.</p>
+<p>Environment tool installation, auditing, and manifest management. Use
+<code>--manifest</code> for JSON or YAML manifests; <code>--json</code> remains supported.</p>
+<p>Subcommands:
+- <code>install</code> — Install tools from a manifest or by application name
+- <code>list</code> — Display tools and versions
+- <code>uninstall</code> — Uninstall tools from a manifest
+- <code>download</code> — Download tools from a manifest</p>
 <div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>tool<span class="w"> </span>list
 sdo<span class="w"> </span>tool<span class="w"> </span>list<span class="w"> </span>--json<span class="w"> </span>apps.json
 sdo<span class="w"> </span>tool<span class="w"> </span>list<span class="w"> </span>--manifest<span class="w"> </span>apps.yaml
@@ -3225,41 +3246,59 @@ sdo<span class="w"> </span>tool<span class="w"> </span>install<span class="w"> <
 The JSON and YAML formats deserialize into the same production tool model.
 Use <code>sdo run</code> for generic workflow YAML; do not pass an apps manifest to it.</p>
 <h4 id="run">run<a class="headerlink" href="#run" title="Anchor link to this section for reference">&para;</a></h4>
-<p>Execute a generic YAML Launcher workflow in declared order:</p>
+<p>Execute a YAML Launcher workflow manifest:</p>
 <div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>run<span class="w"> </span>--manifest<span class="w"> </span>workflow.yaml
 </code></pre></div>
 <p>Workflow YAML supports <code>steps</code>, <code>workingDirectory</code>, <code>variables</code>,
 <code>execution.timeout</code> in seconds, expected return codes, captured output, and
 stop-on-error behavior. The command reports completed step counts and returns
 nonzero when the workflow fails.</p>
-<h4 id="test">test<a class="headerlink" href="#test" title="Anchor link to this section for reference">&para;</a></h4>
-<p>Execute ntools-launcher test metadata, either one file/test name or the
-discovered suite:</p>
+<h4 id="e2e">e2e<a class="headerlink" href="#e2e" title="Anchor link to this section for reference">&para;</a></h4>
+<p>Run ntools-launcher YAML test metadata by file, test name, or directory:</p>
 <div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>e2e<span class="w"> </span>--test-case<span class="w"> </span>metadata/Test_Validate_AzureDevOps_CreateBugFromMarkdown.yaml
 sdo<span class="w"> </span>e2e<span class="w"> </span>--metadata-path<span class="w"> </span>metadata
 sdo<span class="w"> </span>e2e
 </code></pre></div>
-<p>Test metadata adds step assertions and extracted variables such as <code>{bug_id}</code>.
-Each metadata file receives a pass/fail result and the command prints aggregate
-totals. Generic workflows and application manifests are rejected with guidance
-to use <code>sdo run</code> or <code>sdo tool</code>.</p>
-<h4 id="env-and-build">env and build<a class="headerlink" href="#env-and-build" title="Anchor link to this section for reference">&para;</a></h4>
+<p>Test metadata supports step assertions and extracted variables such as
+<code>{bug_id}</code>. The command reports each result and aggregate totals. Generic
+workflows and application manifests should use <code>sdo run</code> or <code>sdo tool</code>.</p>
+<h4 id="env">env<a class="headerlink" href="#env" title="Anchor link to this section for reference">&para;</a></h4>
+<p>Display local environment information.</p>
 <div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>env<span class="w"> </span>path
-sdo<span class="w"> </span>build<span class="w"> </span>targets
 </code></pre></div>
-<p><code>sdo env path</code> displays the effective PATH. <code>sdo build targets</code> lists targets and updates <code>targets.md</code> using the existing build-target discovery behavior.</p>
+<p><code>env path</code> prints the effective PATH entries with duplicates removed.</p>
+<h4 id="build">build<a class="headerlink" href="#build" title="Anchor link to this section for reference">&para;</a></h4>
+<p>Display available build targets for the current solution or project.</p>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>build<span class="w"> </span>targets
+</code></pre></div>
+<p><code>build targets</code> lists targets and updates <code>targets.md</code> using the existing
+build-target discovery behavior.</p>
 <h4 id="release">release<a class="headerlink" href="#release" title="Anchor link to this section for reference">&para;</a></h4>
+<p>Manage GitHub and Azure DevOps releases.</p>
+<p>Subcommands:
+- <code>create</code> — Create a GitHub release
+- <code>download</code> — Download a release asset
+- <code>list</code> — List releases for a repository</p>
 <div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>release<span class="w"> </span>list<span class="w"> </span>--dry-run
 sdo<span class="w"> </span>release<span class="w"> </span>create<span class="w"> </span>--repo<span class="w"> </span>owner/repository<span class="w"> </span>--tag<span class="w"> </span>v1.0.0<span class="w"> </span>--branch<span class="w"> </span>main<span class="w"> </span>--file<span class="w"> </span>release.zip<span class="w"> </span>--dry-run
 sdo<span class="w"> </span>release<span class="w"> </span>download<span class="w"> </span>--repo<span class="w"> </span>owner/repository<span class="w"> </span>--tag<span class="w"> </span>v1.0.0<span class="w"> </span>--dry-run
 </code></pre></div>
 <h4 id="backup">backup<a class="headerlink" href="#backup" title="Anchor link to this section for reference">&para;</a></h4>
+<p>Create, validate, or run a configured workspace backup. The direct form and
+<code>backup run</code> perform the same operation.</p>
+<p>Subcommands:
+- <code>init</code> — Extract a sample backup configuration
+- <code>run</code> — Validate or perform a configured backup</p>
 <div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>backup<span class="w"> </span>init<span class="w"> </span>--output<span class="w"> </span>nbackup.json
 sdo<span class="w"> </span>backup<span class="w"> </span>--input<span class="w"> </span>nbackup.json<span class="w"> </span>--dry-run
 sdo<span class="w"> </span>backup<span class="w"> </span>run<span class="w"> </span>--input<span class="w"> </span>nbackup.json<span class="w"> </span>--dry-run
 </code></pre></div>
 <p><code>backup</code> accepts the backup options directly and implicitly runs the backup operation. The explicit <code>backup run</code> form remains supported and executes the same logic. Both forms resolve environment variables, apply configured exclusions and log options, and invoke <code>robocopy</code> only when <code>--dry-run</code> is not specified.</p>
 <h4 id="file">file<a class="headerlink" href="#file" title="Anchor link to this section for reference">&para;</a></h4>
+<p>List files or folders recursively.</p>
+<p>Subcommands:
+- <code>files</code> — List files matching extensions
+- <code>folders</code> — List folders containing specified names</p>
 <div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>file<span class="w"> </span>files<span class="w"> </span>--directoryPath<span class="w"> </span>C:<span class="se">\w</span>ork<span class="w"> </span>--extensions<span class="w"> </span>.cs
 sdo<span class="w"> </span>file<span class="w"> </span>folders<span class="w"> </span>--directoryPath<span class="w"> </span>C:<span class="se">\w</span>ork<span class="w"> </span>--name<span class="w"> </span>src
 </code></pre></div>

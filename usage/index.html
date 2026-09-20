@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#global-options" class="md-skip">
+        <a href="#ntools-usage" class="md-skip">
           Skip to content
         </a>
       
@@ -526,6 +526,8 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
+        
+      
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
           
@@ -568,6 +570,8 @@
   
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -576,10 +580,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#global-options" class="md-nav__link">
+  <a href="#prerequisites" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Global Options
+        Prerequisites
       
     </span>
   </a>
@@ -587,10 +591,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#build-test-commands" class="md-nav__link">
+  <a href="#first-run" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Build &amp; Test Commands
+        First Run
       
     </span>
   </a>
@@ -598,60 +602,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#yaml-commands" class="md-nav__link">
+  <a href="#yaml-workflows" class="md-nav__link">
     <span class="md-ellipsis">
       
-        YAML Commands
+        YAML Workflows
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="YAML Commands">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#workflow-yaml" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Workflow YAML
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tool-manifests" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Tool manifests
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#test-metadata" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Test metadata
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#sdo-configuration-management-advanced-automation-features" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        SDO Configuration Management (Advanced Automation Features)
+        Next Steps
       
     </span>
   </a>
@@ -1354,117 +1319,40 @@
   
 
 
-  <h1>Usage Guide</h1>
-
-<p>Once Ntools is installed, open a Developer Command Prompt for Visual Studio 2026 and navigate to your solution folder (for example, <code>./ntools</code>). The <a href="https://dotnet.microsoft.com/download">.NET SDK</a> must be installed and available in your PATH for build operations. The <code>sdo</code> executable is the primary command-line interface for Ntools. The following are examples of how to use it:</p>
-<h2 id="global-options">Global Options<a class="headerlink" href="#global-options" title="Anchor link to this section for reference">&para;</a></h2>
-<p>Ntools supports global options that work across all commands:
-- <code>--dry-run</code>: Preview changes without applying them
-- <code>--verbose</code>: Enable verbose output for detailed information</p>
-<h2 id="build-test-commands">Build &amp; Test Commands<a class="headerlink" href="#build-test-commands" title="Anchor link to this section for reference">&para;</a></h2>
+<h1 id="ntools-usage">Ntools Usage<a class="headerlink" href="#ntools-usage" title="Anchor link to this section for reference">&para;</a></h1>
+<p>Ntools provides the <code>sdo</code> command-line tool for build automation, YAML
+workflows, tool management, and DevOps operations.</p>
+<h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Anchor link to this section for reference">&para;</a></h2>
 <ul>
-<li>Build a solution: Compiles the solution in the solution directory</li>
+<li>Install the <a href="https://dotnet.microsoft.com/download">.NET SDK</a>.</li>
+<li>Install Ntools and open a Developer Command Prompt for Visual Studio.</li>
+<li>Change to the solution or repository directory.</li>
 </ul>
-<p><div class="highlight"><pre><span></span><code>sdo solution
+<h2 id="first-run">First Run<a class="headerlink" href="#first-run" title="Anchor link to this section for reference">&para;</a></h2>
+<p>Build and clean the current solution:</p>
+<div class="highlight"><pre><span></span><code>sdo solution
+sdo clean
 </code></pre></div>
-- Clean a solution:  Deletes the release/Debug, bin and obj folders in the solution directory</p>
-<p><div class="highlight"><pre><span></span><code>sdo clean
+<p>Run unit tests with the repository target or <code>dotnet test</code>:</p>
+<div class="highlight"><pre><span></span><code>sdo TEST
+dotnet test
 </code></pre></div>
-- Run ntools-launcher YAML test metadata with <code>sdo e2e</code>:</p>
-<div class="highlight"><pre><span></span><code>sdo e2e
-</code></pre></div>
-<p>For solution unit tests, use the repository test target or <code>dotnet test</code>, for
-example <code>nb UNIT_TEST_SDOTESTS</code>.</p>
-<h2 id="yaml-commands">YAML Commands<a class="headerlink" href="#yaml-commands" title="Anchor link to this section for reference">&para;</a></h2>
-<p>The SDO CLI keeps three YAML formats separate:</p>
+<p>Use <code>--verbose</code> for diagnostic output and <code>--dry-run</code> to preview supported
+operations.</p>
+<h2 id="yaml-workflows">YAML Workflows<a class="headerlink" href="#yaml-workflows" title="Anchor link to this section for reference">&para;</a></h2>
+<p>The YAML command families have separate purposes:</p>
 <ul>
-<li><code>sdo run --manifest &lt;file&gt;</code> executes generic YAML Launcher workflows.</li>
-<li><code>sdo tool &lt;operation&gt; --manifest &lt;file&gt;</code> manages application manifests.</li>
-<li><code>sdo e2e --test-case &lt;path-or-name&gt;</code> executes test metadata with assertions
-  and extracted variables.</li>
+<li><code>sdo run --manifest &lt;file&gt;</code> runs a YAML Launcher workflow.</li>
+<li><code>sdo tool &lt;operation&gt; --manifest &lt;file&gt;</code> manages JSON or YAML tool manifests.</li>
+<li><code>sdo e2e --test-case &lt;path-or-name&gt;</code> runs test metadata with assertions.</li>
 </ul>
-<h3 id="workflow-yaml">Workflow YAML<a class="headerlink" href="#workflow-yaml" title="Anchor link to this section for reference">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>sdo run --manifest .\workflow.yaml
-</code></pre></div>
-<p>Workflow files define <code>steps</code>, optional <code>variables</code>, and <code>execution</code> settings.
-Variable references use <code>$(NAME)</code>. Tool manifests are rejected by <code>sdo run</code>.</p>
-<h3 id="tool-manifests">Tool manifests<a class="headerlink" href="#tool-manifests" title="Anchor link to this section for reference">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>sdo tool list --manifest .\apps.yaml
-sdo tool install --manifest .\apps.yaml --dry-run
-sdo tool download --manifest .\apps.yaml --dry-run
-sdo tool uninstall --manifest .\apps.yaml --dry-run
-</code></pre></div>
-<p>JSON remains supported with <code>--json</code>, and named installs remain available with
-<code>--name</code> and optional <code>--appversion</code>.</p>
-<h3 id="test-metadata">Test metadata<a class="headerlink" href="#test-metadata" title="Anchor link to this section for reference">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>sdo e2e --test-case .\metadata\Test_Validate_AzureDevOps_CreateBugFromMarkdown.yaml
-sdo e2e --metadata-path .\metadata
-</code></pre></div>
-<p>Test metadata uses launcher steps with <code>assertions</code> and <code>extractVariables</code>.
-The command reports each metadata result and an aggregate pass/fail summary.
-Generic workflows and tool manifests are rejected with guidance to use
-<code>sdo run</code> or <code>sdo tool</code>. The legacy <code>sdo-e2e-test test</code> command remains
-available during migration.</p>
+<h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Anchor link to this section for reference">&para;</a></h2>
+<p>See the <a href="../sdo-net/">sdo CLI reference</a> for all commands, options, examples,
+configuration, build targets, and troubleshooting guidance.</p>
 <ul>
-<li>
-<p>Run specific unit test suites:
-<div class="highlight"><pre><span></span><code>sdo UNIT_TEST_CLI_VALIDATION    # CLI validation tests
-sdo UNIT_TEST_GIT_CLONE_COMMAND # Git clone command tests
-sdo UNIT_TEST_ALL              # All unit tests (except long-running ones)
-</code></pre></div></p>
-</li>
-<li>
-<p>Create a stage release: Creates a stage build which includes the following steps:</p>
-<ul>
-<li>Clean the solution</li>
-<li>Build the solution</li>
-<li>Run tests with code coverage</li>
-<li>Generate coverage reports</li>
-<li>Publish the stage build</li>
-<li>Verify artifacts with smoke tests</li>
-<li>Create a zip file of the stage build file</li>
+<li><a href="../nbuild-targets/">Nbuild targets</a></li>
+<li><a href="../code-coverage/">Code coverage</a></li>
 </ul>
-</li>
-</ul>
-<div class="highlight"><pre><span></span><code>sdo stage
-</code></pre></div>
-<ul>
-<li>Comprehensive smoke test: Validates published artifacts and build system integrity</li>
-</ul>
-<div class="highlight"><pre><span></span><code>sdo smoke_test
-</code></pre></div>
-<ul>
-<li>Display available targets:  Lists all the available targets in the targets file</li>
-</ul>
-<div class="highlight"><pre><span></span><code>sdo targets
-</code></pre></div>
-<ul>
-<li>See the complete list of available targets at <a href="../nbuild-targets/">Nbuild Targets</a></li>
-<li>Learn more about code coverage at <a href="../code-coverage/">Code Coverage</a></li>
-</ul>
-<h2 id="sdo-configuration-management-advanced-automation-features">SDO Configuration Management (Advanced Automation Features)<a class="headerlink" href="#sdo-configuration-management-advanced-automation-features" title="Anchor link to this section for reference">&para;</a></h2>
-<p>Work item queries can be standardized using YAML configuration files. See <a href="../sdo-net/#configuration-system-yaml-based">SDO Configuration System</a> for detailed documentation.</p>
-<p><strong>Quick Start</strong>:</p>
-<ol>
-<li>Create <code>sdo-config.yaml</code> in your project's <code>.temp</code> folder:</li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="nt">commands</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">wi</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">list</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">area_path</span><span class="p">:</span><span class="w"> </span><span class="s">"MyProject\\Backend"</span>
-<span class="w">      </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="s">"In</span><span class="nv"> </span><span class="s">Progress"</span>
-<span class="w">      </span><span class="nt">top</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20</span>
-</code></pre></div>
-<ol>
-<li>Run <code>sdo wi list</code> from the project directory to use configuration defaults automatically</li>
-</ol>
-<p><strong>Configuration Priority</strong> (highest to lowest):
-1. CLI parameters: <code>sdo wi list --state "Done"</code>
-2. Config file defaults: <code>sdo-config.yaml</code>
-3. Hard-coded defaults in code</p>
-<p>For more details, see:
-- <a href="../sdo-net/#configuration-system-yaml-based">Configuration System Documentation</a>
-- <a href="../sdo-net/#markdown-parser-for-content-creation">Markdown Parser for Content Creation</a></p>
 
 
 
