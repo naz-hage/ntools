@@ -47,8 +47,7 @@ public sealed class TestCommand : Command
                     return 1;
                 }
 
-                var runner = new NtoolsLauncherTestRunner(verbose, metadataPath: resolvedMetadataPath);
-                return await runner.RunAllTestsAsync() ? 0 : 1;
+                return await RunMetadataSuiteAsync(resolvedMetadataPath, verbose);
             }
 
             var testFile = ResolveTestFile(testCase, resolvedMetadataPath);
@@ -74,12 +73,94 @@ public sealed class TestCommand : Command
             }
 
             var testRunner = new NtoolsLauncherTestRunner(verbose, metadataPath: resolvedMetadataPath);
-            return await testRunner.RunTestAsync(testCase) ? 0 : 1;
+            ConsoleHelper.WriteWarning("Metadata files: 1");
+            var success = await testRunner.RunTestAsync(testCase);
+            WriteMetadataResult(GetTestName(testCase), success);
+            WriteMetadataSummary(success ? 1 : 0, success ? 0 : 1);
+            return success ? 0 : 1;
         }
         catch (Exception exception)
         {
             ConsoleHelper.WriteError($"Test run failed: {exception.Message}");
             return 1;
+        }
+    }
+
+    private static async Task<int> RunMetadataSuiteAsync(string metadataPath, bool verbose)
+    {
+        var metadataFiles = GetMetadataFiles(metadataPath);
+        ConsoleHelper.WriteWarning($"Metadata files: {metadataFiles.Length}");
+
+        if (metadataFiles.Length == 0)
+        {
+            ConsoleHelper.WriteWarning("No YAML test files found.");
+            WriteMetadataSummary(0, 0);
+            return 0;
+        }
+
+        var passed = 0;
+        var failed = 0;
+        var runner = new NtoolsLauncherTestRunner(verbose, metadataPath: metadataPath);
+
+        foreach (var metadataFile in metadataFiles)
+        {
+            var testName = GetTestName(metadataFile);
+            var success = await runner.RunTestAsync(testName);
+            if (success)
+            {
+                passed++;
+            }
+            else
+            {
+                failed++;
+            }
+
+            WriteMetadataResult(testName, success);
+        }
+
+        WriteMetadataSummary(passed, failed);
+        return failed == 0 ? 0 : 1;
+    }
+
+    private static string[] GetMetadataFiles(string metadataPath)
+    {
+        return Directory.GetFiles(metadataPath)
+            .Where(path =>
+            {
+                var fileName = Path.GetFileName(path);
+                var supportedExtension = fileName.EndsWith(".yaml", StringComparison.OrdinalIgnoreCase) ||
+                    fileName.EndsWith(".yml", StringComparison.OrdinalIgnoreCase);
+                var supportedName = fileName.StartsWith("Test_", StringComparison.OrdinalIgnoreCase) ||
+                    fileName.StartsWith("Validate_", StringComparison.OrdinalIgnoreCase);
+                return supportedName && supportedExtension;
+            })
+            .OrderBy(path => path, StringComparer.Ordinal)
+            .ToArray();
+    }
+
+    private static void WriteMetadataResult(string testName, bool success)
+    {
+        if (success)
+        {
+            ConsoleHelper.WriteSuccess($"PASS: {testName}");
+        }
+        else
+        {
+            ConsoleHelper.WriteError($"FAIL: {testName}");
+        }
+    }
+
+    private static void WriteMetadataSummary(int passed, int failed)
+    {
+        ConsoleHelper.WriteWarning($"Metadata summary: {passed + failed} total");
+        ConsoleHelper.WriteSuccess($"Passed: {passed}");
+        if (failed > 0)
+        {
+            ConsoleHelper.WriteError($"Failed: {failed}");
+        }
+        else
+        {
+            ConsoleHelper.WriteWarning("Failed: 0");
         }
     }
 
