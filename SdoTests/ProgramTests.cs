@@ -170,7 +170,7 @@ steps:
 
         try
         {
-            var result = Program.Main("test", "--test-case", metadataPath);
+            var result = Program.Main("e2e", "--test-case", metadataPath);
 
             Assert.Equal(0, result);
         }
@@ -194,7 +194,7 @@ steps:
 
         try
         {
-            var result = Program.Main("test", "--test-case", manifestPath);
+            var result = Program.Main("e2e", "--test-case", manifestPath);
 
             Assert.NotEqual(0, result);
         }
@@ -222,7 +222,7 @@ steps:
 
         try
         {
-            var result = Program.Main("test", "--metadata-path", metadataPath);
+            var result = Program.Main("e2e", "--metadata-path", metadataPath);
 
             Assert.Equal(0, result);
         }

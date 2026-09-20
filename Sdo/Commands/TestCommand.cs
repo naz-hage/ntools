@@ -13,7 +13,7 @@ namespace Sdo.Commands;
 public sealed class TestCommand : Command
 {
     public TestCommand(Option<bool> verboseOption)
-        : base("test", "Run ntools-launcher YAML test metadata")
+        : base("e2e", "Run ntools-launcher YAML test metadata")
     {
         var testCaseOption = new Option<string?>("--test-case")
         {

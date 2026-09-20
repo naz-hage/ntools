@@ -773,15 +773,51 @@ These command groups consolidate the local build, backup, and file-search workfl
 
 #### tool
 
-Manage tools from an apps manifest:
+Manage tools from JSON or YAML application manifests. `--manifest` is shared
+by all four operations; `--json` remains supported for existing scripts.
 
 ```bash
 sdo tool list
 sdo tool list --json apps.json
-sdo tool install --json apps.json --dry-run
-sdo tool uninstall --json apps.json --dry-run
-sdo tool download --json apps.json --dry-run
+sdo tool list --manifest apps.yaml
+sdo tool install --manifest apps.yaml --dry-run
+sdo tool download --manifest apps.yaml --dry-run
+sdo tool uninstall --manifest apps.yaml --dry-run
+sdo tool install --name "Git for Windows" --appversion 2.51.1 --dry-run
 ```
+
+Application manifests contain `Version`, `DownloadPath`, and `NbuildAppList`.
+The JSON and YAML formats deserialize into the same production tool model.
+Use `sdo run` for generic workflow YAML; do not pass an apps manifest to it.
+
+#### run
+
+Execute a generic YAML Launcher workflow in declared order:
+
+```bash
+sdo run --manifest workflow.yaml
+```
+
+Workflow YAML supports `steps`, `workingDirectory`, `variables`,
+`execution.timeout` in seconds, expected return codes, captured output, and
+stop-on-error behavior. The command reports completed step counts and returns
+nonzero when the workflow fails.
+
+#### test
+
+Execute ntools-launcher test metadata, either one file/test name or the
+discovered suite:
+
+```bash
+sdo e2e --test-case metadata/Test_Validate_AzureDevOps_CreateBugFromMarkdown.yaml
+sdo e2e --metadata-path metadata
+sdo e2e
+```
+
+Test metadata adds step assertions and extracted variables such as `{bug_id}`.
+Each metadata file receives a pass/fail result and the command prints aggregate
+totals. Generic workflows and application manifests are rejected with guidance
+to use `sdo run` or `sdo tool`.
 
 #### env and build
 
@@ -1539,12 +1575,16 @@ STEP 2: Execute --assigned-to-me filter
 Run individual test cases:
 
 ```bash
-# Run a specific test
-sdo-e2e-tests.exe --test-case Validate_AzureDevOps_ListAssignedToMe
+# Run a specific migrated metadata test through sdo
+sdo e2e --test-case .\metadata\Test_Validate_AzureDevOps_ListAssignedToMe.yaml
 
 # Run with verbose output
-sdo-e2e-tests.exe --test-case Validate_GitHub_ListAssignedToMe --verbose
+sdo e2e --test-case .\metadata\Test_Validate_GitHub_ListAssignedToMe.yaml --verbose
 ```
+
+The legacy `sdo-e2e-test test` command remains available as a compatibility
+path during migration. New CI and scripts should use `sdo e2e`; the legacy
+executable can be retired after callers have migrated.
 
 #### Test Coverage
 

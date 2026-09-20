@@ -20,11 +20,57 @@ sdo solution
 ```cmd
 sdo clean
 ```
-- Test solution: runs all the tests in the solution with optional code coverage
+- Run ntools-launcher YAML test metadata with `sdo e2e`:
 
 ```cmd
-sdo test
+sdo e2e
 ```
+
+For solution unit tests, use the repository test target or `dotnet test`, for
+example `nb UNIT_TEST_SDOTESTS`.
+
+## YAML Commands
+
+The SDO CLI keeps three YAML formats separate:
+
+- `sdo run --manifest <file>` executes generic YAML Launcher workflows.
+- `sdo tool <operation> --manifest <file>` manages application manifests.
+- `sdo e2e --test-case <path-or-name>` executes test metadata with assertions
+  and extracted variables.
+
+### Workflow YAML
+
+```cmd
+sdo run --manifest .\workflow.yaml
+```
+
+Workflow files define `steps`, optional `variables`, and `execution` settings.
+Variable references use `$(NAME)`. Tool manifests are rejected by `sdo run`.
+
+### Tool manifests
+
+```cmd
+sdo tool list --manifest .\apps.yaml
+sdo tool install --manifest .\apps.yaml --dry-run
+sdo tool download --manifest .\apps.yaml --dry-run
+sdo tool uninstall --manifest .\apps.yaml --dry-run
+```
+
+JSON remains supported with `--json`, and named installs remain available with
+`--name` and optional `--appversion`.
+
+### Test metadata
+
+```cmd
+sdo e2e --test-case .\metadata\Test_Validate_AzureDevOps_CreateBugFromMarkdown.yaml
+sdo e2e --metadata-path .\metadata
+```
+
+Test metadata uses launcher steps with `assertions` and `extractVariables`.
+The command reports each metadata result and an aggregate pass/fail summary.
+Generic workflows and tool manifests are rejected with guidance to use
+`sdo run` or `sdo tool`. The legacy `sdo-e2e-test test` command remains
+available during migration.
 
 - Run specific unit test suites:
 ```cmd
