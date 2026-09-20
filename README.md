@@ -75,6 +75,23 @@ steps:
 
 Tool manifests such as `apps.yaml` are handled by `sdo tool`, not `sdo run`.
 
+#### YAML Test Metadata
+
+Run one test metadata file by path or name, or discover the migrated suite:
+
+```bash
+sdo test --test-case .\metadata\Test_Validate_AzureDevOps_CreateBugFromMarkdown.yaml
+sdo test --metadata-path .\metadata
+sdo test
+```
+
+Test metadata is distinct from workflow YAML because its steps may define
+assertions and extracted variables such as `{bug_id}`. Use `sdo run` for
+generic workflows and `sdo tool` for application manifests. The legacy
+`sdo-e2e-test test` command remains available during migration; new scripts
+and CI should use `sdo test`. The compatibility executable can be retired
+after existing callers have migrated.
+
 **Authentication:**
 - Azure DevOps: Set `AZURE_DEVOPS_PAT` environment variable
 - GitHub: Uses GitHub CLI authentication or `GITHUB_TOKEN` environment variable
