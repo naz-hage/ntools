@@ -61,34 +61,39 @@ git remote -v
 ```
 $ sdo --help
 
-sdo v1.73.7 - Simple DevOps Operations by naz-hage (2020-2026)
+sdo v1.81.4 - Simple DevOps Operations by naz-hage (2020-2026)
 
 Description:
   Simple DevOps Operations CLI tool for Azure DevOps and GitHub
 
 Usage:
-  sdo [command] [options]
+  sdo [command] [options] [[--] <additional arguments>...]
 
 Options:
-  --dry-run       Perform a dry run without side effects
-  --verbose       Enable verbose output
+  -v, --verbose   Enable verbose output
+  -dr, --dry-run  Perform a dry run without side effects
   -?, -h, --help  Show help and usage information
   --version       Show version information
 
 Commands:
-  map       Show command mappings between SDO and native CLI tools
+  map       Show command mappings between SDO and gh/az native CLI tools
   auth      Verify authentication with GitHub or Azure DevOps
   pipeline  Pipeline/workflow management commands (create, show, list, run, status, logs, delete, lastbuild, update)
   pr        Pull request operations
   repo      Repository management commands
-  tool      Tool installation and download commands
-  env       Environment inspection commands
-  build     Build automation and target management
-  release   GitHub release operations
-  backup    Backup configuration and execution
-  file      File and folder search commands
   wi        Work item management commands
   user      User management commands for GitHub and Azure DevOps
+  tool      Environment tool installation, auditing, and manifest management
+  run       Execute a YAML Launcher workflow manifest
+  e2e       Run ntools-launcher YAML test metadata
+  env       Environment and local system utilities
+  build     Build automation and target management
+  release   GitHub and Azure DevOps release management
+  backup    Environment and workspace backup utilities
+  file      File and folder listing utilities
+
+Additional Arguments:
+  Arguments passed to the application that is being run.
 ```
 
 ## Command Reference
@@ -682,7 +687,7 @@ An unmatched single token is treated as an MSBuild target, preserving the legacy
 
 ```bash
 sdo build                         # Display available targets
-sdo test --verbose                # Build the `test` target through MSBuild
+sdo TEST --verbose                # Build the `TEST` target through MSBuild
 ```
 
 The target is resolved from `sdo.targets` in the current directory. Multiple unmatched tokens and unknown options return an error.
@@ -772,8 +777,14 @@ These command groups consolidate the local build, backup, and file-search workfl
 
 #### tool
 
-Manage tools from JSON or YAML application manifests. `--manifest` is shared
-by all four operations; `--json` remains supported for existing scripts.
+Environment tool installation, auditing, and manifest management. Use
+`--manifest` for JSON or YAML manifests; `--json` remains supported.
+
+Subcommands:
+- `install` — Install tools from a manifest or by application name
+- `list` — Display tools and versions
+- `uninstall` — Uninstall tools from a manifest
+- `download` — Download tools from a manifest
 
 ```bash
 sdo tool list
@@ -791,7 +802,7 @@ Use `sdo run` for generic workflow YAML; do not pass an apps manifest to it.
 
 #### run
 
-Execute a generic YAML Launcher workflow in declared order:
+Execute a YAML Launcher workflow manifest:
 
 ```bash
 sdo run --manifest workflow.yaml
@@ -802,10 +813,9 @@ Workflow YAML supports `steps`, `workingDirectory`, `variables`,
 stop-on-error behavior. The command reports completed step counts and returns
 nonzero when the workflow fails.
 
-#### test
+#### e2e
 
-Execute ntools-launcher test metadata, either one file/test name or the
-discovered suite:
+Run ntools-launcher YAML test metadata by file, test name, or directory:
 
 ```bash
 sdo e2e --test-case metadata/Test_Validate_AzureDevOps_CreateBugFromMarkdown.yaml
@@ -813,21 +823,39 @@ sdo e2e --metadata-path metadata
 sdo e2e
 ```
 
-Test metadata adds step assertions and extracted variables such as `{bug_id}`.
-Each metadata file receives a pass/fail result and the command prints aggregate
-totals. Generic workflows and application manifests are rejected with guidance
-to use `sdo run` or `sdo tool`.
+Test metadata supports step assertions and extracted variables such as
+`{bug_id}`. The command reports each result and aggregate totals. Generic
+workflows and application manifests should use `sdo run` or `sdo tool`.
 
-#### env and build
+#### env
+
+Display local environment information.
 
 ```bash
 sdo env path
+```
+
+`env path` prints the effective PATH entries with duplicates removed.
+
+#### build
+
+Display available build targets for the current solution or project.
+
+```bash
 sdo build targets
 ```
 
-`sdo env path` displays the effective PATH. `sdo build targets` lists targets and updates `targets.md` using the existing build-target discovery behavior.
+`build targets` lists targets and updates `targets.md` using the existing
+build-target discovery behavior.
 
 #### release
+
+Manage GitHub and Azure DevOps releases.
+
+Subcommands:
+- `create` — Create a GitHub release
+- `download` — Download a release asset
+- `list` — List releases for a repository
 
 ```bash
 sdo release list --dry-run
@@ -836,6 +864,13 @@ sdo release download --repo owner/repository --tag v1.0.0 --dry-run
 ```
 
 #### backup
+
+Create, validate, or run a configured workspace backup. The direct form and
+`backup run` perform the same operation.
+
+Subcommands:
+- `init` — Extract a sample backup configuration
+- `run` — Validate or perform a configured backup
 
 ```bash
 sdo backup init --output nbackup.json
@@ -846,6 +881,12 @@ sdo backup run --input nbackup.json --dry-run
 `backup` accepts the backup options directly and implicitly runs the backup operation. The explicit `backup run` form remains supported and executes the same logic. Both forms resolve environment variables, apply configured exclusions and log options, and invoke `robocopy` only when `--dry-run` is not specified.
 
 #### file
+
+List files or folders recursively.
+
+Subcommands:
+- `files` — List files matching extensions
+- `folders` — List folders containing specified names
 
 ```bash
 sdo file files --directoryPath C:\work --extensions .cs
