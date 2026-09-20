@@ -123,7 +123,7 @@
     </Target>
 
     <!-- Unit tests for all SDO tests with code coverage -->
-    <Target Name="UNIT_TEST_SDO_ALL">
+    <Target Name="UNIT_TEST_SDOTESTS">
         <Message Text="Running all SDO unit tests with code coverage..." />
         <Exec Command='dotnet test "$(SolutionDir)\SdoTests\SdoTests.csproj" --configuration Release --logger trx --collect:"XPlat Code Coverage"' WorkingDirectory="$(SolutionDir)" />
         <Message Text="All SDO unit tests complete." />
