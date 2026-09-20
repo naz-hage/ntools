@@ -107,38 +107,6 @@ sdo targets
 - See the complete list of available targets at [Nbuild Targets](./nbuild-targets.md)
 - Learn more about code coverage at [Code Coverage](./code-coverage.md)
 
-## E2E Testing Commands (Advanced Automation Features)
-
-Run end-to-end tests for validating cross-platform SDO operations:
-
-- Run Azure DevOps work item filtering tests:
-
-```cmd
-sdo RUN_AZDO_WI_ASSIGNED_TO_ME_TEST
-```
-
-- Run GitHub issue filtering tests:
-
-```cmd
-sdo RUN_GITHUB_WI_ASSIGNED_TO_ME_TEST
-```
-
-- Run Azure DevOps pipeline operation tests:
-
-```cmd
-sdo RUN_AZDO_PIPELINE_TEST
-```
-
-- Run GitHub Actions operation tests:
-
-```cmd
-sdo RUN_GITHUB_PIPELINE_TEST
-```
-
-**Output**: Color-coded console (green for [SUCCESS], red for [ERROR]) with detailed logging to `sdo-e2e-test.log`
-
-- See the complete list of E2E targets in [SDO CLI documentation](./sdo-net.md#e2e-testing-infrastructure)
-
 ## SDO Configuration Management (Advanced Automation Features)
 
 Work item queries can be standardized using YAML configuration files. See [SDO Configuration System](./sdo-net.md#configuration-system-yaml-based) for detailed documentation.

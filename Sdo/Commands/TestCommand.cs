@@ -88,6 +88,7 @@ public sealed class TestCommand : Command
 
     private static async Task<int> RunMetadataSuiteAsync(string metadataPath, bool verbose)
     {
+        ConsoleHelper.WriteInfo($"metadata Path: {metadataPath}");
         var metadataFiles = GetMetadataFiles(metadataPath);
         ConsoleHelper.WriteWarning($"Metadata files: {metadataFiles.Length}");
 
