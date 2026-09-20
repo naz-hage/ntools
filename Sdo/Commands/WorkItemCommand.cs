@@ -1977,7 +1977,7 @@ namespace Sdo.Commands
                     {
                         foreach (var error in parseResult.Errors)
                         {
-                            ConsoleHelper.WriteLine($"Markdown parse error (line {error.LineNumber}): {error.Message}");
+                            ConsoleHelper.WriteError($"Markdown parse error (line {error.LineNumber}): {error.Message}");
                         }
                     }
                     return null;
@@ -2002,7 +2002,7 @@ namespace Sdo.Commands
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteLine($"Failed to parse markdown file: {ex.Message}");
+                ConsoleHelper.WriteError($"Failed to parse markdown file: {ex.Message}");
                 return null;
             }
         }

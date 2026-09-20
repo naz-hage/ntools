@@ -48,6 +48,33 @@ sdo pr create --title "Feature: New Capability"
 sdo repo list
 ```
 
+#### YAML Workflows
+
+Run an ordered YAML Launcher workflow with `sdo run`. The manifest must define
+at least one step; variables use `$(NAME)` placeholders.
+
+```bash
+sdo run --manifest workflow.yaml
+```
+
+```yaml
+version: '1.0'
+description: Build the project
+variables:
+  CONFIGURATION: Release
+execution:
+  timeout: 00:10:00
+  stopOnFirstError: true
+steps:
+  - name: Build
+    path: dotnet
+    arguments: build --configuration $(CONFIGURATION)
+    workingDirectory: .
+    expectedReturnCode: 0
+```
+
+Tool manifests such as `apps.yaml` are handled by `sdo tool`, not `sdo run`.
+
 **Authentication:**
 - Azure DevOps: Set `AZURE_DEVOPS_PAT` environment variable
 - GitHub: Uses GitHub CLI authentication or `GITHUB_TOKEN` environment variable

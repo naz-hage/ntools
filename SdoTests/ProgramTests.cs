@@ -136,6 +136,24 @@ public class ProgramTests
     }
 
     [Fact]
+    public void Main_WithToolManifestOnRun_ReturnsNonZero()
+    {
+        var manifestPath = Path.Combine(Path.GetTempPath(), $"sdo-apps-{Guid.NewGuid():N}.yaml");
+        File.WriteAllText(manifestPath, "Version: '1.0'\nDownloadPath: 'C:/downloads'\nNbuildAppList: []\n");
+
+        try
+        {
+            var result = Program.Main("run", "--manifest", manifestPath);
+
+            Assert.NotEqual(0, result);
+        }
+        finally
+        {
+            File.Delete(manifestPath);
+        }
+    }
+
+    [Fact]
     public void Main_WithFileCommands_SearchesFilesAndFolders()
     {
         var testRoot = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());

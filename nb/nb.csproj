@@ -36,6 +36,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="YamlDotNet" Version="18.1.0" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<None Include="..\go\apps.json" CopyToOutputDirectory="PreserveNewest" Link="apps.json" />
 	</ItemGroup>
 

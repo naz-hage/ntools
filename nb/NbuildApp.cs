@@ -2,7 +2,12 @@
 
 namespace Nbuild
 {
-    public record NbuildApps(string Version, List<NbuildApp> NbuildAppList);
+    public class NbuildApps
+    {
+        public string? Version { get; set; }
+        public List<NbuildApp> NbuildAppList { get; set; } = [];
+        public string? DownloadPath { get; set; }
+    }
 
     public class NbuildApp
     {

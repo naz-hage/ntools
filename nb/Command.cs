@@ -9,6 +9,8 @@ using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace Nbuild
 {
@@ -17,7 +19,7 @@ namespace Nbuild
         private const string SupportedVersion = "1.2.0";
         private const int MsiReturnCodeRestartRequired = 1603;
         public static readonly string DefaultAppsFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "nbuild", "apps.json");
-        private static readonly string DownloadsDirectory = $"{Environment.GetEnvironmentVariable("Temp")}\\nb"; // "C:\\NToolsDownloads" $"{Environment.GetEnvironmentVariable("Temp")}\\nb"
+        private static string DownloadsDirectory = $"{Environment.GetEnvironmentVariable("Temp")}\\nb"; // "C:\\NToolsDownloads" $"{Environment.GetEnvironmentVariable("Temp")}\\nb"
         private static bool Verbose = false;
         private static bool ValidJson = false;
 
@@ -602,7 +604,6 @@ namespace Nbuild
         private static ResultHelper Install(NbuildApp nbuildApp, bool verbose = false)
         {
             Verbose = verbose;
-            if (!CanRunCommand()) return ResultHelper.Fail(-1, $"You must run this command as an administrator");
 
             if (string.IsNullOrEmpty(nbuildApp.DownloadedFile) ||
                 string.IsNullOrEmpty(nbuildApp.WebDownloadFile) ||
@@ -921,21 +922,15 @@ namespace Nbuild
                 }
             }
 
-            NbuildApps listAppData;
-            try
-            {
-                listAppData = JsonSerializer.Deserialize<NbuildApps>(json) ?? throw new ArgumentException("Failed to parse json to list of objects");
-            }
-            catch (JsonException ex)
-            {
-                throw new ArgumentException($"Invalid JSON format: {ex.Message}. Please check the JSON file for proper escaping of backslashes and quotes.", ex);
-            }
+            var listAppData = DeserializeManifest(json);
 
             // make sure version matches supported version
             if (listAppData.Version != SupportedVersion)
             {
-                throw new ArgumentException($"Json Version {listAppData.Version} is not supported. Please use version {SupportedVersion}");
+                throw new ArgumentException($"Manifest version {listAppData.Version} is not supported. Please use version {SupportedVersion}");
             }
+
+            ConfigureDownloadsDirectory(listAppData.DownloadPath);
 
             foreach (var appData in listAppData.NbuildAppList)
             {
@@ -943,6 +938,65 @@ namespace Nbuild
                 UpdateEnvironmentVariables(appData);
                 yield return appData;
             }
+        }
+
+        private static NbuildApps DeserializeManifest(string content)
+        {
+            var isYaml = content.TrimStart().StartsWith("Version:", StringComparison.OrdinalIgnoreCase) ||
+                content.TrimStart().StartsWith("version:", StringComparison.OrdinalIgnoreCase);
+            try
+            {
+                if (isYaml)
+                {
+                    return new DeserializerBuilder()
+                        .WithNamingConvention(NullNamingConvention.Instance)
+                        .IgnoreUnmatchedProperties()
+                        .Build()
+                        .Deserialize<NbuildApps>(content)
+                        ?? throw new ArgumentException("Failed to parse YAML manifest to a tool list.");
+                }
+
+                return JsonSerializer.Deserialize<NbuildApps>(content)
+                    ?? throw new ArgumentException("Failed to parse JSON manifest to a tool list.");
+            }
+            catch (YamlDotNet.Core.YamlException ex)
+            {
+                var location = ex.Start.Line > 0
+                    ? $" at line {ex.Start.Line}, column {ex.Start.Column}"
+                    : string.Empty;
+                throw new ArgumentException(
+                    $"Invalid YAML format{location}: {GetDetailedExceptionMessage(ex)}",
+                    ex);
+            }
+            catch (JsonException ex)
+            {
+                throw new ArgumentException($"Invalid JSON format: {ex.Message}. Please check the manifest for proper escaping.", ex);
+            }
+        }
+
+        private static string GetDetailedExceptionMessage(Exception exception)
+        {
+            var messages = new List<string>();
+            for (var current = exception; current != null; current = current.InnerException)
+            {
+                if (!string.IsNullOrWhiteSpace(current.Message) &&
+                    !messages.Contains(current.Message, StringComparer.Ordinal))
+                {
+                    messages.Add(current.Message);
+                }
+            }
+
+            return string.Join(" -> ", messages);
+        }
+
+        private static void ConfigureDownloadsDirectory(string? downloadPath)
+        {
+            if (!string.IsNullOrWhiteSpace(downloadPath))
+            {
+                DownloadsDirectory = Environment.ExpandEnvironmentVariables(downloadPath);
+            }
+
+            Directory.CreateDirectory(DownloadsDirectory);
         }
 
         /// <summary>
