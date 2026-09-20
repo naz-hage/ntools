@@ -1045,6 +1045,28 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        run
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        test
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#env-and-build" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3284,13 +3306,38 @@ sdo<span class="w"> </span>repo<span class="w"> </span>delete<span class="w"> </
 <h3 id="local-automation">Local automation<a class="headerlink" href="#local-automation" title="Anchor link to this section for reference">&para;</a></h3>
 <p>These command groups consolidate the local build, backup, and file-search workflows into SDO.</p>
 <h4 id="tool">tool<a class="headerlink" href="#tool" title="Anchor link to this section for reference">&para;</a></h4>
-<p>Manage tools from an apps manifest:</p>
+<p>Manage tools from JSON or YAML application manifests. <code>--manifest</code> is shared
+by all four operations; <code>--json</code> remains supported for existing scripts.</p>
 <div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>tool<span class="w"> </span>list
 sdo<span class="w"> </span>tool<span class="w"> </span>list<span class="w"> </span>--json<span class="w"> </span>apps.json
-sdo<span class="w"> </span>tool<span class="w"> </span>install<span class="w"> </span>--json<span class="w"> </span>apps.json<span class="w"> </span>--dry-run
-sdo<span class="w"> </span>tool<span class="w"> </span>uninstall<span class="w"> </span>--json<span class="w"> </span>apps.json<span class="w"> </span>--dry-run
-sdo<span class="w"> </span>tool<span class="w"> </span>download<span class="w"> </span>--json<span class="w"> </span>apps.json<span class="w"> </span>--dry-run
+sdo<span class="w"> </span>tool<span class="w"> </span>list<span class="w"> </span>--manifest<span class="w"> </span>apps.yaml
+sdo<span class="w"> </span>tool<span class="w"> </span>install<span class="w"> </span>--manifest<span class="w"> </span>apps.yaml<span class="w"> </span>--dry-run
+sdo<span class="w"> </span>tool<span class="w"> </span>download<span class="w"> </span>--manifest<span class="w"> </span>apps.yaml<span class="w"> </span>--dry-run
+sdo<span class="w"> </span>tool<span class="w"> </span>uninstall<span class="w"> </span>--manifest<span class="w"> </span>apps.yaml<span class="w"> </span>--dry-run
+sdo<span class="w"> </span>tool<span class="w"> </span>install<span class="w"> </span>--name<span class="w"> </span><span class="s2">"Git for Windows"</span><span class="w"> </span>--appversion<span class="w"> </span><span class="m">2</span>.51.1<span class="w"> </span>--dry-run
 </code></pre></div>
+<p>Application manifests contain <code>Version</code>, <code>DownloadPath</code>, and <code>NbuildAppList</code>.
+The JSON and YAML formats deserialize into the same production tool model.
+Use <code>sdo run</code> for generic workflow YAML; do not pass an apps manifest to it.</p>
+<h4 id="run">run<a class="headerlink" href="#run" title="Anchor link to this section for reference">&para;</a></h4>
+<p>Execute a generic YAML Launcher workflow in declared order:</p>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>run<span class="w"> </span>--manifest<span class="w"> </span>workflow.yaml
+</code></pre></div>
+<p>Workflow YAML supports <code>steps</code>, <code>workingDirectory</code>, <code>variables</code>,
+<code>execution.timeout</code> in seconds, expected return codes, captured output, and
+stop-on-error behavior. The command reports completed step counts and returns
+nonzero when the workflow fails.</p>
+<h4 id="test">test<a class="headerlink" href="#test" title="Anchor link to this section for reference">&para;</a></h4>
+<p>Execute ntools-launcher test metadata, either one file/test name or the
+discovered suite:</p>
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>e2e<span class="w"> </span>--test-case<span class="w"> </span>metadata/Test_Validate_AzureDevOps_CreateBugFromMarkdown.yaml
+sdo<span class="w"> </span>e2e<span class="w"> </span>--metadata-path<span class="w"> </span>metadata
+sdo<span class="w"> </span>e2e
+</code></pre></div>
+<p>Test metadata adds step assertions and extracted variables such as <code>{bug_id}</code>.
+Each metadata file receives a pass/fail result and the command prints aggregate
+totals. Generic workflows and application manifests are rejected with guidance
+to use <code>sdo run</code> or <code>sdo tool</code>.</p>
 <h4 id="env-and-build">env and build<a class="headerlink" href="#env-and-build" title="Anchor link to this section for reference">&para;</a></h4>
 <div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>env<span class="w"> </span>path
 sdo<span class="w"> </span>build<span class="w"> </span>targets
@@ -3935,12 +3982,15 @@ STEP 2: Execute --assigned-to-me filter
 </code></pre></div>
 <h4 id="running-specific-tests">Running Specific Tests<a class="headerlink" href="#running-specific-tests" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Run individual test cases:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Run a specific test</span>
-sdo-e2e-tests.exe<span class="w"> </span>--test-case<span class="w"> </span>Validate_AzureDevOps_ListAssignedToMe
+<div class="highlight"><pre><span></span><code><span class="c1"># Run a specific migrated metadata test through sdo</span>
+sdo<span class="w"> </span>e2e<span class="w"> </span>--test-case<span class="w"> </span>.<span class="se">\m</span>etadata<span class="se">\T</span>est_Validate_AzureDevOps_ListAssignedToMe.yaml
 
 <span class="c1"># Run with verbose output</span>
-sdo-e2e-tests.exe<span class="w"> </span>--test-case<span class="w"> </span>Validate_GitHub_ListAssignedToMe<span class="w"> </span>--verbose
+sdo<span class="w"> </span>e2e<span class="w"> </span>--test-case<span class="w"> </span>.<span class="se">\m</span>etadata<span class="se">\T</span>est_Validate_GitHub_ListAssignedToMe.yaml<span class="w"> </span>--verbose
 </code></pre></div>
+<p>The legacy <code>sdo-e2e-test test</code> command remains available as a compatibility
+path during migration. New CI and scripts should use <code>sdo e2e</code>; the legacy
+executable can be retired after callers have migrated.</p>
 <h4 id="test-coverage">Test Coverage<a class="headerlink" href="#test-coverage" title="Anchor link to this section for reference">&para;</a></h4>
 <p><strong>Platform Parity Tests</strong>:
 - Work item list filtering

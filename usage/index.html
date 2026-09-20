@@ -598,6 +598,56 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#yaml-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        YAML Commands
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="YAML Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#workflow-yaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow YAML
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tool-manifests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tool manifests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test metadata
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#e2e-testing-commands-advanced-automation-features" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1331,9 +1381,41 @@
 - Clean a solution:  Deletes the release/Debug, bin and obj folders in the solution directory</p>
 <p><div class="highlight"><pre><span></span><code>sdo clean
 </code></pre></div>
-- Test solution: runs all the tests in the solution with optional code coverage</p>
-<div class="highlight"><pre><span></span><code>sdo test
+- Run ntools-launcher YAML test metadata with <code>sdo e2e</code>:</p>
+<div class="highlight"><pre><span></span><code>sdo e2e
 </code></pre></div>
+<p>For solution unit tests, use the repository test target or <code>dotnet test</code>, for
+example <code>nb UNIT_TEST_SDOTESTS</code>.</p>
+<h2 id="yaml-commands">YAML Commands<a class="headerlink" href="#yaml-commands" title="Anchor link to this section for reference">&para;</a></h2>
+<p>The SDO CLI keeps three YAML formats separate:</p>
+<ul>
+<li><code>sdo run --manifest &lt;file&gt;</code> executes generic YAML Launcher workflows.</li>
+<li><code>sdo tool &lt;operation&gt; --manifest &lt;file&gt;</code> manages application manifests.</li>
+<li><code>sdo e2e --test-case &lt;path-or-name&gt;</code> executes test metadata with assertions
+  and extracted variables.</li>
+</ul>
+<h3 id="workflow-yaml">Workflow YAML<a class="headerlink" href="#workflow-yaml" title="Anchor link to this section for reference">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>sdo run --manifest .\workflow.yaml
+</code></pre></div>
+<p>Workflow files define <code>steps</code>, optional <code>variables</code>, and <code>execution</code> settings.
+Variable references use <code>$(NAME)</code>. Tool manifests are rejected by <code>sdo run</code>.</p>
+<h3 id="tool-manifests">Tool manifests<a class="headerlink" href="#tool-manifests" title="Anchor link to this section for reference">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>sdo tool list --manifest .\apps.yaml
+sdo tool install --manifest .\apps.yaml --dry-run
+sdo tool download --manifest .\apps.yaml --dry-run
+sdo tool uninstall --manifest .\apps.yaml --dry-run
+</code></pre></div>
+<p>JSON remains supported with <code>--json</code>, and named installs remain available with
+<code>--name</code> and optional <code>--appversion</code>.</p>
+<h3 id="test-metadata">Test metadata<a class="headerlink" href="#test-metadata" title="Anchor link to this section for reference">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>sdo e2e --test-case .\metadata\Test_Validate_AzureDevOps_CreateBugFromMarkdown.yaml
+sdo e2e --metadata-path .\metadata
+</code></pre></div>
+<p>Test metadata uses launcher steps with <code>assertions</code> and <code>extractVariables</code>.
+The command reports each metadata result and an aggregate pass/fail summary.
+Generic workflows and tool manifests are rejected with guidance to use
+<code>sdo run</code> or <code>sdo tool</code>. The legacy <code>sdo-e2e-test test</code> command remains
+available during migration.</p>
 <ul>
 <li>
 <p>Run specific unit test suites:
