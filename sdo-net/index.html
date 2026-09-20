@@ -1536,100 +1536,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#e2e-testing-infrastructure" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        E2E Testing Infrastructure
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="E2E Testing Infrastructure">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#overview_3" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Overview
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#test-targets" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Test Targets
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#example-output" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Example Output
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#running-specific-tests" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Running Specific Tests
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#test-coverage" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Test Coverage
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#log-files" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Log Files
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#integration-with-cicd" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Integration with CI/CD
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -2733,7 +2639,6 @@
 <li><a href="#troubleshooting">Troubleshooting</a></li>
 <li><a href="#configuration-system-yaml-based">Configuration</a></li>
 <li><a href="#markdown-parser-for-content-creation">Markdown input</a></li>
-<li><a href="#e2e-testing-infrastructure">E2E testing</a></li>
 <li><a href="#nbuild-targets">Build targets</a></li>
 </ul>
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Anchor link to this section for reference">&para;</a></h2>
@@ -3935,91 +3840,6 @@ npm<span class="w"> </span><span class="nb">test</span>
 npm<span class="w"> </span>run<span class="w"> </span>lint
 <span class="sb">```</span>
 </code></pre></div></p>
-<hr />
-<h3 id="e2e-testing-infrastructure">E2E Testing Infrastructure<a class="headerlink" href="#e2e-testing-infrastructure" title="Anchor link to this section for reference">&para;</a></h3>
-<p>Automated testing framework for validating SDO functionality across Azure DevOps and GitHub platforms with color-coded output.</p>
-<h4 id="overview_3">Overview<a class="headerlink" href="#overview_3" title="Anchor link to this section for reference">&para;</a></h4>
-<ul>
-<li><strong>Cross-Platform Testing</strong>: Validates both Azure DevOps and GitHub operations</li>
-<li><strong>Color-Coded Output</strong>: Green for success, red for errors, visible in console</li>
-<li><strong>Test Discovery</strong>: Reflection-based automatic test discovery</li>
-<li><strong>Specific Test Execution</strong>: Run individual tests via <code>--test-case</code> parameter</li>
-<li><strong>Logging</strong>: Plain text output to <code>sdo-e2e-test.log</code></li>
-</ul>
-<h4 id="test-targets">Test Targets<a class="headerlink" href="#test-targets" title="Anchor link to this section for reference">&para;</a></h4>
-<p>Available MSBuild targets for E2E testing:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Run all Azure DevOps tests</span>
-sdo<span class="w"> </span>RUN_AZDO_WI_ASSIGNED_TO_ME_TEST
-
-<span class="c1"># Run all GitHub tests  </span>
-sdo<span class="w"> </span>RUN_GITHUB_WI_ASSIGNED_TO_ME_TEST
-
-<span class="c1"># Run Azure DevOps pipeline tests</span>
-sdo<span class="w"> </span>RUN_AZDO_PIPELINE_TEST
-
-<span class="c1"># Run GitHub Actions tests</span>
-sdo<span class="w"> </span>RUN_GITHUB_PIPELINE_TEST
-</code></pre></div>
-<h4 id="example-output">Example Output<a class="headerlink" href="#example-output" title="Anchor link to this section for reference">&para;</a></h4>
-<div class="highlight"><pre><span></span><code>----------------------------------------------------------
-STEP 1: Get unfiltered work item count
-----------------------------------------------------------
-[INFO] Executing: sdo.exe wi list
-[INFO] Unfiltered work items count: 34
-
-----------------------------------------------------------
-STEP 2: Execute --assigned-to-me filter
-----------------------------------------------------------
-[INFO] Executing: sdo.exe wi list --assigned-to-me
-[SUCCESS] √ Exit code is 0
-[SUCCESS] √ Work items returned: 1
-[SUCCESS] √ Filter validation passed: 1 &lt;= 34
-
-----------------------------------------------------------
-[SUCCESS] √ Azure DevOps List Assigned To Me Test PASSED
-[SUCCESS] √ PASSED: Validate_AzureDevOps_ListAssignedToMe
-----------------------------------------------------------
-</code></pre></div>
-<h4 id="running-specific-tests">Running Specific Tests<a class="headerlink" href="#running-specific-tests" title="Anchor link to this section for reference">&para;</a></h4>
-<p>Run individual test cases:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Run a specific migrated metadata test through sdo</span>
-sdo<span class="w"> </span>e2e<span class="w"> </span>--test-case<span class="w"> </span>.<span class="se">\m</span>etadata<span class="se">\T</span>est_Validate_AzureDevOps_ListAssignedToMe.yaml
-
-<span class="c1"># Run with verbose output</span>
-sdo<span class="w"> </span>e2e<span class="w"> </span>--test-case<span class="w"> </span>.<span class="se">\m</span>etadata<span class="se">\T</span>est_Validate_GitHub_ListAssignedToMe.yaml<span class="w"> </span>--verbose
-</code></pre></div>
-<p>The legacy <code>sdo-e2e-test test</code> command remains available as a compatibility
-path during migration. New CI and scripts should use <code>sdo e2e</code>; the legacy
-executable can be retired after callers have migrated.</p>
-<h4 id="test-coverage">Test Coverage<a class="headerlink" href="#test-coverage" title="Anchor link to this section for reference">&para;</a></h4>
-<p><strong>Platform Parity Tests</strong>:
-- Work item list filtering
-- Assigned-to-me logic
-- User detection across platforms
-- Pipeline creation and execution
-- Repository operations</p>
-<p><strong>Reliability Tests</strong>:
-- Connection timeout handling
-- Authentication failure recovery
-- API rate limiting
-- Network error resilience</p>
-<h4 id="log-files">Log Files<a class="headerlink" href="#log-files" title="Anchor link to this section for reference">&para;</a></h4>
-<p>Test logs are saved to:
-- Location: <code>sdo-e2e-test/bin/Debug/net10.0/sdo-e2e-test.log</code>
-- Format: Plain text with timestamps
-- Content: Detailed step-by-step execution trace</p>
-<h4 id="integration-with-cicd">Integration with CI/CD<a class="headerlink" href="#integration-with-cicd" title="Anchor link to this section for reference">&para;</a></h4>
-<p>These tests can be integrated into your build pipeline:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># In your GitHub Actions workflow</span>
--<span class="w"> </span>name:<span class="w"> </span>Run<span class="w"> </span>E2E<span class="w"> </span>Tests
-<span class="w">  </span>run:<span class="w"> </span>sdo<span class="w"> </span>RUN_AZDO_WI_ASSIGNED_TO_ME_TEST
-
-<span class="c1"># Or in Azure Pipelines</span>
--<span class="w"> </span>task:<span class="w"> </span>PowerShell@2
-<span class="w">  </span>inputs:
-<span class="w">    </span>scriptType:<span class="w"> </span><span class="s1">'inline'</span>
-<span class="w">    </span>script:<span class="w"> </span><span class="s1">'sdo RUN_GITHUB_WI_ASSIGNED_TO_ME_TEST'</span>
-</code></pre></div>
 <hr />
 <h2 id="service-enhancements">Service Enhancements<a class="headerlink" href="#service-enhancements" title="Anchor link to this section for reference">&para;</a></h2>
 <p>Advanced Automation Features includes reliability and performance improvements to core services.</p>

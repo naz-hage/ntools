@@ -989,21 +989,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#4-e2e-testing-infrastructure" class="md-nav__link">
+  <a href="#4-service-enhancements" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. E2E Testing Infrastructure
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#5-service-enhancements" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        5. Service Enhancements
+        4. Service Enhancements
       
     </span>
   </a>
@@ -1616,7 +1605,7 @@
 <li><strong>Work Item Management</strong>: Full CRUD operations and commenting on Azure DevOps work items and GitHub issues.</li>
 <li><strong>Repository &amp; PR Operations</strong>: Multi-platform repo creation and deletion, git tagging/branching, and PR creation with branch-based auto-detection.</li>
 <li><strong>Pipeline Management</strong>: CI/CD pipeline creation, execution, and monitoring.</li>
-<li><strong>Advanced Automation</strong>: Auto-discovering YAML configuration system, Markdown parser for rich content generation, dry-run mode, and cross-platform E2E testing infrastructure.</li>
+<li><strong>Advanced Automation</strong>: Auto-discovering YAML configuration system, Markdown parser for rich content generation, and dry-run mode.</li>
 </ul>
 <h4 id="go-executables">Go Executables<a class="headerlink" href="#go-executables" title="Anchor link to this section for reference">&para;</a></h4>
 <ul>
@@ -1680,7 +1669,6 @@
 ├── coverage.cobertura.xml        # Test coverage report
 ├── sdo.targets                # MSBuild targets
 ├── unit-tests.targets            # Unit test targets
-├── e2e-tests.targets             # E2E test targets
 │
 ├── Sdo/                          # Main SDO executable project
 │   ├── Sdo.csproj
@@ -1887,24 +1875,7 @@
 <li><strong>Integration</strong>: Automatically applied when creating work items or PRs from markdown files</li>
 <li><strong>Benefits</strong>: Professional-formatted work items, template reuse, standardized content structure</li>
 </ul>
-<h4 id="4-e2e-testing-infrastructure">4. <strong>E2E Testing Infrastructure</strong><a class="headerlink" href="#4-e2e-testing-infrastructure" title="Anchor link to this section for reference">&para;</a></h4>
-<ul>
-<li><strong>e2e-tests.targets</strong>: New MSBuild build targets for E2E test orchestration</li>
-<li><strong>Test Discovery</strong>: Reflection-based attribute matching for automatic test discovery</li>
-<li><strong>Color-Coded Output</strong>: </li>
-<li>[SUCCESS] messages in green for quick feedback</li>
-<li>[ERROR] messages in red for failure identification</li>
-<li>Plain text log file output (sdo-e2e-test.log)</li>
-<li><strong>Cross-Platform Validation</strong>: Integrated tests for both Azure DevOps and GitHub platforms</li>
-<li><strong>Test Execution</strong>: Supports specific test case execution via <code>--test-case</code> parameter</li>
-<li><strong>Available Targets</strong>:</li>
-<li><code>RUN_AZDO_WI_ASSIGNED_TO_ME_TEST</code> - Azure DevOps work item filtering</li>
-<li><code>RUN_GITHUB_WI_ASSIGNED_TO_ME_TEST</code> - GitHub issue filtering</li>
-<li><code>RUN_AZDO_PIPELINE_TEST</code> - Azure DevOps pipeline operations</li>
-<li><code>RUN_GITHUB_PIPELINE_TEST</code> - GitHub Actions operations</li>
-<li><strong>Benefits</strong>: Automated quality validation, cross-platform parity assurance, comprehensive release testing</li>
-</ul>
-<h4 id="5-service-enhancements">5. <strong>Service Enhancements</strong><a class="headerlink" href="#5-service-enhancements" title="Anchor link to this section for reference">&para;</a></h4>
+<h4 id="4-service-enhancements">4. <strong>Service Enhancements</strong><a class="headerlink" href="#4-service-enhancements" title="Anchor link to this section for reference">&para;</a></h4>
 <ul>
 <li><strong>AzureDevOpsClient</strong>: </li>
 <li>Endpoint prioritization: /connectionData first (most reliable), falls back to Graph API</li>
@@ -1939,7 +1910,6 @@
 <li><strong>Branch-Based PR Creation</strong>: Auto-detects work item ID and file path from branch name pattern</li>
 <li><strong>Configuration Management</strong>: YAML-based defaults for standardized operations (Advanced Automation Features)</li>
 <li><strong>Rich Content</strong>: Markdown templates for professional work items and PRs (Advanced Automation Features)</li>
-<li><strong>Automated Testing</strong>: E2E testing infrastructure with cross-platform validation (Advanced Automation Features)</li>
 </ul>
 <h3 id="dependencies">Dependencies<a class="headerlink" href="#dependencies" title="Anchor link to this section for reference">&para;</a></h3>
 <h4 id="ntools-suite-net">ntools Suite (.NET)<a class="headerlink" href="#ntools-suite-net" title="Anchor link to this section for reference">&para;</a></h4>

@@ -648,17 +648,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#e2e-testing-commands-advanced-automation-features" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        E2E Testing Commands (Advanced Automation Features)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#sdo-configuration-management-advanced-automation-features" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1452,32 +1441,6 @@ sdo UNIT_TEST_ALL              # All unit tests (except long-running ones)
 <ul>
 <li>See the complete list of available targets at <a href="../nbuild-targets/">Nbuild Targets</a></li>
 <li>Learn more about code coverage at <a href="../code-coverage/">Code Coverage</a></li>
-</ul>
-<h2 id="e2e-testing-commands-advanced-automation-features">E2E Testing Commands (Advanced Automation Features)<a class="headerlink" href="#e2e-testing-commands-advanced-automation-features" title="Anchor link to this section for reference">&para;</a></h2>
-<p>Run end-to-end tests for validating cross-platform SDO operations:</p>
-<ul>
-<li>Run Azure DevOps work item filtering tests:</li>
-</ul>
-<div class="highlight"><pre><span></span><code>sdo RUN_AZDO_WI_ASSIGNED_TO_ME_TEST
-</code></pre></div>
-<ul>
-<li>Run GitHub issue filtering tests:</li>
-</ul>
-<div class="highlight"><pre><span></span><code>sdo RUN_GITHUB_WI_ASSIGNED_TO_ME_TEST
-</code></pre></div>
-<ul>
-<li>Run Azure DevOps pipeline operation tests:</li>
-</ul>
-<div class="highlight"><pre><span></span><code>sdo RUN_AZDO_PIPELINE_TEST
-</code></pre></div>
-<ul>
-<li>Run GitHub Actions operation tests:</li>
-</ul>
-<div class="highlight"><pre><span></span><code>sdo RUN_GITHUB_PIPELINE_TEST
-</code></pre></div>
-<p><strong>Output</strong>: Color-coded console (green for [SUCCESS], red for [ERROR]) with detailed logging to <code>sdo-e2e-test.log</code></p>
-<ul>
-<li>See the complete list of E2E targets in <a href="../sdo-net/#e2e-testing-infrastructure">SDO CLI documentation</a></li>
 </ul>
 <h2 id="sdo-configuration-management-advanced-automation-features">SDO Configuration Management (Advanced Automation Features)<a class="headerlink" href="#sdo-configuration-management-advanced-automation-features" title="Anchor link to this section for reference">&para;</a></h2>
 <p>Work item queries can be standardized using YAML configuration files. See <a href="../sdo-net/#configuration-system-yaml-based">SDO Configuration System</a> for detailed documentation.</p>
