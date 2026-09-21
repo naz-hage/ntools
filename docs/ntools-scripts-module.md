@@ -105,9 +105,6 @@ Test-MSBuildDelegation
 # sdo smoke_test  # (from command line - includes both artifact validation AND target delegation)
 ```
 
-### Integration with Build System
-- **Usage**: `PUBLISH` target uses `Publish-AllProjects` function with deterministic repository path
-
 ### MSBuild Integration
 - **Usage**: `PUBLISH` target uses `Publish-AllProjects` function with deterministic repository path
 - **Smoke Testing**: `SMOKE_TEST` target uses `Test-TargetDelegation` function for build system validation

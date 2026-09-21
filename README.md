@@ -48,6 +48,70 @@ sdo pr create --title "Feature: New Capability"
 sdo repo list
 ```
 
+#### YAML Workflows
+
+Run an ordered YAML Launcher workflow with `sdo run`. The manifest must define
+at least one step; variables use `$(NAME)` placeholders.
+
+```bash
+sdo run --manifest workflow.yaml
+```
+
+```yaml
+version: '1.0'
+description: Build the project
+variables:
+  CONFIGURATION: Release
+execution:
+  timeout: 00:10:00
+  stopOnFirstError: true
+steps:
+  - name: Build
+    path: dotnet
+    arguments: build --configuration $(CONFIGURATION)
+    workingDirectory: .
+    expectedReturnCode: 0
+```
+
+Tool manifests such as `apps.yaml` are handled by `sdo tool`, not `sdo run`.
+
+#### YAML Tool Manifests
+
+`sdo tool` accepts the existing JSON manifest format and the equivalent YAML
+format. Use `--manifest` for either format; `--json` remains available for
+existing scripts.
+
+```bash
+sdo tool list --manifest .\go\apps.yaml
+sdo tool install --manifest .\go\apps.yaml --dry-run
+sdo tool download --manifest .\go\apps.yaml --dry-run
+sdo tool uninstall --manifest .\go\apps.yaml --dry-run
+
+sdo tool list --json .\go\apps.json
+sdo tool install --json .\go\apps.json --dry-run
+sdo tool install --name "Git for Windows" --appversion 2.51.1 --dry-run
+```
+
+Tool manifests contain `Version`, `DownloadPath`, and `NbuildAppList`.
+Use `sdo run` for workflow YAML and `sdo e2e` for test metadata YAML.
+
+#### YAML Test Metadata
+
+Run one test metadata file by path or name, or discover the migrated suite:
+
+```bash
+sdo e2e --test-case .\metadata\Test_Validate_AzureDevOps_CreateBugFromMarkdown.yaml
+sdo e2e --metadata-path .\metadata
+sdo e2e
+```
+
+Test metadata is distinct from workflow YAML because its steps may define
+assertions and extracted variables such as `{bug_id}`. Use `sdo run` for
+generic workflows and `sdo tool` for application manifests. The legacy
+`sdo-e2e-test test` command remains available during migration; new scripts
+and CI should use `sdo e2e`. The compatibility executable can be retired
+after existing callers have migrated.
+
 **Authentication:**
 - Azure DevOps: Set `AZURE_DEVOPS_PAT` environment variable
 - GitHub: Uses GitHub CLI authentication or `GITHUB_TOKEN` environment variable
@@ -62,7 +126,7 @@ sdo repo list
 **Usage:**
 ```bash
 sdo solution           # Build solution
-sdo test               # Run tests
+sdo e2e                # Run ntools-launcher test metadata
 sdo stage              # Create stage release
 sdo prod               # Create production release
 ```

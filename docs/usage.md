@@ -1,123 +1,47 @@
 
+# Ntools Usage
 
-Once Ntools is installed, open a Developer Command Prompt for Visual Studio 2026 and navigate to your solution folder (for example, `./ntools`). The [.NET SDK](https://dotnet.microsoft.com/download) must be installed and available in your PATH for build operations. The `sdo` executable is the primary command-line interface for Ntools. The following are examples of how to use it:
+Ntools provides the `sdo` command-line tool for build automation, YAML
+workflows, tool management, and DevOps operations.
 
-## Global Options
+## Prerequisites
 
-Ntools supports global options that work across all commands:
-- `--dry-run`: Preview changes without applying them
-- `--verbose`: Enable verbose output for detailed information
+- Install the [.NET SDK](https://dotnet.microsoft.com/download).
+- Install Ntools and open a Developer Command Prompt for Visual Studio.
+- Change to the solution or repository directory.
 
-## Build & Test Commands
+## First Run
 
--   Build a solution: Compiles the solution in the solution directory
+Build and clean the current solution:
 
 ```cmd
 sdo solution
-```
-- Clean a solution:  Deletes the release/Debug, bin and obj folders in the solution directory
-
-```cmd
 sdo clean
 ```
-- Test solution: runs all the tests in the solution with optional code coverage
+
+Run unit tests with the repository target or `dotnet test`:
 
 ```cmd
-sdo test
+sdo TEST
+dotnet test
 ```
 
-- Run specific unit test suites:
-```cmd
-sdo UNIT_TEST_CLI_VALIDATION    # CLI validation tests
-sdo UNIT_TEST_GIT_CLONE_COMMAND # Git clone command tests
-sdo UNIT_TEST_ALL              # All unit tests (except long-running ones)
-```
+Use `--verbose` for diagnostic output and `--dry-run` to preview supported
+operations.
 
-- Create a stage release: Creates a stage build which includes the following steps:
-    - Clean the solution
-    - Build the solution
-    - Run tests with code coverage
-    - Generate coverage reports
-    - Publish the stage build
-    - Verify artifacts with smoke tests
-    - Create a zip file of the stage build file
+## YAML Workflows
 
-```cmd
-sdo stage
-```
+The YAML command families have separate purposes:
 
-- Comprehensive smoke test: Validates published artifacts and build system integrity
+- `sdo run --manifest <file>` runs a YAML Launcher workflow.
+- `sdo tool <operation> --manifest <file>` manages JSON or YAML tool manifests.
+- `sdo e2e --test-case <path-or-name>` runs test metadata with assertions.
 
-```cmd
-sdo smoke_test
-```
+## Next Steps
 
-- Display available targets:  Lists all the available targets in the targets file
-    
-```cmd
-sdo targets
-```
+See the [sdo CLI reference](./sdo-net.md) for all commands, options, examples,
+configuration, build targets, and troubleshooting guidance.
 
-- See the complete list of available targets at [Nbuild Targets](./nbuild-targets.md)
-- Learn more about code coverage at [Code Coverage](./code-coverage.md)
-
-## E2E Testing Commands (Advanced Automation Features)
-
-Run end-to-end tests for validating cross-platform SDO operations:
-
-- Run Azure DevOps work item filtering tests:
-
-```cmd
-sdo RUN_AZDO_WI_ASSIGNED_TO_ME_TEST
-```
-
-- Run GitHub issue filtering tests:
-
-```cmd
-sdo RUN_GITHUB_WI_ASSIGNED_TO_ME_TEST
-```
-
-- Run Azure DevOps pipeline operation tests:
-
-```cmd
-sdo RUN_AZDO_PIPELINE_TEST
-```
-
-- Run GitHub Actions operation tests:
-
-```cmd
-sdo RUN_GITHUB_PIPELINE_TEST
-```
-
-**Output**: Color-coded console (green for [SUCCESS], red for [ERROR]) with detailed logging to `sdo-e2e-test.log`
-
-- See the complete list of E2E targets in [SDO CLI documentation](./sdo-net.md#e2e-testing-infrastructure)
-
-## SDO Configuration Management (Advanced Automation Features)
-
-Work item queries can be standardized using YAML configuration files. See [SDO Configuration System](./sdo-net.md#configuration-system-yaml-based) for detailed documentation.
-
-**Quick Start**:
-
-1. Create `sdo-config.yaml` in your project's `.temp` folder:
-
-```yaml
-commands:
-  wi:
-    list:
-      area_path: "MyProject\\Backend"
-      state: "In Progress"
-      top: 20
-```
-
-2. Run `sdo wi list` from the project directory to use configuration defaults automatically
-
-**Configuration Priority** (highest to lowest):
-1. CLI parameters: `sdo wi list --state "Done"`
-2. Config file defaults: `sdo-config.yaml`
-3. Hard-coded defaults in code
-
-For more details, see:
-- [Configuration System Documentation](./sdo-net.md#configuration-system-yaml-based)
-- [Markdown Parser for Content Creation](./sdo-net.md#markdown-parser-for-content-creation)
+- [SDO targets](./sdo-targets.md)
+- [Code coverage](./code-coverage.md)
 

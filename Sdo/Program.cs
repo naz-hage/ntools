@@ -58,6 +58,8 @@ namespace Sdo
             // Migration command groups. Implementations are added incrementally while
             // the legacy nb, nbackup, and lf commands remain available.
             rootCommand.Subcommands.Add(new Commands.ToolCommand(verboseOption, dryRunOption));
+            rootCommand.Subcommands.Add(new Commands.RunCommand(verboseOption));
+            rootCommand.Subcommands.Add(new Commands.TestCommand(verboseOption));
             rootCommand.Subcommands.Add(new Commands.EnvironmentCommand(verboseOption));
             rootCommand.Subcommands.Add(new Commands.BuildCommand(verboseOption));
             rootCommand.Subcommands.Add(new Commands.ReleaseCommand(verboseOption, dryRunOption));

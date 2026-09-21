@@ -123,7 +123,7 @@
     </Target>
 
     <!-- Unit tests for all SDO tests with code coverage -->
-    <Target Name="UNIT_TEST_SDO_ALL">
+    <Target Name="UNIT_TEST_SDOTESTS">
         <Message Text="Running all SDO unit tests with code coverage..." />
         <Exec Command='dotnet test "$(SolutionDir)\SdoTests\SdoTests.csproj" --configuration Release --logger trx --collect:"XPlat Code Coverage"' WorkingDirectory="$(SolutionDir)" />
         <Message Text="All SDO unit tests complete." />
@@ -137,8 +137,25 @@
     </Target>
 
     <!-- Run all unit tests -->
-    <Target Name="UNIT_TEST_ALL" DependsOnTargets="UNIT_TEST_CLI_VALIDATION;UNIT_TEST_BUILD_STARTER;UNIT_TEST_CLI;UNIT_TEST_COMMAND;UNIT_TEST_NB_COMMAND;UNIT_TEST_GIT_CLONE_COMMAND;UNIT_TEST_NTOOLS_JSON;UNIT_TEST_RELEASE_SERVICE_FACTORY;UNIT_TEST_RESOURCE_HELPER;UNIT_TEST_WORKITEM_COMMAND;UNIT_TEST_PIPELINE_COMMAND;UNIT_TEST_WORKITEM_STATE_TRANSLATOR">
+    <Target Name="UNIT_TEST_ALL" 
+        DependsOnTargets="UNIT_TEST_CLI_VALIDATION;
+            UNIT_TEST_BUILD_STARTER;
+            UNIT_TEST_CLI;
+            UNIT_TEST_COMMAND;
+            UNIT_TEST_NB_COMMAND;
+            UNIT_TEST_GIT_CLONE_COMMAND;
+            UNIT_TEST_NTOOLS_JSON;
+            UNIT_TEST_RELEASE_SERVICE_FACTORY;
+            UNIT_TEST_RESOURCE_HELPER;
+            UNIT_TEST_WORKITEM_COMMAND;
+            UNIT_TEST_PIPELINE_COMMAND;
+            UNIT_TEST_MAPPING_GENERATOR;
+            UNIT_TEST_SDOTESTS;
+            UNIT_TEST_NBTESTS;
+            UNIT_TEST_PULL_REQUEST_COMMAND;
+            UNIT_TEST_REPOSITORY_COMMAND;
+            UNIT_TEST_PATH_MANAGER;
+            UNIT_TEST_WORKITEM_STATE_TRANSLATOR">
         <Message Text="All unit tests completed." />
     </Target>
-
 </Project>

@@ -136,6 +136,103 @@ public class ProgramTests
     }
 
     [Fact]
+    public void Main_WithToolManifestOnRun_ReturnsNonZero()
+    {
+        var manifestPath = Path.Combine(Path.GetTempPath(), $"sdo-apps-{Guid.NewGuid():N}.yaml");
+        File.WriteAllText(manifestPath, "Version: '1.0'\nDownloadPath: 'C:/downloads'\nNbuildAppList: []\n");
+
+        try
+        {
+            var result = Program.Main("run", "--manifest", manifestPath);
+
+            Assert.NotEqual(0, result);
+        }
+        finally
+        {
+            File.Delete(manifestPath);
+        }
+    }
+
+    [Fact]
+    public void Main_WithTestMetadataFile_RunsSharedLauncherRunner()
+    {
+        var metadataPath = Path.Combine(Path.GetTempPath(), $"sdo-test-{Guid.NewGuid():N}.yaml");
+        File.WriteAllText(metadataPath, """
+version: '1.0'
+steps:
+  - name: test
+    path: cmd.exe
+    arguments: /c echo metadata
+    assertions:
+      - type: output_contains
+        value: metadata
+""");
+
+        try
+        {
+            var result = Program.Main("e2e", "--test-case", metadataPath);
+
+            Assert.Equal(0, result);
+        }
+        finally
+        {
+            File.Delete(metadataPath);
+        }
+    }
+
+    [Fact]
+    public void Main_WithWorkflowMetadataOnTest_ReturnsNonZero()
+    {
+        var manifestPath = Path.Combine(Path.GetTempPath(), $"sdo-workflow-{Guid.NewGuid():N}.yaml");
+        File.WriteAllText(manifestPath, """
+version: '1.0'
+steps:
+  - name: build
+    path: cmd.exe
+    arguments: /c exit 0
+""");
+
+        try
+        {
+            var result = Program.Main("e2e", "--test-case", manifestPath);
+
+            Assert.NotEqual(0, result);
+        }
+        finally
+        {
+            File.Delete(manifestPath);
+        }
+    }
+
+    [Fact]
+    public void Main_WithTestMetadataDirectory_RunsDiscoveredTests()
+    {
+        var metadataPath = Path.Combine(Path.GetTempPath(), $"sdo-metadata-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(metadataPath);
+        File.WriteAllText(Path.Combine(metadataPath, "Test_Discovered.yaml"), """
+version: '1.0'
+steps:
+  - name: test
+    path: cmd.exe
+    arguments: /c exit 0
+    assertions:
+      - type: exit_code
+        value: '0'
+""");
+
+        try
+        {
+            var result = Program.Main("e2e", "--metadata-path", metadataPath);
+
+            Assert.Equal(0, result);
+        }
+        finally
+        {
+            Directory.Delete(metadataPath, true);
+        }
+    }
+
+    [Fact]
     public void Main_WithFileCommands_SearchesFilesAndFolders()
     {
         var testRoot = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());

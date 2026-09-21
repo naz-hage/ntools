@@ -10,7 +10,7 @@
 * **Work Item Management**: Full CRUD operations and commenting on Azure DevOps work items and GitHub issues.
 * **Repository & PR Operations**: Multi-platform repo creation and deletion, git tagging/branching, and PR creation with branch-based auto-detection.
 * **Pipeline Management**: CI/CD pipeline creation, execution, and monitoring.
-* **Advanced Automation**: Auto-discovering YAML configuration system, Markdown parser for rich content generation, dry-run mode, and cross-platform E2E testing infrastructure.
+* **Advanced Automation**: Auto-discovering YAML configuration system, Markdown parser for rich content generation, and dry-run mode.
 
 #### Go Executables
 - **Purpose**: Various utilities written in Go
@@ -59,7 +59,6 @@ ntools/
 ├── coverage.cobertura.xml        # Test coverage report
 ├── sdo.targets                # MSBuild targets
 ├── unit-tests.targets            # Unit test targets
-├── e2e-tests.targets             # E2E test targets
 │
 ├── Sdo/                          # Main SDO executable project
 │   ├── Sdo.csproj
@@ -273,23 +272,7 @@ Both sdo and ntools Suite follow consistent design principles:
 - **Integration**: Automatically applied when creating work items or PRs from markdown files
 - **Benefits**: Professional-formatted work items, template reuse, standardized content structure
 
-#### 4. **E2E Testing Infrastructure**
-- **e2e-tests.targets**: New MSBuild build targets for E2E test orchestration
-- **Test Discovery**: Reflection-based attribute matching for automatic test discovery
-- **Color-Coded Output**: 
-  - [SUCCESS] messages in green for quick feedback
-  - [ERROR] messages in red for failure identification
-  - Plain text log file output (sdo-e2e-test.log)
-- **Cross-Platform Validation**: Integrated tests for both Azure DevOps and GitHub platforms
-- **Test Execution**: Supports specific test case execution via `--test-case` parameter
-- **Available Targets**:
-  - `RUN_AZDO_WI_ASSIGNED_TO_ME_TEST` - Azure DevOps work item filtering
-  - `RUN_GITHUB_WI_ASSIGNED_TO_ME_TEST` - GitHub issue filtering
-  - `RUN_AZDO_PIPELINE_TEST` - Azure DevOps pipeline operations
-  - `RUN_GITHUB_PIPELINE_TEST` - GitHub Actions operations
-- **Benefits**: Automated quality validation, cross-platform parity assurance, comprehensive release testing
-
-#### 5. **Service Enhancements**
+#### 4. **Service Enhancements**
 - **AzureDevOpsClient**: 
   - Endpoint prioritization: /connectionData first (most reliable), falls back to Graph API
   - Enhanced error handling and logging
@@ -323,7 +306,6 @@ Both sdo and ntools Suite follow consistent design principles:
 - **Branch-Based PR Creation**: Auto-detects work item ID and file path from branch name pattern
 - **Configuration Management**: YAML-based defaults for standardized operations (Advanced Automation Features)
 - **Rich Content**: Markdown templates for professional work items and PRs (Advanced Automation Features)
-- **Automated Testing**: E2E testing infrastructure with cross-platform validation (Advanced Automation Features)
 
 ### Dependencies
 

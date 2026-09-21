@@ -56,7 +56,7 @@ nav:
           - ntools-scripts API: ntools-scripts-module-api.md
   - Build and Test:
       - Custom Build Tasks: nbuildtasks.md
-      - MSBuild Targets: nbuild-targets.md
+      - SDO Targets: sdo-targets.md
       - Code Coverage: code-coverage.md
   - Reference:
       - Azure DevOps Payloads: azdo_payloads.md

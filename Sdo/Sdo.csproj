@@ -31,6 +31,7 @@
 
 	<ItemGroup>
 	<PackageReference Include="System.CommandLine" Version="2.0.12" />
+	<PackageReference Include="ntools-launcher" Version="1.13.0" />
 	<PackageReference Include="YamlDotNet" Version="18.1.0" />
 	</ItemGroup>
 

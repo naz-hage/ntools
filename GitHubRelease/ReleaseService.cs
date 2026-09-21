@@ -1,3 +1,4 @@
+using Launcher.Helpers;
 using System.Diagnostics;
 using System.Net;
 using System.Text;
@@ -63,7 +64,7 @@ namespace GitHubRelease
             await UpdateReleaseNotes(release);
 
             // Log the release object for debugging
-            Console.WriteLine($"Creating release with tag: {release.TagName}, target commitish: {release.TargetCommitish}");
+            ConsoleHelper.WriteInfo($"Creating release with tag: {release.TagName}, target commitish: {release.TargetCommitish}");
 
             // Validate tag_name and target_commitish
             if (string.IsNullOrEmpty(release.TagName) || string.IsNullOrEmpty(release.TargetCommitish))
@@ -112,8 +113,8 @@ namespace GitHubRelease
                     if (branch.GetProperty("commit").GetProperty("sha").GetString() == commitSha)
                     {
                         var branchInGitHubActions = branch.GetProperty("name").GetString();
-                        Console.WriteLine($"branch In GitHubActions: {branchInGitHubActions}");
-                        Console.WriteLine($"CommitSha In GitHubActions: {commitSha}");
+                        ConsoleHelper.WriteInfo($"branch In GitHubActions: {branchInGitHubActions}");
+                        ConsoleHelper.WriteInfo($"CommitSha In GitHubActions: {commitSha}");
                         return branchInGitHubActions;
                     }
                 }
@@ -185,7 +186,7 @@ namespace GitHubRelease
         {
             if (IsProdTag(release.TagName!))
             {
-                Console.WriteLine("Production release");
+                ConsoleHelper.WriteInfo("Production release");
                 var tags = await GetReleaseTagsAsync();
                 var responseMessage = await DeleteStagingReleases(tags);
                 if (!responseMessage.IsSuccessStatusCode)
@@ -195,7 +196,7 @@ namespace GitHubRelease
             }
             else
             {
-                Console.WriteLine("Not a production release");
+                ConsoleHelper.WriteInfo("Not a production release");
             }
         }
 
@@ -237,16 +238,16 @@ namespace GitHubRelease
         /// <exception cref="InvalidOperationException">Thrown when no commits are found since the last release.</exception>
         public async Task UpdateReleaseNotes(Release release)
         {
-            Console.WriteLine("Updating release notes...");
+            ConsoleHelper.WriteInfo("Updating release notes...");
             var (sinceLastPublished, sinceTag) = await GetLatestReleasePublishedAtAndTagAsync(release.TargetCommitish!);
-            Console.WriteLine($"sinceLastPublished: {sinceLastPublished}");
-            Console.WriteLine($"sinceTag: {sinceTag}");
+            ConsoleHelper.WriteInfo($"sinceLastPublished: {sinceLastPublished}");
+            ConsoleHelper.WriteInfo($"sinceTag: {sinceTag}");
 
             var commitService = new CommitService(ApiService, Repo);
 
-            Console.WriteLine("Getting commits since the last release...");
+            ConsoleHelper.WriteInfo("Getting commits since the last release...");
             var commits = await commitService.GetCommits(release.TargetCommitish!, sinceLastPublished);
-            Console.WriteLine($"commits: {commits.Count}");
+            ConsoleHelper.WriteInfo($"commits: {commits.Count}");
 
             if (commits.Count <= 0)
             {
@@ -275,28 +276,28 @@ namespace GitHubRelease
             string jsonBody = JsonSerializer.Serialize(release, context.Release);
 
             // Verbose logging: show all key elements
-            Console.WriteLine(" --- CreateReleaseAndUploadAsset ---");
-            Console.WriteLine($" Repo: {Repo}");
-            Console.WriteLine($" Release Tag: {release.TagName}");
-            Console.WriteLine($" Target Commitish: {release.TargetCommitish}");
-            Console.WriteLine($" Asset Path: {assetPath}");
-            if (verbose) Console.WriteLine($" Release JSON Body: {jsonBody}");
+            ConsoleHelper.WriteInfo(" --- CreateReleaseAndUploadAsset ---");
+            ConsoleHelper.WriteInfo($" Repo: {Repo}");
+            ConsoleHelper.WriteInfo($" Release Tag: {release.TagName}");
+            ConsoleHelper.WriteInfo($" Target Commitish: {release.TargetCommitish}");
+            ConsoleHelper.WriteInfo($" Asset Path: {assetPath}");
+            if (verbose) ConsoleHelper.WriteInfo($" Release JSON Body: {jsonBody}");
 
             // Send a POST request to create a new release on GitHub
             var uri = $"{Constants.GitHubApiPrefix}/{Repo}/releases";
-            if (verbose) Console.WriteLine($"POST URI: {uri}");
+            if (verbose) ConsoleHelper.WriteVerbose($"POST URI: {uri}");
             var response = await ApiService.PostAsync(uri, new StringContent(jsonBody, Encoding.UTF8, "application/json"));
 
             var responseContent = await response.Content.ReadAsStringAsync();
-            Console.WriteLine($"Release creation response status: {response.StatusCode}");
-            if (verbose) Console.WriteLine($"[VERBOSE] Release creation response body: {responseContent}");
+            ConsoleHelper.WriteInfo($"Release creation response status: {response.StatusCode}");
+            if (verbose) ConsoleHelper.WriteVerbose($"[VERBOSE] Release creation response body: {responseContent}");
 
             if (!response.IsSuccessStatusCode)
             {
                 throw new InvalidOperationException($"Error: Could not create a release: {release.TagName}. Response: {responseContent}");
             }
 
-            Console.WriteLine($"Successfully created a release {release.TagName}. Uploading asset...");
+            ConsoleHelper.WriteInfo($"Successfully created a release {release.TagName}. Uploading asset...");
 
             // Extract the upload URL from the response
             var responseObject = JsonDocument.Parse(responseContent);
@@ -304,25 +305,25 @@ namespace GitHubRelease
             if (uploadUrlDynamic is string uploadUrl)
             {
                 uploadUrl = uploadUrl.Replace("{?name,label}", $"?name={Path.GetFileName(assetPath)}");
-                if (verbose) Console.WriteLine($"Asset upload URL: {uploadUrl}");
+                if (verbose) ConsoleHelper.WriteVerbose($"Asset upload URL: {uploadUrl}");
             }
             else
             {
-                Console.WriteLine("[VERBOSE] Failed to extract upload URL from the response.");
+                ConsoleHelper.WriteError("Failed to extract upload URL from the response.");
                 throw new InvalidOperationException("Failed to extract upload URL from the response.");
             }
 
             // Upload the asset
             response = await UploadAsset(assetPath, uploadUrl, verbose);
             var assetUploadContent = await response.Content.ReadAsStringAsync();
-            Console.WriteLine($"Asset upload response status: {response.StatusCode}");
-            if (verbose) Console.WriteLine($"Asset upload response body: {assetUploadContent}");
+            ConsoleHelper.WriteInfo($"Asset upload response status: {response.StatusCode}");
+            if (verbose) ConsoleHelper.WriteVerbose($"Asset upload response body: {assetUploadContent}");
             if (!response.IsSuccessStatusCode)
             {
                 throw new InvalidOperationException($"Error: Could not upload the asset: {assetPath}. Response: {assetUploadContent}");
             }
 
-            Console.WriteLine($"Successfully uploaded the asset: {assetPath}.");
+            ConsoleHelper.WriteInfo($"Successfully uploaded the asset: {assetPath}.");
             return response;
         }
 
@@ -347,14 +348,14 @@ namespace GitHubRelease
             var releases = await GetLatestReleaseRawAsync(branch);
             if (releases == null)
             {
-                Console.WriteLine($"No releases found on {branch}");
+                ConsoleHelper.WriteInfo($"No releases found on {branch}");
                 // Get the latest release on the main branch
                 releases = await GetLatestReleaseRawAsync("main");
             }
 
             if (releases != null)
             {
-                Debug.WriteLine($"Releases JSON: {releases.RootElement}");
+                ConsoleHelper.WriteInfo($"Releases JSON: {releases.RootElement}");
             }
 
             return releases;
@@ -386,6 +387,7 @@ namespace GitHubRelease
 
             if (response.IsSuccessStatusCode)
             {
+            
                 var content = await response.Content.ReadAsStringAsync();
                 var releases = JsonDocument.Parse(content).RootElement.EnumerateArray();
 
@@ -403,8 +405,8 @@ namespace GitHubRelease
             }
             else
             {
-                Console.WriteLine($"Failed to retrieve tags. Status code: {response.StatusCode}");
-                Console.WriteLine(await response.Content.ReadAsStringAsync());
+                ConsoleHelper.WriteError($"Failed to retrieve tags. Status code: {response.StatusCode}");
+                ConsoleHelper.WriteError(await response.Content.ReadAsStringAsync());
                 return new List<string>();
             }
         }
@@ -443,8 +445,8 @@ namespace GitHubRelease
             }
             else
             {
-                Console.WriteLine($"Failed to retrieve releases. Status code: {response.StatusCode}");
-                Console.WriteLine(await response.Content.ReadAsStringAsync());
+                ConsoleHelper.WriteError($"Failed to retrieve releases. Status code: {response.StatusCode}");
+                ConsoleHelper.WriteError(await response.Content.ReadAsStringAsync());
                 return new List<int>();
             }
         }
@@ -483,16 +485,16 @@ namespace GitHubRelease
                 {
                     // Console the published_at date of the latest release
                     var publishedAt = releases[0].GetProperty("published_at").GetString();
-                    Console.WriteLine($"published_at: {publishedAt}");
+                    ConsoleHelper.WriteInfo($"published_at: {publishedAt}");
                     // return the latest release on the specified branch as a JsonDocument object
                     return JsonDocument.Parse(releaseOnBranch.GetRawText());
                 }
             }
             else
             {
-                Console.WriteLine($"Releases not found. Status code: {response.StatusCode}");
+                ConsoleHelper.WriteError($"Releases not found. Status code: {response.StatusCode}");
                 // print response content to console for debugging
-                Console.WriteLine(await response.Content.ReadAsStringAsync());
+                ConsoleHelper.WriteError(await response.Content.ReadAsStringAsync());
             }
             return null;
         }
@@ -534,8 +536,8 @@ namespace GitHubRelease
                 string publishedAt = root.GetProperty("published_at").GetString() ?? NoneFound;
                 string tagName = root.GetProperty("tag_name").GetString() ?? NoneFound;
 
-                Console.WriteLine($"Published At: {publishedAt}");
-                Console.WriteLine($"Tag Name: {tagName}");
+                ConsoleHelper.WriteInfo($"Published At: {publishedAt}");
+                ConsoleHelper.WriteInfo($"Tag Name: {tagName}");
 
                 return (publishedAt, tagName);
             }
@@ -567,7 +569,7 @@ namespace GitHubRelease
             }
             catch (JsonException ex)
             {
-                Console.WriteLine($"Failed to parse response content to JSON. Exception: {ex.Message}");
+                ConsoleHelper.WriteError($"Failed to parse response content to JSON. Exception: {ex.Message}");
                 return null;
             }
         }
@@ -582,16 +584,16 @@ namespace GitHubRelease
         {
             ApiService.SetupHeaders();
             var uri = $"{Constants.GitHubApiPrefix}/{Repo}/releases/{releaseId}";
-            Console.WriteLine($"DELETE uri: {uri}");
+            ConsoleHelper.WriteInfo($"DELETE uri: {uri}");
             var response = await ApiService.DeleteAsync(uri);
 
             if (response.IsSuccessStatusCode)
             {
-                Console.WriteLine($"Successfully deleted the release: {releaseId}.");
+                ConsoleHelper.WriteInfo($"Successfully deleted the release: {releaseId}.");
             }
             else
             {
-                Console.WriteLine($"Failed to delete the release: {releaseId}. Status code: {response.StatusCode}");
+                ConsoleHelper.WriteError($"Failed to delete the release: {releaseId}. Status code: {response.StatusCode}");
             }
 
             return response;
@@ -621,7 +623,7 @@ namespace GitHubRelease
             }
             else
             {
-                Console.WriteLine($"release by tag name {tagName} not found. Status code: {response.StatusCode}");
+                ConsoleHelper.WriteError($"release by tag name {tagName} not found. Status code: {response.StatusCode}");
                 return null;
             }
         }
@@ -645,7 +647,7 @@ namespace GitHubRelease
         {
             if (!File.Exists(assetPath))
             {
-                Console.WriteLine($"File {assetPath} does not exist");
+                ConsoleHelper.WriteError($"File {assetPath} does not exist");
                 return new HttpResponseMessage(HttpStatusCode.NotFound);
             }
 
@@ -661,18 +663,18 @@ namespace GitHubRelease
             byteArrayContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(assetMimeType);
 
             // Log the request details
-            if (verbose) Console.WriteLine($"Uploading asset to URL: {uploadUrl}");
-            if (verbose) Console.WriteLine($"Asset Path: {assetPath}");
-            if (verbose) Console.WriteLine($"Asset MIME Type: {assetMimeType}");
-            if (verbose) Console.WriteLine($"Asset Content Length: {assetContent.Length} bytes");
+            if (verbose) ConsoleHelper.WriteInfo($"Uploading asset to URL: {uploadUrl}");
+            if (verbose) ConsoleHelper.WriteInfo($"Asset Path: {assetPath}");
+            if (verbose) ConsoleHelper.WriteInfo($"Asset MIME Type: {assetMimeType}");
+            if (verbose) ConsoleHelper.WriteInfo($"Asset Content Length: {assetContent.Length} bytes");
 
             // Make the POST request with the specified assetMimeType to upload the asset
             var uploadResponse = await ApiService.PostAsync(uploadUrl, byteArrayContent);
 
             // Log the response details
-            Console.WriteLine($"Response Status Code: {uploadResponse.StatusCode}");
+            ConsoleHelper.WriteInfo($"Response Status Code: {uploadResponse.StatusCode}");
             var responseContent = await uploadResponse.Content.ReadAsStringAsync();
-            if (verbose) Console.WriteLine($"Response Content: {responseContent}");
+            if (verbose) ConsoleHelper.WriteInfo($"Response Content: {responseContent}");
             return uploadResponse;
         }
         /// <summary>
@@ -698,23 +700,23 @@ namespace GitHubRelease
                 {
                     if (release.Draft)
                     {
-                        Console.WriteLine("The release is a draft.");
+                        ConsoleHelper.WriteInfo("The release is a draft.");
                     }
                     else if (release.Prerelease)
                     {
-                        Console.WriteLine("The release is a pre-release.");
+                        ConsoleHelper.WriteInfo("The release is a pre-release.");
                     }
                     else
                     {
-                        Console.WriteLine("The release is a normal release.");
+                        ConsoleHelper.WriteInfo("The release is a normal release.");
                     }
                 }
                 return release;
             }
             else
             {
-                Console.WriteLine($"Failed to retrieve release {releaseId}. Status code: {response.StatusCode}");
-                Console.WriteLine(await response.Content.ReadAsStringAsync());
+                ConsoleHelper.WriteError($"Failed to retrieve release {releaseId}. Status code: {response.StatusCode}");
+                ConsoleHelper.WriteError(await response.Content.ReadAsStringAsync());
                 return null;
             }
         }
@@ -774,12 +776,12 @@ namespace GitHubRelease
             {
                 var assetContent = await response.Content.ReadAsByteArrayAsync();
                 await File.WriteAllBytesAsync(assetFileName, assetContent);
-                Console.WriteLine($"Successfully downloaded the asset to: {assetFileName}");
+                ConsoleHelper.WriteInfo($"Successfully downloaded the asset to: {assetFileName}");
             }
             else
             {
-                Console.WriteLine($"Error: Could not download the asset. Status code: {response.StatusCode}");
-                Console.WriteLine(await response.Content.ReadAsStringAsync());
+                ConsoleHelper.WriteError($"Error: Could not download the asset. Status code: {response.StatusCode}");
+                ConsoleHelper.WriteError(await response.Content.ReadAsStringAsync());
             }
 
             return response;
@@ -805,7 +807,7 @@ namespace GitHubRelease
             var releaseId = await GetReleaseByTagNameAsync(tagName);
             if (!releaseId.HasValue)
             {
-                Console.WriteLine($"Release with tag {tagName} not found.");
+                ConsoleHelper.WriteError($"Release with tag {tagName} not found.");
                 return new HttpResponseMessage(HttpStatusCode.NotFound);
             }
 
@@ -829,33 +831,33 @@ namespace GitHubRelease
                         response = await DownloadAssetFromUrl(downloadUrl, assetFileName);
                         if (response.IsSuccessStatusCode)
                         {
-                            Console.WriteLine($"Successfully downloaded the asset to: {assetFileName}");
+                            ConsoleHelper.WriteInfo($"Successfully downloaded the asset to: {assetFileName}");
                             return response;
                         }
                         else
                         {
-                            Console.WriteLine($"Error: Could not download the asset. Status code: {response.StatusCode}");
+                            ConsoleHelper.WriteError($"Error: Could not download the asset. Status code: {response.StatusCode}");
                             var contentError = await response.Content.ReadAsStringAsync();
-                            Console.WriteLine(contentError);
+                            ConsoleHelper.WriteError(contentError);
                             return response;
                         }
                     }
                     else
                     {
-                        Console.WriteLine($"Download URL for asset {assetName} not found.");
+                        ConsoleHelper.WriteError($"Download URL for asset {assetName} not found.");
                         return new HttpResponseMessage(HttpStatusCode.NotFound);
                     }
                 }
                 else
                 {
-                    Console.WriteLine($"Asset with name {assetName} not found in release {tagName}.");
+                    ConsoleHelper.WriteError($"Asset with name {assetName} not found in release {tagName}.");
                     return new HttpResponseMessage(HttpStatusCode.NotFound);
                 }
             }
             else
             {
-                Console.WriteLine($"Failed to get assets for release {tagName}. Status code: {response.StatusCode}");
-                Console.WriteLine(await response.Content.ReadAsStringAsync());
+                ConsoleHelper.WriteError($"Failed to get assets for release {tagName}. Status code: {response.StatusCode}");
+                ConsoleHelper.WriteError(await response.Content.ReadAsStringAsync());
                 return response;
             }
         }
@@ -879,7 +881,7 @@ namespace GitHubRelease
             var authorizationHeader = ApiService.GetClient().DefaultRequestHeaders.Authorization;
             if (authorizationHeader == null)
             {
-                Console.WriteLine("Authorization header is not set.");
+                ConsoleHelper.WriteError("Authorization header is not set.");
                 throw new InvalidOperationException("Authorization header is not set.");
             }
 
@@ -890,7 +892,7 @@ namespace GitHubRelease
             // Log the response headers
             foreach (var header in response.Headers)
             {
-                Console.WriteLine($"{header.Key}: {string.Join(", ", header.Value)}");
+                ConsoleHelper.WriteInfo($"{header.Key}: {string.Join(", ", header.Value)}");
             }
 
             if (response.IsSuccessStatusCode)
@@ -898,18 +900,18 @@ namespace GitHubRelease
                 // Log the scopes
                 if (response.Headers.TryGetValues("X-OAuth-Scopes", out var scopes))
                 {
-                    Console.WriteLine($"Token scopes: {string.Join(", ", scopes)}");
+                    ConsoleHelper.WriteInfo($"Token scopes: {string.Join(", ", scopes)}");
                 }
                 else
                 {
-                    Console.WriteLine("Token scopes not found in the response headers.");
+                    ConsoleHelper.WriteError("Token scopes not found in the response headers.");
                 }
             }
             else
             {
-                Console.WriteLine($"Error: Could not retrieve token permissions. Status code: {response.StatusCode}");
+                ConsoleHelper.WriteError($"Error: Could not retrieve token permissions. Status code: {response.StatusCode}");
                 var responseContent = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"Response content: {responseContent}");
+                ConsoleHelper.WriteError($"Response content: {responseContent}");
             }
         }
 
@@ -946,7 +948,7 @@ namespace GitHubRelease
             }
             else
             {
-                Console.WriteLine($"Error: Could not download the asset. Status code: {response.StatusCode}");
+                ConsoleHelper.WriteError($"Error: Could not download the asset. Status code: {response.StatusCode}");
             }
 
             return response;
@@ -966,7 +968,7 @@ namespace GitHubRelease
             var releaseId = await GetReleaseByTagNameAsync(tagName);
             if (!releaseId.HasValue)
             {
-                Console.WriteLine($"Release with tag {tagName} not found.");
+                ConsoleHelper.WriteError($"Release with tag {tagName} not found.");
                 return false;
             }
 
@@ -987,7 +989,7 @@ namespace GitHubRelease
             }
             else
             {
-                Console.WriteLine($"Failed to get assets for release {tagName}. Status code: {response.StatusCode}");
+                ConsoleHelper.WriteError($"Failed to get assets for release {tagName}. Status code: {response.StatusCode}");
             }
 
             return false;
@@ -1015,7 +1017,7 @@ namespace GitHubRelease
 
             if (!releases.Any())
             {
-                Console.WriteLine("No releases found.");
+                ConsoleHelper.WriteInfo("No releases found.");
                 return new List<Release>();
             }
 
@@ -1025,9 +1027,9 @@ namespace GitHubRelease
 
         private async Task HandleErrorResponse(HttpResponseMessage response)
         {
-            Console.WriteLine($"Failed to retrieve releases. Status code: {response.StatusCode}");
+            ConsoleHelper.WriteError($"Failed to retrieve releases. Status code: {response.StatusCode}");
             var content = await response.Content.ReadAsStringAsync();
-            Console.WriteLine(content);
+            ConsoleHelper.WriteError(content);
         }
 
         private List<JsonElement> SelectLatestReleases(List<JsonElement> releases)
