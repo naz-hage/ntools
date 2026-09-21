@@ -42,6 +42,6 @@ The YAML command families have separate purposes:
 See the [sdo CLI reference](./sdo-net.md) for all commands, options, examples,
 configuration, build targets, and troubleshooting guidance.
 
-- [Nbuild targets](./nbuild-targets.md)
+- [SDO targets](./sdo-targets.md)
 - [Code coverage](./code-coverage.md)
 

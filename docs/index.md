@@ -24,7 +24,7 @@ This repository contains a collection of software tools specifically designed to
 
 ### Build System Features
 - [Code Coverage](code-coverage.md)
-- [MSBuild Targets](nbuild-targets.md)
+- [SDO Targets](sdo-targets.md)
 
 ### DevOps Integration
 - [Version Automation Guide](version-automation-guide.md)

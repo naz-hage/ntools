@@ -571,10 +571,21 @@ public partial class BuildStarter
     /// <returns>A <see cref="ResultHelper"/> object representing the result of the operation.</returns>
     public static ResultHelper DisplayTargetsInFile(string filePath)
     {
+        return DisplayTargetsInFile(filePath, new HashSet<string>(StringComparer.OrdinalIgnoreCase));
+    }
+
+    private static ResultHelper DisplayTargetsInFile(string filePath, HashSet<string> displayedFiles)
+    {
         //replace $(BuildTools) with environment variable ProgramFiles/Nbuild
         filePath = filePath.Replace("$(BuildTools)", $"{Environment.GetEnvironmentVariable("ProgramFiles")}\\nbuild");
         try
         {
+            var normalizedFilePath = Path.GetFullPath(filePath);
+            if (!displayedFiles.Add(normalizedFilePath))
+            {
+                return ResultHelper.Success();
+            }
+
             using (StreamWriter writer = new(TargetsMd, true))
             {
                 Console.WriteLine($"{filePath} Targets:");
@@ -610,7 +621,7 @@ public partial class BuildStarter
                     Console.WriteLine($"----------------------");
                 }
                 // Recursive call for each imported target file
-                DisplayTargetsInFile(item);
+                DisplayTargetsInFile(item, displayedFiles);
             }
 
         }
@@ -635,9 +646,10 @@ public partial class BuildStarter
         }
 
         string[] targetsFiles = Directory.GetFiles(directoryPath, "*.targets", SearchOption.TopDirectoryOnly);
+        var displayedFiles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var targetsFile in targetsFiles)
         {
-            var result = DisplayTargetsInFile(targetsFile);
+            var result = DisplayTargetsInFile(targetsFile, displayedFiles);
             if (!result.IsSuccess())
             {
                 return result;

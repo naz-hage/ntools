@@ -100,6 +100,41 @@ namespace Nbuild.Tests
             Assert.IsTrue(fileNames.Count() > 0);
         }
 
+        [TestMethod]
+        public void DisplayTargets_DoesNotRepeatImportedFile()
+        {
+            var originalDirectory = Environment.CurrentDirectory;
+            var temporaryDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(temporaryDirectory);
+
+            try
+            {
+                File.WriteAllText(Path.Combine(temporaryDirectory, "root.targets"), """
+                    <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+                      <Import Project="child.targets" />
+                      <Target Name="ROOT" />
+                    </Project>
+                    """);
+                File.WriteAllText(Path.Combine(temporaryDirectory, "child.targets"), """
+                    <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+                      <Target Name="CHILD" />
+                    </Project>
+                    """);
+
+                Environment.CurrentDirectory = temporaryDirectory;
+                var result = BuildStarter.DisplayTargets(temporaryDirectory);
+
+                Assert.IsTrue(result.IsSuccess());
+                var generatedTargets = File.ReadAllText(Path.Combine(temporaryDirectory, "targets.md"));
+                Assert.AreEqual(1, generatedTargets.Split("CHILD", StringSplitOptions.None).Length - 1);
+            }
+            finally
+            {
+                Environment.CurrentDirectory = originalDirectory;
+                Directory.Delete(temporaryDirectory, recursive: true);
+            }
+        }
+
         [TestMethod()]
         public void ExtractCommentsFromTargets()
         {

@@ -1,31 +1,57 @@
-The table below lists all available targets for the Nbuild tool. 
-
-- **./ntools\sdo.targets Targets**
+- **C:\source\ntools\sdo.targets Targets**
 
 | **Target Name** | **Description** |
 | --- | --- |
 | ARTIFACTS           | Setup the ARTIFACTS folders for binaries and test results - override |
 | FILE_VERSIONS       | Test for FileVersion task and powershell file-version.ps1 |
 | NBUILD_DOWNLOAD     | Download Nbuild specified in the NbuildTargetVersion |
+| SETUP_ENVIRONMENT   | Setup development environment by importing ntools-scripts and calling Set-DevelopmentEnvironment |
+| TEST_NTOOLS_SCRIPTS | Test that ntools-scripts module is installed and can report a version |
 | MKDOCS              | Build docs locally for testing |
-| MKDOCS_DEPLOY       | mkdocs deploy locally |
+| RUN_NBTESTS_COVERAGE | Run nbTests and generate code coverage report |
+| MKDOCS_DEPLOY       | mkdocs deploy locally with live reload fixes |
+| INSTALL_PYTHON_TEST_DEPS | Install python test dependencies for atools and run pytest (verbose) |
+| RUN_PYTESTS_VERBOSE | Run Python pytest for atools package (verbose) |
+| RUN_SDO_TESTS       | Run SDO tests specifically |
 | GET_PRODUCT_CODES   | Example to get the installation Product code used for uninstallation of product |
 | CORE                | Display core properties |
+| BUILD               | Build the solution alias solution target |
+| CHECK_GITHUB_KEY    | Check for API_GITHUB_KEY environment variable and print its length |
 | UPDATE_NTOOLS       | Update ntools locally for testing |
 | NUGET_UPDATE        | Update the ntools-launcher nuget package in the local feed for testing - not needed for normal builds |
 | YELLOW_MESSAGE      | Example of a target that displays a yellow color message |
 | RED_MESSAGE         | Example of a target that displays a red color message |
-| GITHUB_RELEASE      | Creates a stage or prod release |
-| GITHUB_PRE_RELEASE  | Creates a stage or prod pre-release |
 | INSTALL_DOTNET_OUTDATED_TOOL | Install dotnet-outdated-tool globally |
 | UPDATE_NUGET_PACKAGES | Update all NuGet packages to the latest version |
 | LIST_NUGET_SOURCES  | List all NuGet sources |
-| UPDATE_DOC_VERSIONS | Update documentation versions from JSON configuration files |
+| UPDATE_DOC_VERSIONS |  |
 | GENERATE_COMMIT_MESSAGE | Intelligent commit message generation |
 | GIT_COMMIT_INFRASTRUCTURE | Automated Git commit with intelligent message generation |
 | UPDATE_AND_COMMIT   | Combined target: Update versions and commit with smart message |
 | INFRASTRUCTURE_COMMIT | Full infrastructure update and commit with intelligent analysis |
 | PREVIEW_COMMIT_MESSAGE | Preview commit message without committing |
+| INSTALL_REPORTGENERATOR | Install ReportGenerator tool globally |
+| GITHUB_RELEASE      | Creates a stage or prod release Add for testing and remove after success |
+| GITHUB_PRE_RELEASE  | Creates a stage or prod pre-release Add for testing and remove after success |
+| RUN_RELEASESERVICEFACTORYTESTS | Run the focused ReleaseServiceFactoryTests via dotnet test |
+| NB_PRECHECK         | Pre-check: ensure no machine-level Debug/Release folders are present before running tests |
+| NB_TEST             | Run the full solution test suite (used by 'nb test') |
+| NB_TEST_DIAGNOSTICS | Diagnostic target to run automatically after NB_TEST to list TestFramework DLLs |
+| NB_DIAG_NbuildTasksTests | Targets auto-generated: one per Tests.csproj in the solution |
+| NB_DIAG_NbuildTests |  |
+| NB_DIAG_lfTests     |  |
+| NB_DIAG_nbTests     |  |
+| NB_DIAG_nBackupTests |  |
+| NB_DIAG_GitHubReleaseTests |  |
+| NB_TEST_DIAG_ALL    | Aggregate target: run all per-project diagnostics sequentially |
+| STAGE               | Create a stage package for testing |
+| PROD                | Create a PROD package for release (delegates to PROD_NEW in common.targets) |
+| SMOKE_TEST          | Comprehensive smoke test to verify published artifacts and build system integrity |
+| TEST                | This prevents double test execution that causes conflicts |
+| PUBLISH             | Publish all non-test projects to artifacts folder |
+
+
+- **C:\Program Files\Nbuild\common.targets Targets**
 
 | **Target Name** | **Description** |
 | --- | --- |
@@ -36,32 +62,22 @@ The table below lists all available targets for the Nbuild tool.
 | DEV                 | Create a development package for testing without incrementing the version |
 | STAGE               | Create a stage package for testing |
 | PROD                | Create a PROD package for release |
-| GITHUB_RELEASE      | Creates a stage or prod release |
-| GITHUB_PRE_RELEASE  | Creates a stage or prod pre-release |
+| GITHUB_RELEASE      | Creates a prod release |
+| GITHUB_PRE_RELEASE  | Creates a pre-release |
 | STAGE_DEPLOY        | Create a STAGE package and deploy for testing |
 | PROD_DEPLOY         | Create a PROD package and deploy for release |
 | SOLUTION            | Build the solution Release configuration  using dotnet build |
 | SOLUTION_MSBUILD    | Build the solution Release configuration  using MSBuild |
 | PACKAGE             | Create a package for the solution default is a zip file of all artifacts |
-| COPY_ARTIFACTS      | Save the artifacts to the artifacts folder with organized structure |
+| COPY_ARTIFACTS      | Save the artifacts to the artifacts folder |
 | DEPLOY              | Deploy the package. default is to extract artifacts into DeploymentProperty folder |
-| TEST                | Run all tests using dotnet test in Release mode with conditional code coverage |
+| TEST                | Run all tests using dotnet test in Release mode |
 | TEST_DEBUG          | Run all tests using dotnet test in Debug mode |
-| COVERAGE            | Generate comprehensive code coverage reports using ReportGenerator |
+| PUBLISH             | Publish all non-test projects to artifacts folder |
+| COVERAGE            | Generate code coverage reports |
 | COVERAGE_SUMMARY    | Display high-level code coverage summary |
-| SMOKE_TEST          | **Comprehensive smoke test**: Validates published artifacts (4+ executables) AND build system integrity (target delegation). Consolidated from TEST_TARGET_DELEGATION |
-| SMOKE_TEST_PWSH     | REMOVED: functionality consolidated into `SMOKE_TEST` |
-| UNIT_TEST_CLI_VALIDATION | Run CLI validation unit tests |
-| UNIT_TEST_BUILD_STARTER | Run BuildStarter unit tests |
-| UNIT_TEST_CLI       | Run CLI unit tests |
-| UNIT_TEST_COMMAND   | Run Command unit tests |
-| UNIT_TEST_NB_COMMAND | Run NbCommand unit tests |
-| UNIT_TEST_GIT_CLONE_COMMAND | Run GitCloneCommand unit tests |
-| UNIT_TEST_NTOOLS_JSON | Run NtoolsJson unit tests |
-| UNIT_TEST_PATH_MANAGER | Run PathManager unit tests (excluded from UNIT_TEST_ALL due to long execution time) |
-| UNIT_TEST_RELEASE_SERVICE_FACTORY | Run ReleaseServiceFactory unit tests |
-| UNIT_TEST_RESOURCE_HELPER | Run ResourceHelper unit tests |
-| UNIT_TEST_ALL       | Run all unit tests except UNIT_TEST_PATH_MANAGER |
+| STAGE_NEW           | Enhanced stage package for testing with coverage and smoke tests |
+| PROD_NEW            | Enhanced prod package for release with coverage and smoke tests |
 | IS_ADMIN            | Check if current process is running in admin mode AdminCheckExitCode property is set |
 | SingleProject       | Example how to build a single project |
 | HandleError         | Error handling placeholder |
@@ -156,3 +172,31 @@ The table below lists all available targets for the Nbuild tool.
 | TF_PLAN             | terraform plan |
 | TF_APPLY            | terraform apply |
 | TF_DESTROY          | terraform destroy |
+
+
+- **unit-tests.targets Targets**
+
+| **Target Name** | **Description** |
+| --- | --- |
+| UNIT_TEST_CLI_VALIDATION | Unit tests for CLI validation |
+| UNIT_TEST_BUILD_STARTER | Unit tests for BuildStarter |
+| UNIT_TEST_CLI       | Unit tests for CLI |
+| UNIT_TEST_COMMAND   | Unit tests for Command |
+| UNIT_TEST_NB_COMMAND | Unit tests for NbCommand |
+| UNIT_TEST_GIT_CLONE_COMMAND | Unit tests for GitCloneCommand |
+| UNIT_TEST_NTOOLS_JSON | Unit tests for NtoolsJson |
+| UNIT_TEST_PATH_MANAGER | UNIT_TEST_PATH_MANAGER is excluded from UNIT_TEST_ALL and should be run separately with: nb UNIT_TEST_PATH_MANAGER |
+| UNIT_TEST_RELEASE_SERVICE_FACTORY | Unit tests for ReleaseServiceFactory |
+| UNIT_TEST_RESOURCE_HELPER | Unit tests for ResourceHelper |
+| UNIT_TEST_WORKITEM_COMMAND | Unit tests for WorkItemCommand |
+| UNIT_TEST_REPOSITORY_COMMAND | Unit tests for WorkItemCommand |
+| UNIT_TEST_PIPELINE_COMMAND | Unit tests for PipelineCommand |
+| UNIT_TEST_ADHOC_GET_PIPELINE_ASYNC | Ad hoc integration-style test for AzureDevOpsClient.GetPipelineAsync |
+| UNIT_TEST_PULL_REQUEST_COMMAND | Unit tests for PullRequestCommand |
+| UNIT_TEST_WORKITEM_STATE_TRANSLATOR | Unit tests for WorkItemStateTranslator |
+| UNIT_TEST_MAPPING_GENERATOR | Unit tests for MappingGenerator |
+| UNIT_TEST_SDOTESTS  | Unit tests for all SDO tests with code coverage |
+| UNIT_TEST_NBTESTS   | Unit tests for all nbtests |
+| UNIT_TEST_ALL       | Run all unit tests |
+
+
