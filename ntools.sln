@@ -15,10 +15,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 		ApiVersions\ApiVersions.csproj = ApiVersions\ApiVersions.csproj
 		mkdocs.yml = mkdocs.yml
-		sdo.log = sdo.log
-		sdo.targets = sdo.targets
 		prebuild.bat = prebuild.bat
 		README.md = README.md
+		sdo.log = sdo.log
+		sdo.targets = sdo.targets
 		targets.md = targets.md
 	EndProjectSection
 EndProject
@@ -84,11 +84,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ntools", "ntools", "{DBDD07
 		docs\ntools\devsetup.md = docs\ntools\devsetup.md
 		docs\ntools\github-release.md = docs\ntools\github-release.md
 		docs\ntools\nbackup.md = docs\ntools\nbackup.md
-		docs\ntools\sdo-targets.md = docs\ntools\sdo-targets.md
 		docs\ntools\nbuild.md = docs\ntools\nbuild.md
 		docs\ntools\nbuildtasks.md = docs\ntools\nbuildtasks.md
 		docs\ntools\ngit.md = docs\ntools\ngit.md
 		docs\ntools\ntools.md = docs\ntools\ntools.md
+		docs\ntools\sdo-targets.md = docs\ntools\sdo-targets.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHubRelease", "GitHubRelease\GitHubRelease.csproj", "{DE08895C-1D65-4A68-B9CC-144B5FADEB5A}"
@@ -115,6 +115,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nBackup", "nBackup\nBackup.csproj", "{75AF1D68-CD4A-4C01-9728-7A93B8DDEA1B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiVersions", "ApiVersions\ApiVersions.csproj", "{71123CA7-06B4-BEC1-ED29-A55FCC7F22BB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Launcher", "..\ntools-launcher\launcher\Launcher.csproj", "{FF2D1836-1D42-E4F6-712E-A4CBFBC64CE8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -282,6 +284,18 @@ Global
 		{71123CA7-06B4-BEC1-ED29-A55FCC7F22BB}.Release|x64.Build.0 = Release|Any CPU
 		{71123CA7-06B4-BEC1-ED29-A55FCC7F22BB}.Release|x86.ActiveCfg = Release|Any CPU
 		{71123CA7-06B4-BEC1-ED29-A55FCC7F22BB}.Release|x86.Build.0 = Release|Any CPU
+		{FF2D1836-1D42-E4F6-712E-A4CBFBC64CE8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF2D1836-1D42-E4F6-712E-A4CBFBC64CE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF2D1836-1D42-E4F6-712E-A4CBFBC64CE8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{FF2D1836-1D42-E4F6-712E-A4CBFBC64CE8}.Debug|x64.Build.0 = Debug|Any CPU
+		{FF2D1836-1D42-E4F6-712E-A4CBFBC64CE8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FF2D1836-1D42-E4F6-712E-A4CBFBC64CE8}.Debug|x86.Build.0 = Debug|Any CPU
+		{FF2D1836-1D42-E4F6-712E-A4CBFBC64CE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF2D1836-1D42-E4F6-712E-A4CBFBC64CE8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF2D1836-1D42-E4F6-712E-A4CBFBC64CE8}.Release|x64.ActiveCfg = Release|Any CPU
+		{FF2D1836-1D42-E4F6-712E-A4CBFBC64CE8}.Release|x64.Build.0 = Release|Any CPU
+		{FF2D1836-1D42-E4F6-712E-A4CBFBC64CE8}.Release|x86.ActiveCfg = Release|Any CPU
+		{FF2D1836-1D42-E4F6-712E-A4CBFBC64CE8}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

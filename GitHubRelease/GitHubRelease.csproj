@@ -20,11 +20,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ntools-launcher" Version="1.13.0" />
+    <ProjectReference Include="..\NbuildTasks\NbuildTasks.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NbuildTasks\NbuildTasks.csproj" />
+    <PackageReference Include="ntools-launcher" Version="1.13.3" />
   </ItemGroup>
 
 </Project>

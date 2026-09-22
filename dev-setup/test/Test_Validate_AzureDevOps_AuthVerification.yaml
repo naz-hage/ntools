@@ -1,0 +1,25 @@
+version: '1.0'
+description: Verifies that the `sdo auth azdo` command correctly authenticates with
+  Azure DevOps
+execution:
+  returnType: exit_code
+steps:
+- name: Azure DevOps Authentication
+  workingDirectory: C:\source\ConsoleApp1
+  path: c:\source\ntools\Sdo\bin\Release\sdo.exe
+  arguments: auth azdo
+  expectedReturnCode: 0
+  assertions:
+  - type: exit_code
+    value: 0
+  - type: output_contains
+    value: authentication
+  - type: output_contains
+    value: authentication successful
+  timeout: 30
+variables:
+  CATEGORY: authentication
+  PLATFORM: azure_devops
+  TEST_CLASS: AuthCommandE2eTests
+  REPOSITORY: C:\\source\\ConsoleApp1
+  REPOSITORY_TYPE: azure_devops

@@ -159,10 +159,8 @@ public sealed class TestCommand : Command
         {
             ConsoleHelper.WriteError($"Failed: {failed}");
         }
-        else
-        {
-            ConsoleHelper.WriteWarning("Failed: 0");
-        }
+        // Write a solid line to separate the summary from any subsequent output
+        ConsoleHelper.WriteLine(new string('-', 40));
     }
 
     private static string ResolveMetadataPath(string? metadataPath)
