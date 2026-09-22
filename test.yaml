@@ -6,10 +6,15 @@ execution:
   verbose: true
   timeout: 60
 steps:
-  - name: build-ntools-launcher
+  - name: update-ntools-launcher-nuget
     path: sdo
     arguments: "nuget_add"
     workingDirectory: "c:\\source\\ntools-launcher"
+    expectedReturnCode: 0
+  - name: ntools-update-ntools-launcher
+    path: sdo
+    arguments: "nuget_update"
+    workingDirectory: "c:\\source\\ntools"
     expectedReturnCode: 0
   - name: build-ntools
     path: sdo
