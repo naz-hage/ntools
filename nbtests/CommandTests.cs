@@ -837,6 +837,47 @@ namespace NbuildTests
         }
 
         [TestMethod]
+        public void GetAppsFromCurrentDirectory_FindsAppInYamlAndOverridesVersion()
+        {
+            var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            Directory.CreateDirectory(tempDir);
+            var originalDir = Directory.GetCurrentDirectory();
+
+            try
+            {
+                Directory.SetCurrentDirectory(tempDir);
+                var yamlPath = Path.Combine(tempDir, "apps.yaml");
+                var yamlContent = """
+                    Version: "1.2.0"
+                    NbuildAppList:
+                      - Name: "testapp"
+                        Version: "1.0.0"
+                        AppFileName: "$(InstallPath)\\testapp.exe"
+                        WebDownloadFile: "https://example.com/$(Version).zip"
+                        DownloadedFile: "$(Version).zip"
+                        InstallCommand: "echo"
+                        InstallArgs: "installed"
+                        InstallPath: 'C:\\Temp\\testapp'
+                        UninstallCommand: "echo"
+                        UninstallArgs: "uninstalled"
+                    """;
+                File.WriteAllText(yamlPath, yamlContent);
+
+                var apps = Command.GetAppsFromCurrentDirectory("testapp", "2.0.0", out _, yamlPath);
+
+                Assert.AreEqual(1, apps.Count);
+                Assert.AreEqual("2.0.0", apps[0].Version);
+                Assert.AreEqual("https://example.com/2.0.0.zip", apps[0].WebDownloadFile);
+                Assert.AreEqual("2.0.0.zip", apps[0].DownloadedFile);
+            }
+            finally
+            {
+                Directory.SetCurrentDirectory(originalDir);
+                Directory.Delete(tempDir, true);
+            }
+        }
+
+        [TestMethod]
         public void GetAppsFromCurrentDirectory_PrefersExplicitJsonAndFallsBackWhenAppIsMissing()
         {
             var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());

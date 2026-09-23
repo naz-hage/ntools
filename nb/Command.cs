@@ -1060,18 +1060,8 @@ namespace Nbuild
 
                 try
                 {
-                    var jsonContent = File.ReadAllText(appsFilePath);
-
-                    // Parse JSON directly without calling GetApps to avoid premature template processing
-                    NbuildApps? listAppData;
-                    try
-                    {
-                        listAppData = JsonSerializer.Deserialize<NbuildApps>(jsonContent);
-                    }
-                    catch (JsonException ex)
-                    {
-                        throw new ArgumentException($"Invalid JSON format in {appsFilePath}: {ex.Message}. Please check the JSON file for proper escaping of backslashes and quotes.", ex);
-                    }
+                    var manifestContent = File.ReadAllText(appsFilePath);
+                    var listAppData = DeserializeManifest(manifestContent);
 
                     if (listAppData == null || listAppData.NbuildAppList == null)
                     {
