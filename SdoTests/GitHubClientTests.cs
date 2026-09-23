@@ -13,6 +13,7 @@ namespace SdoTests;
 /// <summary>
 /// Unit tests for the GitHubClient class.
 /// </summary>
+[Trait("Category", "Integration")]
 public class GitHubClientTests
 {
     [Fact]
