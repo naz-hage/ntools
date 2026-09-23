@@ -1335,34 +1335,41 @@ namespace Nbuild
                 return ResultHelper.Fail(-1, "Build type is required");
             }
 
-            if (dryRun)
-            {
-                ConsoleHelper.WriteVerbose($"DRY-RUN: Would compute and set a {buildType} git tag.");
-                if (push)
-                {
-                    ConsoleHelper.WriteVerbose("DRY-RUN: Would push the computed tag to the remote repository");
-                }
-                ConsoleHelper.WriteVerbose("DRY-RUN: No actual changes will be made to the repository or remote.");
-                return ResultHelper.Success();
-            }
-
             var gitWrapper = new GitWrapper();
-
+            string? currentTag = gitWrapper.Tag;
             string? nextTag = gitWrapper.AutoTag(buildType);
             if (string.IsNullOrEmpty(nextTag))
             {
                 return ResultHelper.Fail(-1, "AutoTag failed");
             }
 
-            var result = gitWrapper.SetTag(nextTag) == true ? ResultHelper.Success() : ResultHelper.Fail(-1, "SetTag failed");
-            if (result.IsSuccess() && push)
+            if (dryRun)
             {
-                ConsoleHelper.WriteVerbose($"new tag: {gitWrapper.Tag}");
-                gitWrapper.PushTag(nextTag);
-                DisplayGitInfo();
+                ConsoleHelper.WriteVerbose($"DRY-RUN: Current git tag: {currentTag}");
+                ConsoleHelper.WriteVerbose($"DRY-RUN: Would compute and set a {buildType} git tag: {nextTag}.");
+                ConsoleHelper.WriteVerbose("DRY-RUN: Would create tag file: .temp\\.tag");
+                if (push)
+                {
+                    ConsoleHelper.WriteVerbose($"DRY-RUN: Would push the computed tag {nextTag} to the remote repository");
+                }
+                ConsoleHelper.WriteVerbose("DRY-RUN: No actual changes will be made to the repository or remote.");
+                return ResultHelper.Success();
             }
-            else if (result.IsSuccess())
+
+            var result = gitWrapper.SetTag(nextTag) == true ? ResultHelper.Success() : ResultHelper.Fail(-1, "SetTag failed");
+            if (result.IsSuccess())
             {
+                var tempDirectory = Path.Combine(Environment.CurrentDirectory, ".temp");
+                Directory.CreateDirectory(tempDirectory);
+                File.WriteAllText(Path.Combine(tempDirectory, ".tag"), nextTag + Environment.NewLine);
+                ConsoleHelper.WriteSuccess("Created tag file: .temp\\.tag");
+
+                if (push)
+                {
+                    ConsoleHelper.WriteVerbose($"new tag: {gitWrapper.Tag}");
+                    gitWrapper.PushTag(nextTag);
+                }
+
                 DisplayGitInfo();
             }
             return result;
