@@ -622,6 +622,14 @@ namespace Nbuild
 
             if (IsAppVersionGreaterOrEqual(nbuildApp))
             {
+                if (nbuildApp.AddToPath == true)
+                {
+                    PathManager.AddAppInstallPathToEnvironmentPath(nbuildApp.InstallPath);
+                    ConsoleHelper.WriteSuccess($"{nbuildApp.InstallPath} added to user PATH for {nbuildApp.Name}.");
+                
+                    return ResultHelper.Success();
+                }
+
                 ConsoleHelper.WriteWarning($"{nbuildApp.Name} {GetAppFileVersion(nbuildApp)} already installed.");
                 return ResultHelper.Success();
             }
@@ -664,7 +672,7 @@ namespace Nbuild
                 var resultInstall = process.LockStart(Verbose);
                 if (resultInstall.IsSuccess())
                 {
-                    if (nbuildApp.AddToPath == true && !TestMode)
+                    if (nbuildApp.AddToPath == true)
                     {
                         PathManager.AddAppInstallPathToEnvironmentPath(nbuildApp.InstallPath);
                     }

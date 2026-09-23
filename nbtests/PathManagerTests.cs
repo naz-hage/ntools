@@ -13,23 +13,19 @@ namespace NbuildTests
     [DoNotParallelize]
     public class PathManagerTests
     {
-        private PathSnapshot? _snapshot;
+        private string _testPath = string.Empty;
 
         [TestInitialize]
         public void TestInitialize()
         {
-            // Create a snapshot of the current PATH before each test
-            _snapshot = PathManager.CreateSnapshot();
+            _testPath = string.Empty;
+            PathManager.UsePathStore(() => _testPath, path => _testPath = path ?? string.Empty);
         }
 
         [TestCleanup]
         public void TestCleanup()
         {
-            // Restore the original PATH after each test
-            if (_snapshot != null)
-            {
-                PathManager.RestoreSnapshot(_snapshot);
-            }
+            PathManager.ResetPathStore();
         }
 
         [TestMethod]
