@@ -13,7 +13,13 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <CopyOutputSymbolsToPublishDirectory>false</CopyOutputSymbolsToPublishDirectory>
+    <SatelliteResourceLanguages>none</SatelliteResourceLanguages>
   </PropertyGroup>
+
+  <ItemGroup>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder Remove=".pdb" />
+  </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Properties\" />

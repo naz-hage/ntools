@@ -12,7 +12,13 @@
 	<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 	<GenerateAssemblyInfo>true</GenerateAssemblyInfo>
 	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+	<CopyOutputSymbolsToPublishDirectory>false</CopyOutputSymbolsToPublishDirectory>
+	<SatelliteResourceLanguages>none</SatelliteResourceLanguages>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<AllowedOutputExtensionsInPackageBuildOutputFolder Remove=".pdb" />
+	</ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="18.9.6" />

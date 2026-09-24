@@ -18,7 +18,13 @@
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	<AssemblyName>nb</AssemblyName>
+	<CopyOutputSymbolsToPublishDirectory>false</CopyOutputSymbolsToPublishDirectory>
+	<SatelliteResourceLanguages>none</SatelliteResourceLanguages>
   </PropertyGroup>
+
+	<ItemGroup>
+		<AllowedOutputExtensionsInPackageBuildOutputFolder Remove=".pdb" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<InternalsVisibleTo Include="nbtests" />

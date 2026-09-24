@@ -116,8 +116,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nBackup", "nBackup\nBackup.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiVersions", "ApiVersions\ApiVersions.csproj", "{71123CA7-06B4-BEC1-ED29-A55FCC7F22BB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Launcher", "..\ntools-launcher\launcher\Launcher.csproj", "{FF2D1836-1D42-E4F6-712E-A4CBFBC64CE8}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -284,18 +282,6 @@ Global
 		{71123CA7-06B4-BEC1-ED29-A55FCC7F22BB}.Release|x64.Build.0 = Release|Any CPU
 		{71123CA7-06B4-BEC1-ED29-A55FCC7F22BB}.Release|x86.ActiveCfg = Release|Any CPU
 		{71123CA7-06B4-BEC1-ED29-A55FCC7F22BB}.Release|x86.Build.0 = Release|Any CPU
-		{FF2D1836-1D42-E4F6-712E-A4CBFBC64CE8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FF2D1836-1D42-E4F6-712E-A4CBFBC64CE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FF2D1836-1D42-E4F6-712E-A4CBFBC64CE8}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{FF2D1836-1D42-E4F6-712E-A4CBFBC64CE8}.Debug|x64.Build.0 = Debug|Any CPU
-		{FF2D1836-1D42-E4F6-712E-A4CBFBC64CE8}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{FF2D1836-1D42-E4F6-712E-A4CBFBC64CE8}.Debug|x86.Build.0 = Debug|Any CPU
-		{FF2D1836-1D42-E4F6-712E-A4CBFBC64CE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FF2D1836-1D42-E4F6-712E-A4CBFBC64CE8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FF2D1836-1D42-E4F6-712E-A4CBFBC64CE8}.Release|x64.ActiveCfg = Release|Any CPU
-		{FF2D1836-1D42-E4F6-712E-A4CBFBC64CE8}.Release|x64.Build.0 = Release|Any CPU
-		{FF2D1836-1D42-E4F6-712E-A4CBFBC64CE8}.Release|x86.ActiveCfg = Release|Any CPU
-		{FF2D1836-1D42-E4F6-712E-A4CBFBC64CE8}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
