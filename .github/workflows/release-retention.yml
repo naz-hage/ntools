@@ -1,0 +1,58 @@
+name: Release Retention
+
+on:
+  schedule:
+    - cron: "0 3 * * *"   # runs daily at 3 AM
+  workflow_dispatch:       # allow manual run
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-retention
+  cancel-in-progress: false
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Delete old releases
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const keep = 10; // number of releases to keep
+            const releases = await github.paginate(
+              github.rest.repos.listReleases,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                per_page: 100
+              }
+            );
+
+            const old = releases.slice(keep);
+
+            for (const rel of old) {
+              console.log(`Deleting release: ${rel.tag_name}`);
+              await github.rest.repos.deleteRelease({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                release_id: rel.id
+              });
+
+              // Delete the tag too when it still exists.
+              try {
+                await github.rest.git.deleteRef({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  ref: `tags/${rel.tag_name}`
+                });
+              } catch (error) {
+                if (error.status === 404) {
+                  core.warning(`Tag already missing: ${rel.tag_name}`);
+                } else {
+                  throw error;
+                }
+              }
+            }
