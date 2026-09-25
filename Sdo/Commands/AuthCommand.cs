@@ -6,7 +6,7 @@
 // This file contains the AuthCommand class for verifying authentication
 // with GitHub and Azure DevOps platforms based on detected Git remote.
 
-using Nbuild.Helpers;
+using Launcher.Helpers;
 using Sdo.Interfaces;
 using Sdo.Services;
 using System.CommandLine;
