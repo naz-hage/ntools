@@ -7,7 +7,7 @@
 // Sdo is a Simple DevOps Operations tool that provides unified operations
 // for Azure DevOps and GitHub work item and repository management.
 
-using Nbuild.Helpers;
+using Launcher.Helpers;
 using NbuildTasks;
 using System.CommandLine;
 

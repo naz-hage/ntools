@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+    <IsPublishable>false</IsPublishable>
     <IsTestProject>true</IsTestProject>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
@@ -14,8 +15,8 @@
 
 	<ItemGroup>
   <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.0" />
-  <PackageReference Include="MSTest.TestAdapter" Version="4.4.0" />
-  <PackageReference Include="MSTest.TestFramework" Version="4.4.0" />
+  <PackageReference Include="MSTest.TestAdapter" Version="4.4.1" />
+  <PackageReference Include="MSTest.TestFramework" Version="4.4.1" />
     <PackageReference Include="coverlet.collector" Version="10.0.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

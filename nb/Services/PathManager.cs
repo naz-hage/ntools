@@ -3,7 +3,7 @@
 // Purpose: Centralizes all PATH environment variable operations to provide
 //          safe, testable, and consistent PATH manipulation.
 // -----------------------------------------------------------------------------
-using Nbuild.Helpers;
+using Launcher.Helpers;
 
 namespace Nbuild.Services
 {
@@ -26,6 +26,20 @@ namespace Nbuild.Services
     public static class PathManager
     {
         private const char PathSeparator = ';';
+        private static Func<string> UserPathReader = ReadUserPath;
+        private static Action<string?> UserPathWriter = WriteUserPath;
+
+        internal static void UsePathStore(Func<string> reader, Action<string?> writer)
+        {
+            UserPathReader = reader ?? throw new ArgumentNullException(nameof(reader));
+            UserPathWriter = writer ?? throw new ArgumentNullException(nameof(writer));
+        }
+
+        internal static void ResetPathStore()
+        {
+            UserPathReader = ReadUserPath;
+            UserPathWriter = WriteUserPath;
+        }
 
         /// <summary>
         /// Gets the current user PATH environment variable.
@@ -33,7 +47,7 @@ namespace Nbuild.Services
         /// <returns>The current user PATH string, or empty string if not set.</returns>
         public static string GetUserPath()
         {
-            return Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User) ?? string.Empty;
+            return UserPathReader() ?? string.Empty;
         }
 
         /// <summary>
@@ -41,6 +55,16 @@ namespace Nbuild.Services
         /// </summary>
         /// <param name="path">The PATH string to set. If null or empty, clears the PATH.</param>
         public static void SetUserPath(string? path)
+        {
+            UserPathWriter(path);
+        }
+
+        private static string ReadUserPath()
+        {
+            return Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User) ?? string.Empty;
+        }
+
+        private static void WriteUserPath(string? path)
         {
             Environment.SetEnvironmentVariable("PATH", path, EnvironmentVariableTarget.User);
         }

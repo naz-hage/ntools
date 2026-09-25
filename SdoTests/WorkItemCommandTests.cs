@@ -221,6 +221,7 @@ public class WorkItemCommandTests
     #region Show Subcommand Execution Tests
 
     [Fact]
+    [Trait("Category", "Integration")]
     public void ShowSubcommand_WithNoArguments_ReturnsError()
     {
         // Arrange
@@ -236,6 +237,7 @@ public class WorkItemCommandTests
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
     public void ShowSubcommand_WithValidId_ReturnsExitCode()
     {
         // Arrange
@@ -251,6 +253,7 @@ public class WorkItemCommandTests
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
     public void ShowSubcommand_WithIdAndComments_ReturnsExitCode()
     {
         // Arrange
@@ -265,6 +268,7 @@ public class WorkItemCommandTests
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
     public void ShowSubcommand_WithIdAndCommentShortAlias_ReturnsExitCode()
     {
         // Arrange
@@ -279,6 +283,7 @@ public class WorkItemCommandTests
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
     public void ShowSubcommand_WithIdAndVerbose_ReturnsExitCode()
     {
         // Arrange
@@ -293,6 +298,7 @@ public class WorkItemCommandTests
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
     public void ShowSubcommand_WithIdOne_ReturnsExitCode()
     {
         // Arrange
@@ -307,6 +313,7 @@ public class WorkItemCommandTests
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
     public void ShowSubcommand_WithIdHundred_ReturnsExitCode()
     {
         // Arrange
@@ -321,6 +328,7 @@ public class WorkItemCommandTests
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
     public void ShowSubcommand_WithIdLarge_ReturnsExitCode()
     {
         // Arrange
@@ -339,6 +347,7 @@ public class WorkItemCommandTests
     #region List Subcommand Execution Tests
 
     [Fact]
+    [Trait("Category", "Integration")]
     public void ListSubcommand_WithNoFilters_ReturnsExitCode()
     {
         // Arrange
@@ -353,6 +362,7 @@ public class WorkItemCommandTests
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
     public void ListSubcommand_WithTypeFilter_ReturnsExitCode()
     {
         // Arrange
@@ -367,6 +377,7 @@ public class WorkItemCommandTests
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
     public void ListSubcommand_WithStateFilter_ReturnsExitCode()
     {
         // Arrange
@@ -381,6 +392,7 @@ public class WorkItemCommandTests
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
     public void ListSubcommand_WithAssignedToFilter_ReturnsExitCode()
     {
         // Arrange
@@ -395,6 +407,7 @@ public class WorkItemCommandTests
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
     public void ListSubcommand_WithAssignedToMeFilter_ReturnsExitCode()
     {
         // Arrange
@@ -409,6 +422,7 @@ public class WorkItemCommandTests
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
     public void ListSubcommand_WithTopOption_ReturnsExitCode()
     {
         // Arrange
@@ -423,6 +437,7 @@ public class WorkItemCommandTests
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
     public void ListSubcommand_WithMultipleFilters_ReturnsExitCode()
     {
         // Arrange
@@ -437,6 +452,7 @@ public class WorkItemCommandTests
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
     public void ListSubcommand_WithVerbose_ReturnsExitCode()
     {
         // Arrange
@@ -451,6 +467,7 @@ public class WorkItemCommandTests
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
     public void ListSubcommand_WithNoOptions_ReturnsExitCode()
     {
         // Arrange
@@ -465,6 +482,7 @@ public class WorkItemCommandTests
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
     public void ListSubcommand_WithTypeFilterOnly_ReturnsExitCode()
     {
         // Arrange
@@ -479,6 +497,7 @@ public class WorkItemCommandTests
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
     public void ListSubcommand_WithStateFilterOnly_ReturnsExitCode()
     {
         // Arrange
@@ -493,6 +512,7 @@ public class WorkItemCommandTests
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
     public void ListSubcommand_WithTopFilterOnly_ReturnsExitCode()
     {
         // Arrange
@@ -601,6 +621,7 @@ public class WorkItemCommandTests
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
     public void UpdateSubcommand_WithValidArguments_ReturnsExitCode()
     {
         // Arrange
@@ -615,6 +636,7 @@ public class WorkItemCommandTests
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
     public void UpdateSubcommand_WithIdAndState_ReturnsExitCode()
     {
         // Arrange
@@ -629,6 +651,7 @@ public class WorkItemCommandTests
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
     public void UpdateSubcommand_WithIdAndAssignee_ReturnsExitCode()
     {
         // Arrange
@@ -643,6 +666,7 @@ public class WorkItemCommandTests
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
     public void UpdateSubcommand_WithMultipleProperties_ReturnsExitCode()
     {
         // Arrange
@@ -717,6 +741,7 @@ public class WorkItemCommandTests
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
     public void UpdateSubcommand_WithNegativeId_ReturnsErrorExitCode()
     {
         // Arrange
@@ -732,6 +757,7 @@ public class WorkItemCommandTests
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
     public void UpdateSubcommand_WithVerbose_ReturnsExitCode()
     {
         // Arrange
@@ -941,6 +967,7 @@ public class WorkItemCommandTests
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
     public void StartSubcommand_WithValidId_ReturnsExitCode()
     {
         // Arrange
@@ -955,6 +982,7 @@ public class WorkItemCommandTests
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
     public void StartSubcommand_WithValidIdAndVerbose_ReturnsExitCode()
     {
         // Arrange
@@ -969,6 +997,7 @@ public class WorkItemCommandTests
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
     public void StartSubcommand_WithIdOne_ReturnsExitCode()
     {
         // Arrange
@@ -983,6 +1012,7 @@ public class WorkItemCommandTests
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
     public void StartSubcommand_WithLargeId_ReturnsExitCode()
     {
         // Arrange
@@ -997,6 +1027,7 @@ public class WorkItemCommandTests
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
     public void StartSubcommand_WithNegativeId_ReturnsErrorExitCode()
     {
         // Arrange
@@ -1110,6 +1141,7 @@ public class WorkItemCommandTests
     #region Config File and Defaults Tests
 
     [Fact]
+    [Trait("Category", "Integration")]
     public void ListSubcommand_WithConfigParameter_ReturnsExitCode()
     {
         // Arrange
@@ -1124,6 +1156,7 @@ public class WorkItemCommandTests
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
     public void ListSubcommand_WithConfigAndOtherFilters_ReturnsExitCode()
     {
         // Arrange
@@ -1139,6 +1172,7 @@ public class WorkItemCommandTests
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
     public void ListSubcommand_ConfigParameterIsOptional()
     {
         // Arrange

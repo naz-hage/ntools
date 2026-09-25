@@ -14,7 +14,13 @@
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AssemblyName>lf</AssemblyName>
+    <CopyOutputSymbolsToPublishDirectory>false</CopyOutputSymbolsToPublishDirectory>
+    <SatelliteResourceLanguages>none</SatelliteResourceLanguages>
   </PropertyGroup>
+
+  <ItemGroup>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder Remove=".pdb" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\NbuildTasks\NbuildTasks.csproj" />

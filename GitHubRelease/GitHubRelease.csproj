@@ -17,14 +17,20 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <CopyOutputSymbolsToPublishDirectory>false</CopyOutputSymbolsToPublishDirectory>
+    <SatelliteResourceLanguages>none</SatelliteResourceLanguages>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ntools-launcher" Version="1.13.0" />
+    <AllowedOutputExtensionsInPackageBuildOutputFolder Remove=".pdb" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\NbuildTasks\NbuildTasks.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ntools-launcher" Version="1.14.0" />
   </ItemGroup>
 
 </Project>

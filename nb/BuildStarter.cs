@@ -1,4 +1,4 @@
-﻿using Nbuild.Helpers;
+﻿using Launcher.Helpers;
 using NbuildTasks;
 using Ntools;
 using System.Diagnostics;
@@ -141,18 +141,17 @@ public partial class BuildStarter
             var spinnerIndex = 0;
             var spinnerEnabled = !Console.IsOutputRedirected;
             var status = $"... '{target}'";
+            var elapsed = Stopwatch.StartNew();
 
             if (spinnerEnabled)
-                Console.Write($"{status} {spinner[spinnerIndex]}");
+                Console.Write($"{status} [{elapsed.Elapsed:hh\\:mm\\:ss}] {spinner[spinnerIndex]}");
             else
                 Console.WriteLine(status);
-
-            Stopwatch? timer = timeout.HasValue ? Stopwatch.StartNew() : null;
 
             while (!process.HasExited)
             {
                 // Optional timeout
-                if (timer != null && timer.Elapsed >= timeout!.Value)
+                if (timeout.HasValue && elapsed.Elapsed >= timeout.Value)
                 {
                     process.Kill(entireProcessTree: true);
                     process.WaitForExit();
@@ -165,14 +164,14 @@ public partial class BuildStarter
                 if (spinnerEnabled)
                 {
                     spinnerIndex = (spinnerIndex + 1) % spinner.Length;
-                    Console.Write($"\r{status} {spinner[spinnerIndex]}");
+                    Console.Write($"\r{status} [{elapsed.Elapsed:hh\\:mm\\:ss}] {spinner[spinnerIndex]}");
                 }
 
                 Thread.Sleep(150);
             }
 
             if (spinnerEnabled)
-                Console.WriteLine($"\r{status} done.   ");
+                Console.WriteLine($"\r{status} [{elapsed.Elapsed:hh\\:mm\\:ss}] done.   ");
 
             var result = ResultHelper.New();
             result.Code = process.ExitCode;

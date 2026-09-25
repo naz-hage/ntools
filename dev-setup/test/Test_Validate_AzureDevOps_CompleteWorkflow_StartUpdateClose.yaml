@@ -1,0 +1,46 @@
+version: '1.0'
+description: 'Verifies the complete workflow: list work items \u2192 start work \u2192\
+  \ update state to In Progress \u2192 close work item'
+execution:
+  mode: Sequential
+  stopOnFirstError: true
+  timeout: 60
+steps:
+- name: Get an Azure DevOps work item
+  path: c:\source\ntools\Sdo\bin\Release\sdo.exe
+  arguments: wi list --state "To Do" --top 1
+  expectedReturnCode: 0
+  workingDirectory: C:\source\ConsoleApp1
+  assertions:
+  - type: exit_code
+    value: 0
+  extractVariables:
+  - name: work_item_id
+    pattern: '^\s*(\d+)\s'
+    groupIndex: 1
+- name: Start work on the item
+  path: c:\source\ntools\Sdo\bin\Release\sdo.exe
+  arguments: wi start {work_item_id}
+  expectedReturnCode: 0
+  workingDirectory: C:\source\ConsoleApp1
+  assertions:
+  - type: exit_code
+    value: 0
+  - type: output_contains
+    value: 'Branch:'
+- name: Update item state to In Progress
+  path: c:\source\ntools\Sdo\bin\Release\sdo.exe
+  arguments: wi update --id {work_item_id} --state "In Progress"
+  expectedReturnCode: 0
+  workingDirectory: C:\source\ConsoleApp1
+  assertions:
+  - type: exit_code
+    value: 0
+- name: Close the work item
+  path: c:\source\ntools\Sdo\bin\Release\sdo.exe
+  arguments: wi update --id {work_item_id} --state closed
+  expectedReturnCode: 0
+  workingDirectory: C:\source\ConsoleApp1
+  assertions:
+  - type: exit_code
+    value: 0

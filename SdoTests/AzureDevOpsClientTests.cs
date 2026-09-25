@@ -13,6 +13,7 @@ namespace SdoTests;
 /// <summary>
 /// Unit tests for the AzureDevOpsClient class.
 /// </summary>
+[Trait("Category", "Integration")]
 public class AzureDevOpsClientTests
 {
     [Fact]

@@ -16,6 +16,13 @@ namespace SdoTests;
 /// </summary>
 public class PlatformServiceTests
 {
+    private readonly string _originalWorkingDirectory = Environment.CurrentDirectory;
+
+    public void Dispose()
+    {
+        Environment.CurrentDirectory = _originalWorkingDirectory;
+    }
+
     private void SetupWorkingDirectory()
     {
         // Set working directory to the solution root (ntools) to ensure Git repository is accessible
