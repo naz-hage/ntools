@@ -154,6 +154,94 @@ public class ProgramTests
     }
 
     [Fact]
+    public void Main_WithStopOnFirstErrorFalse_ContinuesAfterFailure()
+    {
+        var manifestPath = CreateFailureManifest(stopOnFirstError: false, includeExecution: true, out var markerPath);
+
+        try
+        {
+            var result = Program.Main("run", "--manifest", manifestPath);
+
+            Assert.Equal(1, result);
+            Assert.True(File.Exists(markerPath));
+        }
+        finally
+        {
+            DeleteFiles(manifestPath, markerPath);
+        }
+    }
+
+    [Fact]
+    public void Main_WithStopOnFirstErrorTrue_StopsAfterFailure()
+    {
+        var manifestPath = CreateFailureManifest(stopOnFirstError: true, includeExecution: true, out var markerPath);
+
+        try
+        {
+            var result = Program.Main("run", "--manifest", manifestPath);
+
+            Assert.Equal(1, result);
+            Assert.False(File.Exists(markerPath));
+        }
+        finally
+        {
+            DeleteFiles(manifestPath, markerPath);
+        }
+    }
+
+    [Fact]
+    public void Main_WithoutStopOnFirstError_StopsRegardlessOfExecutionSection()
+    {
+        var manifestWithoutExecution = CreateFailureManifest(null, includeExecution: false, out var markerWithoutExecution);
+        var manifestWithExecution = CreateFailureManifest(null, includeExecution: true, out var markerWithExecution);
+
+        try
+        {
+            Assert.Equal(1, Program.Main("run", "--manifest", manifestWithoutExecution));
+            Assert.Equal(1, Program.Main("run", "--manifest", manifestWithExecution));
+            Assert.False(File.Exists(markerWithoutExecution));
+            Assert.False(File.Exists(markerWithExecution));
+        }
+        finally
+        {
+            DeleteFiles(manifestWithoutExecution, markerWithoutExecution, manifestWithExecution, markerWithExecution);
+        }
+    }
+
+    private static string CreateFailureManifest(bool? stopOnFirstError, bool includeExecution, out string markerPath)
+    {
+        var manifestPath = Path.Combine(Path.GetTempPath(), $"sdo-run-{Guid.NewGuid():N}.yaml");
+        markerPath = Path.Combine(Path.GetTempPath(), $"sdo-marker-{Guid.NewGuid():N}.txt").Replace('\\', '/');
+        var executionSection = includeExecution
+            ? $"execution:\n  verbose: false\n  stopOnFirstError: {(stopOnFirstError ?? true).ToString().ToLowerInvariant()}\n"
+            : string.Empty;
+        var yaml = $"""
+version: '1.0'
+{executionSection}steps:
+  - name: fail
+    path: cmd.exe
+    arguments: /c exit 1
+  - name: marker
+    path: cmd.exe
+    arguments: /c echo ran > {markerPath}
+""";
+
+        File.WriteAllText(manifestPath, yaml);
+        return manifestPath;
+    }
+
+    private static void DeleteFiles(params string[] paths)
+    {
+        foreach (var path in paths)
+        {
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+        }
+    }
+
+    [Fact]
     public void Main_WithTestMetadataFile_RunsSharedLauncherRunner()
     {
         var metadataPath = Path.Combine(Path.GetTempPath(), $"sdo-test-{Guid.NewGuid():N}.yaml");

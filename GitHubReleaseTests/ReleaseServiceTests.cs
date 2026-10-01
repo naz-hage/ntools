@@ -262,6 +262,7 @@ namespace GitHubRelease.Tests
         [TestMethod]
         public async Task DownloadPublicAssetByName_ShouldDownloadAsset()
         {
+            var VersionToTest = Environment.GetEnvironmentVariable("VersionToTest") ?? "1.82.0";
             var owner = Credentials.GetOwner();
             var repoParts = Repo.Split('/');
             var repoOwner = repoParts.Length > 1 ? repoParts[0] : owner;
@@ -274,7 +275,7 @@ namespace GitHubRelease.Tests
                 return;
             }
             Console.WriteLine("[TestMode] Real mode detected");
-            string tagName = "1.13.0";
+            string tagName = VersionToTest;
             string assetName = $"{tagName}.zip";
             string DownloadPath = @"c:\temp";
             var assetFileName = Path.Combine(DownloadPath, assetName);

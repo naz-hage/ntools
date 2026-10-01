@@ -6,9 +6,9 @@ variables:
   Verbosity: "minimal"
   ReleaseDir: "C:\\Release"
   Project: "Sdo"
-  ContinueOnError: false
 execution:
     verbose: true
+    stopOnFirstError: true
 steps:
   - name: clean solution
     path: sdo
