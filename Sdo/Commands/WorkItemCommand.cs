@@ -6,7 +6,7 @@
 // This file contains the WorkItemCommand class for managing work items
 // across GitHub Issues and Azure DevOps work items.
 
-using Launcher.Helpers;
+using Launcher.Services;
 using NbuildTasks;
 using Sdo.Interfaces;
 using Sdo.Models;

@@ -3,6 +3,7 @@ description: "Build the ntools stage"
 variables:
   ArtifactDirectory: "C:\\Artifacts"
   Target: "Release"
+  BuildType: "stage"
   Verbosity: "minimal"
   ReleaseDir: "C:\\Release"
   Project: "Sdo"
@@ -28,7 +29,7 @@ steps:
   # AUTOTAG_STAGE;
   - name: autotag stage
     path: sdo
-    arguments: "repo tag auto -b stage --verbose --dry-run"
+    arguments: "repo tag auto -b $(BuildType) --verbose --dry-run"
     workingDirectory: .
     expectedReturnCode: 0
   # Version=$(Get-Content .\.temp\.tag) /v:m
