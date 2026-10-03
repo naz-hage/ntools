@@ -30,7 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ntools-launcher" Version="1.14.9" />
+    <PackageReference Include="ntools-launcher" Version="1.15.0" />
   </ItemGroup>
 
 </Project>
