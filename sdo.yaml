@@ -2,11 +2,12 @@ version: "1.0"
 description: "Build the ntools stage"
 variables:
   ArtifactDirectory: "C:\\Artifacts"
+  DeployDirectory: "C:\\Program Files\\home"
   Target: "Release"
+  BuildType: "stage"
   Verbosity: "minimal"
   ReleaseDir: "C:\\Release"
   Project: "Sdo"
-  ContinueOnError: false
 execution:
     verbose: true
 steps:
@@ -28,7 +29,7 @@ steps:
   # AUTOTAG_STAGE;
   - name: autotag stage
     path: sdo
-    arguments: "repo tag auto -b stage --verbose --dry-run"
+    arguments: "repo tag auto -b $(BuildType) --verbose"
     workingDirectory: .
     expectedReturnCode: 0
   # Version=$(Get-Content .\.temp\.tag) /v:m
@@ -44,25 +45,35 @@ steps:
     workingDirectory: .
     expectedReturnCode: 0
   # TEST;
-  # - name: test solution
-  #   path: sdo
-  #   arguments: "test"
-  #   workingDirectory: .
-  #   expectedReturnCode: 0
-  # COPY_ARTIFACTS;
-  # PUBLISH;
-  - name: publish sdo
-    path: pwsh.exe
-    arguments: >-
-      -NoProfile -Command
-      "$version = (Get-Content '.\\.temp\\.tag').Trim();
-      $output = Join-Path '$(ArtifactDirectory)' ('ntools\\$(Target)\\' + $version);
-      dotnet publish `
-        '.\\Sdo\\Sdo.csproj' `
-        -c '$(Target)' `
-        -o $output `
-        --no-restore `
-        /p:SolutionVersion=$version `
-        /v:$(Verbosity)"
+  - name: test solution
+    path: sdo
+    arguments: "test"
     workingDirectory: .
     expectedReturnCode: 0
+  # PUBLISH;
+  # - name: publish sdo
+  #   path: pwsh.exe
+  #   arguments: >-
+  #     -NoProfile -Command
+  #     "$version = (Get-Content '.\\.temp\\.tag').Trim();
+  #     $output = Join-Path '$(ArtifactDirectory)' ('ntools\\$(Target)\\' + $version);
+  #     dotnet publish `
+  #       '.\\Sdo\\Sdo.csproj' `
+  #       -c '$(Target)' `
+  #       -o $output `
+  #       --no-restore `
+  #       /p:SolutionVersion=$version `
+  #       /v:$(Verbosity)"
+  #   workingDirectory: .
+  #   expectedReturnCode: 0
+  # - name: publish ntools
+  #   path: pwsh.exe
+  #   arguments: >-
+  #     -NoProfile -Command
+  #     "$version = (Get-Content '.\.temp\.tag').Trim();
+  #     dotnet publish ntools.sln
+  #     --configuration '$(Target)'
+  #     --output '$(DeployDirectory)'
+  #     "-p:Version=$version"
+  #   workingDirectory: .
+  #   expectedReturnCode: 0    

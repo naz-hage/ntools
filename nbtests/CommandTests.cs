@@ -1,6 +1,4 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Nbuild;
-using Nbuild.Services;
 using NbuildTasks;
 using Ntools;
 using System.Collections;
@@ -16,7 +14,7 @@ namespace NbuildTests
         private const string NbuildAssemblyName = "nb.dll";
         private const string NbuildAppListJsonFile = "ntools.json";
         private const string LocalTest = "LOCAL_TEST";
-        private const string VersionToTest = "1.10.0";
+        private const string VersionToTest = "1.82.0";
         // Local test mode flag
         private bool? LocalTestMode;
 
@@ -188,7 +186,7 @@ namespace NbuildTests
                 ""NbuildAppList"": [
                 {
                 ""Name"": ""nbuild"",
-                ""Version"": ""1.6.0"",
+                ""Version"": ""VersionToTest"",
                 ""AppFileName"": ""sdo.exe"",
                 ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
                 ""DownloadedFile"": ""$(Version).zip"",
@@ -200,6 +198,7 @@ namespace NbuildTests
                 }
             ]
             }";
+            json = json.Replace("VersionToTest", VersionToTest);
 
             // Act
             var result = Command.Download(json);
@@ -209,6 +208,12 @@ namespace NbuildTests
 
             //teardown
             TeardownTestModeFlag();
+
+            // Clean up downloaded files
+            if (File.Exists(Path.Combine(TestPath, $"{VersionToTest}.zip")))
+            {
+                File.Delete(Path.Combine(TestPath, $"{VersionToTest}.zip"));
+            }
         }
 
         [TestMethod()]
@@ -349,6 +354,13 @@ namespace NbuildTests
 
             // teardown
             TeardownTestModeFlag();
+
+            // Clean up downloaded files
+            var downloadedFile = Path.Combine(TestPath, $"{VersionToTest}.zip");
+            if (File.Exists(downloadedFile))
+            {
+                File.Delete(downloadedFile);
+            }
         }
 
         // Test method for uninstall functionality

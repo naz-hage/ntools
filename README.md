@@ -73,6 +73,8 @@ steps:
     expectedReturnCode: 0
 ```
 
+`execution.stopOnFirstError` controls workflow continuation. It defaults to `true`, so a failed step stops the workflow. Set it to `false` to run subsequent steps; the workflow still returns a non-zero exit code when any step fails.
+
 Tool manifests such as `apps.yaml` are handled by `sdo tool`, not `sdo run`.
 
 #### YAML Tool Manifests

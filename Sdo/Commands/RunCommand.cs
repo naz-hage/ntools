@@ -1,9 +1,8 @@
-using Launcher.Helpers;
+using Launcher.Services;
 using System.CommandLine;
-using YamlLauncher;
-using YamlLauncher.Logging;
-using YamlLauncher.Models;
 using YamlDotNet.Serialization;
+using YamlLauncher;
+using YamlLauncher.Models;
 
 namespace Sdo.Commands;
 
@@ -47,7 +46,7 @@ public sealed class RunCommand : Command
             }
 
             var effectiveVerbose = verbose || config.Execution?.Verbose == true;
-            var executor = new StepExecutor(effectiveVerbose, new ConsoleLogger(effectiveVerbose));
+            var executor = new StepExecutor(effectiveVerbose);
             var variables = config.Variables ?? new Dictionary<string, string>();
             var completedSteps = 0;
             var success = true;
@@ -156,25 +155,6 @@ public sealed class RunCommand : Command
             if (!string.IsNullOrWhiteSpace(result.StdErr))
             {
                 Console.Error.WriteLine(result.StdErr);
-            }
-        }
-    }
-
-    private sealed class ConsoleLogger(bool verbose) : ILogger
-    {
-        public bool IsVerbose { get; } = verbose;
-
-        public void LogInfo(string message) => Console.WriteLine(message);
-
-        public void LogWarning(string message) => Console.Error.WriteLine(message);
-
-        public void LogError(string message) => Console.Error.WriteLine(message);
-
-        public void LogVerbose(string message)
-        {
-            if (IsVerbose)
-            {
-                ConsoleHelper.WriteLine(message, ConsoleColor.Cyan);
             }
         }
     }

@@ -1,5 +1,5 @@
 ﻿using GitHubRelease;
-using Launcher.Helpers;
+using Launcher.Services;
 using Nbuild.Services;
 using NbuildTasks;
 using Ntools;
