@@ -1342,10 +1342,30 @@ operations.</p>
 <h2 id="yaml-workflows">YAML Workflows<a class="headerlink" href="#yaml-workflows" title="Anchor link to this section for reference">&para;</a></h2>
 <p>The YAML command families have separate purposes:</p>
 <ul>
-<li><code>sdo run --manifest &lt;file&gt;</code> runs a YAML Launcher workflow.</li>
+<li><code>sdo run [--manifest &lt;file&gt;]</code> runs a YAML Launcher workflow. The default
+  manifest is <code>sdo.yaml</code> in the current directory.</li>
 <li><code>sdo tool &lt;operation&gt; --manifest &lt;file&gt;</code> manages JSON or YAML tool manifests.</li>
 <li><code>sdo e2e --test-case &lt;path-or-name&gt;</code> runs test metadata with assertions.</li>
 </ul>
+<p>To execute a named stage or selected steps, use exactly one selection option:</p>
+<div class="highlight"><pre><span></span><code>sdo run
+sdo run --manifest workflow.yaml --stage release
+sdo run --manifest workflow.yaml --step build
+sdo run --manifest workflow.yaml --step-index 2 0
+</code></pre></div>
+<p><code>--stage</code> executes a named, ordered group of step names. <code>--step</code> executes
+one uniquely named step. <code>--step-index</code> accepts multiple zero-based indices
+and preserves their requested order. Stage names, referenced step names, and
+indices are validated before any selected step starts. These options are
+mutually exclusive.</p>
+<p>Stages are defined beside the top-level <code>steps</code> collection:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">stages</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">release</span>
+<span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">clean</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">build</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">publish</span>
+</code></pre></div>
 <h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Anchor link to this section for reference">&para;</a></h2>
 <p>See the <a href="../sdo-net/">sdo CLI reference</a> for all commands, options, examples,
 configuration, build targets, and troubleshooting guidance.</p>

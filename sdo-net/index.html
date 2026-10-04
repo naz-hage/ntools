@@ -3254,12 +3254,28 @@ The JSON and YAML formats deserialize into the same production tool model.
 Use <code>sdo run</code> for generic workflow YAML; do not pass an apps manifest to it.</p>
 <h4 id="run">run<a class="headerlink" href="#run" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Execute a YAML Launcher workflow manifest:</p>
-<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>run<span class="w"> </span>--manifest<span class="w"> </span>workflow.yaml
+<div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>run
+sdo<span class="w"> </span>run<span class="w"> </span>--manifest<span class="w"> </span>workflow.yaml
+sdo<span class="w"> </span>run<span class="w"> </span>--manifest<span class="w"> </span>workflow.yaml<span class="w"> </span>--stage<span class="w"> </span>release
+sdo<span class="w"> </span>run<span class="w"> </span>--manifest<span class="w"> </span>workflow.yaml<span class="w"> </span>--step<span class="w"> </span>build
+sdo<span class="w"> </span>run<span class="w"> </span>--manifest<span class="w"> </span>workflow.yaml<span class="w"> </span>--step-index<span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="m">0</span>
 </code></pre></div>
-<p>Workflow YAML supports <code>steps</code>, <code>workingDirectory</code>, <code>variables</code>,
+<p><code>--manifest</code> is optional and defaults to <code>sdo.yaml</code> in the current directory.
+Workflow YAML supports <code>steps</code>, <code>workingDirectory</code>, <code>variables</code>,
 <code>execution.timeout</code> in seconds, expected return codes, captured output, and
-stop-on-error behavior. The command reports completed step counts and returns
-nonzero when the workflow fails.</p>
+stop-on-error behavior. Use exactly one of <code>--stage</code>, <code>--step</code>, or
+<code>--step-index</code> to execute a named stage, a uniquely named step, or multiple
+zero-based step indices in the requested order. Stage names, referenced step
+names, and indices are validated before execution begins. The command reports
+completed step counts and returns nonzero when the workflow fails.</p>
+<p>Stages are ordered groups of existing step names:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">stages</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">release</span>
+<span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">clean</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">build</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">publish</span>
+</code></pre></div>
 <h4 id="e2e">e2e<a class="headerlink" href="#e2e" title="Anchor link to this section for reference">&para;</a></h4>
 <p>Run ntools-launcher YAML test metadata by file, test name, or directory:</p>
 <div class="highlight"><pre><span></span><code>sdo<span class="w"> </span>e2e<span class="w"> </span>--test-case<span class="w"> </span>metadata/Test_Validate_AzureDevOps_CreateBugFromMarkdown.yaml
