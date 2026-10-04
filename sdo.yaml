@@ -10,6 +10,10 @@ variables:
   Project: "Sdo"
 execution:
     verbose: true
+stages:
+  - name: stage
+    steps:
+      - dotnet-version
 steps:
   - name: clean solution
     path: sdo

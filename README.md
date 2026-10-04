@@ -50,11 +50,16 @@ sdo repo list
 
 #### YAML Workflows
 
-Run an ordered YAML Launcher workflow with `sdo run`. The manifest must define
-at least one step; variables use `$(NAME)` placeholders.
+Run an ordered YAML Launcher workflow with `sdo run`. Without `--manifest`, it
+loads `sdo.yaml` from the current directory. The manifest must define at least
+one step; variables use `$(NAME)` placeholders.
 
 ```bash
+sdo run
 sdo run --manifest workflow.yaml
+sdo run --manifest workflow.yaml --stage release
+sdo run --manifest workflow.yaml --step build
+sdo run --manifest workflow.yaml --step-index 2 0
 ```
 
 ```yaml
@@ -74,6 +79,27 @@ steps:
 ```
 
 `execution.stopOnFirstError` controls workflow continuation. It defaults to `true`, so a failed step stops the workflow. Set it to `false` to run subsequent steps; the workflow still returns a non-zero exit code when any step fails.
+
+Use one selection option to execute only part of a workflow:
+
+- `--stage <name>` executes a named stage.
+- `--step <name>` executes one uniquely named step.
+- `--step-index <index>...` executes multiple zero-based step indices in the
+  order supplied.
+
+Stages are ordered groups of existing step names defined beside `steps`:
+
+```yaml
+stages:
+  - name: release
+    steps:
+      - clean
+      - build
+      - publish
+```
+
+The selected stage or steps are validated before execution. Do not combine
+`--stage`, `--step`, and `--step-index`.
 
 Tool manifests such as `apps.yaml` are handled by `sdo tool`, not `sdo run`.
 

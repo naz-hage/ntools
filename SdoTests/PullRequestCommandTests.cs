@@ -463,7 +463,7 @@ public class PullRequestCommandTests
             Assert.NotNull(method);
 
             // Act
-            var result = (string)method.Invoke(_command, new object[] { workItemId });
+            var result = (string?)method.Invoke(_command, new object[] { workItemId });
 
             // Assert
             Assert.NotNull(result);
@@ -484,7 +484,7 @@ public class PullRequestCommandTests
             int workItemId = 456;
 
             // Act
-            var result = (string)method.Invoke(_command, new object[] { workItemId });
+            var result = (string?)method.Invoke(_command, new object[] { workItemId });
 
             // Assert
             Assert.Contains("456", result);
@@ -501,12 +501,11 @@ public class PullRequestCommandTests
             Assert.NotNull(method);
 
             // Act
-            var result = (string)method.Invoke(_command, new object[] { 100 });
+            var result = (string?)method.Invoke(_command, new object[] { 100 });
 
             // Assert
             Assert.Contains(".temp", result);
         }
     }
 }
-
 
