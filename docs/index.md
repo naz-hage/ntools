@@ -6,6 +6,7 @@ This repository contains a collection of software tools specifically designed to
 
 ### Getting Started
 - [Installation](installation.md)
+- [Features](features.md)
 - [Usage Guide](usage.md)
 - [Project Setup](setup.md)
 - [Architecture Overview](devops-tools-suite-architecture.md)

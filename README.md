@@ -1,58 +1,40 @@
-# Software Tools Collection
+# SDO
 
-A powerful collection of command-line utilities for .NET developers, providing build automation, testing, Git operations, GitHub release management, and unified project management across Azure DevOps and GitHub.
+SDO (Simple DevOps Operations) is a single command-line utility for .NET
+development and repository automation. It brings build and test execution,
+Git and GitHub operations, workflows, and Azure DevOps or
+GitHub project management together under one consistent `sdo` command.
 
-## Key Features
+> **Migration:** This repository is transitioning from `ntools` to `sdo`.
+> The project is moving from a collection of separate CLI tools to one
+> unified command-line utility. Existing commands are being consolidated
+> under `sdo`; update scripts and documentation as you migrate.
 
-- **Build & Test**: Comprehensive build system with .NET SDK integration and extensive testing support
-- **Git Operations**: Complete Git workflow automation including tagging, branching, and repository cloning
-- **GitHub Integration**: Automated release creation and asset management
-- **Project Management**: Unified SDO CLI for managing work items and repositories across Azure DevOps and GitHub
-- **Global Options**: `--dry-run` and `--verbose` options available across all commands
-- **Modular Architecture**: Clean separation of concerns with service-based design
-- **Extensive Testing**: Comprehensive unit test suite with targeted execution options
+## Authentication
 
-## Recent Updates
-
-- **.NET 10.0 Upgrade**: Upgraded all projects to .NET 10.0 for C# 14.0 syntax support and latest runtime features
-- **.NET SDK Integration**: Updated sdo.exe to use .NET SDK instead of direct MSBuild dependency with automatic dotnet.exe detection
-- **System.CommandLine 2.0.1**: Upgraded to stable CLI framework with global option support
-- **Enhanced Testing**: Added granular unit testing targets for efficient test execution
-- **Git Clone Support**: New command for repository cloning operations
-- **Improved Documentation**: Updated CLI reference and build target documentation
+- **Azure DevOps**: Set the `AZURE_DEVOPS_PAT` environment variable.
+- **GitHub**: Use GitHub CLI authentication or set the `GITHUB_TOKEN`
+  environment variable.
 
 - Checkout the [documentation](https://naz-hage.github.io/ntools/) for more information.
 
 - The [installation](https://naz-hage.github.io/ntools/installation/) process is straightforward, and the tools are highly reliable and efficient, ensuring the safety and integrity of your data.
 
-- Take advantage of the `ntools`' [intuitive command-line interface](https://naz-hage.github.io/ntools/usage/) to streamline your development process. From building solutions to running tests, creating stage builds, and exploring available options, the `ntools` provide a seamless experience for all your software development needs.
+- See the [SDO features](https://naz-hage.github.io/ntools/features/) for an overview of the utility's capabilities.
+
+- See the [`sdo` usage documentation](https://naz-hage.github.io/ntools/usage/) for command details and examples.
 
 - Don't hesitate to write an [issue](https://github.com/naz-hage/NTools/issues) if you have any questions or suggestions.
 
-## Tools Overview
+## Workflows and Metadata
 
-### Sdo (Simple DevOps Operations)
-SDO is a unified CLI tool for managing work items and repositories across Azure DevOps and GitHub.
+### YAML Workflows
 
-**Key Capabilities:**
-- **Work Item Management**: Create, update, and query work items (PBIs, Tasks, Bugs, Epics) in Azure DevOps or issues in GitHub
-- **Repository Operations**: Manage repositories, branches, and code across platforms
-- **Pull Request Management**: Create and manage pull requests with cross-platform support
-- **Platform Agnostic**: Single command syntax works with both Azure DevOps and GitHub
-
-**Usage:**
-```bash
-sdo wi list --type "Product Backlog Item"
-sdo wi create --file-path pbi.md
-sdo pr create --title "Feature: New Capability"
-sdo repo list
-```
-
-#### YAML Workflows
-
-Run an ordered YAML Launcher workflow with `sdo run`. Without `--manifest`, it
-loads `sdo.yaml` from the current directory. The manifest must define at least
-one step; variables use `$(NAME)` placeholders.
+`sdo.yaml` is being introduced to replace `sdo.targets` as the basis for the
+build and test lifecycle. Run an ordered YAML Launcher workflow with
+`sdo run`. Without `--manifest`, it loads `sdo.yaml` from the current
+directory. The manifest must define at least one step; variables use
+`$(NAME)` placeholders.
 
 ```bash
 sdo run
@@ -140,59 +122,35 @@ generic workflows and `sdo tool` for application manifests. The legacy
 and CI should use `sdo e2e`. The compatibility executable can be retired
 after existing callers have migrated.
 
-**Authentication:**
-- Azure DevOps: Set `AZURE_DEVOPS_PAT` environment variable
-- GitHub: Uses GitHub CLI authentication or `GITHUB_TOKEN` environment variable
-
-**Key Capabilities:**
-- Build solutions and projects with .NET SDK
-- Run comprehensive unit and integration tests
-- Create stage and production releases
-- Git operations (tag, branch, clone)
-- Automated release creation and management
-
-**Usage:**
-```bash
-sdo solution           # Build solution
-sdo e2e                # Run ntools-launcher test metadata
-sdo stage              # Create stage release
-sdo prod               # Create production release
-```
-
 **Example GitHub Actions workflow:**
 ```yml
-- name: Build using ntools
+- name: Build using sdo
   run: |
     & "$env:ProgramFilesPath/nbuild/sdo.exe" ${{ env.Build_Type }} -v ${{ env.Enable_Logging }}
   shell: pwsh
   working-directory: ${{ github.workspace }}
-  env:
-    OWNER: ${{ secrets.OWNER }}
-    API_GITHUB_KEY: ${{ secrets.API_GITHUB_KEY }}
 ```
 
-### GitHubRelease
-GitHubRelease is a tool that allows you to create and manage GitHub releases from the command line. It simplifies the process of creating and managing releases, making it easier to publish your software updates on GitHub.
-
-**Key Capabilities:**
-- Create and manage GitHub releases
-- Automated release notes from commits
-- Upload release artifacts and packages
-- Stage and production release management
-
-**Authentication Methods** (choose one):
-- Set `API_GITHUB_KEY` environment variable with your GitHub personal access token
-- Use GitHub CLI: Run `gh auth login` to authenticate
-- Windows Credential Manager (for additional security)
-
-**Smart Authentication:**
-- Public repositories work without authentication for read operations
-- Private repositories require authentication
-- Must add a Repository secret token named `API_GITHUB_KEY` to the GitHub repository Secrets and variables (for CI/CD)
-- Must add a Repository secret owner named `OWNER` to the GitHub repository Secrets and variables (optional)
-
-**Release Management:**
-
-When `sdo stage` runs successfully, the tool creates a stage release. This release is tagged with the next tag release number, and the release notes include the commits since the last stage or prod tag. The API token from the repository secrets is used to create this release. The release package is uploaded to the release. The release is also tagged with the next stage release number.
-
-When `sdo prod` runs successfully, the tool creates a production release. This release is also tagged with the next prod release, and the release notes include the commits since the last production tag. All previous stage releases are deleted. The API token from the repository secrets is used to create this release. The release package is uploaded to the release. The release is also tagged with the next prod release number. All previous stage releases are deleted.
+### Next Ideas
+- e2e testing framework integration
+  - Implement e2e testing framework integration.
+  - Note: This integration will leverage the existing StepExecution mechanism in ntools-launcher for seamless e2e testing.
+- `sdo` commands/cli options enhancements
+   `sdo run` command
+    - define where comments are added for stage or step
+    - add option to list steps and stage
+    - add alias -s for --step
+    - add alias -g for --stage
+    - define what step is used as the default step when --step is not specified
+- `sdo tool` command
+    - Add deprecation warning for json file input
+    - Deprecate json file input after one release cycle
+    - Make yaml the default input format
+- `sdo setup` command
+    - Add setup option to configure a new machine for development
+    - Add option to install required dependencies automatically
+    - Add option to configure environment variables for development
+    - Add option to set up project-specific configurations
+    - Add option to configure development tools and IDE settings
+    - Add option to set up version control and repository settings
+    - Add option to configure project-specific scripts and automation
