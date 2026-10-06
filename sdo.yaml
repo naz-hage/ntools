@@ -7,13 +7,209 @@ variables:
   BuildType: "stage"
   Verbosity: "minimal"
   ReleaseDir: "C:\\Release"
-  Project: "Sdo"
+  Project: "ntools"
 execution:
     verbose: true
+stages:
+  - name: stage
+    steps:
+      - dotnet-version
+  - name: pre-release
+    steps:
+      - clean
+      - tag
+      - autotag-stage
+      - test
+      - coverage
+      - coverage-summary
+      - publish
+      - copy-artifacts
+      - smoke-test
+      - package
+      - githubprerelease
 steps:
-  - name: clean solution
+  - name: clean
+    path: pwsh.exe
+    arguments: >-
+      -NoProfile -Command
+      "$solution = Join-Path (Get-Location) '$(Project).sln';
+      dotnet clean $solution --configuration $(Target);
+      if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE };
+      dotnet clean $solution --configuration Debug;
+      if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE };
+      @('Release', 'Debug', 'x64') | ForEach-Object {
+        $path = Join-Path (Get-Location) $_;
+        if (Test-Path $path) { Remove-Item $path -Recurse -Force }
+      };
+      Get-ChildItem -Path (Get-Location) -Directory -Recurse -Force |
+        Where-Object { $_.Name -in @('obj', 'bin') } |
+        Sort-Object FullName -Descending |
+        Remove-Item -Recurse -Force"
+    workingDirectory: .
+    expectedReturnCode: 0
+  - name: tag
     path: sdo
-    arguments: "clean"
+    arguments: repo info
+    workingDirectory: .
+    expectedReturnCode: 0
+  - name: autotag-stage
+    path: sdo
+    arguments: repo tag auto -b $(BuildType) --verbose
+    workingDirectory: .
+    expectedReturnCode: 0
+  - name: test
+    path: pwsh.exe
+    arguments: >-
+      -NoProfile -Command
+      "$version = (Get-Content '.\.temp\.tag').Trim();
+      $results = Join-Path '$(ArtifactDirectory)\ntools\TestResults' $version;
+      if (Test-Path $results) { Remove-Item $results -Recurse -Force };
+      New-Item -ItemType Directory -Path $results -Force | Out-Null;
+      dotnet test '$(Project).sln'
+      --configuration $(Target)
+      --logger 'console;verbosity=normal'
+      --logger trx
+      --results-directory $results
+      --verbosity normal
+      --collect 'XPlat Code Coverage';
+      exit $LASTEXITCODE"
+    workingDirectory: .
+    expectedReturnCode: 0
+  - name: coverage
+    path: pwsh.exe
+    arguments: >-
+      -NoProfile -Command
+      "$version = (Get-Content '.\.temp\.tag').Trim();
+      $results = Join-Path '$(ArtifactDirectory)\ntools\TestResults' $version;
+      $coverage = Join-Path '$(ArtifactDirectory)\ntools\CoverageReport' $version;
+      dotnet tool install --global dotnet-reportgenerator-globaltool
+      --ignore-failed-sources;
+      New-Item -ItemType Directory -Path $coverage -Force | Out-Null;
+      $reportGenerator = Join-Path $HOME '.dotnet\tools\reportgenerator.exe';
+      $filters = @('-assemblyfilters:+*;-*Tests*;-*Test*',
+      '-classfilters:+*;-*.Tests.*;-*.Test.*',
+      '-reporttypes:Html;Cobertura;TextSummary',
+      "-targetdir:$coverage");
+      & $reportGenerator "-reports:$results\**\coverage.cobertura.xml" @filters;
+      if ($LASTEXITCODE -ne 0) {
+        & $reportGenerator "-reports:$results\**\*.xml" @filters
+      };
+      $cobertura = Join-Path $coverage 'Cobertura.xml';
+      if (Test-Path $cobertura) {
+        Copy-Item $cobertura '.\coverage.cobertura.xml' -Force
+      }"
+    workingDirectory: .
+    expectedReturnCode: 0
+  - name: coverage-summary
+    path: pwsh.exe
+    arguments: >-
+      -NoProfile -Command
+      "$version = (Get-Content '.\.temp\.tag').Trim();
+      $summary = Join-Path '$(ArtifactDirectory)\ntools\CoverageReport' $version;
+      $summary = Join-Path $summary 'Summary.txt';
+      if (-not (Test-Path $summary)) {
+        Write-Error "Coverage summary file not found at: $summary";
+        exit 1
+      };
+      Get-Content $summary;
+      Write-Host 'For detailed coverage, open the generated index.html report.';
+      Write-Host 'Coverage data file: .\coverage.cobertura.xml'"
+    workingDirectory: .
+    expectedReturnCode: 0
+  - name: publish
+    path: sdo
+    arguments: "PUBLISH"
+    workingDirectory: .
+    expectedReturnCode: 0
+  - name: copy-artifacts
+    path: sdo
+    arguments: "COPY_ARTIFACTS"
+    workingDirectory: .
+    expectedReturnCode: 0
+  - name: smoke-test
+    path: pwsh.exe
+    arguments: >-
+      -NoProfile -Command
+      "$version = (Get-Content '.\.temp\.tag').Trim();
+      $artifacts = '$(ArtifactDirectory)\ntools\Release\' + $version;
+      if (-not (Test-Path $artifacts)) {
+        Write-Error "Artifacts folder not found at: $artifacts";
+        exit 1
+      };
+      $executable = Join-Path $artifacts 'GitHubRelease.exe';
+      if (Test-Path $executable) {
+        & $executable --help;
+        Write-Host "GitHubRelease.exe exit code: $LASTEXITCODE"
+      };
+      $source = Join-Path (Get-Location) 'sdo.targets';
+      $delegate = Join-Path (Get-Location) 'nb\resources\common.targets';
+      if (-not (Test-Path $source)) {
+        Write-Error "Source target file not found: $source";
+        exit 1
+      };
+      if (-not (Test-Path $delegate)) {
+        Write-Error "Delegate target file not found: $delegate";
+        exit 1
+      };
+      $module = Join-Path $env:ProgramFiles 'nbuild\ntools-scripts.psm1';
+      if (-not (Test-Path $module)) {
+        Write-Error "Build tools module not found: $module";
+        exit 1
+      };
+      Import-Module $module -Force;
+      Test-TargetDelegation -SourceTarget STAGE -DelegateTarget STAGE_NEW
+      -SourceFile $source -DelegateFile $delegate;
+      if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }"
+    workingDirectory: .
+    expectedReturnCode: 0
+  - name: package
+    path: pwsh.exe
+    arguments: >-
+      -NoProfile -Command
+      "$version = (Get-Content '.\.temp\.tag').Trim();
+      $artifacts = '$(ArtifactDirectory)\ntools\Release\' + $version;
+      $package = $artifacts + '.zip';
+      $zip = Join-Path $env:ProgramFiles '7-Zip\7z.exe';
+      if (-not (Test-Path $artifacts)) {
+        Write-Error "Artifacts folder not found at: $artifacts";
+        exit 1
+      };
+      if (-not (Test-Path $zip)) {
+        Write-Error "7-Zip executable not found: $zip";
+        exit 1
+      };
+      & $zip a -r -tzip $package ($artifacts + '\*');
+      if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE };
+      Remove-Item $artifacts -Recurse -Force"
+    workingDirectory: .
+    expectedReturnCode: 0
+  - name: githubprerelease
+    path: pwsh.exe
+    arguments: >-
+      -NoProfile -Command
+      "if ([string]::IsNullOrWhiteSpace($env:GITHUB_ACTIONS)) {
+        Write-Host 'Skipping GitHub pre-release outside GitHub Actions.';
+        exit 0
+      };
+      $version = (Get-Content '.\.temp\.tag').Trim();
+      $branch = (git branch --show-current).Trim();
+      $repository = $env:GITHUB_REPOSITORY;
+      if ([string]::IsNullOrWhiteSpace($repository)) {
+        Write-Error 'GITHUB_REPOSITORY is required to create a GitHub pre-release.';
+        exit 1
+      };
+      if ([string]::IsNullOrWhiteSpace($branch)) {
+        Write-Error 'The current Git branch is required to create a GitHub pre-release.';
+        exit 1
+      };
+      $artifact = '$(ArtifactDirectory)\ntools\Release\' + $version + '.zip';
+      git push origin $version;
+      if ($LASTEXITCODE -ne 0) {
+        Write-Error "Failed to push tag $version.";
+        exit $LASTEXITCODE
+      };
+      sdo release create -p -r $repository -t $version -b $branch -f $artifact --verbose;
+      exit $LASTEXITCODE"
     workingDirectory: .
     expectedReturnCode: 0
   - name: dotnet-version
@@ -21,33 +217,28 @@ steps:
     arguments: "--version"
     workingDirectory: .
     expectedReturnCode: 0
-  - name: get repo info
-    path: sdo
-    arguments: "repo info"
-    workingDirectory: .
-    expectedReturnCode: 0    
-  # AUTOTAG_STAGE;
-  - name: autotag stage
-    path: sdo
-    arguments: "repo tag auto -b $(BuildType) --verbose"
-    workingDirectory: .
-    expectedReturnCode: 0
-  # Version=$(Get-Content .\.temp\.tag) /v:m
+   # Version=$(Get-Content .\.temp\.tag) /v:m
   - name: get version
     path:  pwsh.exe
     arguments: '-Command Get-Content .\.temp\.tag'
     workingDirectory: .
     expectedReturnCode: 0
   # SOLUTION;
-  - name: build solution
-    path: sdo
-    arguments: "solution"
-    workingDirectory: .
-    expectedReturnCode: 0
-  # TEST;
-  - name: test solution
-    path: sdo
-    arguments: "test"
+  - name: solution
+    path: pwsh.exe
+    arguments: >-
+      -NoProfile -Command
+      "$version = (Get-Content '.\.temp\.tag').Trim();
+      dotnet restore;
+      if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE };
+      dotnet build .\ntools.sln
+      --no-restore
+      --configuration Release
+      /p:FileVersion=$version
+      /p:AssemblyVersion=$version
+      /p:UICulture=en-US
+      /p:Culture=en-US;
+      exit $LASTEXITCODE"
     workingDirectory: .
     expectedReturnCode: 0
   # PUBLISH;

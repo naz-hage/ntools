@@ -1,4 +1,4 @@
- ## Title: [TASK/PBI-XXX] Brief description
+ ## Brief description
 
 ## Description
 <!-- What changed and why -->
@@ -13,8 +13,7 @@
 
 ## Testing
 <!-- How you validated the changes -->
-- [ ] Tests pass (`make test` or `pytest`)
-- [ ] Code quality checks pass (`make lint`)
+- [ ] Tests pass (`sdo test`)
 
 ## Screenshots/Demos
 <!-- If applicable, add screenshots or demos -->

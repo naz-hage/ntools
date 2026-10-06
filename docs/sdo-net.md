@@ -812,13 +812,32 @@ Use `sdo run` for generic workflow YAML; do not pass an apps manifest to it.
 Execute a YAML Launcher workflow manifest:
 
 ```bash
+sdo run
 sdo run --manifest workflow.yaml
+sdo run --manifest workflow.yaml --stage release
+sdo run --manifest workflow.yaml --step build
+sdo run --manifest workflow.yaml --step-index 2 0
 ```
 
+`--manifest` is optional and defaults to `sdo.yaml` in the current directory.
 Workflow YAML supports `steps`, `workingDirectory`, `variables`,
 `execution.timeout` in seconds, expected return codes, captured output, and
-stop-on-error behavior. The command reports completed step counts and returns
-nonzero when the workflow fails.
+stop-on-error behavior. Use exactly one of `--stage`, `--step`, or
+`--step-index` to execute a named stage, a uniquely named step, or multiple
+zero-based step indices in the requested order. Stage names, referenced step
+names, and indices are validated before execution begins. The command reports
+completed step counts and returns nonzero when the workflow fails.
+
+Stages are ordered groups of existing step names:
+
+```yaml
+stages:
+  - name: release
+    steps:
+      - clean
+      - build
+      - publish
+```
 
 #### e2e
 
@@ -1936,4 +1955,3 @@ sdo.exe core
 Runs the target named `core` if it is listed by `sdo build targets`.
 
 ---
-

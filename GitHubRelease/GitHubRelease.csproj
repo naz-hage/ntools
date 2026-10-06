@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
@@ -30,7 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ntools-launcher" Version="1.15.0" />
+    <PackageReference Include="ntools-launcher" Version="1.16.0" />
   </ItemGroup>
 
 </Project>

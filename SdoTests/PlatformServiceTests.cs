@@ -14,7 +14,7 @@ namespace SdoTests;
 /// <summary>
 /// Unit tests for the PlatformDetector class.
 /// </summary>
-public class PlatformServiceTests
+public class PlatformServiceTests : IDisposable
 {
     private readonly string _originalWorkingDirectory = Environment.CurrentDirectory;
 

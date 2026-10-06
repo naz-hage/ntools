@@ -154,6 +154,42 @@ public class ProgramTests
     }
 
     [Fact]
+    public void Main_WithMissingManifestPath_ReturnsNonZero()
+    {
+        var result = Program.Main("run", "--manifest", "--stage", "stage");
+
+        Assert.NotEqual(0, result);
+    }
+
+    [Fact]
+    public void Main_WithoutManifest_UsesSdoYamlInCurrentDirectory()
+    {
+        var originalDirectory = Environment.CurrentDirectory;
+        var testDirectory = Path.Combine(Path.GetTempPath(), $"sdo-default-manifest-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(testDirectory);
+        Environment.CurrentDirectory = testDirectory;
+        File.WriteAllText(Path.Combine(testDirectory, "sdo.yaml"), """
+version: '1.0'
+steps:
+  - name: default
+    path: cmd.exe
+    arguments: /c exit 0
+""");
+
+        try
+        {
+            var result = Program.Main("run");
+
+            Assert.Equal(0, result);
+        }
+        finally
+        {
+            Environment.CurrentDirectory = originalDirectory;
+            Directory.Delete(testDirectory, true);
+        }
+    }
+
+    [Fact]
     public void Main_WithStopOnFirstErrorFalse_ContinuesAfterFailure()
     {
         var manifestPath = CreateFailureManifest(stopOnFirstError: false, includeExecution: true, out var markerPath);
@@ -205,6 +241,156 @@ public class ProgramTests
         finally
         {
             DeleteFiles(manifestWithoutExecution, markerWithoutExecution, manifestWithExecution, markerWithExecution);
+        }
+    }
+
+    [Fact]
+    public void Main_WithNamedStage_ExecutesReferencedStepsInStageOrder()
+    {
+        var manifestPath = Path.Combine(Path.GetTempPath(), $"sdo-stage-{Guid.NewGuid():N}.yaml");
+        var markerPath = Path.Combine(Path.GetTempPath(), $"sdo-stage-marker-{Guid.NewGuid():N}.txt").Replace('\\', '/');
+        File.WriteAllText(manifestPath, $"""
+version: '1.0'
+steps:
+  - name: first
+    path: cmd.exe
+    arguments: /c echo first>>{markerPath}
+  - name: second
+    path: cmd.exe
+    arguments: /c echo second>>{markerPath}
+stages:
+  - name: release
+    steps:
+      - second
+      - first
+""");
+
+        try
+        {
+            var result = Program.Main("run", "--manifest", manifestPath, "--stage", "release");
+
+            Assert.Equal(0, result);
+            Assert.Equal(["second", "first"], File.ReadAllLines(markerPath));
+        }
+        finally
+        {
+            DeleteFiles(manifestPath, markerPath);
+        }
+    }
+
+    [Fact]
+    public void Main_WithStepIndices_ExecutesRequestedOrder()
+    {
+        var manifestPath = Path.Combine(Path.GetTempPath(), $"sdo-index-{Guid.NewGuid():N}.yaml");
+        var markerPath = Path.Combine(Path.GetTempPath(), $"sdo-index-marker-{Guid.NewGuid():N}.txt").Replace('\\', '/');
+        File.WriteAllText(manifestPath, $"""
+version: '1.0'
+steps:
+  - name: first
+    path: cmd.exe
+    arguments: /c echo first>>{markerPath}
+  - name: second
+    path: cmd.exe
+    arguments: /c echo second>>{markerPath}
+""");
+
+        try
+        {
+            var result = Program.Main(
+                "run", "--manifest", manifestPath,
+                "--step-index", "1", "0");
+
+            Assert.Equal(0, result);
+            Assert.Equal(["second", "first"], File.ReadAllLines(markerPath));
+        }
+        finally
+        {
+            DeleteFiles(manifestPath, markerPath);
+        }
+    }
+
+    [Fact]
+    public void Main_WithNamedStep_ExecutesOnlyThatStep()
+    {
+        var manifestPath = Path.Combine(Path.GetTempPath(), $"sdo-step-{Guid.NewGuid():N}.yaml");
+        var markerPath = Path.Combine(Path.GetTempPath(), $"sdo-step-marker-{Guid.NewGuid():N}.txt").Replace('\\', '/');
+        File.WriteAllText(manifestPath, $"""
+version: '1.0'
+steps:
+  - name: first
+    path: cmd.exe
+    arguments: /c echo first>>{markerPath}
+  - name: selected
+    path: cmd.exe
+    arguments: /c echo selected>>{markerPath}
+""");
+
+        try
+        {
+            var result = Program.Main("run", "--manifest", manifestPath, "--step", "selected");
+
+            Assert.Equal(0, result);
+            Assert.Equal(["selected"], File.ReadAllLines(markerPath));
+        }
+        finally
+        {
+            DeleteFiles(manifestPath, markerPath);
+        }
+    }
+
+    [Fact]
+    public void Main_WithUnknownStage_ReturnsNonZeroBeforeExecutingSteps()
+    {
+        var manifestPath = Path.Combine(Path.GetTempPath(), $"sdo-invalid-stage-{Guid.NewGuid():N}.yaml");
+        var markerPath = Path.Combine(Path.GetTempPath(), $"sdo-invalid-stage-marker-{Guid.NewGuid():N}.txt").Replace('\\', '/');
+        File.WriteAllText(manifestPath, $"""
+version: '1.0'
+steps:
+  - name: build
+    path: cmd.exe
+    arguments: /c echo build>>{markerPath}
+""");
+
+        try
+        {
+            var result = Program.Main("run", "--manifest", manifestPath, "--stage", "missing");
+
+            Assert.NotEqual(0, result);
+            Assert.False(File.Exists(markerPath));
+        }
+        finally
+        {
+            DeleteFiles(manifestPath, markerPath);
+        }
+    }
+
+    [Fact]
+    public void Main_WithMultipleRunSelections_ReturnsNonZero()
+    {
+        var manifestPath = Path.Combine(Path.GetTempPath(), $"sdo-selection-{Guid.NewGuid():N}.yaml");
+        File.WriteAllText(manifestPath, """
+version: '1.0'
+steps:
+  - name: build
+    path: cmd.exe
+    arguments: /c exit 0
+stages:
+  - name: release
+    steps:
+      - build
+""");
+
+        try
+        {
+            var result = Program.Main(
+                "run", "--manifest", manifestPath,
+                "--stage", "release", "--step", "build");
+
+            Assert.NotEqual(0, result);
+        }
+        finally
+        {
+            DeleteFiles(manifestPath);
         }
     }
 
