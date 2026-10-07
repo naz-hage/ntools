@@ -1,6 +1,6 @@
-# Code Coverage in NTools
+# Code Coverage in SDO
 
-The NTools build system includes comprehensive code coverage support that can be easily configured and integrated into your build pipeline.
+The SDO build system includes comprehensive code coverage support that can be easily configured and integrated into your build pipeline.
 
 ## Overview
 

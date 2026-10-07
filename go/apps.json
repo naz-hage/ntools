@@ -208,7 +208,7 @@
       "Name": "Ntools",
       "Version": "1.80.0",
       "AppFileName": "$(InstallPath)\\sdo.exe",
-      "WebDownloadFile": "https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip",
+      "WebDownloadFile": "https://github.com/naz-hage/sdo/releases/download/$(Version)/$(Version).zip",
       "DownloadedFile": "$(Version).zip",
       "InstallCommand": "powershell.exe",
       "InstallArgs": "-Command Expand-Archive -Path $(Version).zip -DestinationPath '$(InstallPath)' -Force",

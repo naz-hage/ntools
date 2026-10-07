@@ -1,8 +1,8 @@
 # Version Automation Guide
 
-This document outlines the automation solutions implemented to keep the `docs/ntools/ntools.md` file synchronized with version information from JSON configuration files in the `dev-setup/` directory.
+This document outlines the automation solutions implemented to keep the SDO developer tools documentation synchronized with version information from JSON configuration files in the `dev-setup/` directory.
 
-The ntools project maintains tool version information in two places:
+The SDO project maintains tool version information in two places:
 1. **JSON Configuration Files** (`dev-setup/*.json`) - Used for automated installation
 2. **Documentation Table** (`docs/ntools/ntools.md`) - User-facing version reference
 
@@ -16,7 +16,7 @@ Previously, these had to be updated manually, leading to inconsistencies and out
 
 - **Module**: `scripts/module-package/ntools-scripts.psm1`
 - **Function**: `Get-VersionFromJson`
-- **Purpose**: Consolidated version management within the ntools-scripts module
+- **Purpose**: Consolidated version management within the SDO scripts module
 - **Integration**: Available in all build processes and CI/CD pipelines
 
 ### Using the Module Approach

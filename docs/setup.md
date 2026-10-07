@@ -4,14 +4,17 @@ The dev-setup folder is a critical part of your project setup. It contains scrip
 
 ## PowerShell Module Integration
 
-**New in v2.3.0**: NTools now includes a consolidated PowerShell module (`ntools-scripts`) that replaces individual scripts with a unified, function-based approach. This module is automatically integrated with the setup process.
+**New in v2.3.0**: SDO now includes a consolidated PowerShell module
+(`ntools-scripts`) that replaces individual scripts with a unified,
+function-based approach. This module is automatically integrated with the
+setup process.
 
 ### Using ntools-scripts Module
 ```powershell
 # Import the module
 Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
 
-# Install NTools using the module (recommended approach)
+# Install SDO using the module (recommended approach)
 Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
 
 # Set up development environment
@@ -26,7 +29,7 @@ For complete module documentation, see [ntools-scripts Module](./ntools-scripts-
 The dev-setup folder typically includes the following files:
 
 - **`ntools.json`**  
-    - Contains installation information for ntools. This file is required to install ntools before other development tools.
+    - Contains installation information for SDO. This file is required to install SDO before other development tools.
 - **`apps.json`**  
     - Lists the development tools required for your project, including their installation and uninstallation details.
 - **Legacy scripts** (deprecated in favor of ntools-scripts module)
@@ -37,7 +40,7 @@ The dev-setup folder typically includes the following files:
 ## File Details
 
 ### 1. ntools.json
-This file provides the installation details for ntools, which is required to manage other tools in the project.
+This file provides the installation details for SDO, which is required to manage other tools in the project.
 
 **Example:**
 ```json
@@ -48,7 +51,7 @@ This file provides the installation details for ntools, which is required to man
       "Name": "Ntools",
       "Version": "1.7.0",
       "AppFileName": "$(InstallPath)\\sdo.exe",
-      "WebDownloadFile": "https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip",
+      "WebDownloadFile": "https://github.com/naz-hage/sdo/releases/download/$(Version)/$(Version).zip",
       "DownloadedFile": "$(Version).zip",
       "InstallCommand": "powershell.exe",
       "InstallArgs": "-Command Expand-Archive -Path $(Version).zip -DestinationPath '$(InstallPath)' -Force",

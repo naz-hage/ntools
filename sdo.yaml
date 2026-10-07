@@ -1,5 +1,5 @@
 version: "1.0"
-description: "Build the ntools stage"
+description: "Build the sdo stage"
 variables:
   ArtifactDirectory: "C:\\Artifacts"
   DeployDirectory: "C:\\Program Files\\home"
@@ -7,7 +7,7 @@ variables:
   BuildType: "stage"
   Verbosity: "minimal"
   ReleaseDir: "C:\\Release"
-  Project: "ntools"
+  Project: "sdo"
 execution:
     verbose: true
 stages:
@@ -62,7 +62,7 @@ steps:
     arguments: >-
       -NoProfile -Command
       "$version = (Get-Content '.\.temp\.tag').Trim();
-      $results = Join-Path '$(ArtifactDirectory)\ntools\TestResults' $version;
+      $results = Join-Path '$(ArtifactDirectory)\$(Project)\TestResults' $version;
       if (Test-Path $results) { Remove-Item $results -Recurse -Force };
       New-Item -ItemType Directory -Path $results -Force | Out-Null;
       dotnet test '$(Project).sln'
@@ -80,8 +80,8 @@ steps:
     arguments: >-
       -NoProfile -Command
       "$version = (Get-Content '.\.temp\.tag').Trim();
-      $results = Join-Path '$(ArtifactDirectory)\ntools\TestResults' $version;
-      $coverage = Join-Path '$(ArtifactDirectory)\ntools\CoverageReport' $version;
+      $results = Join-Path '$(ArtifactDirectory)\$(Project)\TestResults' $version;
+      $coverage = Join-Path '$(ArtifactDirectory)\$(Project)\CoverageReport' $version;
       dotnet tool install --global dotnet-reportgenerator-globaltool
       --ignore-failed-sources;
       New-Item -ItemType Directory -Path $coverage -Force | Out-Null;
@@ -89,10 +89,10 @@ steps:
       $filters = @('-assemblyfilters:+*;-*Tests*;-*Test*',
       '-classfilters:+*;-*.Tests.*;-*.Test.*',
       '-reporttypes:Html;Cobertura;TextSummary',
-      "-targetdir:$coverage");
-      & $reportGenerator "-reports:$results\**\coverage.cobertura.xml" @filters;
+      ('-targetdir:' + $coverage));
+      & $reportGenerator ('-reports:' + $results + '\**\coverage.cobertura.xml') @filters;
       if ($LASTEXITCODE -ne 0) {
-        & $reportGenerator "-reports:$results\**\*.xml" @filters
+        & $reportGenerator ('-reports:' + $results + '\**\*.xml') @filters
       };
       $cobertura = Join-Path $coverage 'Cobertura.xml';
       if (Test-Path $cobertura) {
@@ -105,10 +105,10 @@ steps:
     arguments: >-
       -NoProfile -Command
       "$version = (Get-Content '.\.temp\.tag').Trim();
-      $summary = Join-Path '$(ArtifactDirectory)\ntools\CoverageReport' $version;
+      $summary = Join-Path '$(ArtifactDirectory)\$(Project)\CoverageReport' $version;
       $summary = Join-Path $summary 'Summary.txt';
       if (-not (Test-Path $summary)) {
-        Write-Error "Coverage summary file not found at: $summary";
+        Write-Error ('Coverage summary file not found at: ' + $summary);
         exit 1
       };
       Get-Content $summary;
@@ -131,29 +131,29 @@ steps:
     arguments: >-
       -NoProfile -Command
       "$version = (Get-Content '.\.temp\.tag').Trim();
-      $artifacts = '$(ArtifactDirectory)\ntools\Release\' + $version;
+      $artifacts = '$(ArtifactDirectory)\$(Project)\Release\' + $version;
       if (-not (Test-Path $artifacts)) {
-        Write-Error "Artifacts folder not found at: $artifacts";
+        Write-Error ('Artifacts folder not found at: ' + $artifacts);
         exit 1
       };
       $executable = Join-Path $artifacts 'GitHubRelease.exe';
       if (Test-Path $executable) {
         & $executable --help;
-        Write-Host "GitHubRelease.exe exit code: $LASTEXITCODE"
+        Write-Host ('GitHubRelease.exe exit code: ' + $LASTEXITCODE)
       };
       $source = Join-Path (Get-Location) 'sdo.targets';
       $delegate = Join-Path (Get-Location) 'nb\resources\common.targets';
       if (-not (Test-Path $source)) {
-        Write-Error "Source target file not found: $source";
+        Write-Error ('Source target file not found: ' + $source);
         exit 1
       };
       if (-not (Test-Path $delegate)) {
-        Write-Error "Delegate target file not found: $delegate";
+        Write-Error ('Delegate target file not found: ' + $delegate);
         exit 1
       };
       $module = Join-Path $env:ProgramFiles 'nbuild\ntools-scripts.psm1';
       if (-not (Test-Path $module)) {
-        Write-Error "Build tools module not found: $module";
+        Write-Error ('Build tools module not found: ' + $module);
         exit 1
       };
       Import-Module $module -Force;
@@ -167,15 +167,15 @@ steps:
     arguments: >-
       -NoProfile -Command
       "$version = (Get-Content '.\.temp\.tag').Trim();
-      $artifacts = '$(ArtifactDirectory)\ntools\Release\' + $version;
+      $artifacts = '$(ArtifactDirectory)\$(Project)\Release\' + $version;
       $package = $artifacts + '.zip';
       $zip = Join-Path $env:ProgramFiles '7-Zip\7z.exe';
       if (-not (Test-Path $artifacts)) {
-        Write-Error "Artifacts folder not found at: $artifacts";
+        Write-Error ('Artifacts folder not found at: ' + $artifacts);
         exit 1
       };
       if (-not (Test-Path $zip)) {
-        Write-Error "7-Zip executable not found: $zip";
+        Write-Error ('7-Zip executable not found: ' + $zip);
         exit 1
       };
       & $zip a -r -tzip $package ($artifacts + '\*');
@@ -202,10 +202,10 @@ steps:
         Write-Error 'The current Git branch is required to create a GitHub pre-release.';
         exit 1
       };
-      $artifact = '$(ArtifactDirectory)\ntools\Release\' + $version + '.zip';
+      $artifact = '$(ArtifactDirectory)\$(Project)\Release\' + $version + '.zip';
       git push origin $version;
       if ($LASTEXITCODE -ne 0) {
-        Write-Error "Failed to push tag $version.";
+        Write-Error ('Failed to push tag ' + $version + '.');
         exit $LASTEXITCODE
       };
       sdo release create -p -r $repository -t $version -b $branch -f $artifact --verbose;
@@ -231,7 +231,7 @@ steps:
       "$version = (Get-Content '.\.temp\.tag').Trim();
       dotnet restore;
       if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE };
-      dotnet build .\ntools.sln
+      dotnet build .\$(Project).sln
       --no-restore
       --configuration Release
       /p:FileVersion=$version
@@ -247,9 +247,9 @@ steps:
   #   arguments: >-
   #     -NoProfile -Command
   #     "$version = (Get-Content '.\\.temp\\.tag').Trim();
-  #     $output = Join-Path '$(ArtifactDirectory)' ('ntools\\$(Target)\\' + $version);
+  #     $output = Join-Path '$(ArtifactDirectory)' ('$(Project)\\$(Target)\\' + $version);
   #     dotnet publish `
-  #       '.\\Sdo\\Sdo.csproj' `
+  #       '.\\$(Project)\\$(Project).csproj' `
   #       -c '$(Target)' `
   #       -o $output `
   #       --no-restore `
@@ -257,12 +257,12 @@ steps:
   #       /v:$(Verbosity)"
   #   workingDirectory: .
   #   expectedReturnCode: 0
-  # - name: publish ntools
+  # - name: publish $(Project)  
   #   path: pwsh.exe
   #   arguments: >-
   #     -NoProfile -Command
   #     "$version = (Get-Content '.\.temp\.tag').Trim();
-  #     dotnet publish ntools.sln
+  #     dotnet publish $(Project).sln
   #     --configuration '$(Target)'
   #     --output '$(DeployDirectory)'
   #     "-p:Version=$version"

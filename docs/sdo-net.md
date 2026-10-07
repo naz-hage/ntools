@@ -59,7 +59,7 @@ The tool auto-detects your platform from Git remote:
 Verify your remote:
 ```bash
 git remote -v
-# origin  https://github.com/naz-hage/ntools (fetch)  -> Uses GitHub
+# origin https://github.com/naz-hage/sdo (fetch) -> Uses GitHub
 # origin  https://dev.azure.com/org/project/_git/repo (fetch)  -> Uses Azure DevOps
 ```
 
@@ -1735,7 +1735,7 @@ Key points:
 ---
 
 ## nbuild targets
-See [`sdo.targets`](https://github.com/naz-hage/ntools/blob/main/Nbuild/resources/sdo.targets) for more information and checkout other targets in [`Nbuild/resources`](https://github.com/naz-hage/ntools/blob/main/Nbuild/resources).
+See [`sdo.targets`](https://github.com/naz-hage/sdo/blob/main/Nbuild/resources/sdo.targets) for more information and checkout other targets in [`Nbuild/resources`] (https://github.com/naz-hage/sdo/blob/main/Nbuild/resources).
 
 ### common targets
 - The `common.targets` file includes all the defaults targets needed to build, test and deploy a solution.  The `common.targets` file is located in the `$(ProgramFiles)\Nbuild` folder.  The `sdo.targets` file in the solution folder imports the `common.targets` file

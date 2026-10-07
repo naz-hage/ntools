@@ -24,7 +24,7 @@ GitHub project management together under one consistent `sdo` command.
 
 - See the [`sdo` usage documentation](https://naz-hage.github.io/ntools/usage/) for command details and examples.
 
-- Don't hesitate to write an [issue](https://github.com/naz-hage/NTools/issues) if you have any questions or suggestions.
+- Don't hesitate to write an [issue](https://github.com/naz-hage/sdo/issues) if you have any questions or suggestions.
 
 ## Workflows and Metadata
 

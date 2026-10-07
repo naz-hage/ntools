@@ -1,6 +1,6 @@
 # Version and Tag
 
-Throughout this document, the terms "version" and "tag" are used interchangeably. The version applies to binaries, product, or repo tagging. The rules for ntools versioning are as follows:
+Throughout this document, the terms "version" and "tag" are used interchangeably. The version applies to binaries, product, or repository tagging. The rules for SDO versioning are as follows:
 
 1. The version is a string in the format of `X.Y.Z`, where `X`, `Y`, and `Z` are integers.
 2. The version is incremented as follows:
@@ -27,7 +27,7 @@ Tool versions in documentation are automatically updated using the MSBuild task 
 
 - **Module**: `scripts/module-package/ntools-scripts.psm1`
 - **Function**: `Get-VersionFromJson`
-- **Purpose**: Consolidated version management within the ntools-scripts module
+- **Purpose**: Consolidated version management within the SDO scripts module
 
 ```powershell
 # Import the module

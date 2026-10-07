@@ -25,7 +25,7 @@ public class PlatformServiceTests : IDisposable
 
     private void SetupWorkingDirectory()
     {
-        // Set working directory to the solution root (ntools) to ensure Git repository is accessible
+        // Set working directory to the solution root (sdo) to ensure Git repository is accessible
         
         // For GitHub Actions, use the GITHUB_WORKSPACE environment variable
         var githubWorkspace = Environment.GetEnvironmentVariable("GITHUB_WORKSPACE");
@@ -59,7 +59,7 @@ public class PlatformServiceTests : IDisposable
         // Act
         var platform = detector.DetectPlatform();
 
-        // Assert - Current ntools repo should be detected as GitHub
+        // Assert - Current sdo repo should be detected as GitHub
         Assert.Equal(Platform.GitHub, platform);
     }
 
@@ -87,8 +87,8 @@ public class PlatformServiceTests : IDisposable
         // Act
         var project = detector.GetProject();
 
-        // Assert - Should detect "ntools" from the current repo
-        Assert.Equal("ntools", project);
+        // Assert - Should detect "sdo" from the current repo
+        Assert.Equal("sdo", project);
     }
 
     [Fact]

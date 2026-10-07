@@ -6,10 +6,10 @@ Tool versions in this table are automatically updated from the single `apps.json
 sdo update_doc_versions
 ```
 
-This will extract all tool/version pairs from the `NbuildAppList` entries in `go/apps.json` and update the documentation table accordingly. The `go/apps.json` file serves as the **single source of truth** for all developer tools managed by ntools. No PowerShell script is needed or maintained for this process.
+This will extract all tool/version pairs from the `NbuildAppList` entries in `go/apps.json` and update the documentation table accordingly. The `go/apps.json` file serves as the **single source of truth** for all developer tools managed by SDO. No PowerShell script is needed or maintained for this process.
 The [Windows dev environment](https://learn.microsoft.com/en-us/windows/dev-environment/) has good information on how to setup a Windows dev environment.
 
-- The table below list the latest dev tools used in Ntools.
+- The table below lists the latest development tools used by SDO.
 
 | Tool                                                                                                       | Version     | Last Checked on |
 | :--------------------------------------------------------------------------------------------------------- | :---------- | :-------------- |
@@ -26,7 +26,7 @@ The [Windows dev environment](https://learn.microsoft.com/en-us/windows/dev-envi
 | [minikube](https://github.com/kubernetes/minikube/releases/) | 1.37.0     | 24-May-26      |
 | [MongoDB Community Server](https://www.mongodb.com/try/download/community)                                | 8.2.1      | 24-May-26      |
 | [Node.js](https://nodejs.org/en/download/) | 22.21.0    | 24-May-26      |
-| [Ntools](https://github.com/naz-hage/ntools/releases)                                                     | 1.47.0     | 24-May-26      |
+| [SDO](https://github.com/naz-hage/sdo/releases) | 1.47.0     | 24-May-26     |
 | [GitHub CLI](https://github.com/cli/cli/releases) | 2.82.1     | 24-May-26      |
 | [NuGet](https://www.nuget.org/downloads) | 6.12.1     | 24-May-26      |
 | [pnpm](https://pnpm.io/) | 10.19.0    | 24-May-26      |
