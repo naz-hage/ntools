@@ -14,7 +14,7 @@ Previously, these had to be updated manually, leading to inconsistencies and out
 
 ## 1. PowerShell Module Integration (v2.3.0+)
 
-- **Module**: `scripts/module-package/ntools-scripts.psm1`
+- **Module**: `scripts/module-package/sdo-scripts.psm1`
 - **Function**: `Get-VersionFromJson`
 - **Purpose**: Consolidated version management within the SDO scripts module
 - **Integration**: Available in all build processes and CI/CD pipelines
@@ -22,7 +22,7 @@ Previously, these had to be updated manually, leading to inconsistencies and out
 ### Using the Module Approach
 ```powershell
 # Import the module
-Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
+Import-Module "./scripts/module-package/sdo-scripts.psm1" -Force
 
 # Update documentation with latest versions
 # (Handled by MSBuild target)

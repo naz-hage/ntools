@@ -25,13 +25,13 @@ Tool versions in documentation are automatically updated using the MSBuild task 
 
 ### PowerShell Module Integration (v2.3.0+)
 
-- **Module**: `scripts/module-package/ntools-scripts.psm1`
+- **Module**: `scripts/module-package/sdo-scripts.psm1`
 - **Function**: `Get-VersionFromJson`
 - **Purpose**: Consolidated version management within the SDO scripts module
 
 ```powershell
 # Import the module
-Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
+Import-Module "./scripts/module-package/sdo-scripts.psm1" -Force
 
 # Get version from specific JSON file
 $version = Get-VersionFromJson -JsonFilePath "./dev-setup/ntools.json"

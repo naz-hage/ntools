@@ -1,12 +1,12 @@
 param(
-    [string]$BuildTools = "$env:ProgramFiles\nbuild"
+    [string]$BuildTools = "$env:ProgramFiles\sdo"
 )
 
 
 Write-Host "Testing installed ntools-scripts module in: $BuildTools"
 
 
-$modulePsm = Join-Path $BuildTools 'ntools-scripts.psm1'
+$modulePsm = Join-Path $BuildTools 'sdo-scripts.psm1'
 
 if (Test-Path $modulePsm) {
     Write-Host "Importing module from: $modulePsm"

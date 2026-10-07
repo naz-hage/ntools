@@ -2,7 +2,7 @@
 
 This page documents how to install, use, develop, and troubleshoot the `ntools-scripts` PowerShell module. The [module API reference](ntools-scripts-module-api.md) is the canonical list of exported functions.
 
-**Location**: `scripts/module-package/ntools-scripts.psm1`
+**Location**: `scripts/module-package/sdo-scripts.psm1`
 
 ## Quick start
 
@@ -10,7 +10,7 @@ Follow these minimal steps to start using the module locally or in CI.
 
 ```powershell
 # Import for local development
-Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
+Import-Module "./scripts/module-package/sdo-scripts.psm1" -Force
 
 # Check the module version
 Get-NtoolsScriptsVersion
@@ -32,13 +32,13 @@ Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
 
 ## Overview
 
-The module consolidates build, CI, setup, testing, utility, and release functions from the previous script structure. Only the functions listed in `scripts/module-package/ntools-scripts.psd1` are exported.
+The module consolidates build, CI, setup, testing, utility, and release functions from the previous script structure. Only the functions listed in `scripts/module-package/sdo-scripts.psd1` are exported.
 
 Discover the exported commands at runtime:
 
 ```powershell
-Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
-Get-Command -Module ntools-scripts | Sort-Object Name
+Import-Module "./scripts/module-package/sdo-scripts.psm1" -Force
+Get-Command -Module sdo-scripts | Sort-Object Name
 ```
 
 ## Installation
@@ -53,18 +53,18 @@ Install-NToolsScriptsModule -InstallPath "$env:ProgramFiles\WindowsPowerShell\Mo
 ## Module Information
 
 **Version**: 2.3.0  
-**Location**: `scripts/module-package/ntools-scripts.psm1`  
+**Location**: `scripts/module-package/sdo-scripts.psm1`  
 **Installation**: Automatically installed via MSBuild targets and GitHub Actions
 
 ## Architecture
 
-The module consolidates functionality from the previous script structure. The manifest at `scripts/module-package/ntools-scripts.psd1` controls the public API; see the [module API reference](ntools-scripts-module-api.md) for the exported commands and examples.
+The module consolidates functionality from the previous script structure. The manifest at `scripts/module-package/sdo-scripts.psd1` controls the public API; see the [module API reference](ntools-scripts-module-api.md) for the exported commands and examples.
 
 ## Usage Examples
 Import the module before calling its exported functions:
 
 ```powershell
-Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
+Import-Module "./scripts/module-package/sdo-scripts.psm1" -Force
 ```
 
 ### Get Module Information
@@ -73,7 +73,7 @@ Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
 Get-NtoolsScriptsVersion
 
 # List all available functions
-Get-Command -Module ntools-scripts | Select-Object Name | Format-Table -AutoSize
+Get-Command -Module sdo-scripts | Select-Object Name | Format-Table -AutoSize
 ```
 
 ### Install NTools with Custom Configuration
@@ -129,23 +129,23 @@ This target performs:
 ```yaml
 - name: Install ntools using ntools-scripts module
   run: |
-    Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
+    Import-Module "./scripts/module-package/sdo-scripts.psm1" -Force
   python atools/install-ntools.py --version 1.32.0 --json dev-setup/ntools.json --downloads-dir ${{ runner.temp }} --dry-run
 ```
 
 ## Module Development
 
 ### Adding New Functions
-1. Add function to appropriate section in `ntools-scripts.psm1`
+1. Add function to appropriate section in `sdo-scripts.psm1`
 2. Add function name to `Export-ModuleMember` line
-3. Update `FunctionsToExport` in `ntools-scripts.psd1`
+3. Update `FunctionsToExport` in `sdo-scripts.psd1`
 4. Increment module version
 5. Update documentation
 
 ### Testing
 ```powershell
 # Test the module
-Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
+Import-Module "./scripts/module-package/sdo-scripts.psm1" -Force
 Test-NToolsScriptsModule
 ```
 
@@ -168,10 +168,10 @@ Install-NToolsScriptsModule -InstallPath "$env:ProgramFiles\WindowsPowerShell\Mo
 ### Module Not Found
 ```powershell
 # Verify module location
-Test-Path "./scripts/module-package/ntools-scripts.psm1"
+Test-Path "./scripts/module-package/sdo-scripts.psm1"
 
 # Check if installed
-Test-Path "$env:ProgramFiles\nbuild\modules\ntools-scripts\ntools-scripts.psm1"
+Test-Path "$env:ProgramFiles\nbuild\modules\ntools-scripts\sdo-scripts.psm1"
 ```
 
 ### Version Issues
@@ -180,15 +180,15 @@ Test-Path "$env:ProgramFiles\nbuild\modules\ntools-scripts\ntools-scripts.psm1"
 Get-NtoolsScriptsVersion
 
 # Check installed version vs source
-Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
+Import-Module "./scripts/module-package/sdo-scripts.psm1" -Force
 Get-NtoolsScriptsVersion
 ```
 
 ### Function Not Available
 ```powershell
 # List all available functions
-Get-Command -Module ntools-scripts
+Get-Command -Module sdo-scripts
 
 # Check if module is properly imported
-Get-Module ntools-scripts
+Get-Module sdo-scripts
 ```

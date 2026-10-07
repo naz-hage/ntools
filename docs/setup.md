@@ -12,7 +12,7 @@ setup process.
 ### Using ntools-scripts Module
 ```powershell
 # Import the module
-Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
+Import-Module "./scripts/module-package/sdo-scripts.psm1" -Force
 
 # Install SDO using the module (recommended approach)
 Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"

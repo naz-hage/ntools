@@ -18,7 +18,7 @@ def test_build_url_from_ntools_json(tmp_path, monkeypatch):
                     "https://example.com/releases/download/" "$(Version)/$(Version).zip"
                 ),
                 "DownloadedFile": "$(Version).zip",
-                "InstallPath": "C:\\Nbuild",
+                "InstallPath": "C:\\Program Files\\sdo",
             }
         ],
     }

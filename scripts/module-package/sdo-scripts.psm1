@@ -300,8 +300,8 @@ function Test-TargetDelegation {
         [string]$DelegateTarget
     )
     
-    $sourceFile = "C:\source\ntools\nbuild.targets"
-    $delegateFile = "C:\Program Files\nbuild\common.targets"
+    $sourceFile = "C:\source\ntools\sdo.targets"
+    $delegateFile = "C:\Program Files\sdo\common.targets"
     
     # Test 1: Source target exists
     $sourceTest = Test-TargetExists -TargetName $SourceTarget -FilePath $sourceFile
@@ -571,7 +571,7 @@ function Invoke-NToolsDownload {
         New-Item -ItemType Directory -Path $DownloadsDirectory | Out-Null
     }
 
-    $url = "https://github.com/naz-hage/ntools/releases/download/$Version/$Version.zip"
+    $url = "https://github.com/naz-hage/sdo/releases/download/$Version/$Version.zip"
     $fileName = "$DownloadsDirectory\$Version.zip"
     
     try {
@@ -594,46 +594,46 @@ function Invoke-NToolsDownload {
 
 function Install-NTools {
     param (
-        [Parameter(Mandatory=$false, HelpMessage = "The version of NTools to install. If not specified, the version is read from ntools.json.")]
+        [Parameter(Mandatory=$false, HelpMessage = "The version of NTools to install. If not specified, the version is read from sdo.yaml.")]
         [string]$Version,
         [Parameter(Mandatory=$false, HelpMessage = "The directory to download the NTools zip file to. Defaults to 'c:\\NToolsDownloads'.")]
         [string]$DownloadsDirectory = "c:\NToolsDownloads",
-        [Parameter(Mandatory=$false, HelpMessage = "Path to the ntools.json file. If not specified, looks for ntools.json relative to script location.")]
-        [string]$NtoolsJsonPath
+        [Parameter(Mandatory=$false, HelpMessage = "Path to the sdo.yaml file. If not specified, looks for sdo.yaml relative to script location.")]
+        [string]$SdoYamlPath
     )
 
-    $deploymentPath = $env:ProgramFiles + "\NBuild"
+    $deploymentPath = Join-Path $env:ProgramFiles "sdo"
 
     # display parameters
     Write-Host "InstallNtools - Parameters:"
     Write-Host "Version: $Version"
     Write-Host "Downloads directory: $DownloadsDirectory"
-    Write-Host "NTools JSON path: $NtoolsJsonPath"
+    Write-Host "sdo.yaml path: $SdoYamlPath"
 
     # If Version is not specified, read it from ntools.json
     if (-not $Version) {
         # Determine ntools.json path
-        if (-not $NtoolsJsonPath) {
+        if (-not $SdoYamlPath) {
             $scriptDir = Split-Path -Parent $PSCommandPath
-            $NtoolsJsonPath = "$scriptDir\..\ntools.json"
-            Write-Host "No NtoolsJsonPath specified, using default: $NtoolsJsonPath"
+            $SdoYamlPath = "$scriptDir\..\sdo.yaml"
+            Write-Host "No SdoYamlPath specified, using default: $SdoYamlPath"
         }
 
-        Write-Host "Reading version from $NtoolsJsonPath ..."
+        Write-Host "Reading version from $SdoYamlPath ..."
         
-        if (Test-Path -Path $NtoolsJsonPath) {
+        if (Test-Path -Path $SdoYamlPath) {
             try {
-                $NtoolsJson = Get-Content -Path $NtoolsJsonPath -Raw | ConvertFrom-json
-                $Version = $NtoolsJson.NbuildAppList[0].Version
-                Write-Host "Version read from ntools.json: $Version"
+                $SdoYaml = Get-Content -Path $SdoYamlPath -Raw
+                $Version = ($SdoYaml | ConvertFrom-Yaml).NbuildAppList[0].Version
+                Write-Host "Version read from sdo.yaml: $Version"
             }
             catch {
-                Write-Warning "Failed to read version from ntools.json. Please specify the version manually."
+                Write-Warning "Failed to read version from sdo.yaml. Please specify the version manually."
                 return $false
             }
         }
         else {
-            Write-Warning "ntools.json not found at '$NtoolsJsonPath'. Please specify the version manually or provide a valid NtoolsJsonPath."
+            Write-Warning "sdo.yaml not found at '$SdoYamlPath'. Please specify the version manually or provide a valid SdoYamlPath."
             return $false
         }
     }
@@ -936,4 +936,3 @@ function Set-CodeSigningTrust {
 Export-ModuleMember -Function Get-ntoolsScriptsVersion, Publish-AllProjects, Get-VersionFromJson, Write-TestResult, Test-TargetExists, Test-TargetDependencies, Test-TargetDelegation, Get-FileHash256, Get-FileVersionInfo, Invoke-FastForward, Write-OutputMessage, Get-NToolsFileVersion, Add-DeploymentPathToEnvironment, Invoke-NToolsDownload, Install-NTools, Set-DevelopmentEnvironment, Get-AgentPublicIp, Add-WafAllowRule, Remove-WafCustomRule, Test-IsAdministrator, Test-MicrosoftPowerShellSecurityModuleLoaded, Test-CertificateStore, New-SelfSignedCodeCertificate, Export-CertificateToPfx, Export-CertificateToCer, Import-CertificateToRoot, Import-CertificateToCurrentUser, Set-ScriptSignature, Get-ScriptSignature, Set-CodeSigningTrust
 
 #endregion
-

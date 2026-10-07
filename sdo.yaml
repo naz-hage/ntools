@@ -151,7 +151,7 @@ steps:
         Write-Error ('Delegate target file not found: ' + $delegate);
         exit 1
       };
-      $module = Join-Path $env:ProgramFiles 'nbuild\ntools-scripts.psm1';
+      $module = Join-Path $env:ProgramFiles 'sdo\sdo-scripts.psm1';
       if (-not (Test-Path $module)) {
         Write-Error ('Build tools module not found: ' + $module);
         exit 1

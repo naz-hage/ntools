@@ -1,6 +1,6 @@
 # ntools-scripts Module API
 
-This is the canonical reference for functions exported by the `ntools-scripts` PowerShell module. The list is defined by `FunctionsToExport` in `scripts/module-package/ntools-scripts.psd1`.
+This is the canonical reference for functions exported by the `ntools-scripts` PowerShell module. The list is defined by `FunctionsToExport` in `scripts/module-package/sdo-scripts.psd1`.
 
 | Function | Description and common usage |
 |---|---|
@@ -24,8 +24,8 @@ This is the canonical reference for functions exported by the `ntools-scripts` P
 For runtime discovery:
 
 ```powershell
-Import-Module './scripts/module-package/ntools-scripts.psm1' -Force
-Get-Command -Module ntools-scripts
+Import-Module './scripts/module-package/sdo-scripts.psm1' -Force
+Get-Command -Module sdo-scripts
 ```
 
 

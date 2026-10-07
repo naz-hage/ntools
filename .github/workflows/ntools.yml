@@ -28,7 +28,7 @@ env:
   solution_name: ntools.sln
   dotnet_version: 10.0
   # Path to the consolidated ntools-scripts module file in the repository
-  NTOOLS_SCRIPT_MODULE: './scripts/module-package/ntools-scripts.psm1'
+  NTOOLS_SCRIPT_MODULE: './scripts/module-package/sdo-scripts.psm1'
   build_type: ${{ github.ref == 'refs/heads/main' && 'prod' || github.event.inputs.build_type || 'stage' }}
   enable_logging: ${{ github.event.inputs.enable_logging || 'false' }}
 
@@ -96,7 +96,7 @@ jobs:
         }
 
         Write-Host "Installed NTools version information:"
-        $sdoPath = "$env:ProgramFiles\NBuild\sdo.exe"
+        $sdoPath = "$env:ProgramFiles\sdo\sdo.exe"
         if (-not (Test-Path $sdoPath)) {
           Write-Error "sdo.exe was not found at $sdoPath"
           exit 1
@@ -122,7 +122,7 @@ jobs:
         Get-NtoolsScriptsVersion
         Write-Host ""
         Write-Host "Available module functions:"
-        Get-Command -Module ntools-scripts | Select-Object Name | Format-Table -AutoSize
+        Get-Command -Module sdo-scripts | Select-Object Name | Format-Table -AutoSize
       shell: pwsh
       working-directory: ${{ github.workspace }}
 

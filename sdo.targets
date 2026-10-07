@@ -2,7 +2,7 @@
 
 	<!-- Reference: https://learn.microsoft.com/en-us/visualstudio/msbuild/walkthrough-using-msbuild?view=vs-2022 -->
 	
-	<Import Project="$(ProgramFiles)\Nbuild\common.targets"/>
+	<Import Project="$(ProgramFiles)\sdo\common.targets"/>
 	<Import Project="unit-tests.targets"/>
 
 	<!-- Update documentation versions from JSON configuration files -->
@@ -11,7 +11,7 @@
 
 	<PropertyGroup>
 		<!-- This is the folder where the *.sln resides-->
-		<DeploymentFolder>$(ProgramFiles)\Nbuild</DeploymentFolder>
+		<DeploymentFolder>$(ProgramFiles)\sdo</DeploymentFolder>
 		<!--  Modify these paths to match your Python installation -->
 		<!-- Always use python.exe from PATH for portability -->
 		<PythonExe>python.exe</PythonExe>
@@ -95,7 +95,7 @@
 	<!-- Setup development environment by importing ntools-scripts and calling Set-DevelopmentEnvironment -->
 	<Target Name="SETUP_ENVIRONMENT" DependsOnTargets="IS_ADMIN">
 		<Message Text="Setting up development environment (Set-DevelopmentEnvironment)" Importance="high" />
-		<Exec Command='pwsh -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "Import-Module \"$(SolutionDir)\scripts\module-package\ntools-scripts.psm1\" -Force; Set-DevelopmentEnvironment -DevDrive \"$(DevDrive)\" -MainDir \"$(MainDir)\""' WorkingDirectory="$(SolutionDir)" />
+		<Exec Command='pwsh -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "Import-Module \"$(SolutionDir)\scripts\module-package\sdo-scripts.psm1\" -Force; Set-DevelopmentEnvironment -DevDrive \"$(DevDrive)\" -MainDir \"$(MainDir)\""' WorkingDirectory="$(SolutionDir)" />
 		<Message Text="SETUP_ENVIRONMENT completed" Importance="high" />
 	</Target>
 
@@ -607,7 +607,7 @@
         <Message Text="✅ Both target files exist" />
         
         <!-- Use consolidated PowerShell module for target validation -->
-	<Exec Command='pwsh -NoProfile -ExecutionPolicy Bypass -Command "Import-Module &apos;$(BuildTools)\ntools-scripts.psm1&apos; -Force; Test-TargetDelegation -SourceTarget &apos;$(SourceTarget)&apos; -DelegateTarget &apos;$(DelegateTarget)&apos;"' 
+	<Exec Command='pwsh -NoProfile -ExecutionPolicy Bypass -Command "Import-Module &apos;$(BuildTools)\sdo-scripts.psm1&apos; -Force; Test-TargetDelegation -SourceTarget &apos;$(SourceTarget)&apos; -DelegateTarget &apos;$(DelegateTarget)&apos;"' 
               WorkingDirectory="$(SolutionDir)" 
               ContinueOnError="true" 
               IgnoreExitCode="true">
@@ -652,7 +652,7 @@
 	<Target Name="PUBLISH" DependsOnTargets="ARTIFACTS;TAG">
 		<RemoveDir Directories="$(ArtifactsFolder)"></RemoveDir>
 		<Message Text="Publishing all non-test projects using ntools-scripts module" Importance="high" />
-		<Exec Command='pwsh -NoProfile -ExecutionPolicy Bypass -Command "Import-Module &apos;$(BuildTools)\ntools-scripts.psm1&apos; -Force; Publish-AllProjects -OutputDir &apos;$(ArtifactsFolder)&apos; -Version &apos;$(ProductVersion)&apos; -RepositoryRoot &apos;$(SolutionDir)&apos;"' WorkingDirectory="$(SolutionDir)" />
+		<Exec Command='pwsh -NoProfile -ExecutionPolicy Bypass -Command "Import-Module &apos;$(BuildTools)\sdo-scripts.psm1&apos; -Force; Publish-AllProjects -OutputDir &apos;$(ArtifactsFolder)&apos; -Version &apos;$(ProductVersion)&apos; -RepositoryRoot &apos;$(SolutionDir)&apos;"' WorkingDirectory="$(SolutionDir)" />
 		<Message Text="All non-test projects published to $(ArtifactsFolder)" Importance="high" />
 
 		<Message Text="==> PUBLISH DONE"/>

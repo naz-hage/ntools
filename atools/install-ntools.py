@@ -134,7 +134,7 @@ def safe_remove_deploy_path(path: Path):
     Safety checks:
     - Path must exist and be a directory
     - Path must not be root (C:\\ or /)
-    - Path must contain the expected app folder name 'Nbuild' or 'NTools' to reduce risk
+    - Path must contain the expected app folder name 'sdo', 'Nbuild', or 'NTools' to reduce risk
     - Raise an exception if checks fail
     """
     if not path.exists():
@@ -150,7 +150,7 @@ def safe_remove_deploy_path(path: Path):
         raise Exception(f"Refusing to remove drive root: {resolved}")
 
     # Basic name check to reduce risk
-    if 'nbuild' not in str(resolved).lower() and 'ntools' not in str(resolved).lower():
+    if all(name not in str(resolved).lower() for name in ('sdo', 'nbuild', 'ntools')):
         raise Exception(f"Deploy path '{resolved}' does not look like ntools install path; refusing to remove")
 
     # Perform removal
@@ -236,7 +236,7 @@ def main():
         deploy_path = Path(args.deploy_path) if args.deploy_path else expand_install_path(app.get('InstallPath', ''))
         if not deploy_path or str(deploy_path) == '':
             # choose reasonable defaults
-            deploy_path = Path('C:/Program Files/Nbuild') if os.name == 'nt' else Path('/usr/local/bin')
+            deploy_path = Path('C:/Program Files/sdo') if os.name == 'nt' else Path('/usr/local/bin')
         print(f"Would extract zip to: {deploy_path}")
         print("Dry run complete. No network calls were made.")
         return 0
@@ -256,7 +256,7 @@ def main():
     else:
         deploy_path = expand_install_path(app.get('InstallPath', ''))
         if not deploy_path or str(deploy_path) == '':
-            deploy_path = Path('C:/Program Files/Nbuild') if os.name == 'nt' else Path('/usr/local/lib/ntools')
+            deploy_path = Path('C:/Program Files/sdo') if os.name == 'nt' else Path('/usr/local/lib/ntools')
 
     # Remove existing installation before extracting new one (explicit policy: always replace)
     try:
