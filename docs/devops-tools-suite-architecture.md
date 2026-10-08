@@ -164,7 +164,7 @@ ntools/
 │   ├── index.md
 │   ├── nbuild.md                 # Nbuild documentation
 │   ├── devops-tools-suite-architecture.md
-│   ├── ntools.md
+│   ├── sdo.md
 │   ├── sdo-net.md
 │   └── other-docs/
 │

@@ -42,7 +42,7 @@ nav:
       - Installation: installation.md
       - Set Up a Project: setup.md
       - Usage Guide: usage.md
-  - Using Ntools:
+  - Using SDO:
       - SDO CLI: sdo-net.md
       - GitHub Releases: github-release.md
   - Development:
@@ -50,10 +50,10 @@ nav:
       - Build Types: buildtypes.md
       - Versioning: versioning.md
       - Version Automation Guide: version-automation-guide.md
-      - Development Tools: ntools.md
+      - Development Tools: sdo.md
       - PowerShell Modules:
-          - ntools-scripts Module: ntools-scripts-module.md
-          - ntools-scripts API: ntools-scripts-module-api.md
+          - sdo-scripts Module: sdo-scripts-module.md
+          - sdo-scripts API: sdo-scripts-module-api.md
   - Build and Test:
       - Custom Build Tasks: nbuildtasks.md
       - SDO Targets: sdo-targets.md

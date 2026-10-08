@@ -5,11 +5,11 @@ The dev-setup folder is a critical part of your project setup. It contains scrip
 ## PowerShell Module Integration
 
 **New in v2.3.0**: SDO now includes a consolidated PowerShell module
-(`ntools-scripts`) that replaces individual scripts with a unified,
+(`sdo-scripts`) that replaces individual scripts with a unified,
 function-based approach. This module is automatically integrated with the
 setup process.
 
-### Using ntools-scripts Module
+### Using sdo-scripts Module
 ```powershell
 # Import the module
 Import-Module "./scripts/module-package/sdo-scripts.psm1" -Force
@@ -22,7 +22,7 @@ Set-DevelopmentEnvironment
 Install-DevelopmentApps
 ```
 
-For complete module documentation, see [ntools-scripts Module](./ntools-scripts-module.md).
+For complete module documentation, see [sdo-scripts Module](./sdo-scripts-module.md).
 
 ## Overview of dev-setup Folder
 
@@ -32,7 +32,7 @@ The dev-setup folder typically includes the following files:
     - Contains installation information for SDO. This file is required to install SDO before other development tools.
 - **`apps.json`**  
     - Lists the development tools required for your project, including their installation and uninstallation details.
-- **Legacy scripts** (deprecated in favor of ntools-scripts module)
+- **Legacy scripts** (deprecated in favor of sdo-scripts module)
   - Individual PowerShell scripts for specific tasks
 
 ---
@@ -127,7 +127,7 @@ $output = "./install.psm1"
 Invoke-WebRequest -Uri $url -OutFile $output
 Import-Module ./install.psm1 -Force
 
-# Install Ntools
+# Install SDO
 MainInstallApp -command install -json .\ntools.json
 if ($LASTEXITCODE -ne 0) {
     Write-OutputMessage "Error: Installation of ntools failed. Exiting script."

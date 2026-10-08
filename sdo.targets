@@ -12,6 +12,7 @@
 	<PropertyGroup>
 		<!-- This is the folder where the *.sln resides-->
 		<DeploymentFolder>$(ProgramFiles)\sdo</DeploymentFolder>
+		<BuildTools>$(ProgramFiles)\sdo</BuildTools>
 		<!--  Modify these paths to match your Python installation -->
 		<!-- Always use python.exe from PATH for portability -->
 		<PythonExe>python.exe</PythonExe>
@@ -321,7 +322,7 @@
 	<Target Name="UPDATE_DOC_VERSIONS" DependsOnTargets="PROPERTIES">
 		<UpdateVersionsInDocs 
 			DevSetupPath="$(SolutionDir)\dev-setup" 
-			DocsPath="$(SolutionDir)\docs\ntools.md" />
+			DocsPath="$(SolutionDir)\docs\sdo.md" />
 		<Message Text="Documentation versions updated successfully." />
 		<Message Text="==> DONE"/>
 	</Target>

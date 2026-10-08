@@ -19,7 +19,7 @@ namespace Nbuild
         private const string SupportedVersion = "1.2.0";
         private const int MsiReturnCodeRestartRequired = 1603;
         public static readonly string DefaultAppsFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "nbuild", "apps.json");
-        private static string DownloadsDirectory = $"{Environment.GetEnvironmentVariable("Temp")}\\nb"; // "C:\\NToolsDownloads" $"{Environment.GetEnvironmentVariable("Temp")}\\nb"
+        private static string DownloadsDirectory = $"{Environment.GetEnvironmentVariable("Temp")}\\nb"; // "C:\\sdo-downloads" $"{Environment.GetEnvironmentVariable("Temp")}\\nb"
         private static bool Verbose = false;
         private static bool ValidJson = false;
 
@@ -39,7 +39,7 @@ namespace Nbuild
         static Command()
         {
             // Examine this method when we implement the logic to require admin
-            DownloadsDirectory = !TestMode || Ntools.CurrentProcess.IsElevated() ? "C:\\NToolsDownloads" : $"{Environment.GetEnvironmentVariable("Temp")}\\nb";
+            DownloadsDirectory = !TestMode || Ntools.CurrentProcess.IsElevated() ? "C:\\sdo-downloads" : $"{Environment.GetEnvironmentVariable("Temp")}\\nb";
 
             if (!Directory.Exists(DownloadsDirectory)) Directory.CreateDirectory(DownloadsDirectory);
 

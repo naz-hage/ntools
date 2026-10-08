@@ -43,7 +43,7 @@ _print_header_local(TOOL_NAME, TOOL_VERSION)
 def parse_args():
     parser = argparse.ArgumentParser(description="Install NTools from release ZIP (cross-platform)")
     parser.add_argument('--version', help='Release version to install (e.g. 1.32.0)')
-    default_downloads = 'C:\\NToolsDownloads' if os.name == 'nt' else '/tmp/NToolsDownloads'
+    default_downloads = 'C:\\sdo-downloads' if os.name == 'nt' else '/tmp/sdo-downloads'
     parser.add_argument('--downloads-dir', default=default_downloads, help=f'Download directory (default: {default_downloads})')
     parser.add_argument('--json', '--ntools-json-path', dest='ntools_json_path', default=str(Path(__file__).resolve().parents[1] / 'dev-setup' / 'ntools.json'), help='Path to ntools.json (default: ./dev-setup/ntools.json)')
     parser.add_argument('--deploy-path', default=None, help='Deployment path (default from ntools.json InstallPath or platform default)')

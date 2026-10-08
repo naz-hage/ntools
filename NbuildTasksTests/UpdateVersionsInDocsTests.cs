@@ -31,11 +31,11 @@ namespace NbuildTasksTests
             //   ├── go/
             //   │   └── apps.json
             //   └── docs/
-            //       └── ntools.md
+            //       └── sdo.md
             _testDirectory = Path.Combine(Path.GetTempPath(), "UpdateVersionsInDocsTests", Guid.NewGuid().ToString());
             _devSetupPath = Path.Combine(_testDirectory, "dev-setup");
             var goPath = Path.Combine(_testDirectory, "go");
-            _docsPath = Path.Combine(_testDirectory, "docs", "ntools.md");
+            _docsPath = Path.Combine(_testDirectory, "docs", "sdo.md");
 
             Directory.CreateDirectory(_devSetupPath);
             Directory.CreateDirectory(goPath);

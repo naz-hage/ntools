@@ -92,7 +92,7 @@ Commands:
   user      User management commands for GitHub and Azure DevOps
   tool      Environment tool installation, auditing, and manifest management
   run       Execute a YAML Launcher workflow manifest
-  e2e       Run ntools-launcher YAML test metadata
+  e2e       Run sdo-launcher YAML test metadata
   env       Environment and local system utilities
   build     Build automation and target management
   release   GitHub and Azure DevOps release management
@@ -841,7 +841,7 @@ stages:
 
 #### e2e
 
-Run ntools-launcher YAML test metadata by file, test name, or directory:
+Run sdo-launcher YAML test metadata by file, test name, or directory:
 
 ```bash
 sdo e2e --test-case metadata/Test_Validate_AzureDevOps_CreateBugFromMarkdown.yaml

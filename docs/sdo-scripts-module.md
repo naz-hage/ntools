@@ -1,6 +1,6 @@
-# ntools-scripts PowerShell Module
+# sdo-scripts PowerShell Module
 
-This page documents how to install, use, develop, and troubleshoot the `ntools-scripts` PowerShell module. The [module API reference](ntools-scripts-module-api.md) is the canonical list of exported functions.
+This page documents how to install, use, develop, and troubleshoot the `sdo-scripts` PowerShell module. The [module API reference](sdo-scripts-module-api.md) is the canonical list of exported functions.
 
 **Location**: `scripts/module-package/sdo-scripts.psm1`
 
@@ -15,7 +15,7 @@ Import-Module "./scripts/module-package/sdo-scripts.psm1" -Force
 # Check the module version
 Get-NtoolsScriptsVersion
 
-# Install NTools using a local configuration file
+# Install SDO using a local configuration file
 Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
 ```
 
@@ -28,7 +28,7 @@ Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
 - [Usage examples](#usage-examples)
 - [Module development](#module-development)
 - [Troubleshooting](#troubleshooting)
-- [Module API reference](ntools-scripts-module-api.md)
+- [Module API reference](sdo-scripts-module-api.md)
 
 ## Overview
 
@@ -46,7 +46,7 @@ Get-Command -Module sdo-scripts | Sort-Object Name
 Install the module manually for local development:
 
 ```powershell
-Install-NToolsScriptsModule -InstallPath "$env:ProgramFiles\WindowsPowerShell\Modules\ntools-scripts" -Force
+Install-NToolsScriptsModule -InstallPath "$env:ProgramFiles\WindowsPowerShell\Modules\sdo-scripts" -Force
 ```
 
 
@@ -58,7 +58,7 @@ Install-NToolsScriptsModule -InstallPath "$env:ProgramFiles\WindowsPowerShell\Mo
 
 ## Architecture
 
-The module consolidates functionality from the previous script structure. The manifest at `scripts/module-package/sdo-scripts.psd1` controls the public API; see the [module API reference](ntools-scripts-module-api.md) for the exported commands and examples.
+The module consolidates functionality from the previous script structure. The manifest at `scripts/module-package/sdo-scripts.psd1` controls the public API; see the [module API reference](sdo-scripts-module-api.md) for the exported commands and examples.
 
 ## Usage Examples
 Import the module before calling its exported functions:
@@ -108,7 +108,7 @@ Test-MSBuildDelegation
 ### MSBuild Integration
 - **Usage**: `PUBLISH` target uses `Publish-AllProjects` function with deterministic repository path
 - **Smoke Testing**: `SMOKE_TEST` target uses `Test-TargetDelegation` function for build system validation
-- **Location**: Module installed to `$env:ProgramFiles\nbuild\modules\ntools-scripts\`
+- **Location**: Module installed to `$env:ProgramFiles\nbuild\modules\sdo-scripts\`
 
 ### SMOKE_TEST Target Integration
 The comprehensive `SMOKE_TEST` target combines artifact validation with PowerShell module functions:
@@ -127,7 +127,7 @@ This target performs:
 
 ### GitHub Actions Integration
 ```yaml
-- name: Install ntools using ntools-scripts module
+- name: Install ntools using sdo-scripts module
   run: |
     Import-Module "./scripts/module-package/sdo-scripts.psm1" -Force
   python atools/install-ntools.py --version 1.32.0 --json dev-setup/ntools.json --downloads-dir ${{ runner.temp }} --dry-run
@@ -152,7 +152,7 @@ Test-NToolsScriptsModule
 ### Installation
 ```powershell
 # Install module manually for development
-Install-NToolsScriptsModule -InstallPath "$env:ProgramFiles\WindowsPowerShell\Modules\ntools-scripts" -Force
+Install-NToolsScriptsModule -InstallPath "$env:ProgramFiles\WindowsPowerShell\Modules\sdo-scripts" -Force
 ```
 
 ## Best Practices
@@ -171,7 +171,7 @@ Install-NToolsScriptsModule -InstallPath "$env:ProgramFiles\WindowsPowerShell\Mo
 Test-Path "./scripts/module-package/sdo-scripts.psm1"
 
 # Check if installed
-Test-Path "$env:ProgramFiles\nbuild\modules\ntools-scripts\sdo-scripts.psm1"
+Test-Path "$env:ProgramFiles\nbuild\modules\sdo-scripts\sdo-scripts.psm1"
 ```
 
 ### Version Issues

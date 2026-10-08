@@ -19,9 +19,9 @@ and Azure DevOps operations on Windows clients and in GitHub Actions.
 - [GitHub Releases](github-release.md)
 
 ### Supporting Components
-- [PowerShell Module - ntools-scripts](ntools-scripts-module.md)
-- [ntools-scripts Module API](ntools-scripts-module-api.md)
-- [Development Tools](ntools.md) - Supporting development utilities
+- [PowerShell Module - sdo-scripts](sdo-scripts-module.md)
+- [sdo-scripts Module API](sdo-scripts-module-api.md)
+- [Development Tools](sdo.md) - Supporting development utilities
 - [Custom Build Tasks (Nbuild Tasks)](nbuildtasks.md)
 
 ### Build System Features

@@ -1,4 +1,4 @@
-name: ntools Workflow
+name: SDO Workflow
 
 on:
   push:
@@ -25,10 +25,10 @@ on:
           - "false"
 
 env:
-  solution_name: ntools.sln
+  solution_name: sdo.sln
   dotnet_version: 10.0
-  # Path to the consolidated ntools-scripts module file in the repository
-  NTOOLS_SCRIPT_MODULE: './scripts/module-package/sdo-scripts.psm1'
+  # Path to the consolidated sdo-scripts module file in the repository
+  SDO_SCRIPT_MODULE: './scripts/module-package/sdo-scripts.psm1'
   build_type: ${{ github.ref == 'refs/heads/main' && 'prod' || github.event.inputs.build_type || 'stage' }}
   enable_logging: ${{ github.event.inputs.enable_logging || 'false' }}
 
@@ -68,7 +68,7 @@ jobs:
       with:
         python-version: '3.13.3'
 
-    - name: Install Python dependencies for install-ntools
+    - name: Install Python dependencies for install-sdo
       run: |
         python -m pip install --upgrade pip
         if (Test-Path "atools/requirements.txt") {
@@ -77,25 +77,25 @@ jobs:
       shell: pwsh
       working-directory: ${{ github.workspace }}
 
-    - name: Install ntools using ntools-scripts module
+    - name: Install sdo using sdo-scripts module
       run: |
-        # Import the consolidated ntools-scripts module using the repo-scoped env var
-        Import-Module $env:NTOOLS_SCRIPT_MODULE -Force
+        # Import the consolidated sdo-scripts module using the repo-scoped env var
+        Import-Module $env:SDO_SCRIPT_MODULE -Force
 
         # Fail fast on any non-terminating errors
         $ErrorActionPreference = 'Stop'
 
-        # Install NTools using the dev-setup/ntools.json file and ensure CI step fails on error
-        Write-Host "Installing NTools using dev-setup/ntools.json..."
+        # Install SDO using the dev-setup/sdo.json file and ensure CI step fails on error
+        Write-Host "Installing SDO using dev-setup/sdo.json..."
         try {
-          Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
+          Install-SDO -SdoJsonPath "./dev-setup/sdo.json"
         }
         catch {
-          Write-Host "Install-NTools failed: $($_.Exception.Message)"
+          Write-Host "Install-SDO failed: $($_.Exception.Message)"
           exit 1
         }
 
-        Write-Host "Installed NTools version information:"
+        Write-Host "Installed SDO version information:"
         $sdoPath = "$env:ProgramFiles\sdo\sdo.exe"
         if (-not (Test-Path $sdoPath)) {
           Write-Error "sdo.exe was not found at $sdoPath"
@@ -112,14 +112,14 @@ jobs:
         git config --global user.name "gitHub-actions"
         git config --global user.email "actions@github.com"
 
-    - name: Verify ntools-scripts Module
+    - name: Verify sdo-scripts Module
       run: |
-        # Import and verify the ntools-scripts module using the repo-scoped env var
-        Import-Module $env:NTOOLS_SCRIPT_MODULE -Force
+        # Import and verify the sdo-scripts module using the repo-scoped env var
+        Import-Module $env:SDO_SCRIPT_MODULE -Force
 
         # Display module version and available functions
-        Write-Host "=== ntools-scripts Module Information ==="
-        Get-NtoolsScriptsVersion
+        Write-Host "=== sdo-scripts Module Information ==="
+        Get-SdoScriptsVersion
         Write-Host ""
         Write-Host "Available module functions:"
         Get-Command -Module sdo-scripts | Select-Object Name | Format-Table -AutoSize
@@ -226,7 +226,7 @@ jobs:
           ## 📊 Code Coverage Report
           
           ### �️ Build & Test Status
-          - ✅ **Build:** Successful (using ntools-scripts v2.3.0 module)
+          - ✅ **Build:** Successful (using sdo-scripts v2.3.0 module)
           - ✅ **Tests:** All tests passing
           - ✅ **Coverage:** Reports generated successfully
           
@@ -274,9 +274,9 @@ jobs:
           mkdir -p TestResults
           pytest --junitxml=./TestResults/pytest-results.xml
 
-      - name: Smoke dry-run of install-ntools
+      - name: Smoke dry-run of install-sdo
         run: |
-          python atools/install-ntools.py --version 1.2.0 --downloads-dir $RUNNER_TEMP --json dev-setup/ntools.json --dry-run
+          python atools/install-sdo.py --version 1.2.0 --downloads-dir $RUNNER_TEMP --json dev-setup/sdo.json --dry-run
           
       - name: Upload pytest results
         if: always()

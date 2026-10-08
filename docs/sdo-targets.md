@@ -5,8 +5,8 @@
 | ARTIFACTS           | Setup the ARTIFACTS folders for binaries and test results - override |
 | FILE_VERSIONS       | Test for FileVersion task and powershell file-version.ps1 |
 | NBUILD_DOWNLOAD     | Download Nbuild specified in the NbuildTargetVersion |
-| SETUP_ENVIRONMENT   | Setup development environment by importing ntools-scripts and calling Set-DevelopmentEnvironment |
-| TEST_NTOOLS_SCRIPTS | Test that ntools-scripts module is installed and can report a version |
+| SETUP_ENVIRONMENT   | Setup development environment by importing sdo-scripts and calling Set-DevelopmentEnvironment |
+| TEST_NTOOLS_SCRIPTS | Test that sdo-scripts module is installed and can report a version |
 | MKDOCS              | Build docs locally for testing |
 | RUN_NBTESTS_COVERAGE | Run nbTests and generate code coverage report |
 | MKDOCS_DEPLOY       | mkdocs deploy locally with live reload fixes |
