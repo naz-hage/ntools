@@ -40,16 +40,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dev-setup", "dev-setup", "{35A35C8A-7DA2-4316-A8BE-00066BD1C003}"
 	ProjectSection(SolutionItems) = preProject
 		dev-setup\install.log = dev-setup\install.log
-		dev-setup\ntools-scripts.psm1 = dev-setup\ntools-scripts.psm1
 		dev-setup\sdo.yaml = dev-setup\sdo.yaml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{F1234567-89AB-CDEF-0123-456789ABCDEF}"
-	ProjectSection(SolutionItems) = preProject
-		scripts\README.md = scripts\README.md
-		scripts\module-package\sdo-scripts.psd1 = scripts\module-package\sdo-scripts.psd1
-		scripts\module-package\sdo-scripts.psm1 = scripts\module-package\sdo-scripts.psm1
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{B79CBB23-CB3B-4934-921E-59BF51B96B93}"
 	ProjectSection(SolutionItems) = preProject
@@ -98,6 +92,13 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nBackup", "nBackup\nBackup.csproj", "{75AF1D68-CD4A-4C01-9728-7A93B8DDEA1B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiVersions", "ApiVersions\ApiVersions.csproj", "{71123CA7-06B4-BEC1-ED29-A55FCC7F22BB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "module-package", "module-package", "{7031D85A-4812-4140-9A3B-EEE1DA8FAD52}"
+	ProjectSection(SolutionItems) = preProject
+		scripts\module-package\sdo-scripts.psd1 = scripts\module-package\sdo-scripts.psd1
+		scripts\module-package\sdo-scripts.psm1 = scripts\module-package\sdo-scripts.psm1
+		scripts\module-package\test-module.ps1 = scripts\module-package\test-module.ps1
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -272,6 +273,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{E9FCB2FE-4245-44DF-A7DE-189496E1431F} = {80B7EE8D-BFD5-4F31-BC37-103FDDACEA23}
 		{DBDD07F6-003B-4E2D-8BBA-651A29E54445} = {B79CBB23-CB3B-4934-921E-59BF51B96B93}
+		{7031D85A-4812-4140-9A3B-EEE1DA8FAD52} = {F1234567-89AB-CDEF-0123-456789ABCDEF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {527DD901-16CB-4923-96ED-B02CD23566E7}

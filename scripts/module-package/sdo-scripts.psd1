@@ -26,6 +26,6 @@
         'Get-NToolsFileVersion',
         'Add-DeploymentPathToEnvironment',
         'Invoke-NToolsDownload',
-        'Install-NTools'
+        'Install-Sdo'
     )
 }
