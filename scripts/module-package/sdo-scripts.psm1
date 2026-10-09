@@ -1,4 +1,4 @@
-# ntools-scripts module - comprehensive version with all functions consolidated
+# sdo-scripts module - comprehensive version with all functions consolidated
 
 #region Common (from Common.psm1)
 # =============================================================================
@@ -108,20 +108,26 @@ function Invoke-ProjectPublish {
 # DevOps Functions (from devops/ folder)
 # =============================================================================
 
-function Get-VersionFromJson {
-    param([string]$JsonPath)
+function Get-VersionFromYaml {
+    param([string]$YamlPath)
     
     try {
-        $json = Get-Content $JsonPath | ConvertFrom-Json
-        $appInfo = $json.NbuildAppList[0]
+        $yaml = Get-Content $YamlPath -Raw
+        $appsSection = [regex]::Match($yaml, '(?ms)^NbuildAppList:\s*(?<Apps>.*)$').Groups['Apps'].Value
+        $appName = [regex]::Match($appsSection, '(?m)^\s*-\s+Name:\s*[''"]?(?<Value>[^''"\r\n]+)[''"]?\s*$').Groups['Value'].Value.Trim()
+        $appVersion = [regex]::Match($appsSection, '(?m)^\s+Version:\s*[''"]?(?<Value>[^''"\r\n]+)[''"]?\s*$').Groups['Value'].Value.Trim()
+        if ([string]::IsNullOrWhiteSpace($appName) -or [string]::IsNullOrWhiteSpace($appVersion)) {
+            throw "NbuildAppList must contain an app Name and Version."
+        }
+
         return @{
-            Name = $appInfo.Name
-            Version = $appInfo.Version
+            Name = $appName
+            Version = $appVersion
             Found = $true
         }
     }
     catch {
-        Write-Warning "Failed to parse $($JsonPath): $($_)"
+        Write-Warning "Failed to parse $($YamlPath): $($_)"
         return @{ Found = $false }
     }
 }
@@ -406,8 +412,8 @@ function Invoke-FastForward {
 # Main Module Functions
 # =============================================================================
 
-function Get-ntoolsScriptsVersion {
-    return "ntools-scripts version 2.3.0"
+function Get-SdoScriptsVersion {
+    return "sdo-scripts version 3.0.0"
 }
 
 function Publish-AllProjects {
@@ -610,9 +616,9 @@ function Install-Sdo {
     Write-Host "Downloads directory: $DownloadsDirectory"
     Write-Host "sdo.yaml path: $SdoYamlPath"
 
-    # If Version is not specified, read it from ntools.json
+    # If Version is not specified, read it from sdo.yaml
     if (-not $Version) {
-        # Determine ntools.json path
+        # Determine sdo.yaml path
         if (-not $SdoYamlPath) {
             $scriptDir = Split-Path -Parent $PSCommandPath
             $SdoYamlPath = "$scriptDir\..\sdo.yaml"
@@ -933,6 +939,6 @@ function Set-CodeSigningTrust {
 
 #region Exports
 # Final export of public functions (including merged signing functions)
-Export-ModuleMember -Function Get-ntoolsScriptsVersion, Publish-AllProjects, Get-VersionFromJson, Write-TestResult, Test-TargetExists, Test-TargetDependencies, Test-TargetDelegation, Get-FileHash256, Get-FileVersionInfo, Invoke-FastForward, Write-OutputMessage, Get-SdoFileVersion, Add-DeploymentPathToEnvironment, Invoke-SdoDownload, Install-Sdo, Set-DevelopmentEnvironment, Get-AgentPublicIp, Add-WafAllowRule, Remove-WafCustomRule, Test-IsAdministrator, Test-MicrosoftPowerShellSecurityModuleLoaded, Test-CertificateStore, New-SelfSignedCodeCertificate, Export-CertificateToPfx, Export-CertificateToCer, Import-CertificateToRoot, Import-CertificateToCurrentUser, Set-ScriptSignature, Get-ScriptSignature, Set-CodeSigningTrust
+Export-ModuleMember -Function Get-SdoScriptsVersion, Publish-AllProjects, Get-VersionFromYaml, Write-TestResult, Test-TargetExists, Test-TargetDependencies, Test-TargetDelegation, Get-FileHash256, Get-FileVersionInfo, Invoke-FastForward, Write-OutputMessage, Get-SdoFileVersion, Add-DeploymentPathToEnvironment, Invoke-SdoDownload, Install-Sdo, Set-DevelopmentEnvironment, Get-AgentPublicIp, Add-WafAllowRule, Remove-WafCustomRule, Test-IsAdministrator, Test-MicrosoftPowerShellSecurityModuleLoaded, Test-CertificateStore, New-SelfSignedCodeCertificate, Export-CertificateToPfx, Export-CertificateToCer, Import-CertificateToRoot, Import-CertificateToCurrentUser, Set-ScriptSignature, Get-ScriptSignature, Set-CodeSigningTrust
 
 #endregion

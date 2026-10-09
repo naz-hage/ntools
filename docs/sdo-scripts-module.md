@@ -13,10 +13,10 @@ Follow these minimal steps to start using the module locally or in CI.
 Import-Module "./scripts/module-package/sdo-scripts.psm1" -Force
 
 # Check the module version
-Get-NtoolsScriptsVersion
+Get-SdoScriptsVersion
 
 # Install SDO using a local configuration file
-Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
+Install-Sdo -SdoYamlPath "./dev-setup/sdo.yaml"
 ```
 
 ## Table of contents
@@ -52,7 +52,7 @@ Install-NToolsScriptsModule -InstallPath "$env:ProgramFiles\WindowsPowerShell\Mo
 
 ## Module Information
 
-**Version**: 2.3.0  
+**Version**: 3.0.0  
 **Location**: `scripts/module-package/sdo-scripts.psm1`  
 **Installation**: Automatically installed via MSBuild targets and GitHub Actions
 
@@ -70,21 +70,21 @@ Import-Module "./scripts/module-package/sdo-scripts.psm1" -Force
 ### Get Module Information
 ```powershell
 # Get version
-Get-NtoolsScriptsVersion
+Get-SdoScriptsVersion
 
 # List all available functions
 Get-Command -Module sdo-scripts | Select-Object Name | Format-Table -AutoSize
 ```
 
-### Install NTools with Custom Configuration
+### Install SDO with Custom Configuration
 ```powershell
-# Install using specific ntools.json file (PowerShell wrapper is deprecated)
+# Install using a specific sdo.yaml file
 # Prefer the cross-platform Python script for CI and cross-platform installs:
-# python atools/install-ntools.py --version 1.32.0 --json dev-setup/ntools.json
-Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
+# python atools/install-sdo.py --version 1.32.0 --yaml dev-setup/sdo.yaml
+Install-Sdo -SdoYamlPath "./dev-setup/sdo.yaml"
 
 # Install specific version
-Install-NTools -Version "1.29.7" -DownloadsDirectory "C:\MyDownloads"
+Install-Sdo -Version "1.29.7" -DownloadsDirectory "C:\MyDownloads"
 ```
 
 ### Publish Projects with Deterministic Path
@@ -127,10 +127,10 @@ This target performs:
 
 ### GitHub Actions Integration
 ```yaml
-- name: Install ntools using sdo-scripts module
+- name: Install SDO using sdo-scripts module
   run: |
     Import-Module "./scripts/module-package/sdo-scripts.psm1" -Force
-  python atools/install-ntools.py --version 1.32.0 --json dev-setup/ntools.json --downloads-dir ${{ runner.temp }} --dry-run
+  python atools/install-sdo.py --version 1.32.0 --yaml dev-setup/sdo.yaml --downloads-dir ${{ runner.temp }} --dry-run
 ```
 
 ## Module Development

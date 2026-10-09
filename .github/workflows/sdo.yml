@@ -88,10 +88,10 @@ jobs:
         # Install SDO using the dev-setup/sdo.yaml file and ensure CI step fails on error
         Write-Host "Installing SDO using dev-setup/sdo.yaml..."
         try {
-          Install-SDO -SdoYamlPath "./dev-setup/sdo.yaml"
+          Install-Sdo -SdoYamlPath "./dev-setup/sdo.yaml"
         }
         catch {
-          Write-Host "Install-SDO failed: $($_.Exception.Message)"
+          Write-Host "Install-Sdo failed: $($_.Exception.Message)"
           exit 1
         }
 
@@ -226,7 +226,7 @@ jobs:
           ## 📊 Code Coverage Report
           
           ### �️ Build & Test Status
-          - ✅ **Build:** Successful (using sdo-scripts v2.3.0 module)
+          - ✅ **Build:** Successful (using sdo-scripts v3.0.0 module)
           - ✅ **Tests:** All tests passing
           - ✅ **Coverage:** Reports generated successfully
           

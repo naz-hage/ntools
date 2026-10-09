@@ -210,7 +210,7 @@ public partial class BuildStarter
 
         List<string> KnownTargetFiles = new List<string>();
 
-        // Find list of *.targets files in ntools deployment folder
+        // Find list of *.targets files in sdo deployment folder
         string[] targetFiles = Directory.GetFiles($"{Environment.GetEnvironmentVariable("ProgramFiles")}\\sdo", "*.targets");
         if (targetFiles == null)
         {

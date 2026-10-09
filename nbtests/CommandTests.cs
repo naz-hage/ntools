@@ -77,7 +77,7 @@ namespace NbuildTests
         public async Task ListReleases_DryRun_PrintsDryRunMessageAndFetchesData()
         {
             // Use a real repository for testing since dry-run now performs read-only fetches
-            var result = await Command.ListReleases("naz-hage/ntools", false, true);
+            var result = await Command.ListReleases("naz-hage/sdo", false, true);
             Assert.IsTrue(result.IsSuccess(), "Expected ListReleases to succeed in dry-run mode.");
             Assert.IsTrue(result.Output.Any(x => x.Contains("DRY-RUN")), "Expected DRY-RUN message in output.");
 

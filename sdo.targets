@@ -93,18 +93,18 @@
 		<Message Text="==> NBUILD_DONE"/>
 	</Target>
 
-	<!-- Setup development environment by importing ntools-scripts and calling Set-DevelopmentEnvironment -->
+	<!-- Setup development environment by importing sdo-scripts and calling Set-DevelopmentEnvironment -->
 	<Target Name="SETUP_ENVIRONMENT" DependsOnTargets="IS_ADMIN">
 		<Message Text="Setting up development environment (Set-DevelopmentEnvironment)" Importance="high" />
 		<Exec Command='pwsh -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "Import-Module \"$(SolutionDir)\scripts\module-package\sdo-scripts.psm1\" -Force; Set-DevelopmentEnvironment -DevDrive \"$(DevDrive)\" -MainDir \"$(MainDir)\""' WorkingDirectory="$(SolutionDir)" />
 		<Message Text="SETUP_ENVIRONMENT completed" Importance="high" />
 	</Target>
 
-	<!-- Test that ntools-scripts module is installed and can report a version -->
+	<!-- Test that sdo-scripts module is installed and can report a version -->
 	<Target Name="TEST_NTOOLS_SCRIPTS" DependsOnTargets="PROPERTIES">
-		<Message Text="Testing ntools-scripts installation" Importance="high" />
+		<Message Text="Testing sdo-scripts installation" Importance="high" />
 		<Exec Command='pwsh -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "$(SolutionDir)\scripts\module-package\test-module.ps1" -BuildTools "$(BuildTools)"' WorkingDirectory="$(SolutionDir)" />
-		<Message Text="ntools-scripts test completed" Importance="high" />
+		<Message Text="sdo-scripts test completed" Importance="high" />
 	</Target>
 
 	<!-- Build docs locally for testing -->
@@ -242,19 +242,6 @@
 		</PropertyGroup>
 		<Message Text="API_GITHUB_KEY length: $(GitHubKeyLength)" Condition="'$(API_GITHUB_KEY)' != ''" Importance="high" />
 		<Message Text="==> CHECK_GITHUB_KEY done" Importance="high" />
-	</Target>
-
-	<!-- Update ntools locally for testing -->
-	<Target Name="UPDATE_NTOOLS" DependsOnTargets="IS_ADMIN" >
-		<PropertyGroup>
-			<SRC>$(SolutionDir)\nb\resources</SRC>
-			<DST>$(DeploymentFolder)</DST>
-		</PropertyGroup>
-		<ItemGroup>
-			<SourceFiles Include="
-						 $(SRC)\*.targets" />
-		</ItemGroup>
-		<Copy SourceFiles="@(SourceFiles)" DestinationFolder="$(DST)" />
 	</Target>
 
 	<!-- Update the ntools-launcher nuget package in the local feed for testing - not needed for normal builds -->
@@ -652,7 +639,7 @@
 	<!-- Publish all non-test projects to artifacts folder -->
 	<Target Name="PUBLISH" DependsOnTargets="ARTIFACTS;TAG">
 		<RemoveDir Directories="$(ArtifactsFolder)"></RemoveDir>
-		<Message Text="Publishing all non-test projects using ntools-scripts module" Importance="high" />
+		<Message Text="Publishing all non-test projects using sdo-scripts module" Importance="high" />
 		<Exec Command='pwsh -NoProfile -ExecutionPolicy Bypass -Command "Import-Module &apos;$(BuildTools)\sdo-scripts.psm1&apos; -Force; Publish-AllProjects -OutputDir &apos;$(ArtifactsFolder)&apos; -Version &apos;$(ProductVersion)&apos; -RepositoryRoot &apos;$(SolutionDir)&apos;"' WorkingDirectory="$(SolutionDir)" />
 		<Message Text="All non-test projects published to $(ArtifactsFolder)" Importance="high" />
 

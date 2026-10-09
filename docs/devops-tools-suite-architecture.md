@@ -44,8 +44,8 @@ The SDO tool-management command handles loading and parsing manifest JSON files 
 ### File Structure
 
 ```
-ntools/
-├── ntools.sln                    # Main solution file
+sdo/
+├── sdo.sln                    # Main solution file
 ├── prebuild.bat                  # Pre-build setup script
 ├── publish-local.ps1             # Local publishing script
 ├── mkdocs.yml                    # Documentation configuration
@@ -169,16 +169,16 @@ ntools/
 │   └── other-docs/
 │
 ├── dev-setup/                    # Development setup scripts
-│   ├── ntools.json               # Application manifest
+│   ├── sdo.yaml               # Application manifest
 │   ├── apps.yaml                 # Tool definitions
 │   └── setup scripts/
 │
 ├── atools/                       # Automated tools and installers
-│   ├── install-ntools.py         # NTools installation script
+│   ├── install-sdo.py         # SDO installation script
 │   ├── requirements.txt           # Python dependencies for installers
 │   ├── requirements-dev.txt       # Development dependencies
 │   └── tests/                    # Tests for installation scripts
-│       └── test_install_ntools.py
+│       └── test_install_sdo.py
 │
 ├── CoverageReport/               # Test coverage reports
 │   ├── index.html

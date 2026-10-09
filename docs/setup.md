@@ -4,10 +4,9 @@ The dev-setup folder is a critical part of your project setup. It contains scrip
 
 ## PowerShell Module Integration
 
-**New in v2.3.0**: SDO now includes a consolidated PowerShell module
-(`sdo-scripts`) that replaces individual scripts with a unified,
-function-based approach. This module is automatically integrated with the
-setup process.
+**New in v3.0.0**: The project has migrated from NTools to SDO. The
+consolidated `sdo-scripts` PowerShell module now uses `sdo.yaml` and provides
+the `Install-Sdo` command in place of the legacy `Install-NTools` command.
 
 ### Using sdo-scripts Module
 ```powershell
@@ -15,7 +14,7 @@ setup process.
 Import-Module "./scripts/module-package/sdo-scripts.psm1" -Force
 
 # Install SDO using the module (recommended approach)
-Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
+Install-Sdo -SdoYamlPath "./dev-setup/sdo.yaml"
 
 # Set up development environment
 Set-DevelopmentEnvironment
@@ -28,7 +27,7 @@ For complete module documentation, see [sdo-scripts Module](./sdo-scripts-module
 
 The dev-setup folder typically includes the following files:
 
-- **`ntools.json`**  
+- **`sdo.yaml`**  
     - Contains installation information for SDO. This file is required to install SDO before other development tools.
 - **`apps.yaml`**  
     - Lists the development tools required for your project, including their installation and uninstallation details.
@@ -39,30 +38,25 @@ The dev-setup folder typically includes the following files:
 
 ## File Details
 
-### 1. ntools.json
+### 1. sdo.yaml
 This file provides the installation details for SDO, which is required to manage other tools in the project.
 
 **Example:**
-```json
-{
-  "Version": "1.2.0",
-  "NbuildAppList": [
-    {
-      "Name": "Ntools",
-      "Version": "1.7.0",
-      "AppFileName": "$(InstallPath)\\sdo.exe",
-      "WebDownloadFile": "https://github.com/naz-hage/sdo/releases/download/$(Version)/$(Version).zip",
-      "DownloadedFile": "$(Version).zip",
-      "InstallCommand": "powershell.exe",
-      "InstallArgs": "-Command Expand-Archive -Path $(Version).zip -DestinationPath '$(InstallPath)' -Force",
-      "InstallPath": "$(ProgramFiles)\\Nbuild",
-      "UninstallCommand": "powershell.exe",
-      "UninstallArgs": "-Command Remove-Item -Path '$(InstallPath)' -Recurse -Force",
-      "StoredHash": "XXX",
-      "AddToPath": true
-    }
-  ]
-}
+```yaml
+Version: "1.2.0"
+NbuildAppList:
+  - Name: "sdo"
+    Version: "1.7.0"
+    AppFileName: "$(InstallPath)\\sdo.exe"
+    WebDownloadFile: "https://github.com/naz-hage/sdo/releases/download/$(Version)/$(Version).zip"
+    DownloadedFile: "$(Version).zip"
+    InstallCommand: "powershell.exe"
+    InstallArgs: "-Command Expand-Archive -Path $(Version).zip -DestinationPath '$(InstallPath)' -Force"
+    InstallPath: "$(ProgramFiles)\\sdo"
+    UninstallCommand: "powershell.exe"
+    UninstallArgs: "-Command Remove-Item -Path '$(InstallPath)' -Recurse -Force"
+    StoredHash: "XXX"
+    AddToPath: true
 ```
 
 ---
@@ -110,22 +104,22 @@ This PowerShell script automates the installation of tools and sets up the devel
 
 **Key Responsibilities:**
 
-- Installs ntools using ntools.json.
+- Installs SDO using sdo.yaml.
 - Installs other tools listed in apps.yaml  .
 - Verifies administrative privileges before proceeding.
 
 **Example:**
 ```powershell
 # Import the install module
-$url = "https://raw.githubusercontent.com/naz-hage/ntools/main/dev-setup/install.psm1"
+$url = "https://raw.githubusercontent.com/naz-hage/sdo/main/dev-setup/install.psm1"
 $output = "./install.psm1"
 Invoke-WebRequest -Uri $url -OutFile $output
 Import-Module ./install.psm1 -Force
 
 # Install SDO
-MainInstallApp -command install -json .\ntools.json
+Install-Sdo -SdoYamlPath .\sdo.yaml
 if ($LASTEXITCODE -ne 0) {
-    Write-OutputMessage "Error: Installation of ntools failed. Exiting script."
+    Write-OutputMessage "Error: Installation of SDO failed. Exiting script."
     exit 1
 }
 
@@ -148,7 +142,7 @@ Your project folder should look like this:
 %MainDirectory%\
 ├── MyProject\
 │   ├── dev-setup\
-│   │   ├── ntools.json
+│   │   ├── sdo.yaml
 │   │   ├── apps.yaml
 │   │   ├── dev-setup.ps1
 │   ├── ... other project and test files

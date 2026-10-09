@@ -6,7 +6,7 @@ execution:
 steps:
 - name: Azure DevOps Authentication
   workingDirectory: C:\source\ConsoleApp1
-  path: c:\source\ntools\Sdo\bin\Release\sdo.exe
+  path: c:\source\sdo\Sdo\bin\Release\sdo.exe
   arguments: auth azdo
   expectedReturnCode: 0
   assertions:

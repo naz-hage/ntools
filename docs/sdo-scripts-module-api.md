@@ -5,9 +5,9 @@ This is the canonical reference for functions exported by the `sdo-scripts` Powe
 | Function | Description and common usage |
 |---|---|
 | `Publish-AllProjects` | Build and publish non-test projects. `Publish-AllProjects -OutputDir C:\Artifacts -Version 1.0.0 -RepositoryRoot C:\MyRepo` |
-| `Get-ntoolsScriptsVersion` | Return the module version. `Get-NtoolsScriptsVersion` |
+| `Get-SdoScriptsVersion` | Return the module version. `Get-SdoScriptsVersion` |
 | `Set-DevelopmentEnvironment` | Set local development environment variables. `Set-DevelopmentEnvironment -DevDrive D: -MainDir source` |
-| `Get-VersionFromJson` | Read version fields from an `ntools.json` file. `Get-VersionFromJson -Path ./dev-setup/ntools.json` |
+| `Get-VersionFromYaml` | Read version fields from an `sdo.yaml` file. `Get-VersionFromYaml -YamlPath ./dev-setup/sdo.yaml` |
 | `Write-TestResult` | Write a standardized test result. `Write-TestResult -Name smoke -Passed $true` |
 | `Test-TargetExists` | Check whether an MSBuild target exists. `Test-TargetExists -ProjectFile foo.targets -TargetName Publish` |
 | `Test-TargetDependencies` | Validate MSBuild target dependencies. `Test-TargetDependencies -ProjectFile foo.targets -TargetName Publish` |
@@ -16,10 +16,10 @@ This is the canonical reference for functions exported by the `sdo-scripts` Powe
 | `Get-FileVersionInfo` | Read file and product version metadata. `Get-FileVersionInfo -Path C:\Artifacts\sdo.exe` |
 | `Invoke-FastForward` | Fast-forward a Git ref. `Invoke-FastForward -Repo . -Remote origin -Branch main` |
 | `Write-OutputMessage` | Write consistently formatted output. `Write-OutputMessage -Level Info -Message Starting` |
-| `Get-NToolsFileVersion` | Read the NTools product version from a binary. `Get-NToolsFileVersion -FilePath C:\Artifacts\sdo.exe` |
+| `Get-SdoFileVersion` | Read the SDO product version from a binary. `Get-SdoFileVersion -FilePath C:\Artifacts\sdo.exe` |
 | `Add-DeploymentPathToEnvironment` | Add a deployment path to `PATH`. `Add-DeploymentPathToEnvironment -Path C:\My\deploy\bin` |
-| `Invoke-NToolsDownload` | Download NTools release artifacts. `Invoke-NToolsDownload -Version 1.2.3 -OutputDir C:\Downloads` |
-| `Install-NTools` | Install an NTools version from a release. `Install-NTools -Version 1.74.0` |
+| `Invoke-SdoDownload` | Download SDO release artifacts. `Invoke-SdoDownload -Version 1.2.3 -DownloadsDirectory C:\Downloads` |
+| `Install-Sdo` | Install an SDO version from a release. `Install-Sdo -Version 1.74.0` |
 
 For runtime discovery:
 
@@ -27,5 +27,3 @@ For runtime discovery:
 Import-Module './scripts/module-package/sdo-scripts.psm1' -Force
 Get-Command -Module sdo-scripts
 ```
-
-

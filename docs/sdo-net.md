@@ -1813,45 +1813,45 @@ Uninstalls applications as specified in the manifest file. (Requires admin privi
 ### 3. List Installed Applications
 ```cmd
 sdo.exe tool list
-sdo.exe tool list --json "C:\Program Files\NBuild\ntools.json"
+sdo.exe tool list --manifest "C:\Program Files\sdo\apps.yaml"
 ```
-Lists all applications specified in the provided JSON file. If no `--json` option is specified, the default file is used.
+Lists all applications specified in the provided JSON file. If no `--manifest` option is specified, the default file is used.
 
 ### 4. Download Applications
 ```cmd
-sdo.exe tool download --json "C:\Program Files\NBuild\ntools.json"
+sdo.exe tool download --manifest "C:\Program Files\sdo\apps.yaml"
 ```
-Downloads tools and applications specified in the manifest file.
+Downloads tools and applications specified in the manifest file. (Uses the `--manifest` option to locate the YAML file.)
 
 ### 5. Error Handling for JSON Manifest Files
 
-The `list`, `install`, `uninstall`, and `download` commands require valid JSON manifest files. The following errors may occur:
+The `list`, `install`, `uninstall`, and `download` commands require valid YAML manifest files. The following errors may occur:
 
 #### File Not Found
 ```
-Error: YAML manifest not found: 'C:\invalid\path\apps.yaml'. Please provide a valid path to the apps.yaml file.
+Error: Manifest not found: 'C:\invalid\path\apps.yaml'. Please provide a valid path to the apps.yaml file.
 Exit code: -1
 ```
 
 **Resolution**: Verify the file path is correct. Common locations:
 - Current directory: `.\apps.yaml`
-- Program Files: `C:\Program Files\nbuild\apps.yaml`
+- Program Files: `C:\Program Files\sdo\apps.yaml`
 - Relative path: `.\dev-setup\apps.yaml`
 
-#### Invalid JSON Format
+#### Invalid YAML Format
 ```
-Error: Invalid JSON format: '.' is an invalid start of a value. Please check the JSON file for proper escaping of backslashes and quotes.
+Error: Invalid YAML format: '.' is an invalid start of a value. Please check the YAML file for proper escaping of backslashes and quotes.
 Exit code: -1
 ```
 
-**Resolution**: Validate your JSON file:
-- Use a JSON validator tool (e.g., jsonlint.com)
+**Resolution**: Validate your YAML file:
+- Use a YAML validator tool (e.g., yamllint.com)
 - Ensure backslashes in Windows paths are escaped: `C:\\Program Files\\...`
-- Ensure quotes in JSON strings are properly escaped: `\"text\"`
+- Ensure quotes in YAML strings are properly escaped: `\"text\"`
 
 #### Unsupported Version
 ```
-Error: Json Version 1.0.0 is not supported. Please use version 1.2.0
+Error: YAML Version 1.0.0 is not supported. Please use version 1.2.0
 Exit code: -1
 ```
 

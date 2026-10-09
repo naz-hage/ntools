@@ -150,8 +150,8 @@ def safe_remove_deploy_path(path: Path):
         raise Exception(f"Refusing to remove drive root: {resolved}")
 
     # Basic name check to reduce risk
-    if all(name not in str(resolved).lower() for name in ('sdo', 'nbuild', 'ntools')):
-        raise Exception(f"Deploy path '{resolved}' does not look like ntools install path; refusing to remove")
+    if all(name not in str(resolved).lower() for name in ('sdo')):
+        raise Exception(f"Deploy path '{resolved}' does not look like sdo install path; refusing to remove")
 
     # Perform removal
     shutil.rmtree(str(resolved))
@@ -163,7 +163,7 @@ def update_path(deploy_path: Path, no_update: bool = False):
         return False
     # On CI or non-windows, prefer printing instructions
     if os.name != 'nt' or os.geteuid() != 0 if hasattr(os, 'geteuid') else False:
-        print(f"To use ntools, add the deployment path to your PATH. Example:\n  export PATH=\"{deploy_path}:$PATH\"")
+        print(f"To use sdp, add the deployment path to your PATH. Example:\n  export PATH=\"{deploy_path}:$PATH\"")
         return False
 
     # Windows: try to modify machine PATH via user environment if possible
@@ -256,7 +256,7 @@ def main():
     else:
         deploy_path = expand_install_path(app.get('InstallPath', ''))
         if not deploy_path or str(deploy_path) == '':
-            deploy_path = Path('C:/Program Files/sdo') if os.name == 'nt' else Path('/usr/local/lib/ntools')
+            deploy_path = Path('C:/Program Files/sdo') if os.name == 'nt' else Path('/usr/local/lib/sdo')
 
     # Remove existing installation before extracting new one (explicit policy: always replace)
     try:

@@ -2,7 +2,7 @@
   "BackupsList": [
     {
       "Source": ".",
-      "Destination": "%APPDATA%\\ntools",
+      "Destination": "%APPDATA%\\sdo",
       "ExcludeFolders": [
         ".git",
         ".vs"

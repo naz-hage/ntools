@@ -26,7 +26,7 @@ Import-Module ./dev-setup/Install.psm1 -Force
 InstallNtools -version "1.74.0"
 ```
 
-The version can be supplied explicitly, or omitted to read the default version from `dev-setup/ntools.json`:
+The version can be supplied explicitly, or omitted to read the default version from `dev-setup/apps.yaml`:
 
 
 ## Post-Installation

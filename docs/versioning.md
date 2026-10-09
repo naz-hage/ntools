@@ -21,20 +21,20 @@ Tags in the [GitHubRelease](./github-release.md) are used to:
 
 ## Version Automation
 
-Tool versions in documentation are automatically updated using the MSBuild task (`UpdateVersionsInDocs`) via the `sdo update_doc_versions` command. This extracts all tool/version pairs from every `NbuildAppList` entry in every `*.json` file in `dev-setup` and updates the documentation table accordingly.
+Tool versions in documentation are automatically updated using the MSBuild task (`UpdateVersionsInDocs`) via the `sdo update_doc_versions` command. This extracts all tool/version pairs from the `NbuildAppList` entries in `dev-setup/sdo.yaml` and `dev-setup/apps.yaml`, then updates the documentation table accordingly.
 
-### PowerShell Module Integration (v2.3.0+)
+### PowerShell Module Integration (v3.0.0+)
 
 - **Module**: `scripts/module-package/sdo-scripts.psm1`
-- **Function**: `Get-VersionFromJson`
+- **Function**: `Get-VersionFromYaml`
 - **Purpose**: Consolidated version management within the SDO scripts module
 
 ```powershell
 # Import the module
 Import-Module "./scripts/module-package/sdo-scripts.psm1" -Force
 
-# Get version from specific JSON file
-$version = Get-VersionFromJson -JsonFilePath "./dev-setup/ntools.json"
+# Get version from the SDO YAML manifest
+$version = Get-VersionFromYaml -YamlPath "./dev-setup/sdo.yaml"
 ```
 
 For complete automation details, see [Version Automation Guide](version-automation-guide.md).
