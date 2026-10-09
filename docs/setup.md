@@ -30,10 +30,10 @@ The dev-setup folder typically includes the following files:
 
 - **`ntools.json`**  
     - Contains installation information for SDO. This file is required to install SDO before other development tools.
-- **`apps.json`**  
+- **`apps.yaml`**  
     - Lists the development tools required for your project, including their installation and uninstallation details.
 - **Legacy scripts** (deprecated in favor of sdo-scripts module)
-  - Individual PowerShell scripts for specific tasks
+- Individual PowerShell scripts for specific tasks
 
 ---
 
@@ -67,31 +67,26 @@ This file provides the installation details for SDO, which is required to manage
 
 ---
 
-### 2. apps.json
+### 2. apps.yaml
 This file lists all the development tools required for the project. Each tool is defined with its name, version, installation details, and uninstallation details.
 
 **Example:**
-```json
-{
-  "Version": "1.2.0",
-  "NbuildAppList": [
-    {
-      "Name": "7-zip",
-      "Version": "23.01",
-      "AppFileName": "$(InstallPath)\\7z.exe",
-      "WebDownloadFile": "https://www.7-zip.org/a/7z2301-x64.exe",
-      "DownloadedFile": "7zip.exe",
-      "InstallCommand": "$(DownloadedFile)",
-      "InstallArgs": "/S /D=\"$(ProgramFiles)\\7-Zip\"",
-      "InstallPath": "$(ProgramFiles)\\7-Zip",
-      "UninstallCommand": "$(InstallPath)\\Uninstall.exe",
-      "UninstallArgs": "/S"
-    }
-  ]
-}
+```yaml
+Version: "1.2.0"
+NbuildAppList:
+  - Name: "7-zip"
+    Version: "23.01"
+    AppFileName: "$(InstallPath)\\7z.exe"
+    WebDownloadFile: "https://www.7-zip.org/a/7z2301-x64.exe"
+    DownloadedFile: "7zip.exe"
+    InstallCommand: "$(DownloadedFile)"
+    InstallArgs: "/S /D=\"$(ProgramFiles)\\7-Zip\""
+    InstallPath: "$(ProgramFiles)\\7-Zip"
+    UninstallCommand: "$(InstallPath)\\Uninstall.exe"
+    UninstallArgs: "/S"
 ```
 
-**Key Elements in apps.json:**
+**Key Elements in apps.yaml:**
 
 | Element Name       | Description                                                                 |
 |--------------------|-----------------------------------------------------------------------------|
@@ -116,7 +111,7 @@ This PowerShell script automates the installation of tools and sets up the devel
 **Key Responsibilities:**
 
 - Installs ntools using ntools.json.
-- Installs other tools listed in apps.json.
+- Installs other tools listed in apps.yaml  .
 - Verifies administrative privileges before proceeding.
 
 **Example:**
@@ -135,7 +130,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 # Install other tools
-& $global:NbExePath install -json .\apps.json
+& $global:NbExePath install --manifest .\apps.yaml
 if ($LASTEXITCODE -ne 0) {
     Write-OutputMessage "Error: Installation of other tools failed. Exiting script."
     exit 1
@@ -154,7 +149,7 @@ Your project folder should look like this:
 ├── MyProject\
 │   ├── dev-setup\
 │   │   ├── ntools.json
-│   │   ├── apps.json
+│   │   ├── apps.yaml
 │   │   ├── dev-setup.ps1
 │   ├── ... other project and test files
 │   └── sdo.targets  (this file is required in the solution folder)
@@ -171,21 +166,19 @@ To add a new tool to your project:
    - Installation path.
    - File name for version checks.
    - Version and name.
-2. Add the tool's details to apps.json.
+2. Add the tool's details to apps.yaml.
 
 **Example for a new tool:**
-```json
-{
-  "Name": "Docker",
-  "Version": "4.38.0.0",
-  "AppFileName": "$(InstallPath)\\Docker Desktop.exe",
-  "WebDownloadFile": "https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe",
-  "DownloadedFile": "Docker Desktop Installer.exe",
-  "InstallCommand": "$(DownloadedFile)",
-  "InstallArgs": "install --quiet",
-  "InstallPath": "$(ProgramFiles)\\Docker\\Docker",
-  "UninstallCommand": "powershell.exe",
-  "UninstallArgs": "-Command \"Remove-Item -Path '$(InstallPath)' -Recurse -Force\"",
-  "AddToPath": true
-}
+```yaml 
+Name: "Docker"
+Version: "4.38.0.0"
+AppFileName: "$(InstallPath)\\Docker Desktop.exe"
+WebDownloadFile: "https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe"
+DownloadedFile: "Docker Desktop Installer.exe"
+InstallCommand: "$(DownloadedFile)"
+InstallArgs: "install --quiet"
+InstallPath: "$(ProgramFiles)\\Docker\\Docker"
+UninstallCommand: "powershell.exe"
+UninstallArgs: "-Command \"Remove-Item -Path '$(InstallPath)' -Recurse -Force\""
+AddToPath: true
 ```

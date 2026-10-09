@@ -18,7 +18,7 @@ namespace Nbuild
     {
         private const string SupportedVersion = "1.2.0";
         private const int MsiReturnCodeRestartRequired = 1603;
-        public static readonly string DefaultAppsFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "nbuild", "apps.json");
+        public static readonly string DefaultAppsFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "sdo", "apps.yaml");
         private static string DownloadsDirectory = $"{Environment.GetEnvironmentVariable("Temp")}\\nb"; // "C:\\sdo-downloads" $"{Environment.GetEnvironmentVariable("Temp")}\\nb"
         private static bool Verbose = false;
         private static bool ValidJson = false;
@@ -60,9 +60,11 @@ namespace Nbuild
 
         private static bool CanRunCommand(bool modifyAcls = true)
         {
+            var testMode = IsTestMode();
+
             if (!Ntools.CurrentProcess.IsElevated())
             {
-                if (!TestMode)
+                if (!testMode)
                 {
                     return false;
                 }
@@ -179,7 +181,10 @@ namespace Nbuild
                 return ResultHelper.Success(msg);
             }
 
-            if (!CanRunCommand()) return ResultHelper.Fail(-1, $"You must run this command as an administrator");
+            if (string.IsNullOrEmpty(name) && string.IsNullOrEmpty(json))
+            {
+                return ResultHelper.Fail(-1, "Either json file path or app name must be provided");
+            }
 
             IEnumerable<NbuildApp> apps;
 
@@ -206,6 +211,8 @@ namespace Nbuild
                     }
                     return ResultHelper.Fail(-1, errorMsg);
                 }
+
+                if (!CanRunCommand()) return ResultHelper.Fail(-1, $"You must run this command as an administrator");
 
                 foreach (var app in appsList)
                 {
@@ -238,6 +245,7 @@ namespace Nbuild
             var jsonAppsList = apps.ToList();
 
             if (!jsonAppsList.Any()) return ResultHelper.Fail(-1, $"No apps found to install");
+            if (!CanRunCommand()) return ResultHelper.Fail(-1, $"You must run this command as an administrator");
 
             if (Verbose) ConsoleHelper.WriteWarning($"{jsonAppsList.Count} apps to install.");
 
@@ -929,6 +937,15 @@ namespace Nbuild
                     throw new ArgumentNullException(nameof(json));
                 }
             }
+            else if (Path.IsPathRooted(json) ||
+                     json.EndsWith(".json", StringComparison.OrdinalIgnoreCase) ||
+                     json.EndsWith(".yaml", StringComparison.OrdinalIgnoreCase) ||
+                     json.EndsWith(".yml", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new FileNotFoundException(
+                    $"Tool manifest not found at '{json}'. " +
+                    "Provide an existing manifest with --manifest <path> (or --json <path>).");
+            }
 
             var listAppData = DeserializeManifest(json);
 
@@ -1026,11 +1043,11 @@ namespace Nbuild
 
             NbuildApp? foundApp = null;
 
-            // Named installs search an explicitly supplied manifest before the standard fallback locations.
+            // Named installs search an explicitly supplied manifest before the standard YAML fallback locations.
             var searchFilePaths = new[]
             {
                 json,
-                Path.Combine(Directory.GetCurrentDirectory(), "apps.json"),
+                Path.Combine(Directory.GetCurrentDirectory(), "apps.yaml"),
                 DefaultAppsFile
             }
             .Where(path => !string.IsNullOrWhiteSpace(path))
@@ -1046,7 +1063,7 @@ namespace Nbuild
                 {
                     if (Verbose)
                     {
-                        ConsoleHelper.WriteVerbose($"apps.json file does not exist: {appsFilePath}");
+                        ConsoleHelper.WriteVerbose($"apps.yaml file does not exist: {appsFilePath}");
                     }
                     continue;
                 }
@@ -1055,7 +1072,7 @@ namespace Nbuild
                 
                 if (Verbose)
                 {
-                    ConsoleHelper.WriteVerbose($"Found apps.json: {appsFilePath}");
+                    ConsoleHelper.WriteVerbose($"Found apps.yaml: {appsFilePath}");
                 }
 
                 try

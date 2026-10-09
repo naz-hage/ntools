@@ -159,15 +159,6 @@ namespace NbuildTests
                     }
                 };
 
-                // Get all environment variables
-                IDictionary environmentVariables = Environment.GetEnvironmentVariables();
-
-                // Iterate over the environment variables and print them
-                foreach (DictionaryEntry entry in environmentVariables)
-                {
-                    Console.WriteLine($"{entry.Key}: {entry.Value}");
-                }
-
                 Assert.IsTrue(process.LockStart(true).IsSuccess());
             }
             LocalTestMode = true;
@@ -259,7 +250,7 @@ namespace NbuildTests
 
         // Test method for install from JSON file functionality
         [TestMethod()]
-        [Ignore("Removed - ntools.json is no longer embedded as a resource. Use go/apps.json instead.")]
+        [Ignore("Removed - ntools.json is no longer embedded as a resource. Use dev-setup/apps.yaml instead.")]
         public void InstallFromJsonFileTest()
         {
             SetupTestModeFlag();
@@ -784,7 +775,7 @@ namespace NbuildTests
                         }
                     ]
                 }";
-                File.WriteAllText("apps.json", jsonContent);
+                File.WriteAllText("apps.yaml", jsonContent);
 
                 // Act
                 var apps = Command.GetAppsFromCurrentDirectory("testapp", null, out var availableApps);
@@ -831,7 +822,7 @@ namespace NbuildTests
                         }
                     ]
                 }";
-                File.WriteAllText("apps.json", jsonContent);
+                File.WriteAllText("apps.yaml", jsonContent);
 
                 // Act - version parameter should override the JSON version
                 var apps = Command.GetAppsFromCurrentDirectory("testapp", "2.0.0", out var availableApps);
@@ -901,7 +892,7 @@ namespace NbuildTests
                 Directory.SetCurrentDirectory(tempDir);
                 var explicitJson = Path.Combine(tempDir, "custom-apps.json");
                 File.WriteAllText(explicitJson, CreateAppManifest("testapp", "1.0.0"));
-                File.WriteAllText("apps.json", CreateAppManifest("testapp", "2.0.0"));
+                File.WriteAllText("apps.yaml", CreateAppManifest("testapp", "2.0.0"));
 
                 var explicitApps = Command.GetAppsFromCurrentDirectory("testapp", "3.0.0", out _, explicitJson);
 
@@ -955,7 +946,7 @@ namespace NbuildTests
             try
             {
                 Directory.SetCurrentDirectory(tempDir);
-                // Create a single apps.json with both versions of the same app
+                // Create a single apps.yaml with both versions of the same app
                 var jsonContentFinal = @"{
                     ""Version"": ""1.2.0"",
                     ""NbuildAppList"": [
@@ -985,7 +976,7 @@ namespace NbuildTests
                         }
                     ]
                 }";
-                File.WriteAllText("apps.json", jsonContentFinal);
+                File.WriteAllText("apps.yaml", jsonContentFinal);
 
                 // Act & Assert - should fail because multiple apps with same name exist without version specified
                 try
@@ -1018,7 +1009,7 @@ namespace NbuildTests
             {
                 Directory.SetCurrentDirectory(tempDir);
 
-                // Create apps.json with unsupported version - this file will be skipped
+                // Create apps.yaml with unsupported version - this file will be skipped
                 var jsonContentBadVersion = @"{
                     ""Version"": ""99.0.0"",
                     ""NbuildAppList"": [
@@ -1036,9 +1027,9 @@ namespace NbuildTests
                         }
                     ]
                 }";
-                File.WriteAllText("apps.json", jsonContentBadVersion);
+                File.WriteAllText("apps.yaml", jsonContentBadVersion);
 
-                // Act - when apps.json has unsupported version, it is skipped
+                // Act - when apps.yaml has unsupported version, it is skipped
                 var apps = Command.GetAppsFromCurrentDirectory("anyapp", null, out var availableApps);
 
                 // Assert - should return empty because the only file has unsupported version (gets skipped)
@@ -1081,7 +1072,7 @@ namespace NbuildTests
                         }
                     ]
                 }";
-                File.WriteAllText("apps.json", jsonContent);
+                File.WriteAllText("apps.yaml", jsonContent);
 
                 // Act
                 var apps = Command.GetAppsFromCurrentDirectory("nonexistent", null, out var availableApps);
@@ -1138,7 +1129,7 @@ namespace NbuildTests
                         }
                     ]
                 }";
-                File.WriteAllText("apps.json", jsonContent);
+                File.WriteAllText("apps.yaml", jsonContent);
 
                 // Act - Use a unique app name that definitely doesn't exist in any system-wide ntools.json
                 var apps = Command.GetAppsFromCurrentDirectory("zzz-test-nonexistent-app-xyz", null, out var availableApps);
@@ -1194,7 +1185,7 @@ namespace NbuildTests
                         }
                     ]
                 }";
-                File.WriteAllText("apps.json", jsonContent);
+                File.WriteAllText("apps.yaml", jsonContent);
 
                 // Act - Use dryRun=false to trigger the actual logic
                 var result = Command.Install(null, "nonexistent-app", null, false, false);
@@ -1215,4 +1206,3 @@ namespace NbuildTests
         }
     }
 }
-

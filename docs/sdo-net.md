@@ -785,7 +785,7 @@ These command groups consolidate the local build, backup, and file-search workfl
 #### tool
 
 Environment tool installation, auditing, and manifest management. Use
-`--manifest` for JSON or YAML manifests; `--json` remains supported.
+`--manifest` for YAML manifests; the legacy `--json` option remains supported for explicitly supplied JSON files.
 
 Subcommands:
 - `install` — Install tools from a manifest or by application name
@@ -795,8 +795,7 @@ Subcommands:
 
 ```bash
 sdo tool list
-sdo tool list --json apps.json
-sdo tool list --manifest apps.yaml
+sdo tool list --manifest .\dev-setup\apps.yaml
 sdo tool install --manifest apps.yaml --dry-run
 sdo tool download --manifest apps.yaml --dry-run
 sdo tool uninstall --manifest apps.yaml --dry-run
@@ -1711,7 +1710,7 @@ sdo wi update --id 243 --state Done
 
 The command reference above is the source of truth for `sdo.exe`. This section retains the build infrastructure details and compatibility notes for projects that still use `sdo.targets`.
 
-> **Breaking change (v1.76+):** `sdo tool install --name` searches only for `apps.json` files. Consolidate application definitions into one `apps.json` file when needed. See [Install by name](#install-by-name-from-current-directory-and-default-location).
+> **Manifest discovery:** `sdo tool install --name` searches only for `apps.yaml` automatically. Use `--manifest` to select another YAML manifest explicitly.
 
 ## Dry-run contract
 
@@ -1775,18 +1774,18 @@ Below are practical examples for using `sdo.exe`. These examples assume you are 
 ```cmd
 sdo.exe tool install --json "C:\Program Files\tools.json"
 ```
-Installs applications specified in the manifest file. The `--json` parameter is optional. When `--name` is provided, the named install searches the explicit `--json` manifest first, then `apps.json` in the current directory, and finally `C:\Program Files\nbuild\apps.json`. (Requires admin privileges.)
+Installs applications specified in the manifest file. The `--manifest` parameter accepts a YAML manifest. The legacy `--json` parameter remains available for an explicitly supplied JSON file. When `--name` is provided without a manifest, automatic discovery searches `apps.yaml` in the current directory, `dev-setup\apps.yaml`, and `C:\Program Files\sdo\apps.yaml`. (Requires admin privileges.)
 
 #### Install by name from current directory and default location:
 ```cmd
 sdo.exe tool install --name "MyApp"
 sdo.exe tool install --name "MyApp" --appversion "1.2.3"
 ```
-Searches for the requested application in the explicit `--json` manifest first when one is provided, then in `apps.json` in the current directory, and finally in the default installation directory. The `--appversion` parameter is optional and overrides the version specified in the JSON file.
+Searches for the requested application in the explicit `--json` manifest first when one is provided, then in `apps.yaml` in the current directory, `go\\apps.yaml`, and finally in `C:\\Program Files\\sdo\\apps.yaml`. The `--appversion` parameter is optional and overrides the version specified in the JSON file.
 
-**BREAKING CHANGE (v1.76+):** This command now searches ONLY for `apps.json` files, not all JSON files. You must consolidate your application definitions into a single `apps.json` file in the target directory or move it to the default installation directory.
+**BREAKING CHANGE (v1.76+):** This command now searches ONLY for `apps.yaml` files, not all JSON files. You must consolidate your application definitions into a single `apps.yaml` file in the target directory or move it to the default installation directory.
 
-**Search order:** When `--json` is provided, that file is searched first, followed by `apps.json` in the current directory, then `C:\Program Files\nbuild\apps.json`. Without `--json`, the current directory is searched first, followed by the default installation directory. The first matching app takes precedence.
+**Search order:** When `--json` is provided, that file is searched first, followed by `apps.yaml` in the current directory, then `C:\Program Files\nbuild\apps.yaml`. Without `--json`, the current directory is searched first, followed by the default installation directory. The first matching app takes precedence.
 
 **Note:** If you specify both `--json` and `--name`, the command searches the specified JSON file first and falls back to the standard locations if the app is not found there. The `--name` method provides a convenient way to install applications without needing to know the exact path to the JSON configuration file.
 
@@ -1797,9 +1796,9 @@ sdo.exe tool install --name "MyApp" --appversion "1.2.3" --dry-run
 ```
 
 **Behavior in dry-run mode:**
-- Searches the explicit `--json` file first when provided, then `apps.json` in the current directory, then the default installation directory
+- Searches the explicit `--json` file first when provided, then `apps.yaml` in the current directory, then the default installation directory
 - If app is found: displays `DRY-RUN: would install app 'MyApp'` in yellow and lists version details
-- If app is not found: displays `No apps found matching 'MyApp'` in red, lists the search directories (current directory and default installation directory), and lists available applications found in those `apps.json` files
+- If app is not found: displays `No apps found matching 'MyApp'` in red, lists the search directories (current directory and default installation directory), and lists available applications found in those `apps.yaml` files
 - Dry-run always returns exit code 0 (success), even when app is not found, as it is a preview/simulation mode
 - Always succeeds (exit code 0) because dry-run is a preview, not actual installation
 - No files are downloaded, installed, or modified
@@ -1830,14 +1829,14 @@ The `list`, `install`, `uninstall`, and `download` commands require valid JSON m
 
 #### File Not Found
 ```
-Error: JSON file not found: 'C:\invalid\path\apps.json'. Please provide a valid path to the apps.json file.
+Error: YAML manifest not found: 'C:\invalid\path\apps.yaml'. Please provide a valid path to the apps.yaml file.
 Exit code: -1
 ```
 
 **Resolution**: Verify the file path is correct. Common locations:
-- Current directory: `.\apps.json`
-- Program Files: `C:\Program Files\nbuild\apps.json`
-- Relative path: `.\dev-setup\apps.json`
+- Current directory: `.\apps.yaml`
+- Program Files: `C:\Program Files\nbuild\apps.yaml`
+- Relative path: `.\dev-setup\apps.yaml`
 
 #### Invalid JSON Format
 ```

@@ -74,9 +74,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHubReleaseTests", "GitHu
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "go", "go", "{72A31A3D-5909-486D-AB92-BF76A06BDAAA}"
 	ProjectSection(SolutionItems) = preProject
-		go\apps.json = go\apps.json
+		dev-setup\apps.yaml = dev-setup\apps.yaml
 		go\build-apps.exe = go\build-apps.exe
-		go\build-apps.go = go\build-apps.go
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lf", "lf\lf.csproj", "{524E8E3D-3495-C6F7-F624-F7AD1A9F2621}"

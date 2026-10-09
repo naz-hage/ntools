@@ -92,13 +92,11 @@ format. Use `--manifest` for either format; `--json` remains available for
 existing scripts.
 
 ```bash
-sdo tool list --manifest .\go\apps.yaml
-sdo tool install --manifest .\go\apps.yaml --dry-run
-sdo tool download --manifest .\go\apps.yaml --dry-run
-sdo tool uninstall --manifest .\go\apps.yaml --dry-run
+sdo tool list --manifest .\dev-setup\apps.yaml
+sdo tool install --manifest .\dev-setup\apps.yaml --dry-run
+sdo tool download --manifest .\dev-setup\apps.yaml --dry-run
+sdo tool uninstall --manifest .\dev-setup\apps.yaml --dry-run
 
-sdo tool list --json .\go\apps.json
-sdo tool install --json .\go\apps.json --dry-run
 sdo tool install --name "Git for Windows" --appversion 2.51.1 --dry-run
 ```
 

@@ -57,6 +57,7 @@ namespace Sdo.Commands
                     return 1;
                 }
 
+                WriteManifestNotice(input);
                 WriteDryRunNotice(dryRun);
                 try
                 {
@@ -93,6 +94,7 @@ namespace Sdo.Commands
                     Console.Error.WriteLine("Error: Specify exactly one of --json or --manifest.");
                     return 1;
                 }
+                WriteManifestNotice(manifest ?? json);
                 WriteDryRunNotice(dryRun);
                 try
                 {
@@ -128,6 +130,7 @@ namespace Sdo.Commands
                     Console.Error.WriteLine("Error: Specify exactly one of --json or --manifest.");
                     return 1;
                 }
+                WriteManifestNotice(manifest ?? json);
                 WriteDryRunNotice(dryRun);
                 try
                 {
@@ -173,16 +176,19 @@ namespace Sdo.Commands
 
             var jsonOption = new Option<string>("--json", ["-j"])
             {
-                Description = "Full path to the manifest file containing your tool definitions."
+                Description = "Legacy path to a JSON tools manifest. Prefer --manifest with apps.yaml."
             };
             jsonOption.DefaultValueFactory = _ =>
             {
-                if (Environment.GetEnvironmentVariable("ProgramFiles") is string programFiles)
+                var manifestCandidates = new[]
                 {
-                    return $"\"{Path.Combine(programFiles, "nbuild", "apps.json")}\"";
-                }
+                    Path.Combine(Environment.CurrentDirectory, "apps.yaml"),
+                    Path.Combine(Environment.CurrentDirectory, "dev-setup", "apps.yaml"),
+                    NbuildCommand.DefaultAppsFile
+                };
 
-                return $"\"{NbuildCommand.DefaultAppsFile}\"";
+                return manifestCandidates.FirstOrDefault(File.Exists)
+                    ?? manifestCandidates[^3];
             };
 
             var manifestOption = new Option<string?>("--manifest", ["-m"])
@@ -204,6 +210,7 @@ namespace Sdo.Commands
                     json = manifest;
                 }
 
+                WriteManifestNotice(json);
                 try
                 {
                     return NbuildCommand.List(json, verbose).Code;
@@ -216,6 +223,17 @@ namespace Sdo.Commands
             });
 
             Subcommands.Add(listCommand);
+        }
+
+        private static void WriteManifestNotice(string? manifest)
+        {
+            if (string.IsNullOrWhiteSpace(manifest))
+            {
+                return;
+            }
+
+            var manifestPath = File.Exists(manifest) ? Path.GetFullPath(manifest) : manifest;
+            ConsoleHelper.WriteInfo($"Using tool manifest: {manifestPath}");
         }
     }
 }

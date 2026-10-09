@@ -32,8 +32,8 @@ The SDO tool-management command handles loading and parsing manifest JSON files 
 #### Error Handling
 | Scenario | Error Message |
 |----------|---------------|
-| File not found | `JSON file not found: '<path>'. Please provide a valid path to the apps.json file.` |
-| Invalid JSON format | `Invalid JSON format: <error details>. Please check the JSON file for proper escaping of backslashes and quotes.` |
+| File not found | `YAML manifest not found: '<path>'. Please provide a valid path to the apps.yaml file.` |
+| Invalid YAML format | `Invalid YAML format: <error details>. Please check the YAML file for proper formatting.` |
 | Unsupported version | `Json Version <version> is not supported. Please use version <supported_version>` |
 
 #### Benefits
@@ -170,7 +170,7 @@ ntools/
 │
 ├── dev-setup/                    # Development setup scripts
 │   ├── ntools.json               # Application manifest
-│   ├── apps.json                 # Tool definitions
+│   ├── apps.yaml                 # Tool definitions
 │   └── setup scripts/
 │
 ├── atools/                       # Automated tools and installers

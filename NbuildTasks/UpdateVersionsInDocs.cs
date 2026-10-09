@@ -21,50 +21,63 @@ namespace NbuildTasks
         {
             try
             {
-                // Build path to apps.json: dev-setup/../go/apps.json
-                var appsJsonPath = Path.Combine(DevSetupPath, "..", "go", "apps.json");
-                appsJsonPath = Path.GetFullPath(appsJsonPath); // Normalize the path
+                var appsYamlPath = Path.GetFullPath(Path.Combine(DevSetupPath, "apps.yaml"));
 
-                if (!File.Exists(appsJsonPath))
+                if (!File.Exists(appsYamlPath))
                 {
-                    Log.LogError($"apps.json not found at: {appsJsonPath}");
+                    Log.LogError($"apps.yaml not found at: {appsYamlPath}");
                     return false;
                 }
 
-                Log.LogMessage(MessageImportance.High, $"Starting version update process from: {appsJsonPath}");
+                Log.LogMessage(MessageImportance.High, $"Starting version update process from: {appsYamlPath}");
 
                 var versionMap = new Dictionary<string, (string Name, string Version)>();
 
                 try
                 {
-                    var jsonContent = File.ReadAllText(appsJsonPath);
-                    var jsonDoc = JsonDocument.Parse(jsonContent);
-
-                    // Extract versions from apps.json NbuildAppList entries
-                    if (jsonDoc.RootElement.TryGetProperty("NbuildAppList", out var appList) &&
-                        appList.ValueKind == JsonValueKind.Array)
+                    var yamlContent = File.ReadAllText(appsYamlPath);
+                    if (yamlContent.TrimStart().StartsWith("{", StringComparison.Ordinal))
                     {
-                        foreach (var app in appList.EnumerateArray())
+                        var jsonDoc = JsonDocument.Parse(yamlContent);
+                        if (jsonDoc.RootElement.TryGetProperty("NbuildAppList", out var jsonAppList) &&
+                            jsonAppList.ValueKind == JsonValueKind.Array)
                         {
-                            if (app.TryGetProperty("Name", out var nameElement) &&
-                                app.TryGetProperty("Version", out var versionElement))
+                            foreach (var app in jsonAppList.EnumerateArray())
                             {
-                                var name = nameElement.GetString();
-                                var version = versionElement.GetString();
-                                // Use tool name as key; if multiple versions exist, last one wins
-                                versionMap[name] = (name, version);
-                                Log.LogMessage(MessageImportance.Normal, $"Found {name}: {version}");
+                                if (app.TryGetProperty("Name", out var nameElement) &&
+                                    app.TryGetProperty("Version", out var versionElement))
+                                {
+                                    var name = nameElement.GetString();
+                                    var version = versionElement.GetString();
+                                    versionMap[name] = (name, version);
+                                    Log.LogMessage(MessageImportance.Normal, $"Found {name}: {version}");
+                                }
                             }
                         }
                     }
                     else
                     {
-                        Log.LogWarning($"No NbuildAppList found in {appsJsonPath}");
+                    var appMatches = Regex.Matches(
+                        yamlContent,
+                        @"(?ms)^\s*-\s+Name:\s*[""']?(?<name>[^""'\r\n]+)[""']?\s*\r?\n\s+Version:\s*[""']?(?<version>[^""'\r\n]+)[""']?");
+
+                    foreach (Match app in appMatches)
+                    {
+                        var name = app.Groups["name"].Value.Trim();
+                        var version = app.Groups["version"].Value.Trim();
+                        versionMap[name] = (name, version);
+                        Log.LogMessage(MessageImportance.Normal, $"Found {name}: {version}");
+                    }
+
+                    if (appMatches.Count == 0)
+                    {
+                        Log.LogWarning($"No NbuildAppList entries found in {appsYamlPath}");
+                    }
                     }
                 }
                 catch (Exception ex)
                 {
-                    Log.LogError($"Failed to parse {appsJsonPath}: {ex.Message}");
+                    Log.LogError($"Failed to parse {appsYamlPath}: {ex.Message}");
                     return false;
                 }
 
@@ -122,7 +135,7 @@ namespace NbuildTasks
 
                     if (!toolFound)
                     {
-                        Log.LogWarning($"Tool '{toolName}' not found in apps.json - skipping version update");
+                        Log.LogWarning($"Tool '{toolName}' not found in apps.yaml - skipping version update");
                         // Insert a new entry filling the entire row with "TBD" except for the tool name and date
                     }
                 }
