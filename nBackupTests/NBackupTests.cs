@@ -72,7 +72,7 @@ namespace NbackupTests
             ResultHelper result = NBackup.Perform(options);
 
             // Assert
-            Assert.IsFalse(result.Code > 3);
+            Assert.IsTrue(result.Code <= 7, $"Robocopy returned failure code {result.Code}.");
         }
 
         [TestMethod()]
@@ -126,7 +126,7 @@ namespace NbackupTests
                 Assert.IsNotNull(backups.BackupsList);
                 Assert.AreEqual(1, backups.BackupsList.Count);
                 Assert.AreEqual(".", backups.BackupsList[0].Source);
-                Assert.AreEqual("%APPDATA%\\ntools", backups.BackupsList[0].Destination);
+                Assert.AreEqual("%APPDATA%\\sdo", backups.BackupsList[0].Destination);
                 Assert.AreEqual("/V /R:5 /W:5 /MT:16 /dcopy:DAT /copy:DT", backups.BackupsList[0].BackupOptions);
                 Assert.IsNotNull(backups.BackupsList[0].ExcludeFolders);
                 Assert.AreEqual(2, backups.BackupsList[0].ExcludeFolders?.Count ?? 0);
