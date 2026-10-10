@@ -272,11 +272,11 @@ jobs:
       - name: Run pytest
         run: |
           mkdir -p TestResults
-          pytest --junitxml=./TestResults/pytest-results.xml
+          pytest atools/tests/test_install_sdo.py --junitxml=./TestResults/pytest-results.xml
 
       - name: Smoke dry-run of install-sdo
         run: |
-          python atools/install-sdo.py --version 1.2.0 --downloads-dir $RUNNER_TEMP --json dev-setup/sdo.json --dry-run
+          python atools/install-sdo.py --version 1.2.0 --downloads-dir $RUNNER_TEMP --manifest dev-setup/sdo.yaml --dry-run
           
       - name: Upload pytest results
         if: always()

@@ -1,4 +1,4 @@
 # Python dependencies for NTools
 # requests is required for downloading NTools releases
 requests==2.33.1
-
+PyYAML==6.0.2
