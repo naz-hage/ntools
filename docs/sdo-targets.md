@@ -18,7 +18,7 @@
 | BUILD               | Build the solution alias solution target |
 | CHECK_GITHUB_KEY    | Check for API_GITHUB_KEY environment variable and print its length |
 | UPDATE_NTOOLS       | Update ntools locally for testing |
-| NUGET_UPDATE        | Update the ntools-launcher nuget package in the local feed for testing - not needed for normal builds |
+| NUGET_UPDATE        | Update the sdo-launcher nuget package in the local feed for testing - not needed for normal builds |
 | YELLOW_MESSAGE      | Example of a target that displays a yellow color message |
 | RED_MESSAGE         | Example of a target that displays a red color message |
 | INSTALL_DOTNET_OUTDATED_TOOL | Install dotnet-outdated-tool globally |

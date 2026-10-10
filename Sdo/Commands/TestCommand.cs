@@ -8,7 +8,7 @@ using YamlLauncher.TestRunners;
 namespace Sdo.Commands;
 
 /// <summary>
-/// Executes ntools-launcher test metadata YAML.
+/// Executes sdo-launcher test metadata YAML.
 /// </summary>
 public sealed class TestCommand : Command
 {
