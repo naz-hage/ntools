@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="18.9.6" />
-    <PackageReference Include="sdo-launcher" Version="1.17.10" />
+    <PackageReference Include="sdo-launcher" Version="1.17.12" />
   </ItemGroup>
 
 </Project>
