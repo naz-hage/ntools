@@ -1,4 +1,4 @@
-# ntools-scripts module - comprehensive version with all functions consolidated
+# sdo-scripts module - comprehensive version with all functions consolidated
 
 #region Common (from Common.psm1)
 # =============================================================================
@@ -108,20 +108,26 @@ function Invoke-ProjectPublish {
 # DevOps Functions (from devops/ folder)
 # =============================================================================
 
-function Get-VersionFromJson {
-    param([string]$JsonPath)
+function Get-VersionFromYaml {
+    param([string]$YamlPath)
     
     try {
-        $json = Get-Content $JsonPath | ConvertFrom-Json
-        $appInfo = $json.NbuildAppList[0]
+        $yaml = Get-Content $YamlPath -Raw
+        $appsSection = [regex]::Match($yaml, '(?ms)^NbuildAppList:\s*(?<Apps>.*)$').Groups['Apps'].Value
+        $appName = [regex]::Match($appsSection, '(?m)^\s*-\s+Name:\s*[''"]?(?<Value>[^''"\r\n]+)[''"]?\s*$').Groups['Value'].Value.Trim()
+        $appVersion = [regex]::Match($appsSection, '(?m)^\s+Version:\s*[''"]?(?<Value>[^''"\r\n]+)[''"]?\s*$').Groups['Value'].Value.Trim()
+        if ([string]::IsNullOrWhiteSpace($appName) -or [string]::IsNullOrWhiteSpace($appVersion)) {
+            throw "NbuildAppList must contain an app Name and Version."
+        }
+
         return @{
-            Name = $appInfo.Name
-            Version = $appInfo.Version
+            Name = $appName
+            Version = $appVersion
             Found = $true
         }
     }
     catch {
-        Write-Warning "Failed to parse $($JsonPath): $($_)"
+        Write-Warning "Failed to parse $($YamlPath): $($_)"
         return @{ Found = $false }
     }
 }
@@ -300,8 +306,8 @@ function Test-TargetDelegation {
         [string]$DelegateTarget
     )
     
-    $sourceFile = "C:\source\ntools\nbuild.targets"
-    $delegateFile = "C:\Program Files\nbuild\common.targets"
+    $sourceFile = "C:\source\ntools\sdo.targets"
+    $delegateFile = "C:\Program Files\sdo\common.targets"
     
     # Test 1: Source target exists
     $sourceTest = Test-TargetExists -TargetName $SourceTarget -FilePath $sourceFile
@@ -406,8 +412,8 @@ function Invoke-FastForward {
 # Main Module Functions
 # =============================================================================
 
-function Get-ntoolsScriptsVersion {
-    return "ntools-scripts version 2.3.0"
+function Get-SdoScriptsVersion {
+    return "sdo-scripts version 3.0.0"
 }
 
 function Publish-AllProjects {
@@ -525,7 +531,7 @@ function Set-DevelopmentEnvironment {
     return $true
 }
 
-function Get-NToolsFileVersion {
+function Get-SdoFileVersion {
     param (
         [Parameter(Mandatory=$true)]
         [string]$FilePath
@@ -552,17 +558,17 @@ function Add-DeploymentPathToEnvironment {
     }
 }
 
-function Invoke-NToolsDownload {
+function Invoke-SdoDownload {
     param (
         [Parameter(Mandatory=$true)]
         [string]$Version,
         [Parameter(Mandatory=$false)]
-        [string]$DownloadsDirectory = "c:\NToolsDownloads"
+        [string]$DownloadsDirectory = "c:\sdo-downloads"
     )
     
     # display parameters
-    Write-Host "DownloadNtools - Parameters:"
-    Write-Host "Downloading NTools version $Version ..."
+    Write-Host "DownloadSdo - Parameters:"
+    Write-Host "Downloading Sdo version $Version ..."
     Write-Host "Downloads directory: $DownloadsDirectory"
 
     # Create the Downloads directory if it doesn't exist
@@ -571,77 +577,77 @@ function Invoke-NToolsDownload {
         New-Item -ItemType Directory -Path $DownloadsDirectory | Out-Null
     }
 
-    $url = "https://github.com/naz-hage/ntools/releases/download/$Version/$Version.zip"
+    $url = "https://github.com/naz-hage/sdo/releases/download/$Version/$Version.zip"
     $fileName = "$DownloadsDirectory\$Version.zip"
     
     try {
         Invoke-WebRequest -Uri $url -OutFile $fileName -ErrorAction Stop
     } catch {
-        $msg = "Failed to download NTools version $Version from $url : $($_.Exception.Message)"
+        $msg = "Failed to download Sdo version $Version from $url : $($_.Exception.Message)"
         Write-Host $msg
         throw $msg
     }
 
     if (Test-Path $fileName) {
-        Write-Host "Downloaded NTools version $Version to $fileName"
+        Write-Host "Downloaded Sdo version $Version to $fileName"
         return $true
     } else {
-        $msg = "Failed to download NTools version $Version from $url - file not found after download"
+        $msg = "Failed to download Sdo version $Version from $url - file not found after download"
         Write-Host $msg
         throw $msg
     }
 }
 
-function Install-NTools {
+function Install-Sdo {
     param (
-        [Parameter(Mandatory=$false, HelpMessage = "The version of NTools to install. If not specified, the version is read from ntools.json.")]
+        [Parameter(Mandatory=$false, HelpMessage = "The version of Sdo to install. If not specified, the version is read from sdo.yaml.")]
         [string]$Version,
-        [Parameter(Mandatory=$false, HelpMessage = "The directory to download the NTools zip file to. Defaults to 'c:\\NToolsDownloads'.")]
-        [string]$DownloadsDirectory = "c:\NToolsDownloads",
-        [Parameter(Mandatory=$false, HelpMessage = "Path to the ntools.json file. If not specified, looks for ntools.json relative to script location.")]
-        [string]$NtoolsJsonPath
+        [Parameter(Mandatory=$false, HelpMessage = "The directory to download the Sdo zip file to. Defaults to 'c:\\sdo-downloads'.")]
+        [string]$DownloadsDirectory = "c:\sdo-downloads",
+        [Parameter(Mandatory=$false, HelpMessage = "Path to the sdo.yaml file. If not specified, looks for sdo.yaml relative to script location.")]
+        [string]$SdoYamlPath
     )
 
-    $deploymentPath = $env:ProgramFiles + "\NBuild"
+    $deploymentPath = Join-Path $env:ProgramFiles "sdo"
 
     # display parameters
-    Write-Host "InstallNtools - Parameters:"
+    Write-Host "InstallSdo - Parameters:"
     Write-Host "Version: $Version"
     Write-Host "Downloads directory: $DownloadsDirectory"
-    Write-Host "NTools JSON path: $NtoolsJsonPath"
+    Write-Host "sdo.yaml path: $SdoYamlPath"
 
-    # If Version is not specified, read it from ntools.json
+    # If Version is not specified, read it from sdo.yaml
     if (-not $Version) {
-        # Determine ntools.json path
-        if (-not $NtoolsJsonPath) {
+        # Determine sdo.yaml path
+        if (-not $SdoYamlPath) {
             $scriptDir = Split-Path -Parent $PSCommandPath
-            $NtoolsJsonPath = "$scriptDir\..\ntools.json"
-            Write-Host "No NtoolsJsonPath specified, using default: $NtoolsJsonPath"
+            $SdoYamlPath = "$scriptDir\..\sdo.yaml"
+            Write-Host "No SdoYamlPath specified, using default: $SdoYamlPath"
         }
 
-        Write-Host "Reading version from $NtoolsJsonPath ..."
+        Write-Host "Reading version from $SdoYamlPath ..."
         
-        if (Test-Path -Path $NtoolsJsonPath) {
-            try {
-                $NtoolsJson = Get-Content -Path $NtoolsJsonPath -Raw | ConvertFrom-json
-                $Version = $NtoolsJson.NbuildAppList[0].Version
-                Write-Host "Version read from ntools.json: $Version"
+        if (Test-Path -Path $SdoYamlPath) {
+            $versionInfo = Get-VersionFromYaml -YamlPath $SdoYamlPath
+            if ($versionInfo.Found) {
+                $Version = $versionInfo.Version
+                Write-Host "Version read from sdo.yaml: $Version"
             }
-            catch {
-                Write-Warning "Failed to read version from ntools.json. Please specify the version manually."
+            else {
+                Write-Warning "Failed to read version from sdo.yaml. Please specify the version manually."
                 return $false
             }
         }
         else {
-            Write-Warning "ntools.json not found at '$NtoolsJsonPath'. Please specify the version manually or provide a valid NtoolsJsonPath."
+            Write-Warning "sdo.yaml not found at '$SdoYamlPath'. Please specify the version manually or provide a valid SdoYamlPath."
             return $false
         }
     }
 
-    # Download the specified version of NTools
-    $downloadResult = Invoke-NToolsDownload -Version $Version -DownloadsDirectory $DownloadsDirectory
+    # Download the specified version of Sdo
+    $downloadResult = Invoke-SdoDownload -Version $Version -DownloadsDirectory $DownloadsDirectory
     if (-not $downloadResult) {
-        throw "Invoke-NToolsDownload failed for version $Version"
+        throw "Invoke-SdoDownload failed for version $Version"
     }
 
     # Check if the downloaded file exists
@@ -657,7 +663,7 @@ function Install-NTools {
         # add deployment path to the PATH environment variable if it doesn't already exist
         Add-DeploymentPathToEnvironment $deploymentPath
 
-        Write-Host "NTools version $Version installed to $deploymentPath"
+        Write-Host "Sdo version $Version installed to $deploymentPath"
         
         # delete deprecated nb.exe, lf.exe and nbackup if they exist
         $deprecatedNb = Join-Path -Path $deploymentPath -ChildPath "nb.exe"
@@ -679,7 +685,7 @@ function Install-NTools {
         return $true
     }
     catch {
-        $msg = "Failed to extract or install NTools from $downloadedFile : $($_.Exception.Message)"
+        $msg = "Failed to extract or install Sdo from $downloadedFile : $($_.Exception.Message)"
         Write-Host $msg
         throw $msg
     }
@@ -933,7 +939,6 @@ function Set-CodeSigningTrust {
 
 #region Exports
 # Final export of public functions (including merged signing functions)
-Export-ModuleMember -Function Get-ntoolsScriptsVersion, Publish-AllProjects, Get-VersionFromJson, Write-TestResult, Test-TargetExists, Test-TargetDependencies, Test-TargetDelegation, Get-FileHash256, Get-FileVersionInfo, Invoke-FastForward, Write-OutputMessage, Get-NToolsFileVersion, Add-DeploymentPathToEnvironment, Invoke-NToolsDownload, Install-NTools, Set-DevelopmentEnvironment, Get-AgentPublicIp, Add-WafAllowRule, Remove-WafCustomRule, Test-IsAdministrator, Test-MicrosoftPowerShellSecurityModuleLoaded, Test-CertificateStore, New-SelfSignedCodeCertificate, Export-CertificateToPfx, Export-CertificateToCer, Import-CertificateToRoot, Import-CertificateToCurrentUser, Set-ScriptSignature, Get-ScriptSignature, Set-CodeSigningTrust
+Export-ModuleMember -Function Get-SdoScriptsVersion, Publish-AllProjects, Get-VersionFromYaml, Write-TestResult, Test-TargetExists, Test-TargetDependencies, Test-TargetDelegation, Get-FileHash256, Get-FileVersionInfo, Invoke-FastForward, Write-OutputMessage, Get-SdoFileVersion, Add-DeploymentPathToEnvironment, Invoke-SdoDownload, Install-Sdo, Set-DevelopmentEnvironment, Get-AgentPublicIp, Add-WafAllowRule, Remove-WafCustomRule, Test-IsAdministrator, Test-MicrosoftPowerShellSecurityModuleLoaded, Test-CertificateStore, New-SelfSignedCodeCertificate, Export-CertificateToPfx, Export-CertificateToCer, Import-CertificateToRoot, Import-CertificateToCurrentUser, Set-ScriptSignature, Get-ScriptSignature, Set-CodeSigningTrust
 
 #endregion
-

@@ -16,15 +16,15 @@ GitHub project management together under one consistent `sdo` command.
 - **GitHub**: Use GitHub CLI authentication or set the `GITHUB_TOKEN`
   environment variable.
 
-- Checkout the [documentation](https://naz-hage.github.io/ntools/) for more information.
+- Checkout the [documentation](https://naz-hage.github.io/sdo/) for more information.
 
-- The [installation](https://naz-hage.github.io/ntools/installation/) process is straightforward, and the tools are highly reliable and efficient, ensuring the safety and integrity of your data.
+- The [installation](https://naz-hage.github.io/sdo/installation/) process is straightforward, and the tools are highly reliable and efficient, ensuring the safety and integrity of your data.
 
-- See the [SDO features](https://naz-hage.github.io/ntools/features/) for an overview of the utility's capabilities.
+- See the [SDO features](https://naz-hage.github.io/sdo/features/) for an overview of the utility's capabilities.
 
-- See the [`sdo` usage documentation](https://naz-hage.github.io/ntools/usage/) for command details and examples.
+- See the [`sdo` usage documentation](https://naz-hage.github.io/sdo/usage/) for command details and examples.
 
-- Don't hesitate to write an [issue](https://github.com/naz-hage/NTools/issues) if you have any questions or suggestions.
+- Don't hesitate to write an [issue](https://github.com/naz-hage/sdo/issues) if you have any questions or suggestions.
 
 ## Workflows and Metadata
 
@@ -92,13 +92,11 @@ format. Use `--manifest` for either format; `--json` remains available for
 existing scripts.
 
 ```bash
-sdo tool list --manifest .\go\apps.yaml
-sdo tool install --manifest .\go\apps.yaml --dry-run
-sdo tool download --manifest .\go\apps.yaml --dry-run
-sdo tool uninstall --manifest .\go\apps.yaml --dry-run
+sdo tool list --manifest .\dev-setup\apps.yaml
+sdo tool install --manifest .\dev-setup\apps.yaml --dry-run
+sdo tool download --manifest .\dev-setup\apps.yaml --dry-run
+sdo tool uninstall --manifest .\dev-setup\apps.yaml --dry-run
 
-sdo tool list --json .\go\apps.json
-sdo tool install --json .\go\apps.json --dry-run
 sdo tool install --name "Git for Windows" --appversion 2.51.1 --dry-run
 ```
 
@@ -134,7 +132,7 @@ after existing callers have migrated.
 ### Next Ideas
 - e2e testing framework integration
   - Implement e2e testing framework integration.
-  - Note: This integration will leverage the existing StepExecution mechanism in ntools-launcher for seamless e2e testing.
+  - Note: This integration will leverage the existing StepExecution mechanism in SDO for seamless e2e testing.
 - `sdo` commands/cli options enhancements
    `sdo run` command
     - define where comments are added for stage or step

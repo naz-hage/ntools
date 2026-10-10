@@ -28,7 +28,7 @@ public partial class BuildStarter
         string sdoPath = Path.Combine(Environment.CurrentDirectory, SdoBuildFileName);
         string nbuildPath = Path.Combine(Environment.CurrentDirectory, NbuildFileName);
         string buildFilePath = File.Exists(sdoPath) ? sdoPath : nbuildPath;
-        string commonBuildXmlPath = Path.Combine($"{Environment.GetEnvironmentVariable("ProgramFiles")}\\nbuild", CommonBuildFileName);
+        string commonBuildXmlPath = Path.Combine($"{Environment.GetEnvironmentVariable("ProgramFiles")}\\sdo", CommonBuildFileName);
 
         if (!File.Exists(buildFilePath))
         {
@@ -210,8 +210,8 @@ public partial class BuildStarter
 
         List<string> KnownTargetFiles = new List<string>();
 
-        // Find list of *.targets files in ntools deployment folder
-        string[] targetFiles = Directory.GetFiles($"{Environment.GetEnvironmentVariable("ProgramFiles")}\\nbuild", "*.targets");
+        // Find list of *.targets files in sdo deployment folder
+        string[] targetFiles = Directory.GetFiles($"{Environment.GetEnvironmentVariable("ProgramFiles")}\\sdo", "*.targets");
         if (targetFiles == null)
         {
             return false;
@@ -438,7 +438,7 @@ public partial class BuildStarter
                         { "$(MainDir)", ntoolsEnv.MainDir },
                         { "$(DevDrive)", ntoolsEnv.DevDrive },
                         { "$(ProgramFiles)", Environment.GetEnvironmentVariable("ProgramFiles") ?? string.Empty },
-                        { "$(BuildTools)", $"{Environment.GetEnvironmentVariable("ProgramFiles")}\\nbuild" }
+                        { "$(BuildTools)", $"{Environment.GetEnvironmentVariable("ProgramFiles")}\\sdo" }
                     };
 
         XmlDocument doc = new XmlDocument();
@@ -576,7 +576,7 @@ public partial class BuildStarter
     private static ResultHelper DisplayTargetsInFile(string filePath, HashSet<string> displayedFiles)
     {
         //replace $(BuildTools) with environment variable ProgramFiles/Nbuild
-        filePath = filePath.Replace("$(BuildTools)", $"{Environment.GetEnvironmentVariable("ProgramFiles")}\\nbuild");
+        filePath = filePath.Replace("$(BuildTools)", $"{Environment.GetEnvironmentVariable("ProgramFiles")}\\sdo");
         try
         {
             var normalizedFilePath = Path.GetFullPath(filePath);
@@ -669,4 +669,3 @@ public partial class BuildStarter
     [GeneratedRegex(@"\d+")]
     private static partial Regex Count();
 }
-

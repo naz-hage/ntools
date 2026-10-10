@@ -3,7 +3,7 @@
 	<!-- Reference: https://learn.microsoft.com/en-us/visualstudio/msbuild/walkthrough-using-msbuild?view=vs-2022 -->
 
 	<!-- This file is a sample sdo.targets to be used in other projects -->
-	<Import Project="$(ProgramFiles)\nbuild\common.targets" />
+	<Import Project="$(ProgramFiles)\sdo\common.targets" />
 
 	<PropertyGroup>
         <!-- The name of the solution  must be filled.  it's normally the folder where the *.sln resides-->

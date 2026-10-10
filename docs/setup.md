@@ -4,91 +4,83 @@ The dev-setup folder is a critical part of your project setup. It contains scrip
 
 ## PowerShell Module Integration
 
-**New in v2.3.0**: NTools now includes a consolidated PowerShell module (`ntools-scripts`) that replaces individual scripts with a unified, function-based approach. This module is automatically integrated with the setup process.
+**New in v3.0.0**: The project has migrated from NTools to SDO. The
+consolidated `sdo-scripts` PowerShell module now uses `sdo.yaml` and provides
+the `Install-Sdo` command in place of the legacy `Install-NTools` command.
 
-### Using ntools-scripts Module
+### Using sdo-scripts Module
 ```powershell
 # Import the module
-Import-Module "./scripts/module-package/ntools-scripts.psm1" -Force
+Import-Module "./scripts/module-package/sdo-scripts.psm1" -Force
 
-# Install NTools using the module (recommended approach)
-Install-NTools -NtoolsJsonPath "./dev-setup/ntools.json"
+# Install SDO using the module (recommended approach)
+Install-Sdo -SdoYamlPath "./dev-setup/sdo.yaml"
 
 # Set up development environment
 Set-DevelopmentEnvironment
 Install-DevelopmentApps
 ```
 
-For complete module documentation, see [ntools-scripts Module](./ntools-scripts-module.md).
+For complete module documentation, see [sdo-scripts Module](./sdo-scripts-module.md).
 
 ## Overview of dev-setup Folder
 
 The dev-setup folder typically includes the following files:
 
-- **`ntools.json`**  
-    - Contains installation information for ntools. This file is required to install ntools before other development tools.
-- **`apps.json`**  
+- **`sdo.yaml`**  
+    - Contains installation information for SDO. This file is required to install SDO before other development tools.
+- **`apps.yaml`**  
     - Lists the development tools required for your project, including their installation and uninstallation details.
-- **Legacy scripts** (deprecated in favor of ntools-scripts module)
-  - Individual PowerShell scripts for specific tasks
+- **Legacy scripts** (deprecated in favor of sdo-scripts module)
+- Individual PowerShell scripts for specific tasks
 
 ---
 
 ## File Details
 
-### 1. ntools.json
-This file provides the installation details for ntools, which is required to manage other tools in the project.
+### 1. sdo.yaml
+This file provides the installation details for SDO, which is required to manage other tools in the project.
 
 **Example:**
-```json
-{
-  "Version": "1.2.0",
-  "NbuildAppList": [
-    {
-      "Name": "Ntools",
-      "Version": "1.7.0",
-      "AppFileName": "$(InstallPath)\\sdo.exe",
-      "WebDownloadFile": "https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip",
-      "DownloadedFile": "$(Version).zip",
-      "InstallCommand": "powershell.exe",
-      "InstallArgs": "-Command Expand-Archive -Path $(Version).zip -DestinationPath '$(InstallPath)' -Force",
-      "InstallPath": "$(ProgramFiles)\\Nbuild",
-      "UninstallCommand": "powershell.exe",
-      "UninstallArgs": "-Command Remove-Item -Path '$(InstallPath)' -Recurse -Force",
-      "StoredHash": "XXX",
-      "AddToPath": true
-    }
-  ]
-}
+```yaml
+Version: "1.2.0"
+NbuildAppList:
+  - Name: "sdo"
+    Version: "1.7.0"
+    AppFileName: "$(InstallPath)\\sdo.exe"
+    WebDownloadFile: "https://github.com/naz-hage/sdo/releases/download/$(Version)/$(Version).zip"
+    DownloadedFile: "$(Version).zip"
+    InstallCommand: "powershell.exe"
+    InstallArgs: "-Command Expand-Archive -Path $(Version).zip -DestinationPath '$(InstallPath)' -Force"
+    InstallPath: "$(ProgramFiles)\\sdo"
+    UninstallCommand: "powershell.exe"
+    UninstallArgs: "-Command Remove-Item -Path '$(InstallPath)' -Recurse -Force"
+    StoredHash: "XXX"
+    AddToPath: true
 ```
 
 ---
 
-### 2. apps.json
+### 2. apps.yaml
 This file lists all the development tools required for the project. Each tool is defined with its name, version, installation details, and uninstallation details.
 
 **Example:**
-```json
-{
-  "Version": "1.2.0",
-  "NbuildAppList": [
-    {
-      "Name": "7-zip",
-      "Version": "23.01",
-      "AppFileName": "$(InstallPath)\\7z.exe",
-      "WebDownloadFile": "https://www.7-zip.org/a/7z2301-x64.exe",
-      "DownloadedFile": "7zip.exe",
-      "InstallCommand": "$(DownloadedFile)",
-      "InstallArgs": "/S /D=\"$(ProgramFiles)\\7-Zip\"",
-      "InstallPath": "$(ProgramFiles)\\7-Zip",
-      "UninstallCommand": "$(InstallPath)\\Uninstall.exe",
-      "UninstallArgs": "/S"
-    }
-  ]
-}
+```yaml
+Version: "1.2.0"
+NbuildAppList:
+  - Name: "7-zip"
+    Version: "23.01"
+    AppFileName: "$(InstallPath)\\7z.exe"
+    WebDownloadFile: "https://www.7-zip.org/a/7z2301-x64.exe"
+    DownloadedFile: "7zip.exe"
+    InstallCommand: "$(DownloadedFile)"
+    InstallArgs: "/S /D=\"$(ProgramFiles)\\7-Zip\""
+    InstallPath: "$(ProgramFiles)\\7-Zip"
+    UninstallCommand: "$(InstallPath)\\Uninstall.exe"
+    UninstallArgs: "/S"
 ```
 
-**Key Elements in apps.json:**
+**Key Elements in apps.yaml:**
 
 | Element Name       | Description                                                                 |
 |--------------------|-----------------------------------------------------------------------------|
@@ -112,27 +104,27 @@ This PowerShell script automates the installation of tools and sets up the devel
 
 **Key Responsibilities:**
 
-- Installs ntools using ntools.json.
-- Installs other tools listed in apps.json.
+- Installs SDO using sdo.yaml.
+- Installs other tools listed in apps.yaml  .
 - Verifies administrative privileges before proceeding.
 
 **Example:**
 ```powershell
 # Import the install module
-$url = "https://raw.githubusercontent.com/naz-hage/ntools/main/dev-setup/install.psm1"
+$url = "https://raw.githubusercontent.com/naz-hage/sdo/main/dev-setup/install.psm1"
 $output = "./install.psm1"
 Invoke-WebRequest -Uri $url -OutFile $output
 Import-Module ./install.psm1 -Force
 
-# Install Ntools
-MainInstallApp -command install -json .\ntools.json
+# Install SDO
+Install-Sdo -SdoYamlPath .\sdo.yaml
 if ($LASTEXITCODE -ne 0) {
-    Write-OutputMessage "Error: Installation of ntools failed. Exiting script."
+    Write-OutputMessage "Error: Installation of SDO failed. Exiting script."
     exit 1
 }
 
 # Install other tools
-& $global:NbExePath install -json .\apps.json
+& $global:NbExePath install --manifest .\apps.yaml
 if ($LASTEXITCODE -ne 0) {
     Write-OutputMessage "Error: Installation of other tools failed. Exiting script."
     exit 1
@@ -150,8 +142,8 @@ Your project folder should look like this:
 %MainDirectory%\
 ├── MyProject\
 │   ├── dev-setup\
-│   │   ├── ntools.json
-│   │   ├── apps.json
+│   │   ├── sdo.yaml
+│   │   ├── apps.yaml
 │   │   ├── dev-setup.ps1
 │   ├── ... other project and test files
 │   └── sdo.targets  (this file is required in the solution folder)
@@ -168,21 +160,19 @@ To add a new tool to your project:
    - Installation path.
    - File name for version checks.
    - Version and name.
-2. Add the tool's details to apps.json.
+2. Add the tool's details to apps.yaml.
 
 **Example for a new tool:**
-```json
-{
-  "Name": "Docker",
-  "Version": "4.38.0.0",
-  "AppFileName": "$(InstallPath)\\Docker Desktop.exe",
-  "WebDownloadFile": "https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe",
-  "DownloadedFile": "Docker Desktop Installer.exe",
-  "InstallCommand": "$(DownloadedFile)",
-  "InstallArgs": "install --quiet",
-  "InstallPath": "$(ProgramFiles)\\Docker\\Docker",
-  "UninstallCommand": "powershell.exe",
-  "UninstallArgs": "-Command \"Remove-Item -Path '$(InstallPath)' -Recurse -Force\"",
-  "AddToPath": true
-}
+```yaml 
+Name: "Docker"
+Version: "4.38.0.0"
+AppFileName: "$(InstallPath)\\Docker Desktop.exe"
+WebDownloadFile: "https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe"
+DownloadedFile: "Docker Desktop Installer.exe"
+InstallCommand: "$(DownloadedFile)"
+InstallArgs: "install --quiet"
+InstallPath: "$(ProgramFiles)\\Docker\\Docker"
+UninstallCommand: "powershell.exe"
+UninstallArgs: "-Command \"Remove-Item -Path '$(InstallPath)' -Recurse -Force\""
+AddToPath: true
 ```

@@ -148,12 +148,14 @@ namespace Nbackup
         /// <returns></returns>
         public static ResultHelper Perform(string source, string destination, string backupOptions, bool verbose = false)
         {
+            var resolvedSource = Path.GetFullPath(source);
+            var resolvedDestination = Path.GetFullPath(destination);
             var process = new Process
             {
                 StartInfo = {
                     WorkingDirectory = Environment.GetFolderPath(Environment.SpecialFolder.System),
                     FileName = "robocopy.exe",
-                    Arguments = $"\"{source}\" \"{destination}\" {backupOptions}",
+                    Arguments = $"\"{resolvedSource}\" \"{resolvedDestination}\" {backupOptions}",
                     RedirectStandardOutput = true,
                     RedirectStandardError = true }
             };

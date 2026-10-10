@@ -279,7 +279,7 @@ namespace GitHubRelease.Tests
             string assetName = $"{tagName}.zip";
             string DownloadPath = @"c:\temp";
             var assetFileName = Path.Combine(DownloadPath, assetName);
-            var repo = "naz-hage/ntools";
+            var repo = "naz-hage/sdo";
             Console.WriteLine($"repo: {repo}");
             Console.WriteLine($"tagName: {tagName}");
             Console.WriteLine($"assetName: {assetName}");

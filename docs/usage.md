@@ -1,13 +1,13 @@
 
-# Ntools Usage
+# SDO Usage
 
-Ntools provides the `sdo` command-line tool for build automation, YAML
+SDO provides the `sdo` command-line tool for build automation, YAML
 workflows, tool management, and DevOps operations.
 
 ## Prerequisites
 
 - Install the [.NET SDK](https://dotnet.microsoft.com/download).
-- Install Ntools and open a Developer Command Prompt for Visual Studio.
+- Install SDO and open a Developer Command Prompt for Visual Studio.
 - Change to the solution or repository directory.
 
 ## First Run

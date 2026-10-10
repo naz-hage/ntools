@@ -1,7 +1,6 @@
 using Nbuild;
 using NbuildTasks;
 using Ntools;
-using System.Collections;
 using System.Diagnostics;
 using System.Reflection;
 
@@ -78,7 +77,7 @@ namespace NbuildTests
         public async Task ListReleases_DryRun_PrintsDryRunMessageAndFetchesData()
         {
             // Use a real repository for testing since dry-run now performs read-only fetches
-            var result = await Command.ListReleases("naz-hage/ntools", false, true);
+            var result = await Command.ListReleases("naz-hage/sdo", false, true);
             Assert.IsTrue(result.IsSuccess(), "Expected ListReleases to succeed in dry-run mode.");
             Assert.IsTrue(result.Output.Any(x => x.Contains("DRY-RUN")), "Expected DRY-RUN message in output.");
 
@@ -159,15 +158,6 @@ namespace NbuildTests
                     }
                 };
 
-                // Get all environment variables
-                IDictionary environmentVariables = Environment.GetEnvironmentVariables();
-
-                // Iterate over the environment variables and print them
-                foreach (DictionaryEntry entry in environmentVariables)
-                {
-                    Console.WriteLine($"{entry.Key}: {entry.Value}");
-                }
-
                 Assert.IsTrue(process.LockStart(true).IsSuccess());
             }
             LocalTestMode = true;
@@ -188,7 +178,7 @@ namespace NbuildTests
                 ""Name"": ""nbuild"",
                 ""Version"": ""VersionToTest"",
                 ""AppFileName"": ""sdo.exe"",
-                ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
+                ""WebDownloadFile"": ""https://github.com/naz-hage/sdo/releases/download/$(Version)/$(Version).zip"",
                 ""DownloadedFile"": ""$(Version).zip"",
                 ""InstallCommand"": ""powershell.exe"",
                 ""InstallArgs"": ""-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force"",
@@ -229,7 +219,7 @@ namespace NbuildTests
                 ""Name"": ""nbuild"",
                 ""Version"": ""0.0.0"",
                 ""AppFileName"": ""nb.exe"",
-                ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
+                ""WebDownloadFile"": ""https://github.com/naz-hage/sdo/releases/download/$(Version)/$(Version).zip"",
                 ""DownloadedFile"": ""$(Version).zip"",
                 ""InstallCommand"": ""powershell.exe"",
                 ""InstallArgs"": ""-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force"",
@@ -259,7 +249,7 @@ namespace NbuildTests
 
         // Test method for install from JSON file functionality
         [TestMethod()]
-        [Ignore("Removed - ntools.json is no longer embedded as a resource. Use go/apps.json instead.")]
+        [Ignore("Removed - ntools.json is no longer embedded as a resource. Use dev-setup/apps.yaml instead.")]
         public void InstallFromJsonFileTest()
         {
             SetupTestModeFlag();
@@ -325,7 +315,7 @@ namespace NbuildTests
                         ""Name"": ""nbuild"",
                         ""Version"": ""versionToTest"",
                         ""AppFileName"": ""$(InstallPath)\\sdo.exe"",
-                        ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
+                        ""WebDownloadFile"": ""https://github.com/naz-hage/sdo/releases/download/$(Version)/$(Version).zip"",
                         ""DownloadedFile"": ""$(Version).zip"",
                         ""InstallCommand"": ""powershell.exe"",
                         ""InstallArgs"": ""-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force"",
@@ -371,7 +361,7 @@ namespace NbuildTests
             // var json = @"{
             //     ""Name"": ""nbuild"",
             //     ""Version"": ""1.2.0"",
-            //     ""Url"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
+            //     ""Url"": ""https://github.com/naz-hage/sdo/releases/download/$(Version)/$(Version).zip"",
             //     ""InstallFile"": ""$(Version).zip"",
             //     ""InstallCommand"": ""c:\\program files\\7-Zip\\7z.exe"",
             //     ""InstallArgs"": ""x $(Version).zip -o\""C:\\Temp\\nbuild2\"" -y""
@@ -386,7 +376,7 @@ namespace NbuildTests
                         ""Name"": ""nbuild"",
                         ""Version"": ""versionToTest"",
                         ""AppFileName"": ""$(InstallPath)\\sdo.exe"",
-                        ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
+                        ""WebDownloadFile"": ""https://github.com/naz-hage/sdo/releases/download/$(Version)/$(Version).zip"",
                         ""DownloadedFile"": ""$(Version).zip"",
                         ""InstallCommand"": ""powershell.exe"",
                         ""InstallArgs"": ""-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force"",
@@ -441,7 +431,7 @@ namespace NbuildTests
                     {
                     ""Version"": ""1.2.0"",
                     ""AppFileName"": ""sdo.exe"",
-                    ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
+                    ""WebDownloadFile"": ""https://github.com/naz-hage/sdo/releases/download/$(Version)/$(Version).zip"",
                     ""DownloadedFile"": ""$(Version).zip"",
                     ""InstallCommand"": ""powershell.exe"",
                     ""InstallArgs"": ""-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force"",
@@ -483,7 +473,7 @@ namespace NbuildTests
                     {
                     ""Name"": ""nbuild"",
                     ""Version"": ""1.2.0"",
-                    ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
+                    ""WebDownloadFile"": ""https://github.com/naz-hage/sdo/releases/download/$(Version)/$(Version).zip"",
                     ""DownloadedFile"": ""$(Version).zip"",
                     ""InstallCommand"": ""powershell.exe"",
                     ""InstallArgs"": ""-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force"",
@@ -566,7 +556,7 @@ namespace NbuildTests
                     ""Name"": ""nbuild"",
                     ""Version"": ""1.2.0"",
                     ""AppFileName"": ""sdo.exe"",
-                    ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
+                    ""WebDownloadFile"": ""https://github.com/naz-hage/sdo/releases/download/$(Version)/$(Version).zip"",
                     ""InstallCommand"": ""powershell.exe"",
                     ""InstallArgs"": ""-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force"",
                     ""InstallPath"": ""C:\\Temp\\nbuild2""
@@ -609,7 +599,7 @@ namespace NbuildTests
                 ""Name"": ""nbuild"",
                 ""Version"": ""1.2.0"",
                 ""AppFileName"": ""sdo.exe"",
-                ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
+                ""WebDownloadFile"": ""https://github.com/naz-hage/sdo/releases/download/$(Version)/$(Version).zip"",
                 ""DownloadedFile"": ""$(Version).zip"",
                 ""InstallArgs"": ""-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force"",
                 ""InstallPath"": ""C:\\Temp\\nbuild2""
@@ -652,7 +642,7 @@ namespace NbuildTests
                 ""Name"": ""nbuild"",
                 ""Version"": ""1.2.0"",
                 ""AppFileName"": ""sdo.exe"",
-                ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
+                ""WebDownloadFile"": ""https://github.com/naz-hage/sdo/releases/download/$(Version)/$(Version).zip"",
                 ""DownloadedFile"": ""$(Version).zip"",
                 ""InstallCommand"": ""powershell.exe"",
                 ""InstallPath"": ""C:\\Temp\\nbuild2""
@@ -695,7 +685,7 @@ namespace NbuildTests
                 ""Name"": ""nbuild"",
                 ""Version"": ""1.2.0"",
                 ""AppFileName"": ""sdo.exe"",
-                ""WebDownloadFile"": ""https://github.com/naz-hage/ntools/releases/download/$(Version)/$(Version).zip"",
+                ""WebDownloadFile"": ""https://github.com/naz-hage/sdo/releases/download/$(Version)/$(Version).zip"",
                 ""DownloadedFile"": ""$(Version).zip"",
                 ""InstallCommand"": ""powershell.exe"",
                 ""InstallArgs"": ""-Command Expand-Archive -Path $(Version).zip -DestinationPath $(InstallPath) -Force""
@@ -784,7 +774,7 @@ namespace NbuildTests
                         }
                     ]
                 }";
-                File.WriteAllText("apps.json", jsonContent);
+                File.WriteAllText("apps.yaml", jsonContent);
 
                 // Act
                 var apps = Command.GetAppsFromCurrentDirectory("testapp", null, out var availableApps);
@@ -831,7 +821,7 @@ namespace NbuildTests
                         }
                     ]
                 }";
-                File.WriteAllText("apps.json", jsonContent);
+                File.WriteAllText("apps.yaml", jsonContent);
 
                 // Act - version parameter should override the JSON version
                 var apps = Command.GetAppsFromCurrentDirectory("testapp", "2.0.0", out var availableApps);
@@ -901,7 +891,7 @@ namespace NbuildTests
                 Directory.SetCurrentDirectory(tempDir);
                 var explicitJson = Path.Combine(tempDir, "custom-apps.json");
                 File.WriteAllText(explicitJson, CreateAppManifest("testapp", "1.0.0"));
-                File.WriteAllText("apps.json", CreateAppManifest("testapp", "2.0.0"));
+                File.WriteAllText("apps.yaml", CreateAppManifest("testapp", "2.0.0"));
 
                 var explicitApps = Command.GetAppsFromCurrentDirectory("testapp", "3.0.0", out _, explicitJson);
 
@@ -955,7 +945,7 @@ namespace NbuildTests
             try
             {
                 Directory.SetCurrentDirectory(tempDir);
-                // Create a single apps.json with both versions of the same app
+                // Create a single apps.yaml with both versions of the same app
                 var jsonContentFinal = @"{
                     ""Version"": ""1.2.0"",
                     ""NbuildAppList"": [
@@ -985,7 +975,7 @@ namespace NbuildTests
                         }
                     ]
                 }";
-                File.WriteAllText("apps.json", jsonContentFinal);
+                File.WriteAllText("apps.yaml", jsonContentFinal);
 
                 // Act & Assert - should fail because multiple apps with same name exist without version specified
                 try
@@ -1018,7 +1008,7 @@ namespace NbuildTests
             {
                 Directory.SetCurrentDirectory(tempDir);
 
-                // Create apps.json with unsupported version - this file will be skipped
+                // Create apps.yaml with unsupported version - this file will be skipped
                 var jsonContentBadVersion = @"{
                     ""Version"": ""99.0.0"",
                     ""NbuildAppList"": [
@@ -1036,9 +1026,9 @@ namespace NbuildTests
                         }
                     ]
                 }";
-                File.WriteAllText("apps.json", jsonContentBadVersion);
+                File.WriteAllText("apps.yaml", jsonContentBadVersion);
 
-                // Act - when apps.json has unsupported version, it is skipped
+                // Act - when apps.yaml has unsupported version, it is skipped
                 var apps = Command.GetAppsFromCurrentDirectory("anyapp", null, out var availableApps);
 
                 // Assert - should return empty because the only file has unsupported version (gets skipped)
@@ -1081,7 +1071,7 @@ namespace NbuildTests
                         }
                     ]
                 }";
-                File.WriteAllText("apps.json", jsonContent);
+                File.WriteAllText("apps.yaml", jsonContent);
 
                 // Act
                 var apps = Command.GetAppsFromCurrentDirectory("nonexistent", null, out var availableApps);
@@ -1138,7 +1128,7 @@ namespace NbuildTests
                         }
                     ]
                 }";
-                File.WriteAllText("apps.json", jsonContent);
+                File.WriteAllText("apps.yaml", jsonContent);
 
                 // Act - Use a unique app name that definitely doesn't exist in any system-wide ntools.json
                 var apps = Command.GetAppsFromCurrentDirectory("zzz-test-nonexistent-app-xyz", null, out var availableApps);
@@ -1194,7 +1184,7 @@ namespace NbuildTests
                         }
                     ]
                 }";
-                File.WriteAllText("apps.json", jsonContent);
+                File.WriteAllText("apps.yaml", jsonContent);
 
                 // Act - Use dryRun=false to trigger the actual logic
                 var result = Command.Install(null, "nonexistent-app", null, false, false);
@@ -1215,4 +1205,3 @@ namespace NbuildTests
         }
     }
 }
-

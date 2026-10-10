@@ -130,7 +130,7 @@ public class ProgramTests
     [Fact]
     public void Main_WithToolListInvalidManifest_ReturnsNonZero()
     {
-        var result = Program.Main("tool", "list", "--json", "missing-apps.json");
+        var result = Program.Main("tool", "list", "--manifest", "missing-apps.yaml");
 
         Assert.NotEqual(0, result);
     }
@@ -571,9 +571,9 @@ steps:
     [Fact]
     public void Main_WithToolInstallUninstallAndDownloadDryRun_ReturnZero()
     {
-        var installResult = Program.Main("tool", "install", "--json", "missing-apps.json", "--dry-run");
-        var uninstallResult = Program.Main("tool", "uninstall", "--json", "missing-apps.json", "--dry-run");
-        var downloadResult = Program.Main("tool", "download", "--json", "missing-apps.json", "--dry-run");
+        var installResult = Program.Main("tool", "install", "--manifest", "missing-apps.yaml", "--dry-run");
+        var uninstallResult = Program.Main("tool", "uninstall", "--manifest", "missing-apps.yaml", "--dry-run");
+        var downloadResult = Program.Main("tool", "download", "--manifest", "missing-apps.yaml", "--dry-run");
 
         Assert.Equal(0, installResult);
         Assert.Equal(0, uninstallResult);

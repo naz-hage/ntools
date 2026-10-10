@@ -46,7 +46,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include="..\go\apps.json" CopyToOutputDirectory="PreserveNewest" Link="apps.json" />
+		<None Include="..\dev-setup\apps.yaml" CopyToOutputDirectory="PreserveNewest" Link="apps.yaml" />
 	</ItemGroup>
 
  <ItemGroup>

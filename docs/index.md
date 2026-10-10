@@ -1,6 +1,7 @@
-## Software Tools Collection
+# SDO Documentation
 
-This repository contains a collection of software tools specifically designed to automate various build and test tasks on Windows clients. Whether you are a developer working on your local machine or using GitHub Actions for continuous integration, these tools will simplify your workflow and enhance your productivity.
+SDO is a single command-line utility for build, test, workflow, Git, GitHub,
+and Azure DevOps operations on Windows clients and in GitHub Actions.
 
 ---
 
@@ -13,14 +14,14 @@ This repository contains a collection of software tools specifically designed to
 - [Build Types](buildtypes.md)
 - [Versioning](versioning.md)
 
-### Core Tools
+### SDO
 - [SDO (sdo.exe)](sdo-net.md) - Unified CLI for GitHub, Azure DevOps, and local automation
 - [GitHub Releases](github-release.md)
 
-### Development & Modules
-- [PowerShell Module - ntools-scripts](ntools-scripts-module.md)
-- [ntools-scripts Module API](ntools-scripts-module-api.md)
-- [Development Tools](ntools.md)
+### Supporting Components
+- [PowerShell Module - sdo-scripts](sdo-scripts-module.md)
+- [sdo-scripts Module API](sdo-scripts-module-api.md)
+- [Development Tools](sdo.md) - Supporting development utilities
 - [Custom Build Tasks (Nbuild Tasks)](nbuildtasks.md)
 
 ### Build System Features
@@ -40,4 +41,4 @@ This repository contains a collection of software tools specifically designed to
 
 ---
 
-Don't hesitate to write an [issue](https://github.com/naz-hage/NTools/issues) if you have any questions or suggestions.
+Don't hesitate to write an [issue](https://github.com/naz-hage/sdo/issues) if you have any questions or suggestions.

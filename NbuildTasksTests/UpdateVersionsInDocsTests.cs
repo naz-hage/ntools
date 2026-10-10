@@ -29,13 +29,13 @@ namespace NbuildTasksTests
             // Create temporary test directory structure:
             // _testDirectory/
             //   ├── go/
-            //   │   └── apps.json
+            //   │   └── apps.yaml
             //   └── docs/
-            //       └── ntools.md
+            //       └── sdo.md
             _testDirectory = Path.Combine(Path.GetTempPath(), "UpdateVersionsInDocsTests", Guid.NewGuid().ToString());
             _devSetupPath = Path.Combine(_testDirectory, "dev-setup");
             var goPath = Path.Combine(_testDirectory, "go");
-            _docsPath = Path.Combine(_testDirectory, "docs", "ntools.md");
+            _docsPath = Path.Combine(_testDirectory, "docs", "sdo.md");
 
             Directory.CreateDirectory(_devSetupPath);
             Directory.CreateDirectory(goPath);
@@ -120,14 +120,14 @@ namespace NbuildTasksTests
         {
             // Arrange
             CreateTestMarkdownFile();
-            // Create empty apps.json with no tools
+            // Create empty apps.yaml with no tools
             CreateEmptyAppsJson();
 
             // Act
             bool result = _task.Execute();
 
             // Assert
-            Assert.IsTrue(result, "Task should succeed even with no tools in apps.json");
+            Assert.IsTrue(result, "Task should succeed even with no tools in apps.yaml");
         }
 
         [TestMethod]
@@ -210,7 +210,7 @@ namespace NbuildTasksTests
 
         private void CreateEmptyAppsJson()
         {
-            var appsJsonPath = Path.Combine(_testDirectory, "go", "apps.json");
+            var appsJsonPath = Path.Combine(_devSetupPath, "apps.yaml");
             
             var jsonData = new
             {
@@ -224,14 +224,14 @@ namespace NbuildTasksTests
 
         private void CreateTestJsonFile(string fileName, string toolName, string version)
         {
-            // Add tool to the list - it will be written to apps.json
+            // Add tool to the list - it will be written to apps.yaml
             _toolsToAdd.Add((toolName, version));
             CreateAppsJson();
         }
 
         private void CreateAppsJson()
         {
-            var appsJsonPath = Path.Combine(_testDirectory, "go", "apps.json");
+            var appsJsonPath = Path.Combine(_devSetupPath, "apps.yaml");
             
             var appList = _toolsToAdd.Select(t => new
             {
@@ -253,14 +253,14 @@ namespace NbuildTasksTests
         private void CreateInvalidJsonFile(string fileName)
         {
             // Invalid JSON - task should handle gracefully
-            var appsJsonPath = Path.Combine(_testDirectory, "go", "apps.json");
+            var appsJsonPath = Path.Combine(_devSetupPath, "apps.yaml");
             File.WriteAllText(appsJsonPath, "{ invalid json content");
         }
 
         private void CreateJsonFileWithoutVersion(string fileName, string toolName)
         {
             // Add tool without version - it will be skipped during update
-            var appsJsonPath = Path.Combine(_testDirectory, "go", "apps.json");
+            var appsJsonPath = Path.Combine(_devSetupPath, "apps.yaml");
 
             var jsonData = new
             {

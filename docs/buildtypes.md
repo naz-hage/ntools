@@ -1,4 +1,4 @@
-**ntools** have two predefined build types: `stage` and `prod`. The `stage` build type is deploy code to a stage environment used for debugging and testing, while the `prod` build type is used for prod deployment. The `stage` build type includes debugging symbols and is not optimized, while the `production` build type is optimized for performance and does not include debugging symbols.
+**SDO** has two predefined build types: `stage` and `prod`. The `stage` build type deploys code to a stage environment used for debugging and testing, while the `prod` build type is used for production deployment. The `stage` build type includes debugging symbols and is not optimized, while the `production` build type is optimized for performance and does not include debugging symbols.
 
 ### stage
 The `stage` build type use the following command:

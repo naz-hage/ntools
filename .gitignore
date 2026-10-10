@@ -400,7 +400,7 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
-# ntools addition
+# sdo addition
 /__azurite_db_blob_extent__.json
 /__azurite_db_blob__.json
 /nuget-push.bat
@@ -429,4 +429,4 @@ docs/todo.md
 
 # Code coverage reports
 /CoverageReport/
-/dev-setup/ntools-scripts.psm1
+/dev-setup/sdo-scripts.psm1

@@ -19,7 +19,7 @@ Here is an example of how to set up authentication in a GitHub Actions workflow 
 
 **Option 1: Personal Access Token (Recommended for CI/CD)**
 ```yml
-- name: Build using ntools
+- name: Build using sdo
   run: |
     & "$env:ProgramFilesPath/nbuild/sdo.exe" ${{ env.Build_Type }} -v ${{ env.Enable_Logging }}
   shell: pwsh
@@ -36,7 +36,7 @@ Here is an example of how to set up authentication in a GitHub Actions workflow 
     gh auth login --with-token <<< ${{ secrets.GITHUB_TOKEN }}
   shell: bash
 
-- name: Build using ntools
+- name: Build using sdo
   run: |
     & "$env:ProgramFilesPath/nbuild/sdo.exe" ${{ env.Build_Type }} -v ${{ env.Enable_Logging }}
   shell: pwsh
@@ -62,7 +62,7 @@ Before running the tool, you must checkout a branch. Here is an example of how t
 
 ## Repository Visibility-Based Authentication
 
-**New Feature**: NTools now intelligently determines when authentication is required based on repository visibility and operation type.
+**Authentication**: SDO determines when authentication is required based on repository visibility and operation type.
 
 ### How It Works
 - **Public Repositories:**

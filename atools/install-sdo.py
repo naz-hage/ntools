@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Install NTools release from GitHub asset ZIP.
+"""Install SDO release from GitHub asset ZIP.
 
 This script is a cross-platform replacement for the PowerShell Install-NTools function.
 
 Features
-- Read release metadata from dev-setup/ntools.json
+- Read release metadata from dev-setup/sdo.yaml
 - Build download URL for the requested version
 - Verify the asset exists (HEAD request)
 - Download the ZIP to downloads directory
@@ -14,7 +14,6 @@ Features
 Usage: run with --help for options
 """
 import argparse
-import json
 import os
 import subprocess
 import sys
@@ -24,6 +23,7 @@ from urllib.parse import urlparse
 import requests
 import zipfile
 import shutil
+import yaml
 
 # Tool identity/version - update __version__ when releasing a new tool version
 __version__ = '0.1.0'
@@ -41,42 +41,42 @@ def _print_header_local(tool_name: str, tool_version: str, start_year: int = 202
 _print_header_local(TOOL_NAME, TOOL_VERSION)
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Install NTools from release ZIP (cross-platform)")
+    parser = argparse.ArgumentParser(description="Install SDO from release ZIP (cross-platform)")
     parser.add_argument('--version', help='Release version to install (e.g. 1.32.0)')
-    default_downloads = 'C:\\NToolsDownloads' if os.name == 'nt' else '/tmp/NToolsDownloads'
+    default_downloads = 'C:\\sdo-downloads' if os.name == 'nt' else '/tmp/sdo-downloads'
     parser.add_argument('--downloads-dir', default=default_downloads, help=f'Download directory (default: {default_downloads})')
-    parser.add_argument('--json', '--ntools-json-path', dest='ntools_json_path', default=str(Path(__file__).resolve().parents[1] / 'dev-setup' / 'ntools.json'), help='Path to ntools.json (default: ./dev-setup/ntools.json)')
-    parser.add_argument('--deploy-path', default=None, help='Deployment path (default from ntools.json InstallPath or platform default)')
+    parser.add_argument('--yaml', '--sdo-yaml-path', dest='sdo_yaml_path', default=str(Path(__file__).resolve().parents[1] / 'dev-setup' / 'sdo.yaml'), help='Path to sdo.yaml (default: ./dev-setup/sdo.yaml)')
+    parser.add_argument('--deploy-path', default=None, help='Deployment path (default from sdo.yaml InstallPath or platform default)')
     parser.add_argument('--dry-run', action='store_true', help='Do not perform network calls or write actions; print what would be done')
     parser.add_argument('--no-path-update', action='store_true', help='Do not attempt to update PATH; print instructions instead')
 
     return parser.parse_args()
 
 
-def load_ntools_json(path: Path):
+def load_sdo_yaml(path: Path):
     if not path.exists():
-        raise FileNotFoundError(f"ntools.json not found at: {path}")
+        raise FileNotFoundError(f"sdo.yaml not found at: {path}")
     with path.open('r', encoding='utf-8') as f:
-        data = json.load(f)
+        data = yaml.safe_load(f)
     return data
 
 
-def build_asset_url(ntools_json: dict, version: str):
+def build_asset_url(sdo_yaml: dict, version: str):
     # find first entry in NbuildAppList with Name matching Ntools or first entry
-    apps = ntools_json.get('NbuildAppList') or ntools_json.get('NtoolsAppList') or []
+    apps = sdo_yaml.get('NbuildAppList') or sdo_yaml.get('NtoolsAppList') or []
     if not apps:
-        raise ValueError('No apps defined in ntools.json')
+        raise ValueError('No apps defined in sdo.yaml')
     app = apps[0]
     tmpl = app.get('WebDownloadFile')
     if not tmpl:
-        raise ValueError('WebDownloadFile template missing in ntools.json')
+        raise ValueError('WebDownloadFile template missing in sdo.yaml')
     url = tmpl.replace('$(Version)', version)
     # Support $(InstallPath) etc not used in URL
     return url, app
 
 
 def expand_install_path(raw_path: str) -> Path:
-    """Expand placeholders like $(ProgramFiles) used in ntools.json InstallPath.
+    """Expand placeholders like $(ProgramFiles) used in sdo.yaml InstallPath.
 
     If $(ProgramFiles) is present on Windows, use the actual ProgramFiles environment
     folder. For other placeholders, expand environment variables and return a Path.
@@ -134,7 +134,7 @@ def safe_remove_deploy_path(path: Path):
     Safety checks:
     - Path must exist and be a directory
     - Path must not be root (C:\\ or /)
-    - Path must contain the expected app folder name 'Nbuild' or 'NTools' to reduce risk
+    - Path must contain the expected app folder name 'sdo', 'Nbuild', or 'NTools' to reduce risk
     - Raise an exception if checks fail
     """
     if not path.exists():
@@ -150,8 +150,8 @@ def safe_remove_deploy_path(path: Path):
         raise Exception(f"Refusing to remove drive root: {resolved}")
 
     # Basic name check to reduce risk
-    if 'nbuild' not in str(resolved).lower() and 'ntools' not in str(resolved).lower():
-        raise Exception(f"Deploy path '{resolved}' does not look like ntools install path; refusing to remove")
+    if all(name not in str(resolved).lower() for name in ('sdo')):
+        raise Exception(f"Deploy path '{resolved}' does not look like sdo install path; refusing to remove")
 
     # Perform removal
     shutil.rmtree(str(resolved))
@@ -163,7 +163,7 @@ def update_path(deploy_path: Path, no_update: bool = False):
         return False
     # On CI or non-windows, prefer printing instructions
     if os.name != 'nt' or os.geteuid() != 0 if hasattr(os, 'geteuid') else False:
-        print(f"To use ntools, add the deployment path to your PATH. Example:\n  export PATH=\"{deploy_path}:$PATH\"")
+        print(f"To use sdp, add the deployment path to your PATH. Example:\n  export PATH=\"{deploy_path}:$PATH\"")
         return False
 
     # Windows: try to modify machine PATH via user environment if possible
@@ -208,19 +208,19 @@ def main():
 
     downloads_dir = Path(args.downloads_dir).expanduser().resolve()
 
-    ntools_json_path = Path(args.ntools_json_path).expanduser()
+    sdo_yaml_path = Path(args.sdo_yaml_path).expanduser()
     # If relative path given, resolve relative to repo root (script's parent parent)
-    if not ntools_json_path.is_absolute():
-        ntools_json_path = (Path(__file__).resolve().parents[1] / ntools_json_path).resolve()
+    if not sdo_yaml_path.is_absolute():
+        sdo_yaml_path = (Path(__file__).resolve().parents[1] / sdo_yaml_path).resolve()
 
     if args.dry_run:
         print("DRY RUN: inputs:")
         print(f" version: {args.version}")
         print(f" downloads_dir: {downloads_dir}")
-        print(f" ntools_json_path: {ntools_json_path}")
+        print(f" sdo_yaml_path: {sdo_yaml_path}")
         print(f" deploy_path: {args.deploy_path}")
-    # Validate ntools.json
-    data = load_ntools_json(ntools_json_path)
+    # Validate sdo.yaml
+    data = load_sdo_yaml(sdo_yaml_path)
     url, app = build_asset_url(data, args.version)
     parsed = urlparse(url)
     if not parsed.scheme.startswith('http'):
@@ -236,7 +236,7 @@ def main():
         deploy_path = Path(args.deploy_path) if args.deploy_path else expand_install_path(app.get('InstallPath', ''))
         if not deploy_path or str(deploy_path) == '':
             # choose reasonable defaults
-            deploy_path = Path('C:/Program Files/Nbuild') if os.name == 'nt' else Path('/usr/local/bin')
+            deploy_path = Path('C:/Program Files/sdo') if os.name == 'nt' else Path('/usr/local/bin')
         print(f"Would extract zip to: {deploy_path}")
         print("Dry run complete. No network calls were made.")
         return 0
@@ -256,7 +256,7 @@ def main():
     else:
         deploy_path = expand_install_path(app.get('InstallPath', ''))
         if not deploy_path or str(deploy_path) == '':
-            deploy_path = Path('C:/Program Files/Nbuild') if os.name == 'nt' else Path('/usr/local/lib/ntools')
+            deploy_path = Path('C:/Program Files/sdo') if os.name == 'nt' else Path('/usr/local/lib/sdo')
 
     # Remove existing installation before extracting new one (explicit policy: always replace)
     try:
@@ -267,7 +267,7 @@ def main():
 
     # Install NTools
     print("\n" + "="*50)
-    print("Installing NTools (Build Tools)...")
+    print("Installing SDO...")
     print("="*50)
 
     extract_zip(download_dest, deploy_path)
@@ -276,15 +276,15 @@ def main():
     if updated:
         print("Install complete and PATH updated.")
     else:
-        print("Install complete. Please ensure the deployment path is on PATH to use ntools.")
+        print("Install complete. Please ensure the deployment path is on PATH to use sdo.")
     
     if args.dry_run:
-        print("\n[DRY RUN] NTools installation steps preview completed.")
-        print(f"[DRY RUN] NTools would be installed in: {deploy_path}")
+        print("\n[DRY RUN] SDO installation steps preview completed.")
+        print(f"[DRY RUN] SDO would be installed in: {deploy_path}")
         print("[DRY RUN] No changes were made; commands above were not executed.")
     else:
-        print("\n[SUCCESS] NTools installation completed successfully!")
-        print(f"NTools is installed in: {deploy_path}")
+        print("\n[SUCCESS] SDO installation completed successfully!")
+        print(f"SDO is installed in: {deploy_path}")
 
     return 0
 

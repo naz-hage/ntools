@@ -119,10 +119,10 @@ Here are examples of custom Tasks that can be used during builds:
 </Target>
 ```
 
-### Modern Approach with ntools-scripts module
+### Modern Approach with sdo-scripts module
 ```xml
 <Target Name="PUBLISH">
-	<Exec Command='pwsh -NoProfile -ExecutionPolicy Bypass -Command "Import-Module &apos;$(BuildTools)\modules\ntools-scripts\ntools-scripts.psm1&apos; -Force; Publish-AllProjects -OutputDir &apos;$(ArtifactsFolder)&apos; -Version &apos;$(ProductVersion)&apos; -RepositoryRoot &apos;$(SolutionDir)&apos;"' WorkingDirectory="$(SolutionDir)" />
+	<Exec Command='pwsh -NoProfile -ExecutionPolicy Bypass -Command "Import-Module &apos;$(BuildTools)\modules\sdo-scripts\sdo-scripts.psm1&apos; -Force; Publish-AllProjects -OutputDir &apos;$(ArtifactsFolder)&apos; -Version &apos;$(ProductVersion)&apos; -RepositoryRoot &apos;$(SolutionDir)&apos;"' WorkingDirectory="$(SolutionDir)" />
 </Target>
 ```
 
@@ -133,7 +133,7 @@ Here are examples of custom Tasks that can be used during builds:
 - **Easier maintenance**: Single module file instead of dozens of scripts
 - **Integration ready**: Automatically installed and available in build process
 
-For complete module documentation, see [ntools-scripts Module](ntools-scripts-module.md).
+For complete module documentation, see [sdo-scripts Module](sdo-scripts-module.md).
 You can also find the complete list of predefined [MSBuild properties in the Microsoft documentation](https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild-reserved-and-well-known-properties?view=vs-2022).
 
 - Here are few examples:

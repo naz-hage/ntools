@@ -32,8 +32,8 @@ The SDO tool-management command handles loading and parsing manifest JSON files 
 #### Error Handling
 | Scenario | Error Message |
 |----------|---------------|
-| File not found | `JSON file not found: '<path>'. Please provide a valid path to the apps.json file.` |
-| Invalid JSON format | `Invalid JSON format: <error details>. Please check the JSON file for proper escaping of backslashes and quotes.` |
+| File not found | `YAML manifest not found: '<path>'. Please provide a valid path to the apps.yaml file.` |
+| Invalid YAML format | `Invalid YAML format: <error details>. Please check the YAML file for proper formatting.` |
 | Unsupported version | `Json Version <version> is not supported. Please use version <supported_version>` |
 
 #### Benefits
@@ -44,8 +44,8 @@ The SDO tool-management command handles loading and parsing manifest JSON files 
 ### File Structure
 
 ```
-ntools/
-├── ntools.sln                    # Main solution file
+sdo/
+├── sdo.sln                    # Main solution file
 ├── prebuild.bat                  # Pre-build setup script
 ├── publish-local.ps1             # Local publishing script
 ├── mkdocs.yml                    # Documentation configuration
@@ -164,21 +164,21 @@ ntools/
 │   ├── index.md
 │   ├── nbuild.md                 # Nbuild documentation
 │   ├── devops-tools-suite-architecture.md
-│   ├── ntools.md
+│   ├── sdo.md
 │   ├── sdo-net.md
 │   └── other-docs/
 │
 ├── dev-setup/                    # Development setup scripts
-│   ├── ntools.json               # Application manifest
-│   ├── apps.json                 # Tool definitions
+│   ├── sdo.yaml               # Application manifest
+│   ├── apps.yaml                 # Tool definitions
 │   └── setup scripts/
 │
 ├── atools/                       # Automated tools and installers
-│   ├── install-ntools.py         # NTools installation script
+│   ├── install-sdo.py         # SDO installation script
 │   ├── requirements.txt           # Python dependencies for installers
 │   ├── requirements-dev.txt       # Development dependencies
 │   └── tests/                    # Tests for installation scripts
-│       └── test_install_ntools.py
+│       └── test_install_sdo.py
 │
 ├── CoverageReport/               # Test coverage reports
 │   ├── index.html
@@ -223,7 +223,7 @@ sdo is a .NET/C# command-line tool for work item creation and repository managem
 
 ### Architecture Principles
 
-Both sdo and ntools Suite follow consistent design principles:
+All SDO components follow consistent design principles:
 
 #### 1. **Separation of Concerns**
 - **CLI Layer**: User interaction and command handling
@@ -309,10 +309,10 @@ Both sdo and ntools Suite follow consistent design principles:
 
 ### Dependencies
 
-#### ntools Suite (.NET)
+#### SDO Build and Test Components
 - **Runtime**: .NET 10.0 SDK
 - **CLI Framework**: System.CommandLine 2.0.2
-- **Build System**: MSBuild with custom targets
+- **Build System**: YAML workflows with `sdo.yaml`
 
 #### sdo (C# Simple DevOps Operations Tool)
 - **Runtime**: .NET 10.0 (only supported implementation)
@@ -326,15 +326,15 @@ Both sdo and ntools Suite follow consistent design principles:
 
 ## Integration Points
 
-### Cross-Tool Workflows
-1. **Build → Work Item Creation**: ntools builds can trigger sdo C# work item creation
-2. **Repository Management**: sdo can create repos that ntools can then build in
-3. **Pipeline Integration**: sdo pipeline operations complement ntools build automation
-4. **Work Item Tracking**: sdo provides work item management alongside ntools build tracking
+### SDO Workflows
+1. **Build → Work Item Creation**: SDO builds can trigger work item creation
+2. **Repository Management**: SDO can create repositories and build them
+3. **Pipeline Integration**: SDO pipeline operations integrate with build automation
+4. **Work Item Tracking**: SDO provides work item management alongside build tracking
 
 ### Shared Concepts
 - **Dual Platform Support**: Both tools work seamlessly with Azure DevOps and GitHub
-- **Common Authentication Patterns**: Shared credential management across ntools and sdo
-- **Consistent CLI Design**: System.CommandLine framework for both tool suites
+- **Common Authentication Patterns**: Shared credential management across SDO commands
+- **Consistent CLI Design**: System.CommandLine framework across SDO commands
 - **Cross-Platform Compatibility**: All executables run on Windows, Linux, and macOS
 - **Performance First**: C# implementation ensures fast, reliable DevOps operations
