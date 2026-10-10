@@ -39,13 +39,15 @@
 			<BinaryFiles 
 					Include="
 					$(SolutionDir)\$(TargetRelease)\*.json;
-					$(SolutionDir)\nb\resources\*.targets;
 					$(SolutionDir)\scripts\build\*.ps1;
 					$(SolutionDir)\scripts\module-package\*.ps1;
 					$(SolutionDir)\scripts\module-package\*.psd1;
 					$(SolutionDir)\scripts\module-package\*.psm1;
 					$(SolutionDir)\nb\resources\*.json"
 					/>
+
+			<BuildToolTargetFiles Include="$(SolutionDir)\nb\resources\*.targets" />
+			<BinaryFiles Include="@(BuildToolTargetFiles)" />
 
 			<RunTimesNetStandard20 Include = "
 							   $(SolutionDir)\$(TargetRelease)\netstandard2.0\*.*"
@@ -644,5 +646,16 @@
 		<Message Text="All non-test projects published to $(ArtifactsFolder)" Importance="high" />
 
 		<Message Text="==> PUBLISH DONE"/>
+	</Target>
+
+	<Target Name="VALIDATE_BUILD_TOOL_RESOURCES" AfterTargets="COPY_ARTIFACTS">
+		<ItemGroup>
+			<MissingBuildToolTargets
+				Include="@(BuildToolTargetFiles)"
+				Condition="!Exists('$(ArtifactsFolder)\%(Filename)%(Extension)')" />
+		</ItemGroup>
+		<Error
+			Condition="'@(MissingBuildToolTargets)' != ''"
+			Text="Build tool target resources were not packaged: @(MissingBuildToolTargets)" />
 	</Target>
 </Project>
