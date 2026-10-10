@@ -276,7 +276,7 @@ jobs:
 
       - name: Smoke dry-run of install-sdo
         run: |
-          python atools/install-sdo.py --version 1.2.0 --downloads-dir $RUNNER_TEMP --manifest dev-setup/sdo.yaml --dry-run
+          python atools/install-sdo.py --version 1.2.0 --downloads-dir $RUNNER_TEMP --yaml dev-setup/sdo.yaml --dry-run
           
       - name: Upload pytest results
         if: always()

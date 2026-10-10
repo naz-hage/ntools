@@ -628,12 +628,12 @@ function Install-Sdo {
         Write-Host "Reading version from $SdoYamlPath ..."
         
         if (Test-Path -Path $SdoYamlPath) {
-            try {
-                $SdoYaml = Get-Content -Path $SdoYamlPath -Raw
-                $Version = ($SdoYaml | ConvertFrom-Yaml).NbuildAppList[0].Version
+            $versionInfo = Get-VersionFromYaml -YamlPath $SdoYamlPath
+            if ($versionInfo.Found) {
+                $Version = $versionInfo.Version
                 Write-Host "Version read from sdo.yaml: $Version"
             }
-            catch {
+            else {
                 Write-Warning "Failed to read version from sdo.yaml. Please specify the version manually."
                 return $false
             }
