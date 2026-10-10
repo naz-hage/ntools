@@ -1,7 +1,7 @@
 Version: '1.2.0'
 NbuildAppList:
   - Name: sdo
-    Version: '1.84.6'
+    Version: '1.85.0'
     AppFileName: '$(InstallPath)\sdo.exe'
     WebDownloadFile: 'https://github.com/naz-hage/sdo/releases/download/$(Version)/$(Version).zip'
     DownloadedFile: '$(Version).zip'
