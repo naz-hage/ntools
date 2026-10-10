@@ -5,11 +5,6 @@ development and repository automation. It brings build and test execution,
 Git and GitHub operations, workflows, and Azure DevOps or
 GitHub project management together under one consistent `sdo` command.
 
-> **Migration:** This repository is transitioning from `ntools` to `sdo`.
-> The project is moving from a collection of separate CLI tools to one
-> unified command-line utility. Existing commands are being consolidated
-> under `sdo`; update scripts and documentation as you migrate.
-
 ## Authentication
 
 - **Azure DevOps**: Set the `AZURE_DEVOPS_PAT` environment variable.

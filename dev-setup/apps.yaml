@@ -189,7 +189,7 @@ NbuildAppList:
     DownloadedFile: "nuget.exe"
     InstallCommand: "xcopy.exe"
     InstallArgs: "$(DownloadedFile) \"$(InstallPath)\\\" /d /y"
-    InstallPath: "$(ProgramFiles)\\NBuild"
+    InstallPath: "$(ProgramFiles)\\sdo"
     UninstallCommand: "powershell.exe"
     UninstallArgs: "-Command Remove-Item -Path '$(AppFileName)' -Force"
   - Name: "pnpm"
